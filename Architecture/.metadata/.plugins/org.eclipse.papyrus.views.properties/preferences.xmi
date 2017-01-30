@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="ASCII"?>
+<pref:Preferences xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:pref="http://www.eclipse.org/papryus/properties/preferences" version="3">
+  <contexts name="Customization" appliedByDefault="true"/>
+  <contexts name="welcome-general" appliedByDefault="true"/>
+  <contexts name="welcome-languages" appliedByDefault="true"/>
+  <contexts name="CSS" appliedByDefault="true"/>
+  <contexts name="style" appliedByDefault="true"/>
+  <contexts name="notation" appliedByDefault="true"/>
+  <contexts name="synchronization" appliedByDefault="true"/>
+  <contexts name="AdvanceStyle" applied="false"/>
+  <contexts name="welcome-diagrams" appliedByDefault="true"/>
+  <contexts name="nattable" appliedByDefault="true"/>
+  <contexts name="UMLStereotypeApplicationExternalResource" appliedByDefault="true"/>
+  <contexts name="SequenceNotation" appliedByDefault="true"/>
+  <contexts name="Symbols" appliedByDefault="true"/>
+  <contexts name="UML" appliedByDefault="true"/>
+  <contexts name="UMLNotation"/>
+</pref:Preferences>

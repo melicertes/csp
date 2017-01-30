@@ -1,0 +1,5 @@
+//org.eclipse.ui.commands/state/org.eclipse.papyrus.infra.nattable.column.index.style/org.eclipse.ui.commands.radioState=Alphabetic
+//org.eclipse.ui.commands/state/org.eclipse.papyrus.infra.nattable.row.index.style/org.eclipse.ui.commands.radioState=Alphabetic
+//org.eclipse.ui.commands/state/org.eclipse.papyrus.infra.nattable.table.hierarchic.style/org.eclipse.ui.commands.radioState=HIERARCHIC_MULTI_TREE_COLUMN
+//org.eclipse.ui.commands/state/org.eclipse.ui.navigator.resources.nested.changeProjectPresentation/org.eclipse.ui.commands.radioState=false
+eclipse.preferences.version=1
