@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<uml:Model xmi:version="20131001" xmlns:xmi="http://www.omg.org/spec/XMI/20131001" xmlns:uml="http://www.eclipse.org/uml2/5.0.0/UML" xmi:id="_2pHo8OIIEeatWcXz0JfjbA" name="RootElement">
+  <packagedElement xmi:type="uml:Model" xmi:id="_B8UbgOIJEeatWcXz0JfjbA" name="Component Model">
+    <packagedElement xmi:type="uml:Package" xmi:id="_6GDp4OIIEeatWcXz0JfjbA" name="Applications Layer">
+      <packagedElement xmi:type="uml:Component" xmi:id="_8SpdQOIIEeatWcXz0JfjbA" name="Xyz Data Emitter"/>
+      <packagedElement xmi:type="uml:Component" xmi:id="_95mM8OIIEeatWcXz0JfjbA" name="Xyz Data Adapter"/>
+      <packagedElement xmi:type="uml:Component" xmi:id="_YLI7IOLaEeaUwfOnRzvRgQ" name="Application Xyz"/>
+      <packagedElement xmi:type="uml:Component" xmi:id="_aXrEIOLaEeaUwfOnRzvRgQ" name="Application Xyz Data Store"/>
+      <packagedElement xmi:type="uml:Component" xmi:id="_eNhe4OLbEeaUwfOnRzvRgQ" name="Xyz Data Sync Client">
+        <ownedOperation xmi:type="uml:Operation" xmi:id="_XIoN4OLdEeaUwfOnRzvRgQ" name="Emit Data"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Component" xmi:id="_g36okOLbEeaUwfOnRzvRgQ" name="RESTful Xyz Data Sync Service"/>
+      <packagedElement xmi:type="uml:Component" xmi:id="_l0DLYOLbEeaUwfOnRzvRgQ" name="Xyz SSO Adapter"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Package" xmi:id="_5iuPEOLTEeaUwfOnRzvRgQ" name="Integration Layer">
+      <packagedElement xmi:type="uml:Package" xmi:id="_9Sr5sOLTEeaUwfOnRzvRgQ" name="Data Synchronization">
+        <packagedElement xmi:type="uml:Component" xmi:id="_1hslcOLaEeaUwfOnRzvRgQ" name="Xyz data sync Camel Route"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Package" xmi:id="__vALIOLTEeaUwfOnRzvRgQ" name="Data Distribution">
+        <packagedElement xmi:type="uml:Component" xmi:id="_79zGMOLaEeaUwfOnRzvRgQ" name="Xyz data dist Camel Route"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Package" xmi:id="_B34jMOLUEeaUwfOnRzvRgQ" name="Data Collaboration">
+        <packagedElement xmi:type="uml:Component" xmi:id="_-5dmEOLaEeaUwfOnRzvRgQ" name="Data Collaboration Camel Route 1"/>
+        <packagedElement xmi:type="uml:Component" xmi:id="_BKMSkOLbEeaUwfOnRzvRgQ" name="Data Collaboration Camel Route 2"/>
+        <packagedElement xmi:type="uml:Component" xmi:id="_D1zkQOLbEeaUwfOnRzvRgQ" name="Data Sender Client"/>
+        <packagedElement xmi:type="uml:Component" xmi:id="_GsHDAOLbEeaUwfOnRzvRgQ" name="Data Receiver Service"/>
+      </packagedElement>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Package" xmi:id="_GZvk0OLUEeaUwfOnRzvRgQ" name="Indexing Search and Reporting">
+      <packagedElement xmi:type="uml:Component" xmi:id="_WT9l0OLUEeaUwfOnRzvRgQ" name="Elastic Search"/>
+      <packagedElement xmi:type="uml:Component" xmi:id="_X3B7EOLUEeaUwfOnRzvRgQ" name="Kibana"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Package" xmi:id="_LENI0OLUEeaUwfOnRzvRgQ" name="Security">
+      <packagedElement xmi:type="uml:Component" xmi:id="_Z28kYOLUEeaUwfOnRzvRgQ" name="Identity Provider"/>
+      <packagedElement xmi:type="uml:Component" xmi:id="_dclOUOLUEeaUwfOnRzvRgQ" name="Identity Directory Store"/>
+      <packagedElement xmi:type="uml:Component" xmi:id="_kZIJsOLUEeaUwfOnRzvRgQ" name="Trust Circle Implementation"/>
+      <packagedElement xmi:type="uml:Component" xmi:id="_mEpQUOLUEeaUwfOnRzvRgQ" name="Distribution Filters"/>
+      <packagedElement xmi:type="uml:Component" xmi:id="_oaz2cOLUEeaUwfOnRzvRgQ" name="Malware Protection"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Package" xmi:id="_O2qGwOLUEeaUwfOnRzvRgQ" name="Configuration">
+      <packagedElement xmi:type="uml:Component" xmi:id="_roDKUOLbEeaUwfOnRzvRgQ" name="Identity and Access Management Configuration"/>
+      <packagedElement xmi:type="uml:Component" xmi:id="_xCRXUOLbEeaUwfOnRzvRgQ" name="Trust Circle Administration"/>
+      <packagedElement xmi:type="uml:Component" xmi:id="_zOld4OLbEeaUwfOnRzvRgQ" name="Application Server Configuration"/>
+      <packagedElement xmi:type="uml:Component" xmi:id="_4xiJEOLbEeaUwfOnRzvRgQ" name="Camel Route Definition Confuration"/>
+      <packagedElement xmi:type="uml:Component" xmi:id="_8OYqcOLbEeaUwfOnRzvRgQ" name="PKI and Certificate Configuration"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Package" xmi:id="_gbQl8OLUEeaUwfOnRzvRgQ" name="Centralized Services">
+      <packagedElement xmi:type="uml:Component" xmi:id="_t-jy4OLUEeaUwfOnRzvRgQ" name="Centralized Identity Provider"/>
+      <packagedElement xmi:type="uml:Component" xmi:id="_v9PGEOLUEeaUwfOnRzvRgQ" name="Centralized Identity Directory Store"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Package" xmi:id="_Jbv5EOLbEeaUwfOnRzvRgQ" name="RESTful Services">
+      <packagedElement xmi:type="uml:Component" xmi:id="_Onvc0OLbEeaUwfOnRzvRgQ" name="Elastic Search RESTful data insertion service"/>
+      <packagedElement xmi:type="uml:Component" xmi:id="_S-dlcOLbEeaUwfOnRzvRgQ" name="Elastic Search RESTful data retrieval service"/>
+      <packagedElement xmi:type="uml:Component" xmi:id="_YFzSsOLbEeaUwfOnRzvRgQ" name="RESTful Data Sync Service"/>
+    </packagedElement>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Model" xmi:id="_SXcKIOIJEeatWcXz0JfjbA" name="Deployment Model">
+    <packagedElement xmi:type="uml:Node" xmi:id="_NIGZ0OI9Eea-JLz1b_CDOA" name="JBoss EAP 7">
+      <nestedClassifier xmi:type="uml:Artifact" xmi:id="_dDj0IOJBEea-JLz1b_CDOA" name="Apache Camel" fileName=""/>
+      <nestedClassifier xmi:type="uml:Artifact" xmi:id="_ostBgOJBEea-JLz1b_CDOA" name="RESTful services"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Node" xmi:id="_zgwQIOLUEeaUwfOnRzvRgQ" name="Integration Layer Linux VM"/>
+    <packagedElement xmi:type="uml:Node" xmi:id="_Ou5_UOLcEeaUwfOnRzvRgQ" name="Security Components Linux VM"/>
+    <packagedElement xmi:type="uml:Node" xmi:id="_R-EqAOLcEeaUwfOnRzvRgQ" name="Search &amp; Indexing Linux VM"/>
+    <packagedElement xmi:type="uml:Dependency" xmi:id="_eiFkMOLcEeaUwfOnRzvRgQ" name="runs on" client="_NIGZ0OI9Eea-JLz1b_CDOA" supplier="_zgwQIOLUEeaUwfOnRzvRgQ"/>
+    <packagedElement xmi:type="uml:Artifact" xmi:id="_zfXPYOLcEeaUwfOnRzvRgQ" name="OpenAM Deployment">
+      <manifestation xmi:type="uml:Manifestation" xmi:id="_6jUaUOLcEeaUwfOnRzvRgQ" client="_zfXPYOLcEeaUwfOnRzvRgQ" supplier="_Z28kYOLUEeaUwfOnRzvRgQ" utilizedElement="_Z28kYOLUEeaUwfOnRzvRgQ"/>
+      <manifestation xmi:type="uml:Manifestation" xmi:id="_7gRx0OLcEeaUwfOnRzvRgQ" client="_zfXPYOLcEeaUwfOnRzvRgQ" supplier="_kZIJsOLUEeaUwfOnRzvRgQ" utilizedElement="_kZIJsOLUEeaUwfOnRzvRgQ"/>
+      <manifestation xmi:type="uml:Manifestation" xmi:id="_7_grgOLcEeaUwfOnRzvRgQ" client="_zfXPYOLcEeaUwfOnRzvRgQ" supplier="_roDKUOLbEeaUwfOnRzvRgQ" utilizedElement="_roDKUOLbEeaUwfOnRzvRgQ"/>
+    </packagedElement>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Model" xmi:id="_Chqw8OLdEeaUwfOnRzvRgQ" name="Use Case Model"/>
+  <packagedElement xmi:type="uml:Model" xmi:id="_EVQOcOLdEeaUwfOnRzvRgQ" name="Dynamic View"/>
+</uml:Model>
