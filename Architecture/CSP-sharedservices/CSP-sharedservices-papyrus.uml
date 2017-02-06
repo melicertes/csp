@@ -43,21 +43,6 @@
       <packagedElement xmi:type="uml:Component" xmi:id="_YFzSsOLbEeaUwfOnRzvRgQ" name="RESTful Data Sync Service"/>
     </packagedElement>
   </packagedElement>
-  <packagedElement xmi:type="uml:Model" xmi:id="_SXcKIOIJEeatWcXz0JfjbA" name="Deployment Model">
-    <packagedElement xmi:type="uml:Node" xmi:id="_NIGZ0OI9Eea-JLz1b_CDOA" name="JBoss EAP 7">
-      <nestedClassifier xmi:type="uml:Artifact" xmi:id="_dDj0IOJBEea-JLz1b_CDOA" name="Apache Camel" fileName=""/>
-      <nestedClassifier xmi:type="uml:Artifact" xmi:id="_ostBgOJBEea-JLz1b_CDOA" name="RESTful services"/>
-    </packagedElement>
-    <packagedElement xmi:type="uml:Node" xmi:id="_zgwQIOLUEeaUwfOnRzvRgQ" name="Integration Layer Linux VM"/>
-    <packagedElement xmi:type="uml:Node" xmi:id="_Ou5_UOLcEeaUwfOnRzvRgQ" name="Security Components Linux VM"/>
-    <packagedElement xmi:type="uml:Node" xmi:id="_R-EqAOLcEeaUwfOnRzvRgQ" name="Search &amp; Indexing Linux VM"/>
-    <packagedElement xmi:type="uml:Dependency" xmi:id="_eiFkMOLcEeaUwfOnRzvRgQ" name="runs on" client="_NIGZ0OI9Eea-JLz1b_CDOA" supplier="_zgwQIOLUEeaUwfOnRzvRgQ"/>
-    <packagedElement xmi:type="uml:Artifact" xmi:id="_zfXPYOLcEeaUwfOnRzvRgQ" name="OpenAM Deployment">
-      <manifestation xmi:type="uml:Manifestation" xmi:id="_6jUaUOLcEeaUwfOnRzvRgQ" client="_zfXPYOLcEeaUwfOnRzvRgQ" supplier="_Z28kYOLUEeaUwfOnRzvRgQ" utilizedElement="_Z28kYOLUEeaUwfOnRzvRgQ"/>
-      <manifestation xmi:type="uml:Manifestation" xmi:id="_7gRx0OLcEeaUwfOnRzvRgQ" client="_zfXPYOLcEeaUwfOnRzvRgQ" supplier="_kZIJsOLUEeaUwfOnRzvRgQ" utilizedElement="_kZIJsOLUEeaUwfOnRzvRgQ"/>
-      <manifestation xmi:type="uml:Manifestation" xmi:id="_7_grgOLcEeaUwfOnRzvRgQ" client="_zfXPYOLcEeaUwfOnRzvRgQ" supplier="_roDKUOLbEeaUwfOnRzvRgQ" utilizedElement="_roDKUOLbEeaUwfOnRzvRgQ"/>
-    </packagedElement>
-  </packagedElement>
   <packagedElement xmi:type="uml:Model" xmi:id="_Chqw8OLdEeaUwfOnRzvRgQ" name="Use Case Model">
     <packagedElement xmi:type="uml:Package" xmi:id="_A7KtcOcgEeaqOcsPDbMbxA" name="Integration">
       <packagedElement xmi:type="uml:UseCase" xmi:id="_gFnrYOctEeas4ad09kgIdw" name="Distribute Data Update to CSP applications">
@@ -197,4 +182,48 @@
     </packagedElement>
   </packagedElement>
   <packagedElement xmi:type="uml:Model" xmi:id="_EVQOcOLdEeaUwfOnRzvRgQ" name="Dynamic View"/>
+  <packagedElement xmi:type="uml:Model" xmi:id="_YkKJ0OeVEeauMZFmYWZCwQ" name="Deployment Model">
+    <packagedElement xmi:type="uml:Package" xmi:id="_YkKJ0eeVEeauMZFmYWZCwQ" name="Integration Layer">
+      <packagedElement xmi:type="uml:Dependency" xmi:id="_YkKJ0ueVEeauMZFmYWZCwQ" name="Runs On" client="_YkKJ1eeVEeauMZFmYWZCwQ _YkKJ1eeVEeauMZFmYWZCwQ _YkKJ1eeVEeauMZFmYWZCwQ _YkKJ1eeVEeauMZFmYWZCwQ _YkKJ1eeVEeauMZFmYWZCwQ _YkKJ1eeVEeauMZFmYWZCwQ _YkKJ1eeVEeauMZFmYWZCwQ _YkKJ1eeVEeauMZFmYWZCwQ _YkKJ1eeVEeauMZFmYWZCwQ" supplier="_YkKJ1OeVEeauMZFmYWZCwQ _YkKJ1OeVEeauMZFmYWZCwQ _YkKJ1OeVEeauMZFmYWZCwQ _YkKJ1OeVEeauMZFmYWZCwQ _YkKJ1OeVEeauMZFmYWZCwQ _YkKJ1OeVEeauMZFmYWZCwQ _YkKJ1OeVEeauMZFmYWZCwQ _YkKJ1OeVEeauMZFmYWZCwQ _YkKJ1OeVEeauMZFmYWZCwQ"/>
+      <packagedElement xmi:type="uml:Node" xmi:id="_YkKJ0-eVEeauMZFmYWZCwQ" name="Integration Layer Linux VM"/>
+      <packagedElement xmi:type="uml:ExecutionEnvironment" xmi:id="_YkKJ1OeVEeauMZFmYWZCwQ" name="OpenJDK Java VM"/>
+      <packagedElement xmi:type="uml:ExecutionEnvironment" xmi:id="_YkKJ1eeVEeauMZFmYWZCwQ" name="JBoss WildFly AppServer">
+        <ownedAttribute xmi:type="uml:Property" xmi:id="_YkKJ1ueVEeauMZFmYWZCwQ" name="security components linux vm" type="_YkKJ4-eVEeauMZFmYWZCwQ" association="_YkKJ2ueVEeauMZFmYWZCwQ"/>
+        <ownedAttribute xmi:type="uml:Property" xmi:id="_YkKJ1-eVEeauMZFmYWZCwQ" name="elastic search linux vm" type="_YkKJ5-eVEeauMZFmYWZCwQ" association="_YkKJ3ueVEeauMZFmYWZCwQ"/>
+        <nestedClassifier xmi:type="uml:Artifact" xmi:id="_YkKJ2OeVEeauMZFmYWZCwQ" name="RESTFul Services"/>
+        <nestedClassifier xmi:type="uml:Artifact" xmi:id="_YkKJ2eeVEeauMZFmYWZCwQ" name="Apache Camel"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:CommunicationPath" xmi:id="_YkKJ2ueVEeauMZFmYWZCwQ" name="Access Control" memberEnd="_YkKJ1ueVEeauMZFmYWZCwQ _YkKJ3eeVEeauMZFmYWZCwQ">
+        <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_YkKJ2-eVEeauMZFmYWZCwQ" source="org.eclipse.papyrus">
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_YkKJ3OeVEeauMZFmYWZCwQ" key="nature" value="UML_Nature"/>
+        </eAnnotations>
+        <ownedEnd xmi:type="uml:Property" xmi:id="_YkKJ3eeVEeauMZFmYWZCwQ" name="jboss wildfly appserver" type="_YkKJ1eeVEeauMZFmYWZCwQ" association="_YkKJ2ueVEeauMZFmYWZCwQ"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:CommunicationPath" xmi:id="_YkKJ3ueVEeauMZFmYWZCwQ" name="Indexing" memberEnd="_YkKJ1-eVEeauMZFmYWZCwQ _YkKJ4eeVEeauMZFmYWZCwQ">
+        <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_YkKJ3-eVEeauMZFmYWZCwQ" source="org.eclipse.papyrus">
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_YkKJ4OeVEeauMZFmYWZCwQ" key="nature" value="UML_Nature"/>
+        </eAnnotations>
+        <ownedEnd xmi:type="uml:Property" xmi:id="_YkKJ4eeVEeauMZFmYWZCwQ" name="jboss wildfly appserver" type="_YkKJ1eeVEeauMZFmYWZCwQ" association="_YkKJ3ueVEeauMZFmYWZCwQ"/>
+      </packagedElement>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Package" xmi:id="_YkKJ4ueVEeauMZFmYWZCwQ" name="Security Components">
+      <packagedElement xmi:type="uml:Node" xmi:id="_YkKJ4-eVEeauMZFmYWZCwQ" name="Security Components Linux VM">
+        <nestedClassifier xmi:type="uml:Artifact" xmi:id="_YkKJ5OeVEeauMZFmYWZCwQ" name="Identity Provider"/>
+      </packagedElement>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Package" xmi:id="_YkKJ5eeVEeauMZFmYWZCwQ" name="Search and Indexing">
+      <packagedElement xmi:type="uml:Node" xmi:id="_YkKJ5ueVEeauMZFmYWZCwQ" name="Search &amp; Indexing Linux VM"/>
+      <packagedElement xmi:type="uml:Node" xmi:id="_YkKJ5-eVEeauMZFmYWZCwQ" name="Elastic Search Linux VM">
+        <ownedAttribute xmi:type="uml:Property" xmi:id="_YkKJ6OeVEeauMZFmYWZCwQ" name="security components linux vm" type="_YkKJ4-eVEeauMZFmYWZCwQ" association="_YkKJ6-eVEeauMZFmYWZCwQ"/>
+        <nestedClassifier xmi:type="uml:Artifact" xmi:id="_YkKJ6eeVEeauMZFmYWZCwQ" name="Elastic Search"/>
+        <nestedClassifier xmi:type="uml:Artifact" xmi:id="_YkKJ6ueVEeauMZFmYWZCwQ" name="Kibana"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:CommunicationPath" xmi:id="_YkKJ6-eVEeauMZFmYWZCwQ" name="Access Control" memberEnd="_YkKJ6OeVEeauMZFmYWZCwQ _YkKJ7ueVEeauMZFmYWZCwQ">
+        <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_YkKJ7OeVEeauMZFmYWZCwQ" source="org.eclipse.papyrus">
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_YkKJ7eeVEeauMZFmYWZCwQ" key="nature" value="UML_Nature"/>
+        </eAnnotations>
+        <ownedEnd xmi:type="uml:Property" xmi:id="_YkKJ7ueVEeauMZFmYWZCwQ" name="elastic search linux vm" type="_YkKJ5-eVEeauMZFmYWZCwQ" association="_YkKJ6-eVEeauMZFmYWZCwQ"/>
+      </packagedElement>
+    </packagedElement>
+  </packagedElement>
 </uml:Model>
