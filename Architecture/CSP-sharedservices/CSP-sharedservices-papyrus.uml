@@ -86,16 +86,44 @@
       <packagedElement xmi:type="uml:UseCase" xmi:id="_djLfoOc0Eea2FcEH0R3fLw" name="Configure Logstash"/>
       <packagedElement xmi:type="uml:Abstraction" xmi:id="_jA2z0Oc1Eea2FcEH0R3fLw" client="_aZUywOc0Eea2FcEH0R3fLw" supplier="_cQ1uAOc0Eea2FcEH0R3fLw"/>
       <packagedElement xmi:type="uml:Abstraction" xmi:id="_jjauUOc1Eea2FcEH0R3fLw" client="_aZUywOc0Eea2FcEH0R3fLw" supplier="_djLfoOc0Eea2FcEH0R3fLw"/>
-      <packagedElement xmi:type="uml:UseCase" xmi:id="_pPh8kOc1Eea2FcEH0R3fLw" name="Configure ES Watcher"/>
-      <packagedElement xmi:type="uml:Abstraction" xmi:id="_q8cKUOc1Eea2FcEH0R3fLw" client="_aZUywOc0Eea2FcEH0R3fLw" supplier="_pPh8kOc1Eea2FcEH0R3fLw"/>
-      <packagedElement xmi:type="uml:UseCase" xmi:id="_SM7QsOdCEea2FcEH0R3fLw" name="Configure Monitoring Reports"/>
-      <packagedElement xmi:type="uml:UseCase" xmi:id="_VDz-QOdCEea2FcEH0R3fLw" name="Run Monitoring Reports"/>
+      <packagedElement xmi:type="uml:UseCase" xmi:id="_SM7QsOdCEea2FcEH0R3fLw" name="Configure Monitoring Reports">
+        <include xmi:type="uml:Include" xmi:id="_0jRXcO0kEeapcoc5bJvXgw" addition="_uEVk0Oc0Eea2FcEH0R3fLw"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:UseCase" xmi:id="_VDz-QOdCEea2FcEH0R3fLw" name="Run Monitoring Reports">
+        <include xmi:type="uml:Include" xmi:id="_3SO4EO0kEeapcoc5bJvXgw" addition="_uEVk0Oc0Eea2FcEH0R3fLw"/>
+      </packagedElement>
     </packagedElement>
-    <packagedElement xmi:type="uml:Package" xmi:id="_CKZXUOc5Eea2FcEH0R3fLw" name="Configuration"/>
+    <packagedElement xmi:type="uml:Package" xmi:id="_CKZXUOc5Eea2FcEH0R3fLw" name="Configuration">
+      <packagedElement xmi:type="uml:UseCase" xmi:id="_7T-ZwO0lEeapcoc5bJvXgw" name="Perform initial VM instalation"/>
+      <packagedElement xmi:type="uml:UseCase" xmi:id="_L492EO0mEeapcoc5bJvXgw" name="Bootstrap installation process">
+        <include xmi:type="uml:Include" xmi:id="_Yop0wO0mEeapcoc5bJvXgw" addition="_7T-ZwO0lEeapcoc5bJvXgw"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:UseCase" xmi:id="_jhoJcO0mEeapcoc5bJvXgw" name="Perform package instalation">
+        <include xmi:type="uml:Include" xmi:id="_mg5W8O0mEeapcoc5bJvXgw" addition="_L492EO0mEeapcoc5bJvXgw"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:UseCase" xmi:id="_7dBLkO0mEeapcoc5bJvXgw" name="Publish package update"/>
+      <packagedElement xmi:type="uml:UseCase" xmi:id="_9ZFPoO0mEeapcoc5bJvXgw" name="Publish packageonfiguration update"/>
+      <packagedElement xmi:type="uml:UseCase" xmi:id="_Hzxs4O0nEeapcoc5bJvXgw" name="Check for updates"/>
+      <packagedElement xmi:type="uml:UseCase" xmi:id="_OtevoO0nEeapcoc5bJvXgw" name="Update package">
+        <include xmi:type="uml:Include" xmi:id="_YttecO0nEeapcoc5bJvXgw" addition="_Hzxs4O0nEeapcoc5bJvXgw"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:UseCase" xmi:id="_Qv9kwO0nEeapcoc5bJvXgw" name="Update package configuration">
+        <include xmi:type="uml:Include" xmi:id="_ZUqwwO0nEeapcoc5bJvXgw" addition="_Hzxs4O0nEeapcoc5bJvXgw"/>
+      </packagedElement>
+    </packagedElement>
     <packagedElement xmi:type="uml:Actor" xmi:id="_577BYOc1Eea2FcEH0R3fLw" name="CSP User"/>
     <packagedElement xmi:type="uml:Actor" xmi:id="_jc4DcOcfEeaqOcsPDbMbxA" name="CSP Administrator"/>
+    <packagedElement xmi:type="uml:Actor" xmi:id="_ROQ8QO0lEeapcoc5bJvXgw" name="ENISA Administrator"/>
+    <packagedElement xmi:type="uml:Actor" xmi:id="_Ee1xYO0nEeapcoc5bJvXgw" name="CSP OS Scheduler"/>
     <packagedElement xmi:type="uml:UseCase" xmi:id="_X472cOcwEeas4ad09kgIdw" name="Create or Update Application Data" isAbstract="true"/>
     <packagedElement xmi:type="uml:UseCase" xmi:id="_uEVk0Oc0Eea2FcEH0R3fLw" name="Log in Elasticsearch"/>
+    <packagedElement xmi:type="uml:Association" xmi:id="_scw3IOdBEea2FcEH0R3fLw" memberEnd="_scysUedBEea2FcEH0R3fLw _sczTYOdBEea2FcEH0R3fLw">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_scyFQOdBEea2FcEH0R3fLw" source="org.eclipse.papyrus">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_scysUOdBEea2FcEH0R3fLw" key="nature" value="UML_Nature"/>
+      </eAnnotations>
+      <ownedEnd xmi:type="uml:Property" xmi:id="_scysUedBEea2FcEH0R3fLw" name="csp user" type="_577BYOc1Eea2FcEH0R3fLw" association="_scw3IOdBEea2FcEH0R3fLw"/>
+      <ownedEnd xmi:type="uml:Property" xmi:id="_sczTYOdBEea2FcEH0R3fLw" name="log in elastic search" type="_uEVk0Oc0Eea2FcEH0R3fLw" association="_scw3IOdBEea2FcEH0R3fLw"/>
+    </packagedElement>
     <packagedElement xmi:type="uml:Association" xmi:id="_PxuvsOc5Eea2FcEH0R3fLw" memberEnd="_Pxwk4Oc5Eea2FcEH0R3fLw _Pxwk4ec5Eea2FcEH0R3fLw">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_Pxv90Oc5Eea2FcEH0R3fLw" source="org.eclipse.papyrus">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Pxv90ec5Eea2FcEH0R3fLw" key="nature" value="UML_Nature"/>
@@ -159,13 +187,6 @@
       <ownedEnd xmi:type="uml:Property" xmi:id="_F4adAedAEea2FcEH0R3fLw" name="csp administrator" type="_jc4DcOcfEeaqOcsPDbMbxA" association="_F4Yn0OdAEea2FcEH0R3fLw"/>
       <ownedEnd xmi:type="uml:Property" xmi:id="_F4bEEOdAEea2FcEH0R3fLw" name="log in elastic search" type="_uEVk0Oc0Eea2FcEH0R3fLw" association="_F4Yn0OdAEea2FcEH0R3fLw"/>
     </packagedElement>
-    <packagedElement xmi:type="uml:Association" xmi:id="_scw3IOdBEea2FcEH0R3fLw" memberEnd="_scysUedBEea2FcEH0R3fLw _sczTYOdBEea2FcEH0R3fLw">
-      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_scyFQOdBEea2FcEH0R3fLw" source="org.eclipse.papyrus">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_scysUOdBEea2FcEH0R3fLw" key="nature" value="UML_Nature"/>
-      </eAnnotations>
-      <ownedEnd xmi:type="uml:Property" xmi:id="_scysUedBEea2FcEH0R3fLw" name="csp user" type="_577BYOc1Eea2FcEH0R3fLw" association="_scw3IOdBEea2FcEH0R3fLw"/>
-      <ownedEnd xmi:type="uml:Property" xmi:id="_sczTYOdBEea2FcEH0R3fLw" name="log in elastic search" type="_uEVk0Oc0Eea2FcEH0R3fLw" association="_scw3IOdBEea2FcEH0R3fLw"/>
-    </packagedElement>
     <packagedElement xmi:type="uml:Association" xmi:id="_XGvfUOdCEea2FcEH0R3fLw" memberEnd="_XGwtcedCEea2FcEH0R3fLw _XGwtcudCEea2FcEH0R3fLw">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_XGwGYOdCEea2FcEH0R3fLw" source="org.eclipse.papyrus">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_XGwtcOdCEea2FcEH0R3fLw" key="nature" value="UML_Nature"/>
@@ -180,11 +201,67 @@
       <ownedEnd xmi:type="uml:Property" xmi:id="_X5tNUedCEea2FcEH0R3fLw" name="csp administrator" type="_jc4DcOcfEeaqOcsPDbMbxA" association="_X5r_MOdCEea2FcEH0R3fLw"/>
       <ownedEnd xmi:type="uml:Property" xmi:id="_X5tNUudCEea2FcEH0R3fLw" name="run monitoring reports" type="_VDz-QOdCEea2FcEH0R3fLw" association="_X5r_MOdCEea2FcEH0R3fLw"/>
     </packagedElement>
+    <packagedElement xmi:type="uml:Association" xmi:id="_AHDHMO0mEeapcoc5bJvXgw" memberEnd="_AHGKgO0mEeapcoc5bJvXgw _AHGxkO0mEeapcoc5bJvXgw">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_AHE8YO0mEeapcoc5bJvXgw" source="org.eclipse.papyrus">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_AHFjcO0mEeapcoc5bJvXgw" key="nature" value="UML_Nature"/>
+      </eAnnotations>
+      <ownedEnd xmi:type="uml:Property" xmi:id="_AHGKgO0mEeapcoc5bJvXgw" name="csp administrator" type="_jc4DcOcfEeaqOcsPDbMbxA" association="_AHDHMO0mEeapcoc5bJvXgw"/>
+      <ownedEnd xmi:type="uml:Property" xmi:id="_AHGxkO0mEeapcoc5bJvXgw" name="perform initial vm instalation" type="_7T-ZwO0lEeapcoc5bJvXgw" association="_AHDHMO0mEeapcoc5bJvXgw"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Association" xmi:id="_obIPAO0mEeapcoc5bJvXgw" memberEnd="_obKrQe0mEeapcoc5bJvXgw _obLSUO0mEeapcoc5bJvXgw">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_obKEMO0mEeapcoc5bJvXgw" source="org.eclipse.papyrus">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_obKrQO0mEeapcoc5bJvXgw" key="nature" value="UML_Nature"/>
+      </eAnnotations>
+      <ownedEnd xmi:type="uml:Property" xmi:id="_obKrQe0mEeapcoc5bJvXgw" name="csp administrator" type="_jc4DcOcfEeaqOcsPDbMbxA" association="_obIPAO0mEeapcoc5bJvXgw"/>
+      <ownedEnd xmi:type="uml:Property" xmi:id="_obLSUO0mEeapcoc5bJvXgw" name="bootstrap installation process" type="_L492EO0mEeapcoc5bJvXgw" association="_obIPAO0mEeapcoc5bJvXgw"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Association" xmi:id="_pIK7MO0mEeapcoc5bJvXgw" memberEnd="_pINXce0mEeapcoc5bJvXgw _pIN-gO0mEeapcoc5bJvXgw">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_pIMwYO0mEeapcoc5bJvXgw" source="org.eclipse.papyrus">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_pINXcO0mEeapcoc5bJvXgw" key="nature" value="UML_Nature"/>
+      </eAnnotations>
+      <ownedEnd xmi:type="uml:Property" xmi:id="_pINXce0mEeapcoc5bJvXgw" name="csp administrator" type="_jc4DcOcfEeaqOcsPDbMbxA" association="_pIK7MO0mEeapcoc5bJvXgw"/>
+      <ownedEnd xmi:type="uml:Property" xmi:id="_pIN-gO0mEeapcoc5bJvXgw" name="perform package instalation" type="_jhoJcO0mEeapcoc5bJvXgw" association="_pIK7MO0mEeapcoc5bJvXgw"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Association" xmi:id="_BC4n4O0nEeapcoc5bJvXgw" memberEnd="_BC6dEe0nEeapcoc5bJvXgw _BC7EIO0nEeapcoc5bJvXgw">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_BC52AO0nEeapcoc5bJvXgw" source="org.eclipse.papyrus">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_BC6dEO0nEeapcoc5bJvXgw" key="nature" value="UML_Nature"/>
+      </eAnnotations>
+      <ownedEnd xmi:type="uml:Property" xmi:id="_BC6dEe0nEeapcoc5bJvXgw" name="enisa administrator" type="_ROQ8QO0lEeapcoc5bJvXgw" association="_BC4n4O0nEeapcoc5bJvXgw"/>
+      <ownedEnd xmi:type="uml:Property" xmi:id="_BC7EIO0nEeapcoc5bJvXgw" name="publish package update" type="_7dBLkO0mEeapcoc5bJvXgw" association="_BC4n4O0nEeapcoc5bJvXgw"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Association" xmi:id="_BhcMIO0nEeapcoc5bJvXgw" memberEnd="_BheBUe0nEeapcoc5bJvXgw _BheBUu0nEeapcoc5bJvXgw">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_BhdaQO0nEeapcoc5bJvXgw" source="org.eclipse.papyrus">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_BheBUO0nEeapcoc5bJvXgw" key="nature" value="UML_Nature"/>
+      </eAnnotations>
+      <ownedEnd xmi:type="uml:Property" xmi:id="_BheBUe0nEeapcoc5bJvXgw" name="enisa administrator" type="_ROQ8QO0lEeapcoc5bJvXgw" association="_BhcMIO0nEeapcoc5bJvXgw"/>
+      <ownedEnd xmi:type="uml:Property" xmi:id="_BheBUu0nEeapcoc5bJvXgw" name="publish configuration update" type="_9ZFPoO0mEeapcoc5bJvXgw" association="_BhcMIO0nEeapcoc5bJvXgw"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Association" xmi:id="_VixzgO0nEeapcoc5bJvXgw" memberEnd="_Vizose0nEeapcoc5bJvXgw _Vi0PwO0nEeapcoc5bJvXgw">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_VizBoO0nEeapcoc5bJvXgw" source="org.eclipse.papyrus">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_VizosO0nEeapcoc5bJvXgw" key="nature" value="UML_Nature"/>
+      </eAnnotations>
+      <ownedEnd xmi:type="uml:Property" xmi:id="_Vizose0nEeapcoc5bJvXgw" name="csp os scheduler" type="_Ee1xYO0nEeapcoc5bJvXgw" association="_VixzgO0nEeapcoc5bJvXgw"/>
+      <ownedEnd xmi:type="uml:Property" xmi:id="_Vi0PwO0nEeapcoc5bJvXgw" name="check for updates" type="_Hzxs4O0nEeapcoc5bJvXgw" association="_VixzgO0nEeapcoc5bJvXgw"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Association" xmi:id="_WXDJEO0nEeapcoc5bJvXgw" memberEnd="_WXE-Qe0nEeapcoc5bJvXgw _WXFlUO0nEeapcoc5bJvXgw">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_WXEXMO0nEeapcoc5bJvXgw" source="org.eclipse.papyrus">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_WXE-QO0nEeapcoc5bJvXgw" key="nature" value="UML_Nature"/>
+      </eAnnotations>
+      <ownedEnd xmi:type="uml:Property" xmi:id="_WXE-Qe0nEeapcoc5bJvXgw" name="csp os scheduler" type="_Ee1xYO0nEeapcoc5bJvXgw" association="_WXDJEO0nEeapcoc5bJvXgw"/>
+      <ownedEnd xmi:type="uml:Property" xmi:id="_WXFlUO0nEeapcoc5bJvXgw" name="update package" type="_OtevoO0nEeapcoc5bJvXgw" association="_WXDJEO0nEeapcoc5bJvXgw"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Association" xmi:id="_XLSpcO0nEeapcoc5bJvXgw" memberEnd="_XLVFsO0nEeapcoc5bJvXgw _XLVFse0nEeapcoc5bJvXgw">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_XLUeoO0nEeapcoc5bJvXgw" source="org.eclipse.papyrus">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_XLUeoe0nEeapcoc5bJvXgw" key="nature" value="UML_Nature"/>
+      </eAnnotations>
+      <ownedEnd xmi:type="uml:Property" xmi:id="_XLVFsO0nEeapcoc5bJvXgw" name="csp os scheduler" type="_Ee1xYO0nEeapcoc5bJvXgw" association="_XLSpcO0nEeapcoc5bJvXgw"/>
+      <ownedEnd xmi:type="uml:Property" xmi:id="_XLVFse0nEeapcoc5bJvXgw" name="update package configuration" type="_Qv9kwO0nEeapcoc5bJvXgw" association="_XLSpcO0nEeapcoc5bJvXgw"/>
+    </packagedElement>
   </packagedElement>
   <packagedElement xmi:type="uml:Model" xmi:id="_EVQOcOLdEeaUwfOnRzvRgQ" name="Dynamic View"/>
   <packagedElement xmi:type="uml:Model" xmi:id="_YkKJ0OeVEeauMZFmYWZCwQ" name="Deployment Model">
     <packagedElement xmi:type="uml:Package" xmi:id="_YkKJ0eeVEeauMZFmYWZCwQ" name="Integration Layer">
-      <packagedElement xmi:type="uml:Dependency" xmi:id="_YkKJ0ueVEeauMZFmYWZCwQ" name="Runs On" client="_YkKJ1eeVEeauMZFmYWZCwQ _YkKJ1eeVEeauMZFmYWZCwQ _YkKJ1eeVEeauMZFmYWZCwQ _YkKJ1eeVEeauMZFmYWZCwQ _YkKJ1eeVEeauMZFmYWZCwQ _YkKJ1eeVEeauMZFmYWZCwQ _YkKJ1eeVEeauMZFmYWZCwQ _YkKJ1eeVEeauMZFmYWZCwQ _YkKJ1eeVEeauMZFmYWZCwQ" supplier="_YkKJ1OeVEeauMZFmYWZCwQ _YkKJ1OeVEeauMZFmYWZCwQ _YkKJ1OeVEeauMZFmYWZCwQ _YkKJ1OeVEeauMZFmYWZCwQ _YkKJ1OeVEeauMZFmYWZCwQ _YkKJ1OeVEeauMZFmYWZCwQ _YkKJ1OeVEeauMZFmYWZCwQ _YkKJ1OeVEeauMZFmYWZCwQ _YkKJ1OeVEeauMZFmYWZCwQ"/>
+      <packagedElement xmi:type="uml:Dependency" xmi:id="_YkKJ0ueVEeauMZFmYWZCwQ" name="Runs On" client="_YkKJ1eeVEeauMZFmYWZCwQ" supplier="_YkKJ1OeVEeauMZFmYWZCwQ"/>
       <packagedElement xmi:type="uml:Node" xmi:id="_YkKJ0-eVEeauMZFmYWZCwQ" name="Integration Layer Linux VM"/>
       <packagedElement xmi:type="uml:ExecutionEnvironment" xmi:id="_YkKJ1OeVEeauMZFmYWZCwQ" name="OpenJDK Java VM"/>
       <packagedElement xmi:type="uml:ExecutionEnvironment" xmi:id="_YkKJ1eeVEeauMZFmYWZCwQ" name="JBoss WildFly AppServer">
