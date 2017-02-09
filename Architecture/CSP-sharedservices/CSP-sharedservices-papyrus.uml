@@ -46,18 +46,17 @@
   <packagedElement xmi:type="uml:Model" xmi:id="_Chqw8OLdEeaUwfOnRzvRgQ" name="Use Case Model">
     <packagedElement xmi:type="uml:Package" xmi:id="_A7KtcOcgEeaqOcsPDbMbxA" name="Integration">
       <packagedElement xmi:type="uml:UseCase" xmi:id="_gFnrYOctEeas4ad09kgIdw" name="Distribute Data Update to CSP applications">
-        <include xmi:type="uml:Include" xmi:id="_7ZrVoOcxEea2FcEH0R3fLw" addition="_X472cOcwEeas4ad09kgIdw"/>
+        <include xmi:type="uml:Include" xmi:id="_BbELYO34EeaCT803Gi2e6w" addition="_wToJUO33EeaCT803Gi2e6w"/>
       </packagedElement>
       <packagedElement xmi:type="uml:UseCase" xmi:id="_wn81QOctEeas4ad09kgIdw" name="Index Data Update">
         <include xmi:type="uml:Include" xmi:id="_3koWsOcxEea2FcEH0R3fLw" addition="_gFnrYOctEeas4ad09kgIdw"/>
-        <include xmi:type="uml:Include" xmi:id="_6yDU8OcxEea2FcEH0R3fLw" addition="_X472cOcwEeas4ad09kgIdw"/>
       </packagedElement>
       <packagedElement xmi:type="uml:UseCase" xmi:id="_SMxPwOcuEeas4ad09kgIdw" name="Distribute Data Update to External CSPs">
-        <include xmi:type="uml:Include" xmi:id="_6RzHkOcxEea2FcEH0R3fLw" addition="_X472cOcwEeas4ad09kgIdw"/>
         <include xmi:type="uml:Include" xmi:id="_8NuowOcxEea2FcEH0R3fLw" addition="_wn81QOctEeas4ad09kgIdw"/>
         <include xmi:type="uml:Include" xmi:id="_8pBdoOcxEea2FcEH0R3fLw" addition="_ap0UkOcuEeas4ad09kgIdw"/>
       </packagedElement>
       <packagedElement xmi:type="uml:UseCase" xmi:id="_ap0UkOcuEeas4ad09kgIdw" name="Filter Message"/>
+      <packagedElement xmi:type="uml:UseCase" xmi:id="_wToJUO33EeaCT803Gi2e6w" name="Deistribute External Data"/>
     </packagedElement>
     <packagedElement xmi:type="uml:Package" xmi:id="_gdEqcOcfEeaqOcsPDbMbxA" name="Search and Reporting">
       <packagedElement xmi:type="uml:UseCase" xmi:id="_mdy2wOcfEeaqOcsPDbMbxA" name="Perform Search" isAbstract="true">
@@ -109,7 +108,6 @@
     <packagedElement xmi:type="uml:Actor" xmi:id="_jc4DcOcfEeaqOcsPDbMbxA" name="CSP Administrator"/>
     <packagedElement xmi:type="uml:Actor" xmi:id="_ROQ8QO0lEeapcoc5bJvXgw" name="ENISA Administrator"/>
     <packagedElement xmi:type="uml:Actor" xmi:id="_Ee1xYO0nEeapcoc5bJvXgw" name="CSP OS Scheduler"/>
-    <packagedElement xmi:type="uml:UseCase" xmi:id="_X472cOcwEeas4ad09kgIdw" name="Create or Update Application Data" isAbstract="true"/>
     <packagedElement xmi:type="uml:UseCase" xmi:id="_uEVk0Oc0Eea2FcEH0R3fLw" name="Log in Elasticsearch"/>
     <packagedElement xmi:type="uml:Association" xmi:id="_scw3IOdBEea2FcEH0R3fLw" memberEnd="_scysUedBEea2FcEH0R3fLw _sczTYOdBEea2FcEH0R3fLw">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_scyFQOdBEea2FcEH0R3fLw" source="org.eclipse.papyrus">
@@ -117,13 +115,6 @@
       </eAnnotations>
       <ownedEnd xmi:type="uml:Property" xmi:id="_scysUedBEea2FcEH0R3fLw" name="csp user" type="_577BYOc1Eea2FcEH0R3fLw" association="_scw3IOdBEea2FcEH0R3fLw"/>
       <ownedEnd xmi:type="uml:Property" xmi:id="_sczTYOdBEea2FcEH0R3fLw" name="log in elastic search" type="_uEVk0Oc0Eea2FcEH0R3fLw" association="_scw3IOdBEea2FcEH0R3fLw"/>
-    </packagedElement>
-    <packagedElement xmi:type="uml:Association" xmi:id="_PxuvsOc5Eea2FcEH0R3fLw" memberEnd="_Pxwk4Oc5Eea2FcEH0R3fLw _Pxwk4ec5Eea2FcEH0R3fLw">
-      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_Pxv90Oc5Eea2FcEH0R3fLw" source="org.eclipse.papyrus">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Pxv90ec5Eea2FcEH0R3fLw" key="nature" value="UML_Nature"/>
-      </eAnnotations>
-      <ownedEnd xmi:type="uml:Property" xmi:id="_Pxwk4Oc5Eea2FcEH0R3fLw" name="csp user" type="_577BYOc1Eea2FcEH0R3fLw" association="_PxuvsOc5Eea2FcEH0R3fLw"/>
-      <ownedEnd xmi:type="uml:Property" xmi:id="_Pxwk4ec5Eea2FcEH0R3fLw" name="create or update application data" type="_X472cOcwEeas4ad09kgIdw" association="_PxuvsOc5Eea2FcEH0R3fLw"/>
     </packagedElement>
     <packagedElement xmi:type="uml:Association" xmi:id="_TzmCoOc5Eea2FcEH0R3fLw" memberEnd="_TznQwec5Eea2FcEH0R3fLw _TznQwuc5Eea2FcEH0R3fLw">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_TzmpsOc5Eea2FcEH0R3fLw" source="org.eclipse.papyrus">
@@ -236,6 +227,22 @@
       </eAnnotations>
       <ownedEnd xmi:type="uml:Property" xmi:id="_N5vbkO2VEeaKaMIsYLNFQg" name="csp administrator" type="_jc4DcOcfEeaqOcsPDbMbxA" association="_N5s_UO2VEeaKaMIsYLNFQg"/>
       <ownedEnd xmi:type="uml:Property" xmi:id="_N5vbke2VEeaKaMIsYLNFQg" name="update configuration/playbook" type="_Qv9kwO0nEeapcoc5bJvXgw" association="_N5s_UO2VEeaKaMIsYLNFQg"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Actor" xmi:id="_sIzZkO31EeaCT803Gi2e6w" name="CSP Application Emitter"/>
+    <packagedElement xmi:type="uml:Association" xmi:id="_yhuqgO31EeaCT803Gi2e6w" memberEnd="_yh4bgO31EeaCT803Gi2e6w _yh4bge31EeaCT803Gi2e6w">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_yhuqge31EeaCT803Gi2e6w" source="org.eclipse.papyrus">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_yhuqgu31EeaCT803Gi2e6w" key="nature" value="UML_Nature"/>
+      </eAnnotations>
+      <ownedEnd xmi:type="uml:Property" xmi:id="_yh4bgO31EeaCT803Gi2e6w" name="csp application emitter" type="_sIzZkO31EeaCT803Gi2e6w" association="_yhuqgO31EeaCT803Gi2e6w"/>
+      <ownedEnd xmi:type="uml:Property" xmi:id="_yh4bge31EeaCT803Gi2e6w" name="distribute data update to csp applications" type="_gFnrYOctEeas4ad09kgIdw" association="_yhuqgO31EeaCT803Gi2e6w"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Actor" xmi:id="_mS98sO33EeaCT803Gi2e6w" name="External CSP"/>
+    <packagedElement xmi:type="uml:Association" xmi:id="_z1BMcO33EeaCT803Gi2e6w" memberEnd="_z1BMc-33EeaCT803Gi2e6w _z1BMdO33EeaCT803Gi2e6w">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_z1BMce33EeaCT803Gi2e6w" source="org.eclipse.papyrus">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_z1BMcu33EeaCT803Gi2e6w" key="nature" value="UML_Nature"/>
+      </eAnnotations>
+      <ownedEnd xmi:type="uml:Property" xmi:id="_z1BMc-33EeaCT803Gi2e6w" name="external csp" type="_mS98sO33EeaCT803Gi2e6w" association="_z1BMcO33EeaCT803Gi2e6w"/>
+      <ownedEnd xmi:type="uml:Property" xmi:id="_z1BMdO33EeaCT803Gi2e6w" name="receive external data" type="_wToJUO33EeaCT803Gi2e6w" association="_z1BMcO33EeaCT803Gi2e6w"/>
     </packagedElement>
   </packagedElement>
   <packagedElement xmi:type="uml:Model" xmi:id="_EVQOcOLdEeaUwfOnRzvRgQ" name="Dynamic View"/>
