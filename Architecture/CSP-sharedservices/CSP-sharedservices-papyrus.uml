@@ -96,13 +96,14 @@
       <packagedElement xmi:type="uml:UseCase" xmi:id="_7T-ZwO0lEeapcoc5bJvXgw" name="Perform initial instalation"/>
       <packagedElement xmi:type="uml:UseCase" xmi:id="_7dBLkO0mEeapcoc5bJvXgw" name="Publish package update"/>
       <packagedElement xmi:type="uml:UseCase" xmi:id="_9ZFPoO0mEeapcoc5bJvXgw" name="Publish configuration/playbook update"/>
-      <packagedElement xmi:type="uml:UseCase" xmi:id="_Hzxs4O0nEeapcoc5bJvXgw" name="Check for updates"/>
-      <packagedElement xmi:type="uml:UseCase" xmi:id="_OtevoO0nEeapcoc5bJvXgw" name="Update package">
-        <include xmi:type="uml:Include" xmi:id="_YttecO0nEeapcoc5bJvXgw" addition="_Hzxs4O0nEeapcoc5bJvXgw"/>
-      </packagedElement>
-      <packagedElement xmi:type="uml:UseCase" xmi:id="_Qv9kwO0nEeapcoc5bJvXgw" name="Update configuration/playbook">
-        <include xmi:type="uml:Include" xmi:id="_ZUqwwO0nEeapcoc5bJvXgw" addition="_Hzxs4O0nEeapcoc5bJvXgw"/>
-      </packagedElement>
+      <packagedElement xmi:type="uml:UseCase" xmi:id="_OtevoO0nEeapcoc5bJvXgw" name="Update package"/>
+      <packagedElement xmi:type="uml:UseCase" xmi:id="_Qv9kwO0nEeapcoc5bJvXgw" name="Update configuration/playbook"/>
+      <packagedElement xmi:type="uml:UseCase" xmi:id="_xMjV8O5mEeaLrfFG1Lb23g" name="Publish application update"/>
+      <packagedElement xmi:type="uml:Abstraction" xmi:id="_1ublsO5mEeaLrfFG1Lb23g" client="_7dBLkO0mEeapcoc5bJvXgw" supplier="_9ZFPoO0mEeapcoc5bJvXgw"/>
+      <packagedElement xmi:type="uml:Abstraction" xmi:id="_21PcwO5mEeaLrfFG1Lb23g" client="_7dBLkO0mEeapcoc5bJvXgw" supplier="_xMjV8O5mEeaLrfFG1Lb23g"/>
+      <packagedElement xmi:type="uml:UseCase" xmi:id="_Es7lUO5nEeaLrfFG1Lb23g" name="Update application"/>
+      <packagedElement xmi:type="uml:Abstraction" xmi:id="_HzkmIO5nEeaLrfFG1Lb23g" client="_OtevoO0nEeapcoc5bJvXgw" supplier="_Es7lUO5nEeaLrfFG1Lb23g"/>
+      <packagedElement xmi:type="uml:Abstraction" xmi:id="_M03VwO5nEeaLrfFG1Lb23g" client="_OtevoO0nEeapcoc5bJvXgw" supplier="_Qv9kwO0nEeapcoc5bJvXgw"/>
     </packagedElement>
     <packagedElement xmi:type="uml:Actor" xmi:id="_577BYOc1Eea2FcEH0R3fLw" name="CSP User"/>
     <packagedElement xmi:type="uml:Actor" xmi:id="_jc4DcOcfEeaqOcsPDbMbxA" name="CSP Administrator"/>
@@ -200,34 +201,6 @@
       <ownedEnd xmi:type="uml:Property" xmi:id="_BC6dEe0nEeapcoc5bJvXgw" name="enisa administrator" type="_ROQ8QO0lEeapcoc5bJvXgw" association="_BC4n4O0nEeapcoc5bJvXgw"/>
       <ownedEnd xmi:type="uml:Property" xmi:id="_BC7EIO0nEeapcoc5bJvXgw" name="publish package update" type="_7dBLkO0mEeapcoc5bJvXgw" association="_BC4n4O0nEeapcoc5bJvXgw"/>
     </packagedElement>
-    <packagedElement xmi:type="uml:Association" xmi:id="_BhcMIO0nEeapcoc5bJvXgw" memberEnd="_BheBUe0nEeapcoc5bJvXgw _BheBUu0nEeapcoc5bJvXgw">
-      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_BhdaQO0nEeapcoc5bJvXgw" source="org.eclipse.papyrus">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_BheBUO0nEeapcoc5bJvXgw" key="nature" value="UML_Nature"/>
-      </eAnnotations>
-      <ownedEnd xmi:type="uml:Property" xmi:id="_BheBUe0nEeapcoc5bJvXgw" name="enisa administrator" type="_ROQ8QO0lEeapcoc5bJvXgw" association="_BhcMIO0nEeapcoc5bJvXgw"/>
-      <ownedEnd xmi:type="uml:Property" xmi:id="_BheBUu0nEeapcoc5bJvXgw" name="publish configuration update" type="_9ZFPoO0mEeapcoc5bJvXgw" association="_BhcMIO0nEeapcoc5bJvXgw"/>
-    </packagedElement>
-    <packagedElement xmi:type="uml:Association" xmi:id="_VixzgO0nEeapcoc5bJvXgw" memberEnd="_Vizose0nEeapcoc5bJvXgw _Vi0PwO0nEeapcoc5bJvXgw">
-      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_VizBoO0nEeapcoc5bJvXgw" source="org.eclipse.papyrus">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_VizosO0nEeapcoc5bJvXgw" key="nature" value="UML_Nature"/>
-      </eAnnotations>
-      <ownedEnd xmi:type="uml:Property" xmi:id="_Vizose0nEeapcoc5bJvXgw" name="csp os scheduler" type="_Ee1xYO0nEeapcoc5bJvXgw" association="_VixzgO0nEeapcoc5bJvXgw"/>
-      <ownedEnd xmi:type="uml:Property" xmi:id="_Vi0PwO0nEeapcoc5bJvXgw" name="check for updates" type="_Hzxs4O0nEeapcoc5bJvXgw" association="_VixzgO0nEeapcoc5bJvXgw"/>
-    </packagedElement>
-    <packagedElement xmi:type="uml:Association" xmi:id="_M_eywO2VEeaKaMIsYLNFQg" memberEnd="_M_lgcO2VEeaKaMIsYLNFQg _M_mHgO2VEeaKaMIsYLNFQg">
-      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_M_kSUO2VEeaKaMIsYLNFQg" source="org.eclipse.papyrus">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_M_k5YO2VEeaKaMIsYLNFQg" key="nature" value="UML_Nature"/>
-      </eAnnotations>
-      <ownedEnd xmi:type="uml:Property" xmi:id="_M_lgcO2VEeaKaMIsYLNFQg" name="csp administrator" type="_jc4DcOcfEeaqOcsPDbMbxA" association="_M_eywO2VEeaKaMIsYLNFQg"/>
-      <ownedEnd xmi:type="uml:Property" xmi:id="_M_mHgO2VEeaKaMIsYLNFQg" name="update package" type="_OtevoO0nEeapcoc5bJvXgw" association="_M_eywO2VEeaKaMIsYLNFQg"/>
-    </packagedElement>
-    <packagedElement xmi:type="uml:Association" xmi:id="_N5s_UO2VEeaKaMIsYLNFQg" memberEnd="_N5vbkO2VEeaKaMIsYLNFQg _N5vbke2VEeaKaMIsYLNFQg">
-      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_N5u0gO2VEeaKaMIsYLNFQg" source="org.eclipse.papyrus">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_N5u0ge2VEeaKaMIsYLNFQg" key="nature" value="UML_Nature"/>
-      </eAnnotations>
-      <ownedEnd xmi:type="uml:Property" xmi:id="_N5vbkO2VEeaKaMIsYLNFQg" name="csp administrator" type="_jc4DcOcfEeaqOcsPDbMbxA" association="_N5s_UO2VEeaKaMIsYLNFQg"/>
-      <ownedEnd xmi:type="uml:Property" xmi:id="_N5vbke2VEeaKaMIsYLNFQg" name="update configuration/playbook" type="_Qv9kwO0nEeapcoc5bJvXgw" association="_N5s_UO2VEeaKaMIsYLNFQg"/>
-    </packagedElement>
     <packagedElement xmi:type="uml:Actor" xmi:id="_sIzZkO31EeaCT803Gi2e6w" name="CSP Application Emitter"/>
     <packagedElement xmi:type="uml:Association" xmi:id="_yhuqgO31EeaCT803Gi2e6w" memberEnd="_yh4bgO31EeaCT803Gi2e6w _yh4bge31EeaCT803Gi2e6w">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_yhuqge31EeaCT803Gi2e6w" source="org.eclipse.papyrus">
@@ -243,6 +216,13 @@
       </eAnnotations>
       <ownedEnd xmi:type="uml:Property" xmi:id="_z1BMc-33EeaCT803Gi2e6w" name="external csp" type="_mS98sO33EeaCT803Gi2e6w" association="_z1BMcO33EeaCT803Gi2e6w"/>
       <ownedEnd xmi:type="uml:Property" xmi:id="_z1BMdO33EeaCT803Gi2e6w" name="receive external data" type="_wToJUO33EeaCT803Gi2e6w" association="_z1BMcO33EeaCT803Gi2e6w"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Association" xmi:id="_Bk9HwO5nEeaLrfFG1Lb23g" memberEnd="_BlGRsO5nEeaLrfFG1Lb23g _BlGRse5nEeaLrfFG1Lb23g">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_Bk9Hwe5nEeaLrfFG1Lb23g" source="org.eclipse.papyrus">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Bk9Hwu5nEeaLrfFG1Lb23g" key="nature" value="UML_Nature"/>
+      </eAnnotations>
+      <ownedEnd xmi:type="uml:Property" xmi:id="_BlGRsO5nEeaLrfFG1Lb23g" name="csp os scheduler" type="_Ee1xYO0nEeapcoc5bJvXgw" association="_Bk9HwO5nEeaLrfFG1Lb23g"/>
+      <ownedEnd xmi:type="uml:Property" xmi:id="_BlGRse5nEeaLrfFG1Lb23g" name="update package" type="_OtevoO0nEeapcoc5bJvXgw" association="_Bk9HwO5nEeaLrfFG1Lb23g"/>
     </packagedElement>
   </packagedElement>
   <packagedElement xmi:type="uml:Model" xmi:id="_EVQOcOLdEeaUwfOnRzvRgQ" name="Dynamic View"/>
