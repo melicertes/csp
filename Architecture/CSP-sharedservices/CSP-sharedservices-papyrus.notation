@@ -1414,4 +1414,115 @@
       <targetAnchor xmi:type="notation:IdentityAnchor" xmi:id="_YkMmh-eVEeauMZFmYWZCwQ" id="(0.0,0.5)"/>
     </edges>
   </notation:Diagram>
+  <notation:Diagram xmi:id="_eLYkoPUVEeaLzenOgNDTDg" type="PapyrusUMLClassDiagram" name="DataEnvelop" measurementUnit="Pixel">
+    <children xmi:type="notation:Shape" xmi:id="_fwrugPUVEeaLzenOgNDTDg" type="DataType_Shape">
+      <children xmi:type="notation:DecorationNode" xmi:id="_fwtjsPUVEeaLzenOgNDTDg" type="DataType_NameLabel"/>
+      <children xmi:type="notation:DecorationNode" xmi:id="_fwtjsfUVEeaLzenOgNDTDg" type="DataType_FloatingNameLabel">
+        <layoutConstraint xmi:type="notation:Location" xmi:id="_fwtjsvUVEeaLzenOgNDTDg" y="5"/>
+      </children>
+      <children xmi:type="notation:BasicCompartment" xmi:id="_fwuKwPUVEeaLzenOgNDTDg" type="DataType_AttributeCompartment">
+        <children xmi:type="notation:Shape" xmi:id="_uRJHQPUVEeaLzenOgNDTDg" type="Property_DataTypeAttributeLabel">
+          <element xmi:type="uml:Property" href="CSP-sharedservices-papyrus.uml#_uRBygPUVEeaLzenOgNDTDg"/>
+          <layoutConstraint xmi:type="notation:Location" xmi:id="_uRJHQfUVEeaLzenOgNDTDg"/>
+        </children>
+        <children xmi:type="notation:Shape" xmi:id="_HhBQEPUWEeaLzenOgNDTDg" type="Property_DataTypeAttributeLabel">
+          <element xmi:type="uml:Property" href="CSP-sharedservices-papyrus.uml#_Hg2Q8PUWEeaLzenOgNDTDg"/>
+          <layoutConstraint xmi:type="notation:Location" xmi:id="_HhBQEfUWEeaLzenOgNDTDg"/>
+        </children>
+        <children xmi:type="notation:Shape" xmi:id="_58V4MPUXEeaLzenOgNDTDg" type="Property_DataTypeAttributeLabel">
+          <element xmi:type="uml:Property" href="CSP-sharedservices-papyrus.uml#_58N8YPUXEeaLzenOgNDTDg"/>
+          <layoutConstraint xmi:type="notation:Location" xmi:id="_58WfQPUXEeaLzenOgNDTDg"/>
+        </children>
+        <children xmi:type="notation:Shape" xmi:id="_9cuOsPUXEeaLzenOgNDTDg" type="Property_DataTypeAttributeLabel">
+          <element xmi:type="uml:Property" href="CSP-sharedservices-papyrus.uml#_9cmS4PUXEeaLzenOgNDTDg"/>
+          <layoutConstraint xmi:type="notation:Location" xmi:id="_9cuOsfUXEeaLzenOgNDTDg"/>
+        </children>
+        <children xmi:type="notation:Shape" xmi:id="_ihlBcPUYEeaLzenOgNDTDg" type="Property_DataTypeAttributeLabel">
+          <element xmi:type="uml:Property" href="CSP-sharedservices-papyrus.uml#_ihaCUPUYEeaLzenOgNDTDg"/>
+          <layoutConstraint xmi:type="notation:Location" xmi:id="_ihlBcfUYEeaLzenOgNDTDg"/>
+        </children>
+        <children xmi:type="notation:Shape" xmi:id="_raPrQPUYEeaLzenOgNDTDg" type="Property_DataTypeAttributeLabel">
+          <element xmi:type="uml:Property" href="CSP-sharedservices-papyrus.uml#_raHIYPUYEeaLzenOgNDTDg"/>
+          <layoutConstraint xmi:type="notation:Location" xmi:id="_raPrQfUYEeaLzenOgNDTDg"/>
+        </children>
+        <children xmi:type="notation:Shape" xmi:id="_FEyW0PUZEeaLzenOgNDTDg" type="Property_DataTypeAttributeLabel">
+          <element xmi:type="uml:Property" href="CSP-sharedservices-papyrus.uml#_FEn-wPUZEeaLzenOgNDTDg"/>
+          <layoutConstraint xmi:type="notation:Location" xmi:id="_FEyW0fUZEeaLzenOgNDTDg"/>
+        </children>
+        <styles xmi:type="notation:TitleStyle" xmi:id="_fwuKwfUVEeaLzenOgNDTDg"/>
+        <styles xmi:type="notation:SortingStyle" xmi:id="_fwuKwvUVEeaLzenOgNDTDg"/>
+        <styles xmi:type="notation:FilteringStyle" xmi:id="_fwuKw_UVEeaLzenOgNDTDg"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_fwuKxPUVEeaLzenOgNDTDg"/>
+      </children>
+      <children xmi:type="notation:BasicCompartment" xmi:id="_fwuKxfUVEeaLzenOgNDTDg" type="DataType_OperationCompartment">
+        <styles xmi:type="notation:TitleStyle" xmi:id="_fwuKxvUVEeaLzenOgNDTDg"/>
+        <styles xmi:type="notation:SortingStyle" xmi:id="_fwuKx_UVEeaLzenOgNDTDg"/>
+        <styles xmi:type="notation:FilteringStyle" xmi:id="_fwuKyPUVEeaLzenOgNDTDg"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_fwuKyfUVEeaLzenOgNDTDg"/>
+      </children>
+      <element xmi:type="uml:DataType" href="CSP-sharedservices-papyrus.uml#_fwndEPUVEeaLzenOgNDTDg"/>
+      <layoutConstraint xmi:type="notation:Bounds" xmi:id="_fwrugfUVEeaLzenOgNDTDg" x="257" y="72"/>
+    </children>
+    <children xmi:type="notation:Shape" xmi:id="_g9NMAPUVEeaLzenOgNDTDg" type="Enumeration_Shape">
+      <children xmi:type="notation:DecorationNode" xmi:id="_g9NzEPUVEeaLzenOgNDTDg" type="Enumeration_NameLabel"/>
+      <children xmi:type="notation:DecorationNode" xmi:id="_g9NzEfUVEeaLzenOgNDTDg" type="Enumeration_FloatingNameLabel">
+        <layoutConstraint xmi:type="notation:Location" xmi:id="_g9NzEvUVEeaLzenOgNDTDg" y="5"/>
+      </children>
+      <children xmi:type="notation:BasicCompartment" xmi:id="_g9NzE_UVEeaLzenOgNDTDg" type="Enumeration_LiteralCompartment">
+        <children xmi:type="notation:Shape" xmi:id="_kEbboPUVEeaLzenOgNDTDg" type="EnumerationLiteral_LiteralLabel">
+          <element xmi:type="uml:EnumerationLiteral" href="CSP-sharedservices-papyrus.uml#_kEVVAPUVEeaLzenOgNDTDg"/>
+          <layoutConstraint xmi:type="notation:Location" xmi:id="_kEbbofUVEeaLzenOgNDTDg"/>
+        </children>
+        <children xmi:type="notation:Shape" xmi:id="_muP9kPUVEeaLzenOgNDTDg" type="EnumerationLiteral_LiteralLabel">
+          <element xmi:type="uml:EnumerationLiteral" href="CSP-sharedservices-papyrus.uml#_muKeAPUVEeaLzenOgNDTDg"/>
+          <layoutConstraint xmi:type="notation:Location" xmi:id="_muP9kfUVEeaLzenOgNDTDg"/>
+        </children>
+        <children xmi:type="notation:Shape" xmi:id="_n3SCMPUVEeaLzenOgNDTDg" type="EnumerationLiteral_LiteralLabel">
+          <element xmi:type="uml:EnumerationLiteral" href="CSP-sharedservices-papyrus.uml#_n3LUgPUVEeaLzenOgNDTDg"/>
+          <layoutConstraint xmi:type="notation:Location" xmi:id="_n3SCMfUVEeaLzenOgNDTDg"/>
+        </children>
+        <children xmi:type="notation:Shape" xmi:id="_o5kloPUVEeaLzenOgNDTDg" type="EnumerationLiteral_LiteralLabel">
+          <element xmi:type="uml:EnumerationLiteral" href="CSP-sharedservices-papyrus.uml#_o5d38PUVEeaLzenOgNDTDg"/>
+          <layoutConstraint xmi:type="notation:Location" xmi:id="_o5klofUVEeaLzenOgNDTDg"/>
+        </children>
+        <children xmi:type="notation:Shape" xmi:id="_qgx0APUVEeaLzenOgNDTDg" type="EnumerationLiteral_LiteralLabel">
+          <element xmi:type="uml:EnumerationLiteral" href="CSP-sharedservices-papyrus.uml#_qgs7gPUVEeaLzenOgNDTDg"/>
+          <layoutConstraint xmi:type="notation:Location" xmi:id="_qgx0AfUVEeaLzenOgNDTDg"/>
+        </children>
+        <children xmi:type="notation:Shape" xmi:id="_rtEA8PUVEeaLzenOgNDTDg" type="EnumerationLiteral_LiteralLabel">
+          <element xmi:type="uml:EnumerationLiteral" href="CSP-sharedservices-papyrus.uml#_rs_IcPUVEeaLzenOgNDTDg"/>
+          <layoutConstraint xmi:type="notation:Location" xmi:id="_rtEA8fUVEeaLzenOgNDTDg"/>
+        </children>
+        <children xmi:type="notation:Shape" xmi:id="_snj6UPUVEeaLzenOgNDTDg" type="EnumerationLiteral_LiteralLabel">
+          <element xmi:type="uml:EnumerationLiteral" href="CSP-sharedservices-papyrus.uml#_sndMoPUVEeaLzenOgNDTDg"/>
+          <layoutConstraint xmi:type="notation:Location" xmi:id="_snj6UfUVEeaLzenOgNDTDg"/>
+        </children>
+        <styles xmi:type="notation:TitleStyle" xmi:id="_g9NzFPUVEeaLzenOgNDTDg"/>
+        <styles xmi:type="notation:SortingStyle" xmi:id="_g9NzFfUVEeaLzenOgNDTDg"/>
+        <styles xmi:type="notation:FilteringStyle" xmi:id="_g9NzFvUVEeaLzenOgNDTDg"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_g9NzF_UVEeaLzenOgNDTDg"/>
+      </children>
+      <element xmi:type="uml:Enumeration" href="CSP-sharedservices-papyrus.uml#_g9LW0PUVEeaLzenOgNDTDg"/>
+      <layoutConstraint xmi:type="notation:Bounds" xmi:id="_g9NMAfUVEeaLzenOgNDTDg" x="544" y="76"/>
+    </children>
+    <styles xmi:type="notation:StringValueStyle" xmi:id="_eLYkofUVEeaLzenOgNDTDg" name="diagram_compatibility_version" stringValue="1.2.0"/>
+    <styles xmi:type="notation:DiagramStyle" xmi:id="_eLYkovUVEeaLzenOgNDTDg"/>
+    <styles xmi:type="style:PapyrusViewStyle" xmi:id="_eLYko_UVEeaLzenOgNDTDg">
+      <owner xmi:type="uml:Model" href="CSP-sharedservices-papyrus.uml#_X-HKEPUVEeaLzenOgNDTDg"/>
+    </styles>
+    <element xmi:type="uml:Model" href="CSP-sharedservices-papyrus.uml#_X-HKEPUVEeaLzenOgNDTDg"/>
+    <edges xmi:type="notation:Connector" xmi:id="_xk3acPUYEeaLzenOgNDTDg" type="Usage_Edge" source="_fwrugPUVEeaLzenOgNDTDg" target="_g9NMAPUVEeaLzenOgNDTDg">
+      <children xmi:type="notation:DecorationNode" xmi:id="_xk3ac_UYEeaLzenOgNDTDg" type="Usage_NameLabel">
+        <layoutConstraint xmi:type="notation:Location" xmi:id="_xk4BgPUYEeaLzenOgNDTDg" y="40"/>
+      </children>
+      <children xmi:type="notation:DecorationNode" xmi:id="_xk4BgfUYEeaLzenOgNDTDg" type="Usage_StereotypeLabel">
+        <layoutConstraint xmi:type="notation:Location" xmi:id="_xk4BgvUYEeaLzenOgNDTDg" x="-7" y="20"/>
+      </children>
+      <styles xmi:type="notation:FontStyle" xmi:id="_xk3acfUYEeaLzenOgNDTDg"/>
+      <element xmi:type="uml:Usage" href="CSP-sharedservices-papyrus.uml#_xkzwEPUYEeaLzenOgNDTDg"/>
+      <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_xk3acvUYEeaLzenOgNDTDg" points="[437, 139, -643984, -643984]$[544, 139, -643984, -643984]"/>
+      <sourceAnchor xmi:type="notation:IdentityAnchor" xmi:id="_xlQcAPUYEeaLzenOgNDTDg" id="(1.0,0.2603550295857988)"/>
+      <targetAnchor xmi:type="notation:IdentityAnchor" xmi:id="_xlQcAfUYEeaLzenOgNDTDg" id="(0.0,0.11042944785276074)"/>
+    </edges>
+  </notation:Diagram>
 </xmi:XMI>
