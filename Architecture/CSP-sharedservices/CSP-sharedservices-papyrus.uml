@@ -1,29 +1,60 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <uml:Model xmi:version="20131001" xmlns:xmi="http://www.omg.org/spec/XMI/20131001" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmlns:uml="http://www.eclipse.org/uml2/5.0.0/UML" xmi:id="_2pHo8OIIEeatWcXz0JfjbA" name="RootElement">
   <packagedElement xmi:type="uml:Model" xmi:id="_B8UbgOIJEeatWcXz0JfjbA" name="Component Model">
+    <packagedElement xmi:type="uml:Package" xmi:id="_jxc3oPVJEeaEA63_qd_6wg" name="Application Layer">
+      <packagedElement xmi:type="uml:Component" xmi:id="_ol2awPVJEeaEA63_qd_6wg" name="Application RESTful Emitter">
+        <packagedElement xmi:type="uml:InformationFlow" xmi:id="_byzwoPVKEeaEA63_qd_6wg" informationSource="_ol2awPVJEeaEA63_qd_6wg" informationTarget="_YFzSsOLbEeaUwfOnRzvRgQ"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Component" xmi:id="_qUefwPVJEeaEA63_qd_6wg" name="Application RESTful Adapter"/>
+      <packagedElement xmi:type="uml:Component" xmi:id="_aF7l0PVPEeaEA63_qd_6wg" name="Application"/>
+    </packagedElement>
     <packagedElement xmi:type="uml:Package" xmi:id="_5iuPEOLTEeaUwfOnRzvRgQ" name="Integration Layer">
       <packagedElement xmi:type="uml:Package" xmi:id="_9Sr5sOLTEeaUwfOnRzvRgQ" name="Data Synchronization">
-        <packagedElement xmi:type="uml:Component" xmi:id="_1hslcOLaEeaUwfOnRzvRgQ" name="Xyz data sync Camel Route"/>
+        <packagedElement xmi:type="uml:Component" xmi:id="_1hslcOLaEeaUwfOnRzvRgQ" name="Data Synchronication Camel Routes">
+          <packagedElement xmi:type="uml:InformationFlow" xmi:id="_Vsrf4PVKEeaEA63_qd_6wg" informationSource="_1hslcOLaEeaUwfOnRzvRgQ" informationTarget="_79zGMOLaEeaUwfOnRzvRgQ"/>
+        </packagedElement>
+        <packagedElement xmi:type="uml:Component" xmi:id="_YFzSsOLbEeaUwfOnRzvRgQ" name="RESTful application Service"/>
+        <packagedElement xmi:type="uml:Component" xmi:id="_i-AMAPVKEeaEA63_qd_6wg" name="RESTful application Client">
+          <packagedElement xmi:type="uml:InformationFlow" xmi:id="_nIfPcPVKEeaEA63_qd_6wg" informationSource="_i-AMAPVKEeaEA63_qd_6wg" informationTarget="_qUefwPVJEeaEA63_qd_6wg"/>
+        </packagedElement>
       </packagedElement>
       <packagedElement xmi:type="uml:Package" xmi:id="__vALIOLTEeaUwfOnRzvRgQ" name="Data Distribution">
-        <packagedElement xmi:type="uml:Component" xmi:id="_79zGMOLaEeaUwfOnRzvRgQ" name="Xyz data dist Camel Route"/>
+        <packagedElement xmi:type="uml:Component" xmi:id="_79zGMOLaEeaUwfOnRzvRgQ" name="Data Distriburion Camel Routes">
+          <ownedAttribute xmi:type="uml:Property" xmi:id="_Fy15YPVKEeaEA63_qd_6wg" name="data collaboration camel routes" type="_-5dmEOLaEeaUwfOnRzvRgQ"/>
+          <packagedElement xmi:type="uml:InformationFlow" xmi:id="_W9r0wPVKEeaEA63_qd_6wg" informationSource="_79zGMOLaEeaUwfOnRzvRgQ" informationTarget="_-5dmEOLaEeaUwfOnRzvRgQ"/>
+        </packagedElement>
+        <packagedElement xmi:type="uml:Component" xmi:id="_xyqTIPVKEeaEA63_qd_6wg" name="RESTful indexing Client">
+          <packagedElement xmi:type="uml:InformationFlow" xmi:id="_-crHoPVKEeaEA63_qd_6wg" informationSource="_xyqTIPVKEeaEA63_qd_6wg" informationTarget="_Onvc0OLbEeaUwfOnRzvRgQ"/>
+        </packagedElement>
       </packagedElement>
       <packagedElement xmi:type="uml:Package" xmi:id="_B34jMOLUEeaUwfOnRzvRgQ" name="Data Collaboration">
-        <packagedElement xmi:type="uml:Component" xmi:id="_-5dmEOLaEeaUwfOnRzvRgQ" name="Data Collaboration Camel Route 1"/>
-        <packagedElement xmi:type="uml:Component" xmi:id="_BKMSkOLbEeaUwfOnRzvRgQ" name="Data Collaboration Camel Route 2"/>
-        <packagedElement xmi:type="uml:Component" xmi:id="_D1zkQOLbEeaUwfOnRzvRgQ" name="Data Sender Client"/>
-        <packagedElement xmi:type="uml:Component" xmi:id="_GsHDAOLbEeaUwfOnRzvRgQ" name="Data Receiver Service"/>
+        <packagedElement xmi:type="uml:Component" xmi:id="_-5dmEOLaEeaUwfOnRzvRgQ" name="Data Collaboration Camel Routes">
+          <packagedElement xmi:type="uml:InformationFlow" xmi:id="_TcwEoPVKEeaEA63_qd_6wg" informationSource="_-5dmEOLaEeaUwfOnRzvRgQ" informationTarget="_1hslcOLaEeaUwfOnRzvRgQ"/>
+        </packagedElement>
+        <packagedElement xmi:type="uml:Component" xmi:id="_D1zkQOLbEeaUwfOnRzvRgQ" name="RESTful eCSP Client">
+          <packagedElement xmi:type="uml:InformationFlow" xmi:id="_NmcjIPVLEeaEA63_qd_6wg" informationSource="_D1zkQOLbEeaUwfOnRzvRgQ" informationTarget="_DOKgsPVLEeaEA63_qd_6wg"/>
+          <packagedElement xmi:type="uml:Usage" xmi:id="_IOVcsPVQEeaEA63_qd_6wg" client="_D1zkQOLbEeaUwfOnRzvRgQ" supplier="_kZIJsOLUEeaUwfOnRzvRgQ"/>
+          <packagedElement xmi:type="uml:InformationFlow" xmi:id="_IWKGgPVREeaEA63_qd_6wg" informationSource="_D1zkQOLbEeaUwfOnRzvRgQ" informationTarget="_mEpQUOLUEeaUwfOnRzvRgQ"/>
+        </packagedElement>
+        <packagedElement xmi:type="uml:Component" xmi:id="_GsHDAOLbEeaUwfOnRzvRgQ" name="RESTful  eCSP Service">
+          <packagedElement xmi:type="uml:Usage" xmi:id="_YumxEPVQEeaEA63_qd_6wg" client="_GsHDAOLbEeaUwfOnRzvRgQ" supplier="_kZIJsOLUEeaUwfOnRzvRgQ"/>
+        </packagedElement>
       </packagedElement>
     </packagedElement>
     <packagedElement xmi:type="uml:Package" xmi:id="_GZvk0OLUEeaUwfOnRzvRgQ" name="Indexing Search and Reporting">
-      <packagedElement xmi:type="uml:Component" xmi:id="_WT9l0OLUEeaUwfOnRzvRgQ" name="Elastic Search"/>
+      <packagedElement xmi:type="uml:Component" xmi:id="_WT9l0OLUEeaUwfOnRzvRgQ" name="Elastic Search">
+        <packagedElement xmi:type="uml:InformationFlow" xmi:id="__sa4QPVKEeaEA63_qd_6wg" informationSource="_WT9l0OLUEeaUwfOnRzvRgQ" informationTarget="_X3B7EOLUEeaUwfOnRzvRgQ"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Component" xmi:id="_Onvc0OLbEeaUwfOnRzvRgQ" name="RESTful indexing service"/>
       <packagedElement xmi:type="uml:Component" xmi:id="_X3B7EOLUEeaUwfOnRzvRgQ" name="Kibana"/>
     </packagedElement>
     <packagedElement xmi:type="uml:Package" xmi:id="_LENI0OLUEeaUwfOnRzvRgQ" name="Security">
       <packagedElement xmi:type="uml:Component" xmi:id="_Z28kYOLUEeaUwfOnRzvRgQ" name="Identity Provider"/>
       <packagedElement xmi:type="uml:Component" xmi:id="_dclOUOLUEeaUwfOnRzvRgQ" name="Identity Directory Store"/>
       <packagedElement xmi:type="uml:Component" xmi:id="_kZIJsOLUEeaUwfOnRzvRgQ" name="Trust Circle Implementation"/>
-      <packagedElement xmi:type="uml:Component" xmi:id="_mEpQUOLUEeaUwfOnRzvRgQ" name="Distribution Filters"/>
+      <packagedElement xmi:type="uml:Component" xmi:id="_mEpQUOLUEeaUwfOnRzvRgQ" name="Distribution Filters">
+        <packagedElement xmi:type="uml:InformationFlow" xmi:id="_KNqasPVREeaEA63_qd_6wg" informationSource="_mEpQUOLUEeaUwfOnRzvRgQ" informationTarget="_D1zkQOLbEeaUwfOnRzvRgQ"/>
+      </packagedElement>
       <packagedElement xmi:type="uml:Component" xmi:id="_oaz2cOLUEeaUwfOnRzvRgQ" name="Malware Protection"/>
     </packagedElement>
     <packagedElement xmi:type="uml:Package" xmi:id="_O2qGwOLUEeaUwfOnRzvRgQ" name="Configuration">
@@ -37,10 +68,8 @@
       <packagedElement xmi:type="uml:Component" xmi:id="_t-jy4OLUEeaUwfOnRzvRgQ" name="Centralized Identity Provider"/>
       <packagedElement xmi:type="uml:Component" xmi:id="_v9PGEOLUEeaUwfOnRzvRgQ" name="Centralized Identity Directory Store"/>
     </packagedElement>
-    <packagedElement xmi:type="uml:Package" xmi:id="_Jbv5EOLbEeaUwfOnRzvRgQ" name="RESTful Services">
-      <packagedElement xmi:type="uml:Component" xmi:id="_Onvc0OLbEeaUwfOnRzvRgQ" name="Elastic Search RESTful data insertion service"/>
-      <packagedElement xmi:type="uml:Component" xmi:id="_S-dlcOLbEeaUwfOnRzvRgQ" name="Elastic Search RESTful data retrieval service"/>
-      <packagedElement xmi:type="uml:Component" xmi:id="_YFzSsOLbEeaUwfOnRzvRgQ" name="RESTful Data Sync Service"/>
+    <packagedElement xmi:type="uml:Component" xmi:id="_DOKgsPVLEeaEA63_qd_6wg" name="External CSP">
+      <packagedElement xmi:type="uml:InformationFlow" xmi:id="_OIWWUPVLEeaEA63_qd_6wg" informationSource="_DOKgsPVLEeaEA63_qd_6wg" informationTarget="_GsHDAOLbEeaUwfOnRzvRgQ"/>
     </packagedElement>
   </packagedElement>
   <packagedElement xmi:type="uml:Model" xmi:id="_Chqw8OLdEeaUwfOnRzvRgQ" name="Use Case Model">
@@ -107,8 +136,10 @@
     </packagedElement>
     <packagedElement xmi:type="uml:Actor" xmi:id="_577BYOc1Eea2FcEH0R3fLw" name="CSP User"/>
     <packagedElement xmi:type="uml:Actor" xmi:id="_jc4DcOcfEeaqOcsPDbMbxA" name="CSP Administrator"/>
-    <packagedElement xmi:type="uml:Actor" xmi:id="_ROQ8QO0lEeapcoc5bJvXgw" name="ENISA Administrator"/>
+    <packagedElement xmi:type="uml:Actor" xmi:id="_sIzZkO31EeaCT803Gi2e6w" name="CSP Application Emitter"/>
     <packagedElement xmi:type="uml:Actor" xmi:id="_Ee1xYO0nEeapcoc5bJvXgw" name="CSP OS Scheduler"/>
+    <packagedElement xmi:type="uml:Actor" xmi:id="_ROQ8QO0lEeapcoc5bJvXgw" name="ENISA Administrator"/>
+    <packagedElement xmi:type="uml:Actor" xmi:id="_mS98sO33EeaCT803Gi2e6w" name="External CSP"/>
     <packagedElement xmi:type="uml:UseCase" xmi:id="_uEVk0Oc0Eea2FcEH0R3fLw" name="Log in Elasticsearch"/>
     <packagedElement xmi:type="uml:Association" xmi:id="_scw3IOdBEea2FcEH0R3fLw" memberEnd="_scysUedBEea2FcEH0R3fLw _sczTYOdBEea2FcEH0R3fLw">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_scyFQOdBEea2FcEH0R3fLw" source="org.eclipse.papyrus">
@@ -201,7 +232,6 @@
       <ownedEnd xmi:type="uml:Property" xmi:id="_BC6dEe0nEeapcoc5bJvXgw" name="enisa administrator" type="_ROQ8QO0lEeapcoc5bJvXgw" association="_BC4n4O0nEeapcoc5bJvXgw"/>
       <ownedEnd xmi:type="uml:Property" xmi:id="_BC7EIO0nEeapcoc5bJvXgw" name="publish package update" type="_7dBLkO0mEeapcoc5bJvXgw" association="_BC4n4O0nEeapcoc5bJvXgw"/>
     </packagedElement>
-    <packagedElement xmi:type="uml:Actor" xmi:id="_sIzZkO31EeaCT803Gi2e6w" name="CSP Application Emitter"/>
     <packagedElement xmi:type="uml:Association" xmi:id="_yhuqgO31EeaCT803Gi2e6w" memberEnd="_yh4bgO31EeaCT803Gi2e6w _yh4bge31EeaCT803Gi2e6w">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_yhuqge31EeaCT803Gi2e6w" source="org.eclipse.papyrus">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_yhuqgu31EeaCT803Gi2e6w" key="nature" value="UML_Nature"/>
@@ -209,7 +239,6 @@
       <ownedEnd xmi:type="uml:Property" xmi:id="_yh4bgO31EeaCT803Gi2e6w" name="csp application emitter" type="_sIzZkO31EeaCT803Gi2e6w" association="_yhuqgO31EeaCT803Gi2e6w"/>
       <ownedEnd xmi:type="uml:Property" xmi:id="_yh4bge31EeaCT803Gi2e6w" name="distribute data update to csp applications" type="_gFnrYOctEeas4ad09kgIdw" association="_yhuqgO31EeaCT803Gi2e6w"/>
     </packagedElement>
-    <packagedElement xmi:type="uml:Actor" xmi:id="_mS98sO33EeaCT803Gi2e6w" name="External CSP"/>
     <packagedElement xmi:type="uml:Association" xmi:id="_z1BMcO33EeaCT803Gi2e6w" memberEnd="_z1BMc-33EeaCT803Gi2e6w _z1BMdO33EeaCT803Gi2e6w">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_z1BMce33EeaCT803Gi2e6w" source="org.eclipse.papyrus">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_z1BMcu33EeaCT803Gi2e6w" key="nature" value="UML_Nature"/>
@@ -228,82 +257,54 @@
   <packagedElement xmi:type="uml:Model" xmi:id="_EVQOcOLdEeaUwfOnRzvRgQ" name="Dynamic View"/>
   <packagedElement xmi:type="uml:Model" xmi:id="_YkKJ0OeVEeauMZFmYWZCwQ" name="Deployment Model">
     <packagedElement xmi:type="uml:Package" xmi:id="_YkKJ0eeVEeauMZFmYWZCwQ" name="Integration Layer">
-      <packagedElement xmi:type="uml:Dependency" xmi:id="_YkKJ0ueVEeauMZFmYWZCwQ" name="Runs On" client="_YkKJ1eeVEeauMZFmYWZCwQ" supplier="_YkKJ1OeVEeauMZFmYWZCwQ"/>
-      <packagedElement xmi:type="uml:Node" xmi:id="_YkKJ0-eVEeauMZFmYWZCwQ" name="Integration Layer Linux VM"/>
-      <packagedElement xmi:type="uml:ExecutionEnvironment" xmi:id="_YkKJ1OeVEeauMZFmYWZCwQ" name="OpenJDK Java VM"/>
-      <packagedElement xmi:type="uml:ExecutionEnvironment" xmi:id="_YkKJ1eeVEeauMZFmYWZCwQ" name="JBoss WildFly AppServer">
-        <ownedAttribute xmi:type="uml:Property" xmi:id="_YkKJ1ueVEeauMZFmYWZCwQ" name="security components linux vm" type="_YkKJ4-eVEeauMZFmYWZCwQ" association="_YkKJ2ueVEeauMZFmYWZCwQ"/>
-        <ownedAttribute xmi:type="uml:Property" xmi:id="_YkKJ1-eVEeauMZFmYWZCwQ" name="elastic search linux vm" type="_YkKJ5-eVEeauMZFmYWZCwQ" association="_YkKJ3ueVEeauMZFmYWZCwQ"/>
-        <nestedClassifier xmi:type="uml:Artifact" xmi:id="_YkKJ2OeVEeauMZFmYWZCwQ" name="RESTFul Services"/>
-        <nestedClassifier xmi:type="uml:Artifact" xmi:id="_YkKJ2eeVEeauMZFmYWZCwQ" name="Apache Camel"/>
-      </packagedElement>
-      <packagedElement xmi:type="uml:CommunicationPath" xmi:id="_YkKJ2ueVEeauMZFmYWZCwQ" name="Access Control" memberEnd="_YkKJ1ueVEeauMZFmYWZCwQ _YkKJ3eeVEeauMZFmYWZCwQ">
-        <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_YkKJ2-eVEeauMZFmYWZCwQ" source="org.eclipse.papyrus">
-          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_YkKJ3OeVEeauMZFmYWZCwQ" key="nature" value="UML_Nature"/>
-        </eAnnotations>
-        <ownedEnd xmi:type="uml:Property" xmi:id="_YkKJ3eeVEeauMZFmYWZCwQ" name="jboss wildfly appserver" type="_YkKJ1eeVEeauMZFmYWZCwQ" association="_YkKJ2ueVEeauMZFmYWZCwQ"/>
-      </packagedElement>
-      <packagedElement xmi:type="uml:CommunicationPath" xmi:id="_YkKJ3ueVEeauMZFmYWZCwQ" name="Indexing" memberEnd="_YkKJ1-eVEeauMZFmYWZCwQ _YkKJ4eeVEeauMZFmYWZCwQ">
-        <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_YkKJ3-eVEeauMZFmYWZCwQ" source="org.eclipse.papyrus">
-          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_YkKJ4OeVEeauMZFmYWZCwQ" key="nature" value="UML_Nature"/>
-        </eAnnotations>
-        <ownedEnd xmi:type="uml:Property" xmi:id="_YkKJ4eeVEeauMZFmYWZCwQ" name="jboss wildfly appserver" type="_YkKJ1eeVEeauMZFmYWZCwQ" association="_YkKJ3ueVEeauMZFmYWZCwQ"/>
+      <packagedElement xmi:type="uml:Node" xmi:id="_YkKJ0-eVEeauMZFmYWZCwQ" name="CSP Linux VM">
+        <nestedClassifier xmi:type="uml:Artifact" xmi:id="_HV-csPKwEea_ncy1aq0dFQ" name="Application Layer Dockers"/>
+        <nestedClassifier xmi:type="uml:Artifact" xmi:id="_YkKJ6eeVEeauMZFmYWZCwQ" name="Security Services Dockers"/>
+        <nestedClassifier xmi:type="uml:Artifact" xmi:id="_YkKJ5OeVEeauMZFmYWZCwQ" name="Surrounding Services Dockers"/>
+        <nestedClassifier xmi:type="uml:Artifact" xmi:id="_YkKJ2OeVEeauMZFmYWZCwQ" name="Integration Layer Dockers"/>
       </packagedElement>
     </packagedElement>
-    <packagedElement xmi:type="uml:Package" xmi:id="_YkKJ4ueVEeauMZFmYWZCwQ" name="Security Components">
-      <packagedElement xmi:type="uml:Node" xmi:id="_YkKJ4-eVEeauMZFmYWZCwQ" name="Security Components Linux VM">
-        <nestedClassifier xmi:type="uml:Artifact" xmi:id="_YkKJ5OeVEeauMZFmYWZCwQ" name="Identity Provider"/>
-      </packagedElement>
-    </packagedElement>
+    <packagedElement xmi:type="uml:Package" xmi:id="_YkKJ4ueVEeauMZFmYWZCwQ" name="Security Components"/>
     <packagedElement xmi:type="uml:Package" xmi:id="_YkKJ5eeVEeauMZFmYWZCwQ" name="Search and Indexing">
       <packagedElement xmi:type="uml:Node" xmi:id="_YkKJ5ueVEeauMZFmYWZCwQ" name="Search &amp; Indexing Linux VM"/>
-      <packagedElement xmi:type="uml:Node" xmi:id="_YkKJ5-eVEeauMZFmYWZCwQ" name="Elastic Search Linux VM">
-        <ownedAttribute xmi:type="uml:Property" xmi:id="_YkKJ6OeVEeauMZFmYWZCwQ" name="security components linux vm" type="_YkKJ4-eVEeauMZFmYWZCwQ" association="_YkKJ6-eVEeauMZFmYWZCwQ"/>
-        <nestedClassifier xmi:type="uml:Artifact" xmi:id="_YkKJ6eeVEeauMZFmYWZCwQ" name="Elastic Search"/>
-        <nestedClassifier xmi:type="uml:Artifact" xmi:id="_YkKJ6ueVEeauMZFmYWZCwQ" name="Kibana"/>
-      </packagedElement>
-      <packagedElement xmi:type="uml:CommunicationPath" xmi:id="_YkKJ6-eVEeauMZFmYWZCwQ" name="Access Control" memberEnd="_YkKJ6OeVEeauMZFmYWZCwQ _YkKJ7ueVEeauMZFmYWZCwQ">
-        <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_YkKJ7OeVEeauMZFmYWZCwQ" source="org.eclipse.papyrus">
-          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_YkKJ7eeVEeauMZFmYWZCwQ" key="nature" value="UML_Nature"/>
-        </eAnnotations>
-        <ownedEnd xmi:type="uml:Property" xmi:id="_YkKJ7ueVEeauMZFmYWZCwQ" name="elastic search linux vm" type="_YkKJ5-eVEeauMZFmYWZCwQ" association="_YkKJ6-eVEeauMZFmYWZCwQ"/>
-      </packagedElement>
     </packagedElement>
   </packagedElement>
-  <packagedElement xmi:type="uml:Model" xmi:id="_X-HKEPUVEeaLzenOgNDTDg" name="Data Model" visibility="public">
-    <packageImport xmi:type="uml:PackageImport" xmi:id="_v7ooQPUXEeaLzenOgNDTDg">
+  <packagedElement xmi:type="uml:Model" xmi:id="_ANdQIPVIEeaEA63_qd_6wg" name="Data Model" visibility="public">
+    <packageImport xmi:type="uml:PackageImport" xmi:id="_ANd3MPVIEeaEA63_qd_6wg">
       <importedPackage xmi:type="uml:Profile" href="pathmap://UML_PROFILES/Ecore.profile.uml#_0"/>
     </packageImport>
-    <packagedElement xmi:type="uml:DataType" xmi:id="_fwndEPUVEeaLzenOgNDTDg" name="DataEnvelop">
-      <ownedAttribute xmi:type="uml:Property" xmi:id="_uRBygPUVEeaLzenOgNDTDg" name="_source" visibility="public">
-        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#EString"/>
-      </ownedAttribute>
-      <ownedAttribute xmi:type="uml:Property" xmi:id="_Hg2Q8PUWEeaLzenOgNDTDg" name="shouldShare">
-        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#EBoolean"/>
-      </ownedAttribute>
-      <ownedAttribute xmi:type="uml:Property" xmi:id="_58N8YPUXEeaLzenOgNDTDg" name="isExternal">
-        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#EBoolean"/>
-      </ownedAttribute>
-      <ownedAttribute xmi:type="uml:Property" xmi:id="_9cmS4PUXEeaLzenOgNDTDg" name="applicationId">
-        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#EString"/>
-      </ownedAttribute>
-      <ownedAttribute xmi:type="uml:Property" xmi:id="_ihaCUPUYEeaLzenOgNDTDg" name="recordId">
-        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#EString"/>
-      </ownedAttribute>
-      <ownedAttribute xmi:type="uml:Property" xmi:id="_raHIYPUYEeaLzenOgNDTDg" name="tcId">
-        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#EString"/>
-      </ownedAttribute>
-      <ownedAttribute xmi:type="uml:Property" xmi:id="_FEn-wPUZEeaLzenOgNDTDg" name="dataType" type="_g9LW0PUVEeaLzenOgNDTDg"/>
+    <packagedElement xmi:type="uml:Package" xmi:id="_ANd3MfVIEeaEA63_qd_6wg" name="IntegrationDataEnvelop">
+      <packagedElement xmi:type="uml:DataType" xmi:id="_ANd3MvVIEeaEA63_qd_6wg" name="IntegrationDataEnvelop">
+        <ownedAttribute xmi:type="uml:Property" xmi:id="_ANd3M_VIEeaEA63_qd_6wg" name="applicationId">
+          <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#EString"/>
+        </ownedAttribute>
+        <ownedAttribute xmi:type="uml:Property" xmi:id="_ANd3NPVIEeaEA63_qd_6wg" name="shouldShare">
+          <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#EBoolean"/>
+        </ownedAttribute>
+        <ownedAttribute xmi:type="uml:Property" xmi:id="_ANd3NfVIEeaEA63_qd_6wg" name="isExternal">
+          <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#EBoolean"/>
+        </ownedAttribute>
+        <ownedAttribute xmi:type="uml:Property" xmi:id="_ANd3NvVIEeaEA63_qd_6wg" name="recordId">
+          <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#EString"/>
+        </ownedAttribute>
+        <ownedAttribute xmi:type="uml:Property" xmi:id="_ANd3N_VIEeaEA63_qd_6wg" name="tcId">
+          <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#EString"/>
+        </ownedAttribute>
+        <ownedAttribute xmi:type="uml:Property" xmi:id="_ANd3OPVIEeaEA63_qd_6wg" name="integrationDataType" type="_ANd3OvVIEeaEA63_qd_6wg"/>
+        <ownedAttribute xmi:type="uml:Property" xmi:id="_ANd3OfVIEeaEA63_qd_6wg" name="integrationData">
+          <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#EString"/>
+        </ownedAttribute>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Enumeration" xmi:id="_ANd3OvVIEeaEA63_qd_6wg" name="IntegrationDataType">
+        <ownedLiteral xmi:type="uml:EnumerationLiteral" xmi:id="_ANd3O_VIEeaEA63_qd_6wg" name="Eventthreat"/>
+        <ownedLiteral xmi:type="uml:EnumerationLiteral" xmi:id="_ANd3PPVIEeaEA63_qd_6wg" name="Vulnerability"/>
+        <ownedLiteral xmi:type="uml:EnumerationLiteral" xmi:id="_ANd3PfVIEeaEA63_qd_6wg" name="Atrefact"/>
+        <ownedLiteral xmi:type="uml:EnumerationLiteral" xmi:id="_ANd3PvVIEeaEA63_qd_6wg" name="Incident"/>
+        <ownedLiteral xmi:type="uml:EnumerationLiteral" xmi:id="_ANd3P_VIEeaEA63_qd_6wg" name="Chat"/>
+        <ownedLiteral xmi:type="uml:EnumerationLiteral" xmi:id="_ANd3QPVIEeaEA63_qd_6wg" name="File"/>
+        <ownedLiteral xmi:type="uml:EnumerationLiteral" xmi:id="_ANd3QfVIEeaEA63_qd_6wg" name="Contact"/>
+      </packagedElement>
+      <packagedElement xmi:type="uml:Usage" xmi:id="_ANd3QvVIEeaEA63_qd_6wg" client="_ANdQIPVIEeaEA63_qd_6wg _ANdQIPVIEeaEA63_qd_6wg _ANdQIPVIEeaEA63_qd_6wg _ANdQIPVIEeaEA63_qd_6wg" supplier="_ANd3OvVIEeaEA63_qd_6wg _ANd3OvVIEeaEA63_qd_6wg _ANd3OvVIEeaEA63_qd_6wg _ANd3OvVIEeaEA63_qd_6wg"/>
     </packagedElement>
-    <packagedElement xmi:type="uml:Enumeration" xmi:id="_g9LW0PUVEeaLzenOgNDTDg" name="DataType">
-      <ownedLiteral xmi:type="uml:EnumerationLiteral" xmi:id="_kEVVAPUVEeaLzenOgNDTDg" name="Eventthreat"/>
-      <ownedLiteral xmi:type="uml:EnumerationLiteral" xmi:id="_muKeAPUVEeaLzenOgNDTDg" name="Vulnerability"/>
-      <ownedLiteral xmi:type="uml:EnumerationLiteral" xmi:id="_n3LUgPUVEeaLzenOgNDTDg" name="Atrefact"/>
-      <ownedLiteral xmi:type="uml:EnumerationLiteral" xmi:id="_o5d38PUVEeaLzenOgNDTDg" name="Incident"/>
-      <ownedLiteral xmi:type="uml:EnumerationLiteral" xmi:id="_qgs7gPUVEeaLzenOgNDTDg" name="Chat"/>
-      <ownedLiteral xmi:type="uml:EnumerationLiteral" xmi:id="_rs_IcPUVEeaLzenOgNDTDg" name="File"/>
-      <ownedLiteral xmi:type="uml:EnumerationLiteral" xmi:id="_sndMoPUVEeaLzenOgNDTDg" name="Contact"/>
-    </packagedElement>
-    <packagedElement xmi:type="uml:Usage" xmi:id="_xkzwEPUYEeaLzenOgNDTDg" client="_uRBygPUVEeaLzenOgNDTDg _X-HKEPUVEeaLzenOgNDTDg" supplier="_g9LW0PUVEeaLzenOgNDTDg"/>
   </packagedElement>
 </uml:Model>
