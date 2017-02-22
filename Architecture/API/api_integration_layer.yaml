@@ -1,0 +1,111 @@
+swagger: '2.0'
+info:
+  description: ""
+  version: "0.0.1"
+  title: Integration Layer API
+
+host: int.csp.org
+schemes:
+  - https
+paths:
+  /dsl:
+    post:
+      tags:
+        - dsl
+      summary: todo
+      description: |
+        todo
+      operationId: synchNewIntData
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: newIntDataObj
+          required: true
+          schema:
+            $ref: '#/definitions/IntegrationData'
+      responses:
+        200:
+          description: Successful operation
+    put:
+      tags:
+        - dsl
+      summary: todo
+      description: |
+        todo
+      operationId: synchUpdatedIntData
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: updIntDataObj
+          required: true
+          schema:
+            $ref: '#/definitions/IntegrationData'
+      responses:
+        200:
+          description: Successful operation
+                
+  /dcl:
+    post:
+      tags:
+        - dsl
+      summary: todo
+      description: |
+        todo
+      operationId: colabIntData
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: newIntDataObj
+          required: true
+          schema:
+            $ref: '#/definitions/IntegrationData'
+      responses:
+        200:
+          description: Successful operation
+
+definitions:
+  IntegrationData:
+    type: object
+    properties:
+      dataParams:
+        $ref: '#/definitions/DataParams'
+      sharingParams:
+        $ref: '#/definitions/SharingParams'
+      dataType:
+        $ref: '#/definitions/IntegrationDataType'
+      dataObject:
+        type: string
+      
+  DataParams:
+    type: object
+    properties:
+      cspId:
+        type: string
+      applicationId:
+        type: string
+      recordId:
+        type: string
+    
+  IntegrationDataType:
+    type: string
+    enum:
+    - threat
+    - incident
+    - vulnerability
+    - artefact
+    - chat
+    - file
+    - contact
+  
+  SharingParams:
+    type: object
+    properties:
+      toShare:
+        type: boolean
+      trustCircleId:
+        type: string
+      isExternal:
+        type: boolean

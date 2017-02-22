@@ -1,0 +1,71 @@
+swagger: '2.0'
+info:
+  description: ""
+  version: "0.0.1"
+  title: Application Adapter API
+
+host: app.csp.org
+schemes:
+  - https
+paths:
+  /adapter:
+    post:
+      summary: todo
+      description: |
+        todo
+      operationId: addIntData
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: intDataObj
+          required: true
+          schema:
+            $ref: '#/definitions/IntegrationData'
+      responses:
+        200:
+          description: Successful operation
+
+definitions:
+  IntegrationData:
+    type: object
+    properties:
+      dataParams:
+        $ref: '#/definitions/DataParams'
+      sharingParams:
+        $ref: '#/definitions/SharingParams'
+      dataType:
+        $ref: '#/definitions/IntegrationDataType'
+      dataObject:
+        type: string
+      
+  DataParams:
+    type: object
+    properties:
+      cspId:
+        type: string
+      applicationId:
+        type: string
+      recordId:
+        type: string
+    
+  IntegrationDataType:
+    type: string
+    enum:
+    - threat
+    - incident
+    - vulnerability
+    - artefact
+    - chat
+    - file
+    - contact
+  
+  SharingParams:
+    type: object
+    properties:
+      toShare:
+        type: boolean
+      trustCircleId:
+        type: string
+      isExternal:
+        type: boolean
