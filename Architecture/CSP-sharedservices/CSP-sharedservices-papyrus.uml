@@ -21,7 +21,10 @@
         <packagedElement xmi:type="uml:InformationFlow" xmi:id="_r9-9w_VVEea4b69uN8N4dw" informationSource="_r9-9wvVVEea4b69uN8N4dw" informationTarget="_r9-9yvVVEea4b69uN8N4dw"/>
       </packagedElement>
       <packagedElement xmi:type="uml:Component" xmi:id="_r9-9xPVVEea4b69uN8N4dw" name="Application RESTful Adapter"/>
-      <packagedElement xmi:type="uml:Component" xmi:id="_r9-9xfVVEea4b69uN8N4dw" name="Application"/>
+      <packagedElement xmi:type="uml:Component" xmi:id="_r9-9xfVVEea4b69uN8N4dw" name="Application">
+        <packagedElement xmi:type="uml:Usage" xmi:id="_Px9pkAQfEeeWNbzuB-wxVw" client="_r9-9xfVVEea4b69uN8N4dw" supplier="_r9-95PVVEea4b69uN8N4dw"/>
+        <packagedElement xmi:type="uml:Usage" xmi:id="_vQdQwAQfEeeWNbzuB-wxVw" client="_r9-9xfVVEea4b69uN8N4dw" supplier="_GJqSkAQfEeeWNbzuB-wxVw"/>
+      </packagedElement>
     </packagedElement>
     <packagedElement xmi:type="uml:Package" xmi:id="_r9-9xvVVEea4b69uN8N4dw" name="Integration Layer">
       <packagedElement xmi:type="uml:Package" xmi:id="_r9-9x_VVEea4b69uN8N4dw" name="Data Synchronization">
@@ -61,16 +64,22 @@
         <packagedElement xmi:type="uml:InformationFlow" xmi:id="_r9-93vVVEea4b69uN8N4dw" informationSource="_r9-93fVVEea4b69uN8N4dw" informationTarget="_r9-94PVVEea4b69uN8N4dw"/>
       </packagedElement>
       <packagedElement xmi:type="uml:Component" xmi:id="_r9-93_VVEea4b69uN8N4dw" name="RESTful indexing service"/>
-      <packagedElement xmi:type="uml:Component" xmi:id="_r9-94PVVEea4b69uN8N4dw" name="Kibana"/>
+      <packagedElement xmi:type="uml:Component" xmi:id="_r9-94PVVEea4b69uN8N4dw" name="Kibana">
+        <packagedElement xmi:type="uml:Usage" xmi:id="_hCU-IAQfEeeWNbzuB-wxVw" client="_r9-94PVVEea4b69uN8N4dw" supplier="_r9-93fVVEea4b69uN8N4dw"/>
+        <packagedElement xmi:type="uml:Usage" xmi:id="_3h9z8AQfEeeWNbzuB-wxVw" client="_r9-94PVVEea4b69uN8N4dw" supplier="_GJqSkAQfEeeWNbzuB-wxVw"/>
+      </packagedElement>
     </packagedElement>
     <packagedElement xmi:type="uml:Package" xmi:id="_r9-94fVVEea4b69uN8N4dw" name="Security">
       <packagedElement xmi:type="uml:Component" xmi:id="_r9-94vVVEea4b69uN8N4dw" name="Identity Provider"/>
       <packagedElement xmi:type="uml:Component" xmi:id="_r9-94_VVEea4b69uN8N4dw" name="Identity Directory Store"/>
-      <packagedElement xmi:type="uml:Component" xmi:id="_r9-95PVVEea4b69uN8N4dw" name="Trust Circle Implementation"/>
+      <packagedElement xmi:type="uml:Component" xmi:id="_r9-95PVVEea4b69uN8N4dw" name="Trust Circle Implementation">
+        <packagedElement xmi:type="uml:Usage" xmi:id="_7UHP4AQfEeeWNbzuB-wxVw" client="_r9-95PVVEea4b69uN8N4dw" supplier="_GJqSkAQfEeeWNbzuB-wxVw"/>
+      </packagedElement>
       <packagedElement xmi:type="uml:Component" xmi:id="_r9-95fVVEea4b69uN8N4dw" name="Distribution Filters">
         <packagedElement xmi:type="uml:InformationFlow" xmi:id="_r9-95vVVEea4b69uN8N4dw" informationSource="_r9-95fVVEea4b69uN8N4dw" informationTarget="_r9-91vVVEea4b69uN8N4dw"/>
       </packagedElement>
       <packagedElement xmi:type="uml:Component" xmi:id="_r9-95_VVEea4b69uN8N4dw" name="Malware Protection"/>
+      <packagedElement xmi:type="uml:Component" xmi:id="_GJqSkAQfEeeWNbzuB-wxVw" name="Security Services"/>
     </packagedElement>
     <packagedElement xmi:type="uml:Package" xmi:id="_r9-96PVVEea4b69uN8N4dw" name="Configuration">
       <packagedElement xmi:type="uml:Component" xmi:id="_r9-96fVVEea4b69uN8N4dw" name="Identity and Access Management Configuration"/>
@@ -163,6 +172,11 @@
         <include xmi:type="uml:Include" xmi:id="_Df0pIAOIEeeR6OGfUKjoKw" addition="_-Nz88AOHEeeR6OGfUKjoKw"/>
       </packagedElement>
       <packagedElement xmi:type="uml:UseCase" xmi:id="_-Nz88AOHEeeR6OGfUKjoKw" name="Log in Trust Circle Management"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Package" xmi:id="_gtUM4AQeEeeWNbzuB-wxVw" name="Security Services">
+      <packagedElement xmi:type="uml:UseCase" xmi:id="_mDnjMAQeEeeWNbzuB-wxVw" name="User Authentication using Credentials"/>
+      <packagedElement xmi:type="uml:UseCase" xmi:id="_ma1wYAQeEeeWNbzuB-wxVw" name="User Authentication using Certificates"/>
+      <packagedElement xmi:type="uml:UseCase" xmi:id="_mwf3UAQeEeeWNbzuB-wxVw" name="User Management in Security Services"/>
     </packagedElement>
     <packagedElement xmi:type="uml:Actor" xmi:id="_r-CBQPVVEea4b69uN8N4dw" name="CSP User"/>
     <packagedElement xmi:type="uml:Actor" xmi:id="_r-CBQfVVEea4b69uN8N4dw" name="CSP Administrator"/>
@@ -340,6 +354,41 @@
       <ownedEnd xmi:type="uml:Property" xmi:id="_h7AZMAOIEeeR6OGfUKjoKw" name="csp application" type="_sbGwUAOHEeeR6OGfUKjoKw" association="_h6-kAAOIEeeR6OGfUKjoKw"/>
       <ownedEnd xmi:type="uml:Property" xmi:id="_h7AZMQOIEeeR6OGfUKjoKw" name="read trust circle" type="_3X3_4AOHEeeR6OGfUKjoKw" association="_h6-kAAOIEeeR6OGfUKjoKw"/>
     </packagedElement>
+    <packagedElement xmi:type="uml:Association" xmi:id="_vGhHEAQeEeeWNbzuB-wxVw" memberEnd="_vGjjUAQeEeeWNbzuB-wxVw _vGkKYAQeEeeWNbzuB-wxVw">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_vGi8QAQeEeeWNbzuB-wxVw" source="org.eclipse.papyrus">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_vGi8QQQeEeeWNbzuB-wxVw" key="nature" value="UML_Nature"/>
+      </eAnnotations>
+      <ownedEnd xmi:type="uml:Property" xmi:id="_vGjjUAQeEeeWNbzuB-wxVw" name="csp user" type="_r-CBQPVVEea4b69uN8N4dw" association="_vGhHEAQeEeeWNbzuB-wxVw"/>
+      <ownedEnd xmi:type="uml:Property" xmi:id="_vGkKYAQeEeeWNbzuB-wxVw" name="user authentication using credentials" type="_mDnjMAQeEeeWNbzuB-wxVw" association="_vGhHEAQeEeeWNbzuB-wxVw"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Association" xmi:id="_vuoP8AQeEeeWNbzuB-wxVw" memberEnd="_vurTQQQeEeeWNbzuB-wxVw _vur6UAQeEeeWNbzuB-wxVw">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_vuqsMAQeEeeWNbzuB-wxVw" source="org.eclipse.papyrus">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_vurTQAQeEeeWNbzuB-wxVw" key="nature" value="UML_Nature"/>
+      </eAnnotations>
+      <ownedEnd xmi:type="uml:Property" xmi:id="_vurTQQQeEeeWNbzuB-wxVw" name="csp user" type="_r-CBQPVVEea4b69uN8N4dw" association="_vuoP8AQeEeeWNbzuB-wxVw"/>
+      <ownedEnd xmi:type="uml:Property" xmi:id="_vur6UAQeEeeWNbzuB-wxVw" name="user authentication using certificates" type="_ma1wYAQeEeeWNbzuB-wxVw" association="_vuoP8AQeEeeWNbzuB-wxVw"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Association" xmi:id="_xTswUAQeEeeWNbzuB-wxVw" memberEnd="_xTvMkgQeEeeWNbzuB-wxVw _xTvzoAQeEeeWNbzuB-wxVw">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_xTvMkAQeEeeWNbzuB-wxVw" source="org.eclipse.papyrus">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_xTvMkQQeEeeWNbzuB-wxVw" key="nature" value="UML_Nature"/>
+      </eAnnotations>
+      <ownedEnd xmi:type="uml:Property" xmi:id="_xTvMkgQeEeeWNbzuB-wxVw" name="csp administrator" type="_r-CBQfVVEea4b69uN8N4dw" association="_xTswUAQeEeeWNbzuB-wxVw"/>
+      <ownedEnd xmi:type="uml:Property" xmi:id="_xTvzoAQeEeeWNbzuB-wxVw" name="user authentication using credentials" type="_mDnjMAQeEeeWNbzuB-wxVw" association="_xTswUAQeEeeWNbzuB-wxVw"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Association" xmi:id="_yFrm4AQeEeeWNbzuB-wxVw" memberEnd="_yFuDIQQeEeeWNbzuB-wxVw _yFuDIgQeEeeWNbzuB-wxVw">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_yFtcEAQeEeeWNbzuB-wxVw" source="org.eclipse.papyrus">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_yFuDIAQeEeeWNbzuB-wxVw" key="nature" value="UML_Nature"/>
+      </eAnnotations>
+      <ownedEnd xmi:type="uml:Property" xmi:id="_yFuDIQQeEeeWNbzuB-wxVw" name="csp administrator" type="_r-CBQfVVEea4b69uN8N4dw" association="_yFrm4AQeEeeWNbzuB-wxVw"/>
+      <ownedEnd xmi:type="uml:Property" xmi:id="_yFuDIgQeEeeWNbzuB-wxVw" name="user authentication using certificates" type="_ma1wYAQeEeeWNbzuB-wxVw" association="_yFrm4AQeEeeWNbzuB-wxVw"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Association" xmi:id="_yrFaAAQeEeeWNbzuB-wxVw" memberEnd="_yrH2QQQeEeeWNbzuB-wxVw _yrIdUAQeEeeWNbzuB-wxVw">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_yrHPMAQeEeeWNbzuB-wxVw" source="org.eclipse.papyrus">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_yrH2QAQeEeeWNbzuB-wxVw" key="nature" value="UML_Nature"/>
+      </eAnnotations>
+      <ownedEnd xmi:type="uml:Property" xmi:id="_yrH2QQQeEeeWNbzuB-wxVw" name="csp administrator" type="_r-CBQfVVEea4b69uN8N4dw" association="_yrFaAAQeEeeWNbzuB-wxVw"/>
+      <ownedEnd xmi:type="uml:Property" xmi:id="_yrIdUAQeEeeWNbzuB-wxVw" name="user management in security services" type="_mwf3UAQeEeeWNbzuB-wxVw" association="_yrFaAAQeEeeWNbzuB-wxVw"/>
+    </packagedElement>
   </packagedElement>
   <packagedElement xmi:type="uml:Model" xmi:id="_r-D2QPVVEea4b69uN8N4dw" name="Data Model" visibility="public">
     <packageImport xmi:type="uml:PackageImport" xmi:id="_r-D2QfVVEea4b69uN8N4dw">
@@ -347,10 +396,13 @@
     </packageImport>
     <packagedElement xmi:type="uml:Package" xmi:id="_r-D2QvVVEea4b69uN8N4dw" name="IntegrationDataEnvelop">
       <packagedElement xmi:type="uml:DataType" xmi:id="_r-D2Q_VVEea4b69uN8N4dw" name="IntegrationDataEnvelop">
+        <ownedAttribute xmi:type="uml:Property" xmi:id="_pQnYwAQgEeeWNbzuB-wxVw" name="cspId">
+          <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#EString"/>
+        </ownedAttribute>
         <ownedAttribute xmi:type="uml:Property" xmi:id="_r-D2RPVVEea4b69uN8N4dw" name="applicationId">
           <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#EString"/>
         </ownedAttribute>
-        <ownedAttribute xmi:type="uml:Property" xmi:id="_r-D2RfVVEea4b69uN8N4dw" name="shouldShare">
+        <ownedAttribute xmi:type="uml:Property" xmi:id="_r-D2RfVVEea4b69uN8N4dw" name="toShare">
           <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#EBoolean"/>
         </ownedAttribute>
         <ownedAttribute xmi:type="uml:Property" xmi:id="_r-D2RvVVEea4b69uN8N4dw" name="isExternal">
@@ -359,7 +411,7 @@
         <ownedAttribute xmi:type="uml:Property" xmi:id="_r-D2R_VVEea4b69uN8N4dw" name="recordId">
           <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#EString"/>
         </ownedAttribute>
-        <ownedAttribute xmi:type="uml:Property" xmi:id="_r-D2SPVVEea4b69uN8N4dw" name="tcId">
+        <ownedAttribute xmi:type="uml:Property" xmi:id="_r-D2SPVVEea4b69uN8N4dw" name="trustCircleId">
           <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#EString"/>
         </ownedAttribute>
         <ownedAttribute xmi:type="uml:Property" xmi:id="_r-D2SfVVEea4b69uN8N4dw" name="integrationDataType" type="_r-D2S_VVEea4b69uN8N4dw"/>
@@ -368,13 +420,15 @@
         </ownedAttribute>
       </packagedElement>
       <packagedElement xmi:type="uml:Enumeration" xmi:id="_r-D2S_VVEea4b69uN8N4dw" name="IntegrationDataType">
-        <ownedLiteral xmi:type="uml:EnumerationLiteral" xmi:id="_r-D2TPVVEea4b69uN8N4dw" name="Eventthreat"/>
+        <ownedLiteral xmi:type="uml:EnumerationLiteral" xmi:id="_r-D2TPVVEea4b69uN8N4dw" name="Event"/>
         <ownedLiteral xmi:type="uml:EnumerationLiteral" xmi:id="_r-D2TfVVEea4b69uN8N4dw" name="Vulnerability"/>
         <ownedLiteral xmi:type="uml:EnumerationLiteral" xmi:id="_r-D2TvVVEea4b69uN8N4dw" name="Atrefact"/>
         <ownedLiteral xmi:type="uml:EnumerationLiteral" xmi:id="_r-D2T_VVEea4b69uN8N4dw" name="Incident"/>
         <ownedLiteral xmi:type="uml:EnumerationLiteral" xmi:id="_r-D2UPVVEea4b69uN8N4dw" name="Chat"/>
         <ownedLiteral xmi:type="uml:EnumerationLiteral" xmi:id="_r-D2UfVVEea4b69uN8N4dw" name="File"/>
         <ownedLiteral xmi:type="uml:EnumerationLiteral" xmi:id="_r-D2UvVVEea4b69uN8N4dw" name="Contact"/>
+        <ownedLiteral xmi:type="uml:EnumerationLiteral" xmi:id="_ltIq8AQgEeeWNbzuB-wxVw" name="TrustCircle"/>
+        <ownedLiteral xmi:type="uml:EnumerationLiteral" xmi:id="_GKNaQAQhEeeWNbzuB-wxVw" name="Threat"/>
       </packagedElement>
       <packagedElement xmi:type="uml:Usage" xmi:id="_r-D2U_VVEea4b69uN8N4dw" client="_r-D2QPVVEea4b69uN8N4dw" supplier="_r-D2S_VVEea4b69uN8N4dw"/>
     </packagedElement>
