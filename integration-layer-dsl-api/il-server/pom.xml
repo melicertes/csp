@@ -14,7 +14,7 @@
     <groupId>com.sastix.csp</groupId>
     <artifactId>il-server</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <packaging>jar</packaging>
+    <packaging>war</packaging>
 
     <properties>
         <camel.version>2.18.2</camel.version>
@@ -48,6 +48,12 @@
         <dependency>
             <groupId>org.apache.camel</groupId>
             <artifactId>camel-http</artifactId>
+            <version>${camel.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-jackson</artifactId>
             <version>${camel.version}</version>
         </dependency>
 

@@ -18,9 +18,9 @@
 	<description>Integration Layer DSL API for csp</description>
 
 	<modules>
+		<module>il-commons</module>
 		<module>il-server</module>
 		<module>il-client</module>
-		<module>il-commons</module>
 	</modules>
 
 	<properties>
