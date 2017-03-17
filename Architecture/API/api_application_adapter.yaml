@@ -26,6 +26,40 @@ paths:
         200:
           description: Successful operation
 
+    put:
+      summary: todo
+      description: |
+        todo
+      operationId: updateIntData
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: intDataObj
+          required: true
+          schema:
+            $ref: '#/definitions/IntegrationData'
+      responses:
+        200:
+          description: Successful operation
+
+    delete:
+      summary: todo
+      description: |
+        todo
+      operationId: deleteIntData
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: intDataObj
+          required: true
+          schema:
+            $ref: '#/definitions/IntegrationData'
+      responses:
+        200:
+          description: Successful operation
+
 definitions:
   IntegrationData:
     type: object
@@ -52,6 +86,7 @@ definitions:
   IntegrationDataType:
     type: string
     enum:
+    - event
     - threat
     - incident
     - vulnerability
@@ -59,13 +94,12 @@ definitions:
     - chat
     - file
     - contact
+    - trustCircle
   
   SharingParams:
     type: object
     properties:
       toShare:
         type: boolean
-      trustCircleId:
-        type: string
       isExternal:
         type: boolean
