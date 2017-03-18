@@ -31,7 +31,9 @@ public class DslApiController {
             String dataType = getDataType(newIntDataObj.getDataType());
 
             if (dataType != null) {
-                intDataProducer.sendBody("direct:apps", newIntDataObj);
+                if (!newIntDataObj.getSharingParams().isExternal()) {
+                    intDataProducer.sendBody("direct:apps", newIntDataObj);
+                }
                 intDataProducer.sendBody("direct:ddl", newIntDataObj);
             } else {
                 throw new InvalidDataTypeException();
@@ -39,10 +41,10 @@ public class DslApiController {
 
         } catch (InvalidDataTypeException e) {
             LOGGER.warn(e.getMessage());
-            return new ResponseEntity<String>(e.getMessage(), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
 
-        return new ResponseEntity<String>(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @RequestMapping(value = "/dsl",
@@ -54,17 +56,20 @@ public class DslApiController {
             String dataType = getDataType(updIntDataObj.getDataType());
 
             if (dataType != null) {
-                intDataProducer.sendBody("direct:apps", updIntDataObj);
+                if (!updIntDataObj.getSharingParams().isExternal()) {
+                    intDataProducer.sendBody("direct:apps", updIntDataObj);
+                }
                 intDataProducer.sendBody("direct:ddl", updIntDataObj);
             } else {
                 throw new InvalidDataTypeException();
             }
+
         } catch (InvalidDataTypeException e) {
             LOGGER.warn(e.getMessage());
-            return new ResponseEntity<String>(e.getMessage(), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
 
-        return new ResponseEntity<String>(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @RequestMapping(value = "/dsl",
@@ -76,17 +81,20 @@ public class DslApiController {
             String dataType = getDataType(delIntDataObj.getDataType());
 
             if (dataType != null) {
-                intDataProducer.sendBody("direct:apps", delIntDataObj);
+                if (!delIntDataObj.getSharingParams().isExternal()) {
+                    intDataProducer.sendBody("direct:apps", delIntDataObj);
+                }
                 intDataProducer.sendBody("direct:ddl", delIntDataObj);
             } else {
                 throw new InvalidDataTypeException();
             }
+
         } catch (InvalidDataTypeException e) {
             LOGGER.warn(e.getMessage());
-            return new ResponseEntity<String>(e.getMessage(), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
 
-        return new ResponseEntity<String>(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     private String getDataType(IntegrationDataType dataType) throws InvalidDataTypeException {
