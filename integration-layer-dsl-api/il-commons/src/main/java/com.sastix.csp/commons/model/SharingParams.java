@@ -18,18 +18,18 @@ public class SharingParams  implements Serializable {
   @JsonProperty("trustCircleId")
   private String trustCircleId;
 
-    @JsonProperty("external")
-    private Boolean external;
+  @JsonProperty("isExternal")
+  private Boolean isExternal;
 
   public SharingParams() {}
 
-    public SharingParams(Boolean toShare, String trustCircleId, Boolean external) {
+  public SharingParams(Boolean toShare, String trustCircleId, Boolean isExternal) {
     this.toShare = toShare;
     this.trustCircleId = trustCircleId;
-        this.external = external;
+    this.isExternal = isExternal;
   }
 
-    public Boolean isToShare() {
+  public Boolean getToShare() {
     return toShare;
   }
 
@@ -45,12 +45,12 @@ public class SharingParams  implements Serializable {
     this.trustCircleId = trustCircleId;
   }
 
-    public Boolean isExternal() {
-        return external;
+  public Boolean getIsExternal() {
+    return isExternal;
   }
 
-    public void setExternal(Boolean external) {
-        this.external = external;
+  public void setIsExternal(Boolean isExternal) {
+    this.isExternal = isExternal;
   }
 
   @Override
@@ -64,12 +64,12 @@ public class SharingParams  implements Serializable {
     SharingParams sharingParams = (SharingParams) o;
     return Objects.equals(this.toShare, sharingParams.toShare) &&
         Objects.equals(this.trustCircleId, sharingParams.trustCircleId) &&
-            Objects.equals(this.external, sharingParams.external);
+            Objects.equals(this.isExternal, sharingParams.isExternal);
   }
 
   @Override
   public int hashCode() {
-      return Objects.hash(toShare, trustCircleId, external);
+    return Objects.hash(toShare, trustCircleId, isExternal);
   }
 
   @Override
@@ -79,7 +79,7 @@ public class SharingParams  implements Serializable {
 
     sb.append("    toShare: ").append(toIndentedString(toShare)).append("\n");
     sb.append("    trustCircleId: ").append(toIndentedString(trustCircleId)).append("\n");
-      sb.append("    external: ").append(toIndentedString(external)).append("\n");
+    sb.append("    isExternal: ").append(toIndentedString(isExternal)).append("\n");
     sb.append("}");
     return sb.toString();
   }

@@ -31,7 +31,7 @@ public class DslApiController {
             String dataType = getDataType(newIntDataObj.getDataType());
 
             if (dataType != null) {
-                if (!newIntDataObj.getSharingParams().isExternal()) {
+                if (!newIntDataObj.getSharingParams().getIsExternal()) {
                     intDataProducer.sendBody("direct:apps", newIntDataObj);
                 }
                 intDataProducer.sendBody("direct:ddl", newIntDataObj);
@@ -56,7 +56,7 @@ public class DslApiController {
             String dataType = getDataType(updIntDataObj.getDataType());
 
             if (dataType != null) {
-                if (!updIntDataObj.getSharingParams().isExternal()) {
+                if (!updIntDataObj.getSharingParams().getIsExternal()) {
                     intDataProducer.sendBody("direct:apps", updIntDataObj);
                 }
                 intDataProducer.sendBody("direct:ddl", updIntDataObj);
@@ -81,7 +81,7 @@ public class DslApiController {
             String dataType = getDataType(delIntDataObj.getDataType());
 
             if (dataType != null) {
-                if (!delIntDataObj.getSharingParams().isExternal()) {
+                if (!delIntDataObj.getSharingParams().getIsExternal()) {
                     intDataProducer.sendBody("direct:apps", delIntDataObj);
                 }
                 intDataProducer.sendBody("direct:ddl", delIntDataObj);
