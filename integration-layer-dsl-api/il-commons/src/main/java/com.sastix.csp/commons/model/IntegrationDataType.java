@@ -7,7 +7,9 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * Gets or Sets IntegrationDataType
  */
 public enum IntegrationDataType {
-  
+
+  EVENT("event"),
+
   THREAT("threat"),
   
   INCIDENT("incident"),
@@ -19,8 +21,10 @@ public enum IntegrationDataType {
   CHAT("chat"),
   
   FILE("file"),
-  
-  CONTACT("contact");
+
+  CONTACT("contact"),
+
+  TRUSTCIRCLE("trustCircle");
 
   private String value;
 

@@ -1,5 +1,6 @@
 package com.sastix.csp.server.api;
 
+import com.sastix.csp.commons.apiHttpStatusResponse.HttpStatusResponseType;
 import com.sastix.csp.commons.exceptions.InvalidDataTypeException;
 import com.sastix.csp.commons.model.IntegrationData;
 import com.sastix.csp.commons.model.IntegrationDataType;
@@ -22,99 +23,109 @@ public class DslApiController {
     @Produce
     private ProducerTemplate intDataProducer;
 
-    @RequestMapping(value = "/dsl",
+    @RequestMapping(value = "/dsl/integrationData",
             consumes = {"application/json"},
             method = RequestMethod.POST)
-    public ResponseEntity<String> synchNewIntData(@RequestBody IntegrationData newIntDataObj) {
+    public ResponseEntity<String> synchNewIntData(@RequestBody IntegrationData intDataObj) {
 
         try {
-            String dataType = getDataType(newIntDataObj.getDataType());
+            String dataType = getDataType(intDataObj.getDataType());
 
             if (dataType != null) {
-                if (!newIntDataObj.getSharingParams().getIsExternal()) {
-                    intDataProducer.sendBody("direct:apps", newIntDataObj);
+                if (!intDataObj.getSharingParams().getIsExternal()) {
+                    intDataProducer.sendBody("direct:apps", intDataObj);
                 }
-                intDataProducer.sendBody("direct:ddl", newIntDataObj);
+                intDataProducer.sendBody("direct:ddl", intDataObj);
             } else {
                 throw new InvalidDataTypeException();
             }
 
         } catch (InvalidDataTypeException e) {
             LOGGER.warn(e.getMessage());
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(HttpStatusResponseType.MALFORMED_INTEGRATION_DATA_STRUCTURE.getReasonPhrase(),
+                    HttpStatus.BAD_REQUEST);
         }
 
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatusResponseType.SUCCESSFUL_OPERATION.getReasonPhrase(),
+                HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/dsl",
+    @RequestMapping(value = "/dsl/integrationData",
             consumes = {"application/json"},
             method = RequestMethod.PUT)
-    public ResponseEntity<String> synchUpdatedIntData(@RequestBody IntegrationData updIntDataObj) {
+    public ResponseEntity<String> synchUpdatedIntData(@RequestBody IntegrationData intDataObj) {
 
         try {
-            String dataType = getDataType(updIntDataObj.getDataType());
+            String dataType = getDataType(intDataObj.getDataType());
 
             if (dataType != null) {
-                if (!updIntDataObj.getSharingParams().getIsExternal()) {
-                    intDataProducer.sendBody("direct:apps", updIntDataObj);
+                if (!intDataObj.getSharingParams().getIsExternal()) {
+                    intDataProducer.sendBody("direct:apps", intDataObj);
                 }
-                intDataProducer.sendBody("direct:ddl", updIntDataObj);
+                intDataProducer.sendBody("direct:ddl", intDataObj);
             } else {
                 throw new InvalidDataTypeException();
             }
 
         } catch (InvalidDataTypeException e) {
             LOGGER.warn(e.getMessage());
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(HttpStatusResponseType.MALFORMED_INTEGRATION_DATA_STRUCTURE.getReasonPhrase(),
+                    HttpStatus.BAD_REQUEST);
         }
 
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatusResponseType.SUCCESSFUL_OPERATION.getReasonPhrase(),
+                HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/dsl",
+    @RequestMapping(value = "/dsl/integrationData",
             consumes = {"application/json"},
             method = RequestMethod.DELETE)
-    public ResponseEntity<String> synchDeletedIntData(@RequestBody IntegrationData delIntDataObj) {
+    public ResponseEntity<String> synchDeletedIntData(@RequestBody IntegrationData intDataObj) {
 
         try {
-            String dataType = getDataType(delIntDataObj.getDataType());
+            String dataType = getDataType(intDataObj.getDataType());
 
             if (dataType != null) {
-                if (!delIntDataObj.getSharingParams().getIsExternal()) {
-                    intDataProducer.sendBody("direct:apps", delIntDataObj);
+                if (!intDataObj.getSharingParams().getIsExternal()) {
+                    intDataProducer.sendBody("direct:apps", intDataObj);
                 }
-                intDataProducer.sendBody("direct:ddl", delIntDataObj);
+                intDataProducer.sendBody("direct:ddl", intDataObj);
             } else {
                 throw new InvalidDataTypeException();
             }
 
         } catch (InvalidDataTypeException e) {
             LOGGER.warn(e.getMessage());
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(HttpStatusResponseType.MALFORMED_INTEGRATION_DATA_STRUCTURE.getReasonPhrase(),
+                    HttpStatus.BAD_REQUEST);
         }
 
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatusResponseType.SUCCESSFUL_OPERATION.getReasonPhrase(),
+                HttpStatus.OK);
     }
 
     private String getDataType(IntegrationDataType dataType) throws InvalidDataTypeException {
 
         if (dataType != null) {
             switch (dataType) {
-                case VULNERABILITY:
-                    return "vulnerability";
-                case ARTEFACT:
-                    return "artefact";
+                case EVENT:
+                    return "event";
                 case THREAT:
                     return "threat";
                 case INCIDENT:
                     return "incident";
+                case VULNERABILITY:
+                    return "vulnerability";
+                case ARTEFACT:
+                    return "artefact";
+                case CHAT:
+                    return "chat";
                 case FILE:
                     return "file";
                 case CONTACT:
                     return "contact";
-                case CHAT:
-                    return "chat";
+                case TRUSTCIRCLE:
+                    return "trustCircle";
                 default:
                     return null;
             }
