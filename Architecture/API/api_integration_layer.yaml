@@ -2,7 +2,7 @@ swagger: '2.0'
 info:
   description: |
     Integration Layer consists of two service endpoints. DSL accepts data from applications and the integration layer performs synchronization of that data between elligible applications, indexing and collaboration with external CSPs, i.e. sends the data to external CSPs based on the data specific trust circles. DCL accepts data from external CSPs, authorizes that data based on data specific trust circles and the integration layer performs synchronization of that data between eligible applications.
-  version: "0.0.3"
+  version: "0.3.0"
   title: Integration Layer API
 
 host: int.csp.org
