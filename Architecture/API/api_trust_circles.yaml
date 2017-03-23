@@ -1,0 +1,78 @@
+swagger: '2.0'
+info:
+  description: ""
+  version: "0.0.1"
+  title: Trust Circles API
+
+host: tc.csp.org
+schemes:
+  - https
+paths:
+  /csp:
+    get:
+      summary: todo
+      description: |
+        todo
+      operationId: getCsps
+      consumes:
+        - application/json
+      parameters:
+        - name: dataType
+          in: query
+          required: true
+          type: string
+      responses:
+        200:
+          description: Successful operation
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Csp'
+
+  /auth:
+    get:
+      summary: todo
+      description: |
+        todo
+      operationId: authData
+      consumes:
+        - application/json
+      parameters:
+        - name: dataType
+          in: query
+          required: true
+          type: string
+        - name: cspId
+          in: query
+          required: true
+          type: string
+      responses:
+        200:
+          description: Successful operation
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Csp'
+
+
+definitions:
+  Csp:
+    type: object
+    properties:
+      cspId:
+        type: string
+      cspUrl:
+        type: string
+        
+  IntegrationDataType:
+    type: string
+    enum:
+    - event
+    - threat
+    - incident
+    - vulnerability
+    - artefact
+    - chat
+    - file
+    - contact
+    - trustCircle
