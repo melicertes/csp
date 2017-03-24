@@ -1858,10 +1858,6 @@
           <element xmi:type="uml:Property" href="CSP-sharedservices-papyrus.uml#_r-D2R_VVEea4b69uN8N4dw"/>
           <layoutConstraint xmi:type="notation:Location" xmi:id="_r-LLDfVVEea4b69uN8N4dw"/>
         </children>
-        <children xmi:type="notation:Shape" xmi:id="_r-LLDvVVEea4b69uN8N4dw" type="Property_DataTypeAttributeLabel">
-          <element xmi:type="uml:Property" href="CSP-sharedservices-papyrus.uml#_r-D2SPVVEea4b69uN8N4dw"/>
-          <layoutConstraint xmi:type="notation:Location" xmi:id="_r-LLD_VVEea4b69uN8N4dw"/>
-        </children>
         <children xmi:type="notation:Shape" xmi:id="_r-LLEPVVEea4b69uN8N4dw" type="Property_DataTypeAttributeLabel">
           <element xmi:type="uml:Property" href="CSP-sharedservices-papyrus.uml#_r-D2SfVVEea4b69uN8N4dw"/>
           <layoutConstraint xmi:type="notation:Location" xmi:id="_r-LLEfVVEea4b69uN8N4dw"/>

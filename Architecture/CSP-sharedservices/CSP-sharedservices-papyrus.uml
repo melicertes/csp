@@ -411,9 +411,6 @@
         <ownedAttribute xmi:type="uml:Property" xmi:id="_r-D2R_VVEea4b69uN8N4dw" name="recordId">
           <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#EString"/>
         </ownedAttribute>
-        <ownedAttribute xmi:type="uml:Property" xmi:id="_r-D2SPVVEea4b69uN8N4dw" name="trustCircleId">
-          <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#EString"/>
-        </ownedAttribute>
         <ownedAttribute xmi:type="uml:Property" xmi:id="_r-D2SfVVEea4b69uN8N4dw" name="integrationDataType" type="_r-D2S_VVEea4b69uN8N4dw"/>
         <ownedAttribute xmi:type="uml:Property" xmi:id="_r-D2SvVVEea4b69uN8N4dw" name="integrationData">
           <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#EString"/>
@@ -422,7 +419,7 @@
       <packagedElement xmi:type="uml:Enumeration" xmi:id="_r-D2S_VVEea4b69uN8N4dw" name="IntegrationDataType">
         <ownedLiteral xmi:type="uml:EnumerationLiteral" xmi:id="_r-D2TPVVEea4b69uN8N4dw" name="Event"/>
         <ownedLiteral xmi:type="uml:EnumerationLiteral" xmi:id="_r-D2TfVVEea4b69uN8N4dw" name="Vulnerability"/>
-        <ownedLiteral xmi:type="uml:EnumerationLiteral" xmi:id="_r-D2TvVVEea4b69uN8N4dw" name="Atrefact"/>
+        <ownedLiteral xmi:type="uml:EnumerationLiteral" xmi:id="_r-D2TvVVEea4b69uN8N4dw" name="Artefact"/>
         <ownedLiteral xmi:type="uml:EnumerationLiteral" xmi:id="_r-D2T_VVEea4b69uN8N4dw" name="Incident"/>
         <ownedLiteral xmi:type="uml:EnumerationLiteral" xmi:id="_r-D2UPVVEea4b69uN8N4dw" name="Chat"/>
         <ownedLiteral xmi:type="uml:EnumerationLiteral" xmi:id="_r-D2UfVVEea4b69uN8N4dw" name="File"/>
