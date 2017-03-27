@@ -1,6 +1,8 @@
 package com.sastix.csp.commons.model;
 
+
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.util.JSONPObject;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -24,13 +26,21 @@ public class IntegrationData  implements Serializable {
   @JsonProperty("dataObject")
   private String dataObject;
 
+  @JsonProperty("dataApp")
+  private String dataApp;
+
+  @JsonProperty("dataPayload")
+  private Object dataPaylod;
+
   public IntegrationData() {}
 
-  public IntegrationData(DataParams dataParams, SharingParams sharingParams, IntegrationDataType dataType, String dataObject) {
+  public IntegrationData(DataParams dataParams, SharingParams sharingParams, IntegrationDataType dataType, String dataObject, String dataApp, Object dataPayload) {
     this.dataParams = dataParams;
     this.sharingParams = sharingParams;
     this.dataType = dataType;
     this.dataObject = dataObject;
+    this.dataApp = dataApp;
+    this.dataPaylod = dataPayload;
   }
 
   public DataParams getDataParams() {
@@ -65,6 +75,22 @@ public class IntegrationData  implements Serializable {
     this.dataObject = dataObject;
   }
 
+  public String getDataApp() {
+    return dataApp;
+  }
+
+  public void setDataApp(String dataApp) {
+    this.dataApp = dataApp;
+  }
+
+  public Object getDataPaylod() {
+    return dataPaylod;
+  }
+
+  public void setDataPaylod(Object dataPaylod) {
+    this.dataPaylod = dataPaylod;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -94,6 +120,10 @@ public class IntegrationData  implements Serializable {
     sb.append("    sharingParams: ").append(toIndentedString(sharingParams)).append("\n");
     sb.append("    dataType: ").append(toIndentedString(dataType)).append("\n");
     sb.append("    dataObject: ").append(toIndentedString(dataObject)).append("\n");
+
+    sb.append("    dataApp: ").append(toIndentedString(dataApp)).append("\n");
+    sb.append("    dataPayload: ").append(toIndentedString(dataPaylod)).append("\n");
+
     sb.append("}");
     return sb.toString();
   }

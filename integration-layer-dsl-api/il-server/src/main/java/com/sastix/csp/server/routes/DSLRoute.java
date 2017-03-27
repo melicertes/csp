@@ -1,6 +1,7 @@
 package com.sastix.csp.server.routes;
 
 import com.sastix.csp.commons.model.IntegrationData;
+import com.sastix.csp.server.processors.ElasticsearchProcessor;
 import com.sastix.csp.server.processors.ExceptionProcessor;
 import com.sastix.csp.server.processors.RecipientsProcessor;
 import org.apache.camel.Exchange;
@@ -18,6 +19,9 @@ public class DSLRoute extends RouteBuilder {
     @Autowired
     private RecipientsProcessor recipientsProcessor;
 
+    @Autowired
+    private ElasticsearchProcessor ddlProcessor;
+
     @Override
     public void configure() throws Exception {
 
@@ -32,10 +36,20 @@ public class DSLRoute extends RouteBuilder {
                 .marshal().json(JsonLibrary.Jackson, IntegrationData.class)
                 .recipientList(header("recipients"));
 
+
         from("direct:ddl")
                 .setHeader(Exchange.HTTP_METHOD, constant("POST"))
                 .setHeader(Exchange.CONTENT_TYPE, constant("application/json"))
                 .marshal().json(JsonLibrary.Jackson, IntegrationData.class)
-                .to("http://localhost:{{server.port}}/ddl");
+                .to("http://localhost:{{server.port}}/es");
+
+        from("direct:es")
+                .process(ddlProcessor)
+                .setHeader(Exchange.HTTP_METHOD, constant("POST"))
+                .setHeader(Exchange.CONTENT_TYPE, constant("application/json"))
+                .marshal().json(JsonLibrary.Jackson, IntegrationData.class)
+                .recipientList(simple("{{elastic.uri}}/${header.esURI}"))
+                .log("[ElasticSearch response]... Received response ${body}") ;
+
     }
 }
