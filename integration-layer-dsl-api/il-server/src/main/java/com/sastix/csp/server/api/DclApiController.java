@@ -31,11 +31,12 @@ public class DclApiController {
     @RequestMapping(value = "/dcl",
             consumes = {"application/json"},
             method = RequestMethod.POST)
-    public ResponseEntity<TrustCircle> synchNewIntData(@RequestBody IntegrationData newIntDataObj) {
+    public ResponseEntity<String> getNewIntDataFromExtCsp(@RequestBody IntegrationData newIntDataObj) {
 
+        logger.info(newIntDataObj.toString());
         intDataProducer.sendBody("direct:edcl", newIntDataObj);
 
-        return new ResponseEntity<TrustCircle>(HttpStatus.OK);
+        return new ResponseEntity<String>(HttpStatus.OK);
     }
 
 }

@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class DslApiController {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DslApiController.class);
+    private static final Logger logger = LoggerFactory.getLogger(DslApiController.class);
 
     @Produce
     private ProducerTemplate intDataProducer;
@@ -30,6 +30,8 @@ public class DslApiController {
         try {
             String dataType = getDataType(newIntDataObj.getDataType());
 
+            logger.info(newIntDataObj.toString());
+
             if (dataType != null) {
                 intDataProducer.sendBody("direct:apps", newIntDataObj);
                 intDataProducer.sendBody("direct:ddl", newIntDataObj);
@@ -38,7 +40,7 @@ public class DslApiController {
             }
 
         } catch (InvalidDataTypeException e) {
-            LOGGER.warn(e.getMessage());
+            logger.warn(e.getMessage());
             return new ResponseEntity<String>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
 
@@ -60,7 +62,7 @@ public class DslApiController {
                 throw new InvalidDataTypeException();
             }
         } catch (InvalidDataTypeException e) {
-            LOGGER.warn(e.getMessage());
+            logger.warn(e.getMessage());
             return new ResponseEntity<String>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
 
@@ -82,7 +84,7 @@ public class DslApiController {
                 throw new InvalidDataTypeException();
             }
         } catch (InvalidDataTypeException e) {
-            LOGGER.warn(e.getMessage());
+            logger.warn(e.getMessage());
             return new ResponseEntity<String>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
 

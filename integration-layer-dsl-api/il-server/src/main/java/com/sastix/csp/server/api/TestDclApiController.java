@@ -15,14 +15,13 @@ import java.util.List;
 @RestController
 public class TestDclApiController {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(TestController.class);
+    private static final Logger logger = LoggerFactory.getLogger(TestController.class);
 
-    @RequestMapping(value = "/ecsp/{appId}",
+    @RequestMapping(value = "/ecsp/{cspId}",
             consumes = { "application/json" },
             method = RequestMethod.POST)
-    public ResponseEntity<String> sendToExCsp(@RequestBody IntegrationData newIntDataObj, @PathVariable("appId") String appId) {
-
-        LOGGER.info("ecsp adapter receives new data for csp with id {" + appId + "}. Datatype: " + newIntDataObj.getDataType().toString());
+    public ResponseEntity<String> sendToExCsp(@RequestBody IntegrationData newIntDataObj, @PathVariable("cspId") String cspId) {
+        logger.info("IntgrationData received by external CSP");
         return new ResponseEntity<String>(HttpStatus.OK);
     }
 
@@ -30,9 +29,8 @@ public class TestDclApiController {
             method = RequestMethod.POST)
     public ResponseEntity<TrustCircle> getTrustCircle(@RequestBody Csp csp) {
 
-        LOGGER.info("TC receives new request from csp: " + csp.toString());
         List<String> csps = new ArrayList<>();
-        csps.add("http://localhost/ecsp1");
+        csps.add("http://localhost:8081/ecsp/1");
         TrustCircle tc = new TrustCircle(csps);
         return new ResponseEntity<TrustCircle>(tc, HttpStatus.OK);
     }

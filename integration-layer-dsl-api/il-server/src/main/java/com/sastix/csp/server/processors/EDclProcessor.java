@@ -18,12 +18,12 @@ import java.util.HashMap;
 import java.util.List;
 
 @Component
-public class DclProcessor implements Processor {
+public class EDclProcessor implements Processor {
 
-    private static final Logger logger = LoggerFactory.getLogger(DclProcessor.class);
+    private static final Logger logger = LoggerFactory.getLogger(EDclProcessor.class);
 
+    private static HashMap<String, String> dataTypesAppMapping = new HashMap<>();
     private static final String TC_ADAPRTER_URI = "http://localhost:8081/tc";
-    private static final String ECSP_ADAPRTER_URI = "http://localhost:{{server.port}}/ecsp/";
     private List<String> ecsps = new ArrayList<String>();
 
     @Override
@@ -31,21 +31,9 @@ public class DclProcessor implements Processor {
 
         IntegrationData integrationData = exchange.getIn().getBody(IntegrationData.class);
 
-        logger.info("Received integrationData from DSL");
-        /**
-         * @TODO Anonymize data
-         */
-
-        /**
-         * Get Recipients from Trust Circles
-         */
-        try {
-            ecsps = getTrustCircle();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        exchange.getIn().setHeader("ecsps", ecsps);
-        logger.info(exchange.getIn().getHeader("ecsps").toString());
+            logger.info("Received integrationData from external CSP");
+            List<String> ecsps = new ArrayList<String>();
+            integrationData.getSharingParams().setIsExternal(true);
     }
 
     private List<String> getTrustCircle() throws IOException {
