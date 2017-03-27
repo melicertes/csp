@@ -1,6 +1,7 @@
 package com.sastix.csp.server.routes;
 
 import com.sastix.csp.commons.model.IntegrationData;
+import com.sastix.csp.server.processors.DclProcessor;
 import com.sastix.csp.server.processors.ExceptionProcessor;
 import com.sastix.csp.server.processors.RecipientsProcessor;
 import org.apache.camel.Exchange;
@@ -18,6 +19,9 @@ public class DSLRoute extends RouteBuilder {
     @Autowired
     private RecipientsProcessor recipientsProcessor;
 
+    @Autowired
+    private DclProcessor dclProcessor;
+
     @Override
     public void configure() throws Exception {
 
@@ -30,7 +34,25 @@ public class DSLRoute extends RouteBuilder {
                 .setHeader(Exchange.HTTP_METHOD, constant("POST"))
                 .setHeader(Exchange.CONTENT_TYPE, constant("application/json"))
                 .marshal().json(JsonLibrary.Jackson, IntegrationData.class)
-                .recipientList(header("recipients"));
+                .recipientList(header("recipients"))
+                .to("direct:dcl");
+
+
+
+        from("direct:dcl")
+                .process(dclProcessor)
+                .setHeader(Exchange.HTTP_METHOD, constant("POST"))
+                .setHeader(Exchange.CONTENT_TYPE, constant("application/json"))
+                .marshal().json(JsonLibrary.Jackson, IntegrationData.class)
+                .recipientList(header("ecsps"));
+
+        from("direct:edcl")
+                .process(dclProcessor)
+                .setHeader(Exchange.HTTP_METHOD, constant("POST"))
+                .setHeader(Exchange.CONTENT_TYPE, constant("application/json"))
+                .marshal().json(JsonLibrary.Jackson, IntegrationData.class)
+                .to("direct:dsl");
+
 
         from("direct:ddl")
                 .setHeader(Exchange.HTTP_METHOD, constant("POST"))
