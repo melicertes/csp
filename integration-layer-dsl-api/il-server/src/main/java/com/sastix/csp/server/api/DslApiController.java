@@ -22,7 +22,18 @@ public class DslApiController {
     @Produce
     private ProducerTemplate intDataProducer;
 
-    @RequestMapping(value = "/dsl",
+//    @RequestMapping(value = "/test",
+//            consumes = {"application/json"},
+//            method = RequestMethod.POST)
+//    public ResponseEntity<String> synchTestIntData(@RequestBody IntegrationData newIntDataObj) {
+//
+//        System.out.println(newIntDataObj.toString());
+//
+//        return new ResponseEntity<String>(HttpStatus.OK);
+//    }
+
+
+        @RequestMapping(value = "/dsl",
             consumes = {"application/json"},
             method = RequestMethod.POST)
     public ResponseEntity<String> synchNewIntData(@RequestBody IntegrationData newIntDataObj) {
@@ -55,7 +66,7 @@ public class DslApiController {
 
             if (dataType != null) {
                 intDataProducer.sendBody("direct:apps", updIntDataObj);
-                intDataProducer.sendBody("direct:ddl", updIntDataObj);
+                //intDataProducer.sendBody("direct:ddl", updIntDataObj);
             } else {
                 throw new InvalidDataTypeException();
             }
@@ -77,7 +88,7 @@ public class DslApiController {
 
             if (dataType != null) {
                 intDataProducer.sendBody("direct:apps", delIntDataObj);
-                intDataProducer.sendBody("direct:ddl", delIntDataObj);
+                //intDataProducer.sendBody("direct:ddl", delIntDataObj);
             } else {
                 throw new InvalidDataTypeException();
             }

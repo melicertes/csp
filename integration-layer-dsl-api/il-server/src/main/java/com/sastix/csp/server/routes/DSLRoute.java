@@ -1,7 +1,7 @@
 package com.sastix.csp.server.routes;
 
 import com.sastix.csp.commons.model.IntegrationData;
-import com.sastix.csp.server.processors.ElasticsearchProcessor;
+import com.sastix.csp.server.processors.DdlProcessor;
 import com.sastix.csp.server.processors.ExceptionProcessor;
 import com.sastix.csp.server.processors.RecipientsProcessor;
 import org.apache.camel.Exchange;
@@ -20,14 +20,14 @@ public class DSLRoute extends RouteBuilder {
     private RecipientsProcessor recipientsProcessor;
 
     @Autowired
-    private ElasticsearchProcessor ddlProcessor;
+    private DdlProcessor ddlProcessor;
 
     @Override
     public void configure() throws Exception {
 
-        onException(Exception.class).process(exceptionProcessor)
-                .log("[Exception thrown]... Received body ${body}")
-                .handled(true);
+//        onException(Exception.class).process(exceptionProcessor)
+//                .log("[Exception thrown]... Received body ${body}")
+//                .handled(true);
 
         from("direct:apps")
                 .process(recipientsProcessor)
@@ -38,18 +38,16 @@ public class DSLRoute extends RouteBuilder {
 
 
         from("direct:ddl")
-                .setHeader(Exchange.HTTP_METHOD, constant("POST"))
-                .setHeader(Exchange.CONTENT_TYPE, constant("application/json"))
-                .marshal().json(JsonLibrary.Jackson, IntegrationData.class)
-                .to("http://localhost:{{server.port}}/es");
-
-        from("direct:es")
                 .process(ddlProcessor)
                 .setHeader(Exchange.HTTP_METHOD, constant("POST"))
                 .setHeader(Exchange.CONTENT_TYPE, constant("application/json"))
                 .marshal().json(JsonLibrary.Jackson, IntegrationData.class)
-                .recipientList(simple("{{elastic.uri}}/${header.esURI}"))
-                .log("[ElasticSearch response]... Received response ${body}") ;
+                .recipientList(header("recipients"))
+                //.to("http://localhost:8081/test")
+                //.recipientList(simple("${header.elastic}"))
+                //.recipientList(simple("${header.esURI}"))
+                .log("[ElasticSearch response]... Received response ${body}");
+
 
     }
 }

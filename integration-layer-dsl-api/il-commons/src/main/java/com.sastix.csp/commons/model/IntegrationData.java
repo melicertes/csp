@@ -24,13 +24,7 @@ public class IntegrationData  implements Serializable {
   private IntegrationDataType dataType;
 
   @JsonProperty("dataObject")
-  private String dataObject;
-
-  @JsonProperty("dataApp")
-  private String dataApp;
-
-  @JsonProperty("dataPayload")
-  private Object dataPaylod;
+  private Object dataObject;
 
   public IntegrationData() {}
 
@@ -39,8 +33,6 @@ public class IntegrationData  implements Serializable {
     this.sharingParams = sharingParams;
     this.dataType = dataType;
     this.dataObject = dataObject;
-    this.dataApp = dataApp;
-    this.dataPaylod = dataPayload;
   }
 
   public DataParams getDataParams() {
@@ -67,29 +59,14 @@ public class IntegrationData  implements Serializable {
     this.dataType = dataType;
   }
 
-  public String getDataObject() {
+  public Object getDataObject() {
     return dataObject;
   }
 
-  public void setDataObject(String dataObject) {
+  public void setDataObject(Object dataObject) {
     this.dataObject = dataObject;
   }
 
-  public String getDataApp() {
-    return dataApp;
-  }
-
-  public void setDataApp(String dataApp) {
-    this.dataApp = dataApp;
-  }
-
-  public Object getDataPaylod() {
-    return dataPaylod;
-  }
-
-  public void setDataPaylod(Object dataPaylod) {
-    this.dataPaylod = dataPaylod;
-  }
 
   @Override
   public boolean equals(Object o) {
@@ -120,9 +97,6 @@ public class IntegrationData  implements Serializable {
     sb.append("    sharingParams: ").append(toIndentedString(sharingParams)).append("\n");
     sb.append("    dataType: ").append(toIndentedString(dataType)).append("\n");
     sb.append("    dataObject: ").append(toIndentedString(dataObject)).append("\n");
-
-    sb.append("    dataApp: ").append(toIndentedString(dataApp)).append("\n");
-    sb.append("    dataPayload: ").append(toIndentedString(dataPaylod)).append("\n");
 
     sb.append("}");
     return sb.toString();
