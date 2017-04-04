@@ -43,7 +43,7 @@ public class DslApiController {
 
             if (dataType != null) {
                 intDataProducer.sendBody("direct:apps", newIntDataObj);
-                intDataProducer.sendBody("direct:ddl", newIntDataObj);
+                //intDataProducer.sendBody("direct:ddl", newIntDataObj);
             } else {
                 throw new InvalidDataTypeException();
             }

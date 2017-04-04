@@ -62,6 +62,10 @@ public class RecipientsProcessor implements Processor {
 
         exchange.getIn().setHeader("recipients", recipients);
 
+
+        ///
+        //exchange.getIn().setBody(integrationData);
+
     }
 
     private void computeRecipientsApps(List<String> recipients, IntegrationDataType dataType) {
@@ -69,5 +73,7 @@ public class RecipientsProcessor implements Processor {
         for (String app : suppApps) {
             recipients.add(APPLICATION_ADAPRTER_URI + app);
         }
+
+        recipients.add("direct:ddl");
     }
 }

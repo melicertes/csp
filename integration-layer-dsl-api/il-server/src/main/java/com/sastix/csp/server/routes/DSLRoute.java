@@ -36,6 +36,14 @@ public class DSLRoute extends RouteBuilder {
                 .marshal().json(JsonLibrary.Jackson, IntegrationData.class)
                 .recipientList(header("recipients"));
 
+////                .setHeader(Exchange.HTTP_METHOD, constant("POST"))
+////                .setHeader(Exchange.CONTENT_TYPE, constant("application/json"))
+//        .unmarshal().json(JsonLibrary.Jackson, IntegrationData.class)
+//        .to("direct:ddl");
+
+//        from("direct:apps")
+//                .to("direct:ddl");
+
 
         from("direct:ddl")
                 .process(ddlProcessor)
