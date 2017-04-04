@@ -23,6 +23,17 @@ public class DslApiController {
     @Produce
     private ProducerTemplate intDataProducer;
 
+//    @RequestMapping(value = "/test",
+//            consumes = {"application/json"},
+//            method = RequestMethod.POST)
+//    public ResponseEntity<String> synchTestIntData(@RequestBody IntegrationData newIntDataObj) {
+//
+//        System.out.println(newIntDataObj.toString());
+//
+//        return new ResponseEntity<String>(HttpStatus.OK);
+//    }
+
+
     @RequestMapping(value = "/dsl/integrationData",
             consumes = {"application/json"},
             method = RequestMethod.POST)
@@ -31,17 +42,22 @@ public class DslApiController {
         try {
             String dataType = getDataType(intDataObj.getDataType());
 
+            LOGGER.info(intDataObj.toString());
+
             if (dataType != null) {
-                intDataProducer.sendBody("direct:apps", intDataObj);
-                intDataProducer.sendBody("direct:ddl", intDataObj);
+
+                intDataProducer.sendBody("direct:dsl", intDataObj);
+                //intDataProducer.sendBody("direct:ddl", newIntDataObj);
             } else {
                 throw new InvalidDataTypeException();
             }
 
         } catch (InvalidDataTypeException e) {
+
             LOGGER.warn(e.getMessage());
             return new ResponseEntity<>(HttpStatusResponseType.MALFORMED_INTEGRATION_DATA_STRUCTURE.getReasonPhrase(),
                     HttpStatus.BAD_REQUEST);
+
         }
 
         return new ResponseEntity<>(HttpStatusResponseType.SUCCESSFUL_OPERATION.getReasonPhrase(),
@@ -57,8 +73,8 @@ public class DslApiController {
             String dataType = getDataType(intDataObj.getDataType());
 
             if (dataType != null) {
-                intDataProducer.sendBody("direct:apps", intDataObj);
-                intDataProducer.sendBody("direct:ddl", intDataObj);
+                intDataProducer.sendBody("direct:dsl", intDataObj);
+                //intDataProducer.sendBody("direct:ddl", updIntDataObj);
             } else {
                 throw new InvalidDataTypeException();
             }
@@ -82,8 +98,8 @@ public class DslApiController {
             String dataType = getDataType(intDataObj.getDataType());
 
             if (dataType != null) {
-                intDataProducer.sendBody("direct:apps", intDataObj);
-                intDataProducer.sendBody("direct:ddl", intDataObj);
+                intDataProducer.sendBody("direct:dsl", intDataObj);
+                //intDataProducer.sendBody("direct:ddl", delIntDataObj);
             } else {
                 throw new InvalidDataTypeException();
             }
