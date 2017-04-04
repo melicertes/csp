@@ -7,18 +7,20 @@ import com.sastix.csp.server.config.Flow1ApplicationsUrls;
 import com.sastix.csp.server.config.Flow2ApplicationsUrls;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
+
 import org.apache.camel.model.dataformat.BoonDataFormat;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 @Component
 public class RecipientsProcessor implements Processor {
+
 
     @Autowired
     ObjectMapper objectMapper;
@@ -43,11 +45,20 @@ public class RecipientsProcessor implements Processor {
     @Override
     public void process(Exchange exchange) throws Exception {
 
-        IntegrationData integrationData = exchange.getIn().getBody(IntegrationData.class);
+        IntegrationData integrationData;
 
         List<String> recipients = new ArrayList<String>();
 
+        integrationData = exchange.getIn().getBody(IntegrationData.class);
+//        if (exchange.getFromEndpoint().getEndpointUri().equals("direct://edcl")) {
+//            String inData = exchange.getIn().getBody(String.class);
+//            integrationData = objectMapper.readValue(inData, IntegrationData.class);
+//        }
+//        else {
+//            integrationData = exchange.getIn().getBody(IntegrationData.class);
+//        }
         IntegrationDataType dataType = integrationData.getDataType();
+
         Boolean isExternal = integrationData.getSharingParams().getIsExternal();
 
         switch (dataType) {
@@ -88,27 +99,28 @@ public class RecipientsProcessor implements Processor {
 
         IntegrationDataType dataType = integrationData.getDataType();
 
+
         switch (dataType) {
             case THREAT:
-                computeRecipientsApps(recipients, dataType);
+                computeRecipientsApps(recipients, dataType, isExternal);
                 break;
             case INCIDENT:
-                computeRecipientsApps(recipients, dataType);
+                computeRecipientsApps(recipients, dataType, isExternal);
                 break;
             case VULNERABILITY:
-                computeRecipientsApps(recipients, dataType);
+                computeRecipientsApps(recipients, dataType, isExternal);
                 break;
             case ARTEFACT:
-                computeRecipientsApps(recipients, dataType);
+                computeRecipientsApps(recipients, dataType, isExternal);
                 break;
             case CHAT:
-                computeRecipientsApps(recipients, dataType);
+                computeRecipientsApps(recipients, dataType, isExternal);
                 break;
             case FILE:
-                computeRecipientsApps(recipients, dataType);
+                computeRecipientsApps(recipients, dataType, isExternal);
                 break;
             case CONTACT:
-                computeRecipientsApps(recipients, dataType);
+                computeRecipientsApps(recipients, dataType, isExternal);
                 break;
         }
 
@@ -129,6 +141,7 @@ public class RecipientsProcessor implements Processor {
             apps.addAll(flow2ApplicationsUrls.getAppsByDataType(dataType));
         } else {
             LOGGER.info("isExternal = {} => Flow 1 of integration layer (synch data from current CSP), ", false);
+            recipients.add("direct:ddl");
             apps.addAll(flow1ApplicationsUrls.getAppListByDataType(dataType));
         }
 
@@ -136,12 +149,5 @@ public class RecipientsProcessor implements Processor {
             recipients.add(APPLICATION_ADAPTER_URI + app);
         }
     }
-    /*
-    private void computeRecipientsApps(List<String> recipients, IntegrationDataType dataType) {
-        String[] suppApps = dataTypesAppMapping.get(dataType.toString()).split(DELIMITER);
-        for (String app : suppApps) {
-            recipients.add(APPLICATION_ADAPRTER_URI + app);
-        }
-    }
-    */
+
 }

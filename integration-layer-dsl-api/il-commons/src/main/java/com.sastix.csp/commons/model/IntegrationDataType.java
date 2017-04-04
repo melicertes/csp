@@ -21,8 +21,10 @@ public enum IntegrationDataType {
   CHAT("chat"),
   
   FILE("file"),
-  
-  CONTACT("contact");
+
+  CONTACT("contact"),
+
+  TRUSTCIRCLE("trustCircle");
 
   private String value;
 

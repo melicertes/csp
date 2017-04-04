@@ -28,7 +28,7 @@ public class DclApiController {
      * @param newIntDataObj
      * @return
      */
-    @RequestMapping(value = "/dcl",
+    @RequestMapping(value = "/dcl/integrationData",
             consumes = {"application/json"},
             method = RequestMethod.POST)
     public ResponseEntity<String> getNewIntDataFromExtCsp(@RequestBody IntegrationData newIntDataObj) {

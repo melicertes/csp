@@ -8,11 +8,13 @@
         <groupId>com.sastix.csp</groupId>
         <artifactId>integration-layer-dsl-api</artifactId>
         <version>0.0.1-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
     <groupId>com.sastix.csp</groupId>
     <artifactId>il-client</artifactId>
     <version>0.0.1-SNAPSHOT</version>
+    <packaging>jar</packaging>
 
     <dependencies>
 
