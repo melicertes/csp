@@ -27,18 +27,12 @@ public class DdlProcessor implements Processor {
 
         //IntegrationData integrationData = exchange.getIn().getBody(IntegrationData.class);
         String inData = exchange.getIn().getBody(String.class);
-        System.out.println(inData.toString());
+
 
 //        ObjectMapper om = new ObjectMapper();
         IntegrationData integrationData = objectMapper.readValue(inData, IntegrationData.class);
 
 
-
-
-        System.out.println(integrationData.toString());
-
-
-        System.out.println("====="+exchange.getIn().getHeader("Exchange.HTTP_METHOD", String.class));
         exchange.getContext().getProperties().get("http.proxyPort");
 
 //System.out.println("====="+exchange.filter(header("Exchange.HTTP_METHOD").isEqualTo("GET")) );
@@ -55,9 +49,11 @@ public class DdlProcessor implements Processor {
          * @TODO: Match indices with Andreas
          */
         //String es = elasticURI + "/viper/" + indexType.toString().toLowerCase() + "?pretty";
-        recipients.add(elasticURI + "/viper/" + indexType.toString().toLowerCase() + "?pretty");
+
         if (toShare)
             recipients.add("direct:dcl");
+
+        recipients.add(elasticURI + "/viper/" + indexType.toString().toLowerCase() + "?pretty");
 
         exchange.getIn().setHeader("recipients", recipients);
         //exchange.getIn().setHeader("elastic", es);

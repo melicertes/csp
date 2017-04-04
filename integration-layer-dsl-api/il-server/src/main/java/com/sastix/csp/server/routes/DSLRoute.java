@@ -2,6 +2,8 @@ package com.sastix.csp.server.routes;
 
 import com.sastix.csp.commons.model.IntegrationData;
 import com.sastix.csp.server.processors.DdlProcessor;
+import com.sastix.csp.server.processors.DclProcessor;
+import com.sastix.csp.server.processors.EDclProcessor;
 import com.sastix.csp.server.processors.ExceptionProcessor;
 import com.sastix.csp.server.processors.RecipientsProcessor;
 import org.apache.camel.Exchange;
@@ -22,27 +24,27 @@ public class DSLRoute extends RouteBuilder {
     @Autowired
     private DdlProcessor ddlProcessor;
 
+    @Autowired
+    private DclProcessor dclProcessor;
+
+    @Autowired
+    private EDclProcessor edclProcessor;
+
     @Override
-    public void configure() throws Exception {
+    public void configure() {
 
 //        onException(Exception.class).process(exceptionProcessor)
 //                .log("[Exception thrown]... Received body ${body}")
 //                .handled(true);
 
-        from("direct:apps")
+
+        from("direct:dsl")
                 .process(recipientsProcessor)
                 .setHeader(Exchange.HTTP_METHOD, constant("POST"))
                 .setHeader(Exchange.CONTENT_TYPE, constant("application/json"))
                 .marshal().json(JsonLibrary.Jackson, IntegrationData.class)
                 .recipientList(header("recipients"));
-
-////                .setHeader(Exchange.HTTP_METHOD, constant("POST"))
-////                .setHeader(Exchange.CONTENT_TYPE, constant("application/json"))
-//        .unmarshal().json(JsonLibrary.Jackson, IntegrationData.class)
-//        .to("direct:ddl");
-
-//        from("direct:apps")
-//                .to("direct:ddl");
+                //.to("direct:dcl");
 
 
         from("direct:ddl")
@@ -55,6 +57,22 @@ public class DSLRoute extends RouteBuilder {
                 //.recipientList(simple("${header.elastic}"))
                 //.recipientList(simple("${header.esURI}"))
                 .log("[ElasticSearch response]... Received response ${body}");
+
+
+        from("direct:dcl")
+                .process(dclProcessor)
+                .setHeader(Exchange.HTTP_METHOD, constant("POST"))
+                .setHeader(Exchange.CONTENT_TYPE, constant("application/json"))
+                //.marshal().json(JsonLibrary.Jackson, IntegrationData.class)
+                .recipientList(header("ecsps"));
+
+
+        from("direct:edcl")
+                .process(edclProcessor)
+                .setHeader(Exchange.HTTP_METHOD, constant("POST"))
+                .setHeader(Exchange.CONTENT_TYPE, constant("application/json"))
+                .marshal().json(JsonLibrary.Jackson, IntegrationData.class)
+                .to("direct:dsl");
 
 
     }

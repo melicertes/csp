@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class DslApiController {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DslApiController.class);
+    private static final Logger logger = LoggerFactory.getLogger(DslApiController.class);
 
     @Produce
     private ProducerTemplate intDataProducer;
@@ -41,15 +41,17 @@ public class DslApiController {
         try {
             String dataType = getDataType(newIntDataObj.getDataType());
 
+            logger.info(newIntDataObj.toString());
+
             if (dataType != null) {
-                intDataProducer.sendBody("direct:apps", newIntDataObj);
+                intDataProducer.sendBody("direct:dsl", newIntDataObj);
                 //intDataProducer.sendBody("direct:ddl", newIntDataObj);
             } else {
                 throw new InvalidDataTypeException();
             }
 
         } catch (InvalidDataTypeException e) {
-            LOGGER.warn(e.getMessage());
+            logger.warn(e.getMessage());
             return new ResponseEntity<String>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
 
@@ -65,13 +67,13 @@ public class DslApiController {
             String dataType = getDataType(updIntDataObj.getDataType());
 
             if (dataType != null) {
-                intDataProducer.sendBody("direct:apps", updIntDataObj);
+                intDataProducer.sendBody("direct:dsl", updIntDataObj);
                 //intDataProducer.sendBody("direct:ddl", updIntDataObj);
             } else {
                 throw new InvalidDataTypeException();
             }
         } catch (InvalidDataTypeException e) {
-            LOGGER.warn(e.getMessage());
+            logger.warn(e.getMessage());
             return new ResponseEntity<String>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
 
@@ -87,13 +89,13 @@ public class DslApiController {
             String dataType = getDataType(delIntDataObj.getDataType());
 
             if (dataType != null) {
-                intDataProducer.sendBody("direct:apps", delIntDataObj);
+                intDataProducer.sendBody("direct:dsl", delIntDataObj);
                 //intDataProducer.sendBody("direct:ddl", delIntDataObj);
             } else {
                 throw new InvalidDataTypeException();
             }
         } catch (InvalidDataTypeException e) {
-            LOGGER.warn(e.getMessage());
+            logger.warn(e.getMessage());
             return new ResponseEntity<String>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
 
