@@ -10,4 +10,5 @@ public interface AdapterClient {
     ResponseEntity<String> processNewIntegrationData(IntegrationData integrationData);
     ResponseEntity<String> updateIntegrationData(IntegrationData integrationData);
     ResponseEntity<String> deleteIntegrationData(IntegrationData integrationData);
+    void setProtocolHostPort(String protocol, String host, String port);
 }

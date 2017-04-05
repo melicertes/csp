@@ -16,21 +16,22 @@ import org.springframework.http.ResponseEntity;
  * Created by iskitsas on 4/4/17.
  */
 public class AdapterClientImpl implements AdapterClient {
+    String context;
     private Logger LOG = (Logger) LoggerFactory.getLogger(AdapterClientImpl.class);
     @Autowired
     @Qualifier("AdapterRestTemplate")
     RetryRestTemplate retryRestTemplate;
     @Override
     public ResponseEntity<String> processNewIntegrationData(IntegrationData integrationData) {
-        String url = ContextUrl.ADAPTER_INTEGRATION_DATA;
+        String url = context+ContextUrl.ADAPTER_INTEGRATION_DATA;
         LOG.debug("API call [post]: " + url);
-        ResponseEntity<String> response = retryRestTemplate.postForEntity(url, integrationData, String.class);
+        ResponseEntity<String> response = retryRestTemplate.exchange(url,HttpMethod.POST, new HttpEntity<Object>(integrationData), String.class);
         return response;
     }
 
     @Override
     public ResponseEntity<String> updateIntegrationData(IntegrationData integrationData) {
-        String url = ContextUrl.ADAPTER_INTEGRATION_DATA;
+        String url = context+ContextUrl.ADAPTER_INTEGRATION_DATA;
         LOG.debug("API call [put]: " + url);
         ResponseEntity<String> response = retryRestTemplate.exchange(url, HttpMethod.PUT,new HttpEntity<Object>(integrationData), String.class);
         LOG.debug("status code: "+response.getStatusCode());
@@ -39,10 +40,15 @@ public class AdapterClientImpl implements AdapterClient {
 
     @Override
     public ResponseEntity<String> deleteIntegrationData(IntegrationData integrationData) {
-        String url = ContextUrl.ADAPTER_INTEGRATION_DATA;
+        String url = context+ContextUrl.ADAPTER_INTEGRATION_DATA;
         LOG.debug("API call [delete]: " + url);
         ResponseEntity<String> response = retryRestTemplate.exchange(url, HttpMethod.DELETE,new HttpEntity<Object>(integrationData), String.class);
         LOG.debug("status code: "+response.getStatusCode());
         return response;
+    }
+
+    @Override
+    public void setProtocolHostPort(String protocol, String host, String port) {
+        context = protocol+"://"+host+":"+port;
     }
 }
