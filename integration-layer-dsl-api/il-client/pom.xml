@@ -6,9 +6,10 @@
 
     <parent>
         <groupId>com.sastix.csp</groupId>
-        <artifactId>integration-layer-dsl-api</artifactId>
+        <artifactId>parent-pom</artifactId>
         <version>0.0.1-SNAPSHOT</version>
-        <relativePath>../pom.xml</relativePath>
+        <relativePath/>
+        <!--<relativePath>../pom.xml</relativePath>-->
     </parent>
 
     <groupId>com.sastix.csp</groupId>
@@ -17,7 +18,25 @@
     <packaging>jar</packaging>
 
     <dependencies>
+        <dependency>
+            <groupId>com.sastix.csp</groupId>
+            <artifactId>il-commons</artifactId>
+            <version>${project.version}</version>
+        </dependency><dependency>
+        <groupId>com.sastix.csp</groupId>
+        <artifactId>il-server</artifactId>
+        <version>${project.version}</version>
+    </dependency>
 
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
 </project>

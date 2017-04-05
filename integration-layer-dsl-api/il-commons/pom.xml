@@ -6,9 +6,10 @@
 
     <parent>
         <groupId>com.sastix.csp</groupId>
-        <artifactId>integration-layer-dsl-api</artifactId>
+        <artifactId>parent-pom</artifactId>
         <version>0.0.1-SNAPSHOT</version>
-        <relativePath>../pom.xml</relativePath>
+        <relativePath/>
+        <!--<relativePath>../pom.xml</relativePath>-->
     </parent>
 
     <groupId>com.sastix.csp</groupId>
@@ -16,16 +17,26 @@
     <version>0.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <properties>
-        <camel.version>2.18.2</camel.version>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>org.apache.camel</groupId>
             <artifactId>camel-jackson</artifactId>
             <version>${camel.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.retry</groupId>
+            <artifactId>spring-retry</artifactId>
+            <version>${spring.retry.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
+        </dependency>
+
     </dependencies>
 
 </project>
