@@ -69,7 +69,7 @@ public class DSLRoute extends RouteBuilder {
 
         from("direct:edcl")
                 .process(edclProcessor)
-//                .setHeader(Exchange.HTTP_METHOD, constant("POST"))
+//                .setHeader(Exchange.HTTP_METHOD, constant("PUT"))
 //                .setHeader(Exchange.CONTENT_TYPE, constant("application/json"))
 //                .marshal().json(JsonLibrary.Jackson, IntegrationData.class)
                 .to("direct:dsl");

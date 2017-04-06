@@ -34,7 +34,23 @@ public class DclApiController {
     public ResponseEntity<String> getNewIntDataFromExtCsp(@RequestBody IntegrationData newIntDataObj) {
 
         logger.info(newIntDataObj.toString());
-        intDataProducer.sendBody("direct:edcl", newIntDataObj);
+        intDataProducer.sendBodyAndHeader("direct:edcl", newIntDataObj,"method", "POST");
+
+        return new ResponseEntity<String>(HttpStatus.OK);
+    }
+
+    /**
+     *
+     * @param newIntDataObj
+     * @return
+     */
+    @RequestMapping(value = "/dcl/integrationData",
+            consumes = {"application/json"},
+            method = RequestMethod.PUT)
+    public ResponseEntity<String> getUpdateIntDataFromExtCsp(@RequestBody IntegrationData newIntDataObj) {
+
+        logger.info(newIntDataObj.toString());
+        intDataProducer.sendBodyAndHeader("direct:edcl", newIntDataObj, "method", "PUT");
 
         return new ResponseEntity<String>(HttpStatus.OK);
     }

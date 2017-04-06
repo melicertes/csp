@@ -17,17 +17,17 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import static com.sastix.csp.server.external.TrustCircles.getTrustCircle;
+
 @Component
 public class DclProcessor implements Processor {
 
     private static final Logger logger = LoggerFactory.getLogger(DclProcessor.class);
 
-    private static final String TC_ADAPRTER_URI = "http://localhost:8081/tc";
-    private static final String ECSP_ADAPRTER_URI = "http://localhost:{{server.port}}/ecsp/";
     private List<String> ecsps = new ArrayList<String>();
 
     @Override
-    public void process(Exchange exchange) {
+    public void process(Exchange exchange) throws IOException {
 
         IntegrationData integrationData = exchange.getIn().getBody(IntegrationData.class);
 
@@ -36,25 +36,13 @@ public class DclProcessor implements Processor {
          * @TODO Anonymize data
          */
 
+
         /**
          * Get Recipients from Trust Circles
          */
-        try {
-            ecsps = getTrustCircle();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        ecsps = getTrustCircle();
+
         exchange.getIn().setHeader("ecsps", ecsps);
         logger.info(exchange.getIn().getHeader("ecsps").toString());
-    }
-
-    private List<String> getTrustCircle() throws IOException {
-
-        RestTemplate restTemplate = new RestTemplate();
-        logger.info("Get from: " + TC_ADAPRTER_URI);
-        HttpEntity<Csp> request = new HttpEntity<Csp>(new Csp("localhost"));
-        TrustCircle tc = restTemplate.postForObject(TC_ADAPRTER_URI, request, TrustCircle.class);
-        logger.info(tc.toString());
-        return tc.getCsps();
     }
 }
