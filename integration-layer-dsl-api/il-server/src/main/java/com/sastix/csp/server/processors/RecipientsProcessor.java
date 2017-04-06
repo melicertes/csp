@@ -49,6 +49,8 @@ public class RecipientsProcessor implements Processor {
 
         List<String> recipients = new ArrayList<String>();
 
+        LOGGER.info(exchange.getIn().getHeaders().toString());
+
         integrationData = exchange.getIn().getBody(IntegrationData.class);
 //        if (exchange.getFromEndpoint().getEndpointUri().equals("direct://edcl")) {
 //            String inData = exchange.getIn().getBody(String.class);
