@@ -3,6 +3,7 @@ package com.sastix.csp.integration;
 import com.sastix.csp.commons.apiHttpStatusResponse.HttpStatusResponseType;
 import com.sastix.csp.commons.model.IntegrationData;
 import com.sastix.csp.commons.model.IntegrationDataType;
+import com.sastix.csp.commons.model.SharingParams;
 import com.sastix.csp.commons.routes.ContextUrl;
 import com.sastix.csp.server.IntegrationLayerDslApiApplication;
 import com.sastix.csp.server.processors.RecipientsProcessor;
@@ -84,6 +85,9 @@ public class IntegrationServerTest {
     public void dslIntegrationDataTest() throws Exception {
         IntegrationData integrationData = new IntegrationData();
         integrationData.setDataType(IntegrationDataType.INCIDENT);
+        SharingParams sharingParams = new SharingParams();
+        sharingParams.setIsExternal(true);
+        integrationData.setSharingParams(sharingParams);
         mvc.perform(post(ContextUrl.DSL_INTEGRATION_DATA).accept(MediaType.TEXT_PLAIN)
                 .content(TestUtil.convertObjectToJsonBytes(integrationData))
                 .contentType(TestUtil.APPLICATION_JSON_UTF8))
