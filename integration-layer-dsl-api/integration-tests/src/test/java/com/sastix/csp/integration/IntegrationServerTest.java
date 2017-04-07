@@ -86,7 +86,7 @@ public class IntegrationServerTest {
         IntegrationData integrationData = new IntegrationData();
         integrationData.setDataType(IntegrationDataType.INCIDENT);
         SharingParams sharingParams = new SharingParams();
-        sharingParams.setIsExternal(true);
+        sharingParams.setIsExternal(false);
         integrationData.setSharingParams(sharingParams);
         mvc.perform(post(ContextUrl.DSL_INTEGRATION_DATA).accept(MediaType.TEXT_PLAIN)
                 .content(TestUtil.convertObjectToJsonBytes(integrationData))

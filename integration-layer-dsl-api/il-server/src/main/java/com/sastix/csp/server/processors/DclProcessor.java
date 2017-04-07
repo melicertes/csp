@@ -40,9 +40,15 @@ public class DclProcessor implements Processor {
         /**
          * Get Recipients from Trust Circles
          */
-        ecsps = getTrustCircle();
+        try {
+            //TODO: can it be done through camel?
+            ecsps = getTrustCircle();
 
-        exchange.getIn().setHeader("ecsps", ecsps);
-        logger.info(exchange.getIn().getHeader("ecsps").toString());
+            exchange.getIn().setHeader("ecsps", ecsps);
+            logger.info(exchange.getIn().getHeader("ecsps").toString());
+        }catch (Exception e){
+            //TODO: handle this situation
+            logger.error("TC api call failed.",e);
+        }
     }
 }
