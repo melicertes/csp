@@ -7,15 +7,11 @@ import com.sastix.csp.commons.model.SharingParams;
 import com.sastix.csp.commons.routes.CamelRoutes;
 import com.sastix.csp.commons.routes.ContextUrl;
 import com.sastix.csp.server.IntegrationLayerDslApiApplication;
-import com.sastix.csp.server.processors.DclProcessor;
-import org.apache.camel.Endpoint;
 import org.apache.camel.EndpointInject;
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.apache.camel.builder.RouteBuilder;
-import org.apache.camel.component.direct.DirectEndpoint;
 import org.apache.camel.component.mock.MockEndpoint;
-import org.apache.camel.impl.DefaultEndpoint;
 import org.apache.camel.model.RouteDefinition;
 import org.apache.camel.spring.SpringCamelContext;
 import org.apache.camel.test.spring.CamelSpringBootRunner;
@@ -31,8 +27,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
-
-import java.io.IOException;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
