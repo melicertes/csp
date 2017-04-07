@@ -502,21 +502,6 @@
       <sourceAnchor xmi:type="notation:IdentityAnchor" xmi:id="_r-EebvVVEea4b69uN8N4dw" id="(0.0,0.6557377049180327)"/>
       <targetAnchor xmi:type="notation:IdentityAnchor" xmi:id="_r-Eeb_VVEea4b69uN8N4dw" id="(1.0,0.6557377049180327)"/>
     </edges>
-    <edges xmi:type="notation:Connector" xmi:id="_PydY0AQfEeeWNbzuB-wxVw" type="Usage_Edge" source="_r-EdyfVVEea4b69uN8N4dw" target="_r-EdufVVEea4b69uN8N4dw">
-      <children xmi:type="notation:DecorationNode" xmi:id="_PydY0wQfEeeWNbzuB-wxVw" type="Usage_NameLabel">
-        <styles xmi:type="notation:BooleanValueStyle" xmi:id="_SeSF4AQfEeeWNbzuB-wxVw" name="IS_UPDATED_POSITION" booleanValue="true"/>
-        <layoutConstraint xmi:type="notation:Location" xmi:id="_PydY1AQfEeeWNbzuB-wxVw" y="40"/>
-      </children>
-      <children xmi:type="notation:DecorationNode" xmi:id="_PydY1QQfEeeWNbzuB-wxVw" type="Usage_StereotypeLabel">
-        <styles xmi:type="notation:BooleanValueStyle" xmi:id="_SegIUAQfEeeWNbzuB-wxVw" name="IS_UPDATED_POSITION" booleanValue="true"/>
-        <layoutConstraint xmi:type="notation:Location" xmi:id="_PydY1gQfEeeWNbzuB-wxVw" x="1" y="27"/>
-      </children>
-      <styles xmi:type="notation:FontStyle" xmi:id="_PydY0QQfEeeWNbzuB-wxVw"/>
-      <element xmi:type="uml:Usage" href="CSP-sharedservices-papyrus.uml#_Px9pkAQfEeeWNbzuB-wxVw"/>
-      <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_PydY0gQfEeeWNbzuB-wxVw" points="[401, 80, -643984, -643984]$[460, 80, -643984, -643984]$[460, 300, -643984, -643984]$[1180, 300, -643984, -643984]$[1180, 620, -643984, -643984]$[1141, 620, -643984, -643984]"/>
-      <sourceAnchor xmi:type="notation:IdentityAnchor" xmi:id="_Py6r0AQfEeeWNbzuB-wxVw" id="(1.0,0.6557377049180327)"/>
-      <targetAnchor xmi:type="notation:IdentityAnchor" xmi:id="_Py6r0QQfEeeWNbzuB-wxVw" id="(1.0,0.6557377049180327)"/>
-    </edges>
     <edges xmi:type="notation:Connector" xmi:id="_hC1UcAQfEeeWNbzuB-wxVw" type="Usage_Edge" source="_W5WjAAQfEeeWNbzuB-wxVw" target="_r-EdmfVVEea4b69uN8N4dw">
       <children xmi:type="notation:DecorationNode" xmi:id="_hC1UcwQfEeeWNbzuB-wxVw" type="Usage_NameLabel">
         <layoutConstraint xmi:type="notation:Location" xmi:id="_hC1UdAQfEeeWNbzuB-wxVw" y="40"/>

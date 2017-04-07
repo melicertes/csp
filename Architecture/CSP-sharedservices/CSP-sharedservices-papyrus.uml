@@ -22,7 +22,6 @@
       </packagedElement>
       <packagedElement xmi:type="uml:Component" xmi:id="_r9-9xPVVEea4b69uN8N4dw" name="Application RESTful Adapter"/>
       <packagedElement xmi:type="uml:Component" xmi:id="_r9-9xfVVEea4b69uN8N4dw" name="Application">
-        <packagedElement xmi:type="uml:Usage" xmi:id="_Px9pkAQfEeeWNbzuB-wxVw" client="_r9-9xfVVEea4b69uN8N4dw" supplier="_r9-95PVVEea4b69uN8N4dw"/>
         <packagedElement xmi:type="uml:Usage" xmi:id="_vQdQwAQfEeeWNbzuB-wxVw" client="_r9-9xfVVEea4b69uN8N4dw" supplier="_GJqSkAQfEeeWNbzuB-wxVw"/>
       </packagedElement>
     </packagedElement>
