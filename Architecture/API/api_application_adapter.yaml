@@ -1,19 +1,58 @@
 swagger: '2.0'
 info:
-  description: ""
-  version: "0.0.1"
+  description: |
+    Application adapter consists of one service endpoint "/adapter" handling one resource "integrationData". Adapter accepts integrationData from the integration layer. The data is either of a data type that the application handles natively or of a data type that can be used by the application as auxiluary data. In the first case, the adapter checks if there is already a record that represents the data and updates that record (deduplication) or creates a new one. The emmition of the creation or update is depended on the "isExternal" flag.
+  version: "0.2.0"
   title: Application Adapter API
 
 host: app.csp.org
 schemes:
   - https
 paths:
-  /adapter:
+  /adapter/integrationData:
     post:
-      summary: todo
+      summary: Proccess new integration data from integration layer
       description: |
-        todo
+        Application adapter gets new data from integration layer. If the "isExternal" flag is set to false, the data is coming from another application inside the local CSP. The data is processed as such and if the process results in another data record being created or updated, the new or updated record is emited back to the integration layer. If the "isExternal" flag is set to true, the data is coming from an external CSP. The data is processed as such and if the process results in a new data record or an update to an existing data record, the new or updated record is emited back to the integration layer with the flag "toShare" set to false.
       operationId: addIntData
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: intDataObj
+          required: true
+          schema:
+            $ref: '#/definitions/IntegrationData'
+      responses:
+        200:
+          description: Successful operation
+        400:
+          description: Malformed Integration Data Structure
+
+    put:
+      summary: Process integration data update from integration layer
+      description: |
+        (See operation addIntData)
+      operationId: updateIntData
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: intDataObj
+          required: true
+          schema:
+            $ref: '#/definitions/IntegrationData'
+      responses:
+        200:
+          description: Successful operation
+        400:
+          description: Malformed Integration Data Structure
+
+    delete:
+      summary: Process integration data deletion from integration layer
+      description: |
+        Application adapter get deletion notification from integration layer. the adapter checks if that record is used by the application and updates the affected records in the application datastore. If the process results in a local data record being updated, the new or updated record is emited back to the integration layer. The dataObject is expected to be null.
+      operationId: deleteIntData
       consumes:
         - application/json
       parameters:
@@ -52,6 +91,7 @@ definitions:
   IntegrationDataType:
     type: string
     enum:
+    - event
     - threat
     - incident
     - vulnerability
@@ -59,13 +99,12 @@ definitions:
     - chat
     - file
     - contact
+    - trustCircle
   
   SharingParams:
     type: object
     properties:
       toShare:
         type: boolean
-      trustCircleId:
-        type: string
       isExternal:
         type: boolean

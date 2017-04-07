@@ -15,17 +15,13 @@ public class SharingParams  implements Serializable {
   @JsonProperty("toShare")
   private Boolean toShare;
 
-  @JsonProperty("trustCircleId")
-  private String trustCircleId;
-
   @JsonProperty("isExternal")
   private Boolean isExternal;
 
   public SharingParams() {}
 
-  public SharingParams(Boolean toShare, String trustCircleId, Boolean isExternal) {
+  public SharingParams(Boolean toShare, Boolean isExternal) {
     this.toShare = toShare;
-    this.trustCircleId = trustCircleId;
     this.isExternal = isExternal;
   }
 
@@ -35,14 +31,6 @@ public class SharingParams  implements Serializable {
 
   public void setToShare(Boolean toShare) {
     this.toShare = toShare;
-  }
-
-  public String getTrustCircleId() {
-    return trustCircleId;
-  }
-
-  public void setTrustCircleId(String trustCircleId) {
-    this.trustCircleId = trustCircleId;
   }
 
   public Boolean getIsExternal() {
@@ -63,13 +51,12 @@ public class SharingParams  implements Serializable {
     }
     SharingParams sharingParams = (SharingParams) o;
     return Objects.equals(this.toShare, sharingParams.toShare) &&
-        Objects.equals(this.trustCircleId, sharingParams.trustCircleId) &&
-        Objects.equals(this.isExternal, sharingParams.isExternal);
+            Objects.equals(this.isExternal, sharingParams.isExternal);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(toShare, trustCircleId, isExternal);
+    return Objects.hash(toShare, isExternal);
   }
 
   @Override
@@ -78,7 +65,6 @@ public class SharingParams  implements Serializable {
     sb.append("class SharingParams {\n");
 
     sb.append("    toShare: ").append(toIndentedString(toShare)).append("\n");
-    sb.append("    trustCircleId: ").append(toIndentedString(trustCircleId)).append("\n");
     sb.append("    isExternal: ").append(toIndentedString(isExternal)).append("\n");
     sb.append("}");
     return sb.toString();

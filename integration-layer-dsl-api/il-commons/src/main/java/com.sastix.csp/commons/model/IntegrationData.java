@@ -1,6 +1,8 @@
 package com.sastix.csp.commons.model;
 
+
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.util.JSONPObject;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -22,11 +24,11 @@ public class IntegrationData  implements Serializable {
   private IntegrationDataType dataType;
 
   @JsonProperty("dataObject")
-  private String dataObject;
+  private Object dataObject;
 
   public IntegrationData() {}
 
-  public IntegrationData(DataParams dataParams, SharingParams sharingParams, IntegrationDataType dataType, String dataObject) {
+  public IntegrationData(DataParams dataParams, SharingParams sharingParams, IntegrationDataType dataType, String dataObject, String dataApp, Object dataPayload) {
     this.dataParams = dataParams;
     this.sharingParams = sharingParams;
     this.dataType = dataType;
@@ -57,13 +59,14 @@ public class IntegrationData  implements Serializable {
     this.dataType = dataType;
   }
 
-  public String getDataObject() {
+  public Object getDataObject() {
     return dataObject;
   }
 
-  public void setDataObject(String dataObject) {
+  public void setDataObject(Object dataObject) {
     this.dataObject = dataObject;
   }
+
 
   @Override
   public boolean equals(Object o) {
@@ -94,6 +97,7 @@ public class IntegrationData  implements Serializable {
     sb.append("    sharingParams: ").append(toIndentedString(sharingParams)).append("\n");
     sb.append("    dataType: ").append(toIndentedString(dataType)).append("\n");
     sb.append("    dataObject: ").append(toIndentedString(dataObject)).append("\n");
+
     sb.append("}");
     return sb.toString();
   }

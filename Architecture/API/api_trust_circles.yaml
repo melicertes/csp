@@ -1,0 +1,362 @@
+swagger: '2.0'
+info:
+  title: CSP API Documentation
+  description: |
+      This document describes the REST API of the CSP system. The API is protected 
+      using Basic Authentication.
+
+  version: "0.0.1"
+
+host: localhost:8000
+schemes:
+  - http
+basePath: /api/v1
+
+produces:
+  - application/json
+paths:
+  /circles:
+    get:
+      description: |
+        Lists all trust Circles.
+      tags:
+        - Trust Circles
+      responses:
+        200:
+          description: An array of trust circles
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/TrustCircle'
+    post:
+      description: Create a new trust circle.
+      tags:
+        - Trust Circles
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/TrustCircle'
+          description: The data of the trust circle to create
+      responses:
+        201:
+          description: The newly created trust circle
+          schema:
+            $ref: '#/definitions/TrustCircle'    
+        400:
+          description: Validation Errors
+          schema:
+            $ref: '#/definitions/Errors'
+            
+  /circles/{id}:
+    get:
+      description: Return a single trust circle
+      tags:
+        - Trust Circles
+      parameters:
+        - name: id
+          in: path
+          type: integer
+          description: The trust circle ID to return
+          required: true
+      responses:
+        200:
+          description: The requested trust circle
+          schema:
+            $ref: '#/definitions/TrustCircle'
+        404:
+          description: Trust circle not found
+    put:
+      description: Update a single trust circle
+      tags:
+        - Trust Circles
+      parameters:
+        - name: id
+          in: path
+          type: integer
+          description: The ID of the trust circle to update
+          required: true
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/TrustCircle'
+          description: The data of the trust circle to update
+      responses:
+        200:
+          description: The changed trust circle
+          schema:
+            $ref: '#/definitions/TrustCircle'
+        400:
+          description: Vaidation Errors
+          schema:
+            $ref: '#/definitions/Errors'
+        404:
+          description: Trust circle not found
+    delete:
+      description: Delete a trust circle
+      tags:
+        - Trust Circles
+      parameters:
+        - name: id
+          in: path
+          type: integer
+          description: The ID of the trust circle to update
+          required: true
+      responses:
+        204:
+          description: Trust Circle deleted successfully
+        404:
+          description: Trust circle not found
+
+# TEAMS ------------------------          
+  /teams:
+    get:
+      description: |
+        Lists all teams.
+      tags:
+        - Teams
+      responses:
+        200:
+          description: An array of teams
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Team'
+    post:
+      description: Create a new team.
+      tags:
+        - Teams
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/Team'
+          description: The data of the team to update
+      responses:
+        201:
+          description: The newly created team
+          schema:
+            $ref: '#/definitions/Team'    
+        400:
+          description: Validation Errors
+          schema:
+            $ref: '#/definitions/Errors'          
+  /teams/{id}:
+    get:
+      description: Return a single team
+      tags:
+        - Teams
+      parameters:
+        - name: id
+          in: path
+          type: integer
+          description: The team ID to return
+          required: true
+      responses:
+        200:
+          description: The requested team
+          schema:
+            $ref: '#/definitions/Team'
+        404:
+          description: Team not found
+    put:
+      description: Update a single team
+      tags:
+        - Teams
+      parameters:
+        - name: id
+          in: path
+          type: integer
+          description: The ID of the team to update
+          required: true
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/Team'
+          description: The data of the team to update
+      responses:
+        200:
+          description: The changed team
+          schema:
+            $ref: '#/definitions/Team'
+        400:
+          description: Vaidation Errors
+          schema:
+            $ref: '#/definitions/Errors'
+        404:
+          description: Team not found
+    delete:
+      description: Delete a team
+      tags:
+        - Teams
+      parameters:
+        - name: id
+          in: path
+          type: integer
+          description: The ID of the team to delete
+          required: true
+      responses:
+        204:
+          description: Team deleted successfully
+        404:
+          description: Team not found
+  /config:
+    get:
+      description: Return the CSP configuration
+      tags:
+        - Config
+      responses:
+        200:
+          description: The configuration
+          schema:
+            $ref: '#/definitions/Config'
+definitions:
+  TrustCircle:
+    type: object
+    required:
+      - short_name
+      - name
+      - description
+      - auth_source
+    properties:
+      id:
+        type: integer
+        description: The unique identifier of this trust circle
+        readOnly: true
+      created:
+        type: string
+        format: date-time
+        readOnly: true
+        description: Creation timestamp        
+      short_name:
+        type: string
+        maxLength: 128
+        description: Short TC name
+      name:
+        type: string
+        maxLength: 255
+        description: Long TC name
+      description:
+        type: string
+        maxLength: 255
+        description: Description of the trust circle
+      auth_source:
+        type: string
+        maxLength: 255
+        description: The authoritative source
+      info_url:
+        type: string
+        format: url
+        description: URL for public information
+      membership_url:
+        type: string
+        format: url
+        description: URL for membership directory
+      teams:
+        type: array
+        items:
+          type: integer
+          description: Team ID
+  Team:
+    type: object
+    required:
+      - short_name
+      - name
+      - host_organisation
+      - description
+      - country
+      - established
+      - status
+    properties:
+      id:
+        type: integer
+        description: The unique identifier of this team
+        readOnly: true
+      created:
+        type: string
+        format: date-time
+        readOnly: true
+        description: Creation timestamp
+      short_name:
+        type: string
+        maxLength: 128
+        description: Short team name
+      name:
+        type: string
+        maxLength: 255
+        description: Long team name
+      host_organisation:
+        type: string
+        maxLength: 255
+        description: Host organisation
+      description:
+        type: string
+        maxLength: 255
+        description: Description of the team
+      country:
+        type: string
+        description: Country of the team (see /config endpoint)
+      additional_countries:
+        type: array
+        description: List of additional countries (see /config endpoint)
+        items:
+          type: string
+      established:
+        type: string
+        format: date
+        description: Date the team has been established
+      nis_team_types:
+        type: array
+        description: List of team types (see /config endpoint)
+        items:
+            type: string
+      nis_sectors:
+        type: array
+        description: List of secor names (see /config endpoint)
+        items:
+            type: string
+      csp_installed:
+        type: boolean
+        description: Flag indicating if CSP is installed by team
+      csp_id:
+        type: string
+        maxLength: 255
+        description: The ID of the CSP installation. Required if csp_installed is true.
+      status:
+        type: string
+        description: Status of the team (see /config endpoint)
+  Config:
+    type: object
+    properties:
+      team_types:
+        type: array
+        description: List of available NIS team types
+        items:
+          type: string
+      sectors:
+        type: array
+        description: List of available NIS sectors
+        items:
+          type: string
+      countries:
+        type: array
+        description: List of available countries
+        items:
+          type: string
+      team_status:
+        type: array
+        description: List of available team status values
+        items:
+          type: string
+  Errors:
+    type: object
+    additionalProperties:
+        type: array
+        description: Field name
+        items:
+          type: string
+          description: Error message
