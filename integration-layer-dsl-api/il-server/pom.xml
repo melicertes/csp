@@ -63,6 +63,11 @@
             <artifactId>il-commons</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.sastix.csp</groupId>
+            <artifactId>il-client</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 
     <!--<build>-->

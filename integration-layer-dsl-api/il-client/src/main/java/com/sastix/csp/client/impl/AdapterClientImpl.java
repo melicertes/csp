@@ -19,7 +19,7 @@ public class AdapterClientImpl implements AdapterClient {
     String context;
     private Logger LOG = (Logger) LoggerFactory.getLogger(AdapterClientImpl.class);
     @Autowired
-    @Qualifier("AdapterRestTemplate")
+    @Qualifier("CspRestTemplate")
     RetryRestTemplate retryRestTemplate;
     @Override
     public ResponseEntity<String> processNewIntegrationData(IntegrationData integrationData) {

@@ -1,17 +1,15 @@
 package com.sastix.csp.integration.adapter;
 
 import com.sastix.csp.client.AdapterClient;
-import com.sastix.csp.client.config.AdapterRestTemplateConfiguration;
+import com.sastix.csp.client.config.CspRestTemplateConfiguration;
 import com.sastix.csp.commons.model.IntegrationData;
 import com.sastix.csp.commons.model.IntegrationDataType;
-import org.hamcrest.MatcherAssert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.springframework.boot.autoconfigure.web.WebClientAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,8 +25,7 @@ import static org.hamcrest.Matchers.*;
  * Created by iskitsas on 4/4/17.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-//@SpringBootTest(classes = {AdapterClient.class, AdapterRestTemplateConfiguration.class}) //SB 1.5
-@SpringBootTest(classes = {AdapterClient.class, AdapterRestTemplateConfiguration.class})
+@SpringBootTest(classes = {AdapterClient.class, CspRestTemplateConfiguration.class}) //SB 1.5
 public class AdapterClientMockTest {
     @Mock
     AdapterClient adapterClient;

@@ -1,23 +1,18 @@
 package com.sastix.csp.server.processors;
 
 
-import com.sastix.csp.commons.model.Csp;
+import com.sastix.csp.client.TrustCirclesClient;
 import com.sastix.csp.commons.model.IntegrationData;
-import com.sastix.csp.commons.model.TrustCircle;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpEntity;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-
-import static com.sastix.csp.server.external.TrustCircles.getTrustCircle;
 
 @Component
 public class DclProcessor implements Processor {
@@ -25,6 +20,9 @@ public class DclProcessor implements Processor {
     private static final Logger logger = LoggerFactory.getLogger(DclProcessor.class);
 
     private List<String> ecsps = new ArrayList<String>();
+
+    @Autowired
+    TrustCirclesClient tcClient;
 
     @Override
     public void process(Exchange exchange) throws IOException {
@@ -42,8 +40,8 @@ public class DclProcessor implements Processor {
          */
         try {
             //TODO: can it be done through camel?
-            ecsps = getTrustCircle();
-
+            //ecsps = getTrustCircle();
+            ecsps = tcClient.getCsps("localhost");
             exchange.getIn().setHeader("ecsps", ecsps);
             logger.info(exchange.getIn().getHeader("ecsps").toString());
         }catch (Exception e){

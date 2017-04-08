@@ -19,11 +19,11 @@ import java.util.concurrent.ConcurrentHashMap;
  * Created by iskitsas on 4/4/17.
  */
 @Configuration
-public class AdapterRestTemplateConfiguration {
-    @Value("${adapter.retry.backOffPeriod:5000}")
+public class CspRestTemplateConfiguration {
+    @Value("${csp.retry.backOffPeriod:5000}")
     private String backOffPeriod;
 
-    @Value("${adapter.retry.maxAttempts:3}")
+    @Value("${csp.retry.maxAttempts:3}")
     private String maxAttempts;
 
     private static final ConcurrentHashMap<String, ExceptionHandler> SUPPORTED_EXCEPTIONS = new ConcurrentHashMap<>();
@@ -64,7 +64,7 @@ public class AdapterRestTemplateConfiguration {
     /**
      * Configure and return the Rest Template.
      */
-    @Bean(name = "AdapterRestTemplate")
+    @Bean(name = "CspRestTemplate")
     public RetryRestTemplate getRestTemplate() {
 
         //Creates the restTemplate instance

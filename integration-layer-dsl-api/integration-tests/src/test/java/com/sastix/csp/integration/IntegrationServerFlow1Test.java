@@ -1,9 +1,12 @@
 package com.sastix.csp.integration;
 
+import com.sastix.csp.client.TrustCirclesClient;
 import com.sastix.csp.commons.apiHttpStatusResponse.HttpStatusResponseType;
+import com.sastix.csp.commons.client.RetryRestTemplate;
 import com.sastix.csp.commons.model.IntegrationData;
 import com.sastix.csp.commons.model.IntegrationDataType;
 import com.sastix.csp.commons.model.SharingParams;
+import com.sastix.csp.commons.model.TrustCircle;
 import com.sastix.csp.commons.routes.CamelRoutes;
 import com.sastix.csp.commons.routes.ContextUrl;
 import com.sastix.csp.server.IntegrationLayerDslApiApplication;
@@ -22,15 +25,21 @@ import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
+
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -40,10 +49,21 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
  * Created by iskitsas on 4/7/17.
  */
 @RunWith(CamelSpringBootRunner.class)
-@SpringBootTest(classes = IntegrationLayerDslApiApplication.class)
+@SpringBootTest(classes = IntegrationLayerDslApiApplication.class,
+        properties = {
+                "csp.retry.backOffPeriod:10",
+                "csp.retry.maxAttempts:1"
+        })
 @MockEndpointsAndSkip("http:*")
 public class IntegrationServerFlow1Test {
     private static final Logger LOG = LoggerFactory.getLogger(IntegrationServerFlow1Test.class);
+
+    @Autowired
+    @Qualifier("CspRestTemplate")
+    RetryRestTemplate retryRestTemplate;
+
+    @Autowired
+    TrustCirclesClient tcClient;
 
     private MockMvc mvc;
     @Autowired
@@ -71,6 +91,9 @@ public class IntegrationServerFlow1Test {
     @DirtiesContext
     @Test
     public void flow1DslTest() throws Exception {
+        MockRestServiceServer mockServer = MockRestServiceServer.bindTo(retryRestTemplate).build();
+        mockServer.expect(requestTo(tcClient.getContext()+ContextUrl.TRUST_CIRCLE)).andRespond(withSuccess(TestUtil.convertObjectToJsonBytes(getMockedTrustCircle()),TestUtil.APPLICATION_JSON_UTF8));
+
         sendFlow1IntegrationData(false);
 
         mockedDsl.expectedMessageCount(1);
@@ -82,6 +105,10 @@ public class IntegrationServerFlow1Test {
             IntegrationData data = in.getBody(IntegrationData.class);
             assertThat(data.getDataType(), is(IntegrationDataType.INCIDENT));
         }
+
+        mockedDdl.expectedMessageCount(1);
+        mockedDdl.assertIsSatisfied();
+        mockServer.verify();
     }
 
     @DirtiesContext
@@ -104,6 +131,16 @@ public class IntegrationServerFlow1Test {
                 .contentType(TestUtil.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
                 .andExpect(content().string(HttpStatusResponseType.SUCCESSFUL_OPERATION.getReasonPhrase()));
+    }
+
+    private TrustCircle getMockedTrustCircle(){
+        TrustCircle trustCircle = new TrustCircle();
+        List<String> listCsps = new ArrayList<>();
+        listCsps.add("http://external.csp1.com");
+        listCsps.add("http://external.csp2.com");
+        listCsps.add("http://external.csp2.com");
+        trustCircle.setCsps(listCsps);
+        return trustCircle;
     }
 
     RouteDefinition getRoute(String uri){

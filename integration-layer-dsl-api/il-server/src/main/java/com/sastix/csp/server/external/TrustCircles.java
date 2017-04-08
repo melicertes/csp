@@ -10,7 +10,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 import java.util.List;
-
+@Deprecated //use TrustCirclesClient
 public class TrustCircles {
 
     private static final Logger logger = LoggerFactory.getLogger(TrustCircles.class);

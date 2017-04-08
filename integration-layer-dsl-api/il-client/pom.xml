@@ -22,11 +22,7 @@
             <groupId>com.sastix.csp</groupId>
             <artifactId>il-commons</artifactId>
             <version>${project.version}</version>
-        </dependency><dependency>
-        <groupId>com.sastix.csp</groupId>
-        <artifactId>il-server</artifactId>
-        <version>${project.version}</version>
-    </dependency>
+        </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>

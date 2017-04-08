@@ -2,7 +2,7 @@ package com.sastix.csp.integration.adapter;
 
 import com.sastix.csp.client.AdapterClient;
 import com.sastix.csp.client.config.AdapterClientConfig;
-import com.sastix.csp.client.config.AdapterRestTemplateConfiguration;
+import com.sastix.csp.client.config.CspRestTemplateConfiguration;
 import com.sastix.csp.commons.model.IntegrationData;
 import com.sastix.csp.commons.model.IntegrationDataType;
 import org.junit.Test;
@@ -21,7 +21,7 @@ import static org.hamcrest.Matchers.is;
  * Created by iskitsas on 4/6/17.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringBootTest(classes = {AdapterClient.class, AdapterRestTemplateConfiguration.class, AdapterClientConfig.class},
+@SpringBootTest(classes = {AdapterClient.class, CspRestTemplateConfiguration.class, AdapterClientConfig.class},
         properties = {
                 "adapter.server.protocol:http",
                 "adapter.server.host:localhost",

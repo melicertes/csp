@@ -6,4 +6,5 @@ package com.sastix.csp.commons.routes;
 public interface ContextUrl {
     String DSL_INTEGRATION_DATA= "/dsl/integrationData";
     String ADAPTER_INTEGRATION_DATA= "/adapter/integrationData";
+    String TRUST_CIRCLE = "/tc";
 }
