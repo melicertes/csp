@@ -1,11 +1,9 @@
 package com.sastix.csp.server.routes;
 
+import com.sastix.csp.commons.model.Csp;
 import com.sastix.csp.commons.model.IntegrationData;
-import com.sastix.csp.server.processors.DdlProcessor;
-import com.sastix.csp.server.processors.DclProcessor;
-import com.sastix.csp.server.processors.EDclProcessor;
-import com.sastix.csp.server.processors.ExceptionProcessor;
-import com.sastix.csp.server.processors.RecipientsProcessor;
+import com.sastix.csp.commons.routes.CamelRoutes;
+import com.sastix.csp.server.processors.*;
 import org.apache.camel.Exchange;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.model.dataformat.JsonLibrary;
@@ -29,6 +27,9 @@ public class DSLRoute extends RouteBuilder {
 
     @Autowired
     private EDclProcessor edclProcessor;
+
+    @Autowired
+    private TrustCirclesProcessor trustCirclesProcessor;
 
     @Override
     public void configure() {
@@ -74,6 +75,10 @@ public class DSLRoute extends RouteBuilder {
 //                .marshal().json(JsonLibrary.Jackson, IntegrationData.class)
                 .to("direct:dsl");
 
+        //TrustCircles routes
+        from(CamelRoutes.TC)
+                .process(trustCirclesProcessor)
+                .marshal().json(JsonLibrary.Jackson, Csp.class);
 
     }
 }

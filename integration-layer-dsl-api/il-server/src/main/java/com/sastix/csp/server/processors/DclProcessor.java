@@ -1,10 +1,15 @@
 package com.sastix.csp.server.processors;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sastix.csp.client.TrustCirclesClient;
+import com.sastix.csp.commons.model.Csp;
 import com.sastix.csp.commons.model.IntegrationData;
-import org.apache.camel.Exchange;
-import org.apache.camel.Processor;
+import com.sastix.csp.commons.model.TrustCircle;
+import com.sastix.csp.commons.routes.CamelRoutes;
+import com.sastix.csp.commons.routes.ContextUrl;
+import com.sastix.csp.server.service.CamelRestService;
+import org.apache.camel.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,9 +25,17 @@ public class DclProcessor implements Processor {
     private static final Logger logger = LoggerFactory.getLogger(DclProcessor.class);
 
     private List<String> ecsps = new ArrayList<String>();
+    @Autowired
+    ObjectMapper objectMapper;
 
     @Autowired
     TrustCirclesClient tcClient;
+
+    @Autowired
+    CamelRestService camelRestService;
+
+    @Produce
+    private ProducerTemplate producerTemplate;
 
     @Override
     public void process(Exchange exchange) throws IOException {
@@ -39,9 +52,20 @@ public class DclProcessor implements Processor {
          * Get Recipients from Trust Circles
          */
         try {
-            //TODO: can it be done through camel?
+            //deprecated
             //ecsps = getTrustCircle();
-            ecsps = tcClient.getCsps("localhost");
+
+            //using sastix client logic
+            //ecsps = tcClient.getCsps("localhost");
+
+            //direct http post through camel
+            //TrustCircle tc = camelRestService.send(tcClient.getContext()+ ContextUrl.TRUST_CIRCLE,new Csp("localhost"), TrustCircle.class);
+
+            // with camel response
+            byte[] data = (byte[]) producerTemplate.sendBody(CamelRoutes.TC, ExchangePattern.InOut,new Csp("localhost"));
+            TrustCircle tc = objectMapper.readValue(data, TrustCircle.class);
+            ecsps = tc.getCsps();
+
             exchange.getIn().setHeader("ecsps", ecsps);
             logger.info(exchange.getIn().getHeader("ecsps").toString());
         }catch (Exception e){

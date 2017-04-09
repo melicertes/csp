@@ -1,5 +1,6 @@
 package com.sastix.csp.integration;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sastix.csp.client.TrustCirclesClient;
 import com.sastix.csp.commons.apiHttpStatusResponse.HttpStatusResponseType;
 import com.sastix.csp.commons.client.RetryRestTemplate;
@@ -10,9 +11,7 @@ import com.sastix.csp.commons.model.TrustCircle;
 import com.sastix.csp.commons.routes.CamelRoutes;
 import com.sastix.csp.commons.routes.ContextUrl;
 import com.sastix.csp.server.IntegrationLayerDslApiApplication;
-import org.apache.camel.EndpointInject;
-import org.apache.camel.Exchange;
-import org.apache.camel.Message;
+import org.apache.camel.*;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.mock.MockEndpoint;
 import org.apache.camel.model.RouteDefinition;
@@ -33,6 +32,7 @@ import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -63,6 +63,9 @@ public class IntegrationServerFlow1Test {
     RetryRestTemplate retryRestTemplate;
 
     @Autowired
+    ObjectMapper objectMapper;
+
+    @Autowired
     TrustCirclesClient tcClient;
 
     private MockMvc mvc;
@@ -75,14 +78,22 @@ public class IntegrationServerFlow1Test {
     @EndpointInject(uri = CamelRoutes.MOCK_PREFIX+":"+CamelRoutes.DDL)
     private MockEndpoint mockedDdl;
 
+    @EndpointInject(uri = CamelRoutes.MOCK_PREFIX+":"+CamelRoutes.TC)
+    private MockEndpoint mockedTC;
+
     @Autowired
     SpringCamelContext springCamelContext;
+
+    String trustCirclesContext;
 
     @Before
     public void init() throws Exception {
         mvc = webAppContextSetup(webApplicationContext).build();
         mockRoute(CamelRoutes.MOCK_PREFIX,CamelRoutes.DSL);
         mockRoute(CamelRoutes.MOCK_PREFIX,CamelRoutes.DDL);
+        mockRouteSkipSendToOriginalEndpoint(CamelRoutes.MOCK_PREFIX,CamelRoutes.TC);
+        trustCirclesContext = tcClient.getContext()+ContextUrl.TRUST_CIRCLE;
+        //MockEndpoint resultEndpoint = springCamelContext.addEndpoint("mock:foo", new MockEndpoint());
     }
 
     // Use @DirtiesContext on the test methods to force Spring Testing to automatically reload the CamelContext after
@@ -90,9 +101,9 @@ public class IntegrationServerFlow1Test {
     // endpoint that is then reused in another test method.
     @DirtiesContext
     @Test
-    public void flow1DslTest() throws Exception {
+    public void flow1DslTestUsingTrustCirclesClient() throws Exception {
         MockRestServiceServer mockServer = MockRestServiceServer.bindTo(retryRestTemplate).build();
-        mockServer.expect(requestTo(tcClient.getContext()+ContextUrl.TRUST_CIRCLE)).andRespond(withSuccess(TestUtil.convertObjectToJsonBytes(getMockedTrustCircle()),TestUtil.APPLICATION_JSON_UTF8));
+        mockServer.expect(requestTo(trustCirclesContext)).andRespond(withSuccess(TestUtil.convertObjectToJsonBytes(getMockedTrustCircle()),TestUtil.APPLICATION_JSON_UTF8));
 
         sendFlow1IntegrationData(false);
 
@@ -113,8 +124,47 @@ public class IntegrationServerFlow1Test {
 
     @DirtiesContext
     @Test
-    public void flow1DdlTest() throws Exception {
+    public void flow1DdlTestUsingCamelEndpointOnly() throws Exception {
+        mockedTC.returnReplyBody(new Expression() {
+            @Override
+            public <T> T evaluate(Exchange exchange, Class<T> type) {
+                try {
+                    return (T) TestUtil.convertObjectToJsonBytes(getMockedTrustCircle());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    return null;
+                }
+            }
+        });
+
+        mockedTC.expectedMessagesMatches(new Predicate() {
+            @Override
+            public boolean matches(Exchange exchange) {
+                String in = exchange.getIn().getBody(String.class);
+                TrustCircle tc = null;
+                try {
+                    tc = objectMapper.readValue(in, TrustCircle.class);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                assertThat(tc.getCsps().size(),is(3));
+                return true;
+            }
+        });
+
         sendFlow1IntegrationData(false);
+
+        mockedDsl.expectedMessageCount(1);
+        mockedDsl.assertIsSatisfied();
+
+        List<Exchange> list = mockedDsl.getReceivedExchanges();
+        for (Exchange exchange : list) {
+            Message in = exchange.getIn();
+            IntegrationData data = in.getBody(IntegrationData.class);
+            assertThat(data.getDataType(), is(IntegrationDataType.INCIDENT));
+        }
+
+
         mockedDdl.expectedMessageCount(1);
         mockedDdl.assertIsSatisfied();
     }
@@ -156,6 +206,19 @@ public class IntegrationServerFlow1Test {
                 // intercept sending to direct:dsl and do something else
                 interceptSendToEndpoint(uri)
                         //.skipSendToOriginalEndpoint()
+                        //.to("log:foo")
+                        .to(mockPrefix+":"+uri);
+            }
+        });
+    }
+    void mockRouteSkipSendToOriginalEndpoint(String mockPrefix,String uri) throws Exception {
+        RouteDefinition dslRoute = getRoute(uri);
+        dslRoute.adviceWith(springCamelContext, new RouteBuilder() {
+            @Override
+            public void configure() throws Exception {
+                // intercept sending to direct:dsl and do something else
+                interceptSendToEndpoint(uri)
+                        .skipSendToOriginalEndpoint()
                         //.to("log:foo")
                         .to(mockPrefix+":"+uri);
             }

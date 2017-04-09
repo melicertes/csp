@@ -8,4 +8,5 @@ public interface CamelRoutes {
     String DSL ="direct:dsl";
     String DCL ="direct:dcl";
     String DDL ="direct:ddl";
+    String TC ="direct:tc";
 }
