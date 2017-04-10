@@ -4,10 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sastix.csp.client.TrustCirclesClient;
 import com.sastix.csp.commons.apiHttpStatusResponse.HttpStatusResponseType;
 import com.sastix.csp.commons.client.RetryRestTemplate;
-import com.sastix.csp.commons.model.IntegrationData;
-import com.sastix.csp.commons.model.IntegrationDataType;
-import com.sastix.csp.commons.model.SharingParams;
-import com.sastix.csp.commons.model.TrustCircle;
+import com.sastix.csp.commons.model.*;
 import com.sastix.csp.commons.routes.CamelRoutes;
 import com.sastix.csp.commons.routes.ContextUrl;
 import com.sastix.csp.integration.MockUtils;
@@ -146,7 +143,8 @@ public class CspServerFlow1SandboxTest {
         list = mockedEcsp.getReceivedExchanges();
         for (Exchange exchange : list) {
             Message in = exchange.getIn();
-            TrustCircle data = in.getBody(TrustCircle.class);
+            TrustCircleEcspDTO trustCircleEcspDTO = in.getBody(TrustCircleEcspDTO.class);
+            TrustCircle data = trustCircleEcspDTO.getTrustCircle();
             assertThat(data.getCsps().size(), is(3));
             assertThat(data.getCsps().get(0), is("http://external.csp1.com"));
         }

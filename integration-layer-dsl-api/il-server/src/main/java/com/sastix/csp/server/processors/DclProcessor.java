@@ -6,6 +6,7 @@ import com.sastix.csp.client.TrustCirclesClient;
 import com.sastix.csp.commons.model.Csp;
 import com.sastix.csp.commons.model.IntegrationData;
 import com.sastix.csp.commons.model.TrustCircle;
+import com.sastix.csp.commons.model.TrustCircleEcspDTO;
 import com.sastix.csp.commons.routes.CamelRoutes;
 import com.sastix.csp.commons.routes.ContextUrl;
 import com.sastix.csp.server.service.CamelRestService;
@@ -66,7 +67,9 @@ public class DclProcessor implements Processor {
             byte[] data = (byte[]) producerTemplate.sendBody(CamelRoutes.TC, ExchangePattern.InOut,new Csp("localhost"));
             TrustCircle tc = objectMapper.readValue(data, TrustCircle.class);
 
-            producerTemplate.sendBody(CamelRoutes.ECSP, ExchangePattern.InOut,tc);
+            TrustCircleEcspDTO trustCircleEcspDTO = new TrustCircleEcspDTO(tc,integrationData);
+
+            producerTemplate.sendBody(CamelRoutes.ECSP, ExchangePattern.InOut,trustCircleEcspDTO);
 
 //            ecsps = tc.getCsps();
 //            exchange.getIn().setHeader("ecsps", ecsps);

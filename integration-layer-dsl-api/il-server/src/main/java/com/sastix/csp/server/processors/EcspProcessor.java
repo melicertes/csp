@@ -1,8 +1,9 @@
 package com.sastix.csp.server.processors;
 
+import com.sastix.csp.commons.model.IntegrationData;
 import com.sastix.csp.commons.model.TrustCircle;
-import org.apache.camel.Exchange;
-import org.apache.camel.Processor;
+import com.sastix.csp.commons.model.TrustCircleEcspDTO;
+import org.apache.camel.*;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -12,10 +13,18 @@ import java.util.List;
  */
 @Component
 public class EcspProcessor implements Processor{
+    @Produce
+    ProducerTemplate producerTemplate;
+
     @Override
     public void process(Exchange exchange) throws Exception {
-        TrustCircle tc = exchange.getIn().getBody(TrustCircle.class);
+        TrustCircleEcspDTO trustCircleEcspDTO = exchange.getIn().getBody(TrustCircleEcspDTO.class);
+        TrustCircle tc = trustCircleEcspDTO.getTrustCircle();
+        IntegrationData integrationData = trustCircleEcspDTO.getIntegrationData();
         List<String> ecsps = tc.getCsps();
-        exchange.getIn().setHeader("ecsps", ecsps);
+        for (String ecsp : ecsps) {
+            producerTemplate.sendBody(ecsp, ExchangePattern.OutIn,integrationData);
+        }
+        //exchange.getIn().setHeader("ecsps", ecsps);
     }
 }
