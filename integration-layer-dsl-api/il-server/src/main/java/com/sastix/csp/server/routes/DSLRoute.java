@@ -5,6 +5,7 @@ import com.sastix.csp.commons.model.IntegrationData;
 import com.sastix.csp.commons.routes.CamelRoutes;
 import com.sastix.csp.server.processors.*;
 import org.apache.camel.Exchange;
+import org.apache.camel.builder.ExpressionBuilder;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.model.dataformat.JsonLibrary;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +30,17 @@ public class DSLRoute extends RouteBuilder {
     private EDclProcessor edclProcessor;
 
     @Autowired
-    private TcProcessor trustCirclesProcessor;
+    private TcProcessor tcProcessor;
+
+    @Autowired
+    private EcspProcessor ecspProcessor;
+
+    @Autowired
+    private AppProcessor appProcessor;
+
+    @Autowired
+    private ElasticProcessor elasticProcessor;
+
 
     @Override
     public void configure() {
@@ -62,10 +73,11 @@ public class DSLRoute extends RouteBuilder {
 
         from(CamelRoutes.DCL)
                 .process(dclProcessor)
-                .setHeader(Exchange.HTTP_METHOD, constant("POST"))
-                .setHeader(Exchange.CONTENT_TYPE, constant("application/json"))
-                //.marshal().json(JsonLibrary.Jackson, IntegrationData.class)
-                .recipientList(header("ecsps"));
+                //.setHeader(Exchange.HTTP_METHOD, constant("POST"))
+                //.setHeader(Exchange.CONTENT_TYPE, constant("application/json"))
+                .marshal().json(JsonLibrary.Jackson, IntegrationData.class)
+                //.recipientList(header("ecsps"))
+        ;
 
 
         from(CamelRoutes.EDCL)
@@ -77,8 +89,22 @@ public class DSLRoute extends RouteBuilder {
 
         //TrustCircles routes
         from(CamelRoutes.TC)
-                .process(trustCirclesProcessor)
+                .process(tcProcessor)
                 .marshal().json(JsonLibrary.Jackson, Csp.class);
+
+        //ExternalCSPs
+        from(CamelRoutes.ECSP)
+                .process(ecspProcessor)
+                .marshal().json(JsonLibrary.Jackson, Csp.class)
+                .recipientList(header("ecsps"));
+
+        //App routing
+        from(CamelRoutes.APP)
+                .process(appProcessor);
+
+        //Elastic route
+        from(CamelRoutes.ELASTIC)
+                .process(elasticProcessor);
 
     }
 }

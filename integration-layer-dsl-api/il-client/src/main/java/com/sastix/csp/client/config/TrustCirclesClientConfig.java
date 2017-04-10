@@ -11,13 +11,13 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 public class TrustCirclesClientConfig {
-    @Value("${tc.server.protocol}")
+    @Value("${tc.protocol}")
     private String protocol;
 
-    @Value("${tc.server.host}")
+    @Value("${tc.host}")
     private String host;
 
-    @Value("${tc.server.port}")
+    @Value("${tc.port}")
     private String port;
 
     @Bean(name = "trustCirclesClient")

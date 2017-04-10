@@ -65,9 +65,12 @@ public class DclProcessor implements Processor {
             // with camel response
             byte[] data = (byte[]) producerTemplate.sendBody(CamelRoutes.TC, ExchangePattern.InOut,new Csp("localhost"));
             TrustCircle tc = objectMapper.readValue(data, TrustCircle.class);
-            ecsps = tc.getCsps();
-            exchange.getIn().setHeader("ecsps", ecsps);
-            logger.info(exchange.getIn().getHeader("ecsps").toString());
+
+            producerTemplate.sendBody(CamelRoutes.ECSP, ExchangePattern.InOut,tc);
+
+//            ecsps = tc.getCsps();
+//            exchange.getIn().setHeader("ecsps", ecsps);
+//            logger.info(exchange.getIn().getHeader("ecsps").toString());
         }catch (Exception e){
             //TODO: handle this situation
             logger.error("TC api call failed.",e);

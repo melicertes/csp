@@ -4,14 +4,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sastix.csp.commons.model.IntegrationData;
 import com.sastix.csp.commons.model.IntegrationDataType;
 import com.sastix.csp.commons.routes.CamelRoutes;
+import com.sastix.csp.commons.routes.HeaderName;
 import com.sastix.csp.server.config.Flow1ApplicationsUrls;
 import com.sastix.csp.server.config.Flow2ApplicationsUrls;
-import org.apache.camel.Exchange;
-import org.apache.camel.Processor;
+import com.sastix.csp.server.service.CspUtils;
+import org.apache.camel.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -20,12 +22,18 @@ import java.util.List;
 @Component
 public class DslProcessor implements Processor {
 
+    @Produce
+    ProducerTemplate producerTemplate;
 
     @Autowired
     ObjectMapper objectMapper;
 
+    @Autowired
+    CspUtils cspUtils;
+
     private static final Logger LOGGER = LoggerFactory.getLogger(DslProcessor.class);
 
+    @Deprecated
     private static final String APPLICATION_ADAPTER_URI = "http://localhost:{{server.port}}/adapter/";
 
     private Flow1ApplicationsUrls flow1ApplicationsUrls;
@@ -86,52 +94,9 @@ public class DslProcessor implements Processor {
                 break;
         }
 
+        //testing direct:app
+        producerTemplate.sendBodyAndHeader(CamelRoutes.APP, ExchangePattern.InOut,integrationData, HeaderName.APP_NAME,"demoapp");
         exchange.getIn().setHeader("recipients", recipients);
-
-
-        /*
-        if (exchange.getFromEndpoint().getEndpointUri().equals("direct://edcl")) {
-            String inData = exchange.getIn().getBody(String.class);
-            integrationData = objectMapper.readValue(inData, IntegrationData.class);
-        }
-        else {
-            integrationData = exchange.getIn().getBody(IntegrationData.class);
-        }
-
-        IntegrationDataType dataType = integrationData.getDataType();
-
-
-        switch (dataType) {
-            case THREAT:
-                computeRecipientsApps(recipients, dataType, isExternal);
-                break;
-            case INCIDENT:
-                computeRecipientsApps(recipients, dataType, isExternal);
-                break;
-            case VULNERABILITY:
-                computeRecipientsApps(recipients, dataType, isExternal);
-                break;
-            case ARTEFACT:
-                computeRecipientsApps(recipients, dataType, isExternal);
-                break;
-            case CHAT:
-                computeRecipientsApps(recipients, dataType, isExternal);
-                break;
-            case FILE:
-                computeRecipientsApps(recipients, dataType, isExternal);
-                break;
-            case CONTACT:
-                computeRecipientsApps(recipients, dataType, isExternal);
-                break;
-        }
-
-        Boolean isExternal = integrationData.getSharingParams().getIsExternal();
-        if (!isExternal) {
-            recipients.add(CamelRoutes.DDL);
-        }
-        exchange.getIn().setHeader("recipients", recipients);
-*/
-
     }
 
     private void computeRecipientsApps(List<String> recipients, IntegrationDataType dataType, Boolean isExternal) {
@@ -147,7 +112,8 @@ public class DslProcessor implements Processor {
         }
 
         for (String app : apps) {
-            recipients.add(APPLICATION_ADAPTER_URI + app);
+            String uri = cspUtils.getAppUri(app);
+            recipients.add(uri + app);
         }
     }
 

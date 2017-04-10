@@ -1,0 +1,32 @@
+flow1:
+  artefact-apps:
+    - jitsi
+    - viper
+    - demoapp
+  event-apps:
+    - jitsi
+    - viper
+    - demoapp
+  incident-apps:
+    - jitsi
+    - viper
+    - demoapp
+  threat-apps:
+    - jitsi
+    - viper
+  vulnerability-apps:
+    - jitsi
+    - viper
+    - demoapp
+
+flow2:
+  artefact-apps:
+    - jitsi
+  event-apps:
+    - jitsi
+  incident-apps:
+    - jitsi
+  threat-apps:
+    - jitsi
+  vulnerability-apps:
+    - jitsi

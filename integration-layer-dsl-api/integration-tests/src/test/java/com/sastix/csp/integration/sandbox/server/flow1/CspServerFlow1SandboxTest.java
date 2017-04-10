@@ -78,6 +78,9 @@ public class CspServerFlow1SandboxTest {
     @EndpointInject(uri = CamelRoutes.MOCK_PREFIX+":"+CamelRoutes.TC)
     private MockEndpoint mockedTC;
 
+    @EndpointInject(uri = CamelRoutes.MOCK_PREFIX+":"+CamelRoutes.ECSP)
+    private MockEndpoint mockedEcsp;
+
     @Autowired
     MockUtils mockUtils;
 
@@ -90,6 +93,7 @@ public class CspServerFlow1SandboxTest {
         mockUtils.setSpringCamelContext(springCamelContext);
         mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX,CamelRoutes.DSL);
         mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX,CamelRoutes.DDL);
+        mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX,CamelRoutes.ECSP);
         mockUtils.mockRouteSkipSendToOriginalEndpoint(CamelRoutes.MOCK_PREFIX,CamelRoutes.TC);
     }
 
@@ -136,6 +140,15 @@ public class CspServerFlow1SandboxTest {
             Message in = exchange.getIn();
             IntegrationData data = in.getBody(IntegrationData.class);
             assertThat(data.getDataType(), is(IntegrationDataType.INCIDENT));
+        }
+
+        mockedEcsp.expectedMessageCount(1);
+        list = mockedEcsp.getReceivedExchanges();
+        for (Exchange exchange : list) {
+            Message in = exchange.getIn();
+            TrustCircle data = in.getBody(TrustCircle.class);
+            assertThat(data.getCsps().size(), is(3));
+            assertThat(data.getCsps().get(0), is("http://external.csp1.com"));
         }
 
         mockedDdl.expectedMessageCount(1);
