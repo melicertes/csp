@@ -6,31 +6,19 @@ import com.sastix.csp.commons.model.IntegrationDataType;
 import com.sastix.csp.commons.model.SharingParams;
 import com.sastix.csp.commons.routes.ContextUrl;
 import com.sastix.csp.server.IntegrationLayerDslApiApplication;
-import com.sastix.csp.server.processors.RecipientsProcessor;
+import com.sastix.csp.server.processors.DslProcessor;
 import org.apache.camel.*;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.impl.DefaultExchange;
-import org.apache.camel.spi.Synchronization;
-import org.apache.camel.spi.UnitOfWork;
-import org.apache.camel.spring.SpringCamelContext;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.*;
 import org.mockito.*;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.mock.http.MockHttpOutputMessage;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.nio.charset.Charset;
-import java.util.List;
-import java.util.Map;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -39,7 +27,6 @@ import org.springframework.web.context.WebApplicationContext;
 
 //import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
@@ -48,13 +35,13 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = IntegrationLayerDslApiApplication.class)
-//@ActiveProfiles("test")
+@Deprecated // see business or sandbox packages for relative examples
 public class IntegrationServerTest {
 
     private MockMvc mvc;
 
     @Spy
-    RecipientsProcessor recipientsProcessor;
+    DslProcessor recipientsProcessor;
 
     @Autowired
     private WebApplicationContext webApplicationContext;

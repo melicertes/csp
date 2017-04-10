@@ -3,6 +3,7 @@ package com.sastix.csp.server.processors;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sastix.csp.commons.model.IntegrationData;
 import com.sastix.csp.commons.model.IntegrationDataType;
+import com.sastix.csp.commons.routes.CamelRoutes;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 
@@ -51,7 +52,7 @@ public class DdlProcessor implements Processor {
         //String es = elasticURI + "/viper/" + indexType.toString().toLowerCase() + "?pretty";
 
         if (toShare)
-            recipients.add("direct:dcl");
+            recipients.add(CamelRoutes.DCL);
 
         recipients.add(elasticURI + "/viper/" + indexType.toString().toLowerCase() + "?pretty");
 

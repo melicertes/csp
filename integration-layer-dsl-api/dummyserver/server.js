@@ -11,7 +11,7 @@ var routes;
 var routeForAppExists = false;
 switch (appName){
     case 'adapter':
-        routes = require('./routes/tcRoutes');
+        routes = require('./routes/adapterRoutes');
         routeForAppExists = true;
         break;
     case 'tc':

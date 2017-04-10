@@ -7,6 +7,7 @@ public interface CamelRoutes {
     String MOCK_PREFIX ="mock";
     String DSL ="direct:dsl";
     String DCL ="direct:dcl";
+    String EDCL ="direct:edcl";
     String DDL ="direct:ddl";
     String TC ="direct:tc";
 }

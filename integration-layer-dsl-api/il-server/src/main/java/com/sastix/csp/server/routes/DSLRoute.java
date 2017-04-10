@@ -17,7 +17,7 @@ public class DSLRoute extends RouteBuilder {
     private ExceptionProcessor exceptionProcessor;
 
     @Autowired
-    private RecipientsProcessor recipientsProcessor;
+    private DslProcessor dslProcessor;
 
     @Autowired
     private DdlProcessor ddlProcessor;
@@ -29,7 +29,7 @@ public class DSLRoute extends RouteBuilder {
     private EDclProcessor edclProcessor;
 
     @Autowired
-    private TrustCirclesProcessor trustCirclesProcessor;
+    private TcProcessor trustCirclesProcessor;
 
     @Override
     public void configure() {
@@ -39,8 +39,8 @@ public class DSLRoute extends RouteBuilder {
 //                .handled(true);
 
 
-        from("direct:dsl")
-                .process(recipientsProcessor)
+        from(CamelRoutes.DSL)
+                .process(dslProcessor)
                 .setHeader(Exchange.HTTP_METHOD, constant("POST"))
                 .setHeader(Exchange.CONTENT_TYPE, constant("application/json"))
                 .marshal().json(JsonLibrary.Jackson, IntegrationData.class)
@@ -48,7 +48,7 @@ public class DSLRoute extends RouteBuilder {
                 //.to("direct:dcl");
 
 
-        from("direct:ddl")
+        from(CamelRoutes.DDL)
                 .process(ddlProcessor)
                 .setHeader(Exchange.HTTP_METHOD, constant("POST"))
                 .setHeader(Exchange.CONTENT_TYPE, constant("application/json"))
@@ -60,7 +60,7 @@ public class DSLRoute extends RouteBuilder {
                 .log("[ElasticSearch response]... Received response ${body}");
 
 
-        from("direct:dcl")
+        from(CamelRoutes.DCL)
                 .process(dclProcessor)
                 .setHeader(Exchange.HTTP_METHOD, constant("POST"))
                 .setHeader(Exchange.CONTENT_TYPE, constant("application/json"))
@@ -68,12 +68,12 @@ public class DSLRoute extends RouteBuilder {
                 .recipientList(header("ecsps"));
 
 
-        from("direct:edcl")
+        from(CamelRoutes.EDCL)
                 .process(edclProcessor)
 //                .setHeader(Exchange.HTTP_METHOD, constant("PUT"))
 //                .setHeader(Exchange.CONTENT_TYPE, constant("application/json"))
 //                .marshal().json(JsonLibrary.Jackson, IntegrationData.class)
-                .to("direct:dsl");
+                .to(CamelRoutes.DSL);
 
         //TrustCircles routes
         from(CamelRoutes.TC)

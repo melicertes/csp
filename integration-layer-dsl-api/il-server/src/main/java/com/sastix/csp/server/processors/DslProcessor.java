@@ -3,12 +3,11 @@ package com.sastix.csp.server.processors;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sastix.csp.commons.model.IntegrationData;
 import com.sastix.csp.commons.model.IntegrationDataType;
+import com.sastix.csp.commons.routes.CamelRoutes;
 import com.sastix.csp.server.config.Flow1ApplicationsUrls;
 import com.sastix.csp.server.config.Flow2ApplicationsUrls;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
-
-import org.apache.camel.model.dataformat.BoonDataFormat;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,13 +18,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
-public class RecipientsProcessor implements Processor {
+public class DslProcessor implements Processor {
 
 
     @Autowired
     ObjectMapper objectMapper;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(RecipientsProcessor.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DslProcessor.class);
 
     private static final String APPLICATION_ADAPTER_URI = "http://localhost:{{server.port}}/adapter/";
 
@@ -128,7 +127,7 @@ public class RecipientsProcessor implements Processor {
 
         Boolean isExternal = integrationData.getSharingParams().getIsExternal();
         if (!isExternal) {
-            recipients.add("direct:ddl");
+            recipients.add(CamelRoutes.DDL);
         }
         exchange.getIn().setHeader("recipients", recipients);
 */
@@ -143,7 +142,7 @@ public class RecipientsProcessor implements Processor {
             apps.addAll(flow2ApplicationsUrls.getAppsByDataType(dataType));
         } else {
             LOGGER.info("isExternal = {} => Flow 1 of integration layer (synch data from current CSP), ", false);
-            recipients.add("direct:ddl");
+            recipients.add(CamelRoutes.DDL);
             apps.addAll(flow1ApplicationsUrls.getAppListByDataType(dataType));
         }
 

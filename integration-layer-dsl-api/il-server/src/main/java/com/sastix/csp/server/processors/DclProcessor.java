@@ -10,6 +10,7 @@ import com.sastix.csp.commons.routes.CamelRoutes;
 import com.sastix.csp.commons.routes.ContextUrl;
 import com.sastix.csp.server.service.CamelRestService;
 import org.apache.camel.*;
+import org.apache.camel.impl.DefaultMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,7 +66,6 @@ public class DclProcessor implements Processor {
             byte[] data = (byte[]) producerTemplate.sendBody(CamelRoutes.TC, ExchangePattern.InOut,new Csp("localhost"));
             TrustCircle tc = objectMapper.readValue(data, TrustCircle.class);
             ecsps = tc.getCsps();
-
             exchange.getIn().setHeader("ecsps", ecsps);
             logger.info(exchange.getIn().getHeader("ecsps").toString());
         }catch (Exception e){

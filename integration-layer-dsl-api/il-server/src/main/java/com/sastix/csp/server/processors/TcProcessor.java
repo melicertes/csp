@@ -9,22 +9,18 @@ import com.sastix.csp.server.service.CamelRestService;
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.apache.camel.Processor;
-import org.apache.camel.http.common.HttpMessage;
 import org.apache.camel.impl.DefaultMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Created by iskitsas on 4/9/17.
  */
 @Component
-public class TrustCirclesProcessor implements Processor{
-    private static final Logger LOG = LoggerFactory.getLogger(TrustCirclesProcessor.class);
+public class TcProcessor implements Processor{
+    private static final Logger LOG = LoggerFactory.getLogger(TcProcessor.class);
     @Autowired
     ObjectMapper objectMapper;
 

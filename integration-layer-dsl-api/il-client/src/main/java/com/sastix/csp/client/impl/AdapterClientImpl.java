@@ -51,4 +51,9 @@ public class AdapterClientImpl implements AdapterClient {
     public void setProtocolHostPort(String protocol, String host, String port) {
         context = protocol+"://"+host+":"+port;
     }
+
+    @Override
+    public String getContext() {
+        return context;
+    }
 }

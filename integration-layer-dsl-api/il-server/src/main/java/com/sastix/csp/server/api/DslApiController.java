@@ -4,6 +4,7 @@ import com.sastix.csp.commons.apiHttpStatusResponse.HttpStatusResponseType;
 import com.sastix.csp.commons.exceptions.InvalidDataTypeException;
 import com.sastix.csp.commons.model.IntegrationData;
 import com.sastix.csp.commons.model.IntegrationDataType;
+import com.sastix.csp.commons.routes.CamelRoutes;
 import org.apache.camel.Produce;
 import org.apache.camel.ProducerTemplate;
 import org.slf4j.Logger;
@@ -46,8 +47,8 @@ public class DslApiController {
 
             if (dataType != null) {
 
-                intDataProducer.sendBody("direct:dsl", intDataObj);
-                //intDataProducer.sendBody("direct:ddl", newIntDataObj);
+                intDataProducer.sendBody(CamelRoutes.DSL, intDataObj);
+                //intDataProducer.sendBody(CamelRoutes.DDL, newIntDataObj);
             } else {
                 throw new InvalidDataTypeException();
             }
@@ -73,8 +74,8 @@ public class DslApiController {
             String dataType = getDataType(intDataObj.getDataType());
 
             if (dataType != null) {
-                intDataProducer.sendBody("direct:dsl", intDataObj);
-                //intDataProducer.sendBody("direct:ddl", updIntDataObj);
+                intDataProducer.sendBody(CamelRoutes.DSL, intDataObj);
+                //intDataProducer.sendBody(CamelRoutes.DDL, updIntDataObj);
             } else {
                 throw new InvalidDataTypeException();
             }
@@ -98,8 +99,8 @@ public class DslApiController {
             String dataType = getDataType(intDataObj.getDataType());
 
             if (dataType != null) {
-                intDataProducer.sendBody("direct:dsl", intDataObj);
-                //intDataProducer.sendBody("direct:ddl", delIntDataObj);
+                intDataProducer.sendBody(CamelRoutes.DSL, intDataObj);
+                //intDataProducer.sendBody(CamelRoutes.DDL, delIntDataObj);
             } else {
                 throw new InvalidDataTypeException();
             }

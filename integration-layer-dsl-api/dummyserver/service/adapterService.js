@@ -3,7 +3,12 @@
 exports.create = function (req, res) {
     //res.send(err);
     //res.json({message:'Successful creation'});
-    res.send('Successful creation');
+
+    if(req.body.dataType) {
+        res.send('Successful creation');
+    }else{
+        res.status(400).send("Error");
+    }
 };
 
 exports.update = function (req, res) {

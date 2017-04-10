@@ -11,4 +11,5 @@ public interface AdapterClient {
     ResponseEntity<String> updateIntegrationData(IntegrationData integrationData);
     ResponseEntity<String> deleteIntegrationData(IntegrationData integrationData);
     void setProtocolHostPort(String protocol, String host, String port);
+    String getContext();
 }
