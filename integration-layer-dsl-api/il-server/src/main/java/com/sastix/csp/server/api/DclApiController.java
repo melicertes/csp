@@ -1,9 +1,6 @@
 package com.sastix.csp.server.api;
 
-import com.sastix.csp.commons.exceptions.InvalidDataTypeException;
 import com.sastix.csp.commons.model.IntegrationData;
-import com.sastix.csp.commons.model.IntegrationDataType;
-import com.sastix.csp.commons.model.TrustCircle;
 import com.sastix.csp.commons.routes.CamelRoutes;
 import org.apache.camel.Produce;
 import org.apache.camel.ProducerTemplate;
@@ -19,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class DclApiController {
 
-    private static final Logger logger = LoggerFactory.getLogger(DslApiController.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DslApiController.class);
 
     @Produce
     private ProducerTemplate intDataProducer;
@@ -34,7 +31,7 @@ public class DclApiController {
             method = RequestMethod.POST)
     public ResponseEntity<String> getNewIntDataFromExtCsp(@RequestBody IntegrationData newIntDataObj) {
 
-        logger.info(newIntDataObj.toString());
+        LOG.info(newIntDataObj.toString());
         intDataProducer.sendBodyAndHeader(CamelRoutes.EDCL, newIntDataObj,"method", "POST");
 
         return new ResponseEntity<String>(HttpStatus.OK);
@@ -50,7 +47,7 @@ public class DclApiController {
             method = RequestMethod.PUT)
     public ResponseEntity<String> getUpdateIntDataFromExtCsp(@RequestBody IntegrationData newIntDataObj) {
 
-        logger.info(newIntDataObj.toString());
+        LOG.info(newIntDataObj.toString());
         intDataProducer.sendBodyAndHeader(CamelRoutes.EDCL, newIntDataObj, "method", "PUT");
 
         return new ResponseEntity<String>(HttpStatus.OK);

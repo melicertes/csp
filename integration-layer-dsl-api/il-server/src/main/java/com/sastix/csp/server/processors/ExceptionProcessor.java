@@ -9,11 +9,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class ExceptionProcessor implements Processor {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ExceptionProcessor.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ExceptionProcessor.class);
 
     @Override
     public void process(Exchange exchange) throws Exception {
 
-        LOGGER.warn(exchange.getProperty("CamelExceptionCaught").toString());
+        LOG.warn(exchange.getProperty("CamelExceptionCaught").toString());
     }
 }

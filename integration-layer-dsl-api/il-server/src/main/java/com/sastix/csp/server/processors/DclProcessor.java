@@ -23,7 +23,7 @@ import java.util.List;
 @Component
 public class DclProcessor implements Processor {
 
-    private static final Logger logger = LoggerFactory.getLogger(DclProcessor.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DclProcessor.class);
 
     private List<String> ecsps = new ArrayList<String>();
     @Autowired
@@ -43,7 +43,7 @@ public class DclProcessor implements Processor {
 
     @Override
     public void process(Exchange exchange) throws IOException {
-        logger.info("CSL Processing integrationData (from DSL)");
+        LOG.info("CSL Processing integrationData (from DSL)");
         IntegrationData integrationData = cspUtils.getExchangeData(exchange,IntegrationData.class);
         String httpMethod = (String) exchange.getIn().getHeader(Exchange.HTTP_METHOD);
 
@@ -76,7 +76,7 @@ public class DclProcessor implements Processor {
             exchange.getIn().setBody(trustCircleEcspDTO);
         }catch (Exception e){
             //TODO: handle this situation
-            logger.error("TC api call failed.",e);
+            LOG.error("TC api call failed.",e);
         }
     }
 }
