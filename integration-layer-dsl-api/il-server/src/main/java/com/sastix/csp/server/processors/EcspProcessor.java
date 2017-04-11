@@ -32,6 +32,8 @@ public class EcspProcessor implements Processor{
         for (String ecsp : ecsps) {
             camelRestService.send(ecsp,integrationData,httpMethod);
         }
+        //exchange.getIn().setHeader(Exchange.HTTP_METHOD, httpMethod);
         //exchange.getIn().setHeader("ecsps", ecsps);
+        //exchange.getIn().setBody(integrationData);
     }
 }

@@ -1,7 +1,6 @@
 package com.sastix.csp.server.routes;
 
 import com.sastix.csp.commons.model.Csp;
-import com.sastix.csp.commons.model.IntegrationData;
 import com.sastix.csp.commons.routes.CamelRoutes;
 import com.sastix.csp.server.processors.*;
 import org.apache.camel.Exchange;
@@ -51,32 +50,18 @@ public class DSLRoute extends RouteBuilder {
 
         from(CamelRoutes.DSL)
                 .process(dslProcessor)
-                //.setHeader(Exchange.HTTP_METHOD, constant("POST"))
-                //.setHeader(Exchange.CONTENT_TYPE, constant("application/json"))
-                //.marshal().json(JsonLibrary.Jackson, IntegrationData.class)
                 .recipientList(header("recipients"));
 
         from(CamelRoutes.DDL)
                 .process(ddlProcessor)
-//                .setHeader(Exchange.HTTP_METHOD, constant("POST"))
-//                .setHeader(Exchange.CONTENT_TYPE, constant("application/json"))
-//                .marshal().json(JsonLibrary.Jackson, IntegrationData.class)
                 .recipientList(header("recipients"));
 
         from(CamelRoutes.DCL)
                 .process(dclProcessor)
-                //.setHeader(Exchange.HTTP_METHOD, constant("POST"))
-                //.setHeader(Exchange.CONTENT_TYPE, constant("application/json"))
-                //.marshal().json(JsonLibrary.Jackson, IntegrationData.class)
-                .recipientList(header("recipients"))
-        ;
-
+                .recipientList(header("recipients"));
 
         from(CamelRoutes.EDCL)
                 .process(edclProcessor)
-//                .setHeader(Exchange.HTTP_METHOD, constant("PUT"))
-//                .setHeader(Exchange.CONTENT_TYPE, constant("application/json"))
-//                .marshal().json(JsonLibrary.Jackson, IntegrationData.class)
                 .to(CamelRoutes.DSL);
 
         //TrustCircles routes
@@ -87,7 +72,6 @@ public class DSLRoute extends RouteBuilder {
         //ExternalCSPs
         from(CamelRoutes.ECSP)
                 .process(ecspProcessor)
-                .marshal().json(JsonLibrary.Jackson, Csp.class)
                 .recipientList(header("ecsps"));
 
         //App routing

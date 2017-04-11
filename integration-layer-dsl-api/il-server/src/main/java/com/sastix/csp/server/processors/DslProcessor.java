@@ -1,13 +1,10 @@
 package com.sastix.csp.server.processors;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sastix.csp.commons.constants.AppProperties;
 import com.sastix.csp.commons.model.IntegrationData;
 import com.sastix.csp.commons.model.IntegrationDataType;
 import com.sastix.csp.commons.routes.CamelRoutes;
 import com.sastix.csp.commons.routes.HeaderName;
-import com.sastix.csp.server.config.Flow1ApplicationsUrls;
-import com.sastix.csp.server.config.Flow2ApplicationsUrls;
 import com.sastix.csp.server.service.CspUtils;
 import org.apache.camel.*;
 
@@ -34,21 +31,6 @@ public class DslProcessor implements Processor {
     Environment env;
 
     private static final Logger LOG = LoggerFactory.getLogger(DslProcessor.class);
-
-    private Flow1ApplicationsUrls flow1ApplicationsUrls;
-    private Flow2ApplicationsUrls flow2ApplicationsUrls;
-
-    @Deprecated
-    @Autowired
-    public void setFlow1ApplicationsUrls(Flow1ApplicationsUrls flow1ApplicationsUrls) {
-        this.flow1ApplicationsUrls = flow1ApplicationsUrls;
-    }
-
-    @Deprecated
-    @Autowired
-    public void setFlow2ApplicationsUrls(Flow2ApplicationsUrls flow2ApplicationsUrls) {
-        this.flow2ApplicationsUrls = flow2ApplicationsUrls;
-    }
 
     @Override
     public void process(Exchange exchange) throws Exception {
@@ -87,5 +69,4 @@ public class DslProcessor implements Processor {
 
         return recipients;
     }
-
 }
