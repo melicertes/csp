@@ -21,16 +21,16 @@ public class CamelRestService {
     @Produce
     private ProducerTemplate producerTemplate;
 
-    public <T> T send(String uri, Object obj ,Class<T> tClass) throws IOException {
-        String out = send(uri,obj);
+    public <T> T send(String uri, Object obj ,String httpMethod, Class<T> tClass) throws IOException {
+        String out = send(uri,obj, httpMethod);
         return objectMapper.readValue(out, tClass);
     }
 
-    public String send(String uri, Object obj) throws IOException {
+    public String send(String uri, Object obj, String httpMethod) throws IOException {
         byte[] b = objectMapper.writeValueAsBytes(obj);
         Exchange exchange = producerTemplate.send(uri, new Processor() {
             public void process(Exchange exchange) throws Exception {
-                exchange.getIn().setHeader(Exchange.HTTP_METHOD,"POST");
+                exchange.getIn().setHeader(Exchange.HTTP_METHOD,httpMethod);
                 exchange.getIn().setBody(b);
             }
         });

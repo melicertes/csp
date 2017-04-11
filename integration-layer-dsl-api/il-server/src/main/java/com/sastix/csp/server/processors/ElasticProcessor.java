@@ -34,7 +34,7 @@ public class ElasticProcessor implements Processor {
     public void process(Exchange exchange) throws Exception {
         //String contextParams = (String) exchange.getIn().getHeader(HeaderName.CONTEXT_PARAMS);
         IntegrationData integrationData = cspUtils.getExchangeData(exchange, IntegrationData.class);
-
+        String httpMethod = (String) exchange.getIn().getHeader(Exchange.HTTP_METHOD);
         /*
         DDL indexes data (DDL -> ELASTIC API)
          */
@@ -48,7 +48,7 @@ public class ElasticProcessor implements Processor {
 
         //TODO: dataObject OR integrationData
         //producerTemplate.sendBody(elasticUri+contextParams, ExchangePattern.InOut,integrationData);
-        camelRestService.send(elasticUri+contextParams,integrationData);
+        camelRestService.send(elasticUri+contextParams,integrationData, httpMethod);
         LOG.info("");
     }
 }

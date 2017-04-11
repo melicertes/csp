@@ -31,16 +31,16 @@ public class AppProcessor implements Processor{
     public void process(Exchange exchange) throws Exception {
         String appName = (String) exchange.getIn().getHeader(HeaderName.APP_NAME);
         IntegrationData integrationData = cspUtils.getExchangeData(exchange, IntegrationData.class);
+        String httpMethod = (String) exchange.getIn().getHeader(Exchange.HTTP_METHOD);
 
         String appUri = cspUtils.getAppUri(appName);
         if(!StringUtils.isEmpty(appUri)){
             //producerTemplate.sendBody(appUri, ExchangePattern.InOut,integrationData);
-            camelRestService.send(appUri,integrationData);
+            camelRestService.send(appUri,integrationData, httpMethod);
         }else{
             //TODO: handle situation
             LOG.warn("could not send to app uri - app not found.");
         }
 
-        LOG.info("");
     }
 }

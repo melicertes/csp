@@ -33,7 +33,8 @@ public class TcProcessor implements Processor{
     @Override
     public void process(Exchange exchange) throws Exception {
         Csp csp = exchange.getIn().getBody(Csp.class);
-        TrustCircle tc = camelRestService.send(tcClient.getContext()+ ContextUrl.TRUST_CIRCLE,csp, TrustCircle.class);
+        String httpMethod = (String) exchange.getIn().getHeader(Exchange.HTTP_METHOD);
+        TrustCircle tc = camelRestService.send(tcClient.getContext()+ ContextUrl.TRUST_CIRCLE,csp, httpMethod, TrustCircle.class);
         Message m = new DefaultMessage();
         m.setBody(tc);
         exchange.setOut(m);

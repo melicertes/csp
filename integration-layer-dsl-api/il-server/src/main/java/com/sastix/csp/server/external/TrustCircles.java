@@ -2,7 +2,6 @@ package com.sastix.csp.server.external;
 
 import com.sastix.csp.commons.model.Csp;
 import com.sastix.csp.commons.model.TrustCircle;
-import com.sastix.csp.server.processors.EDclProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;

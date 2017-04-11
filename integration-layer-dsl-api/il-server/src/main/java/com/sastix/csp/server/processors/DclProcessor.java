@@ -43,10 +43,10 @@ public class DclProcessor implements Processor {
 
     @Override
     public void process(Exchange exchange) throws IOException {
-
+        logger.info("CSL Processing integrationData (from DSL)");
         IntegrationData integrationData = cspUtils.getExchangeData(exchange,IntegrationData.class);
+        String httpMethod = (String) exchange.getIn().getHeader(Exchange.HTTP_METHOD);
 
-        logger.info("Received integrationData from DSL");
         /**
          * @TODO Anonymize data
          */
@@ -66,16 +66,14 @@ public class DclProcessor implements Processor {
             //TrustCircle tc = camelRestService.send(tcClient.getContext()+ ContextUrl.TRUST_CIRCLE,new Csp("localhost"), TrustCircle.class);
 
             // with camel response
-            byte[] data = (byte[]) producerTemplate.sendBody(CamelRoutes.TC, ExchangePattern.InOut,new Csp("localhost"));
+            byte[] data = (byte[]) producerTemplate.sendBodyAndHeader(CamelRoutes.TC, ExchangePattern.InOut,new Csp("localhost"), Exchange.HTTP_METHOD, httpMethod);
             TrustCircle tc = objectMapper.readValue(data, TrustCircle.class);
 
             TrustCircleEcspDTO trustCircleEcspDTO = new TrustCircleEcspDTO(tc,integrationData);
 
-            producerTemplate.sendBody(CamelRoutes.ECSP, ExchangePattern.InOut,trustCircleEcspDTO);
-
-//            ecsps = tc.getCsps();
-//            exchange.getIn().setHeader("ecsps", ecsps);
-//            logger.info(exchange.getIn().getHeader("ecsps").toString());
+            //producerTemplate.sendBodyAndHeader(CamelRoutes.ECSP, ExchangePattern.InOut,trustCircleEcspDTO, Exchange.HTTP_METHOD, httpMethod);
+            exchange.getIn().setHeader("recipients", CamelRoutes.ECSP);
+            exchange.getIn().setBody(trustCircleEcspDTO);
         }catch (Exception e){
             //TODO: handle this situation
             logger.error("TC api call failed.",e);

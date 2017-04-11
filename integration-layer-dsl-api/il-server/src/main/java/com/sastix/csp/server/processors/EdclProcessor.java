@@ -16,9 +16,9 @@ import java.util.HashMap;
 import java.util.List;
 
 @Component
-public class EDclProcessor implements Processor {
+public class EdclProcessor implements Processor {
 
-    private static final Logger LOG = LoggerFactory.getLogger(EDclProcessor.class);
+    private static final Logger LOG = LoggerFactory.getLogger(EdclProcessor.class);
 
     private static HashMap<String, String> dataTypesAppMapping = new HashMap<>();
     private List<String> ecsps = new ArrayList<String>();
@@ -28,18 +28,10 @@ public class EDclProcessor implements Processor {
 
     @Override
     public void process(Exchange exchange) throws IOException {
-
         IntegrationData integrationData = cspUtils.getExchangeData(exchange, IntegrationData.class);
+        String httpMethod = (String) exchange.getIn().getHeader(Exchange.HTTP_METHOD);
 
-        LOG.info("Received integrationData from external CSP");
-        LOG.info(exchange.getIn().getHeaders().toString());
-
-        if (exchange.getIn().getHeader("method").equals("POST")){
-            exchange.getIn().setHeader(Exchange.HTTP_METHOD, "POST");
-        }
-        else if (exchange.getIn().getHeader("method").equals("PUT")){
-            exchange.getIn().setHeader(Exchange.HTTP_METHOD, "PUT");
-        }
+        exchange.getIn().setHeader(Exchange.HTTP_METHOD, httpMethod);
 
         List<String> ecsps = new ArrayList<String>();
         integrationData.getSharingParams().setIsExternal(true);

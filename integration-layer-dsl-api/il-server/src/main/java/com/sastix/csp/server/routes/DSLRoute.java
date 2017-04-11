@@ -5,7 +5,6 @@ import com.sastix.csp.commons.model.IntegrationData;
 import com.sastix.csp.commons.routes.CamelRoutes;
 import com.sastix.csp.server.processors.*;
 import org.apache.camel.Exchange;
-import org.apache.camel.builder.ExpressionBuilder;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.model.dataformat.JsonLibrary;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +26,7 @@ public class DSLRoute extends RouteBuilder {
     private DclProcessor dclProcessor;
 
     @Autowired
-    private EDclProcessor edclProcessor;
+    private EdclProcessor edclProcessor;
 
     @Autowired
     private TcProcessor tcProcessor;
@@ -52,31 +51,24 @@ public class DSLRoute extends RouteBuilder {
 
         from(CamelRoutes.DSL)
                 .process(dslProcessor)
-                .setHeader(Exchange.HTTP_METHOD, constant("POST"))
-                .setHeader(Exchange.CONTENT_TYPE, constant("application/json"))
-                .marshal().json(JsonLibrary.Jackson, IntegrationData.class)
+                //.setHeader(Exchange.HTTP_METHOD, constant("POST"))
+                //.setHeader(Exchange.CONTENT_TYPE, constant("application/json"))
+                //.marshal().json(JsonLibrary.Jackson, IntegrationData.class)
                 .recipientList(header("recipients"));
-                //.to("direct:dcl");
-
 
         from(CamelRoutes.DDL)
                 .process(ddlProcessor)
-                .setHeader(Exchange.HTTP_METHOD, constant("POST"))
-                .setHeader(Exchange.CONTENT_TYPE, constant("application/json"))
-                .marshal().json(JsonLibrary.Jackson, IntegrationData.class)
-                .recipientList(header("recipients"))
-                //.to("http://localhost:8081/test")
-                //.recipientList(simple("${header.elastic}"))
-                //.recipientList(simple("${header.esURI}"))
-                .log("[ElasticSearch response]... Received response ${body}");
-
+//                .setHeader(Exchange.HTTP_METHOD, constant("POST"))
+//                .setHeader(Exchange.CONTENT_TYPE, constant("application/json"))
+//                .marshal().json(JsonLibrary.Jackson, IntegrationData.class)
+                .recipientList(header("recipients"));
 
         from(CamelRoutes.DCL)
                 .process(dclProcessor)
                 //.setHeader(Exchange.HTTP_METHOD, constant("POST"))
                 //.setHeader(Exchange.CONTENT_TYPE, constant("application/json"))
-                .marshal().json(JsonLibrary.Jackson, IntegrationData.class)
-                //.recipientList(header("ecsps"))
+                //.marshal().json(JsonLibrary.Jackson, IntegrationData.class)
+                .recipientList(header("recipients"))
         ;
 
 

@@ -1,5 +1,6 @@
 package com.sastix.csp.server.processors;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sastix.csp.commons.constants.AppProperties;
 import com.sastix.csp.commons.model.IntegrationData;
 import com.sastix.csp.commons.model.IntegrationDataType;
@@ -17,9 +18,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
@@ -54,11 +53,12 @@ public class DslProcessor implements Processor {
     @Override
     public void process(Exchange exchange) throws Exception {
         IntegrationData integrationData = cspUtils.getExchangeData(exchange, IntegrationData.class);
-        List<String> recipients = computeRecipientsApps(integrationData);
+        List<String> recipients = computeRecipientsApps(exchange, integrationData);
         exchange.getIn().setHeader("recipients", recipients);
+
     }
 
-    private List<String> computeRecipientsApps(IntegrationData integrationData) {
+    private List<String> computeRecipientsApps(Exchange exchange, IntegrationData integrationData) {
         List<String> recipients = new ArrayList<>();
         IntegrationDataType dataType = integrationData.getDataType();
         Boolean isExternal = integrationData.getSharingParams().getIsExternal();
@@ -71,24 +71,18 @@ public class DslProcessor implements Processor {
             apps = Arrays.asList(appsArr).stream().map(s->s.trim()).collect(Collectors.toList());
         }
 
-        /* deprecated
-        if (isExternal) {
-            LOG.info("isExternal = {} => Flow 2 of integration layer (synch data from external CSPs), ", true);
-            apps.addAll(flow2ApplicationsUrls.getAppsByDataType(dataType));
-        } else {
-            LOG.info("isExternal = {} => Flow 1 of integration layer (synch data from current CSP), ", false);
-            recipients.add(CamelRoutes.DDL);
-            apps.addAll(flow1ApplicationsUrls.getAppListByDataType(dataType));
-        }*/
-
         if(!isExternal){
             recipients.add(CamelRoutes.DDL);
         }
 
         for (String app : apps) {
             //String uri = cspUtils.getAppUri(app);
-            //recipients.add(uri + app);
-            producerTemplate.sendBodyAndHeader(CamelRoutes.APP, ExchangePattern.InOut,integrationData, HeaderName.APP_NAME,app);
+            //recipients.add(uri);
+            //recipients.add(CamelRoutes.APP+"?name="+app);//haven't find a solution for this yet, using producerTemplate instead
+            Map<String,Object> headers = new HashMap<>();
+            headers.put(HeaderName.APP_NAME,app);
+            headers.put(Exchange.HTTP_METHOD,exchange.getIn().getHeader(Exchange.HTTP_METHOD));
+            producerTemplate.sendBodyAndHeaders(CamelRoutes.APP, ExchangePattern.InOut,integrationData, headers);
         }
 
         return recipients;
