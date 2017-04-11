@@ -3,6 +3,7 @@ package com.sastix.csp.server.processors;
 import com.sastix.csp.commons.model.IntegrationData;
 import com.sastix.csp.commons.routes.ContextUrl;
 import com.sastix.csp.commons.routes.HeaderName;
+import com.sastix.csp.server.service.CamelRestService;
 import com.sastix.csp.server.service.CspUtils;
 import org.apache.camel.*;
 import org.slf4j.Logger;
@@ -27,6 +28,9 @@ public class AppProcessor implements Processor{
     @Autowired
     CspUtils cspUtils;
 
+    @Autowired
+    CamelRestService camelRestService;
+
     @Override
     public void process(Exchange exchange) throws Exception {
         Map<String,Object> map = exchange.getIn().getHeaders();
@@ -36,6 +40,7 @@ public class AppProcessor implements Processor{
         String appUri = cspUtils.getAppUri(appName);
         if(!StringUtils.isEmpty(appUri)){
             //producerTemplate.sendBody(appUri, ExchangePattern.InOut,integrationData);
+            camelRestService.send(appUri,integrationData);
         }else{
             //TODO: handle situation
             LOG.warn("could not send to app uri - app not found.");

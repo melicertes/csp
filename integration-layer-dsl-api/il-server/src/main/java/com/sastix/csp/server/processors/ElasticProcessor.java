@@ -5,9 +5,11 @@ import com.sastix.csp.commons.model.IntegrationData;
 import com.sastix.csp.commons.model.IntegrationDataType;
 import com.sastix.csp.commons.routes.CamelRoutes;
 import com.sastix.csp.commons.routes.HeaderName;
+import com.sastix.csp.server.service.CamelRestService;
 import org.apache.camel.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -23,6 +25,9 @@ public class ElasticProcessor implements Processor {
 
     @Produce
     ProducerTemplate producerTemplate;
+
+    @Autowired
+    CamelRestService camelRestService;
 
     @Override
     public void process(Exchange exchange) throws Exception {
@@ -41,8 +46,8 @@ public class ElasticProcessor implements Processor {
         String contextParams = "/viper/" + indexType.toString().toLowerCase() + "?pretty";
 
         //TODO: dataObject OR integrationData
-        producerTemplate.sendBody(elasticUri+contextParams, ExchangePattern.InOut,integrationData);
-
+        //producerTemplate.sendBody(elasticUri+contextParams, ExchangePattern.InOut,integrationData);
+        camelRestService.send(elasticUri+contextParams,integrationData);
         LOG.info("");
     }
 }

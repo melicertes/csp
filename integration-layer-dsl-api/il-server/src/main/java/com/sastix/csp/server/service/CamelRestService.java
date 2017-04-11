@@ -22,6 +22,11 @@ public class CamelRestService {
     private ProducerTemplate producerTemplate;
 
     public <T> T send(String uri, Object obj ,Class<T> tClass) throws IOException {
+        String out = send(uri,obj);
+        return (T)objectMapper.readValue(out, tClass);
+    }
+
+    public String send(String uri, Object obj) throws IOException {
         byte[] b = objectMapper.writeValueAsBytes(obj);
         Exchange exchange = producerTemplate.send(uri, new Processor() {
             public void process(Exchange exchange) throws Exception {
@@ -31,6 +36,6 @@ public class CamelRestService {
         });
 
         String out = exchange.getOut().getBody(String.class);
-        return (T)objectMapper.readValue(out, tClass);
+        return out;
     }
 }

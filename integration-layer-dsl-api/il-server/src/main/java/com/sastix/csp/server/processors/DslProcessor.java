@@ -72,34 +72,33 @@ public class DslProcessor implements Processor {
 
         switch (dataType) {
             case THREAT:
-                computeRecipientsApps(recipients, dataType, isExternal);
+                computeRecipientsApps(recipients, integrationData, isExternal);
                 break;
             case INCIDENT:
-                computeRecipientsApps(recipients, dataType, isExternal);
+                computeRecipientsApps(recipients, integrationData, isExternal);
                 break;
             case VULNERABILITY:
-                computeRecipientsApps(recipients, dataType, isExternal);
+                computeRecipientsApps(recipients, integrationData, isExternal);
                 break;
             case ARTEFACT:
-                computeRecipientsApps(recipients, dataType, isExternal);
+                computeRecipientsApps(recipients, integrationData, isExternal);
                 break;
             case CHAT:
-                computeRecipientsApps(recipients, dataType, isExternal);
+                computeRecipientsApps(recipients, integrationData, isExternal);
                 break;
             case FILE:
-                computeRecipientsApps(recipients, dataType, isExternal);
+                computeRecipientsApps(recipients, integrationData, isExternal);
                 break;
             case CONTACT:
-                computeRecipientsApps(recipients, dataType, isExternal);
+                computeRecipientsApps(recipients, integrationData, isExternal);
                 break;
         }
 
-        //testing direct:app
-        producerTemplate.sendBodyAndHeader(CamelRoutes.APP, ExchangePattern.InOut,integrationData, HeaderName.APP_NAME,"demoapp");
         exchange.getIn().setHeader("recipients", recipients);
     }
 
-    private void computeRecipientsApps(List<String> recipients, IntegrationDataType dataType, Boolean isExternal) {
+    private void computeRecipientsApps(List<String> recipients, IntegrationData integrationData, Boolean isExternal) {
+        IntegrationDataType dataType = integrationData.getDataType();
         List<String> apps = new ArrayList<>();
 
         if (isExternal) {
@@ -112,8 +111,9 @@ public class DslProcessor implements Processor {
         }
 
         for (String app : apps) {
-            String uri = cspUtils.getAppUri(app);
-            recipients.add(uri + app);
+            //String uri = cspUtils.getAppUri(app);
+            //recipients.add(uri + app);
+            producerTemplate.sendBodyAndHeader(CamelRoutes.APP, ExchangePattern.InOut,integrationData, HeaderName.APP_NAME,app);
         }
     }
 
