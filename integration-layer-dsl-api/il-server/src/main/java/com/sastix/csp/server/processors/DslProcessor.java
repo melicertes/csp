@@ -1,6 +1,6 @@
 package com.sastix.csp.server.processors;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sastix.csp.commons.constants.AppProperties;
 import com.sastix.csp.commons.model.IntegrationData;
 import com.sastix.csp.commons.model.IntegrationDataType;
 import com.sastix.csp.commons.routes.CamelRoutes;
@@ -15,9 +15,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class DslProcessor implements Processor {
@@ -26,24 +29,23 @@ public class DslProcessor implements Processor {
     ProducerTemplate producerTemplate;
 
     @Autowired
-    ObjectMapper objectMapper;
-
-    @Autowired
     CspUtils cspUtils;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DslProcessor.class);
+    @Autowired
+    Environment env;
 
-    @Deprecated
-    private static final String APPLICATION_ADAPTER_URI = "http://localhost:{{server.port}}/adapter/";
+    private static final Logger LOG = LoggerFactory.getLogger(DslProcessor.class);
 
     private Flow1ApplicationsUrls flow1ApplicationsUrls;
     private Flow2ApplicationsUrls flow2ApplicationsUrls;
 
+    @Deprecated
     @Autowired
     public void setFlow1ApplicationsUrls(Flow1ApplicationsUrls flow1ApplicationsUrls) {
         this.flow1ApplicationsUrls = flow1ApplicationsUrls;
     }
 
+    @Deprecated
     @Autowired
     public void setFlow2ApplicationsUrls(Flow2ApplicationsUrls flow2ApplicationsUrls) {
         this.flow2ApplicationsUrls = flow2ApplicationsUrls;
@@ -51,63 +53,36 @@ public class DslProcessor implements Processor {
 
     @Override
     public void process(Exchange exchange) throws Exception {
-
-        IntegrationData integrationData;
-
-        List<String> recipients = new ArrayList<String>();
-
-        LOGGER.info(exchange.getIn().getHeaders().toString());
-
-        integrationData = exchange.getIn().getBody(IntegrationData.class);
-//        if (exchange.getFromEndpoint().getEndpointUri().equals("direct://edcl")) {
-//            String inData = exchange.getIn().getBody(String.class);
-//            integrationData = objectMapper.readValue(inData, IntegrationData.class);
-//        }
-//        else {
-//            integrationData = exchange.getIn().getBody(IntegrationData.class);
-//        }
-        IntegrationDataType dataType = integrationData.getDataType();
-
-        Boolean isExternal = integrationData.getSharingParams().getIsExternal();
-
-        switch (dataType) {
-            case THREAT:
-                computeRecipientsApps(recipients, integrationData, isExternal);
-                break;
-            case INCIDENT:
-                computeRecipientsApps(recipients, integrationData, isExternal);
-                break;
-            case VULNERABILITY:
-                computeRecipientsApps(recipients, integrationData, isExternal);
-                break;
-            case ARTEFACT:
-                computeRecipientsApps(recipients, integrationData, isExternal);
-                break;
-            case CHAT:
-                computeRecipientsApps(recipients, integrationData, isExternal);
-                break;
-            case FILE:
-                computeRecipientsApps(recipients, integrationData, isExternal);
-                break;
-            case CONTACT:
-                computeRecipientsApps(recipients, integrationData, isExternal);
-                break;
-        }
-
+        IntegrationData integrationData = cspUtils.getExchangeData(exchange, IntegrationData.class);
+        List<String> recipients = computeRecipientsApps(integrationData);
         exchange.getIn().setHeader("recipients", recipients);
     }
 
-    private void computeRecipientsApps(List<String> recipients, IntegrationData integrationData, Boolean isExternal) {
+    private List<String> computeRecipientsApps(IntegrationData integrationData) {
+        List<String> recipients = new ArrayList<>();
         IntegrationDataType dataType = integrationData.getDataType();
-        List<String> apps = new ArrayList<>();
+        Boolean isExternal = integrationData.getSharingParams().getIsExternal();
 
+        List<String> apps = new ArrayList<>();
+        String appsStr = env.getProperty((isExternal? AppProperties.EXTERNAL:AppProperties.INTERNAL)+"."+dataType.toString()+".apps");
+
+        if(!StringUtils.isEmpty(appsStr)){
+            String[] appsArr =  appsStr.split(",");
+            apps = Arrays.asList(appsArr).stream().map(s->s.trim()).collect(Collectors.toList());
+        }
+
+        /* deprecated
         if (isExternal) {
-            LOGGER.info("isExternal = {} => Flow 2 of integration layer (synch data from external CSPs), ", true);
+            LOG.info("isExternal = {} => Flow 2 of integration layer (synch data from external CSPs), ", true);
             apps.addAll(flow2ApplicationsUrls.getAppsByDataType(dataType));
         } else {
-            LOGGER.info("isExternal = {} => Flow 1 of integration layer (synch data from current CSP), ", false);
+            LOG.info("isExternal = {} => Flow 1 of integration layer (synch data from current CSP), ", false);
             recipients.add(CamelRoutes.DDL);
             apps.addAll(flow1ApplicationsUrls.getAppListByDataType(dataType));
+        }*/
+
+        if(!isExternal){
+            recipients.add(CamelRoutes.DDL);
         }
 
         for (String app : apps) {
@@ -115,6 +90,8 @@ public class DslProcessor implements Processor {
             //recipients.add(uri + app);
             producerTemplate.sendBodyAndHeader(CamelRoutes.APP, ExchangePattern.InOut,integrationData, HeaderName.APP_NAME,app);
         }
+
+        return recipients;
     }
 
 }

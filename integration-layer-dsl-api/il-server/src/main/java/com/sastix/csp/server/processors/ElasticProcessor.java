@@ -1,11 +1,9 @@
 package com.sastix.csp.server.processors;
 
-import com.sastix.csp.commons.model.Csp;
 import com.sastix.csp.commons.model.IntegrationData;
 import com.sastix.csp.commons.model.IntegrationDataType;
-import com.sastix.csp.commons.routes.CamelRoutes;
-import com.sastix.csp.commons.routes.HeaderName;
 import com.sastix.csp.server.service.CamelRestService;
+import com.sastix.csp.server.service.CspUtils;
 import org.apache.camel.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,10 +27,13 @@ public class ElasticProcessor implements Processor {
     @Autowired
     CamelRestService camelRestService;
 
+    @Autowired
+    CspUtils cspUtils;
+
     @Override
     public void process(Exchange exchange) throws Exception {
         //String contextParams = (String) exchange.getIn().getHeader(HeaderName.CONTEXT_PARAMS);
-        IntegrationData integrationData = exchange.getIn().getBody(IntegrationData.class);
+        IntegrationData integrationData = cspUtils.getExchangeData(exchange, IntegrationData.class);
 
         /*
         DDL indexes data (DDL -> ELASTIC API)

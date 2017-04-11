@@ -23,7 +23,7 @@ public class CamelRestService {
 
     public <T> T send(String uri, Object obj ,Class<T> tClass) throws IOException {
         String out = send(uri,obj);
-        return (T)objectMapper.readValue(out, tClass);
+        return objectMapper.readValue(out, tClass);
     }
 
     public String send(String uri, Object obj) throws IOException {

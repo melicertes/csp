@@ -24,7 +24,7 @@ public enum IntegrationDataType {
 
   CONTACT("contact"),
 
-  TRUSTCIRCLE("trustCircle");
+  TRUSTCIRCLE("trustcircle");
 
   private String value;
 

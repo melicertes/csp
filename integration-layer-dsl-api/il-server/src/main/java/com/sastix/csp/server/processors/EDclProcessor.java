@@ -1,16 +1,14 @@
 package com.sastix.csp.server.processors;
 
 
-import com.sastix.csp.commons.model.Csp;
 import com.sastix.csp.commons.model.IntegrationData;
-import com.sastix.csp.commons.model.TrustCircle;
+import com.sastix.csp.server.service.CspUtils;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpEntity;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -20,18 +18,21 @@ import java.util.List;
 @Component
 public class EDclProcessor implements Processor {
 
-    private static final Logger logger = LoggerFactory.getLogger(EDclProcessor.class);
+    private static final Logger LOG = LoggerFactory.getLogger(EDclProcessor.class);
 
     private static HashMap<String, String> dataTypesAppMapping = new HashMap<>();
     private List<String> ecsps = new ArrayList<String>();
 
+    @Autowired
+    CspUtils cspUtils;
+
     @Override
-    public void process(Exchange exchange) {
+    public void process(Exchange exchange) throws IOException {
 
-        IntegrationData integrationData = exchange.getIn().getBody(IntegrationData.class);
+        IntegrationData integrationData = cspUtils.getExchangeData(exchange, IntegrationData.class);
 
-        logger.info("Received integrationData from external CSP");
-        logger.info(exchange.getIn().getHeaders().toString());
+        LOG.info("Received integrationData from external CSP");
+        LOG.info(exchange.getIn().getHeaders().toString());
 
         if (exchange.getIn().getHeader("method").equals("POST")){
             exchange.getIn().setHeader(Exchange.HTTP_METHOD, "POST");

@@ -8,10 +8,9 @@ import com.sastix.csp.commons.model.IntegrationData;
 import com.sastix.csp.commons.model.TrustCircle;
 import com.sastix.csp.commons.model.TrustCircleEcspDTO;
 import com.sastix.csp.commons.routes.CamelRoutes;
-import com.sastix.csp.commons.routes.ContextUrl;
 import com.sastix.csp.server.service.CamelRestService;
+import com.sastix.csp.server.service.CspUtils;
 import org.apache.camel.*;
-import org.apache.camel.impl.DefaultMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,13 +35,16 @@ public class DclProcessor implements Processor {
     @Autowired
     CamelRestService camelRestService;
 
+    @Autowired
+    CspUtils cspUtils;
+
     @Produce
     private ProducerTemplate producerTemplate;
 
     @Override
     public void process(Exchange exchange) throws IOException {
 
-        IntegrationData integrationData = exchange.getIn().getBody(IntegrationData.class);
+        IntegrationData integrationData = cspUtils.getExchangeData(exchange,IntegrationData.class);
 
         logger.info("Received integrationData from DSL");
         /**

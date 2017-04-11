@@ -28,7 +28,7 @@ import static org.junit.Assert.fail;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = {AdapterClient.class, CspRestTemplateConfiguration.class, AdapterClientConfig.class},
         properties = {
-                "csp.retry.backOffPeriod:10",
+                "csp.retry.backOffPeriod:10",//ms
                 "csp.retry.maxAttempts:1",
                 "adapter.server.protocol:http",
                 "adapter.server.host:localhost",

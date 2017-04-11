@@ -2,12 +2,9 @@ package com.sastix.csp.server.processors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sastix.csp.commons.model.IntegrationData;
-import com.sastix.csp.commons.model.IntegrationDataType;
 import com.sastix.csp.commons.routes.CamelRoutes;
-import com.sastix.csp.commons.routes.HeaderName;
+import com.sastix.csp.server.service.CspUtils;
 import org.apache.camel.*;
-
-import org.apache.camel.impl.DefaultMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -27,10 +24,12 @@ public class DdlProcessor implements Processor {
     @Produce
     ProducerTemplate producerTemplate;
 
+    @Autowired
+    CspUtils cspUtils;
+
     @Override
     public void process(Exchange exchange) throws Exception {
-        String inData = exchange.getIn().getBody(String.class);
-        IntegrationData integrationData = objectMapper.readValue(inData, IntegrationData.class);
+        IntegrationData integrationData = cspUtils.getExchangeData(exchange, IntegrationData.class);
         Boolean toShare = integrationData.getSharingParams().getToShare();
 
         List<String> recipients = new ArrayList<String>();
@@ -40,9 +39,10 @@ public class DdlProcessor implements Processor {
             producerTemplate.sendBody(CamelRoutes.DCL, ExchangePattern.InOut,integrationData);
         }
 
-       //recipients.add(elasticURI + "/viper/" + indexType.toString().toLowerCase() + "?pretty");
         producerTemplate.sendBody(CamelRoutes.ELASTIC, ExchangePattern.InOut,integrationData);
-
+        //recipients.add(CamelRoutes.ELASTIC);
         exchange.getIn().setHeader("recipients", recipients);
+//        exchange.getIn().setHeader(Exchange.HTTP_METHOD,"POST");
+        exchange.getIn().setBody(integrationData);
     }
 }

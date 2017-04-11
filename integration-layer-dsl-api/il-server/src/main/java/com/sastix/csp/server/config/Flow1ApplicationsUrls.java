@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import java.util.ArrayList;
 import java.util.List;
 
+@Deprecated
 @Configuration
 @ConfigurationProperties("flow1")
 public class Flow1ApplicationsUrls {

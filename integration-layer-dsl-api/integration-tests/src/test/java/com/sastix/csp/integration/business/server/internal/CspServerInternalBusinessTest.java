@@ -1,4 +1,4 @@
-package com.sastix.csp.integration.business.server.flow1;
+package com.sastix.csp.integration.business.server.internal;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sastix.csp.client.TrustCirclesClient;
@@ -13,7 +13,6 @@ import org.apache.camel.*;
 import org.apache.camel.component.mock.MockEndpoint;
 import org.apache.camel.spring.SpringCamelContext;
 import org.apache.camel.test.spring.CamelSpringBootRunner;
-import org.apache.camel.test.spring.MockEndpointsAndSkip;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -44,8 +43,8 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
 //@MockEndpointsAndSkip("http:*") // by removing this any http requests will be sent as expected.
 // Thus, by injecting the mocked Camel Endpoints we can assert any delivered/exchanged messages in normal business flows,
 // and additionally to let the http request made through Camel to "flow" normally to the requested http-endpoints.
-public class CspServerFlow1BusinessTest {
-    private static final Logger LOG = LoggerFactory.getLogger(CspServerFlow1BusinessTest.class);
+public class CspServerInternalBusinessTest {
+    private static final Logger LOG = LoggerFactory.getLogger(CspServerInternalBusinessTest.class);
 
     @Autowired
     ObjectMapper objectMapper;
