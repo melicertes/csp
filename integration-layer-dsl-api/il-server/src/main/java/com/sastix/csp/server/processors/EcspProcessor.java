@@ -1,10 +1,13 @@
 package com.sastix.csp.server.processors;
 
 import com.sastix.csp.commons.model.IntegrationData;
+import com.sastix.csp.commons.model.Team;
 import com.sastix.csp.commons.model.TrustCircle;
 import com.sastix.csp.commons.model.TrustCircleEcspDTO;
 import com.sastix.csp.server.service.CamelRestService;
 import org.apache.camel.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -15,6 +18,7 @@ import java.util.List;
  */
 @Component
 public class EcspProcessor implements Processor{
+    private static final Logger LOG = LoggerFactory.getLogger(EcspProcessor.class);
     @Produce
     ProducerTemplate producerTemplate;
 
@@ -28,9 +32,9 @@ public class EcspProcessor implements Processor{
         IntegrationData integrationData = trustCircleEcspDTO.getIntegrationData();
         String httpMethod = (String) exchange.getIn().getHeader(Exchange.HTTP_METHOD);
 
-        List<String> ecsps = tc.getCsps();
-        for (String ecsp : ecsps) {
-            camelRestService.send(ecsp,integrationData,httpMethod);
+        List<Team> ecsps = trustCircleEcspDTO.getTeams();
+        for (Team ecsp : ecsps) {
+            camelRestService.send(ecsp.getUrl(),integrationData,httpMethod);
         }
         //exchange.getIn().setHeader(Exchange.HTTP_METHOD, httpMethod);
         //exchange.getIn().setHeader("ecsps", ecsps);

@@ -31,6 +31,7 @@ public class CamelRestService {
         Exchange exchange = producerTemplate.send(uri, new Processor() {
             public void process(Exchange exchange) throws Exception {
                 exchange.getIn().setHeader(Exchange.HTTP_METHOD,httpMethod);
+//                exchange.getIn().setHeader("Authorization","Basic YWRtaW46YWRtaW4=");
                 exchange.getIn().setBody(b);
             }
         });
