@@ -14,6 +14,10 @@ public final class DurationConverter implements Converter<String, Duration> {
 		this.formatter = DateTimeFormatter.ofPattern(dateFormat);
 	}
 
+	public DurationConverter(DateTimeFormatter formatter) {
+		this.formatter = formatter;
+	}
+
 	@Override
 	public Duration convert(String source) {
 		if (source == null || source.isEmpty()) {
@@ -21,7 +25,6 @@ public final class DurationConverter implements Converter<String, Duration> {
 		}
 
 		LocalTime time = LocalTime.parse(source, formatter);
-		
 		return Duration.ofHours(time.getHour()).plusMinutes(time.getMinute());
 	}
 }

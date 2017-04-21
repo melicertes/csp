@@ -3,20 +3,26 @@ package eu.europa.csp.vcbadmin.model;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
-import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
+
+import eu.europa.csp.vcbadmin.constants.MeetingStatus;
 
 @Entity
 @Table(name = "vcb_meeting")
@@ -26,8 +32,15 @@ public class Meeting {
 	@GeneratedValue
 	private Long id;
 
-	@OneToMany(mappedBy = "meeting", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "meeting", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private List<Participant> participants = new LinkedList<>();
+
+	@OneToMany(mappedBy = "meeting", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	private List<MeetingScheduledTask> scheduledTasks = new LinkedList<>();
+
+	@NotNull
+	@ManyToOne(fetch = FetchType.LAZY)
+	private User user;
 
 	@NotNull
 	private String room;
@@ -36,25 +49,20 @@ public class Meeting {
 	private String url;
 
 	@NotNull
-	private LocalDateTime start;
+	private ZonedDateTime start;
 
 	@NotNull
 	private Duration duration;
-	
+
 	@NotNull
-	private String status;
+	@Enumerated(EnumType.STRING)
+	private MeetingStatus status;
 
 	public Meeting() {
 
 	}
 
-	public Meeting(MeetingForm form_meeting, String url) {
-		this.duration = form_meeting.getDuration();
-		this.start = form_meeting.getStart();
-		this.setParticipantEmails(form_meeting.getEmails().stream().filter(s->s!=null && !s.isEmpty()).collect(Collectors.toList()));
-		this.url=url;
-		this.status="Pending";
-	}
+	
 
 	public void setParticipantEmails(Collection<String> emails) {
 		MessageDigest md = null;
@@ -69,7 +77,8 @@ public class Meeting {
 			for (String email : emails) {
 				String hashed_email = hba.marshal(md.digest((email + System.currentTimeMillis()).getBytes()));
 				md.reset();
-				participants.add(new Participant(email, hashed_email.substring(0, 6), hashed_email.substring(6, 16),this));
+				participants
+						.add(new Participant(email, hashed_email.substring(0, 6), hashed_email.substring(6, 16), this));
 				sb.append(email);
 			}
 			sb.append(System.currentTimeMillis());
@@ -79,15 +88,15 @@ public class Meeting {
 
 	@Override
 	public String toString() {
-		return "Meeting [id=" + id + ", participants=" + participants + ", room=" + room + ", url=" + url + ", start="
-				+ start + ", duration=" + duration + "]";
+		return "Meeting [id=" + id + ", room=" + room + ", url=" + url + ", start=" + start + ", duration=" + duration
+				+ "]";
 	}
 
 	public Duration getDuration() {
 		return duration;
 	}
 
-	public LocalDateTime getExpectedEnd() {
+	public ZonedDateTime getExpectedEnd() {
 		return start.plus(duration);
 	}
 
@@ -99,7 +108,7 @@ public class Meeting {
 		return room;
 	}
 
-	public LocalDateTime getStart() {
+	public ZonedDateTime getStart() {
 		return start;
 	}
 
@@ -119,7 +128,7 @@ public class Meeting {
 		this.room = room;
 	}
 
-	public void setStart(LocalDateTime start) {
+	public void setStart(ZonedDateTime start) {
 		this.start = start;
 	}
 
@@ -135,11 +144,48 @@ public class Meeting {
 		this.participants = participants;
 	}
 
-	public String getStatus() {
+	public MeetingStatus getStatus() {
 		return status;
 	}
 
-	public void setStatus(String status) {
+	public void setStatus(MeetingStatus status) {
 		this.status = status;
+	}
+
+	public List<MeetingScheduledTask> getScheduledTasks() {
+		return scheduledTasks;
+	}
+
+	public void setScheduledTasks(List<MeetingScheduledTask> scheduledTasks) {
+		this.scheduledTasks = scheduledTasks;
+	}
+
+	public LocalTime getDurationAsTime() {
+		// according to https://jira.sastix.com/browse/SXCSP-125
+		// duration should be 0:30 up to 08:00, so it is safe to assume that
+		// this is is a time
+//		System.out.println(duration.toHours());
+//		System.out.println(duration.toMinutes() % 60);
+		return LocalTime.of(Long.valueOf(duration.toHours()).intValue(),
+				Long.valueOf(duration.toMinutes()).intValue() % 60);
+	}
+
+	public void addScheduledTask(MeetingScheduledTask meeting_scheduled_task) {
+		if (scheduledTasks == null) {
+			this.scheduledTasks = new LinkedList<>();
+		}
+		scheduledTasks.add(meeting_scheduled_task);
+	}
+
+
+
+	public User getUser() {
+		return user;
+	}
+
+
+
+	public void setUser(User user) {
+		this.user = user;
 	}
 }

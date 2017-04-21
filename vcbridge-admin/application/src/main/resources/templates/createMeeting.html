@@ -10,8 +10,9 @@
 	xmlns:th="http://www.thymeleaf.org"
 	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	layout:decorator="layout">
-
+	
 <div layout:fragment="content">
+
 <div class="app header-fixed sidebar-fixed aside-menu-fixed aside-menu-hidden">
 
             <div class="col-md-8">
@@ -26,15 +27,19 @@
                             <div th:if="${param.logout}">
                                 You have been logged out.
                             </div>
-                            <form action="#" th:action="@{/createMeeting}" th:object="${meetingForm}" method="post">
+                            <form id="createMeetingForm" action="#" th:action="@{/createMeeting}" th:object="${meetingForm}" method="post">
                                 <div class="input-group mb-3">
                                     <span class="input-group-addon"><i class="icon-calendar"></i>
                                     </span>
-                                    <input type="datetime-local" class="form-control" th:field="*{start}"/>
+                                    <input type="datetime-local" value="" required="true" class="form-control datetimeinput" placeholder="2011-12-03T10:15:30+01:00"/>
+                                    <input hidden="true" type="text" class="form-control datetimeoutput" th:field="*{start}" placeholder="2011-12-03T10:15:30+01:00"/>
+                                    <select id="selecttimezone" class="selectpicker" name="timeZone"></select>
+                                    
+                                   
                                     <td th:if="${#fields.hasErrors('start')}" th:errors="*{start}">Start Error</td>
                                 </div>
                                 <div class="input-group mb-4">
-                                    <span class="input-group-addon"><i class="icon-calendar-empty"></i>
+                                    <span class="input-group-addon"><i class="icon-bell"></i>
                                     </span>
                                     <input type="time" class="form-control" th:field="*{duration}"/>
                                     <td th:if="${#fields.hasErrors('duration')}" th:errors="*{duration}">Duration Error</td>
@@ -64,7 +69,7 @@
                                 	</div>
                                     <div class="col-12 text-right">
                                     	<button value="Create" type="submit" class="btn btn-primary px-4">Create</button>
-                                    	<button value="Cancel" type="submit" class="btn btn-primary px-4">Cancel</button>
+                                    	<a th:href="@{/listMeeting}" class="btn btn-primary px-4">Cancel</a>
                                     </div>
                                 </div>
                             </form>
@@ -96,12 +101,24 @@ $(document).ready(function() {
     $(add_button).click(function(e){ //on add input button click
         e.preventDefault();
 	    $(wrapper).append('<tr class="useremail"><td><input class="todelete" type="checkbox" value=""></input></td><td><input hidden="true" class="form-control" type="text" value="' + new_email.val() + '" name="emails['+x+']"/><div>'+new_email.val()+'</div></td></tr>'); //add input box
+	    new_email.val("");
+	    new_email.focus();
 	    x++; //text box increment
     });
     $(wrapper).on("click",".remove_field", function(e){ //user click on remove text
         e.preventDefault(); $(this).parent('div').remove(); x--;
-    })
+    });
+    $('#createMeetingForm').on('submit', function(e) { //use on if jQuery 1.7+
+        e.preventDefault();  //prevent form from submitting
+        $(".datetimeoutput").val(moment.tz($(".datetimeinput").val(),$("#selecttimezone").val()).format());
+        this.submit();
+    });
+    
+
 });
+
 </script>
+<!-- <script src="resources/js/bootstrap-select.min.js"></script> -->
+<script type="text/javascript" src="resources/js/timezones.js"></script>
 </div>
 </html>

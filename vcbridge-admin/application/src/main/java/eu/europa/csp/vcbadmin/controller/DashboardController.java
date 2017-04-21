@@ -9,20 +9,18 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 import eu.europa.csp.vcbadmin.config.OpenfireProperties;
 
-
-
 @Controller
 public class DashboardController {
-	//String test;
-	
+	// String test;
+
 	@Autowired
 	public DashboardController(OpenfireProperties properties) {
-		//this.test = properties.getTest();
+		// this.test = properties.getTest();
 	}
-	
+
 	@GetMapping("/")
 	public String showHome(Model model) {
-		//model.addAttribute("test", test);
+		// model.addAttribute("test", test);
 		return "dashboard";
 	}
 

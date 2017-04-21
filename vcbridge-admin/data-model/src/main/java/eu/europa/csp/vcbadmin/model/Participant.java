@@ -5,18 +5,20 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "vcb_participant")
 public class Participant {
-	public Participant(){
-		
+	public Participant() {
+
 	}
-	public Participant(String email, String username, String password,Meeting meeting) {
+
+	public Participant(String email, String username, String password, Meeting meeting) {
 		this.email = email;
-		this.username=username;
-		this.password=password;
-		this.meeting=meeting;
+		this.username = username;
+		this.password = password;
+		this.meeting = meeting;
 	}
 
 	public Long getId() {
@@ -65,6 +67,8 @@ public class Participant {
 	private String email;
 	private String username;
 	private String password;
+
+	@NotNull
 	@ManyToOne
 	private Meeting meeting;
 
