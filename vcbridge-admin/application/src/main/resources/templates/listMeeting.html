@@ -1,0 +1,85 @@
+<!--
+ * CoreUI - Open Source Bootstrap Admin Template
+ * @version v1.0.0-alpha.4
+ * @link http://coreui.io
+ * Copyright (c) 2017 creativeLabs Łukasz Holeczek
+ * @license MIT
+ -->
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorator="layout">
+
+<div layout:fragment="content">
+<div class="app header-fixed sidebar-fixed aside-menu-fixed aside-menu-hidden">
+
+            <div class="col-md-8">
+                <div class="card-group mb-0">
+                    <div class="card p-4">
+                        <div class="card-block">
+                            <h1>Scheduled meetings</h1>
+                            <form action="#" th:action="@{/cancelMeeting}" method="post">
+                            <table class="table">
+							  <thead>
+							    <tr>
+							      <th><input type="checkbox" value="" ></input></th>
+							      <th>Start Date and Time</th>
+							      <th>Duration</th>
+							      <th>Participants</th>
+							      <th>Status</th>
+							    </tr>
+							  </thead>
+							  <tbody>
+							    <tr th:each="meeting, stat : ${meetings}">
+							      <th scope="row"><input type="checkbox" name="id" th:value="${meeting.id}"></input></th>
+							      <td th:text="${meeting.start}">start</td>
+							      <td th:text="${meeting.duration}">duration</td>
+							      <td th:text="${#lists.size(meeting.participants)}">#ofparticipants</td>
+							      <td th:text="${meeting.status}">status</td>
+							    </tr>
+							  </tbody>
+							</table>
+							<div class="row">
+                            	<div class="col-6">
+                            		<button id="cancel_meeting_button" type="submit" class="btn btn-primary px-4">Cancel</button>
+                            	</div>
+                            </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+</div>
+</div>
+<div layout:fragment="scripts">
+<script>
+$(document).ready(function() {
+    var max_fields      = 10; //maximum input boxes allowed
+    var wrapper         = $(".input_fields_wrap"); //Fields wrapper
+    var add_button      = $("#add_field_button"); //Add button ID
+    var delete_button      = $("#delete_button"); //Delete button
+    var new_email		= $("#new_email"); // new email input
+    var x = 0; //initlal text box count
+
+	$(delete_button).click(function(e){
+		e.preventDefault();
+		$("tr.useremail").each(function() {
+			$this = $(this)
+			if($(this).find("input.todelete").is(":checked")){
+				$(this).remove();
+			}
+		});
+	});
+    $(add_button).click(function(e){ //on add input button click
+        e.preventDefault();
+	    $(wrapper).append('<tr class="useremail"><td><input class="todelete" type="checkbox" value=""></input></td><td><input hidden="true" class="form-control" type="text" value="' + new_email.val() + '" name="emails['+x+']"/><div>'+new_email.val()+'</div></td></tr>'); //add input box
+	    x++; //text box increment
+    });
+    $(wrapper).on("click",".remove_field", function(e){ //user click on remove text
+        e.preventDefault(); $(this).parent('div').remove(); x--;
+    })
+});
+</script>
+</div>
+</html>

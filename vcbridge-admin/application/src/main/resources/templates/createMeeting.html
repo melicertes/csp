@@ -1,0 +1,107 @@
+<!--
+ * CoreUI - Open Source Bootstrap Admin Template
+ * @version v1.0.0-alpha.4
+ * @link http://coreui.io
+ * Copyright (c) 2017 creativeLabs Łukasz Holeczek
+ * @license MIT
+ -->
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorator="layout">
+
+<div layout:fragment="content">
+<div class="app header-fixed sidebar-fixed aside-menu-fixed aside-menu-hidden">
+
+            <div class="col-md-8">
+                <div class="card-group mb-0">
+                    <div class="card p-4">
+                        <div class="card-block">
+                            <h1>Create meeting</h1>
+                            <p class="text-muted">Schedule a conference meeting</p>
+                            <div th:if="${param.error}">
+                                Invalid username and password.
+                            </div>
+                            <div th:if="${param.logout}">
+                                You have been logged out.
+                            </div>
+                            <form action="#" th:action="@{/createMeeting}" th:object="${meetingForm}" method="post">
+                                <div class="input-group mb-3">
+                                    <span class="input-group-addon"><i class="icon-calendar"></i>
+                                    </span>
+                                    <input type="datetime-local" class="form-control" th:field="*{start}"/>
+                                    <td th:if="${#fields.hasErrors('start')}" th:errors="*{start}">Start Error</td>
+                                </div>
+                                <div class="input-group mb-4">
+                                    <span class="input-group-addon"><i class="icon-calendar-empty"></i>
+                                    </span>
+                                    <input type="time" class="form-control" th:field="*{duration}"/>
+                                    <td th:if="${#fields.hasErrors('duration')}" th:errors="*{duration}">Duration Error</td>
+                                </div>
+                                <table class="table">
+                                <div class="input-group mb-4">
+                                    <span class="input-group-addon"><i class="icon-user"></i></span>
+                                    <input class="form-control" type="email" id="new_email" placeholder="Enter email"/>
+                                    <button id="add_field_button" class="btn btn-primary">Add</button>
+                                </div>
+                                <thead>
+                                  <tr>
+                                    <th>Select</th>
+                                    <th>Participants in meeting</th>
+                                  </tr>
+                                </thead>
+                                <tbody class="input_fields_wrap">
+                                    <tr class="useremail" th:each="email, stat : ${meetingForm.emails}">         
+                                        <td><input class="todelete" type="checkbox" value=""></input></td>
+                                        <td><input hidden="true" type="text" class="form-control" th:field="*{emails[__${stat.index}__]}" th:value="${email}"/><div th:text="${email}"></div></td>
+                                    </tr>
+                                </tbody>
+                                </table>
+                                <div class="row">
+                                	<div class="col-6">
+                                		<button id="delete_button" class="btn btn-primary px-4">Delete</button>
+                                	</div>
+                                    <div class="col-12 text-right">
+                                    	<button value="Create" type="submit" class="btn btn-primary px-4">Create</button>
+                                    	<button value="Cancel" type="submit" class="btn btn-primary px-4">Cancel</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+</div>
+</div>
+<div layout:fragment="scripts">
+<script>
+$(document).ready(function() {
+    var max_fields      = 10; //maximum input boxes allowed
+    var wrapper         = $(".input_fields_wrap"); //Fields wrapper
+    var add_button      = $("#add_field_button"); //Add button ID
+    var delete_button      = $("#delete_button"); //Delete button
+    var new_email		= $("#new_email"); // new email input
+    var x = 0; //initlal text box count
+
+	$(delete_button).click(function(e){
+		e.preventDefault();
+		$("tr.useremail").each(function() {
+			$this = $(this)
+			if($(this).find("input.todelete").is(":checked")){
+				$(this).remove();
+			}
+		});
+	});
+    $(add_button).click(function(e){ //on add input button click
+        e.preventDefault();
+	    $(wrapper).append('<tr class="useremail"><td><input class="todelete" type="checkbox" value=""></input></td><td><input hidden="true" class="form-control" type="text" value="' + new_email.val() + '" name="emails['+x+']"/><div>'+new_email.val()+'</div></td></tr>'); //add input box
+	    x++; //text box increment
+    });
+    $(wrapper).on("click",".remove_field", function(e){ //user click on remove text
+        e.preventDefault(); $(this).parent('div').remove(); x--;
+    })
+});
+</script>
+</div>
+</html>
