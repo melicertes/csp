@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class DclApiController {
 
-    private static final Logger LOG = LoggerFactory.getLogger(DslApiController.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DclApiController.class);
 
     @Produce
     private ProducerTemplate intDataProducer;

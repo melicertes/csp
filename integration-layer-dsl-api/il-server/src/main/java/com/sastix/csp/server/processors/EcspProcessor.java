@@ -32,12 +32,12 @@ public class EcspProcessor implements Processor{
         IntegrationData integrationData = trustCircleEcspDTO.getIntegrationData();
         String httpMethod = (String) exchange.getIn().getHeader(Exchange.HTTP_METHOD);
 
-        List<Team> ecsps = trustCircleEcspDTO.getTeams();
-        for (Team ecsp : ecsps) {
-            camelRestService.send(ecsp.getUrl(),integrationData,httpMethod);
+        List<Team> teams = trustCircleEcspDTO.getTeams();
+        LOG.info(teams.toString());
+        for (Team team : teams) {
+            String uri = team.getUrl() + "/" + "adapter/integrationData";
+            String response = camelRestService.send(uri, integrationData, httpMethod);
+            LOG.info("Response from ECSP " + team.getShortName() + ": " + response);
         }
-        //exchange.getIn().setHeader(Exchange.HTTP_METHOD, httpMethod);
-        //exchange.getIn().setHeader("ecsps", ecsps);
-        //exchange.getIn().setBody(integrationData);
     }
 }
