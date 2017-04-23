@@ -119,7 +119,7 @@ public class ElasticProcessor implements Processor {
                 String deleteResponse = camelRestService.send(this.getElasticURI() + "/" + dataType.toString().toLowerCase() + "/" + hit.getId(), null, HttpMethods.DELETE.name());
                 LOG.info("ES Delete index "+hit.getId()+"response: " + deleteResponse);
             }
-            
+
         }
 
 

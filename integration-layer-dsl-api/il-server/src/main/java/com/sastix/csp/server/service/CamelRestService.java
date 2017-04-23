@@ -33,7 +33,6 @@ public class CamelRestService {
             public void process(Exchange exchange) throws Exception {
                 exchange.getIn().setHeader(Exchange.HTTP_METHOD, httpMethod);
                 exchange.getIn().setHeader(Exchange.CONTENT_TYPE, MediaType.APPLICATION_JSON);
-                //exchange.getIn().setHeader("Content-Type", "application/json");
 //                exchange.getIn().setHeader("Authorization","Basic YWRtaW46YWRtaW4=");
                 exchange.getIn().setBody(b);
             }
