@@ -71,12 +71,11 @@ public class DclProcessor implements Processor {
             for (Integer id : tc.getTeams()){
                 byte[] dataTeam = (byte[]) producerTemplate.sendBodyAndHeader(CamelRoutes.TCT, ExchangePattern.InOut, id, Exchange.HTTP_METHOD, "GET");
                 Team team = objectMapper.readValue(dataTeam, Team.class);
-                LOG.info(team.toString());
                 teams.add(team);
             }
 
             trustCircleEcspDTO.setTeams(teams);
-            producerTemplate.sendBodyAndHeader(CamelRoutes.ECSP, ExchangePattern.InOut,trustCircleEcspDTO, Exchange.HTTP_METHOD, httpMethod);
+            producerTemplate.sendBodyAndHeader(CamelRoutes.ECSP, ExchangePattern.InOut, trustCircleEcspDTO, Exchange.HTTP_METHOD, httpMethod);
             exchange.getIn().setHeader("recipients", CamelRoutes.ECSP);
             exchange.getIn().setBody(trustCircleEcspDTO);
 

@@ -30,6 +30,9 @@ public class DSLRoute extends RouteBuilder {
     private TcProcessor tcProcessor;
 
     @Autowired
+    private TeamProcessor teamProcessor;
+
+    @Autowired
     private EcspProcessor ecspProcessor;
 
     @Autowired
@@ -63,15 +66,21 @@ public class DSLRoute extends RouteBuilder {
                 .process(edclProcessor)
                 .to(CamelRoutes.DSL);
 
-        //TrustCircles routes
+        //TrustCircles Circles routes
         from(CamelRoutes.TC)
                 .process(tcProcessor)
                 .marshal().json(JsonLibrary.Jackson, Csp.class);
 
+        //TrustCircles Teams routes
+        from(CamelRoutes.TCT)
+                .process(teamProcessor)
+                .marshal().json(JsonLibrary.Jackson, Csp.class)
+                .recipientList(header("recipients"));
+
         //ExternalCSPs
         from(CamelRoutes.ECSP)
-                .process(ecspProcessor)
-                .recipientList(header("ecsps"));
+                .process(ecspProcessor);
+
 
         //App routing
         from(CamelRoutes.APP)

@@ -3,6 +3,7 @@ package com.sastix.csp.server.processors;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sastix.csp.client.TrustCirclesClient;
 import com.sastix.csp.commons.model.Csp;
+import com.sastix.csp.commons.model.IntegrationDataType;
 import com.sastix.csp.commons.model.TrustCircle;
 import com.sastix.csp.commons.model.TrustCircleEcspDTO;
 import com.sastix.csp.commons.routes.ContextUrl;
@@ -14,6 +15,7 @@ import org.apache.camel.impl.DefaultMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
@@ -22,6 +24,16 @@ import org.springframework.stereotype.Component;
 @Component
 public class TcProcessor implements Processor{
     private static final Logger LOG = LoggerFactory.getLogger(TcProcessor.class);
+
+    @Value("${tc.protocol}")
+    String tcProtocol;
+    @Value("${tc.host}")
+    String tcHost;
+    @Value("${tc.port}")
+    String tcPort;
+    @Value("${tc.path.circles}")
+    String tcPath;
+
     @Autowired
     ObjectMapper objectMapper;
 
@@ -36,11 +48,44 @@ public class TcProcessor implements Processor{
 //        TrustCircleEcspDTO trustCircleEcspDTO = exchange.getIn().getBody(TrustCircleEcspDTO.class);
         Csp csp = exchange.getIn().getBody(Csp.class);
         String httpMethod = (String) exchange.getIn().getHeader(Exchange.HTTP_METHOD);
-        String uri = "http://csp.dangerduck.gr:8000/api/v1/circles/" + csp.getCspId();LOG.info(uri);
-        TrustCircle tc = camelRestService.send(uri,csp, httpMethod, TrustCircle.class);
+
+        String uri = this.getTcURI() + "/" + csp.getCspId();
+        LOG.info(uri);
+        TrustCircle tc = camelRestService.send(uri, csp, httpMethod, TrustCircle.class);
         LOG.info(tc.toString());
         Message m = new DefaultMessage();
         m.setBody(tc);
         exchange.setOut(m);
+    }
+
+    private String getThreatVal(Csp csp) {
+        String shortNameVal = "CTC::";
+        if (csp.getCspId().equals(IntegrationDataType.ARTEFACT.toString())) {
+            shortNameVal += "SHARING_DATA_ARTEFACT";
+        } else if (csp.getCspId().equals(IntegrationDataType.CHAT.toString())) {
+            shortNameVal += "SHARING_DATA_CHAT";
+        } else if (csp.getCspId().equals(IntegrationDataType.VULNERABILITY.toString())) {
+            shortNameVal += "SHARING_DATA_VULNERABILITY";
+        } else if (csp.getCspId().equals(IntegrationDataType.CONTACT.toString())) {
+            shortNameVal += "SHARING_DATA_CONTACT";
+        } else if (csp.getCspId().equals(IntegrationDataType.EVENT.toString())) {
+            shortNameVal += "SHARING_DATA_EVENT";
+        } else if (csp.getCspId().equals(IntegrationDataType.FILE.toString())) {
+            shortNameVal += "SHARING_DATA_FILE";
+        } else if (csp.getCspId().equals(IntegrationDataType.INCIDENT.toString())) {
+            shortNameVal += "SHARING_DATA_INCIDENT";
+        } else if (csp.getCspId().trim().equals(IntegrationDataType.THREAT.toString().trim())) {
+            shortNameVal += "SHARING_DATA_THREAT";
+        } else if (csp.getCspId().equals(IntegrationDataType.TRUSTCIRCLE.toString())) {
+            shortNameVal += "";
+        } else {
+            shortNameVal += "UNKNOWN";
+        }
+        LOG.info(shortNameVal);
+        return shortNameVal;
+    }
+
+    private String getTcURI() {
+        return tcProtocol + "://" + tcHost + ":" + tcPort + tcPath;
     }
 }

@@ -31,7 +31,7 @@ public class TestDclApiController {
 
         List<String> csps = new ArrayList<>();
         csps.add("http://localhost:8081/ecsp/1");
-        TrustCircle tc = new TrustCircle(csps);
+        TrustCircle tc = new TrustCircle();
         return new ResponseEntity<TrustCircle>(tc, HttpStatus.OK);
     }
 
