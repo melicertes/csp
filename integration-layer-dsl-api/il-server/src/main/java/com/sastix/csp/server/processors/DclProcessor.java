@@ -8,7 +8,6 @@ import com.sastix.csp.commons.routes.CamelRoutes;
 import com.sastix.csp.server.service.CamelRestService;
 import com.sastix.csp.server.service.CspUtils;
 import org.apache.camel.*;
-import org.apache.camel.http.common.HttpMethods;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -34,10 +34,8 @@ public class AppProcessor implements Processor{
         String httpMethod = (String) exchange.getIn().getHeader(Exchange.HTTP_METHOD);
 
         String appUri = cspUtils.getAppUri(appName);
-        LOG.info("=========================");
         if(!StringUtils.isEmpty(appUri)){
             //producerTemplate.sendBody(appUri, ExchangePattern.InOut,integrationData);
-            LOG.info(appUri);
             camelRestService.send(appUri,integrationData, httpMethod);
         }else{
             //TODO: handle situation

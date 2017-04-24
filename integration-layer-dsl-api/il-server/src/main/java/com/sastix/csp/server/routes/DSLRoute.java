@@ -63,8 +63,8 @@ public class DSLRoute extends RouteBuilder {
                 .recipientList(header("recipients"));
 
         from(CamelRoutes.EDCL)
-                .process(edclProcessor)
-                .to(CamelRoutes.DSL);
+                .process(edclProcessor);
+//                .to(CamelRoutes.DSL);
 
         //TrustCircles Circles routes
         from(CamelRoutes.TC)
