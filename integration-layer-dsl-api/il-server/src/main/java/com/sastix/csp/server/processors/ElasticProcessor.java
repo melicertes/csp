@@ -80,12 +80,15 @@ public class ElasticProcessor implements Processor {
             String response = camelRestService.send(this.getElasticURI() + "/" + dataType.toString().toLowerCase() + "/_search", elasticSearchRequest, HttpMethod.POST.name());
             LOG.info("ES Search response: " + response);
 
+            //create update transaction object
+            ElasticData elasticData = new ElasticData(integrationData.getDataParams(), integrationData.getDataObject());
+
             ElasticSearchResponse elasticSearchResponse = new ObjectMapper().readValue(response, ElasticSearchResponse.class);
             for(Hit hit : elasticSearchResponse.getHits().getHits()) {
                 LOG.info(hit.getId());
-                /**
-                 * @TODO perform update query with put (wait for Andreas URI)
-                 */
+                //query ES to perform update
+                String updateResponse = camelRestService.send(this.getElasticURI() + "/" + dataType.toString().toLowerCase() + "/" + hit.getId() + "/_update", elasticData, HttpMethods.POST.name());
+                LOG.info("ES Update index "+hit.getId()+"response: " + updateResponse);
             }
 
         }
