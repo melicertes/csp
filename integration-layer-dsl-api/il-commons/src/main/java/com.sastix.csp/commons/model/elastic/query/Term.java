@@ -1,0 +1,72 @@
+package com.sastix.csp.commons.model.elastic.query;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+
+import java.util.HashMap;
+import java.util.Map;
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonPropertyOrder({
+        "recordId",
+        "cspId",
+        "applicationId"
+})
+public class Term {
+
+    @JsonProperty("recordId")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private String recordId;
+
+    @JsonProperty("cspId")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private String cspId;
+
+    @JsonProperty("applicationId")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private String applicationId;
+
+
+    @JsonProperty("recordId")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public String getRecordId() {
+        return recordId;
+    }
+
+    @JsonProperty("recordId")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public void setRecordId(String recordId) {
+        this.recordId = recordId;
+    }
+
+    @JsonProperty("cspId")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public String getCspId() {
+        return cspId;
+    }
+
+    @JsonProperty("cspId")
+    public void setCspId(String cspId) {
+        this.cspId = cspId;
+    }
+
+    @JsonProperty("applicationId")
+    public String getApplicationId() {
+        return applicationId;
+    }
+
+    @JsonProperty("applicationId")
+    public void setApplicationId(String applicationId) {
+        this.applicationId = applicationId;
+    }
+
+    @Override
+    public String toString() {
+        return "Term{" +
+                "recordId='" + recordId + '\'' +
+                ", cspId='" + cspId + '\'' +
+                ", applicationId='" + applicationId + '\'' +
+                '}';
+    }
+}

@@ -10,20 +10,20 @@ import java.io.Serializable;
 public class Csp implements Serializable {
 
     @JsonProperty("cspId")
-    private String cspId;
+    private Integer cspId;
 
     public Csp() {
     }
 
-    public Csp(String cspId) {
+    public Csp(Integer cspId) {
         this.cspId = cspId;
     }
 
-    public String getCspId() {
+    public Integer getCspId() {
         return cspId;
     }
 
-    public void setCspId(String cspId) {
+    public void setCspId(Integer cspId) {
         this.cspId = cspId;
     }
 

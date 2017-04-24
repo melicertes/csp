@@ -58,32 +58,32 @@ public class TcProcessor implements Processor{
         exchange.setOut(m);
     }
 
-    private String getThreatVal(Csp csp) {
+/*    private String getThreatVal(Csp csp) {
         String shortNameVal = "CTC::";
-        if (csp.getCspId().equals(IntegrationDataType.ARTEFACT.toString())) {
+        if (csp.getCspId().equals(IntegrationDataType.ARTEFACT.name())) {
             shortNameVal += "SHARING_DATA_ARTEFACT";
-        } else if (csp.getCspId().equals(IntegrationDataType.CHAT.toString())) {
+        } else if (csp.getCspId().equals(IntegrationDataType.CHAT.name())) {
             shortNameVal += "SHARING_DATA_CHAT";
-        } else if (csp.getCspId().equals(IntegrationDataType.VULNERABILITY.toString())) {
+        } else if (csp.getCspId().equals(IntegrationDataType.VULNERABILITY.name())) {
             shortNameVal += "SHARING_DATA_VULNERABILITY";
-        } else if (csp.getCspId().equals(IntegrationDataType.CONTACT.toString())) {
+        } else if (csp.getCspId().equals(IntegrationDataType.CONTACT.name())) {
             shortNameVal += "SHARING_DATA_CONTACT";
-        } else if (csp.getCspId().equals(IntegrationDataType.EVENT.toString())) {
+        } else if (csp.getCspId().equals(IntegrationDataType.EVENT.name())) {
             shortNameVal += "SHARING_DATA_EVENT";
-        } else if (csp.getCspId().equals(IntegrationDataType.FILE.toString())) {
+        } else if (csp.getCspId().equals(IntegrationDataType.FILE.name())) {
             shortNameVal += "SHARING_DATA_FILE";
-        } else if (csp.getCspId().equals(IntegrationDataType.INCIDENT.toString())) {
+        } else if (csp.getCspId().equals(IntegrationDataType.INCIDENT.name())) {
             shortNameVal += "SHARING_DATA_INCIDENT";
-        } else if (csp.getCspId().trim().equals(IntegrationDataType.THREAT.toString().trim())) {
+        } else if (csp.getCspId().trim().equals(IntegrationDataType.THREAT.name().trim())) {
             shortNameVal += "SHARING_DATA_THREAT";
-        } else if (csp.getCspId().equals(IntegrationDataType.TRUSTCIRCLE.toString())) {
+        } else if (csp.getCspId().equals(IntegrationDataType.TRUSTCIRCLE.name())) {
             shortNameVal += "";
         } else {
             shortNameVal += "UNKNOWN";
         }
         LOG.info(shortNameVal);
         return shortNameVal;
-    }
+    }*/
 
     private String getTcURI() {
         return tcProtocol + "://" + tcHost + ":" + tcPort + tcPath;

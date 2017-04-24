@@ -28,7 +28,7 @@ public class IntegrationData  implements Serializable {
 
   public IntegrationData() {}
 
-  public IntegrationData(DataParams dataParams, SharingParams sharingParams, IntegrationDataType dataType, String dataObject, String dataApp, Object dataPayload) {
+  public IntegrationData(DataParams dataParams, SharingParams sharingParams, IntegrationDataType dataType, Object dataObject) {
     this.dataParams = dataParams;
     this.sharingParams = sharingParams;
     this.dataType = dataType;

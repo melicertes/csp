@@ -18,9 +18,6 @@ public class DdlProcessor implements Processor {
     @Autowired
     ObjectMapper objectMapper;
 
-    @Value("${elastic.uri}")
-    String elasticURI;
-
     @Produce
     ProducerTemplate producerTemplate;
 
@@ -31,7 +28,7 @@ public class DdlProcessor implements Processor {
     public void process(Exchange exchange) throws Exception {
         IntegrationData integrationData = cspUtils.getExchangeData(exchange, IntegrationData.class);
         Boolean toShare = integrationData.getSharingParams().getToShare();
-        String httpMethod = (String) exchange.getIn().getHeader(Exchange.HTTP_METHOD);
+
         List<String> recipients = new ArrayList<>();
 
         if (toShare) {
