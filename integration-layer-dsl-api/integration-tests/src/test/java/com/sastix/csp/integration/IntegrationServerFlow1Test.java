@@ -106,7 +106,7 @@ public class IntegrationServerFlow1Test {
     @Test
     public void flow1DslTestUsingTrustCirclesClient() throws Exception {
         MockRestServiceServer mockServer = MockRestServiceServer.bindTo(retryRestTemplate).build();
-        mockServer.expect(requestTo(trustCirclesContext)).andRespond(withSuccess(TestUtil.convertObjectToJsonBytes(mockUtils.getMockedTrustCircle(3,"http://external.csp%s.com")),TestUtil.APPLICATION_JSON_UTF8));
+        mockServer.expect(requestTo(trustCirclesContext)).andRespond(withSuccess(TestUtil.convertObjectToJsonBytes(mockUtils.getMockedTrustCircle(3)),TestUtil.APPLICATION_JSON_UTF8));
 
         sendFlow1IntegrationData(false);
 
@@ -132,7 +132,7 @@ public class IntegrationServerFlow1Test {
             @Override
             public <T> T evaluate(Exchange exchange, Class<T> type) {
                 try {
-                    return (T) TestUtil.convertObjectToJsonBytes(mockUtils.getMockedTrustCircle(3,"http://external.csp%s.com"));
+                    return (T) TestUtil.convertObjectToJsonBytes(mockUtils.getMockedTrustCircle(3));
                 } catch (IOException e) {
                     e.printStackTrace();
                     return null;

@@ -1,5 +1,7 @@
 package com.sastix.csp.client;
 
+import com.sastix.csp.commons.model.TrustCircle;
+
 import java.util.List;
 
 /**
@@ -8,5 +10,5 @@ import java.util.List;
 public interface TrustCirclesClient {
     void setProtocolHostPort(String protocol, String host, String port);
     String getContext();
-    List<String> getCsps(Integer id);
+   TrustCircle getTrustCircle(Integer id);
 }

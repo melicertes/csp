@@ -76,7 +76,7 @@ public class DclProcessor implements Processor {
             }
 
             trustCircleEcspDTO.setTeams(teams);
-            producerTemplate.sendBodyAndHeader(CamelRoutes.ECSP, ExchangePattern.InOut, trustCircleEcspDTO, Exchange.HTTP_METHOD, httpMethod);
+            //AVOID this: producerTemplate.sendBodyAndHeader(CamelRoutes.ECSP, ExchangePattern.InOut, trustCircleEcspDTO, Exchange.HTTP_METHOD, httpMethod); // if used, ends in multicast ...
             exchange.getIn().setHeader("recipients", CamelRoutes.ECSP);
             exchange.getIn().setBody(trustCircleEcspDTO);
 
