@@ -1,4 +1,4 @@
-package eu.europa.csp.vcbadmin.config;
+package eu.europa.csp.vcbadmin.config.converters;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -12,6 +12,7 @@ public final class ZonedDateTimeConverter implements Converter<String, ZonedDate
 	public ZonedDateTimeConverter(String timeFormat) {
 		this.formatter = DateTimeFormatter.ofPattern(timeFormat);
 	}
+
 	public ZonedDateTimeConverter(DateTimeFormatter formatter) {
 		this.formatter = formatter;
 	}
@@ -21,7 +22,7 @@ public final class ZonedDateTimeConverter implements Converter<String, ZonedDate
 		if (source == null || source.isEmpty()) {
 			return null;
 		}
-		
+
 		return ZonedDateTime.parse(source, formatter);
 	}
 }

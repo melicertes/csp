@@ -14,12 +14,11 @@ public class MeetingForm {
 
 	}
 
-	public static Meeting createMeetingFromForm(MeetingForm form_meeting, String url, User user) {
+	public static Meeting createMeetingFromForm(MeetingForm form_meeting, User user) {
 		Meeting m = new Meeting();
 		m.setDuration(form_meeting.getDuration());
 		m.setStart(form_meeting.getStart());
 		m.setParticipantEmails(form_meeting.getEmails());
-		m.setUrl(url);
 		m.setStatus(MeetingStatus.Pending);
 		m.setUser(user);
 		return m;

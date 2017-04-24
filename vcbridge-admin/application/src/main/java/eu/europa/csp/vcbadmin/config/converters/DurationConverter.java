@@ -1,4 +1,4 @@
-package eu.europa.csp.vcbadmin.config;
+package eu.europa.csp.vcbadmin.config.converters;
 
 import java.time.Duration;
 import java.time.LocalTime;
@@ -25,6 +25,6 @@ public final class DurationConverter implements Converter<String, Duration> {
 		}
 
 		LocalTime time = LocalTime.parse(source, formatter);
-		return Duration.ofHours(time.getHour()).plusMinutes(time.getMinute());
+		return Duration.ofHours(time.getHour()>=12?time.getHour()-12:time.getHour()).plusMinutes(time.getMinute());
 	}
 }

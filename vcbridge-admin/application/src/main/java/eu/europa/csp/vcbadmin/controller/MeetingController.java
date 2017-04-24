@@ -64,7 +64,8 @@ public class MeetingController {
 				.collect(Collectors.toList());
 		if (emails.isEmpty()) {
 			bindingResult.reject("emails");
-			//bindingResult.addError(new ObjectError("emails", "Participants list should not be empty"));
+			// bindingResult.addError(new ObjectError("emails", "Participants
+			// list should not be empty"));
 		}
 		if (bindingResult.hasErrors()) {
 			return "createMeeting";
@@ -73,13 +74,13 @@ public class MeetingController {
 		log.debug("Meeting validated ok: {}", meetingForm);
 		log.debug(meetingForm.toString());
 
-		String url = String.format("https://%s:%s/ofmeet/?r=%s", openFireProperties.getVideobridgeHost(),
-				openFireProperties.getVideobridgeHost(), openFireProperties.getMeetingRoom());
-
 		Optional<User> user = userRepository.findByEmail(auth.getName());
-		Meeting m = MeetingForm.createMeetingFromForm(meetingForm, url, user.get());
-		log.info("Start of meeting: {}",m.getStart());
-		log.info("Now - 30 min: {}",ZonedDateTime.now().minusMinutes(30));
+		Meeting m = MeetingForm.createMeetingFromForm(meetingForm, user.get());
+		String url = String.format("https://%s:%s/ofmeet/?r=%s", openFireProperties.getVideobridgeHost(),
+				openFireProperties.getVideobridgeHost(), m.getRoom());
+		m.setUrl(url);
+		log.info("Start of meeting: {}", m.getStart());
+		log.info("Now - 30 min: {}", ZonedDateTime.now().minusMinutes(30));
 		if (ZonedDateTime.now().minusMinutes(30).isAfter(m.getStart())) {
 			meetingService.createMeeting(m,
 					Arrays.asList(
@@ -115,7 +116,10 @@ public class MeetingController {
 	public String showMeeting(Model model, Authentication auth) {
 		Iterable<Meeting> meetings = meetingRepository.findByUserEmailAndStatusOrStatus(auth.getName(),
 				MeetingStatus.Pending, MeetingStatus.Running);
+		Iterable<Meeting> pastMeetings = meetingRepository.findByUserEmailAndStatusOrStatusOrStatus(auth.getName(),
+				MeetingStatus.Cancel, MeetingStatus.Completed, MeetingStatus.Expired);
 		model.addAttribute("meetings", meetings);
+		model.addAttribute("pastMeetings", pastMeetings);
 		return "listMeeting";
 	}
 }

@@ -9,6 +9,7 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.validation.constraints.NotNull;
 
 import eu.europa.csp.vcbadmin.constants.MeetingScheduledTaskType;
 
@@ -18,15 +19,22 @@ public class MeetingScheduledTask {
 	@GeneratedValue
 	private Long id;
 
+	@NotNull
 	@ManyToOne(fetch = FetchType.EAGER)
 	private Meeting meeting;
 
+	@NotNull
 	@Enumerated(EnumType.STRING)
 	private MeetingScheduledTaskType taskType;
 
+	@NotNull
 	private ZonedDateTime taskTime;
 
+	@NotNull
 	private Boolean completed;
+
+	@NotNull
+	private Integer failed = 0;
 
 	public static MeetingScheduledTask getNewCompleted(MeetingScheduledTaskType taskType, ZonedDateTime taskTime) {
 		MeetingScheduledTask m = new MeetingScheduledTask(taskType, taskTime);
@@ -73,6 +81,14 @@ public class MeetingScheduledTask {
 		return taskTime;
 	}
 
+	public Integer getFailed() {
+		return failed;
+	}
+
+	public void setFailed(Integer failed) {
+		this.failed = failed;
+	}
+
 	public MeetingScheduledTaskType getTaskType() {
 		return taskType;
 	}
@@ -101,6 +117,10 @@ public class MeetingScheduledTask {
 	public String toString() {
 		return "MeetingScheduledTask [id=" + id + ", taskType=" + taskType + ", taskTime=" + taskTime + ", completed="
 				+ completed + "]";
+	}
+
+	public void increaseFailed() {
+		++failed;
 	}
 
 }

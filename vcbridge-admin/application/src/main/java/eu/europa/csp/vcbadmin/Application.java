@@ -10,10 +10,11 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 import eu.europa.csp.vcbadmin.config.OpenfireProperties;
+import eu.europa.csp.vcbadmin.config.VcbadminProperties;
 
 @SpringBootApplication
 @ComponentScan("eu.europa.csp.vcbadmin")
-@EnableConfigurationProperties(OpenfireProperties.class)
+@EnableConfigurationProperties({OpenfireProperties.class,VcbadminProperties.class})
 @EntityScan(
         basePackageClasses = {Application.class, Jsr310JpaConverters.class}
 )
