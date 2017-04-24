@@ -15,6 +15,7 @@ exports.create = function (req, res) {
 exports.update = function (req, res) {
     //res.json({message:'Successful update'});
     res.send('Successful update');
+    console.log(req.body);
     console.log('Successful update');
 };
 
@@ -22,4 +23,7 @@ exports.delete = function (req, res) {
     //res.json({message:'Successful delete'});
     res.send('Successful delete');
     console.log('Successful delete');
+    console.log(req.headers)
+    console.log(req.get('header'))
+    console.log(req.body)
 };
