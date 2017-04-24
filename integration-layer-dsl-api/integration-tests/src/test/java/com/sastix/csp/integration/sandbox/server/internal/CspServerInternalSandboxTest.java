@@ -65,6 +65,9 @@ public class CspServerInternalSandboxTest {
     @EndpointInject(uri = CamelRoutes.MOCK_PREFIX+":"+CamelRoutes.TC)
     private MockEndpoint mockedTC;
 
+    @EndpointInject(uri = CamelRoutes.MOCK_PREFIX+":"+CamelRoutes.TCT)
+    private MockEndpoint mockedTCT;
+
     @EndpointInject(uri = CamelRoutes.MOCK_PREFIX+":"+CamelRoutes.ECSP)
     private MockEndpoint mockedEcsp;
 
@@ -74,6 +77,9 @@ public class CspServerInternalSandboxTest {
     @Autowired
     SpringCamelContext springCamelContext;
 
+    private Integer numOfCsps = 3;
+    private Integer currentCspId = 0;
+
     @Before
     public void init() throws Exception {
         mvc = webAppContextSetup(webApplicationContext).build();
@@ -82,6 +88,7 @@ public class CspServerInternalSandboxTest {
         mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX,CamelRoutes.DDL);
         mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX,CamelRoutes.ECSP);
         mockUtils.mockRouteSkipSendToOriginalEndpoint(CamelRoutes.MOCK_PREFIX,CamelRoutes.TC);
+        mockUtils.mockRouteSkipSendToOriginalEndpoint(CamelRoutes.MOCK_PREFIX,CamelRoutes.TCT);
     }
 
     // Use @DirtiesContext on each test method to force Spring Testing to automatically reload the CamelContext after
@@ -94,7 +101,7 @@ public class CspServerInternalSandboxTest {
             @Override
             public <T> T evaluate(Exchange exchange, Class<T> type) {
                 try {
-                    return (T) TestUtil.convertObjectToJsonBytes(mockUtils.getMockedTrustCircle(3,"http://external.csp%s.com"));
+                    return (T) TestUtil.convertObjectToJsonBytes(mockUtils.getMockedTrustCircle(3));
                 } catch (IOException e) {
                     e.printStackTrace();
                     return null;
@@ -117,6 +124,19 @@ public class CspServerInternalSandboxTest {
             }
         });
 
+        mockedTCT.returnReplyBody(new Expression() {
+            @Override
+            public <T> T evaluate(Exchange exchange, Class<T> type) {
+                try {
+                    currentCspId = currentCspId+1;
+                    return (T) TestUtil.convertObjectToJsonBytes(mockUtils.getMockedTeam(currentCspId,"http://external.csp%s.com"));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    return null;
+                }
+            }
+        });
+
         mockUtils.sendFlow1IntegrationData(mvc,false);
 
         mockedDsl.expectedMessageCount(1);
@@ -134,9 +154,9 @@ public class CspServerInternalSandboxTest {
         for (Exchange exchange : list) {
             Message in = exchange.getIn();
             TrustCircleEcspDTO trustCircleEcspDTO = in.getBody(TrustCircleEcspDTO.class);
-            TrustCircle data = trustCircleEcspDTO.getTrustCircle();
-            assertThat(data.getCsps().size(), is(3));
-            assertThat(data.getCsps().get(0), is("http://external.csp1.com"));
+            List<Team> data = trustCircleEcspDTO.getTeams();
+            assertThat(data.size(), is(3));
+            assertThat(data.get(0).getUrl(), is("http://external.csp1.com"));
         }
 
         mockedDdl.expectedMessageCount(1);

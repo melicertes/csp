@@ -90,7 +90,7 @@ public class CspServerInternalBusinessTest {
             @Override
             public <T> T evaluate(Exchange exchange, Class<T> type) {
                 try {
-                    return (T) TestUtil.convertObjectToJsonBytes(mockUtils.getMockedTrustCircle(3,"http://external.csp%s.com"));
+                    return (T) TestUtil.convertObjectToJsonBytes(mockUtils.getMockedTrustCircle(3));
                 } catch (IOException e) {
                     e.printStackTrace();
                     return null;

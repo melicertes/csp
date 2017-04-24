@@ -28,6 +28,7 @@ import java.util.List;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
@@ -109,7 +110,7 @@ public class CspServerInternalBusinessTcTest {
         for (Exchange exchange : list) {
             Message in = exchange.getIn();
             Csp dataIn = in.getBody(Csp.class);
-            assertThat(dataIn.getCspId(), containsString("localhost"));
+            assertThat(dataIn.getCspId(), greaterThan(0));
         }
 
         mockedDcl.expectedMessageCount(1);

@@ -3,6 +3,7 @@ package com.sastix.csp.integration.business.client.tc;
 import com.sastix.csp.client.TrustCirclesClient;
 import com.sastix.csp.client.config.CspRestTemplateConfiguration;
 import com.sastix.csp.client.config.TrustCirclesClientConfig;
+import com.sastix.csp.commons.model.TrustCircle;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -52,20 +53,20 @@ public class TcClientBusinessTest {
     public void getCspsDataBadRequestTestWay1(){
         exception.expect(ResourceAccessException.class);
         tcClient.setProtocolHostPort("http","dummy","9999");
-        tcClient.getCsps("localhost");
+        tcClient.getTrustCircle(1);
     }
 
     @Test(expected = ResourceAccessException.class)
     public void getCspsDataBadRequestTestWay2(){
         tcClient.setProtocolHostPort("http","dummy","9999");
-        tcClient.getCsps("dummy");
+        tcClient.getTrustCircle(1);
     }
 
     @Test
     public void getCspsDataBadRequestTestWay3(){
         try {
             tcClient.setProtocolHostPort("http","dummy","9999");
-            tcClient.getCsps("dummy");
+            tcClient.getTrustCircle(1);
             fail("Expected ResourceAccessException Exception");
         } catch (ResourceAccessException e) {
             assertThat(e.getMessage(),containsString("I/O error on POST request"));
@@ -73,9 +74,9 @@ public class TcClientBusinessTest {
     }
 
     @Test
-    public void getCspsTest(){
-        List<String> list = tcClient.getCsps("localhost");
-        assertThat(list.size(),is(1));
-        assertThat(list.get(0),containsString("http://ex.csp1.com"));
+    public void getTrustCircleTest(){
+        tcClient.setProtocolHostPort("http","localhost","8081");
+        TrustCircle trustCircle = tcClient.getTrustCircle(1);
+        assertThat(trustCircle.getTeams().size(),is(2));
     }
 }

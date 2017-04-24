@@ -4,6 +4,7 @@ import com.sastix.csp.commons.model.IntegrationData;
 import com.sastix.csp.commons.model.Team;
 import com.sastix.csp.commons.model.TrustCircle;
 import com.sastix.csp.commons.model.TrustCircleEcspDTO;
+import com.sastix.csp.commons.routes.ContextUrl;
 import com.sastix.csp.server.service.CamelRestService;
 import org.apache.camel.*;
 import org.slf4j.Logger;
@@ -35,7 +36,7 @@ public class EcspProcessor implements Processor{
         List<Team> teams = trustCircleEcspDTO.getTeams();
         LOG.info(teams.toString());
         for (Team team : teams) {
-            String uri = team.getUrl() + "/" + "adapter/integrationData";
+            String uri = team.getUrl() + ContextUrl.ADAPTER_INTEGRATION_DATA;
             String response = camelRestService.send(uri, integrationData, httpMethod);
             LOG.info("Response from ECSP " + team.getShortName() + ": " + response);
         }
