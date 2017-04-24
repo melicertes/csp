@@ -38,6 +38,12 @@ module.exports = function (app) {
         .post(adapterService.create)
         .put(adapterService.update)
         .delete(adapterService.delete);
+    
+    app.route('/adapter/demoapp')
+        .post(adapterService.create)
+        .put(adapterService.update)
+        .delete(adapterService.delete);
+
 
     // app.route('/adapter/:taskId')
     //     .get(todoList.read_a_task)

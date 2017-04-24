@@ -8,6 +8,7 @@ import com.sastix.csp.commons.routes.CamelRoutes;
 import com.sastix.csp.server.service.CamelRestService;
 import com.sastix.csp.server.service.CspUtils;
 import org.apache.camel.*;
+import org.apache.camel.http.common.HttpMethods;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,7 +64,8 @@ public class DclProcessor implements Processor {
             //TrustCircle tc = camelRestService.send(tcClient.getContext()+ ContextUrl.TRUST_CIRCLE,new Csp("localhost"), TrustCircle.class);
 
             // with camel response
-            byte[] data = (byte[]) producerTemplate.sendBodyAndHeader(CamelRoutes.TC, ExchangePattern.InOut,new Csp("1"), Exchange.HTTP_METHOD, "GET");
+            Integer datatypeId = integrationData.getDataType().ordinal();
+            byte[] data = (byte[]) producerTemplate.sendBodyAndHeader(CamelRoutes.TC, ExchangePattern.InOut,new Csp(datatypeId), Exchange.HTTP_METHOD, "GET");
             TrustCircle tc = objectMapper.readValue(data, TrustCircle.class);
 
             TrustCircleEcspDTO trustCircleEcspDTO = new TrustCircleEcspDTO(tc, integrationData);

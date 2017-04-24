@@ -8,5 +8,5 @@ import java.util.List;
 public interface TrustCirclesClient {
     void setProtocolHostPort(String protocol, String host, String port);
     String getContext();
-    List<String> getCsps(String id);
+    List<String> getCsps(Integer id);
 }
