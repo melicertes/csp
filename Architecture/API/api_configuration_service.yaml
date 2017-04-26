@@ -22,7 +22,11 @@ paths:
       parameters:
         - name: cspId
           in: path
-          description: a unique identifier that defines a Registered and Known CSP
+          description: | 
+            a unique identifier that defines a Registered and Known CSP. The 
+            csp identifier follows the UUID formatted as text, for 36 characters
+            total, arranged as 8-4-4-4-12. 
+            Example = 123e4567-e89b-12d3-a456-426655440000 
           required: true
           type: string
       responses:
@@ -46,10 +50,13 @@ paths:
       parameters:
         - name: cspId
           in: path
-          description: a unique identifier that defines a Registered and Known CSP
+          description: | 
+            a unique identifier that defines a Registered and Known CSP. The 
+            csp identifier follows the UUID formatted as text, for 36 characters
+            total, arranged as 8-4-4-4-12. 
+            Example = 123e4567-e89b-12d3-a456-426655440000 
           required: true
           type: string
-          format: xxxx-xxxx-xxxx-xxxx
         - name: heartbeatInfo
           in: body
           description: the heartbeat information
@@ -77,7 +84,11 @@ paths:
       parameters:
         - name: cspId
           in: path
-          description: a unique identifier that defines a Registered and Known CSP
+          description: | 
+            a unique identifier that defines a Registered and Known CSP. The 
+            csp identifier follows the UUID formatted as text, for 36 characters
+            total, arranged as 8-4-4-4-12. 
+            Example = 123e4567-e89b-12d3-a456-426655440000 
           required: true
           type: string
         - name: cspRegistration
@@ -117,9 +128,13 @@ paths:
       parameters:
         - name: cspId
           in: path
-          description: a unique identifier that defines a Registered and Known CSP
+          description: | 
+            a unique identifier that defines a Registered and Known CSP. The 
+            csp identifier follows the UUID formatted as text, for 36 characters
+            total, arranged as 8-4-4-4-12. 
+            Example = 123e4567-e89b-12d3-a456-426655440000 
           required: true
-          type: string
+          type: string 
         - name: apiVersion
           in: path
           description: the api version supported, without dots, eg. 1.0.0 -> 100
