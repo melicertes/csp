@@ -3,7 +3,6 @@ package com.sastix.csp.server.processors;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sastix.csp.commons.model.*;
 import com.sastix.csp.commons.model.elastic.ElasticData;
-import com.sastix.csp.commons.model.elastic.ElasticDelete;
 import com.sastix.csp.commons.model.elastic.ElasticSearchRequest;
 import com.sastix.csp.commons.model.elastic.ElasticSearchResponse;
 import com.sastix.csp.commons.model.elastic.query.Bool;
@@ -19,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -60,7 +60,7 @@ public class ElasticProcessor implements Processor {
         /*
         DDL indexes data (DDL -> ELASTIC API)
          */
-        if (httpMethod.equals(HttpMethods.POST.name())) {
+        if (httpMethod.equals(HttpMethod.POST.name())) {
             //create insert transaction object
             ElasticData elasticData = new ElasticData(integrationData.getDataParams(), integrationData.getDataObject());
 
@@ -69,7 +69,7 @@ public class ElasticProcessor implements Processor {
             LOG.info("ES Insert response: " + response);
 
         }
-        else if (httpMethod.equals(HttpMethods.PUT.name())) {
+        else if (httpMethod.equals(HttpMethod.PUT.name())) {
             //create search transaction object
             ElasticSearchRequest elasticSearchRequest = this.getElasticSearchRequest(integrationData);
 
@@ -89,7 +89,7 @@ public class ElasticProcessor implements Processor {
             }
 
         }
-        else if (httpMethod.equals(HttpMethods.DELETE.name())) {
+        else if (httpMethod.equals(HttpMethod.DELETE.name())) {
             /**
              * Method 1. Camel does not transmits body in DELETE verbs
              */
@@ -117,7 +117,7 @@ public class ElasticProcessor implements Processor {
             for(Hit hit : elasticSearchResponse.getHits().getHits()) {
                 LOG.info(hit.getId());
                 //query ES to perform deletion
-                String deleteResponse = camelRestService.send(this.getElasticURI() + "/" + dataType.toString().toLowerCase() + "/" + hit.getId(), null, HttpMethods.DELETE.name());
+                String deleteResponse = camelRestService.send(this.getElasticURI() + "/" + dataType.toString().toLowerCase() + "/" + hit.getId(), null, HttpMethod.DELETE.name());
                 LOG.info("ES Delete index "+hit.getId()+"response: " + deleteResponse);
             }
 

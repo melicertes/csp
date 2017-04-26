@@ -8,7 +8,6 @@ import com.sastix.csp.commons.routes.CamelRoutes;
 import com.sastix.csp.server.service.CamelRestService;
 import com.sastix.csp.server.service.CspUtils;
 import org.apache.camel.*;
-import org.apache.camel.http.common.HttpMethods;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -77,7 +76,7 @@ public class DclProcessor implements Processor {
             }
 
             trustCircleEcspDTO.setTeams(teams);
-            producerTemplate.sendBodyAndHeader(CamelRoutes.ECSP, ExchangePattern.InOut, trustCircleEcspDTO, Exchange.HTTP_METHOD, httpMethod);
+            //AVOID this: producerTemplate.sendBodyAndHeader(CamelRoutes.ECSP, ExchangePattern.InOut, trustCircleEcspDTO, Exchange.HTTP_METHOD, httpMethod); // if used, ends in multicast ...
             exchange.getIn().setHeader("recipients", CamelRoutes.ECSP);
             exchange.getIn().setBody(trustCircleEcspDTO);
 

@@ -4,6 +4,7 @@ import com.sastix.csp.client.TrustCirclesClient;
 import com.sastix.csp.client.config.CspRestTemplateConfiguration;
 import com.sastix.csp.client.config.TrustCirclesClientConfig;
 import com.sastix.csp.commons.client.RetryRestTemplate;
+import com.sastix.csp.commons.model.TrustCircle;
 import com.sastix.csp.commons.routes.ContextUrl;
 import com.sastix.csp.integration.MockUtils;
 import com.sastix.csp.integration.TestUtil;
@@ -56,13 +57,10 @@ public class TcClientSandboxTest {
     public void getExternalCspsTest() throws IOException {
         MockRestServiceServer mockServer = MockRestServiceServer.bindTo(retryRestTemplate).build();
         mockServer.expect(requestTo(trustCirclesContext))
-                .andRespond(withSuccess(TestUtil.convertObjectToJsonBytes(mockUtils.getMockedTrustCircle(14,"http://external.csp%s.com")),TestUtil.APPLICATION_JSON_UTF8));
+                .andRespond(withSuccess(TestUtil.convertObjectToJsonBytes(mockUtils.getMockedTrustCircle(14)), TestUtil.APPLICATION_JSON_UTF8));
 
-        List<String> ecsps = tcClient.getCsps("localhost");
-        assertThat(ecsps.size(), is(14));
-        ecsps.forEach(str->{
-            assertThat(str, containsString("http://external.csp"));
-        });
+        TrustCircle trustCircle = tcClient.getTrustCircle(1);
+        assertThat(trustCircle.getTeams().size(), is(14));
 
         mockServer.verify();
     }

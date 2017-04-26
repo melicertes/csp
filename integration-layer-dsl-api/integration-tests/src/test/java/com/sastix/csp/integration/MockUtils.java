@@ -1,10 +1,7 @@
 package com.sastix.csp.integration;
 
 import com.sastix.csp.commons.apiHttpStatusResponse.HttpStatusResponseType;
-import com.sastix.csp.commons.model.IntegrationData;
-import com.sastix.csp.commons.model.IntegrationDataType;
-import com.sastix.csp.commons.model.SharingParams;
-import com.sastix.csp.commons.model.TrustCircle;
+import com.sastix.csp.commons.model.*;
 import com.sastix.csp.commons.routes.ContextUrl;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.model.RouteDefinition;
@@ -35,16 +32,38 @@ public class MockUtils {
     /**
      * examples: getMockedTrustCircle(3, "http://external.csp%s.com")
      * */
-    public TrustCircle getMockedTrustCircle(int count, String strWithCountArg){
+    public TrustCircle getMockedTrustCircle(int count){
         TrustCircle trustCircle = new TrustCircle();
-        List<String> listCsps = new ArrayList<>();
+        //List<String> listCsps = new ArrayList<>();
+        List<Integer> teamList = new ArrayList<>();
         for(int i=0; i< count;i++) {
-            listCsps.add(String.format(strWithCountArg,""+(i+1)));
+            //listCsps.add(String.format(strWithCountArg,""+(i+1)));
+            teamList.add(i);
         }
-        trustCircle.setCsps(listCsps);
+        trustCircle.setTeams(teamList);
         return trustCircle;
     }
 
+
+    public List<Team> getMockedTeams(int count, String strWithCountArg){
+        List<Team> ret = new ArrayList<>();
+        for(int i=0; i< count;i++) {
+            Team t= new Team();
+            t.setUrl(String.format(strWithCountArg,""+(i+1)));
+            ret.add(t);
+        }
+        return ret;
+    }
+
+    public Team getMockedTeam(int id, String strWithCountArg) {
+        Team team = new Team();
+        team.setUrl(String.format(strWithCountArg, "" + id));
+
+
+        return team;
+    }
+
+    /*@Deprecated
     public TrustCircle getMockedTrustCircle(String... mockedECsp){
         TrustCircle trustCircle = new TrustCircle();
         List<String> listCsps = new ArrayList<>();
@@ -53,7 +72,7 @@ public class MockUtils {
         }
         trustCircle.setCsps(listCsps);
         return trustCircle;
-    }
+    }*/
 
     public void sendFlow1IntegrationData(MockMvc mvc, Boolean isExternal) throws Exception {
         IntegrationData integrationData = new IntegrationData();

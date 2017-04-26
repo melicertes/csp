@@ -24,7 +24,8 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
         "nis_team_types",
         "nis_sectors",
         "created",
-        "status"
+        "status",
+        "csp_id"
 })
 public class Team {
 
@@ -54,6 +55,10 @@ public class Team {
     private String created;
     @JsonProperty("status")
     private Integer status;
+
+    @JsonProperty("csp_id")
+    private String cspId;
+
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
@@ -185,6 +190,16 @@ public class Team {
     @JsonProperty("status")
     public void setStatus(Integer status) {
         this.status = status;
+    }
+
+    @JsonProperty("csp_id")
+    public String getCspId() {
+        return cspId;
+    }
+
+    @JsonProperty("csp_id")
+    public void setCspId(String cspId) {
+        this.cspId = cspId;
     }
 
     @JsonAnyGetter

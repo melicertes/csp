@@ -33,8 +33,11 @@ public class EdclProcessor implements Processor {
     @Autowired
     ObjectMapper objectMapper;
 
+    private boolean authorized = false;
+
     @Override
     public void process(Exchange exchange) throws IOException {
+        List<String> recipients = new ArrayList<>();
         IntegrationData integrationData = cspUtils.getExchangeData(exchange, IntegrationData.class);
         String httpMethod = (String) exchange.getIn().getHeader(Exchange.HTTP_METHOD);
 
@@ -49,9 +52,18 @@ public class EdclProcessor implements Processor {
         for (Integer id : tc.getTeams()){
             byte[] dataTeam = (byte[]) producerTemplate.sendBodyAndHeader(CamelRoutes.TCT, ExchangePattern.InOut, id, Exchange.HTTP_METHOD, "GET");
             Team team = objectMapper.readValue(dataTeam, Team.class);
-            teams.add(team);
+            if (team.getCspId().equals(integrationData.getDataParams().getCspId())){
+                authorized = true;
+            }
+
         }
 
-        integrationData.getSharingParams().setIsExternal(true);
+        if (authorized){
+            integrationData.getSharingParams().setIsExternal(true);
+            integrationData.getSharingParams().setToShare(false);
+            recipients.add(CamelRoutes.DSL);
+            exchange.getIn().setHeader("recipients", recipients);
+        }
+
     }
 }

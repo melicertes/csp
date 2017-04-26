@@ -28,11 +28,11 @@ public class TrustCirclesClientImpl implements TrustCirclesClient {
     }
 
     @Override
-    public List<String> getCsps(Integer id) {
+    public TrustCircle getTrustCircle(Integer id) {
         String url = context+ ContextUrl.TRUST_CIRCLE;
         LOG.debug("API call [post]: " + url);
         TrustCircle trustCircle = retryRestTemplate.postForObject(url, new Csp(id), TrustCircle.class);
-        return trustCircle.getCsps();
+        return trustCircle;
     }
 
     @Override
