@@ -1,9 +1,13 @@
 package eu.europa.csp.vcbadmin.controller;
 
+import java.time.Duration;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import javax.validation.Valid;
@@ -16,27 +20,35 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import eu.europa.csp.vcbadmin.config.OpenfireProperties;
+import eu.europa.csp.vcbadmin.config.editors.DurationEditor;
+import eu.europa.csp.vcbadmin.config.editors.ZoneDateTimeEditor;
 import eu.europa.csp.vcbadmin.constants.MeetingScheduledTaskType;
 import eu.europa.csp.vcbadmin.constants.MeetingStatus;
+import eu.europa.csp.vcbadmin.model.EmailTemplate;
 import eu.europa.csp.vcbadmin.model.Meeting;
 import eu.europa.csp.vcbadmin.model.MeetingForm;
 import eu.europa.csp.vcbadmin.model.MeetingScheduledTask;
 import eu.europa.csp.vcbadmin.model.User;
+import eu.europa.csp.vcbadmin.repository.EmailTemplateRepository;
 import eu.europa.csp.vcbadmin.repository.MeetingRepository;
 import eu.europa.csp.vcbadmin.repository.UserRepository;
+import eu.europa.csp.vcbadmin.service.EmailService;
 import eu.europa.csp.vcbadmin.service.MeetingNotFound;
 import eu.europa.csp.vcbadmin.service.MeetingService;
 
-@Validated
 @Controller
 public class MeetingController {
 	private static final Logger log = LoggerFactory.getLogger(MeetingController.class);
+	private static final String EMAIL_PATTERN = "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@"
+			+ "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
 	@Autowired
 	MeetingRepository meetingRepository;
 
@@ -47,6 +59,12 @@ public class MeetingController {
 	UserRepository userRepository;
 	private OpenfireProperties openFireProperties;
 
+	@Autowired
+	EmailService emailService;
+	
+	@Autowired
+	EmailTemplateRepository emailTemplateRepository;
+	
 	@GetMapping("/createMeeting")
 	public String showForm(MeetingForm formMeeting) {
 		return "createMeeting";
@@ -57,15 +75,41 @@ public class MeetingController {
 		this.openFireProperties = properties;
 	}
 
+	@InitBinder("meetingForm")
+	public void dataBinding(WebDataBinder binder) {
+
+		binder.registerCustomEditor(ZonedDateTime.class,
+				new ZoneDateTimeEditor(DateTimeFormatter.ISO_ZONED_DATE_TIME, true));
+		binder.registerCustomEditor(Duration.class, new DurationEditor("HH:mm", true));
+
+		// binder.addCustomFormatter(new DurationFormatter("HH:mm"),
+		// "duration");
+		// binder.addCustomFormatter(new
+		// ZoneDateTimeFormatter(DateTimeFormatter.ISO_ZONED_DATE_TIME),"start");
+	}
+
 	@PostMapping("/createMeeting")
-	public String checkPersonInfo(@Valid MeetingForm meetingForm, BindingResult bindingResult, Authentication auth) {
-		// System.out.println(bindingResult.getAllErrors());
+	public String checkPersonInfo(@Valid @ModelAttribute("meetingForm") MeetingForm meetingForm,
+			BindingResult bindingResult, Authentication auth) {
 		List<String> emails = meetingForm.getEmails().stream().filter(s -> s != null && !s.isEmpty())
 				.collect(Collectors.toList());
 		if (emails.isEmpty()) {
-			bindingResult.reject("emails");
-			// bindingResult.addError(new ObjectError("emails", "Participants
-			// list should not be empty"));
+			bindingResult.rejectValue("emails", "errors.emails.empty", "Please provide at least one participant");
+		} else {
+			for (String email : emails) {
+				Pattern pattern = Pattern.compile(EMAIL_PATTERN);
+				Matcher matcher = pattern.matcher(email);
+				if (!matcher.matches()) {
+					bindingResult.rejectValue("emails", "errors.emails.malformed", "Some emails are not well-formed");
+				}
+			}
+		}
+		if (meetingForm.getDuration() != null) {
+			if (meetingForm.getDuration().compareTo(Duration.ofHours(8)) > 0
+					|| meetingForm.getDuration().compareTo(Duration.ofMinutes(30)) < 0) {
+				bindingResult.rejectValue("duration", "errors.duration.hour.limits",
+						"Duration hours must [00:30-8:00]");
+			}
 		}
 		if (bindingResult.hasErrors()) {
 			return "createMeeting";
@@ -77,7 +121,7 @@ public class MeetingController {
 		Optional<User> user = userRepository.findByEmail(auth.getName());
 		Meeting m = MeetingForm.createMeetingFromForm(meetingForm, user.get());
 		String url = String.format("https://%s:%s/ofmeet/?r=%s", openFireProperties.getVideobridgeHost(),
-				openFireProperties.getVideobridgeHost(), m.getRoom());
+				openFireProperties.getVideobridgeEndpointPort(), m.getRoom());
 		m.setUrl(url);
 		log.info("Start of meeting: {}", m.getStart());
 		log.info("Now - 30 min: {}", ZonedDateTime.now().minusMinutes(30));
@@ -111,7 +155,7 @@ public class MeetingController {
 		}
 		return "redirect:/listMeeting";
 	}
-
+	
 	@GetMapping("/listMeeting")
 	public String showMeeting(Model model, Authentication auth) {
 		Iterable<Meeting> meetings = meetingRepository.findByUserEmailAndStatusOrStatus(auth.getName(),
@@ -120,6 +164,9 @@ public class MeetingController {
 				MeetingStatus.Cancel, MeetingStatus.Completed, MeetingStatus.Expired);
 		model.addAttribute("meetings", meetings);
 		model.addAttribute("pastMeetings", pastMeetings);
+		
+		 Optional<User> u = userRepository.findByEmail(auth.getName());
+		emailService.prepareAndSendInvitation(u.get().getInvitation(),  meetings.iterator().next());
 		return "listMeeting";
 	}
 }

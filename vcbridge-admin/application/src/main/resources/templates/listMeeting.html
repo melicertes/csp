@@ -38,7 +38,7 @@
 											<th scope="row"><input type="checkbox" name="id"
 												th:value="${meeting.id}"></input></th>
 											<td th:text="${{meeting.start}}">start</td>
-											<td th:text="${meeting.durationAsTime}">duration</td>
+											<td th:text="${{meeting.duration}}">duration</td>
 											<td th:text="${#lists.size(meeting.participants)}">#ofparticipants</td>
 											<td th:text="${meeting.status}">status</td>
 										</tr>

@@ -9,10 +9,13 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 //import javax.validation.constraints.NotNull;
 import javax.validation.constraints.NotNull;
+
+import org.hibernate.engine.internal.Cascade;
 
 //import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -52,6 +55,28 @@ public class User {
 
 	public User() {
 	}
+	
+	public EmailTemplate getInvitation() {
+		return invitation;
+	}
+
+	public void setInvitation(EmailTemplate invitation) {
+		this.invitation = invitation;
+	}
+
+	public EmailTemplate getCancellation() {
+		return cancellation;
+	}
+
+	public void setCancellation(EmailTemplate cancellation) {
+		this.cancellation = cancellation;
+	}
+
+	@OneToOne
+	private EmailTemplate invitation;
+	
+	@OneToOne
+	private EmailTemplate cancellation;
 
 	@OneToMany(mappedBy = "user")
 	private List<Meeting> meetings;

@@ -87,7 +87,7 @@ public class OpenfireService {
 		// AuthenticationToken("a62nV75X8MgB7sxu");
 		// Set Openfire settings (9090 is the port of Openfire Admin Console)
 		RestApiClient restApiClient = new RestApiClient(properties.getVideobridgeHost(),
-				Integer.valueOf(properties.getVideobridgePort()), authenticationToken);
+				Integer.valueOf(properties.getVideobridgeAdminPort()), authenticationToken);
 		log.info("Creating room {}...", meeting.getRoom());
 		// Create a new chat room (chatroom id, chatroom name, description).
 		// There are more chatroom settings available.
@@ -158,7 +158,7 @@ public class OpenfireService {
 		// AuthenticationToken("a62nV75X8MgB7sxu");
 		// Set Openfire settings (9090 is the port of Openfire Admin Console)
 		RestApiClient restApiClient = new RestApiClient(properties.getVideobridgeHost(),
-				Integer.valueOf(properties.getVideobridgePort()), authenticationToken);
+				Integer.valueOf(properties.getVideobridgeAdminPort()), authenticationToken);
 		log.info("Deleting room {}...", meeting.getRoom());
 		// Delete a chat room
 		try {

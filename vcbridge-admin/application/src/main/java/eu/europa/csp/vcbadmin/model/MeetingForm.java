@@ -55,10 +55,10 @@ public class MeetingForm {
 	}
 
 	@NotNull
-	// @DateTimeFormat(iso=ISO.DATE_TIME)
+	//@DateTimeFormat(iso=ISO.DATE_TIME)
 	private ZonedDateTime start;
 	@NotNull
-	// @DateTimeFormat(iso=ISO.TIME)
+	//@DateTimeFormat(iso = ISO.TIME)
 	private Duration duration;
 	@NotNull
 	private LinkedList<String> emails = new LinkedList<>();

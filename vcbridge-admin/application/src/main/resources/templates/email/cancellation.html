@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+<meta name="description" content="Login" />
+<meta name="author" content="Dimis - Sastix" />
+<meta name="keyword" content="SCX videoconference" />
+<!-- <link rel="shortcut icon" href="assets/ico/favicon.png"> -->
+<title>Meeting notification</title>
+</head>
+<body class="app flex-row align-items-center">
+	<h3>Dear <span th:text="${email}"></span>,</h3>
+	<p>he meeting at <span th:text="${meeting_date}"></span> and <span th:text="${meeting_time}"></span> has been cancelled.</p>
+	
+	Best regards,
+	<p><span th:text="${user_first}"></span>,<span th:text="${user_lastname}"></span></p>
+</body>
+</html>
