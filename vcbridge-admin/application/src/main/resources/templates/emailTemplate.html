@@ -1,0 +1,122 @@
+<!--
+ * CoreUI - Open Source Bootstrap Admin Template
+ * @version v1.0.0-alpha.4
+ * @link http://coreui.io
+ * Copyright (c) 2017 creativeLabs Łukasz Holeczek
+ * @license MIT
+ -->
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorator="layout">
+
+<div layout:fragment="content">
+	<div
+		class="app header-fixed sidebar-fixed aside-menu-fixed aside-menu-hidden">
+		<br/>
+		<div class="col-md-12">
+			<div class="card-group">
+			<div class="card p-4">
+				<form action="#" th:action="@{/saveEmailTemplates}"
+					th:object="${emailTemplates}" method="post"
+					class="form-horizontal ">
+					<div class="card p-4">
+						<div class="card-header">
+							<strong>Email for meeting invitation</strong>
+						</div>
+
+						<div class="card-block">
+							<div>
+								<div class="form-group row">
+									<label class="col-md-3 form-control-label"
+										for="invitation.subject">Subject</label>
+									<div class="col-md-9">
+										<input type="text" th:field="*{invitation.subject}"
+											class="form-control" placeholder="Enter invitation subject.." />
+									</div>
+								</div>
+								<div class="form-group row">
+									<div class="col-md-12">
+										<textarea th:field="*{invitation.content}"
+											class="form-control" placeholder="Enter invitation content.."></textarea>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="card p-4">
+						<div class="card-header">
+							<strong>Email for meeting cancellation</strong>
+						</div>
+						<div class="card-block">
+							<div>
+
+								<div class="form-group row">
+									<label class="col-md-3 form-control-label"
+										for="cancellation.subject">Subject</label>
+									<div class="col-md-9">
+										<input type="text" th:field="*{cancellation.subject}"
+											class="form-control"
+											placeholder="Enter cancellation subject.." />
+									</div>
+								</div>
+								<div class="form-group row">
+									<div class="col-md-12">
+										<textarea th:field="*{cancellation.content}"
+											class="form-control" placeholder="Enter cancellation content"></textarea>
+									</div>
+								</div>
+
+
+							</div>
+
+						</div>
+
+
+
+					</div>
+					<div class="row pull-right">
+						<div class="col-6">
+							<button type="submit" class="btn btn-primary px-4">Save
+								Changes</button>
+						</div>
+						<div class="col-6">
+							<button type="submit" class="btn btn-primary px-4">Cancel</button>
+						</div>
+					</div>
+				</form>
+			</div>
+			<div class="card p-4">
+						<div class="card-header">
+							<strong>Variables allowed in templates</strong>
+						</div>
+						<div class="card-block">
+							<div>
+								<ul>
+								<li>{email} - user email</li>
+								<li>{meeting_date} - date in dd/MM/yyyy format</li>
+								<li>{meeting_time} - time in HH:mm ZZZ (timezone) format</li>
+								</ul>
+								<ul>
+								<li>{meeting_username} - the generated/unique username for the participant</li>
+								<li>{meeting_password} - the generated/unique password for the participant</li>
+								<li>{user_first} - user first name</li>
+								<li>{user_lastname} - user last name</li>
+								</ul>
+								
+
+
+							</div>
+
+						</div>
+
+
+
+					</div>
+			</div>
+		</div>
+	</div>
+</div>
+<div layout:fragment="scripts"></div>
+</html>

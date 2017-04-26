@@ -1,6 +1,7 @@
 package eu.europa.csp.vcbadmin.service;
 
 import java.util.ArrayList;
+import java.util.Optional;
 
 import javax.ws.rs.core.Response;
 
@@ -20,6 +21,8 @@ import org.springframework.stereotype.Service;
 import eu.europa.csp.vcbadmin.config.OpenfireProperties;
 import eu.europa.csp.vcbadmin.model.Meeting;
 import eu.europa.csp.vcbadmin.model.Participant;
+import eu.europa.csp.vcbadmin.model.User;
+import eu.europa.csp.vcbadmin.repository.EmailTemplateRepository;
 import eu.europa.csp.vcbadmin.service.exception.ErrorAddingUserToMeeting;
 import eu.europa.csp.vcbadmin.service.exception.ErrorCreatingRoom;
 import eu.europa.csp.vcbadmin.service.exception.ErrorCreatingUser;
@@ -146,8 +149,7 @@ public class OpenfireService {
 				}
 			});
 			log.info("User {} added to room {}", participant.getUsername(), meeting.getRoom());
-		}
-
+		}		
 	}
 
 	public void deleteMeeting(Meeting meeting) {

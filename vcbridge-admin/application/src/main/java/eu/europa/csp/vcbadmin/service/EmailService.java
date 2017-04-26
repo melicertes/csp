@@ -11,6 +11,7 @@ import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.mail.javamail.MimeMessagePreparator;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import eu.europa.csp.vcbadmin.model.EmailTemplate;
@@ -26,8 +27,9 @@ public class EmailService {
 	@Autowired
 	MailContentBuilder mailContentBuilder;
 
-	public void prepareAndSendInvitation(EmailTemplate et, Meeting meeting) {
-		//System.out.println("Participants!!:: " + meeting.getParticipants());
+	@Async
+	public void prepareAndSend(EmailTemplate et, Meeting meeting) {
+		// System.out.println("Participants!!:: " + meeting.getParticipants());
 		for (Participant p : meeting.getParticipants()) {
 			Map<String, String> m = new HashMap<>();
 			// MimeMessageHelper messageHelper = new MimeMessageHelper(new
@@ -35,10 +37,10 @@ public class EmailService {
 
 			MimeMessagePreparator messagePreparator = mimeMessage -> {
 				MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage);
-				//messageHelper.setFrom(meeting.getUser().getEmail());
+				// messageHelper.setFrom(meeting.getUser().getEmail());
 				messageHelper.setFrom("noreply@allaboutcar.com.cy");
 				messageHelper.setTo(p.getEmail());
-				
+
 				m.put("email", p.getEmail());
 				m.put("meeting_date", meeting.getStart().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
 				m.put("meeting_time", meeting.getStart().format(DateTimeFormatter.ofPattern("HH:mm ZZZ")));
@@ -46,22 +48,21 @@ public class EmailService {
 				m.put("meeting_password", p.getPassword());
 				m.put("user_first", meeting.getUser().getFirstName());
 				m.put("user_lastname", meeting.getUser().getLastName());
-				
-				String subject = mailContentBuilder.build(et.getSubject(), m,false);
+
+				String subject = mailContentBuilder.build(et.getSubject(), m, false);
 				messageHelper.setSubject(subject);
 
-				
-
-				String content = mailContentBuilder.build(et.getContent(), m,true);
+				String content = mailContentBuilder.build(et.getContent(), m, true);
 
 				messageHelper.setText(content, true);
 			};
-			 try {
-			 mailSender.send(messagePreparator);
-			 } catch (MailException e) {
-				 log.error("Error sending email to "+p.getEmail(),e);
-			 // runtime exception; compiler will not force you to handle it
-			 }
+			try {
+				mailSender.send(messagePreparator);
+			} catch (MailException e) {
+				log.error("Error sending email to " + p.getEmail(), e);
+				// runtime exception; compiler will not force you to handle it
+			}
+			log.info("Email sent to {}", p.getEmail());
 		}
 	}
 }

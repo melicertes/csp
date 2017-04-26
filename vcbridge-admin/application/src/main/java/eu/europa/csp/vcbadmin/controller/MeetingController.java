@@ -57,13 +57,10 @@ public class MeetingController {
 
 	@Autowired
 	UserRepository userRepository;
+	
 	private OpenfireProperties openFireProperties;
 
-	@Autowired
-	EmailService emailService;
 	
-	@Autowired
-	EmailTemplateRepository emailTemplateRepository;
 	
 	@GetMapping("/createMeeting")
 	public String showForm(MeetingForm formMeeting) {
@@ -125,7 +122,7 @@ public class MeetingController {
 		m.setUrl(url);
 		log.info("Start of meeting: {}", m.getStart());
 		log.info("Now - 30 min: {}", ZonedDateTime.now().minusMinutes(30));
-		if (ZonedDateTime.now().minusMinutes(30).isAfter(m.getStart())) {
+		if (m.getStart().minusMinutes(30).isBefore(ZonedDateTime.now())) {
 			meetingService.createMeeting(m,
 					Arrays.asList(
 							MeetingScheduledTask.getNewCompleted(MeetingScheduledTaskType.START_MEETING,
@@ -164,9 +161,6 @@ public class MeetingController {
 				MeetingStatus.Cancel, MeetingStatus.Completed, MeetingStatus.Expired);
 		model.addAttribute("meetings", meetings);
 		model.addAttribute("pastMeetings", pastMeetings);
-		
-		 Optional<User> u = userRepository.findByEmail(auth.getName());
-		emailService.prepareAndSendInvitation(u.get().getInvitation(),  meetings.iterator().next());
 		return "listMeeting";
 	}
 }

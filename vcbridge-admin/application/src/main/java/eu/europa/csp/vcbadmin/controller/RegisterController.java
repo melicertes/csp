@@ -74,7 +74,7 @@ public class RegisterController {
 		log.debug("Constructing init cancellation email for user {}",user.getEmail());
 		et = new EmailTemplate();
 		et.setSubject("Meeting cancellation: ${meeting_date} ${meeting_time}");
-		content = new Scanner(invitationHTML.getInputStream(), "utf-8").useDelimiter("\\Z").next();
+		content = new Scanner(cancellationHTML.getInputStream(), "utf-8").useDelimiter("\\Z").next();
 		et.setContent(content);
 		et.setType(EmailTemplateType.CANCELLATION);
 		et.setUser(user);

@@ -2,6 +2,7 @@ package eu.europa.csp.vcbadmin.model;
 
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -14,8 +15,6 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 //import javax.validation.constraints.NotNull;
 import javax.validation.constraints.NotNull;
-
-import org.hibernate.engine.internal.Cascade;
 
 //import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -55,7 +54,7 @@ public class User {
 
 	public User() {
 	}
-	
+
 	public EmailTemplate getInvitation() {
 		return invitation;
 	}
@@ -72,10 +71,10 @@ public class User {
 		this.cancellation = cancellation;
 	}
 
-	@OneToOne
+	@OneToOne(cascade = CascadeType.ALL)
 	private EmailTemplate invitation;
-	
-	@OneToOne
+
+	@OneToOne(cascade = CascadeType.ALL)
 	private EmailTemplate cancellation;
 
 	@OneToMany(mappedBy = "user")
