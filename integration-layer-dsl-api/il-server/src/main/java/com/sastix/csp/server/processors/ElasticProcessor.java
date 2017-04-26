@@ -64,8 +64,6 @@ public class ElasticProcessor implements Processor {
             //create insert transaction object
             ElasticData elasticData = new ElasticData(integrationData.getDataParams(), integrationData.getDataObject());
 
-            LOG.info("IS POST");
-
             //query ES for insertion
             String response = camelRestService.send(this.getElasticURI() + "/" + dataType.toString().toLowerCase() + "?pretty", elasticData, httpMethod);
             LOG.info("ES Insert response: " + response);
@@ -76,7 +74,7 @@ public class ElasticProcessor implements Processor {
             ElasticSearchRequest elasticSearchRequest = this.getElasticSearchRequest(integrationData);
 
             //query ES to get IDs
-            String response = camelRestService.send(this.getElasticURI() + "/" + dataType.toString().toLowerCase() + "/_search", elasticSearchRequest, HttpMethods.POST.name());
+            String response = camelRestService.send(this.getElasticURI() + "/" + dataType.toString().toLowerCase() + "/_search?pretty&_source=false", elasticSearchRequest, HttpMethods.POST.name());
             LOG.info("ES Search response: " + response);
 
             //create update transaction object
@@ -86,8 +84,8 @@ public class ElasticProcessor implements Processor {
             for(Hit hit : elasticSearchResponse.getHits().getHits()) {
                 LOG.info(hit.getId());
                 //query ES to perform update
-                String updateResponse = camelRestService.send(this.getElasticURI() + "/" + dataType.toString().toLowerCase() + "/" + hit.getId() + "/_update", elasticData, HttpMethods.POST.name());
-                LOG.info("ES Update index "+hit.getId()+"response: " + updateResponse);
+                String updateResponse = camelRestService.send(this.getElasticURI() + "/" + dataType.toString().toLowerCase() + "/" + hit.getId() + "", elasticData, HttpMethods.POST.name());
+                LOG.info("ES Update index "+hit.getId()+" response: " + updateResponse);
             }
 
         }
@@ -112,7 +110,7 @@ public class ElasticProcessor implements Processor {
             ElasticSearchRequest elasticSearchRequest = this.getElasticSearchRequest(integrationData);
 
             //query ES to get IDs
-            String response = camelRestService.send(this.getElasticURI() + "/" + dataType.toString().toLowerCase() + "/_search", elasticSearchRequest, HttpMethods.POST.name());
+            String response = camelRestService.send(this.getElasticURI() + "/" + dataType.toString().toLowerCase() + "/_search?pretty&_source=false", elasticSearchRequest, HttpMethods.POST.name());
             LOG.info("ES Search response: " + response);
 
             ElasticSearchResponse elasticSearchResponse = new ObjectMapper().readValue(response, ElasticSearchResponse.class);
@@ -171,7 +169,7 @@ public class ElasticProcessor implements Processor {
 
         ElasticSearchRequest elasticSearchRequest = new ElasticSearchRequest();
         elasticSearchRequest.setQuery(this.getElasticQuery(integrationData));
-        elasticSearchRequest.setFields(fields);
+        //elasticSearchRequest.setFields(fields);
 
         return elasticSearchRequest;
     }
