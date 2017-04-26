@@ -8,8 +8,8 @@
         <groupId>com.sastix.csp</groupId>
         <artifactId>parent-pom</artifactId>
         <version>0.0.1-SNAPSHOT</version>
-        <relativePath/>
-        <!--<relativePath>../pom.xml</relativePath>-->
+        <!--<relativePath/>-->
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
     <groupId>com.sastix.csp</groupId>
@@ -70,13 +70,13 @@
         </dependency>
     </dependencies>
 
-    <!--<build>-->
-        <!--<plugins>-->
-            <!--<plugin>-->
-                <!--<groupId>org.springframework.boot</groupId>-->
-                <!--<artifactId>spring-boot-maven-plugin</artifactId>-->
-            <!--</plugin>-->
-        <!--</plugins>-->
-    <!--</build>-->
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>

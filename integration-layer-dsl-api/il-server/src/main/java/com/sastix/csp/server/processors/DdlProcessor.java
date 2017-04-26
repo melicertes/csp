@@ -37,7 +37,7 @@ public class DdlProcessor implements Processor {
         }
 
         //producerTemplate.sendBodyAndHeader(CamelRoutes.ELASTIC, ExchangePattern.InOut,integrationData, Exchange.HTTP_METHOD, httpMethod);
-//        recipients.add(CamelRoutes.ELASTIC);
+        recipients.add(CamelRoutes.ELASTIC);
         exchange.getIn().setHeader("recipients", recipients);
 //        exchange.getIn().setHeader(Exchange.HTTP_METHOD,httpMethod);
         exchange.getIn().setBody(integrationData);
