@@ -29,9 +29,9 @@ public class TrustCirclesClientImpl implements TrustCirclesClient {
 
     @Override
     public TrustCircle getTrustCircle(Integer id) {
-        String url = context+ ContextUrl.TRUST_CIRCLE;
+        String url = context + ContextUrl.TRUST_CIRCLE + id;
         LOG.debug("API call [post]: " + url);
-        TrustCircle trustCircle = retryRestTemplate.postForObject(url, new Csp(id), TrustCircle.class);
+        TrustCircle trustCircle = retryRestTemplate.getForObject(url, TrustCircle.class);
         return trustCircle;
     }
 
