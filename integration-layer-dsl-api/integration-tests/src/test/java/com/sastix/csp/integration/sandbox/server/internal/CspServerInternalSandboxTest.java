@@ -7,6 +7,7 @@ import com.sastix.csp.commons.routes.CamelRoutes;
 import com.sastix.csp.integration.MockUtils;
 import com.sastix.csp.integration.TestUtil;
 import com.sastix.csp.server.IntegrationLayerDslApiApplication;
+import com.sastix.csp.server.routes.RouteUtils;
 import org.apache.camel.*;
 import org.apache.camel.component.mock.MockEndpoint;
 import org.apache.camel.spring.SpringCamelContext;
@@ -40,10 +41,12 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
 @SpringBootTest(classes = {IntegrationLayerDslApiApplication.class, MockUtils.class},
         properties = {
                 "csp.retry.backOffPeriod:10",
-                "csp.retry.maxAttempts:1"
+                "csp.retry.maxAttempts:1",
+                "embedded.activemq.start:true",
+                "apache.camel.use.activemq:true",
         })
 @MockEndpointsAndSkip("http:*")
-public class CspServerInternalSandboxTest {
+public class CspServerInternalSandboxTest implements CamelRoutes{
     private static final Logger LOG = LoggerFactory.getLogger(CspServerInternalSandboxTest.class);
 
     @Autowired
@@ -56,23 +59,26 @@ public class CspServerInternalSandboxTest {
     @Autowired
     private WebApplicationContext webApplicationContext;
 
-    @EndpointInject(uri = CamelRoutes.MOCK_PREFIX+":"+CamelRoutes.DSL)
+    @EndpointInject(uri = CamelRoutes.MOCK_PREFIX+":"+DIRECT+":"+CamelRoutes.DSL)
     private MockEndpoint mockedDsl;
 
-    @EndpointInject(uri = CamelRoutes.MOCK_PREFIX+":"+CamelRoutes.DDL)
+    @EndpointInject(uri = CamelRoutes.MOCK_PREFIX+":"+DIRECT+":"+CamelRoutes.DDL)
     private MockEndpoint mockedDdl;
 
-    @EndpointInject(uri = CamelRoutes.MOCK_PREFIX+":"+CamelRoutes.TC)
+    @EndpointInject(uri = CamelRoutes.MOCK_PREFIX+":"+DIRECT+":"+CamelRoutes.TC)
     private MockEndpoint mockedTC;
 
-    @EndpointInject(uri = CamelRoutes.MOCK_PREFIX+":"+CamelRoutes.TCT)
+    @EndpointInject(uri = CamelRoutes.MOCK_PREFIX+":"+DIRECT+":"+CamelRoutes.TCT)
     private MockEndpoint mockedTCT;
 
-    @EndpointInject(uri = CamelRoutes.MOCK_PREFIX+":"+CamelRoutes.ECSP)
+    @EndpointInject(uri = CamelRoutes.MOCK_PREFIX+":"+DIRECT+":"+CamelRoutes.ECSP)
     private MockEndpoint mockedEcsp;
 
     @Autowired
     MockUtils mockUtils;
+
+    @Autowired
+    RouteUtils routes;
 
     @Autowired
     SpringCamelContext springCamelContext;
@@ -84,11 +90,11 @@ public class CspServerInternalSandboxTest {
     public void init() throws Exception {
         mvc = webAppContextSetup(webApplicationContext).build();
         mockUtils.setSpringCamelContext(springCamelContext);
-        mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX,CamelRoutes.DSL);
-        mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX,CamelRoutes.DDL);
-        mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX,CamelRoutes.ECSP);
-        mockUtils.mockRouteSkipSendToOriginalEndpoint(CamelRoutes.MOCK_PREFIX,CamelRoutes.TC);
-        mockUtils.mockRouteSkipSendToOriginalEndpoint(CamelRoutes.MOCK_PREFIX,CamelRoutes.TCT);
+        mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX,routes.apply(DSL),mockedDsl.getEndpointUri());
+        mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX,routes.apply(DDL), mockedDdl.getEndpointUri());
+        mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX,routes.apply(ECSP), mockedEcsp.getEndpointUri());
+        mockUtils.mockRouteSkipSendToOriginalEndpoint(CamelRoutes.MOCK_PREFIX, routes.apply(TC),mockedTC.getEndpointUri());
+        mockUtils.mockRouteSkipSendToOriginalEndpoint(CamelRoutes.MOCK_PREFIX,routes.apply(TCT),mockedTCT.getEndpointUri());
     }
 
     // Use @DirtiesContext on each test method to force Spring Testing to automatically reload the CamelContext after

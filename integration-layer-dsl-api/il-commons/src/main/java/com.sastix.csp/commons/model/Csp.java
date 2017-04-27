@@ -9,6 +9,8 @@ import java.io.Serializable;
  */
 public class Csp implements Serializable {
 
+    private static final long serialVersionUID = 8017306632593895290L;
+
     @JsonProperty("cspId")
     private Integer cspId;
 

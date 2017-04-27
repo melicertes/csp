@@ -4,11 +4,13 @@ import com.sastix.csp.commons.apiHttpStatusResponse.HttpStatusResponseType;
 import com.sastix.csp.commons.exceptions.InvalidDataTypeException;
 import com.sastix.csp.commons.model.IntegrationData;
 import com.sastix.csp.commons.routes.CamelRoutes;
+import com.sastix.csp.server.routes.RouteUtils;
 import org.apache.camel.Exchange;
 import org.apache.camel.Produce;
 import org.apache.camel.ProducerTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,12 +19,15 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class DslApiController {
+public class DslApiController implements CamelRoutes{
 
     private static final Logger LOG = LoggerFactory.getLogger(DslApiController.class);
 
     @Produce
     private ProducerTemplate producerTemplate;
+
+    @Autowired
+    RouteUtils routes;
 
 
     @RequestMapping(value = "/dsl/integrationData",
@@ -51,7 +56,7 @@ public class DslApiController {
             String dataType = integrationData.getDataType().toString();
 
             if (dataType != null) {
-                producerTemplate.sendBodyAndHeader(CamelRoutes.DSL, integrationData, Exchange.HTTP_METHOD, requestMethod);
+                producerTemplate.sendBodyAndHeader(routes.apply(DSL), integrationData, Exchange.HTTP_METHOD, requestMethod);
             } else {
                 throw new InvalidDataTypeException();
             }

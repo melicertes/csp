@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class DSLRoute extends RouteBuilder {
+public class CspRoutes extends RouteBuilder implements CamelRoutes{
 
     @Autowired
     private ExceptionProcessor exceptionProcessor;
@@ -41,6 +41,11 @@ public class DSLRoute extends RouteBuilder {
     @Autowired
     private ElasticProcessor elasticProcessor;
 
+    @Autowired
+    RouteUtils endpoint;
+
+
+
 
     @Override
     public void configure() {
@@ -50,44 +55,44 @@ public class DSLRoute extends RouteBuilder {
 //                .handled(true);
 
 
-        from(CamelRoutes.DSL)
+        from(endpoint.apply(DSL))
                 .process(dslProcessor)
                 .recipientList(header("recipients"));
 
-        from(CamelRoutes.DDL)
+        from(endpoint.apply(DDL))
                 .process(ddlProcessor)
                 .recipientList(header("recipients"));
 
-        from(CamelRoutes.DCL)
+        from(endpoint.apply(DCL))
                 .process(dclProcessor)
                 .recipientList(header("recipients"));
 
-        from(CamelRoutes.EDCL)
+        from(endpoint.apply(EDCL))
                 .process(edclProcessor);
 //                .to(CamelRoutes.DSL);
 
         //TrustCircles Circles routes
-        from(CamelRoutes.TC)
+        from(endpoint.apply(TC))
                 .process(tcProcessor)
                 .marshal().json(JsonLibrary.Jackson, Csp.class);
 
         //TrustCircles Teams routes
-        from(CamelRoutes.TCT)
+        from(endpoint.apply(TCT))
                 .process(teamProcessor)
                 .marshal().json(JsonLibrary.Jackson, Csp.class)
                 .recipientList(header("recipients"));
 
         //ExternalCSPs
-        from(CamelRoutes.ECSP)
+        from(endpoint.apply(ECSP))
                 .process(ecspProcessor);
 
 
         //App routing
-        from(CamelRoutes.APP)
+        from(endpoint.apply(APP))
                 .process(appProcessor);
 
         //Elastic route
-        from(CamelRoutes.ELASTIC)
+        from(endpoint.apply(ELASTIC))
                 .process(elasticProcessor);
 
     }

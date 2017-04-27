@@ -5,6 +5,7 @@ import com.sastix.csp.commons.model.IntegrationData;
 import com.sastix.csp.commons.model.IntegrationDataType;
 import com.sastix.csp.commons.routes.CamelRoutes;
 import com.sastix.csp.commons.routes.HeaderName;
+import com.sastix.csp.server.routes.RouteUtils;
 import com.sastix.csp.server.service.CspUtils;
 import org.apache.camel.*;
 
@@ -19,7 +20,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
-public class DslProcessor implements Processor {
+public class DslProcessor implements Processor,CamelRoutes {
 
     @Produce
     ProducerTemplate producerTemplate;
@@ -29,6 +30,9 @@ public class DslProcessor implements Processor {
 
     @Autowired
     Environment env;
+
+    @Autowired
+    RouteUtils routes;
 
     private static final Logger LOG = LoggerFactory.getLogger(DslProcessor.class);
 
@@ -54,7 +58,7 @@ public class DslProcessor implements Processor {
         }
 
         if(!isExternal){
-            recipients.add(CamelRoutes.DDL);
+            recipients.add(routes.apply(DDL));
         }
 
         for (String app : apps) {
@@ -64,7 +68,7 @@ public class DslProcessor implements Processor {
             Map<String,Object> headers = new HashMap<>();
             headers.put(HeaderName.APP_NAME,app);
             headers.put(Exchange.HTTP_METHOD,exchange.getIn().getHeader(Exchange.HTTP_METHOD));
-            producerTemplate.sendBodyAndHeaders(CamelRoutes.APP, ExchangePattern.InOut,integrationData, headers);
+            producerTemplate.sendBodyAndHeaders(routes.apply(APP), ExchangePattern.InOut,integrationData, headers);
         }
 
         return recipients;
