@@ -59,19 +59,19 @@ public class CspServerInternalSandboxTest implements CamelRoutes{
     @Autowired
     private WebApplicationContext webApplicationContext;
 
-    @EndpointInject(uri = CamelRoutes.MOCK_PREFIX+":"+DIRECT+":"+CamelRoutes.DSL)
+    @EndpointInject(uri = CamelRoutes.MOCK_PREFIX+":"+DIRECT+":"+DSL)
     private MockEndpoint mockedDsl;
 
-    @EndpointInject(uri = CamelRoutes.MOCK_PREFIX+":"+DIRECT+":"+CamelRoutes.DDL)
+    @EndpointInject(uri = CamelRoutes.MOCK_PREFIX+":"+DIRECT+":"+DDL)
     private MockEndpoint mockedDdl;
 
-    @EndpointInject(uri = CamelRoutes.MOCK_PREFIX+":"+DIRECT+":"+CamelRoutes.TC)
+    @EndpointInject(uri = CamelRoutes.MOCK_PREFIX+":"+DIRECT+":"+TC)
     private MockEndpoint mockedTC;
 
-    @EndpointInject(uri = CamelRoutes.MOCK_PREFIX+":"+DIRECT+":"+CamelRoutes.TCT)
+    @EndpointInject(uri = CamelRoutes.MOCK_PREFIX+":"+DIRECT+":"+TCT)
     private MockEndpoint mockedTCT;
 
-    @EndpointInject(uri = CamelRoutes.MOCK_PREFIX+":"+DIRECT+":"+CamelRoutes.ECSP)
+    @EndpointInject(uri = CamelRoutes.MOCK_PREFIX+":"+DIRECT+":"+ECSP)
     private MockEndpoint mockedEcsp;
 
     @Autowired

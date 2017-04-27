@@ -8,6 +8,7 @@ import com.sastix.csp.commons.model.IntegrationDataType;
 import com.sastix.csp.commons.routes.CamelRoutes;
 import com.sastix.csp.integration.MockUtils;
 import com.sastix.csp.server.IntegrationLayerDslApiApplication;
+import com.sastix.csp.server.routes.RouteUtils;
 import org.apache.camel.*;
 import org.apache.camel.component.mock.MockEndpoint;
 import org.apache.camel.spring.SpringCamelContext;
@@ -39,13 +40,20 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
 @SpringBootTest(classes = {IntegrationLayerDslApiApplication.class, MockUtils.class},
         properties = {
                 "csp.retry.backOffPeriod:10",
-                "csp.retry.maxAttempts:1"
+                "csp.retry.maxAttempts:1",
+                "embedded.activemq.start:false",
+                "apache.camel.use.activemq:false",
+                "tc.protocol: http",
+                "tc.host: localhost",
+                "tc.port: 8081",
+                "tc.path.circles:/tc",
+                "tc.path.teams:/tct"
         })
 @MockEndpointsAndSkip("^http://localhost.*adapter.*|http://csp.*|http://ex.*") // by removing this any http requests will be sent as expected.
 // In this test we mock all other http requests except for tc. TC dummy server is expected on 3001 port.
 // To start the TC dummy server:
 // $ APP_NAME=tc PORT=8081 node server.js
-public class CspServerInternalBusinessTcTest {
+public class CspServerInternalBusinessTcTest implements CamelRoutes {
     private static final Logger LOG = LoggerFactory.getLogger(CspServerInternalBusinessTcTest.class);
 
     @Autowired
@@ -58,20 +66,23 @@ public class CspServerInternalBusinessTcTest {
     @Autowired
     private WebApplicationContext webApplicationContext;
 
-    @EndpointInject(uri = CamelRoutes.MOCK_PREFIX+":"+CamelRoutes.DSL)
+    @EndpointInject(uri = CamelRoutes.MOCK_PREFIX+":"+DIRECT+":"+DSL)
     private MockEndpoint mockedDsl;
 
-    @EndpointInject(uri = CamelRoutes.MOCK_PREFIX+":"+CamelRoutes.DDL)
+    @EndpointInject(uri = CamelRoutes.MOCK_PREFIX+":"+DIRECT+":"+DDL)
     private MockEndpoint mockedDdl;
 
-    @EndpointInject(uri = CamelRoutes.MOCK_PREFIX+":"+CamelRoutes.DCL)
+    @EndpointInject(uri = CamelRoutes.MOCK_PREFIX+":"+DIRECT+":"+DCL)
     private MockEndpoint mockedDcl;
 
-    @EndpointInject(uri = CamelRoutes.MOCK_PREFIX+":"+CamelRoutes.TC)
+    @EndpointInject(uri = CamelRoutes.MOCK_PREFIX+":"+DIRECT+":"+TC)
     private MockEndpoint mockedTC;
 
     @Autowired
     MockUtils mockUtils;
+
+    @Autowired
+    RouteUtils routes;
 
     @Autowired
     SpringCamelContext springCamelContext;
@@ -80,10 +91,10 @@ public class CspServerInternalBusinessTcTest {
     public void init() throws Exception {
         mvc = webAppContextSetup(webApplicationContext).build();
         mockUtils.setSpringCamelContext(springCamelContext);
-        mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX,CamelRoutes.DSL);
-        mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX,CamelRoutes.DCL);
-        mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX,CamelRoutes.DDL);
-        mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX,CamelRoutes.TC);
+        mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX,routes.apply(DSL),mockedDsl.getEndpointUri());
+        mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX,routes.apply(DCL),mockedDcl.getEndpointUri());
+        mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX,routes.apply(DDL),mockedDdl.getEndpointUri());
+        mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX,routes.apply(TC),mockedTC.getEndpointUri());
     }
 
     // Use @DirtiesContext on each test method to force Spring Testing to automatically reload the CamelContext after
