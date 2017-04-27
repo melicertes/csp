@@ -32,15 +32,12 @@ import eu.europa.csp.vcbadmin.config.editors.DurationEditor;
 import eu.europa.csp.vcbadmin.config.editors.ZoneDateTimeEditor;
 import eu.europa.csp.vcbadmin.constants.MeetingScheduledTaskType;
 import eu.europa.csp.vcbadmin.constants.MeetingStatus;
-import eu.europa.csp.vcbadmin.model.EmailTemplate;
 import eu.europa.csp.vcbadmin.model.Meeting;
 import eu.europa.csp.vcbadmin.model.MeetingForm;
 import eu.europa.csp.vcbadmin.model.MeetingScheduledTask;
 import eu.europa.csp.vcbadmin.model.User;
-import eu.europa.csp.vcbadmin.repository.EmailTemplateRepository;
 import eu.europa.csp.vcbadmin.repository.MeetingRepository;
 import eu.europa.csp.vcbadmin.repository.UserRepository;
-import eu.europa.csp.vcbadmin.service.EmailService;
 import eu.europa.csp.vcbadmin.service.MeetingNotFound;
 import eu.europa.csp.vcbadmin.service.MeetingService;
 
@@ -57,11 +54,9 @@ public class MeetingController {
 
 	@Autowired
 	UserRepository userRepository;
-	
+
 	private OpenfireProperties openFireProperties;
 
-	
-	
 	@GetMapping("/createMeeting")
 	public String showForm(MeetingForm formMeeting) {
 		return "createMeeting";
@@ -122,22 +117,10 @@ public class MeetingController {
 		m.setUrl(url);
 		log.info("Start of meeting: {}", m.getStart());
 		log.info("Now - 30 min: {}", ZonedDateTime.now().minusMinutes(30));
-		if (m.getStart().minusMinutes(30).isBefore(ZonedDateTime.now())) {
-			meetingService.createMeeting(m,
-					Arrays.asList(
-							MeetingScheduledTask.getNewCompleted(MeetingScheduledTaskType.START_MEETING,
-									m.getStart().minusMinutes(30)),
-							new MeetingScheduledTask(MeetingScheduledTaskType.END_MEETING,
-									m.getExpectedEnd().plusMinutes(30))));
-			// TODO fire immediately the email service and openfire stuff
-		} else {
-			meetingService.createMeeting(m,
-					Arrays.asList(
-							new MeetingScheduledTask(MeetingScheduledTaskType.START_MEETING,
-									m.getStart().minusMinutes(30)),
-							new MeetingScheduledTask(MeetingScheduledTaskType.END_MEETING,
-									m.getExpectedEnd().plusMinutes(30))));
-		}
+
+		meetingService.createMeeting(m, Arrays.asList(
+				new MeetingScheduledTask(MeetingScheduledTaskType.START_MEETING, m.getStart().minusMinutes(30)),
+				new MeetingScheduledTask(MeetingScheduledTaskType.END_MEETING, m.getExpectedEnd().plusMinutes(30))));
 		return "redirect:/listMeeting";
 	}
 
@@ -152,8 +135,8 @@ public class MeetingController {
 		}
 		return "redirect:/listMeeting";
 	}
-	
-	@GetMapping("/listMeeting")
+
+	@GetMapping(value={"/listMeeting","/"})
 	public String showMeeting(Model model, Authentication auth) {
 		Iterable<Meeting> meetings = meetingRepository.findByUserEmailAndStatusOrStatus(auth.getName(),
 				MeetingStatus.Pending, MeetingStatus.Running);

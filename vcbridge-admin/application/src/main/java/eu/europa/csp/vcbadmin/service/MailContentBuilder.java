@@ -10,9 +10,6 @@ import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring4.messageresolver.SpringMessageResolver;
-import org.thymeleaf.templatemode.StandardTemplateModeHandlers;
-
-import eu.europa.csp.vcbadmin.config.StaticTemplateExecutor;
 
 @Service
 public class MailContentBuilder {
@@ -26,18 +23,22 @@ public class MailContentBuilder {
 	}
 
 	@Autowired
+	TemplateEngine emailTemplateEngine;
+	@Autowired
 	MessageSource messageSource;
 
-	public String build(String emailTemplate, Map<String, String> values,boolean html) {
+	public String build(String emailTemplate, Map<String, Object> values, boolean html) {
 		SpringMessageResolver springMessageResolver = new SpringMessageResolver();
+
 		springMessageResolver.setMessageSource(messageSource);
 		Context context = new Context();
 		context.setVariables(values);
 		// context.setVariable("message", message);
-
-		StaticTemplateExecutor templateEngine = new StaticTemplateExecutor(context, springMessageResolver,
-				html?StandardTemplateModeHandlers.HTML5.getTemplateModeName():StandardTemplateModeHandlers.HTML5.getTemplateModeName());
-		String result = templateEngine.processTemplateCode(emailTemplate);
+		// StaticTemplateExecutor templateEngine = new
+		// StaticTemplateExecutor(context,
+		// springMessageResolver,html?TemplateMode.HTML.name():TemplateMode.TEXT.name());
+		// String result = templateEngine.processTemplateCode(emailTemplate);
+		String result = emailTemplateEngine.process(emailTemplate, context);
 		log.info("Prepared text for email:\n {}", result);
 		return result;// , context);
 	}

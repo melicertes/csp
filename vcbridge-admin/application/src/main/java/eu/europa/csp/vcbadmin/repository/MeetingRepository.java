@@ -4,6 +4,7 @@ import java.time.ZonedDateTime;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import eu.europa.csp.vcbadmin.constants.MeetingStatus;
@@ -22,4 +23,15 @@ public interface MeetingRepository extends JpaRepository<Meeting, Long> {
 			MeetingStatus status3);
 
 	List<Meeting> findById(Long id);
+
+	@Modifying(clearAutomatically = true)
+	@Query(value="update vcb_meeting set status = 'Expired' where status='Running' and DATE_ADD(start,INTERVAL duration/1000 MICROSECOND)<?1",nativeQuery = true)
+	void updateRunningToExpired(ZonedDateTime now);
+
+	@Modifying(clearAutomatically = true)
+	@Query("update Meeting m set m.status = 'Running' where m.status='Pending' and m.start <?1")
+	void updatePendingToRunning(ZonedDateTime now);
+
+	// List<Meeting> findByStatusAndStartLessThan(MeetingStatus status,
+	// ZonedDateTime now);
 }

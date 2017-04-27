@@ -38,6 +38,7 @@ public class EmailTemplateController {
 			BindingResult bindingResult, Authentication auth) {
 
 		if (bindingResult.hasErrors()) {
+			log.warn("Email template validation returned errors:\n{}",bindingResult.getAllErrors());
 			return "emailTemplate";
 		}
 

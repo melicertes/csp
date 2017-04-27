@@ -28,7 +28,7 @@
 
 						<div class="card-block">
 							<div>
-								<div class="form-group row">
+								<div class="form-group row" th:classappend="${#fields.hasErrors('invitation.subject')} ? has-danger">
 									<label class="col-md-3 form-control-label"
 										for="invitation.subject">Subject</label>
 									<div class="col-md-9">
@@ -36,7 +36,7 @@
 											class="form-control" placeholder="Enter invitation subject.." />
 									</div>
 								</div>
-								<div class="form-group row">
+								<div class="form-group row" th:classappend="${#fields.hasErrors('invitation.content')} ? has-danger">
 									<div class="col-md-12">
 										<textarea th:field="*{invitation.content}"
 											class="form-control" placeholder="Enter invitation content.."></textarea>
@@ -52,7 +52,7 @@
 						<div class="card-block">
 							<div>
 
-								<div class="form-group row">
+								<div class="form-group row" th:classappend="${#fields.hasErrors('cancellation.subject')} ? has-danger">
 									<label class="col-md-3 form-control-label"
 										for="cancellation.subject">Subject</label>
 									<div class="col-md-9">
@@ -61,7 +61,7 @@
 											placeholder="Enter cancellation subject.." />
 									</div>
 								</div>
-								<div class="form-group row">
+								<div class="form-group row" th:classappend="${#fields.hasErrors('cancellation.content')} ? has-danger">
 									<div class="col-md-12">
 										<textarea th:field="*{cancellation.content}"
 											class="form-control" placeholder="Enter cancellation content"></textarea>

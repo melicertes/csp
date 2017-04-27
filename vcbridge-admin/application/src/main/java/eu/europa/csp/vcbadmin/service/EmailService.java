@@ -31,7 +31,7 @@ public class EmailService {
 	public void prepareAndSend(EmailTemplate et, Meeting meeting) {
 		// System.out.println("Participants!!:: " + meeting.getParticipants());
 		for (Participant p : meeting.getParticipants()) {
-			Map<String, String> m = new HashMap<>();
+			Map<String, Object> m = new HashMap<>();
 			// MimeMessageHelper messageHelper = new MimeMessageHelper(new
 			// MimeMessage((Session)(null)));
 

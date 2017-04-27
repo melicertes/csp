@@ -27,30 +27,45 @@
 						<form id="createMeetingForm" action="#"
 							th:action="@{/createMeeting}" th:object="${meetingForm}"
 							method="post">
-							<div class="input-group mb-3">
+							<div class="input-group mb-3"
+								th:classappend="${#fields.hasErrors('start')} ? has-danger">
 								<span class="input-group-addon"><i class="icon-calendar"></i>
-								</span> <input type="datetime-local" th:value="${{meetingForm.start}}" required="true"
-									class="form-control datetimeinput"
-									placeholder="2011-12-03T10:15:30+01:00" /> <input
-									hidden="true" type="text" class="form-control datetimeoutput"
-									th:field="*{start}" placeholder="2011-12-03T10:15:30+01:00" />
-								<select id="selecttimezone" class="selectpicker" name="timeZone"></select>
+								</span> <input type="datetime-local" th:value="${{meetingForm.start}}"
+									required="true" class="form-control datetimeinput"
+									placeholder="2011-12-03T10:15:30+01:00" />
+								<div th:if="${#fields.hasErrors('start')}" th:errors="*{start}"
+									class="form-control-feedback">Error start</div>
 
-
-								<td th:if="${#fields.hasErrors('start')}" th:errors="*{start}">Start
-									Error</td>
+								<input hidden="true" type="text"
+									class="form-control datetimeoutput" th:field="*{start}"
+									placeholder="2011-12-03T10:15:30+01:00" /> <select
+									id="selecttimezone" class="selectpicker" name="timeZone"></select>
 							</div>
-							<div class="input-group mb-4">
+							<div class="input-group mb-4"
+								th:classappend="${#fields.hasErrors('duration')} ? has-danger">
 								<span class="input-group-addon"><i class="icon-bell"></i>
-								</span> <input type="time" class="form-control" th:field="*{duration}" />
-								<td th:if="${#fields.hasErrors('duration')}"
-									th:errors="*{duration}">Duration Error</td>
+								</span> <input type="time" class="form-control" th:field="*{duration}"></input>
+								<div th:if="${#fields.hasErrors('duration')}"
+									th:errors="*{duration}" class="form-control-feedback">Error
+									duration</div>
+							</div>
+							<div class="form-group">
+								<div class='input-group date' id='datetimepicker1'>
+									<input type='text' class="form-control" /> <span
+										class="input-group-addon"> <span
+										class="glyphicon glyphicon-calendar"></span>
+									</span>
+								</div>
 							</div>
 							<table class="table">
-								<div class="input-group mb-4">
+								<div class="input-group mb-4"
+									th:classappend="${#fields.hasErrors('emails')} ? has-danger">
 									<span class="input-group-addon"><i class="icon-user"></i></span>
 									<input class="form-control" type="email" id="new_email"
 										placeholder="Enter email" />
+									<div th:if="${#fields.hasErrors('emails')}"
+										th:errors="*{emails}" class="form-control-feedback">Error
+										emails</div>
 									<button id="add_field_button" class="btn btn-primary">Add</button>
 								</div>
 								<thead>
@@ -88,52 +103,94 @@
 </div>
 <div layout:fragment="scripts">
 	<script>
-$(document).ready(function() {
-    var max_fields      = 10; //maximum input boxes allowed
-    var wrapper         = $(".input_fields_wrap"); //Fields wrapper
-    var add_button      = $("#add_field_button"); //Add button ID
-    var delete_button      = $("#delete_button"); //Delete button
-    var new_email		= $("#new_email"); // new email input
-    var x = 0; //initlal text box count
+		$(document)
+				.ready(
+						function() {
+							var max_fields = 10; //maximum input boxes allowed
+							var wrapper = $(".input_fields_wrap"); //Fields wrapper
+							var add_button = $("#add_field_button"); //Add button ID
+							var delete_button = $("#delete_button"); //Delete button
+							var new_email = $("#new_email"); // new email input
+							var x = 0; //initlal text box count
 
-	$(delete_button).click(function(e){
-		e.preventDefault();
-		$("tr.useremail").each(function() {
-			$this = $(this)
-			if($(this).find("input.todelete").is(":checked")){
-				$(this).remove();
-			}
-		});
-	});
-    $(add_button).click(function(e){ //on add input button click
-        e.preventDefault();
-    	if(new_email.val() != ""){
-		    $(wrapper).append('<tr class="useremail"><td><input class="todelete" type="checkbox" value=""></input></td><td><input hidden="true" class="form-control" type="text" value="' + new_email.val() + '" name="emails['+x+']"/><div>'+new_email.val()+'</div></td></tr>'); //add input box
-		    new_email.val("");
-		    new_email.focus();
-		    x++; //text box increment
-    	}
-    });
-    $(wrapper).on("click",".remove_field", function(e){ //user click on remove text
-        e.preventDefault(); $(this).parent('div').remove(); x--;
-    });
-   
-    
-    $('#createMeetingForm').on('submit', function(e) { //use on if jQuery 1.7+
-        e.preventDefault();  //prevent form from submitting
-        console.log($(".datetimeinput").val());
-        
-        $(".datetimeoutput").val(moment.tz($(".datetimeinput").val(),$("#selecttimezone").val()).format());
-        console.log($("#selecttimezone").val());
-        console.log($(".datetimeoutput").val());
-        this.submit();
-    });
-    
+							$(delete_button).click(
+									function(e) {
+										e.preventDefault();
+										$("tr.useremail").each(
+												function() {
+													$this = $(this)
+													if ($(this).find(
+															"input.todelete")
+															.is(":checked")) {
+														$(this).remove();
+													}
+												});
+									});
+							$(add_button)
+									.click(
+											function(e) { //on add input button click
+												e.preventDefault();
+												if (new_email.val() != "") {
+													$(wrapper)
+															.append(
+																	'<tr class="useremail"><td><input class="todelete" type="checkbox" value=""></input></td><td><input hidden="true" class="form-control" type="text" value="'
+																			+ new_email
+																					.val()
+																			+ '" name="emails['
+																			+ x
+																			+ ']"/><div>'
+																			+ new_email
+																					.val()
+																			+ '</div></td></tr>'); //add input box
+													new_email.val("");
+													new_email.focus();
+													x++; //text box increment
+												}
+											});
+							$(wrapper).on("click", ".remove_field",
+									function(e) { //user click on remove text
+										e.preventDefault();
+										$(this).parent('div').remove();
+										x--;
+									});
 
-});
+							$('#createMeetingForm')
+									.on(
+											'submit',
+											function(e) { //use on if jQuery 1.7+
+												e.preventDefault(); //prevent form from submitting
+												console.log($(".datetimeinput")
+														.val());
 
-</script>
+												$(".datetimeoutput")
+														.val(
+																moment
+																		.tz(
+																				$(
+																						".datetimeinput")
+																						.val(),
+																				$(
+																						"#selecttimezone")
+																						.val())
+																		.format());
+												console
+														.log($(
+																"#selecttimezone")
+																.val());
+												console
+														.log($(
+																".datetimeoutput")
+																.val());
+												this.submit();
+											});
+
+						});
+	</script>
 	<!-- <script src="resources/js/bootstrap-select.min.js"></script> -->
-	<script type="text/javascript" src="resources/js/timezones.js"></script>
+	<script type="text/javascript" src="resources/js/timezones.js">
+		$(function() {
+			$('#datetimepicker1').datetimepicker();
+		});
+	</script>
 </div>
 </html>

@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import eu.europa.csp.vcbadmin.config.VcbadminProperties;
 import eu.europa.csp.vcbadmin.constants.MeetingScheduledTaskType;
 import eu.europa.csp.vcbadmin.model.MeetingScheduledTask;
+import eu.europa.csp.vcbadmin.repository.MeetingRepository;
 import eu.europa.csp.vcbadmin.repository.MeetingScheduledTaskRepository;
 import eu.europa.csp.vcbadmin.service.EmailService;
 import eu.europa.csp.vcbadmin.service.MeetingNotFound;
@@ -28,6 +29,8 @@ public class MeetingScheduler {
 	private MeetingScheduledTaskRepository meetingScheduledTaskRepository;
 	@Autowired
 	private MeetingService meetingService;
+	@Autowired
+	private MeetingRepository meetingRepository;
 
 	@Autowired
 	RetryTemplate retryTemplate;
@@ -37,10 +40,10 @@ public class MeetingScheduler {
 
 	@Autowired
 	VcbadminProperties vcbadminProperties;
-	
+
 	@Autowired
 	EmailService emailService;
-	
+
 	@Transactional
 	@Scheduled(fixedRate = 60000)
 	public void checkExpired() {
@@ -63,8 +66,8 @@ public class MeetingScheduler {
 						task.setCompleted(true);
 						meetingScheduledTaskRepository.save(task);
 						log.info("Task changed...");
-						log.info("Sending invitation emails for meeting {}",task.getMeeting().getId());
-						emailService.prepareAndSend(task.getMeeting().getUser().getInvitation(),  task.getMeeting());
+						log.info("Sending invitation emails for meeting {}", task.getMeeting().getId());
+						emailService.prepareAndSend(task.getMeeting().getUser().getInvitation(), task.getMeeting());
 					} else {
 						try {
 							log.info("Finishing meeting...");
@@ -86,5 +89,12 @@ public class MeetingScheduler {
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		}
+	}
+
+	@Transactional
+	@Scheduled(fixedRate = 60000)
+	public void changeStatus() {
+		meetingRepository.updateRunningToExpired(ZonedDateTime.now());
+		meetingRepository.updatePendingToRunning(ZonedDateTime.now());
 	}
 }
