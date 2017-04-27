@@ -1,0 +1,17 @@
+---------------------------------------------------
+-- Running an integration test from command line --
+---------------------------------------------------
+
+1. First build the project
+--------------------------
+$ mvn clean install -DskipTests
+
+
+2. Navigate to target folder and locate the jar file
+----------------------------------------------------
+$ cd integration-layer-dsl-api/integration-tests/target
+
+
+3. Run one or more test-classes by providing the package+classnames as arguments
+--------------------------------------------------------------------------------
+$ java -jar integration-tests-0.0.1-SNAPSHOT.jar com.sastix.csp.integration.sandbox.server.internal.CspServerInternalSandboxTest
