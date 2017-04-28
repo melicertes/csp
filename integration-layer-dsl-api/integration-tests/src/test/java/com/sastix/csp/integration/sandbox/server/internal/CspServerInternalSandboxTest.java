@@ -42,8 +42,8 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
         properties = {
                 "csp.retry.backOffPeriod:10",
                 "csp.retry.maxAttempts:1",
-                "embedded.activemq.start:true",
-                "apache.camel.use.activemq:true",
+                "embedded.activemq.start:false",
+                "apache.camel.use.activemq:false",
         })
 @MockEndpointsAndSkip("http:*")
 public class CspServerInternalSandboxTest implements CamelRoutes{
