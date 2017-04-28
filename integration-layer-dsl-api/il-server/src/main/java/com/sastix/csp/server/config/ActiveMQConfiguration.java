@@ -2,16 +2,16 @@ package com.sastix.csp.server.config;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.RedeliveryPolicy;
-import org.apache.activemq.broker.BrokerService;
 import org.apache.activemq.camel.component.ActiveMQComponent;
 import org.apache.activemq.jms.pool.PooledConnectionFactory;
-import org.apache.camel.CamelContext;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.jms.connection.JmsTransactionManager;
 import org.springframework.jms.listener.DefaultMessageListenerContainer;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.PlatformTransactionManager;
 
 import javax.annotation.PostConstruct;
 
@@ -21,6 +21,7 @@ import javax.annotation.PostConstruct;
  */
 @Component
 public class ActiveMQConfiguration {
+    private static final Logger LOG = LoggerFactory.getLogger(ActiveMQConfiguration.class);
     @Value("${activemq.broker.url}")
     private String activemqBrokerUrl;
 
@@ -30,27 +31,33 @@ public class ActiveMQConfiguration {
     @Value("${activemq.password}")
     private String activemqPassword;
 
-    @Value("${activemq.max.redelivery.delay}")
-    private long maximumRedeliveryDelay;
+    @Value("${activemq.redelivery.delay}")
+    private long redeliveryDelay;
 
-    @Value("${activemq.max.retry.attempts}")
-    private int maxRetryAttempts;
+    @Value("${activemq.max.redelivery.attempts}")
+    private int maxRedeliveryAttempts;
 
     @Value("${activemq.max.connections}")
     private int maxConnections;
 
     @Bean
-    public ActiveMQComponent activemq() {
+    public ActiveMQConnectionFactory activeMQConnectionFactory(){
         // Connection Factory
 
         ActiveMQConnectionFactory activeMQConnectionFactory = activeMQConnectionFactory(activemqBrokerUrl);
+        activeMQConnectionFactory.setRedeliveryPolicy(redeliveryPolicy());
+        activeMQConnectionFactory.setTrustAllPackages(true);
 
+        return activeMQConnectionFactory;
+    }
+
+    @Bean
+    public ActiveMQComponent activemq(ActiveMQConnectionFactory activeMQConnectionFactory) {
         // Pooled Connection Factory
 
         PooledConnectionFactory pooledConnectionFactory = new PooledConnectionFactory();
         pooledConnectionFactory.setConnectionFactory(activeMQConnectionFactory);
         pooledConnectionFactory.setMaxConnections(maxConnections);
-        activeMQConnectionFactory.setTrustAllPackages(true);
 
         // ActiveMQ Component
 
@@ -62,13 +69,7 @@ public class ActiveMQConfiguration {
     }
 
     @Bean
-    public ActiveMQComponent activemqtx()
-    {
-        // Connection Factory
-
-        ActiveMQConnectionFactory activeMQConnectionFactory = activeMQConnectionFactory(activemqBrokerUrl);
-        activeMQConnectionFactory.setRedeliveryPolicy(redeliveryPolicy());
-        activeMQConnectionFactory.setTrustAllPackages(true);
+    public ActiveMQComponent activemqtx(ActiveMQConnectionFactory activeMQConnectionFactory) {
         // Pooled Connection Factory
 
         PooledConnectionFactory pooledConnectionFactory = new PooledConnectionFactory();
@@ -80,6 +81,7 @@ public class ActiveMQConfiguration {
         ActiveMQComponent activeMQComponent = new ActiveMQComponent();
         activeMQComponent.setConnectionFactory(pooledConnectionFactory);
         activeMQComponent.setCacheLevel(DefaultMessageListenerContainer.CACHE_CONSUMER);
+//        activeMQComponent.setTransactionManager(jmsTransactionManager(activeMQConnectionFactory));
 //        activeMQComponent.setTransacted(true);
         return activeMQComponent;
     }
@@ -90,17 +92,28 @@ public class ActiveMQConfiguration {
 
         //redeliveryPolicy.setBackOffMultiplier(2);
         //redeliveryPolicy.setUseExponentialBackOff(true);
-        redeliveryPolicy.setMaximumRedeliveries(maxRetryAttempts);
-        redeliveryPolicy.setRedeliveryDelay(maximumRedeliveryDelay);
+        redeliveryPolicy.setMaximumRedeliveries(maxRedeliveryAttempts);
+        redeliveryPolicy.setRedeliveryDelay(redeliveryDelay);
 
         return redeliveryPolicy;
     }
 
     private ActiveMQConnectionFactory activeMQConnectionFactory(String brokerURL) {
-        System.out.println("SETTING UP AMQ WITH: " + brokerURL);
+        LOG.info("SETTING UP AMQ WITH: " + brokerURL);
         ActiveMQConnectionFactory activeMQConnectionFactory = new ActiveMQConnectionFactory(brokerURL);
         activeMQConnectionFactory.setUserName(activemqUsername);
         activeMQConnectionFactory.setPassword(activemqPassword);
         return activeMQConnectionFactory;
+    }
+
+    /**
+     * To support transacted endpoints
+     * http://camel.apache.org/how-do-i-make-my-jms-endpoint-transactional.html
+     * */
+    @Bean
+    public PlatformTransactionManager jmsTransactionManager(ActiveMQConnectionFactory activeMQConnectionFactory) {
+        JmsTransactionManager jmsTransactionManager = new JmsTransactionManager();
+        jmsTransactionManager.setConnectionFactory(activeMQConnectionFactory);
+        return jmsTransactionManager;
     }
 }

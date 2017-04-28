@@ -3,9 +3,11 @@ package com.sastix.csp.server.routes;
 import com.sastix.csp.commons.model.Csp;
 import com.sastix.csp.commons.routes.CamelRoutes;
 import com.sastix.csp.server.processors.*;
+import org.apache.camel.LoggingLevel;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.model.dataformat.JsonLibrary;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -44,16 +46,26 @@ public class CspRoutes extends RouteBuilder implements CamelRoutes{
     @Autowired
     RouteUtils endpoint;
 
+    @Value("${activemq.redelivery.delay}")
+    private long redeliveryDelay;
 
+    @Value("${activemq.max.redelivery.attempts}")
+    private int maxRedeliveryAttempts;
 
 
     @Override
     public void configure() {
 
-//        onException(Exception.class).process(exceptionProcessor)
-//                .log("[Exception thrown]... Received body ${body}")
-//                .handled(true);
+        //errorHandler(defaultErrorHandler().maximumRedeliveries(2).redeliveryDelay(1000).retryAttemptedLogLevel(LoggingLevel.WARN));
 
+        onException(Exception.class)
+                .maximumRedeliveries(maxRedeliveryAttempts)
+                .redeliveryDelay(redeliveryDelay)
+                .retryAttemptedLogLevel(LoggingLevel.WARN)
+                .process(exceptionProcessor)
+                .handled(true)
+                //.to(endpoint.apply(ERROR))
+        ;
 
         from(endpoint.apply(DSL))
                 .process(dslProcessor)
