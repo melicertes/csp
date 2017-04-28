@@ -167,5 +167,7 @@ public class CspServerInternalSandboxTest implements CamelRoutes{
 
         mockedDdl.expectedMessageCount(1);
         mockedDdl.assertIsSatisfied();
+        //Thread.sleep(10*1000); //to avoid "Rejecting received message because of the listener container having been stopped in the meantime"
+        //be careful when debugging, you might miss breakpoints if the time is not enough
     }
 }
