@@ -5,7 +5,7 @@ import com.sastix.csp.commons.model.IntegrationData;
 import com.sastix.csp.commons.model.IntegrationDataType;
 import com.sastix.csp.commons.model.SharingParams;
 import com.sastix.csp.commons.routes.ContextUrl;
-import com.sastix.csp.server.IntegrationLayerDslApiApplication;
+import com.sastix.csp.server.CspApp;
 import com.sastix.csp.server.processors.DslProcessor;
 import org.apache.camel.*;
 import org.apache.camel.impl.DefaultCamelContext;
@@ -34,7 +34,7 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
  * Created by iskitsas on 4/3/17.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringBootTest(classes = IntegrationLayerDslApiApplication.class)
+@SpringBootTest(classes = CspApp.class)
 @Deprecated // see business or sandbox packages for relative examples
 public class IntegrationServerTest {
 

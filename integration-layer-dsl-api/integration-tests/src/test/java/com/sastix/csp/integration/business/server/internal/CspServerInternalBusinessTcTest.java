@@ -7,7 +7,7 @@ import com.sastix.csp.commons.model.IntegrationData;
 import com.sastix.csp.commons.model.IntegrationDataType;
 import com.sastix.csp.commons.routes.CamelRoutes;
 import com.sastix.csp.integration.MockUtils;
-import com.sastix.csp.server.IntegrationLayerDslApiApplication;
+import com.sastix.csp.server.CspApp;
 import com.sastix.csp.server.routes.RouteUtils;
 import org.apache.camel.*;
 import org.apache.camel.component.mock.MockEndpoint;
@@ -27,7 +27,6 @@ import org.springframework.web.context.WebApplicationContext;
 
 import java.util.List;
 
-import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
@@ -37,7 +36,7 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
  * Created by iskitsas on 4/7/17.
  */
 @RunWith(CamelSpringBootRunner.class)
-@SpringBootTest(classes = {IntegrationLayerDslApiApplication.class, MockUtils.class},
+@SpringBootTest(classes = {CspApp.class, MockUtils.class},
         properties = {
                 "csp.retry.backOffPeriod:10",
                 "csp.retry.maxAttempts:1",

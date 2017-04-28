@@ -6,7 +6,7 @@ import com.sastix.csp.commons.model.*;
 import com.sastix.csp.commons.routes.CamelRoutes;
 import com.sastix.csp.integration.MockUtils;
 import com.sastix.csp.integration.TestUtil;
-import com.sastix.csp.server.IntegrationLayerDslApiApplication;
+import com.sastix.csp.server.CspApp;
 import com.sastix.csp.server.routes.RouteUtils;
 import org.apache.camel.*;
 import org.apache.camel.component.mock.MockEndpoint;
@@ -38,7 +38,7 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
  * Created by iskitsas on 4/7/17.
  */
 @RunWith(CamelSpringBootRunner.class)
-@SpringBootTest(classes = {IntegrationLayerDslApiApplication.class, MockUtils.class},
+@SpringBootTest(classes = {CspApp.class, MockUtils.class},
         properties = {
                 "csp.retry.backOffPeriod:10",
                 "csp.retry.maxAttempts:1",
