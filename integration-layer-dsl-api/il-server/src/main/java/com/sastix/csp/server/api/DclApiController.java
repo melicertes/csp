@@ -2,6 +2,7 @@ package com.sastix.csp.server.api;
 
 import com.sastix.csp.commons.model.IntegrationData;
 import com.sastix.csp.commons.routes.CamelRoutes;
+import com.sastix.csp.commons.routes.ContextUrl;
 import com.sastix.csp.server.routes.RouteUtils;
 import org.apache.camel.Produce;
 import org.apache.camel.ProducerTemplate;
@@ -31,7 +32,7 @@ public class DclApiController implements CamelRoutes{
      * @param newIntDataObj
      * @return
      */
-    @RequestMapping(value = "/dcl/integrationData",
+    @RequestMapping(value = ContextUrl.DCL_INTEGRATION_DATA,
             consumes = {"application/json"},
             method = RequestMethod.POST)
     public ResponseEntity<String> getNewIntDataFromExtCsp(@RequestBody IntegrationData newIntDataObj) {
@@ -47,7 +48,7 @@ public class DclApiController implements CamelRoutes{
      * @param newIntDataObj
      * @return
      */
-    @RequestMapping(value = "/dcl/integrationData",
+    @RequestMapping(value = ContextUrl.DCL_INTEGRATION_DATA,
             consumes = {"application/json"},
             method = RequestMethod.PUT)
     public ResponseEntity<String> getUpdateIntDataFromExtCsp(@RequestBody IntegrationData newIntDataObj) {

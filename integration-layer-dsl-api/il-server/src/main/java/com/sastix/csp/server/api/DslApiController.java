@@ -4,6 +4,7 @@ import com.sastix.csp.commons.apiHttpStatusResponse.HttpStatusResponseType;
 import com.sastix.csp.commons.exceptions.InvalidDataTypeException;
 import com.sastix.csp.commons.model.IntegrationData;
 import com.sastix.csp.commons.routes.CamelRoutes;
+import com.sastix.csp.commons.routes.ContextUrl;
 import com.sastix.csp.server.routes.RouteUtils;
 import org.apache.camel.Exchange;
 import org.apache.camel.Produce;
@@ -30,21 +31,21 @@ public class DslApiController implements CamelRoutes{
     RouteUtils routes;
 
 
-    @RequestMapping(value = "/dsl/integrationData",
+    @RequestMapping(value = ContextUrl.DSL_INTEGRATION_DATA,
             consumes = {"application/json"},
             method = RequestMethod.POST)
     public ResponseEntity<String> synchNewIntData(@RequestBody IntegrationData integrationData) {
         return handleIntegrationData(integrationData, "POST");
     }
 
-    @RequestMapping(value = "/dsl/integrationData",
+    @RequestMapping(value = ContextUrl.DSL_INTEGRATION_DATA,
             consumes = {"application/json"},
             method = RequestMethod.PUT)
     public ResponseEntity<String> synchUpdatedIntData(@RequestBody IntegrationData integrationData) {
         return handleIntegrationData(integrationData, "PUT");
     }
 
-    @RequestMapping(value = "/dsl/integrationData",
+    @RequestMapping(value = ContextUrl.DSL_INTEGRATION_DATA,
             consumes = {"application/json"},
             method = RequestMethod.DELETE)
     public ResponseEntity<String> synchDeletedIntData(@RequestBody IntegrationData integrationData) {
