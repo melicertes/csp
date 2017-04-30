@@ -17,6 +17,7 @@
 		<br/>
 		<div class="col-md-12">
 			<div class="card-group">
+			<div class="col-md-8">
 			<div class="card p-4">
 				<form action="#" th:action="@{/saveEmailTemplates}"
 					th:object="${emailTemplates}" method="post"
@@ -38,10 +39,13 @@
 								</div>
 								<div class="form-group row" th:classappend="${#fields.hasErrors('invitation.content')} ? has-danger">
 									<div class="col-md-12">
-										<textarea th:field="*{invitation.content}"
+										<textarea id="invitation-input" th:field="*{invitation.content}"
 											class="form-control" placeholder="Enter invitation content.."></textarea>
 									</div>
 								</div>
+								<div id="editor">
+  <p>Hello World!</p>
+</div>
 							</div>
 						</div>
 					</div>
@@ -87,22 +91,24 @@
 					</div>
 				</form>
 			</div>
-			<div class="card p-4">
+			</div>
+			<div class="col-md-4">
+			<div class="card p-6">
 						<div class="card-header">
 							<strong>Variables allowed in templates</strong>
 						</div>
 						<div class="card-block">
 							<div>
 								<ul>
-								<li>{email} - user email</li>
-								<li>{meeting_date} - date in dd/MM/yyyy format</li>
-								<li>{meeting_time} - time in HH:mm ZZZ (timezone) format</li>
+								<li><b>{email}</b> - user email</li>
+								<li><b>{meeting_date}</b> - date in dd/MM/yyyy format</li>
+								<li><b>{meeting_time}</b> - time in HH:mm ZZZ (timezone) format</li>
 								</ul>
 								<ul>
-								<li>{meeting_username} - the generated/unique username for the participant</li>
-								<li>{meeting_password} - the generated/unique password for the participant</li>
-								<li>{user_first} - user first name</li>
-								<li>{user_lastname} - user last name</li>
+								<li><b>{meeting_username}</b> - the generated/unique username for the participant</li>
+								<li><b>{meeting_password}</b> - the generated/unique password for the participant</li>
+								<li><b>{user_first}</b> - user first name</li>
+								<li><b>{user_lastname}</b> - user last name</li>
 								</ul>
 								
 
@@ -115,8 +121,20 @@
 
 					</div>
 			</div>
+			</div>
 		</div>
 	</div>
 </div>
-<div layout:fragment="scripts"></div>
+<div layout:fragment="scripts">
+  <!-- Main Quill library -->
+<!-- <script src="//cdn.quilljs.com/1.2.4/quill.min.js"></script>
+
+<script type="text/javascript">
+var quill = new Quill('#editor', {
+	  modules: { toolbar: true },
+	  theme: 'snow'
+	});
+</script> -->
+  
+</div>
 </html>

@@ -1,7 +1,6 @@
 package eu.europa.csp.vcbadmin.controller;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.Scanner;
 
 import org.slf4j.Logger;
@@ -64,7 +63,7 @@ public class RegisterController {
 		
 		log.debug("Constructing init invitation email for user {}",user.getEmail());
 		EmailTemplate et = new EmailTemplate();
-		et.setSubject("Meeting invitation: ${meeting_date} ${meeting_time}");
+		et.setSubject("Meeting invitation: [(${meeting_date})] [(${meeting_time})]");
 		String content = new Scanner(invitationHTML.getInputStream(), "utf-8").useDelimiter("\\Z").next();
 		et.setContent(content);
 		et.setType(EmailTemplateType.INVITATION);
@@ -73,7 +72,7 @@ public class RegisterController {
 		
 		log.debug("Constructing init cancellation email for user {}",user.getEmail());
 		et = new EmailTemplate();
-		et.setSubject("Meeting cancellation: ${meeting_date} ${meeting_time}");
+		et.setSubject("Meeting cancellation: [(${meeting_date})] [(${meeting_time})]");
 		content = new Scanner(cancellationHTML.getInputStream(), "utf-8").useDelimiter("\\Z").next();
 		et.setContent(content);
 		et.setType(EmailTemplateType.CANCELLATION);

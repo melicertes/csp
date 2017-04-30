@@ -38,7 +38,7 @@ public class EmailService {
 			MimeMessagePreparator messagePreparator = mimeMessage -> {
 				MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage);
 				// messageHelper.setFrom(meeting.getUser().getEmail());
-				messageHelper.setFrom("noreply@allaboutcar.com.cy");
+				messageHelper.setFrom("do-not-reply@sastix.com");
 				messageHelper.setTo(p.getEmail());
 
 				m.put("email", p.getEmail());
@@ -46,6 +46,7 @@ public class EmailService {
 				m.put("meeting_time", meeting.getStart().format(DateTimeFormatter.ofPattern("HH:mm ZZZ")));
 				m.put("meeting_username", p.getUsername());
 				m.put("meeting_password", p.getPassword());
+				m.put("meeting_url", meeting.getUrl());
 				m.put("user_first", meeting.getUser().getFirstName());
 				m.put("user_lastname", meeting.getUser().getLastName());
 

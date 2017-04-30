@@ -11,4 +11,7 @@ public class ErrorDeletingRoom extends OpenfireException {
 		super(message);
 	}
 
+	public ErrorDeletingRoom(String message, Exception e) {
+		super(message, e);
+	}
 }

@@ -17,9 +17,9 @@ import eu.europa.csp.vcbadmin.model.MeetingScheduledTask;
 import eu.europa.csp.vcbadmin.repository.MeetingRepository;
 import eu.europa.csp.vcbadmin.repository.MeetingScheduledTaskRepository;
 import eu.europa.csp.vcbadmin.service.EmailService;
-import eu.europa.csp.vcbadmin.service.MeetingNotFound;
 import eu.europa.csp.vcbadmin.service.MeetingService;
 import eu.europa.csp.vcbadmin.service.OpenfireService;
+import eu.europa.csp.vcbadmin.service.exception.MeetingNotFound;
 import eu.europa.csp.vcbadmin.service.exception.OpenfireException;
 
 @Component
@@ -78,12 +78,16 @@ public class MeetingScheduler {
 							log.error("Scheduler: Meeting not found", e);
 						}
 					}
-				} catch (OpenfireException e) {
+				} catch (OpenfireException e) { // instead of OpenfireException 
 					log.error("Error in Meeting Scheduler");
 					log.error(e.getMessage(), e);
 					// task.setError(true);
 					task.increaseFailed();
-					meetingScheduledTaskRepository.save(task);
+					if (task.getFailed().equals(vcbadminProperties.getMaxTaskRetries())) {
+						meetingService.failMeeting(task.getMeeting());
+					} else {
+						meetingScheduledTaskRepository.save(task);
+					}
 				}
 			}
 		} catch (Exception e) {

@@ -10,4 +10,8 @@ public class ErrorCreatingRoom extends OpenfireException {
 	public ErrorCreatingRoom(String message) {
 		super(message);
 	}
+
+	public ErrorCreatingRoom(String message, Exception e) {
+		super(message, e);
+	}
 }

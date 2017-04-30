@@ -11,4 +11,7 @@ public class ErrorDeletingUser extends OpenfireException {
 		super(message);
 	}
 
+	public ErrorDeletingUser(String message, Exception e) {
+		super(message, e);
+	}
 }

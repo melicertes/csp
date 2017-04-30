@@ -10,5 +10,9 @@ public class ErrorCreatingUser extends OpenfireException {
 	public ErrorCreatingUser(String message) {
 		super(message);
 	}
+	
+	public ErrorCreatingUser(String message, Exception e) {
+		super(message, e);
+	}
 
 }

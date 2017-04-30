@@ -11,4 +11,7 @@ public class ErrorAddingUserToMeeting extends OpenfireException {
 		super(message);
 	}
 
+	public ErrorAddingUserToMeeting(String message, Exception e) {
+		super(message, e);
+	}
 }

@@ -78,7 +78,10 @@
 										<td th:text="${{meeting.start}}">start</td>
 										<td th:text="${meeting.durationAsTime}">duration</td>
 										<td th:text="${#lists.size(meeting.participants)}">#ofparticipants</td>
-										<td th:text="${meeting.status}">status</td>
+										<td><span th:text="${meeting.status}"></span><sup
+											th:if="${#strings.toString(meeting.status) == 'Error'}">
+												<a href="#" th:href="@{/retryMeeting(id=${meeting.id})}">Retry</a>
+										</sup></td>
 									</tr>
 								</tbody>
 							</table>
@@ -91,6 +94,7 @@
 	</div>
 </div>
 <div layout:fragment="scripts">
+
 	<script>
 		$(document)
 				.ready(

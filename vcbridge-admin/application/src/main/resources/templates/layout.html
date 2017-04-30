@@ -24,12 +24,23 @@
 
 <!-- Main styles for this application -->
 <link href="resources/css/style.css" rel="stylesheet" />
-
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-timepicker/0.5.2/css/bootstrap-timepicker.min.css" />
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.4/css/bootstrap-datepicker.css" />
+<link href="resources/css/style.css" rel="stylesheet" />
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.4/css/selectize.min.css" />
+<!-- <link href="resources/css/jquery.timesetter.min.css" rel="stylesheet" /> -->
 <!-- Datetime picker -->
-<!-- <link href="resources/css/bootstrap-datetimepicker.min.css" -->
-<!-- 	rel="stylesheet" /> -->
-
-</head>
+<!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/css/bootstrap-datetimepicker.min.css" /> -->
+<!-- <link href="resources/css/bootstrap-datetimepicker.min.css" rel="stylesheet" />
+ -->
+ 
+ <!-- Theme included stylesheets -->
+<!-- <link href="//cdn.quilljs.com/1.2.4/quill.snow.css" rel="stylesheet">
+ -->
+ </head>
 
 <!-- BODY options, add following classes to body to change options
 
@@ -51,6 +62,37 @@
 1. '.footer-fixed'						- Fixed footer
 
 -->
+
+<style>
+.selectize-input>* {
+	vertical-align: middle;
+}
+
+.selectize-input .item {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	max-width: 150px;
+}
+
+/* respnonsive */
+.selectize-input {
+	display: table !important;
+	table-layout: fixed;
+	width: 100%;
+}
+
+.selectize-input>* {
+	vertical-align: middle;
+}
+
+.selectize-input .item {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	max-width: 80%;
+}
+</style>
 
 <body class="app header-fixed">
 	<header class="app-header navbar">
@@ -88,9 +130,19 @@
 	</header>
 
 	<div class="app-body">
-
-
 		<!-- Main content -->
+		<div class="" th:each="err, stat : ${errors}">
+			<div class="alert alert-warning alert-dismissible fade show"
+				role="alert">
+				<button type="button" class="close" data-dismiss="alert"
+					aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<strong>Error</strong><span th:text="${err}">You should check in on some of
+				those fields below.</span>
+			</div>
+		</div>
+		
 		<main class="main" layout:fragment="content"> <!-- Breadcrumb -->
 
 
@@ -104,8 +156,8 @@
 	</div>
 
 	<footer class="app-footer">
-		<a href="#">CSP</a> &copy; 2017. <span
-			class="float-right">Powered by <a href="http://sastix.com">Sastix</a>
+		<a href="#">CSP</a> &copy; 2017. <span class="float-right">Powered
+			by <a href="http://sastix.com">Sastix</a>
 		</span>
 	</footer>
 
@@ -115,8 +167,9 @@
 	<script src="resources/js/moment-with-locales.min.js"></script>
 	<script src="resources/js/moment.min.js"></script>
 	<script src="resources/js/bootstrap.min.js"></script>
+	<!-- 	<script src="resources/js/bootstrap-datetimepicker.min.js"></script>
+ -->
 	<script src="resources/js/pace.min.js"></script>
-
 
 	<!-- Plugins and scripts required by all views -->
 	<!-- 	<script src="resources/bower_components/chart.js/dist/Chart.min.js"></script> -->
@@ -124,12 +177,20 @@
 
 	<!-- GenesisUI main scripts -->
 
-
-	<script src="resources/js/app.js"></script>
+	<!-- <script src="resources/js/app.js"></script> -->
+	<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js"></script> -->
 
 	<!-- Datetime picker -->
 
-	<!-- 	<script src="resources/js/bootstrap-datetimepicker.min.js"></script> -->
+	<script
+		src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-timepicker/0.5.2/js/bootstrap-timepicker.min.js"></script>
+	<script
+		src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.4/js/bootstrap-datepicker.min.js"></script>
+
+	<!-- <script type="text/javascript">$(function() {
+		console.log('hahahaah');
+		$('#datetimepicker1').datetimepicker();
+	});</script> -->
 
 
 	<div class="row" layout:fragment="scripts"></div>

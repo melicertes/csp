@@ -1,7 +1,6 @@
 package eu.europa.csp.vcbadmin.service;
 
 import java.util.ArrayList;
-import java.util.Optional;
 
 import javax.ws.rs.core.Response;
 
@@ -21,8 +20,6 @@ import org.springframework.stereotype.Service;
 import eu.europa.csp.vcbadmin.config.OpenfireProperties;
 import eu.europa.csp.vcbadmin.model.Meeting;
 import eu.europa.csp.vcbadmin.model.Participant;
-import eu.europa.csp.vcbadmin.model.User;
-import eu.europa.csp.vcbadmin.repository.EmailTemplateRepository;
 import eu.europa.csp.vcbadmin.service.exception.ErrorAddingUserToMeeting;
 import eu.europa.csp.vcbadmin.service.exception.ErrorCreatingRoom;
 import eu.europa.csp.vcbadmin.service.exception.ErrorCreatingUser;
@@ -40,45 +37,71 @@ public class OpenfireService {
 	RetryTemplate retryTemplate;
 
 	private void createRoom(RestApiClient restApiClient, String room) throws ErrorCreatingRoom {
-		MUCRoomEntity chatRoom = new MUCRoomEntity(room, room, "Some description");
-		Response r = restApiClient.createChatRoom(chatRoom);
-		if (r.getStatus() != 201) {
+		Response r = null;
+		try {
+			MUCRoomEntity chatRoom = new MUCRoomEntity(room, room, "Some description");
+			r = restApiClient.createChatRoom(chatRoom);
+		} catch (Exception e) {
+			throw new ErrorCreatingRoom(String.format("Error creating room %s", room), e);
+		}
+		if (r == null || r.getStatus() != 201) {
 			throw new ErrorCreatingRoom(String.format("Error creating room %s", room));
 		}
 	}
 
 	private void createUser(RestApiClient restApiClient, Participant participant) throws ErrorCreatingUser {
-		UserEntity userEntity = new UserEntity(participant.getUsername(), participant.getUsername(),
-				participant.getEmail(), participant.getPassword());
-		Response r = restApiClient.createUser(userEntity);
-		if (r.getStatus() != 201) {
+		Response r = null;
+		try {
+			UserEntity userEntity = new UserEntity(participant.getUsername(), participant.getUsername(),
+					participant.getEmail(), participant.getPassword());
+			r = restApiClient.createUser(userEntity);
+		} catch (Exception e) {
+			throw new ErrorCreatingUser(String.format("Error creating user %s", participant.getUsername()), e);
+		}
+		if (r == null || r.getStatus() != 201) {
 			throw new ErrorCreatingUser(String.format("Error creating user %s", participant.getUsername()));
 		}
 	}
 
 	private void addUserToRoom(RestApiClient restApiClient, String username, String room)
 			throws ErrorAddingUserToMeeting {
-		Response r = restApiClient.addMember(room, username);
-		if (r.getStatus() != 201) {
+		Response r = null;
+		try {
+			r = restApiClient.addMember(room, username);
+		} catch (Exception e) {
+			throw new ErrorAddingUserToMeeting(String.format("Error adding user %s to room %s", username, room), e);
+		}
+		if (r == null || r.getStatus() != 201) {
 			throw new ErrorAddingUserToMeeting(String.format("Error adding user %s to room %s", username, room));
 		}
 	}
 
 	private void deleteRoom(RestApiClient restApiClient, String room) throws ErrorDeletingRoom {
-		Response r = restApiClient.deleteChatRoom(room);
-		if (r.getStatus() != 200) {
+		Response r = null;
+		try {
+			r = restApiClient.deleteChatRoom(room);
+		} catch (Exception e) {
+			throw new ErrorDeletingRoom(String.format("Error deleting room %s", room), e);
+		}
+		if (r == null || r.getStatus() != 200) {
 			throw new ErrorDeletingRoom(String.format("Error deleting room %s", room));
 		}
 	}
 
 	private void deleteUser(RestApiClient restApiClient, String username) throws ErrorDeletingUser {
-		Response r = restApiClient.deleteUser(username);
+		Response r;
+		try {
+			r = restApiClient.deleteUser(username);
+		} catch (Exception e) {
+			throw new ErrorDeletingUser(String.format("Error deleting user %s", username), e);
+		}
 		if (r.getStatus() != 200) {
 			throw new ErrorDeletingUser(String.format("Error deleting user %s", username));
 		}
 	}
 
 	public void createMeeting(Meeting meeting) throws OpenfireException {
+
 		log.info("Creating meeting...");
 		log.info("Open openfire connection...");
 		log.info(properties.toString());
@@ -149,7 +172,7 @@ public class OpenfireService {
 				}
 			});
 			log.info("User {} added to room {}", participant.getUsername(), meeting.getRoom());
-		}		
+		}
 	}
 
 	public void deleteMeeting(Meeting meeting) {
