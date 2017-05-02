@@ -43,13 +43,13 @@
 								<span class="input-group-addon"><i class="icon-calendar"></i></span>
 								<input id="datepicker" type="text" data-provide="datepicker" data-orientation="auto bottom"
 								data-format="yy-mm-dd"  class="form-control date col-md-3"
-									required="true" th:value="${{meetingForm.startDate}}"/>
+									required="true" th:value="${{meetingForm.startDate}}" placeholder="Date e.g., 05-31-2021"/>
 								<span class="input-group-addon"><i class="icon-clock"></i></span>
 								<input id="timepicker"
 									class="form-control  bootstrap-timepicker timepicker col-md-3" 
 									data-provide="timepicker" data-template="dropdown"
 									data-minute-step="1" data-show-meridian="false" type="text"
-									required="true" th:value="${{meetingForm.startTime}}"/>
+									required="true" th:value="${{meetingForm.startTime}}" placeholder="Time e.g., 18:20"/>
 								<select id="selecttimezone" class="selectpicker col-md-6" name="timeZone"></select>
 								<div th:if="${#fields.hasErrors('timeZone')}" th:errors="*{timeZone}"
 									class="form-control-feedback">Error timezone</div>
@@ -65,7 +65,7 @@
 									class="form-control  bootstrap-timepicker timepicker col-md-3" 
 									data-provide="timepicker" data-template="dropdown" th:field="*{duration}"
 									data-minute-step="1" data-show-meridian="false" data-max-hours="8" data-default-time="01:00" type="text"
-									required="true" th:value="${{meetingForm.startTime}}"/>
+									required="true" th:value="${{meetingForm.startTime}}" placeholder="Duration e.g., 01:30"/>
 								<div th:if="${#fields.hasErrors('duration')}"
 									th:errors="*{duration}" class="form-control-feedback">Error
 									duration</div>
