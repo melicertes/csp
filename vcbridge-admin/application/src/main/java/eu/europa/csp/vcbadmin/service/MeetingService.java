@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import eu.europa.csp.vcbadmin.config.VcbadminProperties;
+import eu.europa.csp.vcbadmin.constants.MeetingScheduledTaskType;
 import eu.europa.csp.vcbadmin.constants.MeetingStatus;
 import eu.europa.csp.vcbadmin.model.Meeting;
 import eu.europa.csp.vcbadmin.model.MeetingScheduledTask;
@@ -66,8 +67,15 @@ public class MeetingService {
 			if (m == null) {
 				throw new MeetingNotFound("Meeting with id " + id + " not found..");
 			}
-			log.info("Sending cancellation emails for meeting {}", m.getId());
-			emailService.prepareAndSend(m.getUser().getCancellation(), m);
+			for(MeetingScheduledTask t:m.getScheduledTasks()){
+				if(t.getTaskType().equals(MeetingScheduledTaskType.START_MEETING)){
+					if(t.getCompleted()==true){
+						log.info("Sending cancellation emails for meeting {}", m.getId());
+						emailService.prepareAndSend(m.getUser().getCancellation(), m);
+						break;
+					}
+				}
+			}
 		}
 	}
 
