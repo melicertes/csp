@@ -67,9 +67,9 @@ public class MeetingService {
 			if (m == null) {
 				throw new MeetingNotFound("Meeting with id " + id + " not found..");
 			}
-			for(MeetingScheduledTask t:m.getScheduledTasks()){
-				if(t.getTaskType().equals(MeetingScheduledTaskType.START_MEETING)){
-					if(t.getCompleted()==true){
+			for (MeetingScheduledTask t : m.getScheduledTasks()) {
+				if (t.getTaskType().equals(MeetingScheduledTaskType.START_MEETING)) {
+					if (t.getCompleted() == true) {
 						log.info("Sending cancellation emails for meeting {}", m.getId());
 						emailService.prepareAndSend(m.getUser().getCancellation(), m);
 						break;

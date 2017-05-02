@@ -4,6 +4,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,11 +14,12 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.mail.javamail.MimeMessagePreparator;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import eu.europa.csp.vcbadmin.model.EmailTemplate;
 import eu.europa.csp.vcbadmin.model.Meeting;
 import eu.europa.csp.vcbadmin.model.Participant;
-
 @Service
 public class EmailService {
 	private static final Logger log = LoggerFactory.getLogger(EmailService.class);
@@ -28,6 +30,7 @@ public class EmailService {
 	MailContentBuilder mailContentBuilder;
 
 	@Async
+	@Transactional(propagation=Propagation.REQUIRES_NEW)
 	public void prepareAndSend(EmailTemplate et, Meeting meeting) {
 		
 		// System.out.println("Participants!!:: " + meeting.getParticipants());
