@@ -14,103 +14,116 @@
 <div layout:fragment="content">
 	<div
 		class="app header-fixed sidebar-fixed aside-menu-fixed aside-menu-hidden">
-		<br/>
+		<br />
 		<div class="col-md-12">
 			<div class="card-group">
-			<div class="col-md-8">
-			<div class="card p-4">
-				<form action="#" th:action="@{/saveEmailTemplates}"
-					th:object="${emailTemplates}" method="post"
-					class="form-horizontal ">
+				<div class="col-md-8">
 					<div class="card p-4">
-						<div class="card-header">
-							<strong>Email for meeting invitation</strong>
-						</div>
+						<form action="#" th:action="@{/saveEmailTemplates}"
+							th:object="${emailTemplates}" method="post"
+							class="form-horizontal ">
+							<div class="card p-4">
+								<div class="card-header">
+									<strong>Email for meeting invitation</strong>
+								</div>
 
-						<div class="card-block">
-							<div>
-								<div class="form-group row" th:classappend="${#fields.hasErrors('invitation.subject')} ? has-danger">
-									<label class="col-md-3 form-control-label"
-										for="invitation.subject">Subject</label>
-									<div class="col-md-9">
-										<input type="text" th:field="*{invitation.subject}"
-											class="form-control" placeholder="Enter invitation subject.." />
+								<div class="card-block">
+									<div>
+										<div class="form-group row"
+											th:classappend="${#fields.hasErrors('invitation.subject')} ? has-danger">
+											<label class="col-md-3 form-control-label"
+												for="invitation.subject">Subject</label>
+											<div class="col-md-9">
+												<input type="text" th:field="*{invitation.subject}"
+													class="form-control"
+													placeholder="Enter invitation subject.." />
+											</div>
+										</div>
+										<div class="form-group row"
+											th:classappend="${#fields.hasErrors('invitation.content')} ? has-danger">
+											<div class="col-md-12">
+												<textarea id="invitation-input"
+													th:field="*{invitation.content}" class="form-control"
+													placeholder="Enter invitation content.."></textarea>
+											</div>
+										</div>
+										<div id="editor">
+											<p>Hello World!</p>
+										</div>
 									</div>
 								</div>
-								<div class="form-group row" th:classappend="${#fields.hasErrors('invitation.content')} ? has-danger">
-									<div class="col-md-12">
-										<textarea id="invitation-input" th:field="*{invitation.content}"
-											class="form-control" placeholder="Enter invitation content.."></textarea>
-									</div>
-								</div>
-								<div id="editor">
-  <p>Hello World!</p>
-</div>
 							</div>
-						</div>
-					</div>
-					<div class="card p-4">
-						<div class="card-header">
-							<strong>Email for meeting cancellation</strong>
-						</div>
-						<div class="card-block">
-							<div>
+							<div class="card p-4">
+								<div class="card-header">
+									<strong>Email for meeting cancellation</strong>
+								</div>
+								<div class="card-block">
+									<div>
 
-								<div class="form-group row" th:classappend="${#fields.hasErrors('cancellation.subject')} ? has-danger">
-									<label class="col-md-3 form-control-label"
-										for="cancellation.subject">Subject</label>
-									<div class="col-md-9">
-										<input type="text" th:field="*{cancellation.subject}"
-											class="form-control"
-											placeholder="Enter cancellation subject.." />
+										<div class="form-group row"
+											th:classappend="${#fields.hasErrors('cancellation.subject')} ? has-danger">
+											<label class="col-md-3 form-control-label"
+												for="cancellation.subject">Subject</label>
+											<div class="col-md-9">
+												<input type="text" th:field="*{cancellation.subject}"
+													class="form-control"
+													placeholder="Enter cancellation subject.." />
+											</div>
+										</div>
+										<div class="form-group row"
+											th:classappend="${#fields.hasErrors('cancellation.content')} ? has-danger">
+											<div class="col-md-12">
+												<textarea id="cancellation-input"
+													th:field="*{cancellation.content}" class="form-control"
+													placeholder="Enter cancellation content"></textarea>
+											</div>
+										</div>
+
+
 									</div>
+
 								</div>
-								<div class="form-group row" th:classappend="${#fields.hasErrors('cancellation.content')} ? has-danger">
-									<div class="col-md-12">
-										<textarea th:field="*{cancellation.content}"
-											class="form-control" placeholder="Enter cancellation content"></textarea>
-									</div>
-								</div>
+
 
 
 							</div>
-
-						</div>
-
-
-
+							<div class="row pull-right">
+								<div class="col-4">
+									<button type="submit" name="reset" class="btn btn-primary px-4">Reset</button>
+								</div>
+								<div class="col-4">
+									<button type="submit" class="btn btn-primary px-2">Save
+										Changes</button>
+								</div>
+								<div class="col-4">
+									<a th:href="@{/listMeeting}" class="btn btn-primary px-2">Cancel</a>
+								</div>
+							</div>
+						</form>
 					</div>
-					<div class="row pull-right">
-						<div class="col-6">
-							<button type="submit" class="btn btn-primary px-4">Save
-								Changes</button>
-						</div>
-						<div class="col-6">
-							<button type="submit" class="btn btn-primary px-4">Cancel</button>
-						</div>
-					</div>
-				</form>
-			</div>
-			</div>
-			<div class="col-md-4">
-			<div class="card p-6">
+				</div>
+				<div class="col-md-4">
+					<div class="card p-6">
 						<div class="card-header">
 							<strong>Variables allowed in templates</strong>
 						</div>
 						<div class="card-block">
 							<div>
 								<ul>
-								<li><b>{email}</b> - user email</li>
-								<li><b>{meeting_date}</b> - date in dd/MM/yyyy format</li>
-								<li><b>{meeting_time}</b> - time in HH:mm ZZZ (timezone) format</li>
+									<li><b>{email}</b> - user email</li>
+									<li><b>{meeting_date}</b> - date in dd/MM/yyyy format</li>
+									<li><b>{meeting_time}</b> - time in HH:mm ZZZ (timezone)
+										format</li>
 								</ul>
 								<ul>
-								<li><b>{meeting_username}</b> - the generated/unique username for the participant</li>
-								<li><b>{meeting_password}</b> - the generated/unique password for the participant</li>
-								<li><b>{user_first}</b> - user first name</li>
-								<li><b>{user_lastname}</b> - user last name</li>
+									<li><b>{meeting_username}</b> - the generated/unique
+										username for the participant</li>
+									<li><b>{meeting_password}</b> - the generated/unique
+										password for the participant</li>
+									<li><b>{user_first}</b> - user first name</li>
+									<li><b>{user_lastname}</b> - user last name</li>
 								</ul>
-								
+
 
 
 							</div>
@@ -120,14 +133,14 @@
 
 
 					</div>
-			</div>
+				</div>
 			</div>
 		</div>
 	</div>
 </div>
 <div layout:fragment="scripts">
-  <!-- Main Quill library -->
-<!-- <script src="//cdn.quilljs.com/1.2.4/quill.min.js"></script>
+	<!-- Main Quill library -->
+	<!-- <script src="//cdn.quilljs.com/1.2.4/quill.min.js"></script>
 
 <script type="text/javascript">
 var quill = new Quill('#editor', {
@@ -135,6 +148,21 @@ var quill = new Quill('#editor', {
 	  theme: 'snow'
 	});
 </script> -->
-  
+	<script
+		src="http://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.3/summernote.js"></script>
+	<script>
+		$(document).ready(function() {
+			$('#invitation-input').summernote({
+				onKeyup : function(e) {
+					$("#lawsContent").val($("#summernote").code());
+				}
+			});
+			$('#cancellation-input').summernote({
+				onKeyup : function(e) {
+					$("#lawsContent").val($("#summernote").code());
+				}
+			});
+		});
+	</script>
 </div>
 </html>

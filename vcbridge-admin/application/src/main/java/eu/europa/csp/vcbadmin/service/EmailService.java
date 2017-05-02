@@ -29,6 +29,7 @@ public class EmailService {
 
 	@Async
 	public void prepareAndSend(EmailTemplate et, Meeting meeting) {
+		
 		// System.out.println("Participants!!:: " + meeting.getParticipants());
 		for (Participant p : meeting.getParticipants()) {
 			Map<String, Object> m = new HashMap<>();
