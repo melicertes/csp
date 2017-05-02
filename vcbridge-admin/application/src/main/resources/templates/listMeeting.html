@@ -22,7 +22,7 @@
 						<h1>Scheduled meetings</h1>
 						<div th:if="${meetings.empty}">Nothing to diplay yet</div>
 						<div th:unless="${meetings.empty}">
-							<form action="#" th:action="@{/cancelMeeting}" method="post">
+							<form id="cancellation-form" action="#" th:action="@{/cancelMeeting}" method="post">
 								<table class="table">
 									<thead>
 										<tr>
@@ -37,7 +37,7 @@
 										<tr class="currentmeeting"
 											th:each="meeting, stat : ${meetings}">
 											<th scope="row"><input class="todelete" type="checkbox"
-												name="id" th:value="${meeting.id}"></input></th>
+												name="id" th:value="${meeting.id}" th:attr="data-date=${{meeting.start}},data-duration=${{meeting.duration}}"></input></th>
 											<td th:text="${{meeting.start}}">start</td>
 											<td th:text="${{meeting.duration}}">duration</td>
 											<td th:text="${#lists.size(meeting.participants)}">#ofparticipants</td>
@@ -47,7 +47,8 @@
 								</table>
 								<div class="row">
 									<div class="col-6">
-										<button id="cancel_meeting_button" type="submit"
+
+										<button id="cancel_meeting_button" type="button"
 											class="btn btn-primary px-4">Cancel</button>
 									</div>
 								</div>
@@ -92,57 +93,81 @@
 			</div>
 		</div>
 	</div>
-</div>
-<div layout:fragment="scripts">
+	<div class="modal fade" id="confirm-cancel" tabindex="-1" role="dialog"
+		aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">Confirm Meeting Cancellation</div>
+				<div class="modal-body">
+					The following meetings are about to be cancelled. On confirmation,
+					all participants will be notified via email and access will be
+					revoked. Please confirm to continue.
+					<table class="table">
+						<thead>
+							<tr>
+								<th>Datetime</th>
+								<th>Duration</th>
+							</tr>
+						</thead>
+						<tbody id="meetingstobecancelled">
+							<tr>
+								<td>dddd</td>
+								<td>ffff</td>
+							</tr>
+						</tbody>
+					</table>
 
-	<script>
-		$(document)
-				.ready(
-						function() {
-							var max_fields = 10; //maximum input boxes allowed
-							var wrapper = $(".input_fields_wrap"); //Fields wrapper
-							var add_button = $("#add_field_button"); //Add button ID
-							var delete_button = $("#delete_button"); //Delete button
-							var new_email = $("#new_email"); // new email input
-							var x = 0; //initlal text box count
+				</div>
 
-							$("#selectall").change(
-									function() {
-										checked = this.checked;
-										$("tr.currentmeeting").each(
-												function() {
-													$this = $(this);
-													$(this).find(
-															"input.todelete")
-															.prop('checked',
-																	checked);
-												});
-									});
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+					<a href="#" id="submit-cancellation" class="btn btn-success success">Submit</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	</div>
+	<div layout:fragment="scripts">
 
-							$(add_button)
-									.click(
-											function(e) { //on add input button click
-												e.preventDefault();
-												$(wrapper)
-														.append(
-																'<tr class="useremail"><td><input class="todelete" type="checkbox" value=""></input></td><td><input hidden="true" class="form-control" type="text" value="'
-																		+ new_email
-																				.val()
-																		+ '" name="emails['
-																		+ x
-																		+ ']"/><div>'
-																		+ new_email
-																				.val()
-																		+ '</div></td></tr>'); //add input box
-												x++; //text box increment
+		<script>
+			$(document).ready(
+					function() {
+
+						$("#selectall").change(
+								function() {
+									checked = this.checked;
+									$("tr.currentmeeting").each(
+											function() {
+												$this = $(this);
+												$(this).find("input.todelete")
+														.prop('checked',
+																checked);
 											});
-							$(wrapper).on("click", ".remove_field",
-									function(e) { //user click on remove text
-										e.preventDefault();
-										$(this).parent('div').remove();
-										x--;
-									})
+								});
+						$("#cancel_meeting_button").click(function(e) {
+							e.preventDefault();
+							$("#meetingstobecancelled tr").remove();
+							var i=0;
+							$("tr.currentmeeting").each(function() {
+								
+								
+								$this = $(this);
+								$(this).find("input.todelete").each(function() {
+									if($(this).prop('checked')==true){
+										i++;
+										$("#meetingstobecancelled").append('<tr><td>'+$(this).attr("data-date")+'</td><td>'+$(this).attr("data-duration")+'</td></tr>');
+									}
+								});
+							}
+
+							);
+							if(i>0)
+								$('#confirm-cancel').modal('show');
 						});
-	</script>
-</div>
+						$('#submit-cancellation').click(function(){
+						    $('#cancellation-form').submit();
+						});
+					});
+		</script>
+	</div>
 </html>
