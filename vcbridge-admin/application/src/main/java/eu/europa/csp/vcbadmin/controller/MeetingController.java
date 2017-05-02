@@ -1,5 +1,6 @@
 package eu.europa.csp.vcbadmin.controller;
 
+import java.io.IOException;
 import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -135,7 +136,7 @@ public class MeetingController {
 	@PostMapping("/cancelMeeting")
 	public String checkPersonInfo(
 			@RequestParam(value = "id") @Size(min = 1, message = "Please select at least one meeting to cancel") Long[] ids,
-			Model model) {
+			Model model) throws IOException {
 		try {
 			meetingService.cancelMeetings(ids);
 		} catch (MeetingNotFound e) {

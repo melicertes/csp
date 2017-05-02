@@ -27,7 +27,7 @@ public class MailContentBuilder {
 	@Autowired
 	MessageSource messageSource;
 
-	public String build(String emailTemplate, Map<String, Object> values, boolean html) {
+	public String build(String emailTemplate, Map<String, Object> values) {
 		SpringMessageResolver springMessageResolver = new SpringMessageResolver();
 
 		springMessageResolver.setMessageSource(messageSource);

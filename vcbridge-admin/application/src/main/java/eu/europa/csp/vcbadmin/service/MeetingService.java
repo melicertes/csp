@@ -1,5 +1,6 @@
 package eu.europa.csp.vcbadmin.service;
 
+import java.io.IOException;
 import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -9,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import eu.europa.csp.vcbadmin.config.VcbadminProperties;
@@ -48,8 +50,8 @@ public class MeetingService {
 		return meeting;
 	}
 
-	@Transactional
-	public void cancelMeetings(Long[] ids) throws MeetingNotFound {
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	public void cancelMeetings(Long[] ids) throws MeetingNotFound, IOException {
 		LinkedList<Meeting> meetings = new LinkedList<>();
 		for (long id : ids) {
 			Meeting m = meetingRepository.findOne(id);
