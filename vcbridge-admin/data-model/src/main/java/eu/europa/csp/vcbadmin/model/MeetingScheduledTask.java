@@ -9,11 +9,13 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
 import eu.europa.csp.vcbadmin.constants.MeetingScheduledTaskType;
 
 @Entity
+@Table(name = "vcb_scheduledtask")
 public class MeetingScheduledTask {
 	@Id
 	@GeneratedValue

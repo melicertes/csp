@@ -8,11 +8,13 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
 import eu.europa.csp.vcbadmin.constants.EmailTemplateType;
 
 @Entity
+@Table(name = "vcb_emailtemplate")
 public class EmailTemplate {
 	@Id
 	@GeneratedValue
