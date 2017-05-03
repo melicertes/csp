@@ -1,0 +1,1 @@
+Dear [(${email})]\nYou have been invited to a meeting to be held at [(${meeting_date})] and [(${meeting_time})].\nTo connect use the following details:\nMeeting URL: [(${meeting_url})] - this meeting uses WebRTC technology: please use Chrome (latest).\nUsername: [(${meeting_username})]\nPassword: [(${meeting_password})]\nThank you,\n[(${user_first})], [(${user_lastname})]

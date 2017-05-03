@@ -7,7 +7,6 @@ import java.time.ZonedDateTime;
 import java.util.LinkedList;
 import java.util.UUID;
 
-import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 
 import eu.europa.csp.vcbadmin.constants.MeetingStatus;

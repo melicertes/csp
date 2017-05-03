@@ -8,6 +8,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Scanner;
 
 import javax.mail.internet.MimeMessage;
 import javax.mail.util.ByteArrayDataSource;
@@ -90,6 +91,12 @@ public class EmailService {
 	@Value(value = "classpath:templates/icalendar/meeting.ics")
 	private Resource meetingTemplate;
 
+	@Value(value = "classpath:templates/icalendar/invitation_description.txt")
+	private Resource meetingTemplateInvitation;
+
+	@Value(value = "classpath:templates/icalendar/cancellation_description.txt")
+	private Resource meetingTemplateCancellation;
+
 	@Async
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void prepareAndSend(EmailTemplate et, Meeting meeting) throws IOException {
@@ -131,22 +138,29 @@ public class EmailService {
 				}
 				br.close();
 				m.put("organizer", meeting.getUser().getFullName());
-				m.put("email", meeting.getUser().getEmail());
+				m.put("organizerEmail", meeting.getUser().getEmail());
 				m.put("summary", subject);
-				m.put("description", String.format("Participants: %s Meeting url: %s", meeting.getParticipants().size(),
-						meeting.getUrl()));
 				m.put("duration", meeting.getDuration().toString());
 				m.put("start", DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmmssX")
 						.format(ZonedDateTime.ofInstant(meeting.getStart().toInstant(), ZoneOffset.UTC)));
 				m.put("uid", meeting.getUid());
 				m.put("location", meeting.getUrl());
+				m.put("comment", content);
 				if (et.getType().equals(EmailTemplateType.INVITATION)) {
-					m.put("sequence", 0);
+					String ics_description_template = new Scanner(meetingTemplateInvitation.getInputStream(), "utf-8")
+							.useDelimiter("\\Z").next();
+					m.put("description", mailContentBuilder.build(ics_description_template, m));
+					m.put("seq", 0);
 					m.put("status", "CONFIRMED");
+
 				} else {
-					m.put("sequence", 1);
+					String ics_description_template = new Scanner(meetingTemplateCancellation.getInputStream(), "utf-8")
+							.useDelimiter("\\Z").next();
+					m.put("description", mailContentBuilder.build(ics_description_template, m));
+					m.put("seq", 1);
 					m.put("status", "CANCELLED");
 				}
+
 				String ics = mailContentBuilder.build(meetingICSBuilder.toString(), m);
 				mimeMessage.setHeader("Content-Class", "urn:content-  classes:calendarmessage");
 				mimeMessage.setHeader("Content-ID", "calendar_message");
@@ -158,11 +172,11 @@ public class EmailService {
 			// ics);
 			try {
 				mailSender.send(messagePreparator);
+				log.info("Email sent to {}", p.getEmail());
 			} catch (MailException e) {
 				log.error("Error sending email to " + p.getEmail(), e);
 				// runtime exception; compiler will not force you to handle it
 			}
-			log.info("Email sent to {}", p.getEmail());
 		}
 	}
 }
