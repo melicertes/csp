@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZonedDateTime;
 import java.util.LinkedList;
+import java.util.UUID;
 
 import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
@@ -19,6 +20,7 @@ public class MeetingForm {
 		m.setParticipantEmails(form_meeting.getEmails());
 		m.setStatus(MeetingStatus.Pending);
 		m.setUser(user);
+		m.setUid(UUID.randomUUID().toString());
 		return m;
 	}
 

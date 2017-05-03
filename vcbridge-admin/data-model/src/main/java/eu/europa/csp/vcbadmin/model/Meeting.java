@@ -31,6 +31,8 @@ public class Meeting {
 	@Id
 	@GeneratedValue
 	private Long id;
+	
+	private String uid;
 
 	@OneToMany(mappedBy = "meeting", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private List<Participant> participants = new LinkedList<>();
@@ -187,5 +189,17 @@ public class Meeting {
 
 	public void setUser(User user) {
 		this.user = user;
+	}
+
+
+
+	public String getUid() {
+		return uid;
+	}
+
+
+
+	public void setUid(String uid) {
+		this.uid = uid;
 	}
 }

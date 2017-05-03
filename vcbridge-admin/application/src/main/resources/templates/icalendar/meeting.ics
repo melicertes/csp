@@ -2,9 +2,11 @@ BEGIN:VCALENDAR
 PRODID:-//Mozilla.org/NONSGML Mozilla Calendar V1.1//EN
 VERSION:2.0
 BEGIN:VEVENT
+SEQUENCE:[(${seq})]
+STATUS:[(${status})]
 UID:[(${uid})]
-SUMMARY:Sastix Meeting
-ORGANIZER;CN=[(${organizer})]
+SUMMARY:[(${summary})]
+ORGANIZER;CN=[(${organizer})]:MAILTO:[(${email})]
 CATEGORIES:Meeting
 DTSTART:[(${start})]
 DURATION:[(${duration})]
@@ -13,7 +15,7 @@ LOCATION:Remote
 BEGIN:VALARM
 ACTION:DISPLAY
 TRIGGER;VALUE=DURATION:-PT15M
-DESCRIPTION:Meeting
+DESCRIPTION:[(${description})]
 END:VALARM
 END:VEVENT
 END:VCALENDAR
