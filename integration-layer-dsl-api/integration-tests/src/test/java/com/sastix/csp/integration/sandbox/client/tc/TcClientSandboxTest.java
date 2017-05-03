@@ -14,6 +14,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.env.Environment;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.web.client.MockRestServiceServer;
 
@@ -46,11 +47,15 @@ public class TcClientSandboxTest {
     @Autowired
     MockUtils mockUtils;
 
+    @Autowired
+    Environment env;
+
     private String trustCirclesContext;
 
     @Before
     public void init(){
-        trustCirclesContext = tcClient.getContext()+ ContextUrl.TRUST_CIRCLE;
+        String trustCirclePath = env.getProperty("tc.path.circles");
+        trustCirclesContext = tcClient.getContext()+ trustCirclePath+"/1";
     }
 
     @Test

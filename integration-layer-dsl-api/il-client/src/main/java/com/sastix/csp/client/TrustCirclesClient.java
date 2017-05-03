@@ -9,6 +9,8 @@ import java.util.List;
  */
 public interface TrustCirclesClient {
     void setProtocolHostPort(String protocol, String host, String port);
+
     String getContext();
-   TrustCircle getTrustCircle(Integer id);
+
+    TrustCircle getTrustCircle(Integer id);
 }

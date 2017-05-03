@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class DclApiController implements CamelRoutes{
+public class DclApiController implements CamelRoutes,ContextUrl{
 
     private static final Logger LOG = LoggerFactory.getLogger(DclApiController.class);
 
@@ -32,7 +32,7 @@ public class DclApiController implements CamelRoutes{
      * @param newIntDataObj
      * @return
      */
-    @RequestMapping(value = ContextUrl.DCL_INTEGRATION_DATA,
+    @RequestMapping(value = "/v"+REST_API_V1+"/"+DCL_INTEGRATION_DATA,
             consumes = {"application/json"},
             method = RequestMethod.POST)
     public ResponseEntity<String> getNewIntDataFromExtCsp(@RequestBody IntegrationData newIntDataObj) {
@@ -40,7 +40,7 @@ public class DclApiController implements CamelRoutes{
         LOG.info(newIntDataObj.toString());
         intDataProducer.sendBodyAndHeader(routes.apply(EDCL), newIntDataObj,"method", "POST");
 
-        return new ResponseEntity<String>(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     /**
@@ -48,7 +48,7 @@ public class DclApiController implements CamelRoutes{
      * @param newIntDataObj
      * @return
      */
-    @RequestMapping(value = ContextUrl.DCL_INTEGRATION_DATA,
+    @RequestMapping(value = "/v"+REST_API_V1+"/"+DCL_INTEGRATION_DATA,
             consumes = {"application/json"},
             method = RequestMethod.PUT)
     public ResponseEntity<String> getUpdateIntDataFromExtCsp(@RequestBody IntegrationData newIntDataObj) {
@@ -56,7 +56,7 @@ public class DclApiController implements CamelRoutes{
         LOG.info(newIntDataObj.toString());
         intDataProducer.sendBodyAndHeader(routes.apply(EDCL), newIntDataObj, "method", "PUT");
 
-        return new ResponseEntity<String>(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
 }

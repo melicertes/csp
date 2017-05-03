@@ -24,7 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * Created by iskitsas on 4/10/17.
  */
 @Component
-public class MockUtils {
+public class MockUtils implements ContextUrl {
     private static final Logger LOG = LoggerFactory.getLogger(MockUtils.class);
 
     SpringCamelContext springCamelContext;
@@ -81,7 +81,7 @@ public class MockUtils {
         sharingParams.setIsExternal(isExternal);
         sharingParams.setToShare(true);
         integrationData.setSharingParams(sharingParams);
-        mvc.perform(post(ContextUrl.DSL_INTEGRATION_DATA).accept(MediaType.TEXT_PLAIN)
+        mvc.perform(post("/v"+REST_API_V1+"/"+DSL_INTEGRATION_DATA).accept(MediaType.TEXT_PLAIN)
                 .content(TestUtil.convertObjectToJsonBytes(integrationData))
                 .contentType(TestUtil.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())

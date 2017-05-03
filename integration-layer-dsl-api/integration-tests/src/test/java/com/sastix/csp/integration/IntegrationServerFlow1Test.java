@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sastix.csp.client.TrustCirclesClient;
 import com.sastix.csp.commons.apiHttpStatusResponse.HttpStatusResponseType;
 import com.sastix.csp.commons.client.RetryRestTemplate;
+import com.sastix.csp.commons.constants.AppProperties;
 import com.sastix.csp.commons.model.IntegrationData;
 import com.sastix.csp.commons.model.IntegrationDataType;
 import com.sastix.csp.commons.model.SharingParams;
@@ -26,6 +27,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.env.Environment;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.client.MockRestServiceServer;
@@ -87,15 +89,20 @@ public class IntegrationServerFlow1Test {
     @Autowired
     SpringCamelContext springCamelContext;
 
+    @Autowired
+    Environment env;
+
     String trustCirclesContext;
 
     @Before
     public void init() throws Exception {
+        String trustCirclePath = env.getProperty("tc.path.circles");
+
         mvc = webAppContextSetup(webApplicationContext).build();
         mockRoute(CamelRoutes.MOCK_PREFIX,CamelRoutes.DSL);
         mockRoute(CamelRoutes.MOCK_PREFIX,CamelRoutes.DDL);
         mockRouteSkipSendToOriginalEndpoint(CamelRoutes.MOCK_PREFIX,CamelRoutes.TC);
-        trustCirclesContext = tcClient.getContext()+ContextUrl.TRUST_CIRCLE;
+        trustCirclesContext = tcClient.getContext()+trustCirclePath;
         //MockEndpoint resultEndpoint = springCamelContext.addEndpoint("mock:foo", new MockEndpoint());
     }
 

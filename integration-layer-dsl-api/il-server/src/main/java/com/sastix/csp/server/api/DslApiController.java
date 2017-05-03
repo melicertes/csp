@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class DslApiController implements CamelRoutes{
+public class DslApiController implements CamelRoutes, ContextUrl{
 
     private static final Logger LOG = LoggerFactory.getLogger(DslApiController.class);
 
@@ -31,21 +31,21 @@ public class DslApiController implements CamelRoutes{
     RouteUtils routes;
 
 
-    @RequestMapping(value = ContextUrl.DSL_INTEGRATION_DATA,
+    @RequestMapping(value = "/v"+REST_API_V1+"/"+DSL_INTEGRATION_DATA,
             consumes = {"application/json"},
             method = RequestMethod.POST)
     public ResponseEntity<String> synchNewIntData(@RequestBody IntegrationData integrationData) {
         return handleIntegrationData(integrationData, "POST");
     }
 
-    @RequestMapping(value = ContextUrl.DSL_INTEGRATION_DATA,
+    @RequestMapping(value = "/v"+REST_API_V1+"/"+DSL_INTEGRATION_DATA,
             consumes = {"application/json"},
             method = RequestMethod.PUT)
     public ResponseEntity<String> synchUpdatedIntData(@RequestBody IntegrationData integrationData) {
         return handleIntegrationData(integrationData, "PUT");
     }
 
-    @RequestMapping(value = ContextUrl.DSL_INTEGRATION_DATA,
+    @RequestMapping(value = "/v"+REST_API_V1+"/"+DSL_INTEGRATION_DATA,
             consumes = {"application/json"},
             method = RequestMethod.DELETE)
     public ResponseEntity<String> synchDeletedIntData(@RequestBody IntegrationData integrationData) {

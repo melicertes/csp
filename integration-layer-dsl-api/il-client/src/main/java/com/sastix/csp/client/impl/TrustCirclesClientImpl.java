@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.util.List;
 
@@ -22,6 +23,9 @@ public class TrustCirclesClientImpl implements TrustCirclesClient {
     @Qualifier("CspRestTemplate")
     RetryRestTemplate retryRestTemplate;
 
+    @Value("${tc.path.circles}")
+    String trustCircle;
+
     @Override
     public void setProtocolHostPort(String protocol, String host, String port) {
         context = protocol+"://"+host+":"+port;
@@ -29,7 +33,7 @@ public class TrustCirclesClientImpl implements TrustCirclesClient {
 
     @Override
     public TrustCircle getTrustCircle(Integer id) {
-        String url = context + ContextUrl.TRUST_CIRCLE + id;
+        String url = context + trustCircle + "/"+id;
         LOG.debug("API call [post]: " + url);
         TrustCircle trustCircle = retryRestTemplate.getForObject(url, TrustCircle.class);
         return trustCircle;
