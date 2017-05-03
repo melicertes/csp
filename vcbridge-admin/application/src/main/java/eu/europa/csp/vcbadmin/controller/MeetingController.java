@@ -84,7 +84,7 @@ public class MeetingController {
 	}
 
 	@PostMapping("/createMeeting")
-	public String checkPersonInfo(@Valid @ModelAttribute("meetingForm") MeetingForm meetingForm,
+	public String createMeeting(@Valid @ModelAttribute("meetingForm") MeetingForm meetingForm,
 			BindingResult bindingResult, Authentication auth) {
 		List<String> emails = meetingForm.getEmails().stream().filter(s -> s != null && !s.isEmpty())
 				.collect(Collectors.toList());
@@ -128,7 +128,10 @@ public class MeetingController {
 		log.info("Now - 30 min: {}", ZonedDateTime.now().minusMinutes(30));
 
 		meetingService.createMeeting(m, Arrays.asList(
-				new MeetingScheduledTask(MeetingScheduledTaskType.START_MEETING, m.getStart().minusMinutes(30)),
+				// new
+				// MeetingScheduledTask(MeetingScheduledTaskType.START_MEETING,
+				// m.getStart().minusMinutes(30))
+				new MeetingScheduledTask(MeetingScheduledTaskType.START_MEETING, ZonedDateTime.now().plusMinutes(10)),
 				new MeetingScheduledTask(MeetingScheduledTaskType.END_MEETING, m.getExpectedEnd().plusMinutes(30))));
 		return "redirect:/listMeeting";
 	}
