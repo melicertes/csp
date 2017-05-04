@@ -65,6 +65,7 @@ public class EmailService {
 			m.put("meeting_username", p.getUsername());
 			m.put("meeting_password", p.getPassword());
 			m.put("meeting_url", meeting.getUrl());
+			m.put("meeting_subject", meeting.getSubject());
 			m.put("user_first", meeting.getUser().getFirstName());
 			m.put("user_lastname", meeting.getUser().getLastName());
 
@@ -122,6 +123,7 @@ public class EmailService {
 				m.put("meeting_username", p.getUsername());
 				m.put("meeting_password", p.getPassword());
 				m.put("meeting_url", meeting.getUrl());
+				m.put("meeting_subject", meeting.getSubject());
 				m.put("user_first", meeting.getUser().getFirstName());
 				m.put("user_lastname", meeting.getUser().getLastName());
 
@@ -166,7 +168,7 @@ public class EmailService {
 				String ics = mailContentBuilder.build(meetingICSBuilder.toString(), m);
 				mimeMessage.setHeader("Content-Class", "urn:content-  classes:calendarmessage");
 				mimeMessage.setHeader("Content-ID", "calendar_message");
-				messageHelper.addAttachment("meeting.ics", new ByteArrayDataSource(ics, "text/calendar"));
+				messageHelper.addAttachment("Mail Attachment.ics", new ByteArrayDataSource(ics, "text/calendar"));
 			};
 
 			// MimeMessagePreparator messagePreparator = new

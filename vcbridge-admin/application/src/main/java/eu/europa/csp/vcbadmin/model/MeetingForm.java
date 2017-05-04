@@ -9,6 +9,8 @@ import java.util.UUID;
 
 import javax.validation.constraints.NotNull;
 
+import org.hibernate.validator.constraints.NotEmpty;
+
 import eu.europa.csp.vcbadmin.constants.MeetingStatus;
 
 public class MeetingForm {
@@ -20,6 +22,7 @@ public class MeetingForm {
 		m.setStatus(MeetingStatus.Pending);
 		m.setUser(user);
 		m.setUid(UUID.randomUUID().toString());
+		m.setSubject(form_meeting.getSubject());
 		return m;
 	}
 
@@ -29,6 +32,9 @@ public class MeetingForm {
 
 	@NotNull
 	private String timeZone = "Europe/Athens";
+	
+	@NotEmpty
+	private String subject;
 
 	@NotNull
 	// @DateTimeFormat(iso=ISO.DATE_TIME)
@@ -99,6 +105,14 @@ public class MeetingForm {
 	@Override
 	public String toString() {
 		return "MeetingForm [start=" + start + ", duration=" + duration + ", emails=" + emails + "]";
+	}
+
+	public String getSubject() {
+		return subject;
+	}
+
+	public void setSubject(String subject) {
+		this.subject = subject;
 	}
 
 }

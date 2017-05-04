@@ -32,6 +32,14 @@
 							<input hidden="true" type="text"
 								class="form-control datetimeoutput" th:field="*{start}"
 								placeholder="2011-12-03T10:15:30+01:00" />
+							<div class="input-group mb-4"
+								th:classappend="${#fields.hasErrors('start')} ? has-danger">
+								<input class="form-control col-md-4" type="text" maxlength="120" th:field="*{subject}"
+									placeholder="Brief subject" required="required"/>
+								<div th:if="${#fields.hasErrors('subject')}"
+									th:errors="*{subject}" class="form-control-feedback">Error
+									subject</div>
+							</div>
 
 
 							<div class="input-group mb-4"

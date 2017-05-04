@@ -22,6 +22,8 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
 
+import org.hibernate.validator.constraints.NotBlank;
+
 import eu.europa.csp.vcbadmin.constants.MeetingStatus;
 
 @Entity
@@ -31,7 +33,7 @@ public class Meeting {
 	@Id
 	@GeneratedValue
 	private Long id;
-	
+
 	private String uid;
 
 	@OneToMany(mappedBy = "meeting", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -50,6 +52,9 @@ public class Meeting {
 	@NotNull
 	private String url;
 
+	@NotBlank
+	private String subject;
+
 	@NotNull
 	private ZonedDateTime start;
 
@@ -63,8 +68,6 @@ public class Meeting {
 	public Meeting() {
 
 	}
-
-	
 
 	public void setParticipantEmails(Collection<String> emails) {
 		MessageDigest md = null;
@@ -166,8 +169,8 @@ public class Meeting {
 		// according to https://jira.sastix.com/browse/SXCSP-125
 		// duration should be 0:30 up to 08:00, so it is safe to assume that
 		// this is is a time
-//		System.out.println(duration.toHours());
-//		System.out.println(duration.toMinutes() % 60);
+		// System.out.println(duration.toHours());
+		// System.out.println(duration.toMinutes() % 60);
 		return LocalTime.of(Long.valueOf(duration.toHours()).intValue(),
 				Long.valueOf(duration.toMinutes()).intValue() % 60);
 	}
@@ -179,27 +182,27 @@ public class Meeting {
 		scheduledTasks.add(meeting_scheduled_task);
 	}
 
-
-
 	public User getUser() {
 		return user;
 	}
-
-
 
 	public void setUser(User user) {
 		this.user = user;
 	}
 
-
-
 	public String getUid() {
 		return uid;
 	}
 
-
-
 	public void setUid(String uid) {
 		this.uid = uid;
+	}
+
+	public String getSubject() {
+		return subject;
+	}
+
+	public void setSubject(String subject) {
+		this.subject = subject;
 	}
 }

@@ -6,7 +6,9 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -90,12 +92,14 @@ public class MeetingController {
 	@PostMapping("/createMeeting")
 	public String createMeeting(@Valid @ModelAttribute("meetingForm") MeetingForm meetingForm,
 			BindingResult bindingResult, Authentication auth) {
-		List<String> emails = meetingForm.getEmails().stream().filter(s -> s != null && !s.isEmpty())
+		List<String> emails = meetingForm.getEmails().stream().filter(s -> Objects.nonNull(s) && !s.trim().isEmpty())
 				.collect(Collectors.toList());
+		System.out.println(emails);
 		if (emails.isEmpty()) {
 			bindingResult.rejectValue("emails", "errors.emails.empty", "Please provide at least one participant");
 		} else {
 			for (String email : emails) {
+				System.out.println(email);
 				Pattern pattern = Pattern.compile(EMAIL_PATTERN);
 				Matcher matcher = pattern.matcher(email);
 				if (!matcher.matches()) {
@@ -120,6 +124,10 @@ public class MeetingController {
 		if (bindingResult.hasErrors()) {
 			return "createMeeting";
 		}
+
+		meetingForm.setEmails(new LinkedList<>(emails)); // important: update
+															// the correct email
+															// list
 
 		log.debug("Meeting validated ok: {}", meetingForm);
 		log.debug(meetingForm.toString());

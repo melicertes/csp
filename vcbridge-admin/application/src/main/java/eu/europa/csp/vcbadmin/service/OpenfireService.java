@@ -1,6 +1,7 @@
 package eu.europa.csp.vcbadmin.service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import javax.ws.rs.core.Response;
 
@@ -40,6 +41,8 @@ public class OpenfireService {
 		Response r = null;
 		try {
 			MUCRoomEntity chatRoom = new MUCRoomEntity(room, room, "Some description");
+			chatRoom.setBroadcastPresenceRoles(Arrays.asList("moderator", "participant", "visitor"));
+			//chatRoom.setMembersOnly(true);
 			r = restApiClient.createChatRoom(chatRoom);
 		} catch (Exception e) {
 			throw new ErrorCreatingRoom(String.format("Error creating room %s", room), e);

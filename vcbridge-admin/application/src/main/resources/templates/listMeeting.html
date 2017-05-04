@@ -28,6 +28,7 @@
 									<thead>
 										<tr>
 											<th><input type="checkbox" id="selectall" value=""></input></th>
+											<th>Subject</th>
 											<th>Start Date and Time</th>
 											<th>Duration</th>
 											<th>Participants</th>
@@ -40,6 +41,7 @@
 											<th scope="row"><input class="todelete" type="checkbox"
 												name="id" th:value="${meeting.id}"
 												th:attr="data-date=${{meeting.start}},data-duration=${{meeting.duration}}"></input></th>
+											<td th:text="${meeting.subject}">start</td>
 											<td th:text="${{meeting.start}}">start</td>
 											<td th:text="${{meeting.duration}}">duration</td>
 											<td th:text="${#lists.size(meeting.participants)}">#ofparticipants</td>
@@ -70,6 +72,7 @@
 							<table class="table">
 								<thead>
 									<tr>
+										<th>Subject</th>
 										<th>Start Date and Time</th>
 										<th>Duration</th>
 										<th>Participants</th>
@@ -78,6 +81,7 @@
 								</thead>
 								<tbody>
 									<tr th:each="meeting, stat : ${pastMeetings}">
+										<td th:text="${meeting.subject}">start</td>
 										<td th:text="${{meeting.start}}">start</td>
 										<td th:text="${meeting.durationAsTime}">duration</td>
 										<td th:text="${#lists.size(meeting.participants)}">#ofparticipants</td>

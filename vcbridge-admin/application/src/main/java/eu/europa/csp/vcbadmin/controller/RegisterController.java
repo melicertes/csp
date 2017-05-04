@@ -50,7 +50,7 @@ public class RegisterController {
 
 	@Value(value = "classpath:templates/email/invitation.html")
 	private Resource invitationHTML;
-	
+
 	@Value(value = "classpath:templates/email/cancellation.html")
 	private Resource cancellationHTML;
 
@@ -60,30 +60,30 @@ public class RegisterController {
 		userForm.setPassword(passwordEncoder.encode(userForm.getPassword()));
 		log.info("Creating user {}", userForm);
 		User user = userRepository.save(userForm);
-		
-		log.debug("Constructing init invitation email for user {}",user.getEmail());
+
+		log.debug("Constructing init invitation email for user {}", user.getEmail());
 		EmailTemplate et = new EmailTemplate();
-		et.setSubject("Meeting invitation: [(${meeting_date})] [(${meeting_time})]");
+		et.setSubject("Invitation: [(${meeting_subject})]");
 		String content = new Scanner(invitationHTML.getInputStream(), "utf-8").useDelimiter("\\Z").next();
 		et.setContent(content);
 		et.setType(EmailTemplateType.INVITATION);
 		et.setUser(user);
 		EmailTemplate invitation = emailTemplateRepository.save(et);
-		
-		log.debug("Constructing init cancellation email for user {}",user.getEmail());
+
+		log.debug("Constructing init cancellation email for user {}", user.getEmail());
 		et = new EmailTemplate();
-		et.setSubject("Meeting cancellation: [(${meeting_date})] [(${meeting_time})]");
+		et.setSubject("Cancelled: [(${meeting_subject})]");
 		content = new Scanner(cancellationHTML.getInputStream(), "utf-8").useDelimiter("\\Z").next();
 		et.setContent(content);
 		et.setType(EmailTemplateType.CANCELLATION);
 		et.setUser(user);
 		EmailTemplate cancellation = emailTemplateRepository.save(et);
-		
+
 		user.setInvitation(invitation);
 		user.setCancellation(cancellation);
-		
+
 		userRepository.save(user);
-		
+
 		return "redirect:/login";
 	}
 
