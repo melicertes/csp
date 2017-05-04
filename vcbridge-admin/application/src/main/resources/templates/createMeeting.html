@@ -13,10 +13,10 @@
 <div layout:fragment="head"></div>
 
 <div layout:fragment="content">
-	
+
 	<div
 		class="app header-fixed sidebar-fixed aside-menu-fixed aside-menu-hidden">
-		<br/>
+		<br />
 		<div class="col-md-8">
 			<div class="card-group mb-0">
 				<div class="card p-4">
@@ -28,50 +28,54 @@
 						<form id="createMeetingForm" action="#"
 							th:action="@{/createMeeting}" th:object="${meetingForm}"
 							method="post">
-							<div class="input-group mb-3">
-								
-								
-
-								
-							</div>
+							<div class="input-group mb-3"></div>
 							<input hidden="true" type="text"
-									class="form-control datetimeoutput" th:field="*{start}"
-									placeholder="2011-12-03T10:15:30+01:00" /> 
-							
+								class="form-control datetimeoutput" th:field="*{start}"
+								placeholder="2011-12-03T10:15:30+01:00" />
 
-							<div class="input-group mb-4" th:classappend="${#fields.hasErrors('start')} ? has-danger">
+
+							<div class="input-group mb-4"
+								th:classappend="${#fields.hasErrors('start')} ? has-danger">
 								<span class="input-group-addon"><i class="icon-calendar"></i></span>
-								<input id="datepicker" type="text" data-provide="datepicker" data-orientation="auto bottom"
-								data-format="yy-mm-dd"  class="form-control date col-md-3"
-									required="true" th:value="${{meetingForm.startDate}}" placeholder="Date e.g., 05-31-2021"/>
-								<span class="input-group-addon"><i class="icon-clock"></i></span>
-								<input id="timepicker"
-									class="form-control  bootstrap-timepicker timepicker col-md-3" 
+								<input id="datepicker" type="text" data-provide="datepicker"
+									data-orientation="auto bottom" data-format="yy-mm-dd"
+									class="form-control date col-md-4" required="true"
+									th:value="${{meetingForm.startDate}}"
+									placeholder="Date e.g., 05-31-2021" /> <span
+									class="input-group-addon"><i class="icon-clock"></i></span> <input
+									id="timepicker"
+									class="form-control  bootstrap-timepicker timepicker col-md-4"
 									data-provide="timepicker" data-template="dropdown"
 									data-minute-step="1" data-show-meridian="false" type="text"
-									required="true" th:value="${{meetingForm.startTime}}" placeholder="Time e.g., 18:20"/>
-								<select id="selecttimezone" class="selectpicker col-md-6" name="timeZone"></select>
-								<div th:if="${#fields.hasErrors('timeZone')}" th:errors="*{timeZone}"
-									class="form-control-feedback">Error timezone</div>
-								
+									required="true" th:value="${{meetingForm.startTime}}"
+									placeholder="Time e.g., 18:20" />
+								<div th:if="${#fields.hasErrors('start')}" th:errors="*{start}"
+									class="form-control-feedback">Error duration</div>
+								<select id="selecttimezone" class="selectpicker col-md-4"
+									name="timeZone"></select>
+								<div th:if="${#fields.hasErrors('timeZone')}"
+									th:errors="*{timeZone}" class="form-control-feedback">Error
+									timezone</div>
+
 							</div>
-							
+
 							<div class="input-group mb-4"
 								th:classappend="${#fields.hasErrors('duration')} ? has-danger">
 								<span class="input-group-addon"><i class="icon-bell"></i>
-								</span> 
-								
-								<input id="durationpicker"
-									class="form-control  bootstrap-timepicker timepicker col-md-3" 
-									data-provide="timepicker" data-template="dropdown" th:field="*{duration}"
-									data-minute-step="1" data-show-meridian="false" data-max-hours="8" data-default-time="01:00" type="text"
-									required="true" th:value="${{meetingForm.startTime}}" placeholder="Duration e.g., 01:30"/>
+								</span> <input id="durationpicker"
+									class="form-control  bootstrap-timepicker timepicker col-md-3"
+									data-provide="timepicker" data-template="dropdown"
+									th:field="*{duration}" data-minute-step="1"
+									data-show-meridian="false" data-max-hours="8"
+									data-default-time="01:00" type="text" required="true"
+									th:value="${{meetingForm.startTime}}"
+									placeholder="Duration e.g., 01:30" />
 								<div th:if="${#fields.hasErrors('duration')}"
 									th:errors="*{duration}" class="form-control-feedback">Error
 									duration</div>
 							</div>
-							
-							
+
+
 							<div class="input-group mb-4"
 								th:classappend="${#fields.hasErrors('emails')} ? has-danger">
 								<span class="input-group-addon"><i class="icon-user"></i></span>
@@ -181,8 +185,15 @@
 												$(".datetimeoutput")
 														.val(
 																moment
-																		.tz($("#datepicker").val() + 'T' + $("#timepicker").val(), 'MM-DD-YYYYTHH:mm'
-																				,
+																		.tz(
+																				$(
+																						"#datepicker")
+																						.val()
+																						+ 'T'
+																						+ $(
+																								"#timepicker")
+																								.val(),
+																				'MM-DD-YYYYTHH:mm',
 																				$(
 																						"#selecttimezone")
 																						.val())
@@ -200,39 +211,39 @@
 
 						});
 	</script>
-	<script type="text/javascript"
-		src="resources/js/jquery.timesetter.js">
-	
+	<script type="text/javascript" src="resources/js/jquery.timesetter.js">
+		
 	</script>
 	<!-- <script src="resources/js/bootstrap-select.min.js"></script> -->
 	<!-- <script type="text/javascript" src="resources/js/timezones.js"></script> -->
-	
-		<script type="text/javascript" src="resources/js/jquery.timesetter.js">
+
+	<script type="text/javascript" src="resources/js/jquery.timesetter.js">
+		
 	</script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.4/js/standalone/selectize.min.js"></script>
-		<script>
-	 $(document).ready(
-			$('#datepicker').datepicker({
-		format : "mm-dd-yyyy",
-		orientation: "auto bottom"
-	})) 
-	$(document).ready(function() {
-	timezone = moment.tz.names();
-    for (var i = 0; i < timezone.length; i++) {
-      $('select').append('<option value="' + timezone[i] + '">' + timezone[i] + '</option>');
-    }
-    $('#selecttimezone').selectize();
-    //$('select').selectpicker();
-})
-	$(document).ready(
-			
-	);
-	
-	
-	
+	<script
+		src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.4/js/standalone/selectize.min.js"></script>
+	<script>
+		$(document).ready($('#datepicker').datepicker({
+			format : "mm-dd-yyyy",
+			orientation : "auto bottom"
+		}))
+		$(document).ready(
+				function() {
+					timezone = moment.tz.names();
+					for (var i = 0; i < timezone.length; i++) {
+						$('select').append(
+								'<option value="' + timezone[i] + '">'
+										+ timezone[i] + '</option>');
+					}
+					$('#selecttimezone').selectize();
+					//$('select').selectpicker();
+				})
+		$(document).ready(
+
+		);
 	</script>
-	
-	
+
+
 </div>
 
 

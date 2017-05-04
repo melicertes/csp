@@ -22,7 +22,8 @@
 						<h1>Scheduled meetings</h1>
 						<div th:if="${meetings.empty}">Nothing to diplay yet</div>
 						<div th:unless="${meetings.empty}">
-							<form id="cancellation-form" action="#" th:action="@{/cancelMeeting}" method="post">
+							<form id="cancellation-form" action="#"
+								th:action="@{/cancelMeeting}" method="post">
 								<table class="table">
 									<thead>
 										<tr>
@@ -37,7 +38,8 @@
 										<tr class="currentmeeting"
 											th:each="meeting, stat : ${meetings}">
 											<th scope="row"><input class="todelete" type="checkbox"
-												name="id" th:value="${meeting.id}" th:attr="data-date=${{meeting.start}},data-duration=${{meeting.duration}}"></input></th>
+												name="id" th:value="${meeting.id}"
+												th:attr="data-date=${{meeting.start}},data-duration=${{meeting.duration}}"></input></th>
 											<td th:text="${{meeting.start}}">start</td>
 											<td th:text="${{meeting.duration}}">duration</td>
 											<td th:text="${#lists.size(meeting.participants)}">#ofparticipants</td>
@@ -121,53 +123,81 @@
 
 				<div class="modal-footer">
 					<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-					<a href="#" id="submit-cancellation" class="btn btn-success success">Submit</a>
+					<a href="#" id="submit-cancellation"
+						class="btn btn-success success">Submit</a>
 				</div>
 			</div>
 		</div>
 	</div>
-	</div>
-	<div layout:fragment="scripts">
+</div>
+<div layout:fragment="scripts">
 
-		<script>
-			$(document).ready(
-					function() {
+	<script>
+		$(document)
+				.ready(
+						function() {
 
-						$("#selectall").change(
-								function() {
-									checked = this.checked;
-									$("tr.currentmeeting").each(
-											function() {
-												$this = $(this);
-												$(this).find("input.todelete")
-														.prop('checked',
-																checked);
+							$("#selectall").change(
+									function() {
+										checked = this.checked;
+										$("tr.currentmeeting").each(
+												function() {
+													$this = $(this);
+													$(this).find(
+															"input.todelete")
+															.prop('checked',
+																	checked);
+												});
+									});
+							$("#cancel_meeting_button")
+									.click(
+											function(e) {
+												e.preventDefault();
+												$("#meetingstobecancelled tr")
+														.remove();
+												var i = 0;
+												$("tr.currentmeeting")
+														.each(
+																function() {
+
+																	$this = $(this);
+																	$(this)
+																			.find(
+																					"input.todelete")
+																			.each(
+																					function() {
+																						if ($(
+																								this)
+																								.prop(
+																										'checked') == true) {
+																							i++;
+																							$(
+																									"#meetingstobecancelled")
+																									.append(
+																											'<tr><td>'
+																													+ $(
+																															this)
+																															.attr(
+																																	"data-date")
+																													+ '</td><td>'
+																													+ $(
+																															this)
+																															.attr(
+																																	"data-duration")
+																													+ '</td></tr>');
+																						}
+																					});
+																}
+
+														);
+												if (i > 0)
+													$('#confirm-cancel').modal(
+															'show');
 											});
-								});
-						$("#cancel_meeting_button").click(function(e) {
-							e.preventDefault();
-							$("#meetingstobecancelled tr").remove();
-							var i=0;
-							$("tr.currentmeeting").each(function() {
-								
-								
-								$this = $(this);
-								$(this).find("input.todelete").each(function() {
-									if($(this).prop('checked')==true){
-										i++;
-										$("#meetingstobecancelled").append('<tr><td>'+$(this).attr("data-date")+'</td><td>'+$(this).attr("data-duration")+'</td></tr>');
-									}
-								});
-							}
-
-							);
-							if(i>0)
-								$('#confirm-cancel').modal('show');
+							$('#submit-cancellation').click(function() {
+								$('#cancellation-form').submit();
+							});
 						});
-						$('#submit-cancellation').click(function(){
-						    $('#cancellation-form').submit();
-						});
-					});
-		</script>
-	</div>
+	</script>
+</div>
 </html>

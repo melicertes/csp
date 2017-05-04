@@ -31,6 +31,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import eu.europa.csp.vcbadmin.config.OpenfireProperties;
+import eu.europa.csp.vcbadmin.config.VcbadminProperties;
 import eu.europa.csp.vcbadmin.config.editors.DurationEditor;
 import eu.europa.csp.vcbadmin.config.editors.ZoneDateTimeEditor;
 import eu.europa.csp.vcbadmin.constants.MeetingScheduledTaskType;
@@ -59,6 +60,9 @@ public class MeetingController {
 	UserRepository userRepository;
 
 	private OpenfireProperties openFireProperties;
+
+	@Autowired
+	VcbadminProperties vcbadminProperties;
 
 	@GetMapping("/createMeeting")
 	public String showForm(MeetingForm formMeeting) {
@@ -100,16 +104,17 @@ public class MeetingController {
 			}
 		}
 		if (meetingForm.getDuration() != null) {
-			if (meetingForm.getDuration().compareTo(Duration.ofHours(8)) > 0
-					|| meetingForm.getDuration().compareTo(Duration.ofMinutes(30)) < 0) {
+			if (meetingForm.getDuration().compareTo(Duration.ofMinutes(vcbadminProperties.getMaxMeetingDuration())) > 0
+					|| meetingForm.getDuration()
+							.compareTo(Duration.ofMinutes(vcbadminProperties.getMinMeetingDuration())) < 0) {
 				bindingResult.rejectValue("duration", "errors.duration.hour.limits",
-						"Duration hours must [00:30-8:00]");
+						"Duration must be withing [00:30-8:00]");
 			}
 		}
 		if (meetingForm.getStart() != null) {
 			if (meetingForm.getStart().isBefore(ZonedDateTime.now())) {
 				bindingResult.rejectValue("start", "errors.start.must.be.after.now",
-						"Starting datetime cannot refer to past");
+						"Start datetime cannot refer to past");
 			}
 		}
 		if (bindingResult.hasErrors()) {
@@ -127,11 +132,22 @@ public class MeetingController {
 		log.info("Start of meeting: {}", m.getStart());
 		log.info("Now - 30 min: {}", ZonedDateTime.now().minusMinutes(30));
 
+		ZonedDateTime invitationDate = ZonedDateTime.now()
+				.plusMinutes(vcbadminProperties.getEmailNotifications().getWaitAfterSubmission());
+		if (invitationDate.isAfter(
+				m.getStart().minusMinutes(vcbadminProperties.getEmailNotifications().getMinTimeAllowedBefore()))) {
+			invitationDate = m.getStart()
+					.minusMinutes(vcbadminProperties.getEmailNotifications().getMinTimeAllowedBefore());
+		} else if (invitationDate.isBefore(
+				m.getStart().minusMinutes(vcbadminProperties.getEmailNotifications().getMaxTimeAllowedBefore()))) {
+			invitationDate = m.getStart()
+					.minusMinutes(vcbadminProperties.getEmailNotifications().getMaxTimeAllowedBefore());
+		}
 		meetingService.createMeeting(m, Arrays.asList(
 				// new
 				// MeetingScheduledTask(MeetingScheduledTaskType.START_MEETING,
 				// m.getStart().minusMinutes(30))
-				new MeetingScheduledTask(MeetingScheduledTaskType.START_MEETING, ZonedDateTime.now().plusMinutes(10)),
+				new MeetingScheduledTask(MeetingScheduledTaskType.START_MEETING, invitationDate),
 				new MeetingScheduledTask(MeetingScheduledTaskType.END_MEETING, m.getExpectedEnd().plusMinutes(30))));
 		return "redirect:/listMeeting";
 	}

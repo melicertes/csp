@@ -117,6 +117,8 @@ public class EmailService {
 				m.put("email", p.getEmail());
 				m.put("meeting_date", meeting.getStart().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
 				m.put("meeting_time", meeting.getStart().format(DateTimeFormatter.ofPattern("HH:mm ZZZ")));
+				m.put("meeting_duration", meeting.getDurationAsTime().format(DateTimeFormatter.ofPattern("HH:mm")));
+				m.put("meeting_duration_str", meeting.getDurationAsTime().format(DateTimeFormatter.ofPattern("H' hour(s) and 'mm' minutes'")));
 				m.put("meeting_username", p.getUsername());
 				m.put("meeting_password", p.getPassword());
 				m.put("meeting_url", meeting.getUrl());
