@@ -11,11 +11,11 @@
 <!-- <link rel="shortcut icon" href="assets/ico/favicon.png"> -->
 <title>Meeting notification</title>
 </head>
-<body class="app flex-row align-items-center">
-	<h3>Dear <span th:text="${email}">participantemail</span>,</h3>
-	<p>The meeting at <span th:text="${meeting_date}">date</span> and <span th:text="${meeting_time}">time</span> has been cancelled.</p>
+<body th:inline="text" class="app flex-row align-items-center">
+	<h3>Dear [[${email}]],</h3>
+	<p>The meeting at [[${meeting_date}]] and [[${meeting_time}]] has been cancelled.</p>
 	
 	Best regards,
-	<p><span th:text="${user_first}">firstname</span>,<span th:text="${user_lastname}">lastname</span></p>
+	<p>[[${user_first}]], [[${user_lastname}]]</p>
 </body>
 </html>
