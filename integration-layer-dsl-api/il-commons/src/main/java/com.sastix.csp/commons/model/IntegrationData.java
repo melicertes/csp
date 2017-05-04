@@ -12,7 +12,7 @@ import java.util.Objects;
  */
 public class IntegrationData  implements Serializable {
 
-  private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = -4036265255253247144L;
 
   @JsonProperty("dataParams")
   private DataParams dataParams;

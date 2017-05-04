@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sastix.csp.client.TrustCirclesClient;
 import com.sastix.csp.commons.model.*;
 import com.sastix.csp.commons.routes.CamelRoutes;
+import com.sastix.csp.server.routes.RouteUtils;
 import com.sastix.csp.server.service.CamelRestService;
 import com.sastix.csp.server.service.CspUtils;
 import org.apache.camel.*;
@@ -18,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
-public class DclProcessor implements Processor {
+public class DclProcessor implements Processor,CamelRoutes {
 
     private static final Logger LOG = LoggerFactory.getLogger(DclProcessor.class);
 
@@ -34,6 +35,9 @@ public class DclProcessor implements Processor {
 
     @Autowired
     CspUtils cspUtils;
+
+    @Autowired
+    RouteUtils routes;
 
     @Produce
     private ProducerTemplate producerTemplate;
@@ -64,20 +68,20 @@ public class DclProcessor implements Processor {
 
             // with camel response
             Integer datatypeId = integrationData.getDataType().ordinal();
-            byte[] data = (byte[]) producerTemplate.sendBodyAndHeader(CamelRoutes.TC, ExchangePattern.InOut,new Csp(datatypeId), Exchange.HTTP_METHOD, "GET");
+            byte[] data = (byte[]) producerTemplate.sendBodyAndHeader(routes.apply(TC), ExchangePattern.InOut,new Csp(datatypeId), Exchange.HTTP_METHOD, "GET");
             TrustCircle tc = objectMapper.readValue(data, TrustCircle.class);
 
             TrustCircleEcspDTO trustCircleEcspDTO = new TrustCircleEcspDTO(tc, integrationData);
             List<Team> teams = new ArrayList<>();
             for (Integer id : tc.getTeams()){
-                byte[] dataTeam = (byte[]) producerTemplate.sendBodyAndHeader(CamelRoutes.TCT, ExchangePattern.InOut, id, Exchange.HTTP_METHOD, "GET");
+                byte[] dataTeam = (byte[]) producerTemplate.sendBodyAndHeader(routes.apply(TCT), ExchangePattern.InOut, id, Exchange.HTTP_METHOD, "GET");
                 Team team = objectMapper.readValue(dataTeam, Team.class);
                 teams.add(team);
             }
 
             trustCircleEcspDTO.setTeams(teams);
-            //AVOID this: producerTemplate.sendBodyAndHeader(CamelRoutes.ECSP, ExchangePattern.InOut, trustCircleEcspDTO, Exchange.HTTP_METHOD, httpMethod); // if used, ends in multicast ...
-            exchange.getIn().setHeader("recipients", CamelRoutes.ECSP);
+            //AVOID this: producerTemplate.sendBodyAndHeader(routes.apply(ECSP), ExchangePattern.InOut, trustCircleEcspDTO, Exchange.HTTP_METHOD, httpMethod); // if used, ends in multicast ...
+            exchange.getIn().setHeader("recipients", routes.apply(ECSP));
             exchange.getIn().setBody(trustCircleEcspDTO);
 
 

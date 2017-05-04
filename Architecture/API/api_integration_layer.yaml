@@ -1,21 +1,28 @@
 swagger: '2.0'
 info:
-  description: |
-    Integration Layer consists of two service endpoints. DSL accepts data from applications and the integration layer performs synchronization of that data between elligible applications, indexing and collaboration with external CSPs, i.e. sends the data to external CSPs based on the data specific trust circles. DCL accepts data from external CSPs, authorizes that data based on data specific trust circles and the integration layer performs synchronization of that data between eligible applications.
-  version: "0.3.0"
+  description: >
+    Integration Layer consists of two service endpoints. DSL accepts data from
+    applications and the integration layer performs synchronization of that data
+    between elligible applications, indexing and collaboration with external
+    CSPs, i.e. sends the data to external CSPs based on the data specific trust
+    circles. DCL accepts data from external CSPs, authorizes that data based on
+    data specific trust circles and the integration layer performs
+    synchronization of that data between eligible applications.
+  version: 1.0.0.1
   title: Integration Layer API
-
 host: int.csp.org
 schemes:
   - https
 paths:
-  /dsl/integrationData:
+  /v1/dsl/integrationData:
     post:
       tags:
         - dsl
       summary: Process new integration data from application
-      description: |
-        Integration layer gets new data from an application. Synchronizes the data between eligible applications. Applications do not emit back data creation or update. Indexes the data into Elastic. Sends the data to external CSPs if toShare is set to true.
+      description: >
+        Integration layer gets new data from an application. Synchronizes the
+        data between eligible applications. Indexes the data into Elastic. Sends
+        the data to external CSPs if toShare is set to true.
       operationId: synchNewIntData
       consumes:
         - application/json
@@ -26,17 +33,23 @@ paths:
           schema:
             $ref: '#/definitions/IntegrationData'
       responses:
-        200:
+        '200':
           description: Successful operation
-        400:
+        '400':
           description: Malformed Integration Data Structure
-
+        '500':
+          description: Internal server error
+        '503':
+          description: Service anavailable
     put:
       tags:
         - dsl
       summary: Process integration data update from application
-      description: |
-        Integration layer gets updated data from an application. Synchronizes the data between eligible applications. Applications do not emit back data creation or update. Updates the existing indexed document in Elastic. Sends the data to external CSPs if toShare is set to true.
+      description: >
+        Integration layer gets updated data from an application. Synchronizes
+        the data between eligible applications. Updates the existing indexed
+        document in Elastic. Sends the data to external CSPs if toShare is set
+        to true.
       operationId: synchUpdatedIntData
       consumes:
         - application/json
@@ -47,17 +60,24 @@ paths:
           schema:
             $ref: '#/definitions/IntegrationData'
       responses:
-        200:
+        '200':
           description: Successful operation
-        400:
+        '400':
           description: Malformed Integration Data Structure
-
+        '500':
+          description: Internal server error
+        '503':
+          description: Service anavailable
     delete:
       tags:
         - dsl
       summary: Process integration data deletion in application
-      description: |
-        Integration layer gets deletion request from an application on a specific integration data record. Forwards the deletion request to eligible applications. toShare is always set to false, no external data will trigger deletion on local data. Applications do not emit back data deletion request. Deletes the existing indexed document from Elastic. No deletion requests are forwarded to external CSPs. dataObject is always null.
+      description: >
+        Integration layer gets deletion request from an application on a
+        specific integration data record. Forwards the deletion request to
+        eligible applications. toShare is always set to false. Deletes the existing indexed
+        document from Elastic. No deletion requests are forwarded to external
+        CSPs. dataObject is always null.
       operationId: synchDeletedIntData
       consumes:
         - application/json
@@ -68,18 +88,25 @@ paths:
           schema:
             $ref: '#/definitions/IntegrationData'
       responses:
-        200:
+        '200':
           description: Successful operation
-        400:
+        '400':
           description: Malformed Integration Data Structure
-        
-  /dcl/integrationData:
+        '500':
+          description: Internal server error
+        '503':
+          description: Service anavailable
+  /v1/dcl/integrationData:
     post:
       tags:
         - dcl
       summary: Process new or updated integration data from external CSP
-      description: |
-        Integration layer gets new or updated data from external CSP. Authorizes the data based on data specific trust circles. Sets the isExternal flag to true. Synchronizes the data to principal application based on data type. Principal applications expected to emit updated data back to integration layer after debuplication (/dsl will handle emitions).
+      description: >
+        Integration layer gets new or updated data from external CSP. Authorizes
+        the data based on data specific trust circles. Sets the isExternal flag
+        to true. Synchronizes the data to principal application based on data
+        type. Principal applications expected to emit updated data back to
+        integration layer after debuplication (/dsl will handle emitions).
       operationId: colabIntData
       consumes:
         - application/json
@@ -90,15 +117,22 @@ paths:
           schema:
             $ref: '#/definitions/IntegrationData'
       responses:
-        200:
+        '200':
           description: Successful operation
-        400:
+        '400':
           description: Malformed Integration Data Structure
-        403:
-          description: CSP authorization failed. External CSP is not authorized to sent specific data type
-        415:
-          description: Unsupported data type. Local CSP does not support given data type. No application that handles given data type is installed
-
+        '403':
+          description: >-
+            CSP authorization failed. External CSP is not authorized to sent
+            specific data type
+        '415':
+          description: >-
+            Unsupported data type. Local CSP does not support given data type.
+            No application that handles given data type is installed
+        '500':
+          description: Internal server error
+        '503':
+          description: Service anavailable
 definitions:
   IntegrationData:
     type: object
@@ -111,7 +145,6 @@ definitions:
         $ref: '#/definitions/IntegrationDataType'
       dataObject:
         type: string
-      
   DataParams:
     type: object
     properties:
@@ -121,20 +154,18 @@ definitions:
         type: string
       recordId:
         type: string
-    
   IntegrationDataType:
     type: string
     enum:
-    - event
-    - threat
-    - incident
-    - vulnerability
-    - artefact
-    - chat
-    - file
-    - contact
-    - trustCircle
-  
+      - event
+      - threat
+      - incident
+      - vulnerability
+      - artefact
+      - chat
+      - file
+      - contact
+      - trustCircle
   SharingParams:
     type: object
     properties:

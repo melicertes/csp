@@ -9,26 +9,26 @@ import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-        "fields",
+//        "fields",
         "query"
 })
 public class ElasticSearchRequest {
 
-    @JsonProperty("fields")
-    private List<String> fields = null;
+//    @JsonProperty("fields")
+//    private List<String> fields = null;
 
     @JsonProperty("query")
     private Query query;
 
-    @JsonProperty("fields")
-    public List<String> getFields() {
-        return fields;
-    }
-
-    @JsonProperty("fields")
-    public void setFields(List<String> fields) {
-        this.fields = fields;
-    }
+//    @JsonProperty("fields")
+//    public List<String> getFields() {
+//        return fields;
+//    }
+//
+//    @JsonProperty("fields")
+//    public void setFields(List<String> fields) {
+//        this.fields = fields;
+//    }
 
     @JsonProperty("query")
     public Query getQuery() {
@@ -43,7 +43,7 @@ public class ElasticSearchRequest {
     @Override
     public String toString() {
         return "ElasticSearchRequest{" +
-                "fields=" + fields +
+//                "fields=" + fields +
                 ", query=" + query +
                 '}';
     }

@@ -1,5 +1,6 @@
 package com.sastix.csp.commons.model;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,8 +28,9 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
         "status",
         "csp_id"
 })
-public class Team {
+public class Team implements Serializable {
 
+    private static final long serialVersionUID = -1574606816973026402L;
     @JsonProperty("id")
     private Integer id;
     @JsonProperty("short_name")

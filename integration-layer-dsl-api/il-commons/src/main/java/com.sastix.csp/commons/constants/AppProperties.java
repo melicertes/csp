@@ -6,4 +6,7 @@ package com.sastix.csp.commons.constants;
 public interface AppProperties {
     String INTERNAL = "internal";
     String EXTERNAL = "external";
+    String SERVER_PROTOCOL = "server.protocol";
+    String SERVER_HOST = "server.host";
+    String SERVER_PORT = "server.port";
 }

@@ -9,54 +9,54 @@ import java.util.Map;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-        "recordId",
-        "cspId",
-        "applicationId"
+        "dataParams.recordId",
+        "dataParams.cspId",
+        "dataParams.applicationId"
 })
 public class Term {
 
-    @JsonProperty("recordId")
+    @JsonProperty("dataParams.recordId")
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String recordId;
 
-    @JsonProperty("cspId")
+    @JsonProperty("dataParams.cspId")
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String cspId;
 
-    @JsonProperty("applicationId")
+    @JsonProperty("dataParams.applicationId")
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String applicationId;
 
 
-    @JsonProperty("recordId")
+    @JsonProperty("dataParams.recordId")
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public String getRecordId() {
         return recordId;
     }
 
-    @JsonProperty("recordId")
+    @JsonProperty("dataParams.recordId")
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public void setRecordId(String recordId) {
         this.recordId = recordId;
     }
 
-    @JsonProperty("cspId")
+    @JsonProperty("dataParams.cspId")
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public String getCspId() {
         return cspId;
     }
 
-    @JsonProperty("cspId")
+    @JsonProperty("dataParams.cspId")
     public void setCspId(String cspId) {
         this.cspId = cspId;
     }
 
-    @JsonProperty("applicationId")
+    @JsonProperty("dataParams.applicationId")
     public String getApplicationId() {
         return applicationId;
     }
 
-    @JsonProperty("applicationId")
+    @JsonProperty("dataParams.applicationId")
     public void setApplicationId(String applicationId) {
         this.applicationId = applicationId;
     }

@@ -69,14 +69,15 @@ public class TcClientBusinessTest {
             tcClient.getTrustCircle(1);
             fail("Expected ResourceAccessException Exception");
         } catch (ResourceAccessException e) {
-            assertThat(e.getMessage(),containsString("I/O error on POST request"));
+            assertThat(e.getMessage(),containsString("I/O error on GET request"));
         }
     }
 
     @Test
     public void getTrustCircleTest(){
-        tcClient.setProtocolHostPort("http","localhost","8081");
+        tcClient.setProtocolHostPort("http","csp.dangerduck.gr","8000");
         TrustCircle trustCircle = tcClient.getTrustCircle(1);
+        System.out.println(trustCircle.toString());
         assertThat(trustCircle.getTeams().size(),is(2));
     }
 }

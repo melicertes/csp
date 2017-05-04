@@ -1,6 +1,7 @@
 package com.sastix.csp.commons.model;
 
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -24,8 +25,9 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
         "teams",
         "created"
 })
-public class TrustCircle {
+public class TrustCircle implements Serializable{
 
+    private static final long serialVersionUID = 7473879403462995916L;
     @JsonProperty("id")
     private Integer id;
     @JsonProperty("short_name")

@@ -107,6 +107,20 @@ public class MockUtils {
         });
     }
 
+    public void mockRoute(String mockPrefix,String originalUri, String mockUri) throws Exception {
+        RouteDefinition dslRoute = getRoute(originalUri);
+        dslRoute.adviceWith(springCamelContext, new RouteBuilder() {
+            @Override
+            public void configure() throws Exception {
+                // intercept sending to direct:uri and do something else
+                interceptSendToEndpoint(originalUri)
+                        //.skipSendToOriginalEndpoint()
+                        //.to("log:foo")
+                        .to(mockUri);
+            }
+        });
+    }
+
     public void mockRouteSkipSendToOriginalEndpoint(String mockPrefix,String uri) throws Exception {
         RouteDefinition dslRoute = getRoute(uri);
         dslRoute.adviceWith(springCamelContext, new RouteBuilder() {
@@ -117,6 +131,20 @@ public class MockUtils {
                         .skipSendToOriginalEndpoint()
                         //.to("log:foo")
                         .to(mockPrefix+":"+uri);
+            }
+        });
+    }
+
+    public void mockRouteSkipSendToOriginalEndpoint(String mockPrefix,String originalUri, String mockUri) throws Exception {
+        RouteDefinition dslRoute = getRoute(originalUri);
+        dslRoute.adviceWith(springCamelContext, new RouteBuilder() {
+            @Override
+            public void configure() throws Exception {
+                // intercept sending to direct:uri and do something else
+                interceptSendToEndpoint(originalUri)
+                        .skipSendToOriginalEndpoint()
+                        //.to("log:foo")
+                        .to(mockUri);
             }
         });
     }

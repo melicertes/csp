@@ -97,9 +97,7 @@
   </packagedElement>
   <packagedElement xmi:type="uml:Model" xmi:id="_r-CBEPVVEea4b69uN8N4dw" name="Use Case Model">
     <packagedElement xmi:type="uml:Package" xmi:id="_r-CBEfVVEea4b69uN8N4dw" name="Integration">
-      <packagedElement xmi:type="uml:UseCase" xmi:id="_r-CBEvVVEea4b69uN8N4dw" name="Distribute Data Update to CSP applications">
-        <include xmi:type="uml:Include" xmi:id="_r-CBE_VVEea4b69uN8N4dw" addition="_r-CBGvVVEea4b69uN8N4dw"/>
-      </packagedElement>
+      <packagedElement xmi:type="uml:UseCase" xmi:id="_r-CBEvVVEea4b69uN8N4dw" name="Distribute Data Update to CSP applications"/>
       <packagedElement xmi:type="uml:UseCase" xmi:id="_r-CBFPVVEea4b69uN8N4dw" name="Index Data Update">
         <include xmi:type="uml:Include" xmi:id="_r-CBFfVVEea4b69uN8N4dw" addition="_r-CBEvVVEea4b69uN8N4dw"/>
       </packagedElement>
@@ -108,68 +106,36 @@
         <include xmi:type="uml:Include" xmi:id="_r-CBGPVVEea4b69uN8N4dw" addition="_r-CBGfVVEea4b69uN8N4dw"/>
       </packagedElement>
       <packagedElement xmi:type="uml:UseCase" xmi:id="_r-CBGfVVEea4b69uN8N4dw" name="Filter Message"/>
-      <packagedElement xmi:type="uml:UseCase" xmi:id="_r-CBGvVVEea4b69uN8N4dw" name="Deistribute External Data"/>
+      <packagedElement xmi:type="uml:UseCase" xmi:id="_r-CBGvVVEea4b69uN8N4dw" name="Distribute External Data"/>
     </packagedElement>
     <packagedElement xmi:type="uml:Package" xmi:id="_r-CBG_VVEea4b69uN8N4dw" name="Search and Reporting">
-      <packagedElement xmi:type="uml:UseCase" xmi:id="_r-CBHPVVEea4b69uN8N4dw" name="Perform Search" isAbstract="true">
-        <include xmi:type="uml:Include" xmi:id="_r-CBHfVVEea4b69uN8N4dw" addition="_r-CBRvVVEea4b69uN8N4dw"/>
-      </packagedElement>
-      <packagedElement xmi:type="uml:UseCase" xmi:id="_r-CBHvVVEea4b69uN8N4dw" name="Perform Full Text Search"/>
-      <packagedElement xmi:type="uml:UseCase" xmi:id="_r-CBH_VVEea4b69uN8N4dw" name="Perform Fields Search"/>
-      <packagedElement xmi:type="uml:UseCase" xmi:id="_r-CBIPVVEea4b69uN8N4dw" name="Prepare Regular Report">
-        <include xmi:type="uml:Include" xmi:id="_r-CBIfVVEea4b69uN8N4dw" addition="_r-CBRvVVEea4b69uN8N4dw"/>
-      </packagedElement>
-      <packagedElement xmi:type="uml:Abstraction" xmi:id="_r-CBIvVVEea4b69uN8N4dw" client="_r-CBHPVVEea4b69uN8N4dw" supplier="_r-CBH_VVEea4b69uN8N4dw"/>
-      <packagedElement xmi:type="uml:Abstraction" xmi:id="_r-CBI_VVEea4b69uN8N4dw" client="_r-CBHPVVEea4b69uN8N4dw" supplier="_r-CBHvVVEea4b69uN8N4dw"/>
-      <packagedElement xmi:type="uml:UseCase" xmi:id="_r-CBJPVVEea4b69uN8N4dw" name="Prepare Custom Report">
-        <include xmi:type="uml:Include" xmi:id="_r-CBJfVVEea4b69uN8N4dw" addition="_r-CBRvVVEea4b69uN8N4dw"/>
-      </packagedElement>
-      <packagedElement xmi:type="uml:UseCase" xmi:id="_r-CBJvVVEea4b69uN8N4dw" name="Run Saved Report">
-        <include xmi:type="uml:Include" xmi:id="_r-CBJ_VVEea4b69uN8N4dw" addition="_r-CBRvVVEea4b69uN8N4dw"/>
-      </packagedElement>
+      <packagedElement xmi:type="uml:UseCase" xmi:id="_r-CBHPVVEea4b69uN8N4dw" name="Perform Search"/>
+      <packagedElement xmi:type="uml:UseCase" xmi:id="_r-CBIPVVEea4b69uN8N4dw" name="Prepare Regular Report"/>
+      <packagedElement xmi:type="uml:UseCase" xmi:id="_r-CBJPVVEea4b69uN8N4dw" name="Prepare Custom Report"/>
+      <packagedElement xmi:type="uml:UseCase" xmi:id="_r-CBJvVVEea4b69uN8N4dw" name="Run Saved Report"/>
     </packagedElement>
     <packagedElement xmi:type="uml:Package" xmi:id="_r-CBKPVVEea4b69uN8N4dw" name=" Monitoring">
       <packagedElement xmi:type="uml:UseCase" xmi:id="_r-CBKfVVEea4b69uN8N4dw" name="Configure Monitoring Parameters">
         <include xmi:type="uml:Include" xmi:id="_r-CBKvVVEea4b69uN8N4dw" addition="_r-CBRvVVEea4b69uN8N4dw"/>
-        <include xmi:type="uml:Include" xmi:id="_r-CBK_VVEea4b69uN8N4dw" addition="_r-CBRvVVEea4b69uN8N4dw"/>
       </packagedElement>
-      <packagedElement xmi:type="uml:UseCase" xmi:id="_r-CBLPVVEea4b69uN8N4dw" name="Configure Filebeat"/>
-      <packagedElement xmi:type="uml:UseCase" xmi:id="_r-CBLfVVEea4b69uN8N4dw" name="Configure Logstash"/>
-      <packagedElement xmi:type="uml:Abstraction" xmi:id="_r-CBLvVVEea4b69uN8N4dw" client="_r-CBKfVVEea4b69uN8N4dw" supplier="_r-CBLPVVEea4b69uN8N4dw"/>
-      <packagedElement xmi:type="uml:Abstraction" xmi:id="_r-CBL_VVEea4b69uN8N4dw" client="_r-CBKfVVEea4b69uN8N4dw" supplier="_r-CBLfVVEea4b69uN8N4dw"/>
-      <packagedElement xmi:type="uml:UseCase" xmi:id="_r-CBMPVVEea4b69uN8N4dw" name="Configure Monitoring Reports">
-        <include xmi:type="uml:Include" xmi:id="_r-CBMfVVEea4b69uN8N4dw" addition="_r-CBRvVVEea4b69uN8N4dw"/>
-      </packagedElement>
-      <packagedElement xmi:type="uml:UseCase" xmi:id="_r-CBMvVVEea4b69uN8N4dw" name="Run Monitoring Reports">
-        <include xmi:type="uml:Include" xmi:id="_r-CBM_VVEea4b69uN8N4dw" addition="_r-CBRvVVEea4b69uN8N4dw"/>
-      </packagedElement>
+      <packagedElement xmi:type="uml:UseCase" xmi:id="_r-CBMPVVEea4b69uN8N4dw" name="Configure Monitoring Reports"/>
+      <packagedElement xmi:type="uml:UseCase" xmi:id="_r-CBMvVVEea4b69uN8N4dw" name="Run Monitoring Reports"/>
+      <packagedElement xmi:type="uml:UseCase" xmi:id="_7FWWYCrHEeeBXMrEXXXp1g" name="Log integration layer activity"/>
+      <packagedElement xmi:type="uml:UseCase" xmi:id="_r-CBRvVVEea4b69uN8N4dw" name="Log in Elasticsearch"/>
     </packagedElement>
     <packagedElement xmi:type="uml:Package" xmi:id="_r-CBNPVVEea4b69uN8N4dw" name="Configuration">
       <packagedElement xmi:type="uml:UseCase" xmi:id="_r-CBNfVVEea4b69uN8N4dw" name="Perform initial instalation"/>
       <packagedElement xmi:type="uml:UseCase" xmi:id="_r-CBNvVVEea4b69uN8N4dw" name="Publish package update"/>
-      <packagedElement xmi:type="uml:UseCase" xmi:id="_r-CBN_VVEea4b69uN8N4dw" name="Publish configuration/playbook update"/>
       <packagedElement xmi:type="uml:UseCase" xmi:id="_r-CBOPVVEea4b69uN8N4dw" name="Update package"/>
-      <packagedElement xmi:type="uml:UseCase" xmi:id="_r-CBOfVVEea4b69uN8N4dw" name="Update configuration/playbook"/>
-      <packagedElement xmi:type="uml:UseCase" xmi:id="_r-CBOvVVEea4b69uN8N4dw" name="Publish application update"/>
-      <packagedElement xmi:type="uml:Abstraction" xmi:id="_r-CBO_VVEea4b69uN8N4dw" client="_r-CBNvVVEea4b69uN8N4dw" supplier="_r-CBN_VVEea4b69uN8N4dw"/>
-      <packagedElement xmi:type="uml:Abstraction" xmi:id="_r-CBPPVVEea4b69uN8N4dw" client="_r-CBNvVVEea4b69uN8N4dw" supplier="_r-CBOvVVEea4b69uN8N4dw"/>
-      <packagedElement xmi:type="uml:UseCase" xmi:id="_r-CBPfVVEea4b69uN8N4dw" name="Update application"/>
-      <packagedElement xmi:type="uml:Abstraction" xmi:id="_r-CBPvVVEea4b69uN8N4dw" client="_r-CBOPVVEea4b69uN8N4dw" supplier="_r-CBPfVVEea4b69uN8N4dw"/>
-      <packagedElement xmi:type="uml:Abstraction" xmi:id="_r-CBP_VVEea4b69uN8N4dw" client="_r-CBOPVVEea4b69uN8N4dw" supplier="_r-CBOfVVEea4b69uN8N4dw"/>
+      <packagedElement xmi:type="uml:UseCase" xmi:id="_uM4K8CrOEeeBXMrEXXXp1g" name="Install application package">
+        <include xmi:type="uml:Include" xmi:id="_y4Q8ACrOEeeBXMrEXXXp1g" addition="_r-CBNfVVEea4b69uN8N4dw"/>
+      </packagedElement>
     </packagedElement>
     <packagedElement xmi:type="uml:Package" xmi:id="_obQ2oAOHEeeR6OGfUKjoKw" name="Trust Circles">
-      <packagedElement xmi:type="uml:UseCase" xmi:id="_xcLdgAOHEeeR6OGfUKjoKw" name="Create Trust Circle">
-        <include xmi:type="uml:Include" xmi:id="_C_fjQAOIEeeR6OGfUKjoKw" addition="_-Nz88AOHEeeR6OGfUKjoKw"/>
-      </packagedElement>
-      <packagedElement xmi:type="uml:UseCase" xmi:id="_zXSfUAOHEeeR6OGfUKjoKw" name="Update Trust Circle">
-        <include xmi:type="uml:Include" xmi:id="_B363MAOIEeeR6OGfUKjoKw" addition="_-Nz88AOHEeeR6OGfUKjoKw"/>
-      </packagedElement>
-      <packagedElement xmi:type="uml:UseCase" xmi:id="_1qcNsAOHEeeR6OGfUKjoKw" name="Delete Trust Circle">
-        <include xmi:type="uml:Include" xmi:id="_CdcmIAOIEeeR6OGfUKjoKw" addition="_-Nz88AOHEeeR6OGfUKjoKw"/>
-      </packagedElement>
-      <packagedElement xmi:type="uml:UseCase" xmi:id="_3X3_4AOHEeeR6OGfUKjoKw" name="Read Trust Circle">
-        <include xmi:type="uml:Include" xmi:id="_Df0pIAOIEeeR6OGfUKjoKw" addition="_-Nz88AOHEeeR6OGfUKjoKw"/>
-      </packagedElement>
+      <packagedElement xmi:type="uml:UseCase" xmi:id="_xcLdgAOHEeeR6OGfUKjoKw" name="Create Trust Circle"/>
+      <packagedElement xmi:type="uml:UseCase" xmi:id="_zXSfUAOHEeeR6OGfUKjoKw" name="Update Trust Circle"/>
+      <packagedElement xmi:type="uml:UseCase" xmi:id="_1qcNsAOHEeeR6OGfUKjoKw" name="Delete Trust Circle"/>
+      <packagedElement xmi:type="uml:UseCase" xmi:id="_3X3_4AOHEeeR6OGfUKjoKw" name="Read Trust Circle"/>
       <packagedElement xmi:type="uml:UseCase" xmi:id="_-Nz88AOHEeeR6OGfUKjoKw" name="Log in Trust Circle Management"/>
     </packagedElement>
     <packagedElement xmi:type="uml:Package" xmi:id="_gtUM4AQeEeeWNbzuB-wxVw" name="Security Services">
@@ -179,12 +145,15 @@
     </packagedElement>
     <packagedElement xmi:type="uml:Actor" xmi:id="_r-CBQPVVEea4b69uN8N4dw" name="CSP User"/>
     <packagedElement xmi:type="uml:Actor" xmi:id="_r-CBQfVVEea4b69uN8N4dw" name="CSP Administrator"/>
+    <packagedElement xmi:type="uml:Actor" xmi:id="_r-CBRPVVEea4b69uN8N4dw" name="Central CSP Administrator"/>
+    <packagedElement xmi:type="uml:Actor" xmi:id="_LhIzYCrIEeeBXMrEXXXp1g" name="CSP Application"/>
+    <packagedElement xmi:type="uml:Actor" xmi:id="_F7WPkCrIEeeBXMrEXXXp1g" name="CSP Integration Layer"/>
+    <packagedElement xmi:type="uml:Actor" xmi:id="_uIYz4CrLEeeBXMrEXXXp1g" name="CSP Data Synchronization Layer"/>
+    <packagedElement xmi:type="uml:Actor" xmi:id="_8CySMCrLEeeBXMrEXXXp1g" name="CSP Data Distribution Layer"/>
+    <packagedElement xmi:type="uml:Actor" xmi:id="_9Zx6UCrLEeeBXMrEXXXp1g" name="CSP Data Colaboration Layer"/>
     <packagedElement xmi:type="uml:Actor" xmi:id="_r-CBQvVVEea4b69uN8N4dw" name="CSP Application Emitter"/>
     <packagedElement xmi:type="uml:Actor" xmi:id="_r-CBQ_VVEea4b69uN8N4dw" name="CSP OS Scheduler"/>
-    <packagedElement xmi:type="uml:Actor" xmi:id="_sbGwUAOHEeeR6OGfUKjoKw" name="CSP Application"/>
-    <packagedElement xmi:type="uml:Actor" xmi:id="_r-CBRPVVEea4b69uN8N4dw" name="ENISA Administrator"/>
     <packagedElement xmi:type="uml:Actor" xmi:id="_r-CBRfVVEea4b69uN8N4dw" name="External CSP"/>
-    <packagedElement xmi:type="uml:UseCase" xmi:id="_r-CBRvVVEea4b69uN8N4dw" name="Log in Elasticsearch"/>
     <packagedElement xmi:type="uml:Association" xmi:id="_r-CBR_VVEea4b69uN8N4dw" memberEnd="_r-CBSvVVEea4b69uN8N4dw _r-CBS_VVEea4b69uN8N4dw">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_r-CBSPVVEea4b69uN8N4dw" source="org.eclipse.papyrus">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_r-CBSfVVEea4b69uN8N4dw" key="nature" value="UML_Nature"/>
@@ -318,13 +287,6 @@
       <ownedEnd xmi:type="uml:Property" xmi:id="_aUFEEgOIEeeR6OGfUKjoKw" name="enisa administrator" type="_r-CBRPVVEea4b69uN8N4dw" association="_aUCn0AOIEeeR6OGfUKjoKw"/>
       <ownedEnd xmi:type="uml:Property" xmi:id="_aUFrIAOIEeeR6OGfUKjoKw" name="delete trust circle" type="_1qcNsAOHEeeR6OGfUKjoKw" association="_aUCn0AOIEeeR6OGfUKjoKw"/>
     </packagedElement>
-    <packagedElement xmi:type="uml:Association" xmi:id="_bFFqQAOIEeeR6OGfUKjoKw" memberEnd="_bFIGgQOIEeeR6OGfUKjoKw _bFIGggOIEeeR6OGfUKjoKw">
-      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_bFHfcAOIEeeR6OGfUKjoKw" source="org.eclipse.papyrus">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_bFIGgAOIEeeR6OGfUKjoKw" key="nature" value="UML_Nature"/>
-      </eAnnotations>
-      <ownedEnd xmi:type="uml:Property" xmi:id="_bFIGgQOIEeeR6OGfUKjoKw" name="enisa administrator" type="_r-CBRPVVEea4b69uN8N4dw" association="_bFFqQAOIEeeR6OGfUKjoKw"/>
-      <ownedEnd xmi:type="uml:Property" xmi:id="_bFIGggOIEeeR6OGfUKjoKw" name="create trust circle" type="_xcLdgAOHEeeR6OGfUKjoKw" association="_bFFqQAOIEeeR6OGfUKjoKw"/>
-    </packagedElement>
     <packagedElement xmi:type="uml:Association" xmi:id="_dUReoAOIEeeR6OGfUKjoKw" memberEnd="_dUTT0AOIEeeR6OGfUKjoKw _dUTT0QOIEeeR6OGfUKjoKw">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_dUSswAOIEeeR6OGfUKjoKw" source="org.eclipse.papyrus">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_dUSswQOIEeeR6OGfUKjoKw" key="nature" value="UML_Nature"/>
@@ -345,13 +307,6 @@
       </eAnnotations>
       <ownedEnd xmi:type="uml:Property" xmi:id="_hDFSsAOIEeeR6OGfUKjoKw" name="csp user" type="_r-CBQPVVEea4b69uN8N4dw" association="_hDC2cAOIEeeR6OGfUKjoKw"/>
       <ownedEnd xmi:type="uml:Property" xmi:id="_hDFSsQOIEeeR6OGfUKjoKw" name="read trust circle" type="_3X3_4AOHEeeR6OGfUKjoKw" association="_hDC2cAOIEeeR6OGfUKjoKw"/>
-    </packagedElement>
-    <packagedElement xmi:type="uml:Association" xmi:id="_h6-kAAOIEeeR6OGfUKjoKw" memberEnd="_h7AZMAOIEeeR6OGfUKjoKw _h7AZMQOIEeeR6OGfUKjoKw">
-      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_h6_yIAOIEeeR6OGfUKjoKw" source="org.eclipse.papyrus">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_h6_yIQOIEeeR6OGfUKjoKw" key="nature" value="UML_Nature"/>
-      </eAnnotations>
-      <ownedEnd xmi:type="uml:Property" xmi:id="_h7AZMAOIEeeR6OGfUKjoKw" name="csp application" type="_sbGwUAOHEeeR6OGfUKjoKw" association="_h6-kAAOIEeeR6OGfUKjoKw"/>
-      <ownedEnd xmi:type="uml:Property" xmi:id="_h7AZMQOIEeeR6OGfUKjoKw" name="read trust circle" type="_3X3_4AOHEeeR6OGfUKjoKw" association="_h6-kAAOIEeeR6OGfUKjoKw"/>
     </packagedElement>
     <packagedElement xmi:type="uml:Association" xmi:id="_vGhHEAQeEeeWNbzuB-wxVw" memberEnd="_vGjjUAQeEeeWNbzuB-wxVw _vGkKYAQeEeeWNbzuB-wxVw">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_vGi8QAQeEeeWNbzuB-wxVw" source="org.eclipse.papyrus">
@@ -387,6 +342,69 @@
       </eAnnotations>
       <ownedEnd xmi:type="uml:Property" xmi:id="_yrH2QQQeEeeWNbzuB-wxVw" name="csp administrator" type="_r-CBQfVVEea4b69uN8N4dw" association="_yrFaAAQeEeeWNbzuB-wxVw"/>
       <ownedEnd xmi:type="uml:Property" xmi:id="_yrIdUAQeEeeWNbzuB-wxVw" name="user management in security services" type="_mwf3UAQeEeeWNbzuB-wxVw" association="_yrFaAAQeEeeWNbzuB-wxVw"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Association" xmi:id="_Jp4W0CrIEeeBXMrEXXXp1g" memberEnd="_Jp7aISrIEeeBXMrEXXXp1g _Jp8BMCrIEeeBXMrEXXXp1g">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_Jp6zECrIEeeBXMrEXXXp1g" source="org.eclipse.papyrus">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Jp7aICrIEeeBXMrEXXXp1g" key="nature" value="UML_Nature"/>
+      </eAnnotations>
+      <ownedEnd xmi:type="uml:Property" xmi:id="_Jp7aISrIEeeBXMrEXXXp1g" name="csp integration layer" type="_F7WPkCrIEeeBXMrEXXXp1g" association="_Jp4W0CrIEeeBXMrEXXXp1g"/>
+      <ownedEnd xmi:type="uml:Property" xmi:id="_Jp8BMCrIEeeBXMrEXXXp1g" name="log integration layer activity" type="_7FWWYCrHEeeBXMrEXXXp1g" association="_Jp4W0CrIEeeBXMrEXXXp1g"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Association" xmi:id="_NBzU4CrIEeeBXMrEXXXp1g" memberEnd="_NB2YMCrIEeeBXMrEXXXp1g _NB2YMSrIEeeBXMrEXXXp1g">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_NB1KECrIEeeBXMrEXXXp1g" source="org.eclipse.papyrus">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_NB1xICrIEeeBXMrEXXXp1g" key="nature" value="UML_Nature"/>
+      </eAnnotations>
+      <ownedEnd xmi:type="uml:Property" xmi:id="_NB2YMCrIEeeBXMrEXXXp1g" name="csp application" type="_LhIzYCrIEeeBXMrEXXXp1g" association="_NBzU4CrIEeeBXMrEXXXp1g"/>
+      <ownedEnd xmi:type="uml:Property" xmi:id="_NB2YMSrIEeeBXMrEXXXp1g" name="log integration layer activity" type="_7FWWYCrHEeeBXMrEXXXp1g" association="_NBzU4CrIEeeBXMrEXXXp1g"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Association" xmi:id="_VNxl4CrKEeeBXMrEXXXp1g" memberEnd="_VN0CICrKEeeBXMrEXXXp1g _VN0CISrKEeeBXMrEXXXp1g">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_VNzbECrKEeeBXMrEXXXp1g" source="org.eclipse.papyrus">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_VNzbESrKEeeBXMrEXXXp1g" key="nature" value="UML_Nature"/>
+      </eAnnotations>
+      <ownedEnd xmi:type="uml:Property" xmi:id="_VN0CICrKEeeBXMrEXXXp1g" name="csp integration layer" type="_F7WPkCrIEeeBXMrEXXXp1g" association="_VNxl4CrKEeeBXMrEXXXp1g"/>
+      <ownedEnd xmi:type="uml:Property" xmi:id="_VN0CISrKEeeBXMrEXXXp1g" name="read trust circle" type="_3X3_4AOHEeeR6OGfUKjoKw" association="_VNxl4CrKEeeBXMrEXXXp1g"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Association" xmi:id="_DKnQgCrMEeeBXMrEXXXp1g" memberEnd="_DKpFsirMEeeBXMrEXXXp1g _DKpswCrMEeeBXMrEXXXp1g">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_DKpFsCrMEeeBXMrEXXXp1g" source="org.eclipse.papyrus">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_DKpFsSrMEeeBXMrEXXXp1g" key="nature" value="UML_Nature"/>
+      </eAnnotations>
+      <ownedEnd xmi:type="uml:Property" xmi:id="_DKpFsirMEeeBXMrEXXXp1g" name="csp data sync layer" type="_uIYz4CrLEeeBXMrEXXXp1g" association="_DKnQgCrMEeeBXMrEXXXp1g"/>
+      <ownedEnd xmi:type="uml:Property" xmi:id="_DKpswCrMEeeBXMrEXXXp1g" name="index data update" type="_r-CBFPVVEea4b69uN8N4dw" association="_DKnQgCrMEeeBXMrEXXXp1g"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Association" xmi:id="_EOfIUCrMEeeBXMrEXXXp1g" memberEnd="_EOg9gCrMEeeBXMrEXXXp1g _EOg9gSrMEeeBXMrEXXXp1g">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_EOgWcCrMEeeBXMrEXXXp1g" source="org.eclipse.papyrus">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_EOgWcSrMEeeBXMrEXXXp1g" key="nature" value="UML_Nature"/>
+      </eAnnotations>
+      <ownedEnd xmi:type="uml:Property" xmi:id="_EOg9gCrMEeeBXMrEXXXp1g" name="csp data dist layer" type="_8CySMCrLEeeBXMrEXXXp1g" association="_EOfIUCrMEeeBXMrEXXXp1g"/>
+      <ownedEnd xmi:type="uml:Property" xmi:id="_EOg9gSrMEeeBXMrEXXXp1g" name="distribute data update to external csps" type="_r-CBFvVVEea4b69uN8N4dw" association="_EOfIUCrMEeeBXMrEXXXp1g"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Association" xmi:id="_E3fpECrMEeeBXMrEXXXp1g" memberEnd="_E3gQIirMEeeBXMrEXXXp1g _E3gQIyrMEeeBXMrEXXXp1g">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_E3gQICrMEeeBXMrEXXXp1g" source="org.eclipse.papyrus">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_E3gQISrMEeeBXMrEXXXp1g" key="nature" value="UML_Nature"/>
+      </eAnnotations>
+      <ownedEnd xmi:type="uml:Property" xmi:id="_E3gQIirMEeeBXMrEXXXp1g" name="csp data colab layer" type="_9Zx6UCrLEeeBXMrEXXXp1g" association="_E3fpECrMEeeBXMrEXXXp1g"/>
+      <ownedEnd xmi:type="uml:Property" xmi:id="_E3gQIyrMEeeBXMrEXXXp1g" name="filter message" type="_r-CBGfVVEea4b69uN8N4dw" association="_E3fpECrMEeeBXMrEXXXp1g"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Association" xmi:id="_zy0fwCrOEeeBXMrEXXXp1g" memberEnd="_zy1t4CrOEeeBXMrEXXXp1g _zy1t4SrOEeeBXMrEXXXp1g">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_zy1G0CrOEeeBXMrEXXXp1g" source="org.eclipse.papyrus">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_zy1G0SrOEeeBXMrEXXXp1g" key="nature" value="UML_Nature"/>
+      </eAnnotations>
+      <ownedEnd xmi:type="uml:Property" xmi:id="_zy1t4CrOEeeBXMrEXXXp1g" name="csp administrator" type="_r-CBQfVVEea4b69uN8N4dw" association="_zy0fwCrOEeeBXMrEXXXp1g"/>
+      <ownedEnd xmi:type="uml:Property" xmi:id="_zy1t4SrOEeeBXMrEXXXp1g" name="install application package" type="_uM4K8CrOEeeBXMrEXXXp1g" association="_zy0fwCrOEeeBXMrEXXXp1g"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Association" xmi:id="_bhSXsC9yEeeJRId8W05D7Q" memberEnd="_bhaTgC9yEeeJRId8W05D7Q _bhaTgS9yEeeJRId8W05D7Q">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_bhVbAC9yEeeJRId8W05D7Q" source="org.eclipse.papyrus">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_bhVbAS9yEeeJRId8W05D7Q" key="nature" value="UML_Nature"/>
+      </eAnnotations>
+      <ownedEnd xmi:type="uml:Property" xmi:id="_bhaTgC9yEeeJRId8W05D7Q" name="central csp administrator" type="_r-CBRPVVEea4b69uN8N4dw" association="_bhSXsC9yEeeJRId8W05D7Q"/>
+      <ownedEnd xmi:type="uml:Property" xmi:id="_bhaTgS9yEeeJRId8W05D7Q" name="create trust circle" type="_xcLdgAOHEeeR6OGfUKjoKw" association="_bhSXsC9yEeeJRId8W05D7Q"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Association" xmi:id="_jjesgC9yEeeJRId8W05D7Q" memberEnd="_jjghsS9yEeeJRId8W05D7Q _jjghsi9yEeeJRId8W05D7Q">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_jjf6oC9yEeeJRId8W05D7Q" source="org.eclipse.papyrus">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_jjghsC9yEeeJRId8W05D7Q" key="nature" value="UML_Nature"/>
+      </eAnnotations>
+      <ownedEnd xmi:type="uml:Property" xmi:id="_jjghsS9yEeeJRId8W05D7Q" name="csp data colaboration layer" type="_9Zx6UCrLEeeBXMrEXXXp1g" association="_jjesgC9yEeeJRId8W05D7Q"/>
+      <ownedEnd xmi:type="uml:Property" xmi:id="_jjghsi9yEeeJRId8W05D7Q" name="read trust circle" type="_3X3_4AOHEeeR6OGfUKjoKw" association="_jjesgC9yEeeJRId8W05D7Q"/>
     </packagedElement>
   </packagedElement>
   <packagedElement xmi:type="uml:Model" xmi:id="_r-D2QPVVEea4b69uN8N4dw" name="Data Model" visibility="public">

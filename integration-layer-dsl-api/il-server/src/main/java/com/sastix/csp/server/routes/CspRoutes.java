@@ -3,13 +3,15 @@ package com.sastix.csp.server.routes;
 import com.sastix.csp.commons.model.Csp;
 import com.sastix.csp.commons.routes.CamelRoutes;
 import com.sastix.csp.server.processors.*;
+import org.apache.camel.LoggingLevel;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.model.dataformat.JsonLibrary;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
-public class DSLRoute extends RouteBuilder {
+public class CspRoutes extends RouteBuilder implements CamelRoutes{
 
     @Autowired
     private ExceptionProcessor exceptionProcessor;
@@ -41,53 +43,68 @@ public class DSLRoute extends RouteBuilder {
     @Autowired
     private ElasticProcessor elasticProcessor;
 
+    @Autowired
+    RouteUtils endpoint;
+
+    @Value("${activemq.redelivery.delay}")
+    private long redeliveryDelay;
+
+    @Value("${activemq.max.redelivery.attempts}")
+    private int maxRedeliveryAttempts;
+
 
     @Override
     public void configure() {
 
-//        onException(Exception.class).process(exceptionProcessor)
-//                .log("[Exception thrown]... Received body ${body}")
-//                .handled(true);
+        //errorHandler(defaultErrorHandler().maximumRedeliveries(2).redeliveryDelay(1000).retryAttemptedLogLevel(LoggingLevel.WARN));
 
+        onException(Exception.class)
+                .maximumRedeliveries(maxRedeliveryAttempts)
+                .redeliveryDelay(redeliveryDelay)
+                .retryAttemptedLogLevel(LoggingLevel.WARN)
+                .process(exceptionProcessor)
+                .handled(true)
+                //.to(endpoint.apply(ERROR))
+        ;
 
-        from(CamelRoutes.DSL)
+        from(endpoint.apply(DSL))
                 .process(dslProcessor)
                 .recipientList(header("recipients"));
 
-        from(CamelRoutes.DDL)
+        from(endpoint.apply(DDL))
                 .process(ddlProcessor)
                 .recipientList(header("recipients"));
 
-        from(CamelRoutes.DCL)
+        from(endpoint.apply(DCL))
                 .process(dclProcessor)
                 .recipientList(header("recipients"));
 
-        from(CamelRoutes.EDCL)
+        from(endpoint.apply(EDCL))
                 .process(edclProcessor);
 //                .to(CamelRoutes.DSL);
 
         //TrustCircles Circles routes
-        from(CamelRoutes.TC)
+        from(endpoint.apply(TC))
                 .process(tcProcessor)
                 .marshal().json(JsonLibrary.Jackson, Csp.class);
 
         //TrustCircles Teams routes
-        from(CamelRoutes.TCT)
+        from(endpoint.apply(TCT))
                 .process(teamProcessor)
                 .marshal().json(JsonLibrary.Jackson, Csp.class)
                 .recipientList(header("recipients"));
 
         //ExternalCSPs
-        from(CamelRoutes.ECSP)
+        from(endpoint.apply(ECSP))
                 .process(ecspProcessor);
 
 
         //App routing
-        from(CamelRoutes.APP)
+        from(endpoint.apply(APP))
                 .process(appProcessor);
 
         //Elastic route
-        from(CamelRoutes.ELASTIC)
+        from(endpoint.apply(ELASTIC))
                 .process(elasticProcessor);
 
     }

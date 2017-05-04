@@ -4,9 +4,9 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class IntegrationLayerDslApiApplication {
+public class CspApp {
 
 	public static void main(String[] args) {
-		SpringApplication.run(IntegrationLayerDslApiApplication.class, args);
+		SpringApplication.run(CspApp.class, args);
 	}
 }
