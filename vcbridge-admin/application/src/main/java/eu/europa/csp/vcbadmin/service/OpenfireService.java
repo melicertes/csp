@@ -42,7 +42,7 @@ public class OpenfireService {
 		try {
 			MUCRoomEntity chatRoom = new MUCRoomEntity(room, room, "Some description");
 			chatRoom.setBroadcastPresenceRoles(Arrays.asList("moderator", "participant", "visitor"));
-			//chatRoom.setMembersOnly(true);
+			chatRoom.setMembersOnly(true);
 			r = restApiClient.createChatRoom(chatRoom);
 		} catch (Exception e) {
 			throw new ErrorCreatingRoom(String.format("Error creating room %s", room), e);
