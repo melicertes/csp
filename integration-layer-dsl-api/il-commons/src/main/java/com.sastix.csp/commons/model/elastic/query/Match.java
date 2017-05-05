@@ -13,7 +13,7 @@ import java.util.Map;
         "dataParams.cspId",
         "dataParams.applicationId"
 })
-public class Term {
+public class Match {
 
     @JsonProperty("dataParams.recordId")
     @JsonInclude(JsonInclude.Include.NON_NULL)

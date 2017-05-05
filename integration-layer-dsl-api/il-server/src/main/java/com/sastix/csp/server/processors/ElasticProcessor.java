@@ -8,7 +8,7 @@ import com.sastix.csp.commons.model.elastic.ElasticSearchResponse;
 import com.sastix.csp.commons.model.elastic.query.Bool;
 import com.sastix.csp.commons.model.elastic.query.Must;
 import com.sastix.csp.commons.model.elastic.query.Query;
-import com.sastix.csp.commons.model.elastic.query.Term;
+import com.sastix.csp.commons.model.elastic.query.Match;
 import com.sastix.csp.commons.model.elastic.search.Hit;
 import com.sastix.csp.server.service.CamelRestService;
 import com.sastix.csp.server.service.CspUtils;
@@ -132,21 +132,21 @@ public class ElasticProcessor implements Processor {
 
     private Query getElasticQuery(IntegrationData integrationData) {
 
-        Term t1 = new Term();
+        Match t1 = new Match();
         t1.setRecordId(integrationData.getDataParams().getRecordId());
 
-        Term t2 = new Term();
+        Match t2 = new Match();
         t2.setCspId(integrationData.getDataParams().getCspId());
 
-        Term t3 = new Term();
+        Match t3 = new Match();
         t3.setApplicationId(integrationData.getDataParams().getApplicationId());
 
         Must m1 = new Must();
-        m1.setTerm(t1);
+        m1.setMatch(t1);
         Must m2 = new Must();
-        m2.setTerm(t2);
+        m2.setMatch(t2);
         Must m3 = new Must();
-        m3.setTerm(t3);
+        m3.setMatch(t3);
 
         ArrayList<Must> must = new ArrayList<>();
         must.add(m1);
