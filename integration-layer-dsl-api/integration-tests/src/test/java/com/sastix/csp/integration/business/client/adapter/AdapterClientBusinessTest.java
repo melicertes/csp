@@ -76,9 +76,54 @@ public class AdapterClientBusinessTest {
     }
 
     @Test
-    public void processNewIntegrationDataSuccessTest(){
+    public void processNewIntegrationDataIncidentSuccessTest(){
         IntegrationData integrationData = new IntegrationData();
         integrationData.setDataType(IntegrationDataType.INCIDENT);
+        ResponseEntity<String> response = adapterClient.processNewIntegrationData(integrationData);
+        assertThat(response.getStatusCode(),is(HttpStatus.OK));
+        assertThat(response.getBody(),containsString("Successful"));
+    }
+
+    @Test
+    public void processNewIntegrationDataThreatSuccessTest(){
+        IntegrationData integrationData = new IntegrationData();
+        integrationData.setDataType(IntegrationDataType.THREAT);
+        ResponseEntity<String> response = adapterClient.processNewIntegrationData(integrationData);
+        assertThat(response.getStatusCode(),is(HttpStatus.OK));
+        assertThat(response.getBody(),containsString("Successful"));
+    }
+
+    @Test
+    public void processNewIntegrationDataArtefactSuccessTest(){
+        IntegrationData integrationData = new IntegrationData();
+        integrationData.setDataType(IntegrationDataType.ARTEFACT);
+        ResponseEntity<String> response = adapterClient.processNewIntegrationData(integrationData);
+        assertThat(response.getStatusCode(),is(HttpStatus.OK));
+        assertThat(response.getBody(),containsString("Successful"));
+    }
+
+    @Test
+    public void processNewIntegrationDataChatSuccessTest(){
+        IntegrationData integrationData = new IntegrationData();
+        integrationData.setDataType(IntegrationDataType.CHAT);
+        ResponseEntity<String> response = adapterClient.processNewIntegrationData(integrationData);
+        assertThat(response.getStatusCode(),is(HttpStatus.OK));
+        assertThat(response.getBody(),containsString("Successful"));
+    }
+
+    @Test
+    public void processNewIntegrationDataContactSuccessTest(){
+        IntegrationData integrationData = new IntegrationData();
+        integrationData.setDataType(IntegrationDataType.CONTACT);
+        ResponseEntity<String> response = adapterClient.processNewIntegrationData(integrationData);
+        assertThat(response.getStatusCode(),is(HttpStatus.OK));
+        assertThat(response.getBody(),containsString("Successful"));
+    }
+
+    @Test
+    public void processNewIntegrationDataEventSuccessTest(){
+        IntegrationData integrationData = new IntegrationData();
+        integrationData.setDataType(IntegrationDataType.EVENT);
         ResponseEntity<String> response = adapterClient.processNewIntegrationData(integrationData);
         assertThat(response.getStatusCode(),is(HttpStatus.OK));
         assertThat(response.getBody(),containsString("Successful"));

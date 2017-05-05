@@ -31,14 +31,15 @@ public class EcspProcessor implements Processor{
         TrustCircleEcspDTO trustCircleEcspDTO = exchange.getIn().getBody(TrustCircleEcspDTO.class);
         TrustCircle tc = trustCircleEcspDTO.getTrustCircle();
         IntegrationData integrationData = trustCircleEcspDTO.getIntegrationData();
+        integrationData.getSharingParams().setIsExternal(true);
+        integrationData.getSharingParams().setToShare(false);
         String httpMethod = (String) exchange.getIn().getHeader(Exchange.HTTP_METHOD);
 
         List<Team> teams = trustCircleEcspDTO.getTeams();
-        LOG.info(teams.toString());
         for (Team team : teams) {
-            String uri = team.getUrl() + ContextUrl.ADAPTER_INTEGRATION_DATA;
+            LOG.info("DCL - Sending to external CSP: " + team.getName() + " -- " + team.getUrl());
+            String uri = team.getUrl() + ContextUrl.DCL_INTEGRATION_DATA;
             String response = camelRestService.send(uri, integrationData, httpMethod);
-            LOG.info("Response from ECSP " + team.getShortName() + ": " + response);
         }
     }
 }

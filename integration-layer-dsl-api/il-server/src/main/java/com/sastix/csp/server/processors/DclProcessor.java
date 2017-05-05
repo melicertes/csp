@@ -44,8 +44,8 @@ public class DclProcessor implements Processor,CamelRoutes {
 
     @Override
     public void process(Exchange exchange) throws IOException {
-        LOG.info("CSL Processing integrationData (from DSL)");
         IntegrationData integrationData = cspUtils.getExchangeData(exchange,IntegrationData.class);
+        LOG.info("DCL - received integrationData with datatype: " + integrationData.getDataType());
         String httpMethod = (String) exchange.getIn().getHeader(Exchange.HTTP_METHOD);
 
         /**
@@ -87,7 +87,7 @@ public class DclProcessor implements Processor,CamelRoutes {
 
         }catch (Exception e){
             //TODO: handle this situation
-            LOG.error("TC api call failed.",e);
+            LOG.error("DCL - TC api call failed.",e);
         }
     }
 }

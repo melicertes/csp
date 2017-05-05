@@ -68,8 +68,8 @@ public class CspRoutes extends RouteBuilder implements CamelRoutes{
                 .recipientList(header("recipients"));
 
         from(endpoint.apply(EDCL))
-                .process(edclProcessor);
-//                .to(CamelRoutes.DSL);
+                .process(edclProcessor)
+                .recipientList(header("recipients"));
 
         //TrustCircles Circles routes
         from(endpoint.apply(TC))
