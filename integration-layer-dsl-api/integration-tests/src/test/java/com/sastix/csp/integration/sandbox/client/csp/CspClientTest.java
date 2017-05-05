@@ -69,16 +69,6 @@ public class CspClientTest implements ContextUrl {
     CspClient cspClient;
 
     @Test
-    public void cspApiVersionTest(){
-        VersionDTO versionDTO = apiVersionClient.getApiVersion();
-        String apiUrl = apiVersionClient.getApiUrl();
-        String cspContext = apiVersionClient.getContext();
-        assertThat(versionDTO.getMaxVersion(),is(1.0));
-        assertThat(apiUrl,is("http://localhost:8081/v1"));
-        assertThat(cspContext,is("/v1"));
-    }
-
-    @Test
     public void sendPostIntegrationDataTest() throws IOException {
         String apiUrl = apiVersionClient.getApiUrl();
         MockRestServiceServer mockServer = MockRestServiceServer.bindTo(retryRestTemplate).build();
