@@ -1,0 +1,18 @@
+# websequencediagrams.com
+title Configuration Service API Interaction
+
+Client->+Server: Query API version (/apiversion)
+Server-->-Client: 200: [Versions supported and paths]
+
+Client->Client: Configuration of Paths
+
+Client->Server: Further API usage
+
+
+alt Error: unknown CSP
+    Client->+Server: Query API version (/apiversion)
+    Server-->-Client: 404: Error Response (unknown CSP)
+else Error: unsupported Version
+    Client->+Server: Query API version (/apiversion)
+    Server-->-Client: 400: Error Response (Version not supported)
+end

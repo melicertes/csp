@@ -9,6 +9,7 @@ import java.util.function.Function;
 public interface CamelRoutes {
     String DIRECT ="direct";
     String ACTIVEMQ ="activemq";
+    String ACTIVEMQ_TX ="activemqtx";
     String MOCK_PREFIX ="mock";
 
     String DSL ="dsl";
@@ -20,6 +21,8 @@ public interface CamelRoutes {
     String ECSP ="ecsp";
     String APP ="app";
     String ELASTIC ="elastic";
+
+    String ERROR ="error";
 //String DSL ="direct:dsl";
 //    String DCL ="direct:dcl";
 //    String EDCL ="direct:edcl";

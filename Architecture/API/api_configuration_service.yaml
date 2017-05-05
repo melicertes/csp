@@ -1,6 +1,6 @@
 swagger: '2.0'
 info:
-  version: 1.0.0.2
+  version: 1.0.0.3
   title: CSP Server Configuration API
 schemes:
   - https
@@ -34,11 +34,15 @@ paths:
           description: List of available updates by module
           schema: 
             $ref: '#/definitions/UpdateInformation'
-        '500': 
-          description: Failure to identify cspId presented
+        '404': 
+          description: cspId not found; failure to identify cspId presented
           schema:
             $ref: '#/definitions/ResponseError'
-
+        '500':
+          description: Systemic failure
+          schema:
+            $ref: '#/definitions/ResponseError'
+            
   '/v1/heartbeat/{cspId}':
     post:
       description: |
@@ -68,6 +72,10 @@ paths:
           description: Successful response
           schema:
             $ref: '#/definitions/Response'
+        '404': 
+          description: cspId not found; failure to identify cspId presented
+          schema:
+            $ref: '#/definitions/ResponseError'
         '500':
           description: Systemic failure
           schema:
@@ -102,15 +110,16 @@ paths:
           description: received when the CSP is registered successfully
           schema:
             $ref: '#/definitions/Response'
-        '500':
-          description: received when CSP requests update but original entry does not exist
+        '404':
+          description: received when CSP requests update but original entry does not exist OR 
+            when cspId is not recognized
           schema:
             $ref: '#/definitions/ResponseError'
-        '501':
+        '400':
           description: received when CSP updates entries with "registrationIsUpdate = false"
           schema:
             $ref: '#/definitions/ResponseError'
-        '502': 
+        '500': 
           description: received when the CSP is not registered due to system error
           schema:
             $ref: '#/definitions/ResponseError'
@@ -147,8 +156,16 @@ paths:
             are reported in payload
           schema:
             $ref: '#/definitions/ApiVersions'
+        '400': 
+          description: version in query is not available
+          schema:
+            $ref: '#/definitions/ResponseError'    
+        '404': 
+          description: cspId not found; failure to identify cspId presented
+          schema:
+            $ref: '#/definitions/ResponseError'
         '500': 
-          description: Failure to identify cspId presented or other error
+          description: Systemic failure
           schema:
             $ref: '#/definitions/ResponseError'
 
@@ -157,8 +174,7 @@ definitions:
     description: object describing versions supported by API
     properties:
       reportedVersion: 
-        type: integer
-        description: reported version by caller
+        $ref: "#/definitions/VersionDefinition"
       reportedVersionString:
         type: string
         description: reported version, full string as correlated
@@ -169,20 +185,32 @@ definitions:
       - reportedVersionString
       - supportedVersions
     example: {
-      reportedVersion: 100,
-      reportedVersionString: '1.0.0',
+      reportedVersion: 10000,
+      reportedVersionString: '1.0.000',
       supportedVersions: [
-        { version: 100, 
-          versionString: '1.0.0', 
+        { 
+          version: 10000, 
+          versionString: '1.0.000', 
           path: '/v1', 
           dateReleased: '2017-03-31T10:00:00Z'
-        },{ version: 101, 
-          versionString: '1.0.0', 
-          path: '/v101', 
+        },{ 
+          version: 10129, 
+          versionString: '1.0.129', 
+          path: '/v10129', 
           dateReleased: '2017-04-31T10:00:00Z'
         }
       ]
     }
+  
+  VersionDefinition:
+    description: |
+      the version definition used for communicating with the CSP APIs;
+      it has a visual and a numeric format. The visual format can be created by 
+      splitting the numeric at specific points, (0 based) 1, 2
+      example: 12000 split as 1.2.000
+    type: integer
+    minimum: 10000
+    maximum: 90000
     
   VersionsList:
     type: array
@@ -193,7 +221,7 @@ definitions:
     type: object
     properties:
       version:
-        type: integer
+        $ref: "#/definitions/VersionDefinition"
       versionString:
         type: string
       path:
@@ -289,7 +317,9 @@ definitions:
       responseCode:
         type: integer
         example: 0
-        description: 'the response code; 0 = OK, 1 = Error (see detailed response)'
+        minimum: 0
+        maximum: 999
+        description: 'the response code; 0 = OK, > 0 = Error (see detailed response)'
       responseText:
         type: string
         example: Successful Submission
@@ -302,7 +332,9 @@ definitions:
     properties:
       responseCode:
         type: integer
-        example: 100
+        minimum: 1000
+        maximum: 9999
+        example: 1020
         description: the response code; code > 0 = Error (see detailed response)
       responseText:
         type: string
@@ -315,6 +347,8 @@ definitions:
       - responseCode
       - responseText
       - responseException
+      
+      
   ModulesInfo:
     description: The json object that contains information on the modules installed
     properties:
@@ -343,7 +377,7 @@ definitions:
       fullName:
         type: string
       version:
-        type: string
+        $ref: "#/definitions/VersionDefinition"
       installedOn:
         type: string
         format: date
@@ -354,7 +388,7 @@ definitions:
     example:
       configuration-service-client:
         fullName: 'configuration-service-client:1.0'
-        version: '1.0'
+        version: 10000
         installed: '2017-04-24T11:59:35Z'
         active: true
         hash: 'c0535e4be2b79ffd93291305436bf889314e4a3faec05ecffcbb7df31ad9e51a'
@@ -364,6 +398,7 @@ definitions:
       - installedOn
       - active
       - hash
+      
   UpdateInformation:
     description: contains update information for the selected CSP
     properties:
@@ -378,12 +413,12 @@ definitions:
           configuration-service-client:
             - name: 'configuration-service-client:1.0.1'
               description: Rolling update of 20170331 to fix CSR-3988
-              version: 1.0.1
+              version: 10129
               released: '2017-03-30T11:12:33Z'
               isIncremental: true
             - name: 'configuration-service-client:1.0.2'
               description: Rolling update of 20170403 to fix CSR-3989
-              version: 1.0.2
+              version: 10200
               released: '2017-04-03T12:12:33Z'
               isIncremental: true
         additionalProperties:
@@ -391,6 +426,7 @@ definitions:
     required:
       - dateChanged
       - available
+      
   ModuleUpdateInfo:
     description: list of available updates for a module
     properties:
@@ -399,7 +435,7 @@ definitions:
       description:
         type: string
       version:
-        type: string
+        $ref: "#/definitions/VersionDefinition"
       released:
         type: string
         format: date-time
@@ -423,7 +459,7 @@ definitions:
     example:
       name: 'configuration-service-client:1.0.1'
       description: 'Rolling update of 20170331 to fix CSR-3988'
-      version: 1.0.1
+      version: 10100
       released: '2017-03-30T11:12:33Z'
       isIncremental: true
       hash: 'c0535e4be2b79ffd93291305436bf889314e4a3faec05ecffcbb7df31ad9e51a'
