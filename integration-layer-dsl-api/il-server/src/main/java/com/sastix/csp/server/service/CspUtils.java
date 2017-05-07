@@ -20,6 +20,7 @@ public class CspUtils {
     ObjectMapper objectMapper;
 
     public String getAppUri(String appName){
+        System.out.println(appName);
         String appProtocol = env.getProperty(appName+".protocol");
         String appHost = env.getProperty(appName+".host");
         String appPort = env.getProperty(appName+".port");

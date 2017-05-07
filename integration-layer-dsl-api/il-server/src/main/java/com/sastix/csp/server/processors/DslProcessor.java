@@ -55,6 +55,7 @@ public class DslProcessor implements Processor,CamelRoutes {
         if(!StringUtils.isEmpty(appsStr)){
             String[] appsArr =  appsStr.split(",");
             apps = Arrays.asList(appsArr).stream().map(s->s.trim()).collect(Collectors.toList());
+            apps.remove(integrationData.getDataParams().getApplicationId());
         }
 
         if(!isExternal){
