@@ -5,6 +5,7 @@ import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,25 +61,28 @@ public class MeetingService {
 			}
 			meetings.add(m);
 			m.setStatus(MeetingStatus.Cancel);
-			m.getScheduledTasks().forEach(st -> st.setCompleted(true));
 		}
 		meetingRepository.save(meetings);
 		log.info("Sending cancellation emails...");
+		meetings.clear();
 		for (long id : ids) {
 			Meeting m = meetingRepository.findOne(id);
 			if (m == null) {
 				throw new MeetingNotFound("Meeting with id " + id + " not found..");
 			}
-			for (MeetingScheduledTask t : m.getScheduledTasks()) {
-				if (t.getTaskType().equals(MeetingScheduledTaskType.START_MEETING)) {
-					if (t.getCompleted() == true) {
-						log.info("Sending cancellation emails for meeting {}", m.getId());
-						emailService.prepareAndSend(m.getUser().getCancellation(), m);
-						break;
-					}
-				}
+			meetings.add(m);
+			List<MeetingScheduledTask> already_started = m.getScheduledTasks().stream()
+					.filter(st -> st.getCompleted() && st.getTaskType().equals(MeetingScheduledTaskType.START_MEETING))
+					.collect(Collectors.toList());
+			if (!already_started.isEmpty()) {
+				log.info("Sending cancellation emails for meeting {}", m.getId());
+				emailService.prepareAndSend(m.getUser().getCancellation(), m);
+			} else {
+				log.info("Not sending email for meeting {} because email invitations haven't been sent yet", m.getId());
 			}
+			m.getScheduledTasks().forEach(st -> st.setCompleted(true));
 		}
+		meetingRepository.save(meetings);
 	}
 
 	@Transactional
