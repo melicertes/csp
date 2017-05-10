@@ -1,15 +1,19 @@
 package com.sastix.csp.integration;
 
 import com.sastix.csp.integration.sandbox.server.internal.CspServerInternalSandboxTest;
+import com.sastix.csp.server.service.CspUtils;
 import org.junit.internal.TextListener;
 import org.junit.runner.JUnitCore;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Created by iskitsas on 4/27/17.
  */
 public class MainAppTest {
+    private static final Logger LOG = LoggerFactory.getLogger(MainAppTest.class);
     public static void main(String[] args) throws ClassNotFoundException {
-        System.out.println("Running tests!");
+        LOG.info("Running tests!");
 
         JUnitCore engine = new JUnitCore();
         engine.addListener(new TextListener(System.out)); // required to print reports
@@ -23,7 +27,7 @@ public class MainAppTest {
         if(classArr.length>0) {
             engine.run(classArr);
         }else{
-            System.out.println("Nothing to execute..");
+            LOG.info("Nothing to execute..");
         }
     }
 

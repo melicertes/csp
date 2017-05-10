@@ -4,10 +4,13 @@ import com.sastix.csp.client.TrustCirclesClient;
 import com.sastix.csp.client.config.CspRestTemplateConfiguration;
 import com.sastix.csp.client.config.TrustCirclesClientConfig;
 import com.sastix.csp.commons.model.TrustCircle;
+import com.sastix.csp.integration.MainAppTest;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -38,6 +41,7 @@ import static org.junit.Assert.fail;
  * $ APP_NAME=tc PORT=8081 node server.js
  * */
 public class TcClientBusinessTest {
+    private static final Logger LOG = LoggerFactory.getLogger(TcClientBusinessTest.class);
     @Autowired
     @Qualifier(value = "trustCirclesClient")
     TrustCirclesClient tcClient;
@@ -77,7 +81,7 @@ public class TcClientBusinessTest {
     public void getTrustCircleTest(){
         tcClient.setProtocolHostPort("http","csp.dangerduck.gr","8000");
         TrustCircle trustCircle = tcClient.getTrustCircle(1);
-        System.out.println(trustCircle.toString());
+        LOG.info(trustCircle.toString());
         assertThat(trustCircle.getTeams().size(),is(2));
     }
 }
