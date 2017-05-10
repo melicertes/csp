@@ -69,7 +69,7 @@ public class CspAppRequestsTest {
         sharingParams.setToShare(true);
         integrationData.setSharingParams(sharingParams);
 
-        String url = serverUrl + ContextUrl.DSL_INTEGRATION_DATA;
+        String url = serverUrl +"/v"+ContextUrl.REST_API_V1+ ContextUrl.DSL_INTEGRATION_DATA;
         ResponseEntity<String> response = retryRestTemplate.exchange(url, HttpMethod.POST, new HttpEntity<Object>(integrationData), String.class);
 
         assertThat(response.getStatusCode(),is(HttpStatus.OK));

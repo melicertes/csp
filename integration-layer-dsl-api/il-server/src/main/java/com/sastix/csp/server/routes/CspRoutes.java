@@ -56,16 +56,24 @@ public class CspRoutes extends RouteBuilder implements CamelRoutes{
     @Override
     public void configure() {
 
-        //errorHandler(defaultErrorHandler().maximumRedeliveries(2).redeliveryDelay(1000).retryAttemptedLogLevel(LoggingLevel.WARN));
+        // same approach with onException below
+        errorHandler(deadLetterChannel(endpoint.apply(ERROR))
+                .maximumRedeliveries(maxRedeliveryAttempts)
+                .redeliveryDelay(redeliveryDelay)
+                .retryAttemptedLogLevel(LoggingLevel.WARN)
+                //.onRedelivery(exceptionProcessor)
+                .onPrepareFailure(exceptionProcessor)
+        );
 
-        onException(Exception.class)
+        // same approach with errorHandler and DQL above
+        /*onException(Exception.class)
                 .maximumRedeliveries(maxRedeliveryAttempts)
                 .redeliveryDelay(redeliveryDelay)
                 .retryAttemptedLogLevel(LoggingLevel.WARN)
                 .process(exceptionProcessor)
                 .handled(true)
-                //.to(endpoint.apply(ERROR))
-        ;
+                .inOnly(endpoint.apply(ERROR))
+        ;*/
 
         from(endpoint.apply(DSL))
                 .process(dslProcessor)

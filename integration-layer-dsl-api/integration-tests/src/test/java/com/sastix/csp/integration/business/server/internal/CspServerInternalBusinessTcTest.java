@@ -9,6 +9,7 @@ import com.sastix.csp.commons.routes.CamelRoutes;
 import com.sastix.csp.integration.MockUtils;
 import com.sastix.csp.server.CspApp;
 import com.sastix.csp.server.routes.RouteUtils;
+import com.sastix.csp.server.service.ErrorMessageHandler;
 import org.apache.camel.*;
 import org.apache.camel.component.mock.MockEndpoint;
 import org.apache.camel.spring.SpringCamelContext;
@@ -40,8 +41,8 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
         properties = {
                 "csp.retry.backOffPeriod:10",
                 "csp.retry.maxAttempts:1",
-                "embedded.activemq.start:false",
-                "apache.camel.use.activemq:false",
+                "embedded.activemq.start:true",
+                "apache.camel.use.activemq:true",
                 "tc.protocol: http",
                 "tc.host: localhost",
                 "tc.port: 8081",
@@ -86,6 +87,9 @@ public class CspServerInternalBusinessTcTest implements CamelRoutes {
     @Autowired
     SpringCamelContext springCamelContext;
 
+    @Autowired
+    ErrorMessageHandler errorMessageHandler;
+
     @Before
     public void init() throws Exception {
         mvc = webAppContextSetup(webApplicationContext).build();
@@ -127,5 +131,9 @@ public class CspServerInternalBusinessTcTest implements CamelRoutes {
 
         mockedDdl.expectedMessageCount(1);
         mockedDdl.assertIsSatisfied();
+
+        Thread.sleep(10*1000); //to avoid "Rejecting received message because of the listener container having been stopped in the meantime"
+        //be careful when debugging, you might miss breakpoints if the time is not enough
+        errorMessageHandler.consumeErrorMessages(1, 1000L,"<br/>");
     }
 }

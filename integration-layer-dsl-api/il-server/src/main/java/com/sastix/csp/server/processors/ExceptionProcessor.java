@@ -27,6 +27,9 @@ public class ExceptionProcessor implements Processor,CamelRoutes {
 
         //based on exception an additional logic could be implemented, eg send an email with errors
 
+        Exception cause = exchange.getProperty(Exchange.EXCEPTION_CAUGHT, Exception.class);
+        exchange.getIn().setHeader(Exchange.INTERCEPTED_ENDPOINT, fromEndpointUri);
+
         LOG.error(msg);
     }
 }

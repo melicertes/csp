@@ -67,6 +67,7 @@ public class DclProcessor implements Processor,CamelRoutes {
             //TrustCircle tc = camelRestService.send(tcClient.getContext()+ ContextUrl.TRUST_CIRCLE,new Csp("localhost"), TrustCircle.class);
 
             // with camel response
+            // -----> TODO: move to TC processor
             Integer datatypeId = integrationData.getDataType().ordinal();
             byte[] data = (byte[]) producerTemplate.sendBodyAndHeader(routes.apply(TC), ExchangePattern.InOut,new Csp(datatypeId), Exchange.HTTP_METHOD, "GET");
             TrustCircle tc = objectMapper.readValue(data, TrustCircle.class);
@@ -78,10 +79,11 @@ public class DclProcessor implements Processor,CamelRoutes {
                 Team team = objectMapper.readValue(dataTeam, Team.class);
                 teams.add(team);
             }
+            // -----<
 
             trustCircleEcspDTO.setTeams(teams);
             //AVOID this: producerTemplate.sendBodyAndHeader(routes.apply(ECSP), ExchangePattern.InOut, trustCircleEcspDTO, Exchange.HTTP_METHOD, httpMethod); // if used, ends in multicast ...
-            exchange.getIn().setHeader("recipients", routes.apply(ECSP));
+            exchange.getIn().setHeader("recipients", routes.apply(ECSP)); //TODO: this should be moved to TC processor
             exchange.getIn().setBody(trustCircleEcspDTO);
 
 
