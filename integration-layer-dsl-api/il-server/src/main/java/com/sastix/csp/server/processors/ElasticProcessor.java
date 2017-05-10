@@ -8,7 +8,7 @@ import com.sastix.csp.commons.model.elastic.ElasticSearchResponse;
 import com.sastix.csp.commons.model.elastic.query.Bool;
 import com.sastix.csp.commons.model.elastic.query.Must;
 import com.sastix.csp.commons.model.elastic.query.Query;
-import com.sastix.csp.commons.model.elastic.query.Term;
+import com.sastix.csp.commons.model.elastic.query.Match;
 import com.sastix.csp.commons.model.elastic.search.Hit;
 import com.sastix.csp.server.service.CamelRestService;
 import com.sastix.csp.server.service.CspUtils;
@@ -66,7 +66,7 @@ public class ElasticProcessor implements Processor {
 
             //query ES for insertion
             String response = camelRestService.send(this.getElasticURI() + "/" + dataType.toString().toLowerCase() + "?pretty", elasticData, httpMethod);
-            LOG.info("ES Insert response: " + response);
+            LOG.info("Elastic - ES Insert response: " + response);
 
         }
         else if (httpMethod.equals(HttpMethod.PUT.name())) {
@@ -75,7 +75,7 @@ public class ElasticProcessor implements Processor {
 
             //query ES to get IDs
             String response = camelRestService.send(this.getElasticURI() + "/" + dataType.toString().toLowerCase() + "/_search?pretty&_source=false", elasticSearchRequest, HttpMethods.POST.name());
-            LOG.info("ES Search response: " + response);
+            LOG.info("Elastic - ES Search response: " + response);
 
             //create update transaction object
             ElasticData elasticData = new ElasticData(integrationData.getDataParams(), integrationData.getDataObject());
@@ -85,7 +85,7 @@ public class ElasticProcessor implements Processor {
                 LOG.info(hit.getId());
                 //query ES to perform update
                 String updateResponse = camelRestService.send(this.getElasticURI() + "/" + dataType.toString().toLowerCase() + "/" + hit.getId() + "", elasticData, HttpMethods.POST.name());
-                LOG.info("ES Update index "+hit.getId()+" response: " + updateResponse);
+                LOG.info("Elastic - ES Update index "+hit.getId()+" response: " + updateResponse);
             }
 
         }
@@ -132,21 +132,21 @@ public class ElasticProcessor implements Processor {
 
     private Query getElasticQuery(IntegrationData integrationData) {
 
-        Term t1 = new Term();
+        Match t1 = new Match();
         t1.setRecordId(integrationData.getDataParams().getRecordId());
 
-        Term t2 = new Term();
+        Match t2 = new Match();
         t2.setCspId(integrationData.getDataParams().getCspId());
 
-        Term t3 = new Term();
+        Match t3 = new Match();
         t3.setApplicationId(integrationData.getDataParams().getApplicationId());
 
         Must m1 = new Must();
-        m1.setTerm(t1);
+        m1.setMatch(t1);
         Must m2 = new Must();
-        m2.setTerm(t2);
+        m2.setMatch(t2);
         Must m3 = new Must();
-        m3.setTerm(t3);
+        m3.setMatch(t3);
 
         ArrayList<Must> must = new ArrayList<>();
         must.add(m1);

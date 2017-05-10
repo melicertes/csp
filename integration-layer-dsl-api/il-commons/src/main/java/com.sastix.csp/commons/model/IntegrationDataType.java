@@ -8,21 +8,23 @@ import com.fasterxml.jackson.annotation.JsonValue;
  */
 public enum IntegrationDataType {
 
-  EVENT("event"),
+  DUMMY("dummy"),
 
   THREAT("threat"),
-  
-  INCIDENT("incident"),
-  
-  VULNERABILITY("vulnerability"),
-  
+
+  EVENT("event"),
+
   ARTEFACT("artefact"),
-  
-  CHAT("chat"),
-  
-  FILE("file"),
+
+  INCIDENT("incident"),
 
   CONTACT("contact"),
+
+  FILE("file"),
+
+  CHAT("chat"),
+
+  VULNERABILITY("vulnerability"),
 
   TRUSTCIRCLE("trustcircle");
 

@@ -41,6 +41,7 @@ public class EdclProcessor implements Processor,CamelRoutes {
 
     @Override
     public void process(Exchange exchange) throws IOException {
+        LOG.info("DCL - received integrationData from external CSP");
         List<String> recipients = new ArrayList<>();
         IntegrationData integrationData = cspUtils.getExchangeData(exchange, IntegrationData.class);
         String httpMethod = (String) exchange.getIn().getHeader(Exchange.HTTP_METHOD);
@@ -57,14 +58,17 @@ public class EdclProcessor implements Processor,CamelRoutes {
             byte[] dataTeam = (byte[]) producerTemplate.sendBodyAndHeader(routes.apply(TCT), ExchangePattern.InOut, id, Exchange.HTTP_METHOD, "GET");
             Team team = objectMapper.readValue(dataTeam, Team.class);
             if (team.getCspId().equals(integrationData.getDataParams().getCspId())){
+                LOG.info("DCL - " + team.getCspId() + " is Authorized");
                 authorized = true;
             }
-
+            else {
+                LOG.info("DCL - " + team.getCspId() + " not Authorized");
+            }
         }
 
         if (authorized){
             integrationData.getSharingParams().setIsExternal(true);
-            integrationData.getSharingParams().setToShare(false);
+//            integrationData.getSharingParams().setToShare(false);
             recipients.add(routes.apply(DSL));
             exchange.getIn().setHeader("recipients", recipients);
         }

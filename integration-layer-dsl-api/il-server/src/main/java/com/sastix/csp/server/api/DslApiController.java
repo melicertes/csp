@@ -35,6 +35,7 @@ public class DslApiController implements CamelRoutes, ContextUrl{
             consumes = {"application/json"},
             method = RequestMethod.POST)
     public ResponseEntity<String> synchNewIntData(@RequestBody IntegrationData integrationData) {
+        LOG.info("DSL Endpoint: POST received");
         return handleIntegrationData(integrationData, "POST");
     }
 
@@ -42,6 +43,7 @@ public class DslApiController implements CamelRoutes, ContextUrl{
             consumes = {"application/json"},
             method = RequestMethod.PUT)
     public ResponseEntity<String> synchUpdatedIntData(@RequestBody IntegrationData integrationData) {
+        LOG.info("DSL Endpoint: PUT received");
         return handleIntegrationData(integrationData, "PUT");
     }
 
@@ -49,6 +51,7 @@ public class DslApiController implements CamelRoutes, ContextUrl{
             consumes = {"application/json"},
             method = RequestMethod.DELETE)
     public ResponseEntity<String> synchDeletedIntData(@RequestBody IntegrationData integrationData) {
+        LOG.info("DSL Endpoint: DELETE received");
         return handleIntegrationData(integrationData, "DELETE");
     }
 

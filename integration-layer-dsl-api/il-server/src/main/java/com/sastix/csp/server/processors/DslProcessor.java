@@ -55,13 +55,21 @@ public class DslProcessor implements Processor,CamelRoutes {
         if(!StringUtils.isEmpty(appsStr)){
             String[] appsArr =  appsStr.split(",");
             apps = Arrays.asList(appsArr).stream().map(s->s.trim()).collect(Collectors.toList());
+            if (!isExternal){
+                apps.remove(integrationData.getDataParams().getApplicationId());
+            }
         }
 
         if(!isExternal){
             recipients.add(routes.apply(DDL));
+            LOG.info("DSL - received integrationData with datatype: " + integrationData.getDataType());
+        }
+        else {
+            LOG.info("DSL - received integrationData with datatype: " + integrationData.getDataType() + ", isExternal = true");
         }
 
         for (String app : apps) {
+//            LOG.info(app.toString());
             //String uri = cspUtils.getAppUri(app);
             //recipients.add(uri);
             //recipients.add(CamelRoutes.APP+"?name="+app);//haven't find a solution for this yet, using producerTemplate instead

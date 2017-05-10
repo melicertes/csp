@@ -37,7 +37,7 @@ public class DclApiController implements CamelRoutes,ContextUrl{
             method = RequestMethod.POST)
     public ResponseEntity<String> getNewIntDataFromExtCsp(@RequestBody IntegrationData newIntDataObj) {
 
-        LOG.info(newIntDataObj.toString());
+        LOG.info("DCL Endpoint: POST received");
         intDataProducer.sendBodyAndHeader(routes.apply(EDCL), newIntDataObj,"method", "POST");
 
         return new ResponseEntity<>(HttpStatus.OK);
@@ -53,10 +53,9 @@ public class DclApiController implements CamelRoutes,ContextUrl{
             method = RequestMethod.PUT)
     public ResponseEntity<String> getUpdateIntDataFromExtCsp(@RequestBody IntegrationData newIntDataObj) {
 
-        LOG.info(newIntDataObj.toString());
+        LOG.info("DCL Endpoint: PUT received");
         intDataProducer.sendBodyAndHeader(routes.apply(EDCL), newIntDataObj, "method", "PUT");
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
-
 }

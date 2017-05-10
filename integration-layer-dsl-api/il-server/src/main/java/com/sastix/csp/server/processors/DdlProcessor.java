@@ -6,6 +6,8 @@ import com.sastix.csp.commons.routes.CamelRoutes;
 import com.sastix.csp.server.routes.RouteUtils;
 import com.sastix.csp.server.service.CspUtils;
 import org.apache.camel.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -16,6 +18,9 @@ import java.util.List;
 
 @Component
 public class DdlProcessor implements Processor,CamelRoutes {
+
+    private static final Logger LOG = LoggerFactory.getLogger(DdlProcessor.class);
+
     @Autowired
     ObjectMapper objectMapper;
 
@@ -28,6 +33,9 @@ public class DdlProcessor implements Processor,CamelRoutes {
     @Autowired
     CspUtils cspUtils;
 
+    @Value("${enableElastic}")
+    Boolean enableElastic;
+
     @Override
     public void process(Exchange exchange) throws Exception {
         IntegrationData integrationData = cspUtils.getExchangeData(exchange, IntegrationData.class);
@@ -36,12 +44,16 @@ public class DdlProcessor implements Processor,CamelRoutes {
         List<String> recipients = new ArrayList<>();
 
         if (toShare) {
+            LOG.info("DDL - received integrationData with datatype: " + integrationData.getDataType() + ", toShare = true, sending to DCL" );
             recipients.add(routes.apply(DCL));
             //producerTemplate.sendBodyAndHeader(routes.apply(DCL), ExchangePattern.InOut,integrationData, Exchange.HTTP_METHOD, httpMethod);
         }
 
         //producerTemplate.sendBodyAndHeader(routes.apply(ELASTIC), ExchangePattern.InOut,integrationData, Exchange.HTTP_METHOD, httpMethod);
-        recipients.add(routes.apply(ELASTIC));
+        if (enableElastic){
+            recipients.add(routes.apply(ELASTIC));
+        }
+
         exchange.getIn().setHeader("recipients", recipients);
 //        exchange.getIn().setHeader(Exchange.HTTP_METHOD,httpMethod);
         exchange.getIn().setBody(integrationData);

@@ -16,7 +16,7 @@ import org.springframework.util.StringUtils;
  */
 @Component
 public class AppProcessor implements Processor{
-    private static final Logger LOG = LoggerFactory.getLogger(TcProcessor.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AppProcessor.class);
 
     @Produce
     ProducerTemplate producerTemplate;
@@ -36,10 +36,11 @@ public class AppProcessor implements Processor{
         String appUri = cspUtils.getAppUri(appName);
         if(!StringUtils.isEmpty(appUri)){
             //producerTemplate.sendBody(appUri, ExchangePattern.InOut,integrationData);
+            LOG.info("DSL - Send to internal application: " + appName + " - " + appUri);
             camelRestService.send(appUri,integrationData, httpMethod);
         }else{
             //TODO: handle situation
-            LOG.warn("could not send to app uri - app not found.");
+            LOG.warn("DSL - could not send to app uri - app not found.");
         }
 
     }

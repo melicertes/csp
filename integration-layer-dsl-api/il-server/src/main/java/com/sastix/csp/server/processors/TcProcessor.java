@@ -45,14 +45,13 @@ public class TcProcessor implements Processor{
 
     @Override
     public void process(Exchange exchange) throws Exception {
+        LOG.info("DCL - Get Trust Circles from TC API");
 //        TrustCircleEcspDTO trustCircleEcspDTO = exchange.getIn().getBody(TrustCircleEcspDTO.class);
         Csp csp = exchange.getIn().getBody(Csp.class);
         String httpMethod = (String) exchange.getIn().getHeader(Exchange.HTTP_METHOD);
 
         String uri = this.getTcURI() + "/" + csp.getCspId();
-        LOG.info(uri);
         TrustCircle tc = camelRestService.send(uri, csp, httpMethod, TrustCircle.class);
-        LOG.info(tc.toString());
         Message m = new DefaultMessage();
         m.setBody(tc);
         exchange.setOut(m);

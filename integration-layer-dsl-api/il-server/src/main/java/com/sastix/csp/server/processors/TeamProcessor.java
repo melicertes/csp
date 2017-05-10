@@ -49,8 +49,10 @@ public class TeamProcessor implements Processor {
 
     @Override
     public void process(Exchange exchange) throws Exception {
+
         Integer teamId = exchange.getIn().getBody(Integer.class);
         String httpMethod = (String) exchange.getIn().getHeader(Exchange.HTTP_METHOD);
+        LOG.info("DCL - Get Team with id " + teamId + " from TC API");
         Team team = camelRestService.send(this.getTcURI() + "/" + teamId, teamId, httpMethod, Team.class);
 
         Message m = new DefaultMessage();
