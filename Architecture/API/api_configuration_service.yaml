@@ -1,6 +1,6 @@
 swagger: '2.0'
 info:
-  version: 1.0.0.3
+  version: 1.0.1
   title: CSP Server Configuration API
 schemes:
   - https
@@ -43,10 +43,10 @@ paths:
           schema:
             $ref: '#/definitions/ResponseError'
             
-  '/v1/heartbeat/{cspId}':
+  '/v1/appInfo/{cspId}':
     post:
       description: |
-        Submits a heartbeat with a body that contains information of the CSP 
+        Submits a body that contains information of the CSP 
       consumes:
         - application/json
       produces:
@@ -63,10 +63,10 @@ paths:
           type: string
         - name: heartbeatInfo
           in: body
-          description: the heartbeat information
+          description: the information
           required: true
           schema:
-            $ref: '#/definitions/HeartBeatInfo'
+            $ref: '#/definitions/AppInfo'
       responses:
         '200':
           description: Successful response
@@ -124,83 +124,7 @@ paths:
           schema:
             $ref: '#/definitions/ResponseError'
 
-  '/apiversion/{cspId}/{apiVersion}':
-    get:
-      description: |
-        A simple API call to allow a client to use a particular version of the API.
-        In the future, multiple API versions may be available but backwards
-        compatibility should be ensured.
-      consumes:   
-        - application/json
-      produces:
-        - application/json
-      parameters:
-        - name: cspId
-          in: path
-          description: | 
-            a unique identifier that defines a Registered and Known CSP. The 
-            csp identifier follows the UUID formatted as text, for 36 characters
-            total, arranged as 8-4-4-4-12. 
-            Example = 123e4567-e89b-12d3-a456-426655440000 
-          required: true
-          type: string 
-        - name: apiVersion
-          in: path
-          description: the api version supported, without dots, eg. 1.0.0 -> 100
-          required: true
-          type: integer
-      responses:
-        '200':
-          description: | 
-            cspId is identified and versions supported 
-            are reported in payload
-          schema:
-            $ref: '#/definitions/ApiVersions'
-        '400': 
-          description: version in query is not available
-          schema:
-            $ref: '#/definitions/ResponseError'    
-        '404': 
-          description: cspId not found; failure to identify cspId presented
-          schema:
-            $ref: '#/definitions/ResponseError'
-        '500': 
-          description: Systemic failure
-          schema:
-            $ref: '#/definitions/ResponseError'
-
 definitions:
-  ApiVersions:
-    description: object describing versions supported by API
-    properties:
-      reportedVersion: 
-        $ref: "#/definitions/VersionDefinition"
-      reportedVersionString:
-        type: string
-        description: reported version, full string as correlated
-      supportedVersions:
-        $ref: '#/definitions/VersionsList'
-    required:
-      - reportedVersion
-      - reportedVersionString
-      - supportedVersions
-    example: {
-      reportedVersion: 10000,
-      reportedVersionString: '1.0.000',
-      supportedVersions: [
-        { 
-          version: 10000, 
-          versionString: '1.0.000', 
-          path: '/v1', 
-          dateReleased: '2017-03-31T10:00:00Z'
-        },{ 
-          version: 10129, 
-          versionString: '1.0.129', 
-          path: '/v10129', 
-          dateReleased: '2017-04-31T10:00:00Z'
-        }
-      ]
-    }
   
   VersionDefinition:
     description: |
@@ -212,24 +136,6 @@ definitions:
     minimum: 10000
     maximum: 90000
     
-  VersionsList:
-    type: array
-    items:
-      $ref: '#/definitions/Version'
-  
-  Version:
-    type: object
-    properties:
-      version:
-        $ref: "#/definitions/VersionDefinition"
-      versionString:
-        type: string
-      path:
-        type: string
-      dateReleased:
-        type: string 
-        format: date-time
-        
   Registration:
     description: Registration object for a new CSP
     properties:
@@ -293,8 +199,8 @@ definitions:
       - personEmail
       - contactType
       
-  HeartBeatInfo:
-    description: Heartbeat object
+  AppInfo:
+    description: AppInfo object
     properties:
       name:
         type: string

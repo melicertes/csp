@@ -5,7 +5,7 @@ info:
       This document describes the REST API of the CSP system. The API is protected 
       using Basic Authentication.
 
-  version: "0.0.1"
+  version: "1.0.1"
 
 host: localhost:8000
 schemes:
@@ -326,6 +326,10 @@ definitions:
         type: string
         maxLength: 255
         description: The ID of the CSP installation. Required if csp_installed is true.
+      csp_domain:
+        type: string
+        maxLength: 255
+        description: The domain of the CSP installation. Required if csp_installed is true.
       status:
         type: string
         description: Status of the team (see /config endpoint)

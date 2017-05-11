@@ -3,12 +3,12 @@ info:
   description: >
     Integration Layer consists of two service endpoints. DSL accepts data from
     applications and the integration layer performs synchronization of that data
-    between elligible applications, indexing and collaboration with external
+    between eligible applications, indexing and collaboration with external
     CSPs, i.e. sends the data to external CSPs based on the data specific trust
     circles. DCL accepts data from external CSPs, authorizes that data based on
     data specific trust circles and the integration layer performs
     synchronization of that data between eligible applications.
-  version: 1.0.0.1
+  version: 1.0.1
   title: Integration Layer API
 host: int.csp.org
 schemes:
@@ -40,7 +40,7 @@ paths:
         '500':
           description: Internal server error
         '503':
-          description: Service anavailable
+          description: Service unavailable
     put:
       tags:
         - dsl
@@ -67,7 +67,7 @@ paths:
         '500':
           description: Internal server error
         '503':
-          description: Service anavailable
+          description: Service unavailable
     delete:
       tags:
         - dsl
@@ -95,7 +95,7 @@ paths:
         '500':
           description: Internal server error
         '503':
-          description: Service anavailable
+          description: Service unavailable
   /v1/dcl/integrationData:
     post:
       tags:
@@ -123,7 +123,7 @@ paths:
           description: Malformed Integration Data Structure
         '403':
           description: >-
-            CSP authorization failed. External CSP is not authorized to sent
+            CSP authorization failed. External CSP is not authorized to send
             specific data type
         '415':
           description: >-
@@ -132,7 +132,7 @@ paths:
         '500':
           description: Internal server error
         '503':
-          description: Service anavailable
+          description: Service unavailable
 definitions:
   IntegrationData:
     type: object
@@ -154,6 +154,9 @@ definitions:
         type: string
       recordId:
         type: string
+      timestamp:
+        type: string
+        format: dateTime
   IntegrationDataType:
     type: string
     enum:

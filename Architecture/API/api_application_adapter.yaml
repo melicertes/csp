@@ -5,9 +5,9 @@ info:
     resource "integrationData". Adapter accepts integrationData from the
     integration layer. The adapter checks if there is already a record that
     represents the data and updates that record (deduplication) or creates a new
-    one. The emmition of the creation or update is depended on the "isExternal"
+    one. The emmition of the creation or update is dependant on the "isExternal"
     flag.
-  version: 1.0.0.1
+  version: 1.0.1
   title: Application Adapter API
 host: app.csp.org
 schemes:
@@ -17,7 +17,7 @@ paths:
     post:
       summary: Proccess new integration data from integration layer
       description: >
-        Application adapter gets new data from integratio n layer. If the
+        Application adapter gets new data from integration layer. If the
         "isExternal" flag is set to false, the data is coming from another
         application inside the local CSP. The data is processed as such and if
         the process results in another data record being created or updated, the
@@ -44,7 +44,7 @@ paths:
         '500':
           description: Internal server error
         '503':
-          description: Service anavailable
+          description: Service unavailable
     put:
       summary: Process integration data update from integration layer
       description: |
@@ -66,7 +66,7 @@ paths:
         '500':
           description: Internal server error
         '503':
-          description: Service anavailable
+          description: Service unavailable
     delete:
       summary: Process integration data deletion from integration layer
       description: >
@@ -75,7 +75,7 @@ paths:
         the affected records in the application datastore. If the process
         results in a local data record being updated, the new or updated record
         is emited back to the integration layer. If the process results in a
-        local data record being deleted, the delete request is emited back to
+        local data record being deleted, the delete request is emitted back to
         the integration layer. All delete requests by the emitter have the
         "toShare" flag to false. The dataObject is expected to be null.
         isExternal is expected to be false.
@@ -94,7 +94,7 @@ paths:
         '500':
           description: Internal server error
         '503':
-          description: Service anavailable
+          description: Service unavailable
 definitions:
   IntegrationData:
     type: object
@@ -116,6 +116,9 @@ definitions:
         type: string
       recordId:
         type: string
+      timestamp:
+        type: string
+        format: dateTime
   IntegrationDataType:
     type: string
     enum:
