@@ -22,6 +22,7 @@ public interface CamelRoutes {
     String APP ="app";
     String ELASTIC ="elastic";
 
+    String ORIGIN_ENDPOINT ="originEndpoint";
     String ERROR ="error";
 //String DSL ="direct:dsl";
 //    String DCL ="direct:dcl";

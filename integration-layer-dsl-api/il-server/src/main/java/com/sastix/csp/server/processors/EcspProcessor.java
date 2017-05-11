@@ -1,9 +1,6 @@
 package com.sastix.csp.server.processors;
 
-import com.sastix.csp.commons.model.IntegrationData;
-import com.sastix.csp.commons.model.Team;
-import com.sastix.csp.commons.model.TrustCircle;
-import com.sastix.csp.commons.model.TrustCircleEcspDTO;
+import com.sastix.csp.commons.model.*;
 import com.sastix.csp.commons.routes.ContextUrl;
 import com.sastix.csp.server.service.CamelRestService;
 import org.apache.camel.*;
@@ -28,7 +25,7 @@ public class EcspProcessor implements Processor{
 
     @Override
     public void process(Exchange exchange) throws Exception {
-        TrustCircleEcspDTO trustCircleEcspDTO = exchange.getIn().getBody(TrustCircleEcspDTO.class);
+        /*TrustCircleEcspDTO trustCircleEcspDTO = exchange.getIn().getBody(TrustCircleEcspDTO.class);
         TrustCircle tc = trustCircleEcspDTO.getTrustCircle();
         IntegrationData integrationData = trustCircleEcspDTO.getIntegrationData();
         integrationData.getSharingParams().setIsExternal(true);
@@ -43,6 +40,15 @@ public class EcspProcessor implements Processor{
             LOG.info("DCL - Sending to external CSP: " + team.getName() + " -- " + team.getUrl());
             String uri = team.getUrl() + ContextUrl.DCL_INTEGRATION_DATA;
             String response = camelRestService.send(uri, integrationData, httpMethod);
-        }
+        }*/
+
+        String httpMethod = (String) exchange.getIn().getHeader(Exchange.HTTP_METHOD);
+        EnhancedTeamDTO enhancedTeamDTO = exchange.getIn().getBody(EnhancedTeamDTO.class);
+        LOG.info("DCL - Sending to external CSP: " + enhancedTeamDTO.getTeam().getName() + " -- " + enhancedTeamDTO.getTeam().getUrl());
+        String uri = enhancedTeamDTO.getTeam().getUrl() + ContextUrl.DCL_INTEGRATION_DATA;
+        String response = camelRestService.send(uri, enhancedTeamDTO.getIntegrationData(), httpMethod);
+
+
+
     }
 }

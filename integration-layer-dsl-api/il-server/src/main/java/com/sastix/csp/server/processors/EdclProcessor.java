@@ -47,31 +47,42 @@ public class EdclProcessor implements Processor,CamelRoutes {
         String httpMethod = (String) exchange.getIn().getHeader(Exchange.HTTP_METHOD);
 
         exchange.getIn().setHeader(Exchange.HTTP_METHOD, httpMethod);
+        //pass message for TC processing
+        exchange.getIn().setBody(integrationData);
+        exchange.getIn().setHeader(CamelRoutes.ORIGIN_ENDPOINT, routes.apply(EDCL));
+        exchange.getIn().setHeader("recipients", routes.apply(TC));
 
-        Integer datatypeId = integrationData.getDataType().ordinal();
-        byte[] data = (byte[]) producerTemplate.sendBodyAndHeader(routes.apply(TC), ExchangePattern.InOut,new Csp(datatypeId), Exchange.HTTP_METHOD, "GET");
-        TrustCircle tc = objectMapper.readValue(data, TrustCircle.class);
 
-        TrustCircleEcspDTO trustCircleEcspDTO = new TrustCircleEcspDTO(tc, integrationData);
-        List<Team> teams = new ArrayList<>();
-        for (Integer id : tc.getTeams()){
-            byte[] dataTeam = (byte[]) producerTemplate.sendBodyAndHeader(routes.apply(TCT), ExchangePattern.InOut, id, Exchange.HTTP_METHOD, "GET");
-            Team team = objectMapper.readValue(dataTeam, Team.class);
-            if (team.getCspId().equals(integrationData.getDataParams().getCspId())){
-                LOG.info("DCL - " + team.getCspId() + " is Authorized");
-                authorized = true;
-            }
-            else {
-                LOG.info("DCL - " + team.getCspId() + " not Authorized");
-            }
-        }
 
-        if (authorized){
-            integrationData.getSharingParams().setIsExternal(true);
-//            integrationData.getSharingParams().setToShare(false);
-            recipients.add(routes.apply(DSL));
-            exchange.getIn().setHeader("recipients", recipients);
-        }
+//        Integer datatypeId = integrationData.getDataType().ordinal();
+//        Csp csp = new Csp(datatypeId);
+//        TrustCircle tc = camelRestService.send(uri, csp, httpMethod, TrustCircle.class);
+//
+//
+//        //byte[] data = (byte[]) producerTemplate.sendBodyAndHeader(routes.apply(TC), ExchangePattern.InOut,new Csp(datatypeId), Exchange.HTTP_METHOD, "GET");
+//        //TrustCircle tc = objectMapper.readValue(data, TrustCircle.class);
+//
+//
+//        for (Integer id : tc.getTeams()){
+//            //byte[] dataTeam = (byte[]) producerTemplate.sendBodyAndHeader(routes.apply(TCT), ExchangePattern.InOut, id, Exchange.HTTP_METHOD, "GET");
+//            //Team team = objectMapper.readValue(dataTeam, Team.class);
+//            Team team = camelRestService.send(this.getTcURI() + "/" + id, id, httpMethod, Team.class);
+//
+//            if (team.getCspId().equals(integrationData.getDataParams().getCspId())){
+//                LOG.info("DCL - " + team.getCspId() + " is Authorized");
+//                authorized = true;
+//            }
+//            else {
+//                LOG.info("DCL - " + team.getCspId() + " not Authorized");
+//            }
+//        }
+//
+//        if (authorized){
+//            integrationData.getSharingParams().setIsExternal(true);
+////            integrationData.getSharingParams().setToShare(false);
+//            recipients.add(routes.apply(DSL));
+//            exchange.getIn().setHeader("recipients", recipients);
+//        }
 
     }
 }

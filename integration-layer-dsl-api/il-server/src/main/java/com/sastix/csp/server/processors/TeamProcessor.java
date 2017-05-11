@@ -22,6 +22,7 @@ import java.util.stream.Collectors;
 /**
  * Created by chris on 19/4/2017.
  */
+@Deprecated
 @Component
 public class TeamProcessor implements Processor {
     private static final Logger LOG = LoggerFactory.getLogger(TcProcessor.class);

@@ -1,8 +1,5 @@
 package com.sastix.csp.integration.business.server.internal;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sastix.csp.client.TrustCirclesClient;
-import com.sastix.csp.commons.model.Csp;
 import com.sastix.csp.commons.model.IntegrationData;
 import com.sastix.csp.commons.model.IntegrationDataType;
 import com.sastix.csp.commons.routes.CamelRoutes;
@@ -55,12 +52,6 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
 // $ APP_NAME=tc PORT=8081 node server.js
 public class CspServerInternalBusinessTcTest implements CamelRoutes {
     private static final Logger LOG = LoggerFactory.getLogger(CspServerInternalBusinessTcTest.class);
-
-    @Autowired
-    ObjectMapper objectMapper;
-
-    @Autowired
-    TrustCirclesClient tcClient;
 
     private MockMvc mvc;
     @Autowired
@@ -120,11 +111,13 @@ public class CspServerInternalBusinessTcTest implements CamelRoutes {
         }
 
         mockedTC.expectedMessageCount(1);
+        mockedTC.assertIsSatisfied();
         list = mockedTC.getReceivedExchanges();
         for (Exchange exchange : list) {
             Message in = exchange.getIn();
-            Csp dataIn = in.getBody(Csp.class);
-            assertThat(dataIn.getCspId(), greaterThan(0));
+            IntegrationData dataIn = in.getBody(IntegrationData.class);
+            assertThat(dataIn.getDataType(), is(IntegrationDataType.INCIDENT));
+            assertThat(exchange.getIn().getHeader(CamelRoutes.ORIGIN_ENDPOINT),is(routes.apply(CamelRoutes.DCL)));
         }
 
         mockedDcl.expectedMessageCount(1);

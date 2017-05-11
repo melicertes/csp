@@ -1,5 +1,6 @@
 package com.sastix.csp.server.processors;
 
+import com.sastix.csp.commons.exceptions.CspBusinessException;
 import com.sastix.csp.commons.model.IntegrationData;
 import com.sastix.csp.commons.routes.HeaderName;
 import com.sastix.csp.server.service.CamelRestService;
@@ -35,12 +36,14 @@ public class AppProcessor implements Processor{
 
         String appUri = cspUtils.getAppUri(appName);
         if(!StringUtils.isEmpty(appUri)){
-            //producerTemplate.sendBody(appUri, ExchangePattern.InOut,integrationData);
             LOG.info("DSL - Send to internal application: " + appName + " - " + appUri);
             camelRestService.send(appUri,integrationData, httpMethod);
         }else{
-            //TODO: handle situation
-            LOG.warn("DSL - could not send to app uri - app not found.");
+            //handle situation
+            String msg = "App processor - could not send to app uri - app not found. Provided appName="+appName;
+            LOG.error(msg);
+            // If we want to use the guaranteed delivery mechanism we should throw the exception
+            //throw new CspBusinessException(msg);
         }
 
     }

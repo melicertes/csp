@@ -1,6 +1,7 @@
 package com.sastix.csp.server.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sastix.csp.commons.exceptions.CspBusinessException;
 import org.apache.camel.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,6 +40,12 @@ public class CamelRestService {
         });
 
         String out = exchange.getOut().getBody(String.class);
+        Exception exception = exchange.getException();
+        Boolean isExternalRedelivered = exchange.isExternalRedelivered();
+        Boolean isFailed = exchange.isFailed();
+        if(isFailed && exception != null){
+            throw new CspBusinessException("Exception in external request",exception.getCause());
+        }
         return out;
     }
 }

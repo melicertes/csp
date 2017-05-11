@@ -7,7 +7,9 @@ import com.sastix.csp.commons.routes.CamelRoutes;
 import com.sastix.csp.integration.MockUtils;
 import com.sastix.csp.integration.TestUtil;
 import com.sastix.csp.server.CspApp;
+import com.sastix.csp.server.processors.TcProcessor;
 import com.sastix.csp.server.routes.RouteUtils;
+import com.sastix.csp.server.service.CamelRestService;
 import org.apache.camel.*;
 import org.apache.camel.component.mock.MockEndpoint;
 import org.apache.camel.spring.SpringCamelContext;
@@ -16,10 +18,12 @@ import org.apache.camel.test.spring.MockEndpointsAndSkip;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
@@ -29,6 +33,9 @@ import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.Matchers.anyObject;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -49,12 +56,6 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
 public class CspServerInternalSandboxTest implements CamelRoutes{
     private static final Logger LOG = LoggerFactory.getLogger(CspServerInternalSandboxTest.class);
 
-    @Autowired
-    ObjectMapper objectMapper;
-
-    @Autowired
-    TrustCirclesClient tcClient;
-
     private MockMvc mvc;
     @Autowired
     private WebApplicationContext webApplicationContext;
@@ -68,11 +69,15 @@ public class CspServerInternalSandboxTest implements CamelRoutes{
     @EndpointInject(uri = CamelRoutes.MOCK_PREFIX+":"+DIRECT+":"+TC)
     private MockEndpoint mockedTC;
 
-    @EndpointInject(uri = CamelRoutes.MOCK_PREFIX+":"+DIRECT+":"+TCT)
-    private MockEndpoint mockedTCT;
+    //deprecated
+    /*@EndpointInject(uri = CamelRoutes.MOCK_PREFIX+":"+DIRECT+":"+TCT)
+    private MockEndpoint mockedTCT;*/
 
     @EndpointInject(uri = CamelRoutes.MOCK_PREFIX+":"+DIRECT+":"+ECSP)
     private MockEndpoint mockedEcsp;
+
+    @MockBean
+    CamelRestService camelRestService;
 
     @Autowired
     MockUtils mockUtils;
@@ -89,12 +94,19 @@ public class CspServerInternalSandboxTest implements CamelRoutes{
     @Before
     public void init() throws Exception {
         mvc = webAppContextSetup(webApplicationContext).build();
+        MockitoAnnotations.initMocks(this);
         mockUtils.setSpringCamelContext(springCamelContext);
         mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX,routes.apply(DSL),mockedDsl.getEndpointUri());
         mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX,routes.apply(DDL), mockedDdl.getEndpointUri());
         mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX,routes.apply(ECSP), mockedEcsp.getEndpointUri());
-        mockUtils.mockRouteSkipSendToOriginalEndpoint(CamelRoutes.MOCK_PREFIX, routes.apply(TC),mockedTC.getEndpointUri());
-        mockUtils.mockRouteSkipSendToOriginalEndpoint(CamelRoutes.MOCK_PREFIX,routes.apply(TCT),mockedTCT.getEndpointUri());
+        Mockito.when(camelRestService.send(anyString(), anyObject(), eq("GET"), eq(TrustCircle.class)))
+                .thenReturn(mockUtils.getMockedTrustCircle(3));
+        Mockito.when(camelRestService.send(anyString(), anyObject(), eq("GET"), eq(Team.class)))
+                .thenReturn(mockUtils.getMockedTeam(1,"http://external.csp%s.com"))
+                .thenReturn(mockUtils.getMockedTeam(2,"http://external.csp%s.com"))
+                .thenReturn(mockUtils.getMockedTeam(3,"http://external.csp%s.com"));
+        ///*deprecated*/ mockUtils.mockRouteSkipSendToOriginalEndpoint(CamelRoutes.MOCK_PREFIX, routes.apply(TC),mockedTC.getEndpointUri());
+        ///*deprecated*/ mockUtils.mockRouteSkipSendToOriginalEndpoint(CamelRoutes.MOCK_PREFIX,routes.apply(TCT),mockedTCT.getEndpointUri());
     }
 
     // Use @DirtiesContext on each test method to force Spring Testing to automatically reload the CamelContext after
@@ -103,7 +115,8 @@ public class CspServerInternalSandboxTest implements CamelRoutes{
     @DirtiesContext
     @Test
     public void dslFlow1TestUsingCamelEndpoint() throws Exception {
-        mockedTC.returnReplyBody(new Expression() {
+        //deprecated
+        /*mockedTC.returnReplyBody(new Expression() {
             @Override
             public <T> T evaluate(Exchange exchange, Class<T> type) {
                 try {
@@ -128,8 +141,10 @@ public class CspServerInternalSandboxTest implements CamelRoutes{
                 assertThat(tc.getCsps().size(),is(3));
                 return true;
             }
-        });
+        });*/
 
+        //deprecated
+        /*
         mockedTCT.returnReplyBody(new Expression() {
             @Override
             public <T> T evaluate(Exchange exchange, Class<T> type) {
@@ -141,7 +156,7 @@ public class CspServerInternalSandboxTest implements CamelRoutes{
                     return null;
                 }
             }
-        });
+        });*/
 
         mockUtils.sendFlow1IntegrationData(mvc,false);
 
@@ -155,14 +170,15 @@ public class CspServerInternalSandboxTest implements CamelRoutes{
             assertThat(data.getDataType(), is(IntegrationDataType.INCIDENT));
         }
 
-        mockedEcsp.expectedMessageCount(1);
+        mockedEcsp.expectedMessageCount(3);
+        mockedEcsp.assertIsSatisfied();
         list = mockedEcsp.getReceivedExchanges();
+        int i=0;
         for (Exchange exchange : list) {
+            i++;
             Message in = exchange.getIn();
-            TrustCircleEcspDTO trustCircleEcspDTO = in.getBody(TrustCircleEcspDTO.class);
-            List<Team> data = trustCircleEcspDTO.getTeams();
-            assertThat(data.size(), is(3));
-            assertThat(data.get(0).getUrl(), is("http://external.csp1.com"));
+            EnhancedTeamDTO enhancedTeamDTO = in.getBody(EnhancedTeamDTO.class);
+            assertThat(enhancedTeamDTO.getTeam().getUrl(), is("http://external.csp"+i+".com"));
         }
 
         mockedDdl.expectedMessageCount(1);

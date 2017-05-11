@@ -7,6 +7,7 @@ import java.util.List;
 /**
  * Created by iskitsas on 4/11/17.
  */
+@Deprecated
 public class TrustCircleEcspDTO implements Serializable {
     private static final long serialVersionUID = 9056613423375285570L;
     TrustCircle trustCircle;

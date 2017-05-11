@@ -94,13 +94,14 @@ public class CspRoutes extends RouteBuilder implements CamelRoutes{
         //TrustCircles Circles routes
         from(endpoint.apply(TC))
                 .process(tcProcessor)
-                .marshal().json(JsonLibrary.Jackson, Csp.class);
+        ;
 
         //TrustCircles Teams routes
-        from(endpoint.apply(TCT))
+        //deprecated
+        /*from(endpoint.apply(TCT))
                 .process(teamProcessor)
                 .marshal().json(JsonLibrary.Jackson, Csp.class)
-                .recipientList(header("recipients"));
+                .recipientList(header("recipients"));*/
 
         //ExternalCSPs
         from(endpoint.apply(ECSP))
