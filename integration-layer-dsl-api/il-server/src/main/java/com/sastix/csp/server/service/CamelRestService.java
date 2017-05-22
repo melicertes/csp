@@ -44,7 +44,7 @@ public class CamelRestService {
         Boolean isExternalRedelivered = exchange.isExternalRedelivered();
         Boolean isFailed = exchange.isFailed();
         if(isFailed && exception != null){
-            throw new CspBusinessException("Exception in external request",exception.getCause());
+            throw new CspBusinessException("Exception in external request: "+exception.getMessage(),exception);
         }
         return out;
     }
