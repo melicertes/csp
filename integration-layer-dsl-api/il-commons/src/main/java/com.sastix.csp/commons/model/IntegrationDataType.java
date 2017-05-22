@@ -26,7 +26,7 @@ public enum IntegrationDataType {
 
   VULNERABILITY("vulnerability"),
 
-  TRUSTCIRCLE("trustcircle");
+  TRUSTCIRCLE("trustCircle");
 
   private String value;
 
