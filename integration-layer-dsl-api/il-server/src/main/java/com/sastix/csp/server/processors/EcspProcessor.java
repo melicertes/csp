@@ -29,22 +29,6 @@ public class EcspProcessor implements Processor{
 
     @Override
     public void process(Exchange exchange) throws Exception {
-        /*TrustCircleEcspDTO trustCircleEcspDTO = exchange.getIn().getBody(TrustCircleEcspDTO.class);
-        TrustCircle tc = trustCircleEcspDTO.getTrustCircle();
-        IntegrationData integrationData = trustCircleEcspDTO.getIntegrationData();
-        integrationData.getSharingParams().setIsExternal(true);
-        integrationData.getSharingParams().setToShare(false);
-        String httpMethod = (String) exchange.getIn().getHeader(Exchange.HTTP_METHOD);
-
-        List<Team> teams = trustCircleEcspDTO.getTeams();
-        for (Team team : teams) {//TODO: this is wrong.
-            // One request should be executed in this processor.
-            // In case of failure you should try to redeliver one request and not a batch of requests.
-            // Move the for loop to previous processor or create a new one
-            LOG.info("DCL - Sending to external CSP: " + team.getName() + " -- " + team.getUrl());
-            String uri = team.getUrl() + ContextUrl.DCL_INTEGRATION_DATA;
-            String response = camelRestService.send(uri, integrationData, httpMethod);
-        }*/
 
         String httpMethod = (String) exchange.getIn().getHeader(Exchange.HTTP_METHOD);
         EnhancedTeamDTO enhancedTeamDTO = exchange.getIn().getBody(EnhancedTeamDTO.class);
@@ -55,8 +39,6 @@ public class EcspProcessor implements Processor{
             uri = uri.replaceAll("http",cspSslConfiguration.getExternalSslEndpointProtocol());
         }
         String response = camelRestService.send(uri, enhancedTeamDTO.getIntegrationData(), httpMethod);
-
-
 
     }
 }

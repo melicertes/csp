@@ -46,23 +46,19 @@ public class DdlProcessor implements Processor,CamelRoutes {
 
         if (toShare) {
             LOG.info("DDL - received integrationData with datatype: " + integrationData.getDataType() + ", toShare = true, sending to DCL" );
-
-//            LOG.info((HttpMethods)exchange.getIn().getHeader(Exchange.HTTP_METHOD));
-//            LOG.info(HttpMethods.DELETE);
             if (!exchange.getIn().getHeader(Exchange.HTTP_METHOD).toString().equals(HttpMethods.DELETE.toString())){
                 LOG.info(exchange.getIn().getHeader(Exchange.HTTP_METHOD).toString());
                 recipients.add(routes.apply(DCL));}
-
-            //producerTemplate.sendBodyAndHeader(routes.apply(DCL), ExchangePattern.InOut,integrationData, Exchange.HTTP_METHOD, httpMethod);
+                //producerTemplate.sendBodyAndHeader(routes.apply(DCL), ExchangePattern.InOut,integrationData, Exchange.HTTP_METHOD, httpMethod);
         }
 
-        //producerTemplate.sendBodyAndHeader(routes.apply(ELASTIC), ExchangePattern.InOut,integrationData, Exchange.HTTP_METHOD, httpMethod);
         if (enableElastic){
             recipients.add(routes.apply(ELASTIC));
+            //producerTemplate.sendBodyAndHeader(routes.apply(ELASTIC), ExchangePattern.InOut,integrationData, Exchange.HTTP_METHOD, httpMethod);
         }
 
         exchange.getIn().setHeader("recipients", recipients);
-//        exchange.getIn().setHeader(Exchange.HTTP_METHOD,httpMethod);
+        //exchange.getIn().setHeader(Exchange.HTTP_METHOD,httpMethod);
         exchange.getIn().setBody(integrationData);
     }
 }
