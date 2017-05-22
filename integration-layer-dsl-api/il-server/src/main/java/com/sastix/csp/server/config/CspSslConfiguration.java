@@ -1,7 +1,12 @@
 package com.sastix.csp.server.config;
 
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
+
+import javax.annotation.PostConstruct;
+import javax.net.ssl.HttpsURLConnection;
 
 /**
  * Created by iskitsas on 5/18/17.
@@ -35,8 +40,35 @@ public class CspSslConfiguration {
     @Value("${external.ssl.keystore.passphrase}")
     String externalSslKeystorePassphrase;
 
+    @Value("${server.ssl.allow.all.hostname}")
+    Boolean serverSslAllowAllHostname;
+
+    @Value("${server.ssl.client-auth}")
+    String serverSslClientAuth;
+
+    @Value("${server.ssl.key-password}")
+    String serverSslKeyPassword;
+
+    @Value("${server.ssl.key-store-password}")
+    String serverSslKeyStorePassword;
+
+    @Value("${server.ssl.key-store}")
+    String serverSslKeyStore;
+
+    @Value("${server.ssl.enabled}")
+    Boolean serverSslEnabled;
+
+
     public Boolean getInternalUseSSL() {
         return internalUseSSL;
+    }
+
+    @PostConstruct
+    public void init(){
+        if(serverSslAllowAllHostname!=null && serverSslAllowAllHostname) {
+            //allowing 'localhost'
+            HttpsURLConnection.setDefaultHostnameVerifier(NoopHostnameVerifier.INSTANCE);
+        }
     }
 
     public void setInternalUseSSL(Boolean internalUseSSL) {
@@ -97,5 +129,53 @@ public class CspSslConfiguration {
 
     public void setExternalSslKeystorePassphrase(String externalSslKeystorePassphrase) {
         this.externalSslKeystorePassphrase = externalSslKeystorePassphrase;
+    }
+
+    public Boolean getServerSslAllowAllHostname() {
+        return serverSslAllowAllHostname;
+    }
+
+    public void setServerSslAllowAllHostname(Boolean serverSslAllowAllHostname) {
+        this.serverSslAllowAllHostname = serverSslAllowAllHostname;
+    }
+
+    public String getServerSslClientAuth() {
+        return serverSslClientAuth;
+    }
+
+    public void setServerSslClientAuth(String serverSslClientAuth) {
+        this.serverSslClientAuth = serverSslClientAuth;
+    }
+
+    public String getServerSslKeyPassword() {
+        return serverSslKeyPassword;
+    }
+
+    public void setServerSslKeyPassword(String serverSslKeyPassword) {
+        this.serverSslKeyPassword = serverSslKeyPassword;
+    }
+
+    public String getServerSslKeyStorePassword() {
+        return serverSslKeyStorePassword;
+    }
+
+    public void setServerSslKeyStorePassword(String serverSslKeyStorePassword) {
+        this.serverSslKeyStorePassword = serverSslKeyStorePassword;
+    }
+
+    public String getServerSslKeyStore() {
+        return serverSslKeyStore;
+    }
+
+    public void setServerSslKeyStore(String serverSslKeyStore) {
+        this.serverSslKeyStore = serverSslKeyStore;
+    }
+
+    public Boolean getServerSslEnabled() {
+        return serverSslEnabled;
+    }
+
+    public void setServerSslEnabled(Boolean serverSslEnabled) {
+        this.serverSslEnabled = serverSslEnabled;
     }
 }
