@@ -9,6 +9,8 @@ import com.sastix.csp.server.CspApp;
 import com.sastix.csp.server.service.CamelRestService;
 import org.apache.camel.test.spring.CamelSpringBootRunner;
 import org.apache.camel.test.spring.MockEndpointsAndSkip;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -90,6 +92,9 @@ public class CspSSLTest implements ContextUrl {
     @Test
     public void sendPostIntegrationDataTest() throws IOException {
         IntegrationData integrationData = new IntegrationData();
+        DataParams dataParams = new DataParams("cspId","applicationId","recordId"
+                ,DateTime.parse("2014-12-13 09:30:17", DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss")));
+        integrationData.setDataParams(dataParams);
         integrationData.setDataType(IntegrationDataType.INCIDENT);
         SharingParams sharingParams = new SharingParams();
         sharingParams.setIsExternal(false);

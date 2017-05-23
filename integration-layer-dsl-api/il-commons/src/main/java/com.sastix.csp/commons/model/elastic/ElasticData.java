@@ -13,7 +13,7 @@ import java.util.Objects;
  */
 public class ElasticData  implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 7678397212931481715L;
 
     @JsonProperty("dataParams")
     private DataParams dataParams;
