@@ -33,8 +33,8 @@ public class EcspProcessor implements Processor{
         String httpMethod = (String) exchange.getIn().getHeader(Exchange.HTTP_METHOD);
         EnhancedTeamDTO enhancedTeamDTO = exchange.getIn().getBody(EnhancedTeamDTO.class);
         LOG.info("DCL - Sending to external CSP: " + enhancedTeamDTO.getTeam().getName() + " -- " + enhancedTeamDTO.getTeam().getUrl());
-        String uri = enhancedTeamDTO.getTeam().getUrl() + ContextUrl.DCL_INTEGRATION_DATA;
-        //http4-ecsp //external certificate
+        String uri = enhancedTeamDTO.getTeam().getUrl() + "/v"+ContextUrl.REST_API_V1+ContextUrl.DCL_INTEGRATION_DATA;
+        //external certificate
         if(cspSslConfiguration.getExternalUseSSL()){
             uri = uri.replaceAll("http",cspSslConfiguration.getExternalSslEndpointProtocol());
         }
