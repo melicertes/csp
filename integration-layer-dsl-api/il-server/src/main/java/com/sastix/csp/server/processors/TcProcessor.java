@@ -40,6 +40,25 @@ public class TcProcessor implements Processor,CamelRoutes{
     @Value("${tc.path.teams}")
     String tcPathTeams;
 
+    @Value("${threat.id}")
+    String threatId;
+    @Value("${event.id}")
+    String eventId;
+    @Value("${artefact.id}")
+    String artefactId;
+    @Value("${incident.id}")
+    String incidentId;
+    @Value("${contact.id}")
+    String contactId;
+    @Value("${file.id}")
+    String fileId;
+    @Value("${chat.id}")
+    String chatId;
+    @Value("${vulnerability.id}")
+    String vulnerabilityId;
+    @Value("${trustCircle.id}")
+    String trustCircleId;
+
     @Autowired
     ObjectMapper objectMapper;
 
@@ -69,16 +88,16 @@ public class TcProcessor implements Processor,CamelRoutes{
         IntegrationData integrationData = exchange.getIn().getBody(IntegrationData.class);
         String httpMethod = (String) exchange.getIn().getHeader(Exchange.HTTP_METHOD);
 
-        Integer datatypeId = integrationData.getDataType().ordinal();
-        Csp csp = new Csp(datatypeId);
+//        Integer datatypeId = integrationData.getDataType().ordinal();
+//        Csp csp = new Csp(datatypeId);
 
         //make all TC calls
-        String uri = this.getTcCirclesURI() + "/" + csp.getCspId();
-        TrustCircle tc = camelRestService.send(uri, csp,  HttpMethod.GET.name(), TrustCircle.class);
+        String uri = this.getTcCirclesURI() + "/" + getTcId(integrationData.getDataType().toString());
+        TrustCircle tc = camelRestService.send(uri, null,  HttpMethod.GET.name(), TrustCircle.class);
 
         List<Team> teams = new ArrayList<>();
         //first make all calls to get the teams
-        for (Integer teamId : tc.getTeams()){
+        for (String teamId : tc.getTeams()){
             //make call to TC-team
             Team team = camelRestService.send(this.getTcTeamsURI() + "/" + teamId, teamId, HttpMethod.GET.name(), Team.class);
             teams.add(team);
@@ -89,46 +108,14 @@ public class TcProcessor implements Processor,CamelRoutes{
         if(originEndpoint.equals(routes.apply(CamelRoutes.DCL))) {
             for(Team team:teams) {
                 //send to ECSP
+                LOG.info(team.toString());
+                LOG.info(integrationData.toString());
                 handleDclFlowAndSendToECSP(httpMethod, team, integrationData);
             }
         }else if(originEndpoint.equals(routes.apply(CamelRoutes.EDCL))){
             handleExternalDclFlowAndSendToDSL(exchange, teams, integrationData);
         }
-
-
-
-
-//        Message m = new DefaultMessage();
-//        m.setBody(tc);
-//        exchange.setOut(m);
     }
-
-/*    private String getThreatVal(Csp csp) {
-        String shortNameVal = "CTC::";
-        if (csp.getCspId().equals(IntegrationDataType.ARTEFACT.name())) {
-            shortNameVal += "SHARING_DATA_ARTEFACT";
-        } else if (csp.getCspId().equals(IntegrationDataType.CHAT.name())) {
-            shortNameVal += "SHARING_DATA_CHAT";
-        } else if (csp.getCspId().equals(IntegrationDataType.VULNERABILITY.name())) {
-            shortNameVal += "SHARING_DATA_VULNERABILITY";
-        } else if (csp.getCspId().equals(IntegrationDataType.CONTACT.name())) {
-            shortNameVal += "SHARING_DATA_CONTACT";
-        } else if (csp.getCspId().equals(IntegrationDataType.EVENT.name())) {
-            shortNameVal += "SHARING_DATA_EVENT";
-        } else if (csp.getCspId().equals(IntegrationDataType.FILE.name())) {
-            shortNameVal += "SHARING_DATA_FILE";
-        } else if (csp.getCspId().equals(IntegrationDataType.INCIDENT.name())) {
-            shortNameVal += "SHARING_DATA_INCIDENT";
-        } else if (csp.getCspId().trim().equals(IntegrationDataType.THREAT.name().trim())) {
-            shortNameVal += "SHARING_DATA_THREAT";
-        } else if (csp.getCspId().equals(IntegrationDataType.TRUSTCIRCLE.name())) {
-            shortNameVal += "";
-        } else {
-            shortNameVal += "UNKNOWN";
-        }
-        LOG.info(shortNameVal);
-        return shortNameVal;
-    }*/
 
     private void handleDclFlowAndSendToECSP(String httpMethod, Team team, IntegrationData integrationData){
         EnhancedTeamDTO enhancedTeamDTO = new EnhancedTeamDTO(team, integrationData);
@@ -153,5 +140,39 @@ public class TcProcessor implements Processor,CamelRoutes{
     }
     private String getTcTeamsURI() {
         return tcProtocol + "://" + tcHost + ":" + tcPort + tcPathTeams;
+    }
+
+    private String getTcId(String dataType){
+        String id = null;
+        switch(dataType) {
+            case "threat":
+                id = threatId;
+                break;
+            case "event":
+                id = eventId;
+                break;
+            case "artefact":
+                id = artefactId;
+                break;
+            case "incident":
+                id = incidentId;
+                break;
+            case "contact":
+                id = contactId;
+                break;
+            case "file":
+                id = fileId;
+                break;
+            case "chat":
+                id = chatId;
+                break;
+            case "vulnerability":
+                id = vulnerabilityId;
+                break;
+            case "trustCircle":
+                id = trustCircleId;
+                break;
+        }
+        return id;
     }
 }
