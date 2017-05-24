@@ -1,6 +1,7 @@
 package com.sastix.csp.server.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sastix.csp.commons.exceptions.CspBusinessException;
 import org.apache.camel.*;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by iskitsas on 4/8/17.
@@ -43,14 +45,27 @@ public class CamelRestService {
         return objectMapper.readValue(out, tClass);
     }
 
+    public <T> T send(String uri, Object obj ,String httpMethod, Class<T> tClass,Map<String,Object> headers) throws IOException {
+        String out = sendBodyAndHeaders(uri,obj, httpMethod,headers);
+        return objectMapper.readValue(out, tClass);
+    }
+
     public String send(String uri, Object obj, String httpMethod) throws IOException {
+        return sendBodyAndHeaders(uri,obj,httpMethod,null);
+    }
+
+    public String sendBodyAndHeaders(String uri, Object obj, String httpMethod, Map<String,Object> headers) throws JsonProcessingException {
         byte[] b = objectMapper.writeValueAsBytes(obj);
         Exchange exchange = producerTemplate.send(uri, new Processor() {
             public void process(Exchange exchange) throws Exception {
                 exchange.getIn().setHeader(Exchange.HTTP_METHOD, httpMethod);
                 exchange.getIn().setHeader(Exchange.CONTENT_TYPE, MediaType.APPLICATION_JSON);
-                exchange.getIn().setHeader("X-CSRFToken", csrfToken);
-                exchange.getIn().setHeader("Authorization",authorization);
+                if(headers!=null){
+                    for (Map.Entry<String, Object> entry : headers.entrySet()) {
+                        exchange.getIn().setHeader(entry.getKey(), entry.getValue());
+                    }
+
+                }
                 exchange.getIn().setBody(b);
             }
         });
