@@ -29,7 +29,7 @@ public class TrustCircle implements Serializable{
 
     private static final long serialVersionUID = 7473879403462995916L;
     @JsonProperty("id")
-    private Integer id;
+    private String id;
     @JsonProperty("short_name")
     private String shortName;
     @JsonProperty("name")
@@ -43,19 +43,19 @@ public class TrustCircle implements Serializable{
     @JsonProperty("membership_url")
     private String membershipUrl;
     @JsonProperty("teams")
-    private List<Integer> teams = null;
+    private List<String> teams = null;
     @JsonProperty("created")
     private String created;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     @JsonProperty("id")
-    public Integer getId() {
+    public String getId() {
         return id;
     }
 
     @JsonProperty("id")
-    public void setId(Integer id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -120,12 +120,12 @@ public class TrustCircle implements Serializable{
     }
 
     @JsonProperty("teams")
-    public List<Integer> getTeams() {
+    public List<String> getTeams() {
         return teams;
     }
 
     @JsonProperty("teams")
-    public void setTeams(List<Integer> teams) {
+    public void setTeams(List<String> teams) {
         this.teams = teams;
     }
 

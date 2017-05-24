@@ -12,20 +12,21 @@ public class Csp implements Serializable {
     private static final long serialVersionUID = 8017306632593895290L;
 
     @JsonProperty("cspId")
-    private Integer cspId;
+//    private Integer cspId;
+    private String cspId;
 
     public Csp() {
     }
 
-    public Csp(Integer cspId) {
+    public Csp(String cspId) {
         this.cspId = cspId;
     }
 
-    public Integer getCspId() {
+    public String getCspId() {
         return cspId;
     }
 
-    public void setCspId(Integer cspId) {
+    public void setCspId(String cspId) {
         this.cspId = cspId;
     }
 

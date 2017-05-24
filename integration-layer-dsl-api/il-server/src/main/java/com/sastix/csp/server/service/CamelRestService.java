@@ -6,6 +6,7 @@ import org.apache.camel.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +24,12 @@ public class CamelRestService {
     @Produce
     private ProducerTemplate producerTemplate;
 
+    @Value("${CSRFToken}")
+    String csrfToken;
+
+    @Value("${Authorization}")
+    String authorization;
+
     public <T> T send(String uri, Object obj ,String httpMethod, Class<T> tClass) throws IOException {
         String out = send(uri,obj, httpMethod);
         return objectMapper.readValue(out, tClass);
@@ -34,7 +41,8 @@ public class CamelRestService {
             public void process(Exchange exchange) throws Exception {
                 exchange.getIn().setHeader(Exchange.HTTP_METHOD, httpMethod);
                 exchange.getIn().setHeader(Exchange.CONTENT_TYPE, MediaType.APPLICATION_JSON);
-//                exchange.getIn().setHeader("Authorization","Basic YWRtaW46YWRtaW4=");
+                exchange.getIn().setHeader("X-CSRFToken", csrfToken);
+                exchange.getIn().setHeader("Authorization",authorization);
                 exchange.getIn().setBody(b);
             }
         });
