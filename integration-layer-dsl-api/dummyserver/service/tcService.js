@@ -1,10 +1,18 @@
 'user strict';
 
+exports.getAllTCs = function (req, res) {
+    console.log("all tcs!");
+    //res.send(err);
+    //res.json({cspId:['http://ex.csp1.com']});
+    res.json([{id:'dummyId',short_name:'incident',teams:['1','2']}]);
+    //res.send('Successful creation');
+};
+
 exports.getCsps = function (req, res) {
     console.log("tc got it!");
     //res.send(err);
     //res.json({cspId:['http://ex.csp1.com']});
-    res.json({id:1,teams:[1,2]});
+    res.json({id:"dummyId",short_name:'incident',teams:['1','2']});
     //res.send('Successful creation');
 };
 var cnt = 0
