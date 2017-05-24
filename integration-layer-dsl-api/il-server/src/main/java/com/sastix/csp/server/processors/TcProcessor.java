@@ -80,26 +80,25 @@ public class TcProcessor implements Processor,CamelRoutes{
         LOG.info("DCL - Get Trust Circles from TC API and "+msg+" [ORIGIN_ENDPOINT:"+originEndpoint+"]");
 
 
-//        TrustCircleEcspDTO trustCircleEcspDTO = exchange.getIn().getBody(TrustCircleEcspDTO.class);
-        //Csp csp = exchange.getIn().getBody(Csp.class);
-
-
-
         IntegrationData integrationData = exchange.getIn().getBody(IntegrationData.class);
         String httpMethod = (String) exchange.getIn().getHeader(Exchange.HTTP_METHOD);
-
-//        Integer datatypeId = integrationData.getDataType().ordinal();
-//        Csp csp = new Csp(datatypeId);
 
         //make all TC calls
         String uri = this.getTcCirclesURI() + "/" + getTcId(integrationData.getDataType().toString());
         TrustCircle tc = camelRestService.send(uri, null,  HttpMethod.GET.name(), TrustCircle.class);
 
+        //TODO: TrustCircle will return Header("X-CSRFToken", csrfToken) and Header("Authorization",authorization);
+        String csrfToken ="TBD"; //TODO
+        String authorization ="TBD";//TODO
+        Map<String,Object> tcAuthHeaders = new HashMap<>();
+        tcAuthHeaders.put("X-CSRFToken",csrfToken);
+        tcAuthHeaders.put("Authorization",authorization);
+
         List<Team> teams = new ArrayList<>();
         //first make all calls to get the teams
         for (String teamId : tc.getTeams()){
             //make call to TC-team
-            Team team = camelRestService.send(this.getTcTeamsURI() + "/" + teamId, teamId, HttpMethod.GET.name(), Team.class);
+            Team team = camelRestService.send(this.getTcTeamsURI() + "/" + teamId, teamId, HttpMethod.GET.name(), Team.class, tcAuthHeaders);
             teams.add(team);
         }
         //all TC calls have been made up to this point, TEAMS list has been populated
