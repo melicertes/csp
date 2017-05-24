@@ -34,6 +34,8 @@ public class MockUtils implements ContextUrl {
      * */
     public TrustCircle getMockedTrustCircle(int count){
         TrustCircle trustCircle = new TrustCircle();
+        trustCircle.setId("dummyId");
+        trustCircle.setShortName("incident");
         //List<String> listCsps = new ArrayList<>();
         List<String> teamList = new ArrayList<>();
         for(int i=0; i< count;i++) {
@@ -42,6 +44,12 @@ public class MockUtils implements ContextUrl {
         }
         trustCircle.setTeams(teamList);
         return trustCircle;
+    }
+
+    public List<TrustCircle> getAllMockedTrustCircles(int count){
+        List<TrustCircle> ret= new ArrayList<>();
+        ret.add(getMockedTrustCircle(3));
+        return ret;
     }
 
 

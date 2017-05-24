@@ -2,6 +2,7 @@ package com.sastix.csp.server.processors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sastix.csp.client.TrustCirclesClient;
+import com.sastix.csp.commons.exceptions.CspBusinessException;
 import com.sastix.csp.commons.model.*;
 import com.sastix.csp.commons.routes.CamelRoutes;
 import com.sastix.csp.commons.routes.ContextUrl;
@@ -17,10 +18,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by iskitsas on 4/9/17.
@@ -39,25 +37,6 @@ public class TcProcessor implements Processor,CamelRoutes{
     String tcPathCircles;
     @Value("${tc.path.teams}")
     String tcPathTeams;
-
-    @Value("${threat.id}")
-    String threatId;
-    @Value("${event.id}")
-    String eventId;
-    @Value("${artefact.id}")
-    String artefactId;
-    @Value("${incident.id}")
-    String incidentId;
-    @Value("${contact.id}")
-    String contactId;
-    @Value("${file.id}")
-    String fileId;
-    @Value("${chat.id}")
-    String chatId;
-    @Value("${vulnerability.id}")
-    String vulnerabilityId;
-    @Value("${trustCircle.id}")
-    String trustCircleId;
 
     @Autowired
     ObjectMapper objectMapper;
@@ -82,33 +61,34 @@ public class TcProcessor implements Processor,CamelRoutes{
         IntegrationData integrationData = exchange.getIn().getBody(IntegrationData.class);
         String httpMethod = (String) exchange.getIn().getHeader(Exchange.HTTP_METHOD);
 
-        String uri = null;
-        String getAllTcUri = this.getTcCirclesURI();
-        ArrayList<TrustCircle> tcList = camelRestService.sendTc(getAllTcUri, null,  HttpMethod.GET.name(), TrustCircle.class);
-        LOG.info(tcList.toString());
-        for (TrustCircle tc: tcList){
-            if (getTcDataType(tc.getShortName()).equals(integrationData.getDataType().toString())){
-                uri = this.getTcCirclesURI() + "/" + tc.getId();
-                break;
-            }
-        }
+        //TODO: AUTHENTICATION WITH TC?? TrustCircle will return Header("X-CSRFToken", csrfToken) and Header("Authorization",authorization);
+        /*String csrfToken ="TODO"; //TODO: HOW TO GET IT?
+        String authorization ="TODO";//TODO: NEEDED?
+        Map<String,Object> tcAuthHeaders = new HashMap<>();
+        tcAuthHeaders.put("csrftoken",csrfToken);
+        tcAuthHeaders.put("Authorization",authorization);*/
 
         //make all TC calls
-//        String uri = this.getTcCirclesURI() + "/" + getTcId(integrationData.getDataType().toString());
-        TrustCircle tc = camelRestService.send(uri, null,  HttpMethod.GET.name(), TrustCircle.class);
 
-        //TODO: TrustCircle will return Header("X-CSRFToken", csrfToken) and Header("Authorization",authorization);
-        String csrfToken ="TBD"; //TODO
-        String authorization ="TBD";//TODO
-        Map<String,Object> tcAuthHeaders = new HashMap<>();
-        tcAuthHeaders.put("X-CSRFToken",csrfToken);
-        tcAuthHeaders.put("Authorization",authorization);
+        String uri = null;
+        String getAllTcUri = this.getTcCirclesURI();
+        List<TrustCircle> tcList = camelRestService.sendAndGetList(getAllTcUri, null,  HttpMethod.GET.name(), TrustCircle.class,null);
+
+        Optional<TrustCircle> optionalTc  = tcList.stream().filter(t->t.getShortName().toLowerCase().contains(integrationData.getDataType().toString().toLowerCase())).findAny();
+
+        if(optionalTc.isPresent()){
+            uri = this.getTcCirclesURI() + "/" + optionalTc.get().getId();
+        }else{
+            throw new CspBusinessException("Could not find trust circle id for this data. "+integrationData.toString());
+        }
+
+        TrustCircle tc = camelRestService.send(uri, null,  HttpMethod.GET.name(), TrustCircle.class);
 
         List<Team> teams = new ArrayList<>();
         //first make all calls to get the teams
         for (String teamId : tc.getTeams()){
             //make call to TC-team
-            Team team = camelRestService.send(this.getTcTeamsURI() + "/" + teamId, teamId, HttpMethod.GET.name(), Team.class, tcAuthHeaders);
+            Team team = camelRestService.send(this.getTcTeamsURI() + "/" + teamId, teamId, HttpMethod.GET.name(), Team.class);
             teams.add(team);
         }
         //all TC calls have been made up to this point, TEAMS list has been populated

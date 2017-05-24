@@ -29,15 +29,9 @@ public class CamelRestService {
     @Produce
     private ProducerTemplate producerTemplate;
 
-    @Value("${CSRFToken}")
-    String csrfToken;
-
-    @Value("${Authorization}")
-    String authorization;
-
-    public <T> ArrayList<T> sendTc(String uri, Object obj , String httpMethod, Class<T> tClass) throws IOException {
-        String out = send(uri,obj, httpMethod);
-        return objectMapper.readValue(out, new TypeReference<List<T>>() { });
+    public <T> List<T> sendAndGetList(String uri, Object obj , String httpMethod, Class<T> tClass, Map<String,Object> headers) throws IOException {
+        String out = sendBodyAndHeaders(uri,obj, httpMethod,headers);
+        return objectMapper.readValue(out, objectMapper.getTypeFactory().constructCollectionType(List.class,tClass));
     }
 
     public <T> T send(String uri, Object obj ,String httpMethod, Class<T> tClass) throws IOException {
