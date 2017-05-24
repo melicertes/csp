@@ -130,38 +130,4 @@ public class TcProcessor implements Processor,CamelRoutes{
     private String getTcTeamsURI() {
         return tcProtocol + "://" + tcHost + ":" + tcPort + tcPathTeams;
     }
-
-    private String getTcDataType(String dataType){
-        String dt = null;
-        switch(dataType) {
-            case "CTC::SHARING_DATA_THREAT":
-                dt = "threat";
-                break;
-            case "CTC::SHARING_DATA_EVENT":
-                dt = "event";
-                break;
-            case "CTC::SHARING_DATA_ARTEFACT":
-                dt = "artefact";
-                break;
-            case "CTC::SHARING_DATA_INCIDENT":
-                dt = "incident";
-                break;
-            case "CTC::SHARING_DATA_CONTACT":
-                dt = "contact";
-                break;
-            case "CTC::SHARING_DATA_FILE":
-                dt = "file";
-                break;
-            case "CTC::SHARING_DATA_CHAT\n":
-                dt = "chat";
-                break;
-            case "CTC::SHARING_DATA_VULNERABILITY":
-                dt = "vulnerability";
-                break;
-            case "CTC::CSP_ALL":
-                dt = "trustCircle";
-                break;
-        }
-        return dt;
-    }
 }
