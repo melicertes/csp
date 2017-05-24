@@ -1,5 +1,6 @@
 package com.sastix.csp.server.service;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sastix.csp.commons.exceptions.CspBusinessException;
 import org.apache.camel.*;
@@ -11,6 +12,8 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by iskitsas on 4/8/17.
@@ -29,6 +32,11 @@ public class CamelRestService {
 
     @Value("${Authorization}")
     String authorization;
+
+    public <T> ArrayList<T> sendTc(String uri, Object obj , String httpMethod, Class<T> tClass) throws IOException {
+        String out = send(uri,obj, httpMethod);
+        return objectMapper.readValue(out, new TypeReference<List<T>>() { });
+    }
 
     public <T> T send(String uri, Object obj ,String httpMethod, Class<T> tClass) throws IOException {
         String out = send(uri,obj, httpMethod);

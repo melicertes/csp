@@ -79,20 +79,24 @@ public class TcProcessor implements Processor,CamelRoutes{
                 originEndpoint.equals(routes.apply(CamelRoutes.EDCL))? " handle from external CSP":"";
         LOG.info("DCL - Get Trust Circles from TC API and "+msg+" [ORIGIN_ENDPOINT:"+originEndpoint+"]");
 
-
-//        TrustCircleEcspDTO trustCircleEcspDTO = exchange.getIn().getBody(TrustCircleEcspDTO.class);
-        //Csp csp = exchange.getIn().getBody(Csp.class);
-
-
-
         IntegrationData integrationData = exchange.getIn().getBody(IntegrationData.class);
         String httpMethod = (String) exchange.getIn().getHeader(Exchange.HTTP_METHOD);
 
 //        Integer datatypeId = integrationData.getDataType().ordinal();
 //        Csp csp = new Csp(datatypeId);
+        String uri = null;
+        String getAllTcUri = this.getTcCirclesURI();
+        ArrayList<TrustCircle> tcList = camelRestService.sendTc(getAllTcUri, null,  HttpMethod.GET.name(), TrustCircle.class);
+        LOG.info(tcList.toString());
+        for (TrustCircle tc: tcList){
+            if (getTcDataType(tc.getShortName()).equals(integrationData.getDataType().toString())){
+                uri = this.getTcCirclesURI() + "/" + tc.getId();
+                break;
+            }
+        }
 
         //make all TC calls
-        String uri = this.getTcCirclesURI() + "/" + getTcId(integrationData.getDataType().toString());
+//        String uri = this.getTcCirclesURI() + "/" + getTcId(integrationData.getDataType().toString());
         TrustCircle tc = camelRestService.send(uri, null,  HttpMethod.GET.name(), TrustCircle.class);
 
         List<Team> teams = new ArrayList<>();
@@ -142,37 +146,37 @@ public class TcProcessor implements Processor,CamelRoutes{
         return tcProtocol + "://" + tcHost + ":" + tcPort + tcPathTeams;
     }
 
-    private String getTcId(String dataType){
-        String id = null;
+    private String getTcDataType(String dataType){
+        String dt = null;
         switch(dataType) {
-            case "threat":
-                id = threatId;
+            case "CTC::SHARING_DATA_THREAT":
+                dt = "threat";
                 break;
-            case "event":
-                id = eventId;
+            case "CTC::SHARING_DATA_EVENT":
+                dt = "event";
                 break;
-            case "artefact":
-                id = artefactId;
+            case "CTC::SHARING_DATA_ARTEFACT":
+                dt = "artefact";
                 break;
-            case "incident":
-                id = incidentId;
+            case "CTC::SHARING_DATA_INCIDENT":
+                dt = "incident";
                 break;
-            case "contact":
-                id = contactId;
+            case "CTC::SHARING_DATA_CONTACT":
+                dt = "contact";
                 break;
-            case "file":
-                id = fileId;
+            case "CTC::SHARING_DATA_FILE":
+                dt = "file";
                 break;
-            case "chat":
-                id = chatId;
+            case "CTC::SHARING_DATA_CHAT\n":
+                dt = "chat";
                 break;
-            case "vulnerability":
-                id = vulnerabilityId;
+            case "CTC::SHARING_DATA_VULNERABILITY":
+                dt = "vulnerability";
                 break;
-            case "trustCircle":
-                id = trustCircleId;
+            case "CTC::CSP_ALL":
+                dt = "trustCircle";
                 break;
         }
-        return id;
+        return dt;
     }
 }
