@@ -38,6 +38,7 @@ public class DslProcessor implements Processor,CamelRoutes {
 
     @Override
     public void process(Exchange exchange) throws Exception {
+        LOG.info("DSL message received.");
         IntegrationData integrationData = cspUtils.getExchangeData(exchange, IntegrationData.class);
         List<String> recipients = computeRecipientsApps(exchange, integrationData);
         exchange.getIn().setHeader("recipients", recipients);

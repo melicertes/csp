@@ -106,7 +106,7 @@ public class TcProcessor implements Processor,CamelRoutes{
                 handleDclFlowAndSendToECSP(httpMethod, team, integrationData);
             }
         }else if(originEndpoint.equals(routes.apply(CamelRoutes.EDCL))){
-            handleExternalDclFlowAndSendToDSL(exchange, teams, integrationData);
+            handleExternalDclFlowAndSendToDSL(exchange,httpMethod, teams, integrationData);
         }
     }
 
@@ -118,15 +118,18 @@ public class TcProcessor implements Processor,CamelRoutes{
         producer.sendBodyAndHeaders(routes.apply(ECSP), ExchangePattern.InOut, enhancedTeamDTO, headers);
     }
 
-    private void handleExternalDclFlowAndSendToDSL(Exchange exchange,List<Team> teams, IntegrationData integrationData){
+    private void handleExternalDclFlowAndSendToDSL(Exchange exchange,String httpMethod,List<Team> teams, IntegrationData integrationData){
         boolean authorized = teams.stream().anyMatch(t->t.getShortName().toLowerCase().equals(integrationData.getDataParams().getCspId().toLowerCase()));
-        LOG.info("Teams: "+teams.toString());
         LOG.info("Authorized (cspId or shortName="+integrationData.getDataParams().getCspId().toLowerCase()+"): "+authorized);
         if (authorized){
             integrationData.getSharingParams().setIsExternal(true);
-            //integrationData.getSharingParams().setToShare(false);
-            exchange.getIn().setBody(integrationData);
-            exchange.getIn().setHeader("recipients", routes.apply(DSL));
+
+            //exchange.getIn().setBody(integrationData); //replace with producer
+            //exchange.getIn().setHeader("recipients", routes.apply(DSL));//replace with producer
+            Map<String, Object> headers = new HashMap<>();
+            headers.put(Exchange.HTTP_METHOD, httpMethod);
+            LOG.info("Handling external request - passing itengration data to DSL: IntegrationData: "+integrationData.toString());
+            producer.sendBodyAndHeaders(routes.apply(DSL),ExchangePattern.InOut,integrationData,headers);
         }
     }
 
