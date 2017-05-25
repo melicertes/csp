@@ -119,7 +119,9 @@ public class TcProcessor implements Processor,CamelRoutes{
     }
 
     private void handleExternalDclFlowAndSendToDSL(Exchange exchange,List<Team> teams, IntegrationData integrationData){
-        boolean authorized = teams.stream().anyMatch(t->t.getCspId().equals(integrationData.getDataParams().getCspId()));
+        boolean authorized = teams.stream().anyMatch(t->t.getShortName().toLowerCase().equals(integrationData.getDataParams().getCspId().toLowerCase()));
+        LOG.info("Teams: "+teams.toString());
+        LOG.info("Authorized (cspId or shortName="+integrationData.getDataParams().getCspId().toLowerCase()+"): "+authorized);
         if (authorized){
             integrationData.getSharingParams().setIsExternal(true);
             //integrationData.getSharingParams().setToShare(false);
