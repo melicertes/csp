@@ -128,7 +128,6 @@ public class TcProcessor implements Processor,CamelRoutes{
             //exchange.getIn().setHeader("recipients", routes.apply(DSL));//replace with producer
             Map<String, Object> headers = new HashMap<>();
             headers.put(Exchange.HTTP_METHOD, httpMethod);
-            LOG.info("Handling external request - passing itengration data to DSL: IntegrationData: "+integrationData.toString());
             producer.sendBodyAndHeaders(routes.apply(DSL),ExchangePattern.InOut,integrationData,headers);
         }
     }
