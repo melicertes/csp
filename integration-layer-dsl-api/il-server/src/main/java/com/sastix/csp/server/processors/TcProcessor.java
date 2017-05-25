@@ -27,6 +27,8 @@ import java.util.*;
 public class TcProcessor implements Processor,CamelRoutes{
     private static final Logger LOG = LoggerFactory.getLogger(TcProcessor.class);
 
+    @Value("${server.name}")
+    String serverName;
     @Value("${tc.protocol}")
     String tcProtocol;
     @Value("${tc.host}")
@@ -89,7 +91,9 @@ public class TcProcessor implements Processor,CamelRoutes{
         for (String teamId : tc.getTeams()){
             //make call to TC-team
             Team team = camelRestService.send(this.getTcTeamsURI() + "/" + teamId, teamId, HttpMethod.GET.name(), Team.class);
-            teams.add(team);
+            if (!team.getShortName().equals(serverName)){
+                teams.add(team);
+            }
         }
         //all TC calls have been made up to this point, TEAMS list has been populated
 
