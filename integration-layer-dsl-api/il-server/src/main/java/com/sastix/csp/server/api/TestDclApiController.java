@@ -25,7 +25,7 @@ public class TestDclApiController {
         return new ResponseEntity<String>(HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/tc",
+/*    @RequestMapping(value = "/tc",
             method = RequestMethod.POST)
     public ResponseEntity<TrustCircle> getTrustCircle(@RequestBody Csp csp) {
 
@@ -33,6 +33,6 @@ public class TestDclApiController {
         csps.add("http://localhost:8081/ecsp/1");
         TrustCircle tc = new TrustCircle();
         return new ResponseEntity<TrustCircle>(tc, HttpStatus.OK);
-    }
+    }*/
 
 }

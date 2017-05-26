@@ -8,7 +8,8 @@ module.exports = function (app) {
         .post(tcService.getCsps)
         .get(tcService.getCsps)
         ;
-
+    app.route('/tc')
+        .get(tcService.getAllTCs);
     app.route('/tct/:id')
         .get(tcService.getTeams)
     ;

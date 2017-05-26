@@ -32,12 +32,12 @@ public class Team implements Serializable {
 
     private static final long serialVersionUID = -1574606816973026402L;
     @JsonProperty("id")
-    private Integer id;
+    private String id;
     @JsonProperty("short_name")
     private String shortName;
     @JsonProperty("name")
     private String name;
-    @JsonProperty("url")
+    @JsonProperty("csp_domain")
     private String url;
     @JsonProperty("host_organisation")
     private String hostOrganisation;
@@ -56,7 +56,7 @@ public class Team implements Serializable {
     @JsonProperty("created")
     private String created;
     @JsonProperty("status")
-    private Integer status;
+    private String status;
 
     @JsonProperty("csp_id")
     private String cspId;
@@ -65,12 +65,12 @@ public class Team implements Serializable {
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     @JsonProperty("id")
-    public Integer getId() {
+    public String getId() {
         return id;
     }
 
     @JsonProperty("id")
-    public void setId(Integer id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -94,12 +94,12 @@ public class Team implements Serializable {
         this.name = name;
     }
 
-    @JsonProperty("url")
+    @JsonProperty("csp_domain")
     public String getUrl() {
         return url;
     }
 
-    @JsonProperty("url")
+    @JsonProperty("csp_domain")
     public void setUrl(String url) {
         this.url = url;
     }
@@ -185,12 +185,12 @@ public class Team implements Serializable {
     }
 
     @JsonProperty("status")
-    public Integer getStatus() {
+    public String getStatus() {
         return status;
     }
 
     @JsonProperty("status")
-    public void setStatus(Integer status) {
+    public void setStatus(String status) {
         this.status = status;
     }
 

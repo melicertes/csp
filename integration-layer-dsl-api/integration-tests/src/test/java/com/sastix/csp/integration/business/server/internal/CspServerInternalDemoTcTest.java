@@ -40,23 +40,23 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
                 "csp.retry.maxAttempts:1",
                 "embedded.activemq.start:true",
                 "apache.camel.use.activemq:true",
-                "internal.use.ssl: true",
+                "internal.use.ssl: false",
                 "internal.ssl.keystore.resource: sslcert/csp-internal.jks",
                 "internal.ssl.keystore.passphrase: 123456",
-                "external.use.ssl: true",
+                "external.use.ssl: false",
                 "external.ssl.keystore.resource: sslcert/csp-internal.jks",
                 "external.ssl.keystore.passphrase: 123456",
-                "tc.protocol: https4-in",
-                "tc.host: localhost",
-                "tc.port: 8081",
-                "tc.path.circles:/tc",
-                "tc.path.teams:/tct"
+                "tc.protocol: http",
+                "tc.host: 178.33.171.199",
+                "tc.port: 8000",
+                "tc.path.circles:/api/v1/circles",
+                "tc.path.teams:/api/v1/teams"
         })
 @MockEndpointsAndSkip("^https4-in://localhost.*adapter.*|https4-in://csp.*|https4-ex://ex.*") // by removing this any http requests will be sent as expected.
 // In this test we mock all other http requests except for tc. TC dummy server is expected on 3001 port.
 // To start the TC dummy server:
 // $ APP_NAME=tc SSL=true PORT=8081 node server.js
-public class CspServerInternalBusinessTcTest implements CamelRoutes {
+public class CspServerInternalDemoTcTest implements CamelRoutes {
     private static final Logger LOG = LoggerFactory.getLogger(CspServerInternalBusinessTcTest.class);
 
     private MockMvc mvc;
