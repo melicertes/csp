@@ -97,6 +97,13 @@ public class MockUtils implements ContextUrl {
         sharingParams.setIsExternal(isExternal);
         sharingParams.setToShare(toShare);
         integrationData.setSharingParams(sharingParams);
+        DataParams dataParams = new DataParams();
+        dataParams.setRecordId("222");
+        dataParams.setApplicationId("taranis");
+        dataParams.setCspId("GR");
+        integrationData.setDataParams(dataParams);
+        integrationData.setDataObject("{\"t\":\"1234\"}");
+
 
         if (httpMethod.toLowerCase().equals("post")) {
             mvc.perform(post("/v"+REST_API_V1+"/"+DSL_INTEGRATION_DATA).accept(MediaType.TEXT_PLAIN)

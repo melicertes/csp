@@ -76,6 +76,9 @@ public class CspServerInternalSandboxTest implements CamelRoutes{
     @EndpointInject(uri = CamelRoutes.MOCK_PREFIX+":"+DIRECT+":"+ECSP)
     private MockEndpoint mockedEcsp;
 
+    @EndpointInject(uri = CamelRoutes.MOCK_PREFIX+":"+DIRECT+":"+ELASTIC)
+    private MockEndpoint mockedElastic;
+
     @MockBean
     CamelRestService camelRestService;
 
@@ -99,6 +102,9 @@ public class CspServerInternalSandboxTest implements CamelRoutes{
         mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX,routes.apply(DSL),mockedDsl.getEndpointUri());
         mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX,routes.apply(DDL), mockedDdl.getEndpointUri());
         mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX,routes.apply(ECSP), mockedEcsp.getEndpointUri());
+
+        mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX,routes.apply(ELASTIC), mockedElastic.getEndpointUri());
+
         Mockito.when(camelRestService.send(anyString(), anyObject(), eq("GET"), eq(TrustCircle.class)))
                 .thenReturn(mockUtils.getMockedTrustCircle(3));
         Mockito.when(camelRestService.send(anyString(), anyObject(), eq("GET"), eq(Team.class)))
@@ -238,6 +244,15 @@ public class CspServerInternalSandboxTest implements CamelRoutes{
 
         mockedDdl.expectedMessageCount(1);
         mockedDdl.assertIsSatisfied();
+
+        list = mockedElastic.getReceivedExchanges();
+        for (Exchange exchange : list) {
+            Message in = exchange.getIn();
+            LOG.info("================================"+in.getBody().toString());
+//            IntegrationData data = in.getBody(IntegrationData.class);
+//            assertThat(data.getDataType(), is(IntegrationDataType.CHAT));
+        }
+
         //Thread.sleep(10*1000); //to avoid "Rejecting received message because of the listener container having been stopped in the meantime"
         //be careful when debugging, you might miss breakpoints if the time is not enough
     }
@@ -313,19 +328,16 @@ public class CspServerInternalSandboxTest implements CamelRoutes{
             assertThat(data.getDataType(), is(IntegrationDataType.CHAT));
         }
 
-        mockedEcsp.expectedMessageCount(3);
-        mockedEcsp.assertIsSatisfied();
-        list = mockedEcsp.getReceivedExchanges();
-        int i=0;
-        for (Exchange exchange : list) {
-            i++;
-            Message in = exchange.getIn();
-            EnhancedTeamDTO enhancedTeamDTO = in.getBody(EnhancedTeamDTO.class);
-            assertThat(enhancedTeamDTO.getTeam().getUrl(), is("http://external.csp"+i+".com"));
-        }
 
         mockedDdl.expectedMessageCount(1);
         mockedDdl.assertIsSatisfied();
+//        list = mockedDdl.getReceivedExchanges();
+//        for (Exchange exchange : list) {
+//            Message in = exchange.getIn();
+//            IntegrationData data = in.getBody(IntegrationData.class);
+//            LOG.info(data.toString());
+//            assertThat(data.getDataType(), is(IntegrationDataType.CHAT));
+//        }
         //Thread.sleep(10*1000); //to avoid "Rejecting received message because of the listener container having been stopped in the meantime"
         //be careful when debugging, you might miss breakpoints if the time is not enough
     }
