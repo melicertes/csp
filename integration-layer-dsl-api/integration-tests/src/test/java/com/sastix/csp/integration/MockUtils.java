@@ -58,6 +58,7 @@ public class MockUtils implements ContextUrl {
         for(int i=0; i< count;i++) {
             Team t= new Team();
             t.setUrl(String.format(strWithCountArg,""+(i+1)));
+            t.setShortName("sname"+i);
             ret.add(t);
         }
         return ret;
@@ -66,7 +67,7 @@ public class MockUtils implements ContextUrl {
     public Team getMockedTeam(int id, String strWithCountArg) {
         Team team = new Team();
         team.setUrl(String.format(strWithCountArg, "" + id));
-
+        team.setShortName("sname"+id);
 
         return team;
     }

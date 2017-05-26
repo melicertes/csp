@@ -91,6 +91,12 @@ public class TcProcessor implements Processor,CamelRoutes{
         for (String teamId : tc.getTeams()){
             //make call to TC-team
             Team team = camelRestService.send(this.getTcTeamsURI() + "/" + teamId, teamId, HttpMethod.GET.name(), Team.class);
+            if(team.getShortName()==null){
+                throw new CspBusinessException("Team short name received from TC API is null - cannot proceed. \n" +
+                        "TrustCircle: "+tc.toString()+"\n" +
+                        "Team: "+team.toString());
+            }
+
             if (!team.getShortName().equals(serverName)){
                 teams.add(team);
             }
