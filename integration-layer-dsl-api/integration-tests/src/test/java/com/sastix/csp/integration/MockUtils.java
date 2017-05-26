@@ -17,6 +17,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -95,6 +97,48 @@ public class MockUtils implements ContextUrl {
                 .contentType(TestUtil.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
                 .andExpect(content().string(HttpStatusResponseType.SUCCESSFUL_OPERATION.getReasonPhrase()));
+    }
+
+    public void sendFlow1Data(MockMvc mvc, Boolean isExternal, Boolean toShare, IntegrationDataType dataType, String httpMethod) throws Exception {
+        IntegrationData integrationData = new IntegrationData();
+        integrationData.setDataType(dataType);
+        SharingParams sharingParams = new SharingParams();
+        sharingParams.setIsExternal(isExternal);
+        sharingParams.setToShare(toShare);
+        integrationData.setSharingParams(sharingParams);
+        DataParams dataParams = new DataParams();
+        dataParams.setRecordId("222");
+        dataParams.setApplicationId("taranis");
+        dataParams.setCspId("GR");
+        integrationData.setDataParams(dataParams);
+        integrationData.setDataObject("{\"t\":\"1234\"}");
+
+
+        if (httpMethod.toLowerCase().equals("post")) {
+            mvc.perform(post("/v"+REST_API_V1+"/"+DSL_INTEGRATION_DATA).accept(MediaType.TEXT_PLAIN)
+                    .content(TestUtil.convertObjectToJsonBytes(integrationData))
+                    .contentType(TestUtil.APPLICATION_JSON_UTF8))
+                    .andExpect(status().isOk())
+                    .andExpect(content().string(HttpStatusResponseType.SUCCESSFUL_OPERATION.getReasonPhrase()));
+        }
+        else if (httpMethod.toLowerCase().equals("put")) {
+            mvc.perform(put("/v"+REST_API_V1+"/"+DSL_INTEGRATION_DATA).accept(MediaType.TEXT_PLAIN)
+                    .content(TestUtil.convertObjectToJsonBytes(integrationData))
+                    .contentType(TestUtil.APPLICATION_JSON_UTF8))
+                    .andExpect(status().isOk())
+                    .andExpect(content().string(HttpStatusResponseType.SUCCESSFUL_OPERATION.getReasonPhrase()));
+        }
+        else if (httpMethod.toLowerCase().equals("delete")) {
+            mvc.perform(delete("/v"+REST_API_V1+"/"+DSL_INTEGRATION_DATA).accept(MediaType.TEXT_PLAIN)
+                    .content(TestUtil.convertObjectToJsonBytes(integrationData))
+                    .contentType(TestUtil.APPLICATION_JSON_UTF8))
+                    .andExpect(status().isOk())
+                    .andExpect(content().string(HttpStatusResponseType.SUCCESSFUL_OPERATION.getReasonPhrase()));
+        }
+
+
+
+
     }
 
     public RouteDefinition getRoute(String uri){
