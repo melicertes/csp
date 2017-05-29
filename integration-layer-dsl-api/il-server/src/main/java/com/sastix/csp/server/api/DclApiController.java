@@ -1,9 +1,12 @@
 package com.sastix.csp.server.api;
 
+import com.sastix.csp.commons.apiHttpStatusResponse.HttpStatusResponseType;
+import com.sastix.csp.commons.exceptions.InvalidDataTypeException;
 import com.sastix.csp.commons.model.IntegrationData;
 import com.sastix.csp.commons.routes.CamelRoutes;
 import com.sastix.csp.commons.routes.ContextUrl;
 import com.sastix.csp.server.routes.RouteUtils;
+import org.apache.camel.Exchange;
 import org.apache.camel.Produce;
 import org.apache.camel.ProducerTemplate;
 import org.slf4j.Logger;
@@ -25,37 +28,56 @@ public class DclApiController implements CamelRoutes,ContextUrl{
     RouteUtils routes;
 
     @Produce
-    private ProducerTemplate intDataProducer;
+    private ProducerTemplate producerTemplate;
 
     /**
      *
-     * @param newIntDataObj
+     * @param integrationData
      * @return
      */
     @RequestMapping(value = "/v"+REST_API_V1+"/"+DCL_INTEGRATION_DATA,
             consumes = {"application/json"},
             method = RequestMethod.POST)
-    public ResponseEntity<String> getNewIntDataFromExtCsp(@RequestBody IntegrationData newIntDataObj) {
+    public ResponseEntity<String> getNewIntDataFromExtCsp(@RequestBody IntegrationData integrationData) {
 
         LOG.info("DCL Endpoint: POST received");
-        intDataProducer.sendBodyAndHeader(routes.apply(EDCL), newIntDataObj,"method", "POST");
 
-        return new ResponseEntity<>(HttpStatus.OK);
+        return handleIntegrationData(integrationData, "POST");
     }
 
     /**
      *
-     * @param newIntDataObj
+     * @param integrationData
      * @return
      */
     @RequestMapping(value = "/v"+REST_API_V1+"/"+DCL_INTEGRATION_DATA,
             consumes = {"application/json"},
             method = RequestMethod.PUT)
-    public ResponseEntity<String> getUpdateIntDataFromExtCsp(@RequestBody IntegrationData newIntDataObj) {
+    public ResponseEntity<String> getUpdateIntDataFromExtCsp(@RequestBody IntegrationData integrationData) {
 
         LOG.info("DCL Endpoint: PUT received");
-        intDataProducer.sendBodyAndHeader(routes.apply(EDCL), newIntDataObj, "method", "PUT");
 
-        return new ResponseEntity<>(HttpStatus.OK);
+        return handleIntegrationData(integrationData, "PUT");
+    }
+
+
+    private ResponseEntity<String> handleIntegrationData(IntegrationData integrationData ,String requestMethod){
+        try {
+            String dataType = integrationData.getDataType().toString();
+
+            if (dataType != null) {
+                producerTemplate.sendBodyAndHeader(routes.apply(EDCL), integrationData, Exchange.HTTP_METHOD, requestMethod);
+            } else {
+                throw new InvalidDataTypeException();
+            }
+
+        } catch (InvalidDataTypeException e) {
+            LOG.warn(e.getMessage());
+            return new ResponseEntity<>(HttpStatusResponseType.MALFORMED_INTEGRATION_DATA_STRUCTURE.getReasonPhrase(),
+                    HttpStatus.BAD_REQUEST);
+        }
+
+        return new ResponseEntity<>(HttpStatusResponseType.SUCCESSFUL_OPERATION.getReasonPhrase(),
+                HttpStatus.OK);
     }
 }
