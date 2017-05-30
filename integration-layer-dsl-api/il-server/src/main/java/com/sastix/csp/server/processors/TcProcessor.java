@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.util.*;
 
 /**
@@ -52,6 +53,11 @@ public class TcProcessor implements Processor,CamelRoutes{
 
     @Autowired
     RouteUtils routes;
+
+    @PostConstruct
+    public void init(){
+        LOG.info("This CSP server name is: "+serverName);
+    }
 
     @Override
     public void process(Exchange exchange) throws Exception {
