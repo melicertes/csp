@@ -1,6 +1,7 @@
 -Dspring.profiles.active=docker
 -DIL_PORT=8081
 -DCSP_NAME=csp0
+-DIL_SSL_KEYSTORE_PASS=
 -DIL_SSL_KEY_PASS=
 -DIL_IN_EVENT_APPS=misp
 -DIL_IN_THREAT_APPS=misp

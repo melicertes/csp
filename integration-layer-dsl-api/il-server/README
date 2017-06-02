@@ -44,6 +44,7 @@ openssl verify -purpose sslserver -CAfile ca.crt csp-internal.crt
 ####################################
 
 # default password to use for demo purposes: 123456
+# if you don not provide a password (leave it empty), the creation of the jks file later will fail
 
 openssl pkcs12 -export -clcerts -in csp-internal.crt -inkey csp-internal.key -out csp-internal.p12
 
