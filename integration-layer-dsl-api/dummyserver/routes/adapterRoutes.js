@@ -3,7 +3,10 @@
 module.exports = function (app) {
     var adapterService = require('../service/adapterService');
 
-    // todoList Routes
+    //Routes
+
+    app.route('/adapter/version')
+        .get(adapterService.version);
     app.route('/adapter/integrationData')
         .all(function(req, res, next){
             console.log('### adapter ###') ;

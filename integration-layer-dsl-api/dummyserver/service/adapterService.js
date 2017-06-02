@@ -39,3 +39,7 @@ exports.delete = function (req, res) {
     console.log(req.body.dataParams);
     console.log(req.body.sharingParams);
 };
+
+exports.version = function (req, res) {
+    res.json({version:'1.0'});
+};
