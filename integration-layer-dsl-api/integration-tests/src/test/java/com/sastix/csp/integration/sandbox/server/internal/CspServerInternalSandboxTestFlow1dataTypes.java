@@ -24,7 +24,10 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
@@ -46,7 +49,7 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
                 "apache.camel.use.activemq:false",
         })
 @MockEndpointsAndSkip("http:*")
-public class CspServerInternalSandboxTestFlow1verbs implements CamelRoutes {
+public class CspServerInternalSandboxTestFlow1dataTypes implements CamelRoutes {
     private static final Logger LOG = LoggerFactory.getLogger(CspServerInternalSandboxTest.class);
 
     private MockMvc mvc;
@@ -92,7 +95,7 @@ public class CspServerInternalSandboxTestFlow1verbs implements CamelRoutes {
 
     private Integer numOfCspsToTest = 3;
     private Integer currentCspId = 0;
-    private IntegrationDataType dataTypeToTest = IntegrationDataType.VULNERABILITY;
+    private HashMap<IntegrationDataType, Integer> internalApps = new HashMap<>();
 
     @Before
     public void init() throws Exception {
@@ -108,24 +111,30 @@ public class CspServerInternalSandboxTestFlow1verbs implements CamelRoutes {
         mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX, routes.apply(APP), mockedApp.getEndpointUri());
         mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX, routes.apply(DCL), mockedDcl.getEndpointUri());
 
-        Mockito.when(camelRestService.sendAndGetList(anyString(), anyObject(), eq("GET"), eq(TrustCircle.class), anyObject()))
-                .thenReturn(mockUtils.getAllMockedTrustCircles(this.numOfCspsToTest, this.dataTypeToTest.name()));
-
-        Mockito.when(camelRestService.send(anyString(), anyObject(), eq("GET"), eq(TrustCircle.class)))
-                .thenReturn(mockUtils.getMockedTrustCircle(this.numOfCspsToTest, this.dataTypeToTest.name()));
+        //Initialize internalApps Hashmap according applicatiopn.properties (internal section)
+        internalApps.put(IntegrationDataType.THREAT, 1);
+        internalApps.put(IntegrationDataType.ARTEFACT, 2);
+        internalApps.put(IntegrationDataType.TRUSTCIRCLE, 1);
 
         Mockito.when(camelRestService.send(anyString(), anyObject(), eq("GET"), eq(Team.class)))
                 .thenReturn(mockUtils.getMockedTeam(1, "http://external.csp%s.com"))
                 .thenReturn(mockUtils.getMockedTeam(2, "http://external.csp%s.com"))
                 .thenReturn(mockUtils.getMockedTeam(3, "http://external.csp%s.com"));
+
     }
 
     @DirtiesContext
     @Test
-    public void testDslFlow1PostToShare() throws Exception {
-        mockUtils.sendFlow1Data(mvc, false, true, this.dataTypeToTest, "POST");
+    public void testDslFlow1PostDataTypeThreat() throws Exception {
+        Mockito.when(camelRestService.sendAndGetList(anyString(), anyObject(), eq("GET"), eq(TrustCircle.class), anyObject()))
+                .thenReturn(mockUtils.getAllMockedTrustCircles(this.numOfCspsToTest, IntegrationDataType.THREAT.name()));
 
-        _toSharePostPutFlowImpl();
+        Mockito.when(camelRestService.send(anyString(), anyObject(), eq("GET"), eq(TrustCircle.class)))
+                .thenReturn(mockUtils.getMockedTrustCircle(this.numOfCspsToTest, IntegrationDataType.THREAT.name()));
+
+        mockUtils.sendFlow1Data(mvc, false, true, IntegrationDataType.THREAT, "POST");
+
+        _flowImpl(IntegrationDataType.THREAT);
 
         //Thread.sleep(10*1000); //to avoid "Rejecting received message because of the listener container having been stopped in the meantime"
         //be careful when debugging, you might miss breakpoints if the time is not enough
@@ -133,35 +142,16 @@ public class CspServerInternalSandboxTestFlow1verbs implements CamelRoutes {
 
     @DirtiesContext
     @Test
-    public void testDslFlow1PutToShare() throws Exception {
-        mockUtils.sendFlow1Data(mvc, false, true, this.dataTypeToTest, "PUT");
+    public void testDslFlow1PutDataTypeThreat() throws Exception {
+        Mockito.when(camelRestService.sendAndGetList(anyString(), anyObject(), eq("GET"), eq(TrustCircle.class), anyObject()))
+                .thenReturn(mockUtils.getAllMockedTrustCircles(this.numOfCspsToTest, IntegrationDataType.THREAT.name()));
 
-        _toSharePostPutFlowImpl();
+        Mockito.when(camelRestService.send(anyString(), anyObject(), eq("GET"), eq(TrustCircle.class)))
+                .thenReturn(mockUtils.getMockedTrustCircle(this.numOfCspsToTest, IntegrationDataType.THREAT.name()));
 
-        //Thread.sleep(10*1000); //to avoid "Rejecting received message because of the listener container having been stopped in the meantime"
-        //be careful when debugging, you might miss breakpoints if the time is not enough
-    }
+        mockUtils.sendFlow1Data(mvc, false, true, IntegrationDataType.THREAT, "PUT");
 
-    @DirtiesContext
-    @Test
-    public void testDslFlow1DeleteToShare() throws Exception {
-        mockUtils.sendFlow1Data(mvc, false, true, this.dataTypeToTest, "DELETE");
-
-        _deleteFlowImpl();
-
-        //Thread.sleep(10*1000); //to avoid "Rejecting received message because of the listener container having been stopped in the meantime"
-        //be careful when debugging, you might miss breakpoints if the time is not enough
-    }
-
-
-
-
-    @DirtiesContext
-    @Test
-    public void testDslFlow1PostNotToShare() throws Exception {
-        mockUtils.sendFlow1Data(mvc, false, false, this.dataTypeToTest, "POST");
-
-        _notToSharePostPutFlowImpl();
+        _flowImpl(IntegrationDataType.THREAT);
 
         //Thread.sleep(10*1000); //to avoid "Rejecting received message because of the listener container having been stopped in the meantime"
         //be careful when debugging, you might miss breakpoints if the time is not enough
@@ -169,10 +159,16 @@ public class CspServerInternalSandboxTestFlow1verbs implements CamelRoutes {
 
     @DirtiesContext
     @Test
-    public void testDslFlow1PutNotToShare() throws Exception {
-        mockUtils.sendFlow1Data(mvc, false, false, this.dataTypeToTest, "PUT");
+    public void testDslFlow1PostDataTypeArtefact() throws Exception {
+        Mockito.when(camelRestService.sendAndGetList(anyString(), anyObject(), eq("GET"), eq(TrustCircle.class), anyObject()))
+                .thenReturn(mockUtils.getAllMockedTrustCircles(this.numOfCspsToTest, IntegrationDataType.ARTEFACT.name()));
 
-        _notToSharePostPutFlowImpl();
+        Mockito.when(camelRestService.send(anyString(), anyObject(), eq("GET"), eq(TrustCircle.class)))
+                .thenReturn(mockUtils.getMockedTrustCircle(this.numOfCspsToTest, IntegrationDataType.ARTEFACT.name()));
+
+        mockUtils.sendFlow1Data(mvc, false, true, IntegrationDataType.ARTEFACT, "POST");
+
+        _flowImpl(IntegrationDataType.ARTEFACT);
 
         //Thread.sleep(10*1000); //to avoid "Rejecting received message because of the listener container having been stopped in the meantime"
         //be careful when debugging, you might miss breakpoints if the time is not enough
@@ -180,17 +176,58 @@ public class CspServerInternalSandboxTestFlow1verbs implements CamelRoutes {
 
     @DirtiesContext
     @Test
-    public void testDslFlow1DeleteNotToShare() throws Exception {
-        mockUtils.sendFlow1Data(mvc, false, false, this.dataTypeToTest, "DELETE");
+    public void testDslFlow1PutDataTypeArtefact() throws Exception {
+        Mockito.when(camelRestService.sendAndGetList(anyString(), anyObject(), eq("GET"), eq(TrustCircle.class), anyObject()))
+                .thenReturn(mockUtils.getAllMockedTrustCircles(this.numOfCspsToTest, IntegrationDataType.ARTEFACT.name()));
 
-        _deleteFlowImpl();
+        Mockito.when(camelRestService.send(anyString(), anyObject(), eq("GET"), eq(TrustCircle.class)))
+                .thenReturn(mockUtils.getMockedTrustCircle(this.numOfCspsToTest, IntegrationDataType.ARTEFACT.name()));
+
+        mockUtils.sendFlow1Data(mvc, false, true, IntegrationDataType.ARTEFACT, "PUT");
+
+        _flowImpl(IntegrationDataType.ARTEFACT);
+
+        //Thread.sleep(10*1000); //to avoid "Rejecting received message because of the listener container having been stopped in the meantime"
+        //be careful when debugging, you might miss breakpoints if the time is not enough
+    }
+
+    @DirtiesContext
+    @Test
+    public void testDslFlow1PostDataTypeTrustcircle() throws Exception {
+        Mockito.when(camelRestService.sendAndGetList(anyString(), anyObject(), eq("GET"), eq(TrustCircle.class), anyObject()))
+                .thenReturn(mockUtils.getAllMockedTrustCircles(this.numOfCspsToTest, IntegrationDataType.TRUSTCIRCLE.name()));
+
+        Mockito.when(camelRestService.send(anyString(), anyObject(), eq("GET"), eq(TrustCircle.class)))
+                .thenReturn(mockUtils.getMockedTrustCircle(this.numOfCspsToTest, IntegrationDataType.TRUSTCIRCLE.name()));
+
+        mockUtils.sendFlow1Data(mvc, false, true, IntegrationDataType.TRUSTCIRCLE, "POST");
+
+        _flowImpl(IntegrationDataType.TRUSTCIRCLE);
+
+        //Thread.sleep(10*1000); //to avoid "Rejecting received message because of the listener container having been stopped in the meantime"
+        //be careful when debugging, you might miss breakpoints if the time is not enough
+    }
+
+    @DirtiesContext
+    @Test
+    public void testDslFlow1PutDataTypeTrustcircle() throws Exception {
+        Mockito.when(camelRestService.sendAndGetList(anyString(), anyObject(), eq("GET"), eq(TrustCircle.class), anyObject()))
+                .thenReturn(mockUtils.getAllMockedTrustCircles(this.numOfCspsToTest, IntegrationDataType.TRUSTCIRCLE.name()));
+
+        Mockito.when(camelRestService.send(anyString(), anyObject(), eq("GET"), eq(TrustCircle.class)))
+                .thenReturn(mockUtils.getMockedTrustCircle(this.numOfCspsToTest, IntegrationDataType.TRUSTCIRCLE.name()));
+
+        mockUtils.sendFlow1Data(mvc, false, true, IntegrationDataType.TRUSTCIRCLE, "PUT");
+
+        _flowImpl(IntegrationDataType.TRUSTCIRCLE);
 
         //Thread.sleep(10*1000); //to avoid "Rejecting received message because of the listener container having been stopped in the meantime"
         //be careful when debugging, you might miss breakpoints if the time is not enough
     }
 
 
-    private void _toSharePostPutFlowImpl() throws Exception {
+
+    private void _flowImpl(IntegrationDataType dataType) throws Exception {
        /*
         DSL
          */
@@ -203,21 +240,21 @@ public class CspServerInternalSandboxTestFlow1verbs implements CamelRoutes {
         for (Exchange exchange : list) {
             Message in = exchange.getIn();
             IntegrationData data = in.getBody(IntegrationData.class);
-            assertThat(data.getDataType(), is(this.dataTypeToTest));
+            assertThat(data.getDataType(), is(dataType));
         }
 
         /*
         APP
          */
-        //Expect 2-messages according to application.properties (internal.incident.apps = rt, intelmq)
-        mockedApp.expectedMessageCount(2);
+        //Expect message count according to application.properties
+        mockedApp.expectedMessageCount(internalApps.get(dataType));
         mockedApp.assertIsSatisfied();
 
         list = mockedApp.getReceivedExchanges();
         for (Exchange exchange : list) {
             Message in = exchange.getIn();
             IntegrationData data = in.getBody(IntegrationData.class);
-            assertThat(data.getDataType(), is(this.dataTypeToTest));
+            assertThat(data.getDataType(), is(dataType));
         }
 
         //DDL
@@ -228,7 +265,7 @@ public class CspServerInternalSandboxTestFlow1verbs implements CamelRoutes {
         for (Exchange exchange : list) {
             Message in = exchange.getIn();
             IntegrationData data = in.getBody(IntegrationData.class);
-            assertThat(data.getDataType(), is(this.dataTypeToTest));
+            assertThat(data.getDataType(), is(dataType));
         }
 
         //DCL
@@ -239,7 +276,7 @@ public class CspServerInternalSandboxTestFlow1verbs implements CamelRoutes {
         for (Exchange exchange : list) {
             Message in = exchange.getIn();
             IntegrationData data = in.getBody(IntegrationData.class);
-            assertThat(data.getDataType(), is(this.dataTypeToTest));
+            assertThat(data.getDataType(), is(dataType));
         }
 
         //TC
@@ -250,7 +287,7 @@ public class CspServerInternalSandboxTestFlow1verbs implements CamelRoutes {
         for (Exchange exchange : list) {
             Message in = exchange.getIn();
             IntegrationData data = in.getBody(IntegrationData.class);
-            assertThat(data.getDataType(), is(this.dataTypeToTest));
+            assertThat(data.getDataType(), is(dataType));
         }
 
         //ESCP
@@ -274,129 +311,8 @@ public class CspServerInternalSandboxTestFlow1verbs implements CamelRoutes {
         for (Exchange exchange : list) {
             Message in = exchange.getIn();
             IntegrationData data = in.getBody(IntegrationData.class);
-            assertThat(data.getDataType(), is(this.dataTypeToTest));
+            assertThat(data.getDataType(), is(dataType));
         }
     }
 
-    private void _notToSharePostPutFlowImpl() throws Exception {
-       /*
-        DSL
-         */
-        //Expect 1-message
-        mockedDsl.expectedMessageCount(1);
-        mockedDsl.assertIsSatisfied();
-
-        List<Exchange> list = mockedDsl.getReceivedExchanges();
-        for (Exchange exchange : list) {
-            Message in = exchange.getIn();
-            IntegrationData data = in.getBody(IntegrationData.class);
-            assertThat(data.getDataType(), is(this.dataTypeToTest));
-        }
-
-        /*
-        APP
-         */
-        //Expect 2-messages according to application.properties (internal.incident.apps = rt, intelmq)
-        mockedApp.expectedMessageCount(2);
-        mockedApp.assertIsSatisfied();
-
-        list = mockedApp.getReceivedExchanges();
-        for (Exchange exchange : list) {
-            Message in = exchange.getIn();
-            IntegrationData data = in.getBody(IntegrationData.class);
-            assertThat(data.getDataType(), is(this.dataTypeToTest));
-        }
-
-        //DDL
-        mockedDdl.expectedMessageCount(1);
-        mockedDdl.assertIsSatisfied();
-
-        list = mockedDdl.getReceivedExchanges();
-        for (Exchange exchange : list) {
-            Message in = exchange.getIn();
-            IntegrationData data = in.getBody(IntegrationData.class);
-            assertThat(data.getDataType(), is(this.dataTypeToTest));
-        }
-
-        /*
-        DCL
-         */
-        //Do not expect something for NotToShare
-        mockedDcl.expectedMessageCount(0);
-        mockedDcl.assertIsSatisfied();
-
-
-        //TC and ESCP are not called from DCL
-
-
-        //ELASTIC
-        mockedElastic.expectedMessageCount(1);
-        mockedElastic.assertIsSatisfied();
-
-        list = mockedElastic.getReceivedExchanges();
-        for (Exchange exchange : list) {
-            Message in = exchange.getIn();
-            IntegrationData data = in.getBody(IntegrationData.class);
-            assertThat(data.getDataType(), is(this.dataTypeToTest));
-        }
-    }
-
-    private void _deleteFlowImpl() throws Exception {
-       /*
-        DSL
-         */
-        //Expect 1-message
-        mockedDsl.expectedMessageCount(1);
-        mockedDsl.assertIsSatisfied();
-
-        List<Exchange> list = mockedDsl.getReceivedExchanges();
-        for (Exchange exchange : list) {
-            Message in = exchange.getIn();
-            IntegrationData data = in.getBody(IntegrationData.class);
-            assertThat(data.getDataType(), is(this.dataTypeToTest));
-        }
-
-        /*
-        APP
-         */
-        //Expect 2-messages according to application.properties (internal.incident.apps = rt, intelmq)
-        mockedApp.expectedMessageCount(2);
-        mockedApp.assertIsSatisfied();
-
-        list = mockedApp.getReceivedExchanges();
-        for (Exchange exchange : list) {
-            Message in = exchange.getIn();
-            IntegrationData data = in.getBody(IntegrationData.class);
-            assertThat(data.getDataType(), is(this.dataTypeToTest));
-        }
-
-        //DDL
-        mockedDdl.expectedMessageCount(1);
-        mockedDdl.assertIsSatisfied();
-
-        list = mockedDdl.getReceivedExchanges();
-        for (Exchange exchange : list) {
-            Message in = exchange.getIn();
-            IntegrationData data = in.getBody(IntegrationData.class);
-            assertThat(data.getDataType(), is(this.dataTypeToTest));
-        }
-
-        /*
-        DCL
-         */
-        //DELETE verb is not propagated to DCL
-        mockedDcl.expectedMessageCount(0);
-        mockedDcl.assertIsSatisfied();
-
-        //ELASTIC
-        mockedElastic.expectedMessageCount(1);
-        mockedElastic.assertIsSatisfied();
-
-        list = mockedElastic.getReceivedExchanges();
-        for (Exchange exchange : list) {
-            Message in = exchange.getIn();
-            IntegrationData data = in.getBody(IntegrationData.class);
-            assertThat(data.getDataType(), is(this.dataTypeToTest));
-        }
-    }
 }
