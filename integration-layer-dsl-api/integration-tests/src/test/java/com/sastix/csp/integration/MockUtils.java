@@ -50,7 +50,28 @@ public class MockUtils implements ContextUrl {
 
     public List<TrustCircle> getAllMockedTrustCircles(int count){
         List<TrustCircle> ret= new ArrayList<>();
-        ret.add(getMockedTrustCircle(3));
+        ret.add(getMockedTrustCircle(count));
+        return ret;
+    }
+
+
+    public TrustCircle getMockedTrustCircle(int count, String dataType){
+        TrustCircle trustCircle = new TrustCircle();
+        trustCircle.setId("dummyId");
+        trustCircle.setShortName(dataType);
+        //List<String> listCsps = new ArrayList<>();
+        List<String> teamList = new ArrayList<>();
+        for(int i=0; i< count;i++) {
+            //listCsps.add(String.format(strWithCountArg,""+(i+1)));
+            teamList.add(i+"");
+        }
+        trustCircle.setTeams(teamList);
+        return trustCircle;
+    }
+
+    public List<TrustCircle> getAllMockedTrustCircles(int count, String dataType){
+        List<TrustCircle> ret= new ArrayList<>();
+        ret.add(getMockedTrustCircle(count, dataType));
         return ret;
     }
 
@@ -99,6 +120,9 @@ public class MockUtils implements ContextUrl {
                 .andExpect(content().string(HttpStatusResponseType.SUCCESSFUL_OPERATION.getReasonPhrase()));
     }
 
+
+
+
     public void sendFlow1Data(MockMvc mvc, Boolean isExternal, Boolean toShare, IntegrationDataType dataType, String httpMethod) throws Exception {
         IntegrationData integrationData = new IntegrationData();
         integrationData.setDataType(dataType);
@@ -109,7 +133,7 @@ public class MockUtils implements ContextUrl {
         DataParams dataParams = new DataParams();
         dataParams.setRecordId("222");
         dataParams.setApplicationId("taranis");
-        dataParams.setCspId("GR");
+        dataParams.setCspId("CERT-GR");
         integrationData.setDataParams(dataParams);
         integrationData.setDataObject("{\"t\":\"1234\"}");
 
@@ -135,11 +159,9 @@ public class MockUtils implements ContextUrl {
                     .andExpect(status().isOk())
                     .andExpect(content().string(HttpStatusResponseType.SUCCESSFUL_OPERATION.getReasonPhrase()));
         }
-
-
-
-
     }
+
+
 
     public RouteDefinition getRoute(String uri){
         List<RouteDefinition> list = springCamelContext.getRouteDefinitions();
