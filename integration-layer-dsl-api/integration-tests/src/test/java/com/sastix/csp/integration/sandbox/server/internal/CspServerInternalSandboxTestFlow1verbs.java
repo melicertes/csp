@@ -92,7 +92,7 @@ public class CspServerInternalSandboxTestFlow1verbs implements CamelRoutes {
 
     private Integer numOfCspsToTest = 3;
     private Integer currentCspId = 0;
-    private String dataTypeToTest = IntegrationDataType.INCIDENT.name();
+    private IntegrationDataType dataTypeToTest = IntegrationDataType.INCIDENT;
 
     @Before
     public void init() throws Exception {
@@ -109,10 +109,10 @@ public class CspServerInternalSandboxTestFlow1verbs implements CamelRoutes {
         mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX, routes.apply(DCL), mockedDcl.getEndpointUri());
 
         Mockito.when(camelRestService.sendAndGetList(anyString(), anyObject(), eq("GET"), eq(TrustCircle.class), anyObject()))
-                .thenReturn(mockUtils.getAllMockedTrustCircles(this.numOfCspsToTest, this.dataTypeToTest));
+                .thenReturn(mockUtils.getAllMockedTrustCircles(this.numOfCspsToTest, this.dataTypeToTest.name()));
 
         Mockito.when(camelRestService.send(anyString(), anyObject(), eq("GET"), eq(TrustCircle.class)))
-                .thenReturn(mockUtils.getMockedTrustCircle(this.numOfCspsToTest, this.dataTypeToTest));
+                .thenReturn(mockUtils.getMockedTrustCircle(this.numOfCspsToTest, this.dataTypeToTest.name()));
 
         Mockito.when(camelRestService.send(anyString(), anyObject(), eq("GET"), eq(Team.class)))
                 .thenReturn(mockUtils.getMockedTeam(1, "http://external.csp%s.com"))
@@ -123,7 +123,7 @@ public class CspServerInternalSandboxTestFlow1verbs implements CamelRoutes {
     @DirtiesContext
     @Test
     public void testDslFlow1PostToShare() throws Exception {
-        mockUtils.sendFlow1Data(mvc, false, true, IntegrationDataType.INCIDENT, "POST");
+        mockUtils.sendFlow1Data(mvc, false, true, this.dataTypeToTest, "POST");
 
         _toSharePostPutFlowImpl();
 
@@ -134,7 +134,7 @@ public class CspServerInternalSandboxTestFlow1verbs implements CamelRoutes {
     @DirtiesContext
     @Test
     public void testDslFlow1PutToShare() throws Exception {
-        mockUtils.sendFlow1Data(mvc, false, true, IntegrationDataType.INCIDENT, "PUT");
+        mockUtils.sendFlow1Data(mvc, false, true, this.dataTypeToTest, "PUT");
 
         _toSharePostPutFlowImpl();
 
@@ -145,7 +145,7 @@ public class CspServerInternalSandboxTestFlow1verbs implements CamelRoutes {
     @DirtiesContext
     @Test
     public void testDslFlow1DeleteToShare() throws Exception {
-        mockUtils.sendFlow1Data(mvc, false, true, IntegrationDataType.INCIDENT, "DELETE");
+        mockUtils.sendFlow1Data(mvc, false, true, this.dataTypeToTest, "DELETE");
 
         _deleteFlowImpl();
 
@@ -159,7 +159,7 @@ public class CspServerInternalSandboxTestFlow1verbs implements CamelRoutes {
     @DirtiesContext
     @Test
     public void testDslFlow1PostNotToShare() throws Exception {
-        mockUtils.sendFlow1Data(mvc, false, false, IntegrationDataType.INCIDENT, "POST");
+        mockUtils.sendFlow1Data(mvc, false, false, this.dataTypeToTest, "POST");
 
         _notToSharePostPutFlowImpl();
 
@@ -170,7 +170,7 @@ public class CspServerInternalSandboxTestFlow1verbs implements CamelRoutes {
     @DirtiesContext
     @Test
     public void testDslFlow1PutNotToShare() throws Exception {
-        mockUtils.sendFlow1Data(mvc, false, false, IntegrationDataType.INCIDENT, "PUT");
+        mockUtils.sendFlow1Data(mvc, false, false, this.dataTypeToTest, "PUT");
 
         _notToSharePostPutFlowImpl();
 
@@ -181,7 +181,7 @@ public class CspServerInternalSandboxTestFlow1verbs implements CamelRoutes {
     @DirtiesContext
     @Test
     public void testDslFlow1DeleteNotToShare() throws Exception {
-        mockUtils.sendFlow1Data(mvc, false, false, IntegrationDataType.INCIDENT, "DELETE");
+        mockUtils.sendFlow1Data(mvc, false, false, this.dataTypeToTest, "DELETE");
 
         _deleteFlowImpl();
 
@@ -203,7 +203,7 @@ public class CspServerInternalSandboxTestFlow1verbs implements CamelRoutes {
         for (Exchange exchange : list) {
             Message in = exchange.getIn();
             IntegrationData data = in.getBody(IntegrationData.class);
-            assertThat(data.getDataType(), is(IntegrationDataType.INCIDENT));
+            assertThat(data.getDataType(), is(this.dataTypeToTest));
         }
 
         /*
@@ -217,7 +217,7 @@ public class CspServerInternalSandboxTestFlow1verbs implements CamelRoutes {
         for (Exchange exchange : list) {
             Message in = exchange.getIn();
             IntegrationData data = in.getBody(IntegrationData.class);
-            assertThat(data.getDataType(), is(IntegrationDataType.INCIDENT));
+            assertThat(data.getDataType(), is(this.dataTypeToTest));
         }
 
         //DDL
@@ -228,7 +228,7 @@ public class CspServerInternalSandboxTestFlow1verbs implements CamelRoutes {
         for (Exchange exchange : list) {
             Message in = exchange.getIn();
             IntegrationData data = in.getBody(IntegrationData.class);
-            assertThat(data.getDataType(), is(IntegrationDataType.INCIDENT));
+            assertThat(data.getDataType(), is(this.dataTypeToTest));
         }
 
         //DCL
@@ -239,7 +239,7 @@ public class CspServerInternalSandboxTestFlow1verbs implements CamelRoutes {
         for (Exchange exchange : list) {
             Message in = exchange.getIn();
             IntegrationData data = in.getBody(IntegrationData.class);
-            assertThat(data.getDataType(), is(IntegrationDataType.INCIDENT));
+            assertThat(data.getDataType(), is(this.dataTypeToTest));
         }
 
         //TC
@@ -250,7 +250,7 @@ public class CspServerInternalSandboxTestFlow1verbs implements CamelRoutes {
         for (Exchange exchange : list) {
             Message in = exchange.getIn();
             IntegrationData data = in.getBody(IntegrationData.class);
-            assertThat(data.getDataType(), is(IntegrationDataType.INCIDENT));
+            assertThat(data.getDataType(), is(this.dataTypeToTest));
         }
 
         //ESCP
@@ -274,7 +274,7 @@ public class CspServerInternalSandboxTestFlow1verbs implements CamelRoutes {
         for (Exchange exchange : list) {
             Message in = exchange.getIn();
             IntegrationData data = in.getBody(IntegrationData.class);
-            assertThat(data.getDataType(), is(IntegrationDataType.INCIDENT));
+            assertThat(data.getDataType(), is(this.dataTypeToTest));
         }
     }
 
@@ -290,7 +290,7 @@ public class CspServerInternalSandboxTestFlow1verbs implements CamelRoutes {
         for (Exchange exchange : list) {
             Message in = exchange.getIn();
             IntegrationData data = in.getBody(IntegrationData.class);
-            assertThat(data.getDataType(), is(IntegrationDataType.INCIDENT));
+            assertThat(data.getDataType(), is(this.dataTypeToTest));
         }
 
         /*
@@ -304,7 +304,7 @@ public class CspServerInternalSandboxTestFlow1verbs implements CamelRoutes {
         for (Exchange exchange : list) {
             Message in = exchange.getIn();
             IntegrationData data = in.getBody(IntegrationData.class);
-            assertThat(data.getDataType(), is(IntegrationDataType.INCIDENT));
+            assertThat(data.getDataType(), is(this.dataTypeToTest));
         }
 
         //DDL
@@ -315,7 +315,7 @@ public class CspServerInternalSandboxTestFlow1verbs implements CamelRoutes {
         for (Exchange exchange : list) {
             Message in = exchange.getIn();
             IntegrationData data = in.getBody(IntegrationData.class);
-            assertThat(data.getDataType(), is(IntegrationDataType.INCIDENT));
+            assertThat(data.getDataType(), is(this.dataTypeToTest));
         }
 
         /*
@@ -337,7 +337,7 @@ public class CspServerInternalSandboxTestFlow1verbs implements CamelRoutes {
         for (Exchange exchange : list) {
             Message in = exchange.getIn();
             IntegrationData data = in.getBody(IntegrationData.class);
-            assertThat(data.getDataType(), is(IntegrationDataType.INCIDENT));
+            assertThat(data.getDataType(), is(this.dataTypeToTest));
         }
     }
 
@@ -353,7 +353,7 @@ public class CspServerInternalSandboxTestFlow1verbs implements CamelRoutes {
         for (Exchange exchange : list) {
             Message in = exchange.getIn();
             IntegrationData data = in.getBody(IntegrationData.class);
-            assertThat(data.getDataType(), is(IntegrationDataType.INCIDENT));
+            assertThat(data.getDataType(), is(this.dataTypeToTest));
         }
 
         /*
@@ -367,7 +367,7 @@ public class CspServerInternalSandboxTestFlow1verbs implements CamelRoutes {
         for (Exchange exchange : list) {
             Message in = exchange.getIn();
             IntegrationData data = in.getBody(IntegrationData.class);
-            assertThat(data.getDataType(), is(IntegrationDataType.INCIDENT));
+            assertThat(data.getDataType(), is(this.dataTypeToTest));
         }
 
         //DDL
@@ -378,7 +378,7 @@ public class CspServerInternalSandboxTestFlow1verbs implements CamelRoutes {
         for (Exchange exchange : list) {
             Message in = exchange.getIn();
             IntegrationData data = in.getBody(IntegrationData.class);
-            assertThat(data.getDataType(), is(IntegrationDataType.INCIDENT));
+            assertThat(data.getDataType(), is(this.dataTypeToTest));
         }
 
         /*
@@ -396,7 +396,7 @@ public class CspServerInternalSandboxTestFlow1verbs implements CamelRoutes {
         for (Exchange exchange : list) {
             Message in = exchange.getIn();
             IntegrationData data = in.getBody(IntegrationData.class);
-            assertThat(data.getDataType(), is(IntegrationDataType.INCIDENT));
+            assertThat(data.getDataType(), is(this.dataTypeToTest));
         }
     }
 }
