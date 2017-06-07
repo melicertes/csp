@@ -51,7 +51,7 @@ public class DslProcessor implements Processor,CamelRoutes {
         Boolean isExternal = integrationData.getSharingParams().getIsExternal();
 
         List<String> apps = new ArrayList<>();
-        String appsStr = env.getProperty((isExternal? AppProperties.EXTERNAL:AppProperties.INTERNAL)+"."+dataType.toString()+".apps");
+        String appsStr = env.getProperty((isExternal? AppProperties.EXTERNAL:AppProperties.INTERNAL)+"."+dataType.toString().toLowerCase()+".apps");
 
         if(!StringUtils.isEmpty(appsStr)){
             String[] appsArr =  appsStr.split(",");
