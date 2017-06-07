@@ -45,6 +45,7 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
                 "csp.retry.maxAttempts:1",
                 "embedded.activemq.start:false",
                 "apache.camel.use.activemq:false",
+                "internal.vulnerability.apps:taranis, misp"
         })
 @MockEndpointsAndSkip("http:*")
 public class CspServerInternalSandboxTestFlow1verbs implements CamelRoutes {
@@ -98,7 +99,8 @@ public class CspServerInternalSandboxTestFlow1verbs implements CamelRoutes {
 
     private Integer numOfCspsToTest = 3;
     private Integer currentCspId = 0;
-    private IntegrationDataType dataTypeToTest = IntegrationDataType.VULNERABILITY;
+    private final IntegrationDataType dataTypeToTest = IntegrationDataType.VULNERABILITY;
+    private final String applicationId = "taranis";
 
     @Before
     public void init() throws Exception {
@@ -138,7 +140,7 @@ public class CspServerInternalSandboxTestFlow1verbs implements CamelRoutes {
     @DirtiesContext
     @Test
     public void testDslFlow1PostToShare() throws Exception {
-        mockUtils.sendFlow1Data(mvc, false, true, this.dataTypeToTest, "POST");
+        mockUtils.sendFlow1Data(mvc, applicationId,false, true, this.dataTypeToTest, "POST");
 
         _toSharePostPutFlowImpl();
 
@@ -149,7 +151,7 @@ public class CspServerInternalSandboxTestFlow1verbs implements CamelRoutes {
     @DirtiesContext
     @Test
     public void testDslFlow1PutToShare() throws Exception {
-        mockUtils.sendFlow1Data(mvc, false, true, this.dataTypeToTest, "PUT");
+        mockUtils.sendFlow1Data(mvc, applicationId,false, true, this.dataTypeToTest, "PUT");
 
         _toSharePostPutFlowImpl();
 
@@ -160,7 +162,7 @@ public class CspServerInternalSandboxTestFlow1verbs implements CamelRoutes {
     @DirtiesContext
     @Test
     public void testDslFlow1DeleteToShare() throws Exception {
-        mockUtils.sendFlow1Data(mvc, false, true, this.dataTypeToTest, "DELETE");
+        mockUtils.sendFlow1Data(mvc, applicationId,false, true, this.dataTypeToTest, "DELETE");
 
         _deleteFlowImpl();
 
@@ -174,7 +176,7 @@ public class CspServerInternalSandboxTestFlow1verbs implements CamelRoutes {
     @DirtiesContext
     @Test
     public void testDslFlow1PostNotToShare() throws Exception {
-        mockUtils.sendFlow1Data(mvc, false, false, this.dataTypeToTest, "POST");
+        mockUtils.sendFlow1Data(mvc, applicationId,false, false, this.dataTypeToTest, "POST");
 
         _notToSharePostPutFlowImpl();
 
@@ -185,7 +187,7 @@ public class CspServerInternalSandboxTestFlow1verbs implements CamelRoutes {
     @DirtiesContext
     @Test
     public void testDslFlow1PutNotToShare() throws Exception {
-        mockUtils.sendFlow1Data(mvc, false, false, this.dataTypeToTest, "PUT");
+        mockUtils.sendFlow1Data(mvc, applicationId,false, false, this.dataTypeToTest, "PUT");
 
         _notToSharePostPutFlowImpl();
 
@@ -196,7 +198,7 @@ public class CspServerInternalSandboxTestFlow1verbs implements CamelRoutes {
     @DirtiesContext
     @Test
     public void testDslFlow1DeleteNotToShare() throws Exception {
-        mockUtils.sendFlow1Data(mvc, false, false, this.dataTypeToTest, "DELETE");
+        mockUtils.sendFlow1Data(mvc, applicationId,false, false, this.dataTypeToTest, "DELETE");
 
         _deleteFlowImpl();
 
@@ -224,8 +226,11 @@ public class CspServerInternalSandboxTestFlow1verbs implements CamelRoutes {
         /*
         APP
          */
-        //Expect 2-messages according to application.properties (internal.incident.apps = rt, intelmq)
-        mockedApp.expectedMessageCount(2);
+        // The data type to test is defined in line 101-> private IntegrationDataType dataTypeToTest = IntegrationDataType.VULNERABILITY;
+        // The application id is "taranis"
+        // Expect 1-messages according to application.properties (internal.vulnerability.apps:taranis, misp)
+        // *since taranis is emitting the message, it should be excluded from receiving his own message
+        mockedApp.expectedMessageCount(1);
         mockedApp.assertIsSatisfied();
 
         list = mockedApp.getReceivedExchanges();
@@ -311,8 +316,11 @@ public class CspServerInternalSandboxTestFlow1verbs implements CamelRoutes {
         /*
         APP
          */
-        //Expect 2-messages according to application.properties (internal.incident.apps = rt, intelmq)
-        mockedApp.expectedMessageCount(2);
+        // The data type to test is defined in line 101-> private IntegrationDataType dataTypeToTest = IntegrationDataType.VULNERABILITY;
+        // The application id is "taranis"
+        // Expect 1-messages according to application.properties (internal.vulnerability.apps:taranis, misp)
+        // *since taranis is emitting the message, it should be excluded from receiving his own message
+        mockedApp.expectedMessageCount(1);
         mockedApp.assertIsSatisfied();
 
         list = mockedApp.getReceivedExchanges();
@@ -374,8 +382,11 @@ public class CspServerInternalSandboxTestFlow1verbs implements CamelRoutes {
         /*
         APP
          */
-        //Expect 2-messages according to application.properties (internal.incident.apps = rt, intelmq)
-        mockedApp.expectedMessageCount(2);
+        // The data type to test is defined in line 101-> private IntegrationDataType dataTypeToTest = IntegrationDataType.VULNERABILITY;
+        // The application id is "taranis"
+        // Expect 1-messages according to application.properties (internal.vulnerability.apps:taranis, misp)
+        // *since taranis is emitting the message, it should be excluded from receiving his own message
+        mockedApp.expectedMessageCount(1);
         mockedApp.assertIsSatisfied();
 
         list = mockedApp.getReceivedExchanges();

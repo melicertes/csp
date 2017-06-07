@@ -147,6 +147,10 @@ public class MockUtils implements ContextUrl {
 
 
     public void sendFlow1Data(MockMvc mvc, Boolean isExternal, Boolean toShare, IntegrationDataType dataType, String httpMethod) throws Exception {
+        sendFlow1Data(mvc,"taranis", isExternal,toShare,dataType,httpMethod);
+    }
+
+    public void sendFlow1Data(MockMvc mvc, String applicationId,Boolean isExternal, Boolean toShare, IntegrationDataType dataType, String httpMethod) throws Exception {
         IntegrationData integrationData = new IntegrationData();
         integrationData.setDataType(dataType);
         SharingParams sharingParams = new SharingParams();
@@ -155,7 +159,7 @@ public class MockUtils implements ContextUrl {
         integrationData.setSharingParams(sharingParams);
         DataParams dataParams = new DataParams();
         dataParams.setRecordId("222");
-        dataParams.setApplicationId("taranis");
+        dataParams.setApplicationId(applicationId);
         dataParams.setCspId("CERT-GR");
         integrationData.setDataParams(dataParams);
         integrationData.setDataObject("{\"t\":\"1234\"}");
