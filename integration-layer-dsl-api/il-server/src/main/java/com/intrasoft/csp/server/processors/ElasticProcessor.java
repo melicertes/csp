@@ -1,6 +1,7 @@
 package com.intrasoft.csp.server.processors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.intrasoft.csp.commons.exceptions.CspBusinessException;
 import com.intrasoft.csp.commons.model.IntegrationData;
 import com.intrasoft.csp.commons.model.IntegrationDataType;
 import com.intrasoft.csp.commons.model.elastic.ElasticData;
@@ -62,7 +63,7 @@ public class ElasticProcessor implements Processor {
         DDL indexes data (DDL -> ELASTIC API)
          */
         if (httpMethod.equals(HttpMethod.POST.name())) {
-            //create insert transaction object
+            //create transaction object
             ElasticData elasticData = new ElasticData(integrationData.getDataParams(), integrationData.getDataObject());
 
             //query ES for insertion
@@ -77,6 +78,10 @@ public class ElasticProcessor implements Processor {
             //query ES to get IDs
             String response = camelRestService.send(this.getElasticURI() + "/" + dataType.toString().toLowerCase() + "/_search?pretty&_source=false", elasticSearchRequest, HttpMethods.POST.name());
             LOG.info("Elastic - ES Search response: " + response);
+
+            if(response == null){
+                throw new CspBusinessException("No response from Elastic (null). Processor will fail and should send message to DeadLetterQ");
+            }
 
             //create update transaction object
             ElasticData elasticData = new ElasticData(integrationData.getDataParams(), integrationData.getDataObject());
@@ -113,6 +118,10 @@ public class ElasticProcessor implements Processor {
             //query ES to get IDs
             String response = camelRestService.send(this.getElasticURI() + "/" + dataType.toString().toLowerCase() + "/_search?pretty&_source=false", elasticSearchRequest, HttpMethods.POST.name());
             LOG.info("ES Search response: " + response);
+
+            if(response == null){
+                throw new CspBusinessException("No response from Elastic (null). Processor will fail and should send message to DeadLetterQ");
+            }
 
             ElasticSearchResponse elasticSearchResponse = new ObjectMapper().readValue(response, ElasticSearchResponse.class);
             for(Hit hit : elasticSearchResponse.getHits().getHits()) {

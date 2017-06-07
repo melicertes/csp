@@ -1,13 +1,19 @@
 package com.intrasoft.csp.integration;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.intrasoft.csp.commons.apiHttpStatusResponse.HttpStatusResponseType;
 import com.intrasoft.csp.commons.model.*;
+import com.intrasoft.csp.commons.model.elastic.ElasticSearchResponse;
+import com.intrasoft.csp.commons.model.elastic.search.Hit;
+import com.intrasoft.csp.commons.model.elastic.search.Hits;
 import com.intrasoft.csp.commons.routes.ContextUrl;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.model.RouteDefinition;
 import org.apache.camel.spring.SpringCamelContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.test.web.servlet.MockMvc;
@@ -29,6 +35,9 @@ public class MockUtils implements ContextUrl {
     private static final Logger LOG = LoggerFactory.getLogger(MockUtils.class);
 
     SpringCamelContext springCamelContext;
+
+    @Autowired
+    ObjectMapper objectMapper;
 
     /**
      * examples: getMockedTrustCircle(3, "http://external.csp%s.com")
@@ -92,6 +101,21 @@ public class MockUtils implements ContextUrl {
         team.setShortName("sname"+id);
 
         return team;
+    }
+
+    public String getMockedElasticSearchResponse(int countHits) throws JsonProcessingException {
+        ElasticSearchResponse elasticSearchResponse = new ElasticSearchResponse();
+        Hits hits = new Hits();
+        List<Hit> hitList = new ArrayList<>();
+        for(int i=0;i<countHits;i++){
+            Hit hit = new Hit();
+            hit.setId("hit id "+(i+1));
+            hitList.add(hit);
+        }
+        hits.setHits(hitList);
+        elasticSearchResponse.setHits(hits);
+
+        return objectMapper.writeValueAsString(elasticSearchResponse);
     }
 
     /*@Deprecated

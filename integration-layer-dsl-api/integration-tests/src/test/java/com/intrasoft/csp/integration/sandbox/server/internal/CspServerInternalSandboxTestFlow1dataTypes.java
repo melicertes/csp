@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.core.env.Environment;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
@@ -33,6 +34,7 @@ import static org.hamcrest.Matchers.is;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.contains;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -91,15 +93,29 @@ public class CspServerInternalSandboxTestFlow1dataTypes implements CamelRoutes {
     @Autowired
     SpringCamelContext springCamelContext;
 
+    @Autowired
+    Environment env;
+
     private Integer numOfCspsToTest = 3;
     private Integer currentCspId = 0;
     private HashMap<IntegrationDataType, Integer> internalApps = new HashMap<>();
+
+    String elasticUri;
 
     @Before
     public void init() throws Exception {
         mvc = webAppContextSetup(webApplicationContext).build();
         MockitoAnnotations.initMocks(this);
         mockUtils.setSpringCamelContext(springCamelContext);
+
+
+        String elasticProtocol = env.getProperty("elastic.protocol");
+        String elasticHost= env.getProperty("elastic.host");
+        String elasticPort= env.getProperty("elastic.port");
+        String elasticPath= env.getProperty("elastic.path");
+
+        elasticUri = elasticProtocol + "://" + elasticHost + ":" + elasticPort + elasticPath;
+
 
         mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX, routes.apply(DSL), mockedDsl.getEndpointUri());
         mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX, routes.apply(DDL), mockedDdl.getEndpointUri());
@@ -118,6 +134,9 @@ public class CspServerInternalSandboxTestFlow1dataTypes implements CamelRoutes {
                 .thenReturn(mockUtils.getMockedTeam(1, "http://external.csp%s.com"))
                 .thenReturn(mockUtils.getMockedTeam(2, "http://external.csp%s.com"))
                 .thenReturn(mockUtils.getMockedTeam(3, "http://external.csp%s.com"));
+
+        Mockito.when(camelRestService.send(contains(elasticUri),anyObject(),anyString()))
+                .thenReturn(mockUtils.getMockedElasticSearchResponse(2));
 
     }
 
