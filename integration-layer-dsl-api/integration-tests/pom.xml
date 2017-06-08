@@ -5,14 +5,13 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>com.sastix.csp</groupId>
+        <groupId>com.intrasoft.csp</groupId>
         <artifactId>parent-pom</artifactId>
         <version>0.0.1-SNAPSHOT</version>
-        <!--<relativePath/>-->
-        <relativePath>../pom.xml</relativePath>
+        <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
-    <groupId>com.sastix.csp</groupId>
+    <groupId>com.intrasoft.csp</groupId>
     <artifactId>integration-tests</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
@@ -30,12 +29,12 @@
         </dependency>
 
         <dependency>
-            <groupId>com.sastix.csp</groupId>
+            <groupId>com.intrasoft.csp</groupId>
             <artifactId>il-server</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.sastix.csp</groupId>
+            <groupId>com.intrasoft.csp</groupId>
             <artifactId>il-client</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -77,7 +76,7 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                    <mainClass>com.sastix.csp.integration.MainAppTest</mainClass>
+                    <mainClass>com.intrasoft.csp.integration.MainAppTest</mainClass>
                 </configuration>
             </plugin>
         </plugins>
@@ -106,7 +105,7 @@
                                 <configuration>
                                     <archive>
                                         <manifest>
-                                            <mainClass>com.sastix.csp.integration.MainAppTest</mainClass>
+                                            <mainClass>com.intrasoft.csp.integration.MainAppTest</mainClass>
                                         </manifest>
                                     </archive>
                                 </configuration>

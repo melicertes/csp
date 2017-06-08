@@ -4,6 +4,9 @@ var express = require('express'),
     app = express(),
     port = process.env.PORT || 3000,
     ssl = process.env.SSL || false,
+    sslCA = process.env.SSL_CA || '/data/common/sslcert/ca.crt',
+    sslCERT = process.env.SSL_CERT || '/data/common/sslcert/csp-internal.crt',
+    sslKEY = process.env.SSL_KEY || '/data/common/sslcert/csp-internal.key',
     appName = process.env.APP_NAME || 'adapter',
     bodyParser = require('body-parser');
 
@@ -44,12 +47,9 @@ if(!ssl) {
     var options = {
         requestCert: true,
         rejectUnauthorized:true,
-        // key: fs.readFileSync('sslcert/server-key.pem'),
-        // cert: fs.readFileSync('sslcert/server-crt.pem'),
-        // ca: fs.readFileSync('sslcert/ca-crt.pem'),
-        key: fs.readFileSync('/data/common/sslcert3/csp-internal.key'),
-        cert: fs.readFileSync('/data/common/sslcert3/csp-internal.crt'),
-        ca: fs.readFileSync('/data/common/sslcert3/ca.crt'),
+        key: fs.readFileSync(sslKEY),
+        cert: fs.readFileSync(sslCERT),
+        ca: fs.readFileSync(sslCA),
     };
 
 

@@ -13,7 +13,9 @@ exports.create = function (req, res) {
     }
 
     console.log(req.get('Content-Type'));
-    console.log(req.body);
+    console.log(req.body.dataType);
+    console.log(req.body.dataParams);
+    console.log(req.body.sharingParams);
 
 };
 
@@ -24,11 +26,20 @@ exports.update = function (req, res) {
     console.log('Successful update');
 
     console.log(req.get('Content-Type'));
-    console.log(req.body);
+    console.log(req.body.dataType);
+    console.log(req.body.dataParams);
+    console.log(req.body.sharingParams);
 };
 
 exports.delete = function (req, res) {
     //res.json({message:'Successful delete'});
     res.send('Successful delete');
     console.log('Successful delete');
+    console.log(req.body.dataType);
+    console.log(req.body.dataParams);
+    console.log(req.body.sharingParams);
+};
+
+exports.version = function (req, res) {
+    res.json({version:'1.0'});
 };
