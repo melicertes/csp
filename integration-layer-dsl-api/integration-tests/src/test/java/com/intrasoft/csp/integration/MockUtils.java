@@ -103,6 +103,14 @@ public class MockUtils implements ContextUrl {
         return team;
     }
 
+    public Team getMockedTeam(int id, String strWithCountArg, String shortName) {
+        Team team = new Team();
+        team.setUrl(String.format(strWithCountArg, "" + id));
+        team.setShortName(shortName);
+
+        return team;
+    }
+
     public String getMockedElasticSearchResponse(int countHits) throws JsonProcessingException {
         ElasticSearchResponse elasticSearchResponse = new ElasticSearchResponse();
         Hits hits = new Hits();
@@ -150,7 +158,7 @@ public class MockUtils implements ContextUrl {
         sendFlow1Data(mvc,"taranis", isExternal,toShare,dataType,httpMethod);
     }
 
-    public void sendFlow1Data(MockMvc mvc, String applicationId,Boolean isExternal, Boolean toShare, IntegrationDataType dataType, String httpMethod) throws Exception {
+    public void sendFlow1Data(MockMvc mvc, String applicationId, Boolean isExternal, Boolean toShare, IntegrationDataType dataType, String httpMethod) throws Exception {
         IntegrationData integrationData = new IntegrationData();
         integrationData.setDataType(dataType);
         SharingParams sharingParams = new SharingParams();
@@ -188,6 +196,37 @@ public class MockUtils implements ContextUrl {
         }
     }
 
+
+    public void sendFlow2Data(MockMvc mvc, String applicationId, Boolean isExternal, Boolean toShare, String cspId, IntegrationDataType dataType, String httpMethod) throws Exception {
+        IntegrationData integrationData = new IntegrationData();
+        integrationData.setDataType(dataType);
+        SharingParams sharingParams = new SharingParams();
+        sharingParams.setIsExternal(isExternal);
+        sharingParams.setToShare(toShare);
+        integrationData.setSharingParams(sharingParams);
+        DataParams dataParams = new DataParams();
+        dataParams.setRecordId("222");
+        dataParams.setApplicationId(applicationId);
+        dataParams.setCspId(cspId);
+        integrationData.setDataParams(dataParams);
+        integrationData.setDataObject("{\"t\":\"1234\"}");
+
+
+        if (httpMethod.toLowerCase().equals("post")) {
+            mvc.perform(post("/v"+REST_API_V1+"/"+DCL_INTEGRATION_DATA).accept(MediaType.TEXT_PLAIN)
+                    .content(TestUtil.convertObjectToJsonBytes(integrationData))
+                    .contentType(TestUtil.APPLICATION_JSON_UTF8))
+                    .andExpect(status().isOk())
+                    .andExpect(content().string(HttpStatusResponseType.SUCCESSFUL_OPERATION.getReasonPhrase()));
+        }
+        else if (httpMethod.toLowerCase().equals("put")) {
+            mvc.perform(put("/v"+REST_API_V1+"/"+DCL_INTEGRATION_DATA).accept(MediaType.TEXT_PLAIN)
+                    .content(TestUtil.convertObjectToJsonBytes(integrationData))
+                    .contentType(TestUtil.APPLICATION_JSON_UTF8))
+                    .andExpect(status().isOk())
+                    .andExpect(content().string(HttpStatusResponseType.SUCCESSFUL_OPERATION.getReasonPhrase()));
+        }
+    }
 
 
     public RouteDefinition getRoute(String uri){
