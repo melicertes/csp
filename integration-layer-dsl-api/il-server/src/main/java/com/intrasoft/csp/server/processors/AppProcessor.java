@@ -36,7 +36,7 @@ public class AppProcessor implements Processor{
         String appUri = cspUtils.getAppUri(appName);
         if(!StringUtils.isEmpty(appUri)){
             LOG.info("DSL - Send to internal application: " + appName + " - " + appUri);
-            camelRestService.send(appUri,integrationData, httpMethod);
+            camelRestService.send(appUri,integrationData, httpMethod, true);
         }else{
             //handle situation
             String msg = "App processor - could not send to app uri - app not found. Provided appName="+appName;

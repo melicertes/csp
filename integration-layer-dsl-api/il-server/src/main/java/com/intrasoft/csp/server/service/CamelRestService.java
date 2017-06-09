@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.intrasoft.csp.commons.exceptions.CspBusinessException;
 import org.apache.camel.*;
+import org.apache.camel.http.common.HttpOperationFailedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,7 +46,17 @@ public class CamelRestService {
         return sendBodyAndHeaders(uri,obj,httpMethod,null);
     }
 
+    public String send(String uri, Object obj, String httpMethod,boolean checkForHttp4xxFailedOperationAndJustLogWithNoGRedelivery) throws IOException {
+        return sendBodyAndHeaders(uri,obj,httpMethod,null,checkForHttp4xxFailedOperationAndJustLogWithNoGRedelivery);
+    }
+
     public String sendBodyAndHeaders(String uri, Object obj, String httpMethod, Map<String,Object> headers) throws JsonProcessingException {
+        return sendBodyAndHeaders(uri, obj, httpMethod, headers, false);
+    }
+
+
+    public String sendBodyAndHeaders(String uri, Object obj, String httpMethod, Map<String,Object> headers,
+                                     boolean checkForHttp4xxFailedOperationAndJustLogWithNoGRedelivery) throws JsonProcessingException {
         byte[] b = objectMapper.writeValueAsBytes(obj);
         Exchange exchange = producerTemplate.send(uri, new Processor() {
             public void process(Exchange exchange) throws Exception {
@@ -66,7 +77,15 @@ public class CamelRestService {
         Boolean isExternalRedelivered = exchange.isExternalRedelivered();
         Boolean isFailed = exchange.isFailed();
         if(isFailed && exception != null){
-            throw new CspBusinessException("Exception in external request: "+exception.getMessage(),exception);
+            if(checkForHttp4xxFailedOperationAndJustLogWithNoGRedelivery
+                    &&  exception.getClass().equals(HttpOperationFailedException.class)
+                    && ((HttpOperationFailedException) exception).getStatusCode()>= 400
+                    && ((HttpOperationFailedException) exception).getStatusCode()< 500){
+                HttpOperationFailedException ef = (HttpOperationFailedException) exception;
+                LOG.error("ENDPOINT "+uri+" responded with statusCode "+ef.getStatusCode() + " "+ef.getStatusText());
+            }else {
+                throw new CspBusinessException("Exception in external request: " + exception.getMessage(), exception);
+            }
         }
         return out;
     }

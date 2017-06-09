@@ -68,13 +68,6 @@ public class TcProcessor implements Processor,CamelRoutes{
         IntegrationData integrationData = exchange.getIn().getBody(IntegrationData.class);
         String httpMethod = (String) exchange.getIn().getHeader(Exchange.HTTP_METHOD);
 
-        //TODO: AUTHENTICATION WITH TC?? TrustCircle will return Header("X-CSRFToken", csrfToken) and Header("Authorization",authorization);
-        /*String csrfToken ="TODO"; //TODO: HOW TO GET IT?
-        String authorization ="TODO";//TODO: NEEDED?
-        Map<String,Object> tcAuthHeaders = new HashMap<>();
-        tcAuthHeaders.put("csrftoken",csrfToken);
-        tcAuthHeaders.put("Authorization",authorization);*/
-
         //make all TC calls
 
         String uri = null;
