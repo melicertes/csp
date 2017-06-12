@@ -1,5 +1,7 @@
 package com.intrasoft.csp.server.service;
 
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.intrasoft.csp.commons.exceptions.CspBusinessException;
@@ -12,6 +14,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -57,6 +60,8 @@ public class CamelRestService {
 
     public String sendBodyAndHeaders(String uri, Object obj, String httpMethod, Map<String,Object> headers,
                                      boolean checkForHttp4xxFailedOperationAndJustLogWithNoGRedelivery) throws JsonProcessingException {
+        //objectMapper.configure(JsonGenerator.Feature.QUOTE_FIELD_NAMES, false);
+        //objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
         byte[] b = objectMapper.writeValueAsBytes(obj);
         Exchange exchange = producerTemplate.send(uri, new Processor() {
             public void process(Exchange exchange) throws Exception {

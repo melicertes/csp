@@ -1,15 +1,15 @@
 package com.intrasoft.csp.commons.exceptions;
 
-public class InvalidDataTypeException extends Exception {
+public class InvalidDataTypeException extends CspBusinessException {
 
-    private static final String message = "EX_DSL_1 “Invalid data type”";
+    private static final long serialVersionUID = -7035022160559563259L;
 
-    public InvalidDataTypeException() {
-        super();
+
+    public InvalidDataTypeException(String message) {
+        super(message);
     }
 
-    @Override
-    public String getMessage() {
-        return message;
+    public InvalidDataTypeException(String message, Throwable cause) {
+        super(message, cause);
     }
 }

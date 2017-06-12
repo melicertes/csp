@@ -140,9 +140,13 @@ public class MockUtils implements ContextUrl {
     public void sendFlow1IntegrationData(MockMvc mvc, Boolean isExternal) throws Exception {
         IntegrationData integrationData = new IntegrationData();
         integrationData.setDataType(IntegrationDataType.INCIDENT);
+        DataParams dataParams = new DataParams();
+        dataParams.setApplicationId("test1");
+        dataParams.setCspId("testCspId");
         SharingParams sharingParams = new SharingParams();
         sharingParams.setIsExternal(isExternal);
         sharingParams.setToShare(true);
+        integrationData.setDataParams(dataParams);
         integrationData.setSharingParams(sharingParams);
         mvc.perform(post("/v"+REST_API_V1+"/"+DSL_INTEGRATION_DATA).accept(MediaType.TEXT_PLAIN)
                 .content(TestUtil.convertObjectToJsonBytes(integrationData))

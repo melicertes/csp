@@ -3,6 +3,7 @@ package com.intrasoft.csp.commons.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.joda.time.DateTime;
 
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -13,9 +14,11 @@ public class DataParams implements Serializable {
 
     private static final long serialVersionUID = -9120520939968768922L;
 
+    @NotNull
     @JsonProperty("cspId")
     private String cspId;
 
+    @NotNull
     @JsonProperty("applicationId")
     private String applicationId;
 

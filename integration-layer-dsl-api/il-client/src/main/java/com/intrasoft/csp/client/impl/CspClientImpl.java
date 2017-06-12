@@ -3,6 +3,7 @@ package com.intrasoft.csp.client.impl;
 import com.intrasoft.csp.client.CspClient;
 import com.intrasoft.csp.commons.client.ApiVersionClient;
 import com.intrasoft.csp.commons.client.RetryRestTemplate;
+import com.intrasoft.csp.commons.exceptions.InvalidDataTypeException;
 import com.intrasoft.csp.commons.model.IntegrationData;
 import com.intrasoft.csp.commons.model.VersionDTO;
 import com.intrasoft.csp.commons.routes.ContextUrl;
@@ -34,7 +35,7 @@ public class CspClientImpl implements CspClient, ContextUrl {
     }
 
     @Override
-    public ResponseEntity<String> postIntegrationData(IntegrationData integrationData, String context) {
+    public ResponseEntity<String> postIntegrationData(IntegrationData integrationData, String context) throws InvalidDataTypeException{
         final String url = apiVersionClient.getApiUrl() + context;
         LOG.debug("API call [post]: " + url);
         ResponseEntity<String> response = retryRestTemplate.exchange(url, HttpMethod.POST, new HttpEntity<Object>(integrationData), String.class);

@@ -2,6 +2,7 @@ package com.intrasoft.csp.commons.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -12,9 +13,11 @@ public class SharingParams implements Serializable {
 
     private static final long serialVersionUID = -1627144414950921949L;
 
+    @NotNull
     @JsonProperty("toShare")
     private Boolean toShare;
 
+    @NotNull
     @JsonProperty("isExternal")
     private Boolean isExternal;
 

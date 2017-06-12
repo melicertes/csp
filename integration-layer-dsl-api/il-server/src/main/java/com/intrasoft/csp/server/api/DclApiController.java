@@ -6,6 +6,7 @@ import com.intrasoft.csp.commons.model.IntegrationData;
 import com.intrasoft.csp.commons.routes.CamelRoutes;
 import com.intrasoft.csp.commons.routes.ContextUrl;
 import com.intrasoft.csp.server.routes.RouteUtils;
+import com.intrasoft.csp.server.service.ApiDataHandler;
 import org.apache.camel.Exchange;
 import org.apache.camel.Produce;
 import org.apache.camel.ProducerTemplate;
@@ -14,6 +15,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.beanvalidation.SpringValidatorAdapter;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -27,8 +31,14 @@ public class DclApiController implements CamelRoutes,ContextUrl{
     @Autowired
     RouteUtils routes;
 
+    @Autowired
+    SpringValidatorAdapter springValidatorAdapter;
+
     @Produce
     private ProducerTemplate producerTemplate;
+
+    @Autowired
+    ApiDataHandler apiDataHandler;
 
     /**
      *
@@ -62,22 +72,6 @@ public class DclApiController implements CamelRoutes,ContextUrl{
 
 
     private ResponseEntity<String> handleIntegrationData(IntegrationData integrationData ,String requestMethod){
-        try {
-            String dataType = integrationData.getDataType().toString();
-
-            if (dataType != null) {
-                producerTemplate.sendBodyAndHeader(routes.apply(EDCL), integrationData, Exchange.HTTP_METHOD, requestMethod);
-            } else {
-                throw new InvalidDataTypeException();
-            }
-
-        } catch (InvalidDataTypeException e) {
-            LOG.warn(e.getMessage());
-            return new ResponseEntity<>(HttpStatusResponseType.MALFORMED_INTEGRATION_DATA_STRUCTURE.getReasonPhrase(),
-                    HttpStatus.BAD_REQUEST);
-        }
-
-        return new ResponseEntity<>(HttpStatusResponseType.SUCCESSFUL_OPERATION.getReasonPhrase(),
-                HttpStatus.OK);
+        return apiDataHandler.handleIntegrationData(routes.apply(EDCL),integrationData,requestMethod);
     }
 }

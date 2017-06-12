@@ -2,9 +2,7 @@ package com.intrasoft.csp.client.config;
 
 import com.intrasoft.csp.commons.client.CommonRetryPolicy;
 import com.intrasoft.csp.commons.client.RetryRestTemplate;
-import com.intrasoft.csp.commons.exceptions.CommonExceptionHandler;
-import com.intrasoft.csp.commons.exceptions.CspGeneralException;
-import com.intrasoft.csp.commons.exceptions.ExceptionHandler;
+import com.intrasoft.csp.commons.exceptions.*;
 import org.apache.http.client.HttpClient;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
@@ -56,6 +54,7 @@ public class CspRestTemplateConfiguration {
 
     static {
         SUPPORTED_EXCEPTIONS.put(CspGeneralException.class.getName(), CspGeneralException::new);
+        SUPPORTED_EXCEPTIONS.put(InvalidDataTypeException.class.getName(), InvalidDataTypeException::new);
 
     }
 
