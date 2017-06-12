@@ -8,7 +8,9 @@ import org.apache.camel.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 /**
  * Created by iskitsas on 4/10/17.
@@ -18,6 +20,9 @@ public class EcspProcessor implements Processor{
     private static final Logger LOG = LoggerFactory.getLogger(EcspProcessor.class);
     @Produce
     ProducerTemplate producerTemplate;
+
+    @Value("${server.subdomain.prefix}")
+    String serverSubdomainPrefix;
 
     @Autowired
     CamelRestService camelRestService;
@@ -38,7 +43,9 @@ public class EcspProcessor implements Processor{
             if(uri.contains("http")) {
                 uri = uri.replaceAll("http", cspSslConfiguration.getExternalSslEndpointProtocol());
             }else{
-                uri = cspSslConfiguration.getExternalSslEndpointProtocol()+"://"+uri;
+                uri = cspSslConfiguration.getExternalSslEndpointProtocol()+"://"
+                        +(!StringUtils.isEmpty(serverSubdomainPrefix)?serverSubdomainPrefix+".":"")
+                        +uri;
             }
         }
         LOG.info("URI resolved: "+uri);
