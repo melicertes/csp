@@ -3,6 +3,8 @@ package com.intrasoft.csp.commons.model;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
+import java.util.HashMap;
+
 /**
  * Gets or Sets IntegrationDataType
  */
@@ -49,5 +51,24 @@ public enum IntegrationDataType {
     }
     return null;
   }
+
+  public static final HashMap<IntegrationDataType, String> trustCircleShortName;
+
+  static
+  {
+      trustCircleShortName = new HashMap<IntegrationDataType, String>();
+      trustCircleShortName.put(IntegrationDataType.ARTEFACT, "artefact");
+      trustCircleShortName.put(IntegrationDataType.CHAT, "chat");
+      trustCircleShortName.put(IntegrationDataType.CONTACT, "contact");
+      trustCircleShortName.put(IntegrationDataType.DUMMY, "dummy");
+      trustCircleShortName.put(IntegrationDataType.EVENT, "event");
+      trustCircleShortName.put(IntegrationDataType.FILE, "file");
+      trustCircleShortName.put(IntegrationDataType.INCIDENT, "incident");
+      trustCircleShortName.put(IntegrationDataType.THREAT, "threat");
+      trustCircleShortName.put(IntegrationDataType.TRUSTCIRCLE, "csp_all");
+  }
+
 }
+
+
 

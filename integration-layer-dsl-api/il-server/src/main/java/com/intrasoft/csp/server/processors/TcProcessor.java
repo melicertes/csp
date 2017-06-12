@@ -2,10 +2,7 @@ package com.intrasoft.csp.server.processors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.intrasoft.csp.commons.exceptions.CspBusinessException;
-import com.intrasoft.csp.commons.model.EnhancedTeamDTO;
-import com.intrasoft.csp.commons.model.IntegrationData;
-import com.intrasoft.csp.commons.model.Team;
-import com.intrasoft.csp.commons.model.TrustCircle;
+import com.intrasoft.csp.commons.model.*;
 import com.intrasoft.csp.commons.routes.CamelRoutes;
 import com.intrasoft.csp.server.service.CamelRestService;
 import com.intrasoft.csp.server.routes.RouteUtils;
@@ -74,7 +71,7 @@ public class TcProcessor implements Processor,CamelRoutes{
         String getAllTcUri = this.getTcCirclesURI();
         List<TrustCircle> tcList = camelRestService.sendAndGetList(getAllTcUri, null,  HttpMethod.GET.name(), TrustCircle.class,null);
 
-        Optional<TrustCircle> optionalTc  = tcList.stream().filter(t->t.getShortName().toLowerCase().contains(integrationData.getDataType().toString().toLowerCase())).findAny();
+        Optional<TrustCircle> optionalTc  = tcList.stream().filter(t->t.getShortName().toLowerCase().contains(IntegrationDataType.trustCircleShortName.get(integrationData.getDataType()).toString().toLowerCase())).findAny();
 
         if(optionalTc.isPresent()){
             uri = this.getTcCirclesURI() + "/" + optionalTc.get().getId();
@@ -123,6 +120,7 @@ public class TcProcessor implements Processor,CamelRoutes{
     }
 
     private void handleExternalDclFlowAndSendToDSL(Exchange exchange,String httpMethod,List<Team> teams, IntegrationData integrationData){
+
         boolean authorized = teams.stream().anyMatch(t->t.getShortName().toLowerCase().equals(integrationData.getDataParams().getCspId().toLowerCase()));
         LOG.info("Authorized (cspId or shortName="+integrationData.getDataParams().getCspId().toLowerCase()+"): "+authorized);
         if (authorized){
