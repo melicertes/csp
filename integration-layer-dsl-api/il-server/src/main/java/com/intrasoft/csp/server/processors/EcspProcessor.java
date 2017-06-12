@@ -35,8 +35,13 @@ public class EcspProcessor implements Processor{
         String uri = enhancedTeamDTO.getTeam().getUrl() + "/v"+ContextUrl.REST_API_V1+ContextUrl.DCL_INTEGRATION_DATA;
         //external certificate
         if(cspSslConfiguration.getExternalUseSSL()){
-            uri = uri.replaceAll("http",cspSslConfiguration.getExternalSslEndpointProtocol());
+            if(uri.contains("http")) {
+                uri = uri.replaceAll("http", cspSslConfiguration.getExternalSslEndpointProtocol());
+            }else{
+                uri = cspSslConfiguration.getExternalSslEndpointProtocol()+"://"+uri;
+            }
         }
+        LOG.info("URI resolved: "+uri);
         String response = camelRestService.send(uri, enhancedTeamDTO.getIntegrationData(), httpMethod);
 
     }

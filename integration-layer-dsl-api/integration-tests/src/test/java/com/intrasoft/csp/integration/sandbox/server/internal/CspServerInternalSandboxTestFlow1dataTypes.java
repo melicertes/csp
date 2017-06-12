@@ -209,10 +209,10 @@ public class CspServerInternalSandboxTestFlow1dataTypes implements CamelRoutes {
     @Test
     public void testDslFlow1PostDataTypeTrustcircle() throws Exception {
         Mockito.when(camelRestService.sendAndGetList(anyString(), anyObject(), eq("GET"), eq(TrustCircle.class), anyObject()))
-                .thenReturn(mockUtils.getAllMockedTrustCircles(this.numOfCspsToTest, IntegrationDataType.TRUSTCIRCLE.name()));
+                .thenReturn(mockUtils.getAllMockedTrustCircles(this.numOfCspsToTest, IntegrationDataType.TRUSTCIRCLE.toString()));
 
         Mockito.when(camelRestService.send(anyString(), anyObject(), eq("GET"), eq(TrustCircle.class)))
-                .thenReturn(mockUtils.getMockedTrustCircle(this.numOfCspsToTest, IntegrationDataType.TRUSTCIRCLE.name()));
+                .thenReturn(mockUtils.getMockedTrustCircle(this.numOfCspsToTest, IntegrationDataType.TRUSTCIRCLE.toString()));
 
         mockUtils.sendFlow1Data(mvc, false, true, IntegrationDataType.TRUSTCIRCLE, "POST");
 
@@ -226,10 +226,10 @@ public class CspServerInternalSandboxTestFlow1dataTypes implements CamelRoutes {
     @Test
     public void testDslFlow1PutDataTypeTrustcircle() throws Exception {
         Mockito.when(camelRestService.sendAndGetList(anyString(), anyObject(), eq("GET"), eq(TrustCircle.class), anyObject()))
-                .thenReturn(mockUtils.getAllMockedTrustCircles(this.numOfCspsToTest, IntegrationDataType.TRUSTCIRCLE.name()));
+                .thenReturn(mockUtils.getAllMockedTrustCircles(this.numOfCspsToTest, IntegrationDataType.TRUSTCIRCLE.toString()));
 
         Mockito.when(camelRestService.send(anyString(), anyObject(), eq("GET"), eq(TrustCircle.class)))
-                .thenReturn(mockUtils.getMockedTrustCircle(this.numOfCspsToTest, IntegrationDataType.TRUSTCIRCLE.name()));
+                .thenReturn(mockUtils.getMockedTrustCircle(this.numOfCspsToTest, IntegrationDataType.TRUSTCIRCLE.toString()));
 
         mockUtils.sendFlow1Data(mvc, false, true, IntegrationDataType.TRUSTCIRCLE, "PUT");
 
