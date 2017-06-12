@@ -22,9 +22,11 @@ public class DataParams implements Serializable {
     @JsonProperty("applicationId")
     private String applicationId;
 
+    @NotNull
     @JsonProperty("recordId")
     private String recordId;
 
+    @NotNull
     @JsonProperty("dateTime")
     private DateTime dateTime;
 

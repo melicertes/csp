@@ -11,6 +11,7 @@ import com.intrasoft.csp.commons.routes.ContextUrl;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.model.RouteDefinition;
 import org.apache.camel.spring.SpringCamelContext;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -140,13 +141,17 @@ public class MockUtils implements ContextUrl {
     public void sendFlow1IntegrationData(MockMvc mvc, Boolean isExternal) throws Exception {
         IntegrationData integrationData = new IntegrationData();
         integrationData.setDataType(IntegrationDataType.INCIDENT);
+
         DataParams dataParams = new DataParams();
         dataParams.setApplicationId("test1");
         dataParams.setCspId("testCspId");
+        dataParams.setRecordId("recordId");
+        dataParams.setDateTime(DateTime.now());
         SharingParams sharingParams = new SharingParams();
         sharingParams.setIsExternal(isExternal);
         sharingParams.setToShare(true);
         integrationData.setDataParams(dataParams);
+        integrationData.setDataObject(dataParams);
         integrationData.setSharingParams(sharingParams);
         mvc.perform(post("/v"+REST_API_V1+"/"+DSL_INTEGRATION_DATA).accept(MediaType.TEXT_PLAIN)
                 .content(TestUtil.convertObjectToJsonBytes(integrationData))
@@ -171,6 +176,7 @@ public class MockUtils implements ContextUrl {
         integrationData.setSharingParams(sharingParams);
         DataParams dataParams = new DataParams();
         dataParams.setRecordId("222");
+        dataParams.setDateTime(DateTime.now());
         dataParams.setApplicationId(applicationId);
         dataParams.setCspId("CERT-GR");
         integrationData.setDataParams(dataParams);
@@ -211,6 +217,7 @@ public class MockUtils implements ContextUrl {
         DataParams dataParams = new DataParams();
         dataParams.setRecordId("222");
         dataParams.setApplicationId(applicationId);
+        dataParams.setDateTime(DateTime.now());
         dataParams.setCspId(cspId);
         integrationData.setDataParams(dataParams);
         integrationData.setDataObject("{\"t\":\"1234\"}");

@@ -32,6 +32,7 @@ public class IntegrationData implements Serializable {
     @JsonProperty("dataType")
     private IntegrationDataType dataType;
 
+    @NotNull
     @JsonProperty("dataObject")
     private Object dataObject;
 
