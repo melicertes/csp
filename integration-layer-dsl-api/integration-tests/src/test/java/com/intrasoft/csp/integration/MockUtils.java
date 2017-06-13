@@ -46,7 +46,7 @@ public class MockUtils implements ContextUrl {
     public TrustCircle getMockedTrustCircle(int count){
         TrustCircle trustCircle = new TrustCircle();
         trustCircle.setId("dummyId");
-        trustCircle.setShortName("incident");
+        trustCircle.setShortName("CTC::SHARING_DATA_INCIDENT");
         //List<String> listCsps = new ArrayList<>();
         List<String> teamList = new ArrayList<>();
         for(int i=0; i< count;i++) {
@@ -64,10 +64,10 @@ public class MockUtils implements ContextUrl {
     }
 
 
-    public TrustCircle getMockedTrustCircle(int count, String dataType){
+    public TrustCircle getMockedTrustCircle(int count, String shortName){
         TrustCircle trustCircle = new TrustCircle();
         trustCircle.setId("dummyId");
-        trustCircle.setShortName(dataType);
+        trustCircle.setShortName(shortName);
         //List<String> listCsps = new ArrayList<>();
         List<String> teamList = new ArrayList<>();
         for(int i=0; i< count;i++) {
@@ -78,9 +78,9 @@ public class MockUtils implements ContextUrl {
         return trustCircle;
     }
 
-    public List<TrustCircle> getAllMockedTrustCircles(int count, String dataType){
+    public List<TrustCircle> getAllMockedTrustCircles(int count, String shortName){
         List<TrustCircle> ret= new ArrayList<>();
-        ret.add(getMockedTrustCircle(count, dataType));
+        ret.add(getMockedTrustCircle(count, shortName));
         return ret;
     }
 

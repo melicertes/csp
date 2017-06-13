@@ -28,7 +28,7 @@ public enum IntegrationDataType {
 
   VULNERABILITY("vulnerability"),
 
-  TRUSTCIRCLE("csp_all");
+  TRUSTCIRCLE("trustCircle");
 
   private String value;
 
@@ -50,6 +50,23 @@ public enum IntegrationDataType {
       }
     }
     return null;
+  }
+
+  public static final HashMap<IntegrationDataType, String> tcNamingConventionForShortName;
+
+  static
+  {
+    tcNamingConventionForShortName = new HashMap<>();
+    tcNamingConventionForShortName.put(IntegrationDataType.VULNERABILITY, "CTC::SHARING_DATA_VULNERABILITY");
+    tcNamingConventionForShortName.put(IntegrationDataType.ARTEFACT, "CTC::SHARING_DATA_ARTEFACT");
+    tcNamingConventionForShortName.put(IntegrationDataType.CHAT, "CTC::SHARING_DATA_CHAT");
+    tcNamingConventionForShortName.put(IntegrationDataType.CONTACT, "CTC::SHARING_DATA_CONTACT");
+    tcNamingConventionForShortName.put(IntegrationDataType.DUMMY, "dummy");
+    tcNamingConventionForShortName.put(IntegrationDataType.EVENT, "CTC::SHARING_DATA_EVENT");
+    tcNamingConventionForShortName.put(IntegrationDataType.FILE, "CTC::SHARING_DATA_FILE");
+    tcNamingConventionForShortName.put(IntegrationDataType.INCIDENT, "CTC::SHARING_DATA_INCIDENT");
+    tcNamingConventionForShortName.put(IntegrationDataType.THREAT, "CTC::SHARING_DATA_THREAT");
+    tcNamingConventionForShortName.put(IntegrationDataType.TRUSTCIRCLE, "CTC::CSP_ALL");
   }
 }
 

@@ -4,6 +4,7 @@ import com.intrasoft.csp.commons.apiHttpStatusResponse.HttpStatusResponseType;
 import com.intrasoft.csp.commons.exceptions.InvalidDataTypeException;
 import com.intrasoft.csp.commons.model.IntegrationData;
 import com.intrasoft.csp.commons.routes.CamelRoutes;
+import com.intrasoft.csp.commons.validators.IntegrationDataValidator;
 import com.intrasoft.csp.server.api.DclApiController;
 import com.intrasoft.csp.server.routes.RouteUtils;
 import org.apache.camel.Exchange;
@@ -30,14 +31,14 @@ public class ApiDataHandler implements CamelRoutes{
     RouteUtils routes;
 
     @Autowired
-    SpringValidatorAdapter springValidatorAdapter;
+    IntegrationDataValidator integrationDataValidator;
 
     @Produce
     private ProducerTemplate producerTemplate;
 
     public ResponseEntity<String> handleIntegrationData(String route, IntegrationData integrationData , String requestMethod){
         BindingResult bindingResult = new BeanPropertyBindingResult(integrationData,"integrationData");
-        springValidatorAdapter.validate(integrationData, bindingResult);
+        integrationDataValidator.validate(integrationData, bindingResult);
         if(bindingResult.hasErrors()){
             throw new InvalidDataTypeException(bindingResult.getAllErrors().toString());
         }

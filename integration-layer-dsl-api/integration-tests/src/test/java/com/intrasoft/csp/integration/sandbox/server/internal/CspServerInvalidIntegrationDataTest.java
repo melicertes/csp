@@ -5,6 +5,8 @@ import com.intrasoft.csp.commons.apiHttpStatusResponse.HttpStatusResponseType;
 import com.intrasoft.csp.commons.exceptions.InvalidDataTypeException;
 import com.intrasoft.csp.commons.model.DataParams;
 import com.intrasoft.csp.commons.model.IntegrationData;
+import com.intrasoft.csp.commons.model.IntegrationDataType;
+import com.intrasoft.csp.commons.model.SharingParams;
 import com.intrasoft.csp.commons.routes.CamelRoutes;
 import com.intrasoft.csp.commons.routes.ContextUrl;
 import com.intrasoft.csp.integration.MockUtils;
@@ -12,14 +14,22 @@ import com.intrasoft.csp.integration.TestUtil;
 import com.intrasoft.csp.server.CspApp;
 import org.apache.camel.test.spring.CamelSpringBootRunner;
 import org.apache.camel.test.spring.MockEndpointsAndSkip;
+import org.joda.time.DateTime;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.mock.http.MockHttpOutputMessage;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
+
+import java.io.IOException;
+import java.util.Arrays;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertThat;
@@ -50,6 +60,16 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
 public class CspServerInvalidIntegrationDataTest implements CamelRoutes, ContextUrl{
     private MockMvc mvc;
 
+    private HttpMessageConverter mappingJackson2HttpMessageConverter;
+
+    @Autowired
+    void setConverters(HttpMessageConverter<?>[] converters) {
+        this.mappingJackson2HttpMessageConverter = Arrays.asList(converters)
+                .stream().filter(hmc -> hmc instanceof MappingJackson2HttpMessageConverter)
+                .findAny().get();
+        Assert.assertNotNull("The JSON message converter must not be null", this.mappingJackson2HttpMessageConverter);
+    }
+
     @Autowired
     CspClient cspClient;
 
@@ -76,5 +96,62 @@ public class CspServerInvalidIntegrationDataTest implements CamelRoutes, Context
             assertThat(e.getMessage(),containsString("Field error in object 'integrationData'"));
         }
 
+    }
+
+    @Test
+    public void InvalidJsonDataObjectTest(){
+        IntegrationData integrationData = new IntegrationData();
+        integrationData.setDataType(IntegrationDataType.VULNERABILITY);
+        SharingParams sharingParams = new SharingParams();
+        sharingParams.setIsExternal(true);
+        sharingParams.setToShare(false);
+        integrationData.setSharingParams(sharingParams);
+        DataParams dataParams = new DataParams();
+        dataParams.setRecordId("222");
+        dataParams.setApplicationId("appId");
+        dataParams.setDateTime(DateTime.now());
+        dataParams.setCspId("cspId");
+        integrationData.setDataParams(dataParams);
+        integrationData.setDataObject("{t\":\"1234\"}");
+        try {
+        cspClient.postIntegrationData(integrationData, DSL_INTEGRATION_DATA);
+            fail("Expected InvalidDataTypeException exception");
+        }catch (InvalidDataTypeException e){
+            assertThat(e.getMessage(),containsString("IntegrationData.dataObject is not a valid json"));
+        }
+    }
+
+    @Test
+    public void test() throws Exception {
+        IntegrationData integrationData = new IntegrationData();
+        integrationData.setDataType(IntegrationDataType.VULNERABILITY);
+        SharingParams sharingParams = new SharingParams();
+        sharingParams.setIsExternal(true);
+        sharingParams.setToShare(false);
+        integrationData.setSharingParams(sharingParams);
+        DataParams dataParams = new DataParams();
+        dataParams.setRecordId("222");
+        dataParams.setApplicationId("appId");
+        dataParams.setDateTime(DateTime.now());
+        dataParams.setCspId("cspId");
+        integrationData.setDataParams(dataParams);
+        integrationData.setDataObject("{t\":\"1234\"}");
+        String j = "{\"dataParams\":" +
+                "{\"cspId\":\"cspId\",\"applicationId\":\"appId\",\"recordId\":\"222\",\"dateTime\":\"2017-06-13T09:52:53+0000\"}," +
+                "\"sharingParams\":{\"toShare\":false,\"isExternal\":true},\"dataType\":\"vulnerability\"," +
+                "\"dataObject\":{\"t\":\"1234\"}}";
+        String jsonToSend = json(integrationData);
+        mvc.perform(post("/v"+REST_API_V1+"/"+DSL_INTEGRATION_DATA).accept(MediaType.TEXT_PLAIN)
+                .content(j)
+                .contentType(TestUtil.APPLICATION_JSON_UTF8))
+                .andExpect(status().isOk())
+                .andExpect(content().string(HttpStatusResponseType.SUCCESSFUL_OPERATION.getReasonPhrase()));
+
+    }
+
+    protected String json(Object object) throws IOException {
+        MockHttpOutputMessage mockHttpOutputMessage = new MockHttpOutputMessage();
+        this.mappingJackson2HttpMessageConverter.write(object, MediaType.APPLICATION_JSON, mockHttpOutputMessage);
+        return mockHttpOutputMessage.getBodyAsString();
     }
 }

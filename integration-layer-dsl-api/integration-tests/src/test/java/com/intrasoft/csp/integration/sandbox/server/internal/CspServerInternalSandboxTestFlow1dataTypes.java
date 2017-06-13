@@ -141,10 +141,10 @@ public class CspServerInternalSandboxTestFlow1dataTypes implements CamelRoutes {
     @Test
     public void testDslFlow1PostDataTypeThreat() throws Exception {
         Mockito.when(camelRestService.sendAndGetList(anyString(), anyObject(), eq("GET"), eq(TrustCircle.class), anyObject()))
-                .thenReturn(mockUtils.getAllMockedTrustCircles(this.numOfCspsToTest, IntegrationDataType.THREAT.name()));
+                .thenReturn(mockUtils.getAllMockedTrustCircles(this.numOfCspsToTest, IntegrationDataType.tcNamingConventionForShortName.get(IntegrationDataType.THREAT)));
 
         Mockito.when(camelRestService.send(anyString(), anyObject(), eq("GET"), eq(TrustCircle.class)))
-                .thenReturn(mockUtils.getMockedTrustCircle(this.numOfCspsToTest, IntegrationDataType.THREAT.name()));
+                .thenReturn(mockUtils.getMockedTrustCircle(this.numOfCspsToTest, IntegrationDataType.tcNamingConventionForShortName.get(IntegrationDataType.THREAT)));
 
         mockUtils.sendFlow1Data(mvc, false, true, IntegrationDataType.THREAT, "POST");
 
@@ -158,10 +158,10 @@ public class CspServerInternalSandboxTestFlow1dataTypes implements CamelRoutes {
     @Test
     public void testDslFlow1PutDataTypeThreat() throws Exception {
         Mockito.when(camelRestService.sendAndGetList(anyString(), anyObject(), eq("GET"), eq(TrustCircle.class), anyObject()))
-                .thenReturn(mockUtils.getAllMockedTrustCircles(this.numOfCspsToTest, IntegrationDataType.THREAT.name()));
+                .thenReturn(mockUtils.getAllMockedTrustCircles(this.numOfCspsToTest, IntegrationDataType.tcNamingConventionForShortName.get(IntegrationDataType.THREAT)));
 
         Mockito.when(camelRestService.send(anyString(), anyObject(), eq("GET"), eq(TrustCircle.class)))
-                .thenReturn(mockUtils.getMockedTrustCircle(this.numOfCspsToTest, IntegrationDataType.THREAT.name()));
+                .thenReturn(mockUtils.getMockedTrustCircle(this.numOfCspsToTest, IntegrationDataType.tcNamingConventionForShortName.get(IntegrationDataType.THREAT)));
 
         mockUtils.sendFlow1Data(mvc, false, true, IntegrationDataType.THREAT, "PUT");
 
@@ -175,10 +175,10 @@ public class CspServerInternalSandboxTestFlow1dataTypes implements CamelRoutes {
     @Test
     public void testDslFlow1PostDataTypeArtefact() throws Exception {
         Mockito.when(camelRestService.sendAndGetList(anyString(), anyObject(), eq("GET"), eq(TrustCircle.class), anyObject()))
-                .thenReturn(mockUtils.getAllMockedTrustCircles(this.numOfCspsToTest, IntegrationDataType.ARTEFACT.name()));
+                .thenReturn(mockUtils.getAllMockedTrustCircles(this.numOfCspsToTest, IntegrationDataType.tcNamingConventionForShortName.get(IntegrationDataType.ARTEFACT)));
 
         Mockito.when(camelRestService.send(anyString(), anyObject(), eq("GET"), eq(TrustCircle.class)))
-                .thenReturn(mockUtils.getMockedTrustCircle(this.numOfCspsToTest, IntegrationDataType.ARTEFACT.name()));
+                .thenReturn(mockUtils.getMockedTrustCircle(this.numOfCspsToTest, IntegrationDataType.tcNamingConventionForShortName.get(IntegrationDataType.ARTEFACT)));
 
         mockUtils.sendFlow1Data(mvc, false, true, IntegrationDataType.ARTEFACT, "POST");
 
@@ -192,10 +192,10 @@ public class CspServerInternalSandboxTestFlow1dataTypes implements CamelRoutes {
     @Test
     public void testDslFlow1PutDataTypeArtefact() throws Exception {
         Mockito.when(camelRestService.sendAndGetList(anyString(), anyObject(), eq("GET"), eq(TrustCircle.class), anyObject()))
-                .thenReturn(mockUtils.getAllMockedTrustCircles(this.numOfCspsToTest, IntegrationDataType.ARTEFACT.name()));
+                .thenReturn(mockUtils.getAllMockedTrustCircles(this.numOfCspsToTest, IntegrationDataType.tcNamingConventionForShortName.get(IntegrationDataType.ARTEFACT)));
 
         Mockito.when(camelRestService.send(anyString(), anyObject(), eq("GET"), eq(TrustCircle.class)))
-                .thenReturn(mockUtils.getMockedTrustCircle(this.numOfCspsToTest, IntegrationDataType.ARTEFACT.name()));
+                .thenReturn(mockUtils.getMockedTrustCircle(this.numOfCspsToTest, IntegrationDataType.tcNamingConventionForShortName.get(IntegrationDataType.ARTEFACT)));
 
         mockUtils.sendFlow1Data(mvc, false, true, IntegrationDataType.ARTEFACT, "PUT");
 
@@ -209,10 +209,10 @@ public class CspServerInternalSandboxTestFlow1dataTypes implements CamelRoutes {
     @Test
     public void testDslFlow1PostDataTypeTrustcircle() throws Exception {
         Mockito.when(camelRestService.sendAndGetList(anyString(), anyObject(), eq("GET"), eq(TrustCircle.class), anyObject()))
-                .thenReturn(mockUtils.getAllMockedTrustCircles(this.numOfCspsToTest, IntegrationDataType.TRUSTCIRCLE.toString()));
+                .thenReturn(mockUtils.getAllMockedTrustCircles(this.numOfCspsToTest, IntegrationDataType.tcNamingConventionForShortName.get(IntegrationDataType.TRUSTCIRCLE)));
 
         Mockito.when(camelRestService.send(anyString(), anyObject(), eq("GET"), eq(TrustCircle.class)))
-                .thenReturn(mockUtils.getMockedTrustCircle(this.numOfCspsToTest, IntegrationDataType.TRUSTCIRCLE.toString()));
+                .thenReturn(mockUtils.getMockedTrustCircle(this.numOfCspsToTest, IntegrationDataType.tcNamingConventionForShortName.get(IntegrationDataType.TRUSTCIRCLE)));
 
         mockUtils.sendFlow1Data(mvc, false, true, IntegrationDataType.TRUSTCIRCLE, "POST");
 
@@ -226,10 +226,10 @@ public class CspServerInternalSandboxTestFlow1dataTypes implements CamelRoutes {
     @Test
     public void testDslFlow1PutDataTypeTrustcircle() throws Exception {
         Mockito.when(camelRestService.sendAndGetList(anyString(), anyObject(), eq("GET"), eq(TrustCircle.class), anyObject()))
-                .thenReturn(mockUtils.getAllMockedTrustCircles(this.numOfCspsToTest, IntegrationDataType.TRUSTCIRCLE.toString()));
+                .thenReturn(mockUtils.getAllMockedTrustCircles(this.numOfCspsToTest, IntegrationDataType.tcNamingConventionForShortName.get(IntegrationDataType.TRUSTCIRCLE)));
 
         Mockito.when(camelRestService.send(anyString(), anyObject(), eq("GET"), eq(TrustCircle.class)))
-                .thenReturn(mockUtils.getMockedTrustCircle(this.numOfCspsToTest, IntegrationDataType.TRUSTCIRCLE.toString()));
+                .thenReturn(mockUtils.getMockedTrustCircle(this.numOfCspsToTest, IntegrationDataType.tcNamingConventionForShortName.get(IntegrationDataType.TRUSTCIRCLE)));
 
         mockUtils.sendFlow1Data(mvc, false, true, IntegrationDataType.TRUSTCIRCLE, "PUT");
 
