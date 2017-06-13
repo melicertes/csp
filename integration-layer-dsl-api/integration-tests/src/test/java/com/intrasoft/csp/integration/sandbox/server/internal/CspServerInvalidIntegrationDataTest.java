@@ -55,6 +55,10 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
                 "csp.retry.maxAttempts:1",
                 "embedded.activemq.start:false",
                 "apache.camel.use.activemq:false",
+                "external.use.ssl:false",
+                "internal.use.ssl:false",
+                "misp.protocol:http",
+                "taranis.protocol:http",
         })
 @MockEndpointsAndSkip("http:*")
 public class CspServerInvalidIntegrationDataTest implements CamelRoutes, ContextUrl{
@@ -112,17 +116,28 @@ public class CspServerInvalidIntegrationDataTest implements CamelRoutes, Context
         dataParams.setDateTime(DateTime.now());
         dataParams.setCspId("cspId");
         integrationData.setDataParams(dataParams);
-        integrationData.setDataObject("{t\":\"1234\"}");
+        integrationData.setDataObject(null);
         try {
         cspClient.postIntegrationData(integrationData, DSL_INTEGRATION_DATA);
             fail("Expected InvalidDataTypeException exception");
         }catch (InvalidDataTypeException e){
-            assertThat(e.getMessage(),containsString("IntegrationData.dataObject is not a valid json"));
+            assertThat(e.getMessage(),containsString(HttpStatusResponseType.MALFORMED_INTEGRATION_DATA_STRUCTURE.getReasonPhrase()));
         }
     }
 
     @Test
-    public void test() throws Exception {
+    public void integrationDataJsonTest() throws Exception {
+        String jsonStr = "{\"dataParams\":" +
+                "{\"cspId\":\"cspId\",\"applicationId\":\"appId\",\"recordId\":\"222\",\"dateTime\":\"2017-06-13T09:52:53+0000\"}," +
+                "\"sharingParams\":{\"toShare\":false,\"isExternal\":true},\"dataType\":\"vulnerability\"," +
+                "\"dataObject\":{\"t\":\"1234\"}}";
+
+        mvc.perform(post("/v"+REST_API_V1+"/"+DSL_INTEGRATION_DATA).accept(MediaType.TEXT_PLAIN)
+                .content(jsonStr)
+                .contentType(TestUtil.APPLICATION_JSON_UTF8))
+                .andExpect(status().isOk())
+                .andExpect(content().string(HttpStatusResponseType.SUCCESSFUL_OPERATION.getReasonPhrase()));
+
         IntegrationData integrationData = new IntegrationData();
         integrationData.setDataType(IntegrationDataType.VULNERABILITY);
         SharingParams sharingParams = new SharingParams();
@@ -135,14 +150,10 @@ public class CspServerInvalidIntegrationDataTest implements CamelRoutes, Context
         dataParams.setDateTime(DateTime.now());
         dataParams.setCspId("cspId");
         integrationData.setDataParams(dataParams);
-        integrationData.setDataObject("{t\":\"1234\"}");
-        String j = "{\"dataParams\":" +
-                "{\"cspId\":\"cspId\",\"applicationId\":\"appId\",\"recordId\":\"222\",\"dateTime\":\"2017-06-13T09:52:53+0000\"}," +
-                "\"sharingParams\":{\"toShare\":false,\"isExternal\":true},\"dataType\":\"vulnerability\"," +
-                "\"dataObject\":{\"t\":\"1234\"}}";
-        String jsonToSend = json(integrationData);
+        integrationData.setDataObject(25d);
+        jsonStr = json(integrationData);
         mvc.perform(post("/v"+REST_API_V1+"/"+DSL_INTEGRATION_DATA).accept(MediaType.TEXT_PLAIN)
-                .content(j)
+                .content(jsonStr)
                 .contentType(TestUtil.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())
                 .andExpect(content().string(HttpStatusResponseType.SUCCESSFUL_OPERATION.getReasonPhrase()));

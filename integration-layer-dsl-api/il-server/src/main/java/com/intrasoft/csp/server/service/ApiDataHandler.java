@@ -36,26 +36,14 @@ public class ApiDataHandler implements CamelRoutes{
     @Produce
     private ProducerTemplate producerTemplate;
 
-    public ResponseEntity<String> handleIntegrationData(String route, IntegrationData integrationData , String requestMethod){
-        BindingResult bindingResult = new BeanPropertyBindingResult(integrationData,"integrationData");
+    public ResponseEntity<String> handleIntegrationData(String route, IntegrationData integrationData, String requestMethod) {
+        BindingResult bindingResult = new BeanPropertyBindingResult(integrationData, "integrationData");
         integrationDataValidator.validate(integrationData, bindingResult);
-        if(bindingResult.hasErrors()){
+        if (bindingResult.hasErrors()) {
             throw new InvalidDataTypeException(bindingResult.getAllErrors().toString());
         }
-        try {
-            String dataType = integrationData.getDataType().toString();
 
-            if (dataType != null) {
-                producerTemplate.sendBodyAndHeader(route, integrationData, Exchange.HTTP_METHOD, requestMethod);
-            } else {
-                throw new InvalidDataTypeException("No dataType was provided. IntegrationData: "+integrationData.toString());
-            }
-
-        } catch (InvalidDataTypeException e) {
-            LOG.warn(e.getMessage());
-            return new ResponseEntity<>(HttpStatusResponseType.MALFORMED_INTEGRATION_DATA_STRUCTURE.getReasonPhrase(),
-                    HttpStatus.BAD_REQUEST);
-        }
+        producerTemplate.sendBodyAndHeader(route, integrationData, Exchange.HTTP_METHOD, requestMethod);
 
         return new ResponseEntity<>(HttpStatusResponseType.SUCCESSFUL_OPERATION.getReasonPhrase(),
                 HttpStatus.OK);

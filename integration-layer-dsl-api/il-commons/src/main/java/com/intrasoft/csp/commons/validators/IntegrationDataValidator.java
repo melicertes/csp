@@ -41,6 +41,11 @@ public class IntegrationDataValidator implements Validator {
 
         //custom rules
         try {
+            // This isValidJson is redundant since the validity has already been checked by spring jackson mapper when received the
+            // message at the controller. In case of an invalid json the platorm will have already thrown an exception,
+            // handled by CspExceptionHandlingController.
+            // Will leave this section of code to demonstrate how someone can enhance the existing SpringValidatorAdapter
+            // with custom rules.
             boolean isValidJson = isValidJSON(((IntegrationData)obj).getDataObject());
             if(!isValidJson){
                 errors.reject("IntegrationData.dataObject is not a valid json. ","integrationdata.dataobject.not.valid");
@@ -60,20 +65,6 @@ public class IntegrationDataValidator implements Validator {
         } catch(JsonProcessingException e){
             valid = false;
         }
-        //return json !=null && valid && isValidJSON(json);
         return valid;
-    }
-
-    public boolean isValidJSON(String json) {
-        try {
-            new JSONObject(json);
-        } catch (JSONException ex) {
-            try {
-                new JSONArray(json);
-            } catch (JSONException ex1) {
-                return false;
-            }
-        }
-        return true;
     }
 }
