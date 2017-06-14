@@ -53,7 +53,7 @@ public class DdlProcessor implements Processor,CamelRoutes {
         }
 
         if (enableElastic){
-            recipients.add(routes.apply(ELASTIC));
+            recipients.add(routes.apply(ELASTIC));//TODO: if trustCircle, it should not send it to Elastic
             //producerTemplate.sendBodyAndHeader(routes.apply(ELASTIC), ExchangePattern.InOut,integrationData, Exchange.HTTP_METHOD, httpMethod);
         }
 

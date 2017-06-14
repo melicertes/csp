@@ -91,7 +91,7 @@ public class TcProcessor implements Processor,CamelRoutes{
                         "Team: "+team.toString());
             }
 
-            if (!team.getShortName().equals(serverName)){
+            if (!team.getShortName().toLowerCase().trim().equals(serverName.toLowerCase().trim())){
                 teams.add(team);
             }
         }

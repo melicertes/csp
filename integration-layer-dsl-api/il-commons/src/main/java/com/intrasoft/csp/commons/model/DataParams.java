@@ -26,7 +26,7 @@ public class DataParams implements Serializable {
     @JsonProperty("recordId")
     private String recordId;
 
-    @NotNull
+    //temporary comment out@NotNull
     @JsonProperty("dateTime")
     private DateTime dateTime;
 
