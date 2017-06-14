@@ -2,6 +2,7 @@ package com.intrasoft.csp.server.processors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.intrasoft.csp.commons.model.IntegrationData;
+import com.intrasoft.csp.commons.model.IntegrationDataType;
 import com.intrasoft.csp.commons.routes.CamelRoutes;
 import com.intrasoft.csp.server.routes.RouteUtils;
 import com.intrasoft.csp.server.service.CspUtils;
@@ -52,8 +53,8 @@ public class DdlProcessor implements Processor,CamelRoutes {
                 //producerTemplate.sendBodyAndHeader(routes.apply(DCL), ExchangePattern.InOut,integrationData, Exchange.HTTP_METHOD, httpMethod);
         }
 
-        if (enableElastic){
-            recipients.add(routes.apply(ELASTIC));//TODO: if trustCircle, it should not send it to Elastic
+        if (enableElastic && !integrationData.getDataType().equals(IntegrationDataType.TRUSTCIRCLE)){
+            recipients.add(routes.apply(ELASTIC));
             //producerTemplate.sendBodyAndHeader(routes.apply(ELASTIC), ExchangePattern.InOut,integrationData, Exchange.HTTP_METHOD, httpMethod);
         }
 

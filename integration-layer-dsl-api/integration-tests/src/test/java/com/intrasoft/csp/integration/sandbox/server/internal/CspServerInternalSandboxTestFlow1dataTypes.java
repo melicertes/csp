@@ -318,7 +318,11 @@ public class CspServerInternalSandboxTestFlow1dataTypes implements CamelRoutes {
         }
 
         //ELASTIC
-        mockedElastic.expectedMessageCount(1);
+        if(IntegrationDataType.TRUSTCIRCLE.equals(dataType)){
+            mockedElastic.expectedMessageCount(0);
+        }else {
+            mockedElastic.expectedMessageCount(1);
+        }
         mockedElastic.assertIsSatisfied();
 
         list = mockedElastic.getReceivedExchanges();
