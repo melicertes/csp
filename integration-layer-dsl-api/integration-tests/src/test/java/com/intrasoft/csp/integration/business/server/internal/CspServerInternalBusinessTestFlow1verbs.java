@@ -48,8 +48,8 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
         properties = {
                 "csp.retry.backOffPeriod:10",
                 "csp.retry.maxAttempts:1",
-                "embedded.activemq.start:true",
-                "apache.camel.use.activemq:true",
+                "embedded.activemq.start:false",
+                "apache.camel.use.activemq:false",
                 "internal.use.ssl: true",
                 "internal.ssl.keystore.resource: sslcert/csp-internal.jks",
                 "internal.ssl.keystore.passphrase: 123456",
@@ -74,7 +74,7 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
                 "elastic.path: /cspdata"
         })
 //@MockEndpointsAndSkip("^https4-in://localhost.*adapter.*|https4-in://csp.*|https4-ex://ex.*") // by removing this any http requests will be sent as expected.
-//@MockEndpointsAndSkip("http://external.csp*") // by removing this any http requests will be sent as expected.
+@MockEndpointsAndSkip("http://external.csp*") // by removing this any http requests will be sent as expected.
 // In this test we mock all other http requests except for tc. TC dummy server is expected on 3001 port.
 // To start the TC dummy server:
 // $ APP_NAME=tc SSL=true PORT=8081 node server.js
@@ -128,7 +128,7 @@ public class CspServerInternalBusinessTestFlow1verbs implements CamelRoutes {
     @Before
     public void init() throws Exception {
         mvc = webAppContextSetup(webApplicationContext).build();
-        MockitoAnnotations.initMocks(this);
+        //MockitoAnnotations.initMocks(this);
         mockUtils.setSpringCamelContext(springCamelContext);
 
         mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX, routes.apply(DSL), mockedDsl.getEndpointUri());
