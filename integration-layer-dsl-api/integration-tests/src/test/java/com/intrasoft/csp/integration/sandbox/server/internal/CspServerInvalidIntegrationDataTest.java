@@ -46,10 +46,10 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
 @SpringBootTest(classes = {CspApp.class},
         webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT,
         properties = {
-                "server.port: 8082",
+                "server.port: 8089",
                 "csp.server.protocol: http",
                 "csp.server.host: localhost",
-                "csp.server.port: 8082",
+                "csp.server.port: 8089",
                 "api.version: 1",
                 "csp.retry.backOffPeriod:10",
                 "csp.retry.maxAttempts:1",
