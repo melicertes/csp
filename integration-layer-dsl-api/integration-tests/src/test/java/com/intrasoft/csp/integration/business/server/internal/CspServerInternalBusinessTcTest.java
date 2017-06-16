@@ -38,6 +38,7 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
                 "csp.retry.backOffPeriod:10",
                 "csp.retry.maxAttempts:1",
                 "embedded.activemq.start:true",
+                "embedded.activemq.persistent:false",
                 "apache.camel.use.activemq:true",
                 "internal.use.ssl: true",
                 "internal.ssl.keystore.resource: sslcert/csp-internal.jks",
