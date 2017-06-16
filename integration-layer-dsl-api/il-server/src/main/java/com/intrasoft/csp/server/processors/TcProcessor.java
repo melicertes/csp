@@ -71,7 +71,7 @@ public class TcProcessor implements Processor,CamelRoutes{
         String getAllTcUri = this.getTcCirclesURI();
         List<TrustCircle> tcList = camelRestService.sendAndGetList(getAllTcUri, null,  HttpMethod.GET.name(), TrustCircle.class,null);
 
-        LOG.info(tcList.toString());
+        LOG.debug(tcList.toString());
         Optional<TrustCircle> optionalTc  = tcList.stream().filter(t->t.getShortName().toLowerCase().contains(IntegrationDataType.tcNamingConventionForShortName.get(integrationData.getDataType()).toString().toLowerCase())).findAny();
         if(optionalTc.isPresent()){
             uri = this.getTcCirclesURI() + "/" + optionalTc.get().getId();
