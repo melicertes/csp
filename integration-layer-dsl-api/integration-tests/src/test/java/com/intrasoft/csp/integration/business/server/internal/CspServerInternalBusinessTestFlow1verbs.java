@@ -30,6 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.core.env.Environment;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
@@ -48,12 +49,12 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
         properties = {
                 "csp.retry.backOffPeriod:10",
                 "csp.retry.maxAttempts:1",
-                "embedded.activemq.start:true",
-                "apache.camel.use.activemq:true",
-                "internal.use.ssl: true",
+                "embedded.activemq.start:false",
+                "apache.camel.use.activemq:false",
+                "internal.use.ssl: false",
                 "internal.ssl.keystore.resource: sslcert/csp-internal.jks",
                 "internal.ssl.keystore.passphrase: 123456",
-                "external.use.ssl: true",
+                "external.use.ssl: false",
                 "external.ssl.keystore.resource: sslcert/csp-internal.jks",
                 "external.ssl.keystore.passphrase: 123456",
 
@@ -75,6 +76,7 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
         })
 //@MockEndpointsAndSkip("^https4-in://localhost.*adapter.*|https4-in://csp.*|https4-ex://ex.*") // by removing this any http requests will be sent as expected.
 //@MockEndpointsAndSkip("http://external.csp*") // by removing this any http requests will be sent as expected.
+@MockEndpointsAndSkip("^http://csp2.dangerduck.gr:8081/v1/dcl/integrationData")
 // In this test we mock all other http requests except for tc. TC dummy server is expected on 3001 port.
 // To start the TC dummy server:
 // $ APP_NAME=tc SSL=true PORT=8081 node server.js
@@ -107,9 +109,6 @@ public class CspServerInternalBusinessTestFlow1verbs implements CamelRoutes {
     @EndpointInject(uri = CamelRoutes.MOCK_PREFIX+":"+DIRECT+":"+ELASTIC)
     private MockEndpoint mockedElastic;
 
-    @MockBean
-    CamelRestService camelRestService;
-
     @Autowired
     MockUtils mockUtils;
 
@@ -122,13 +121,15 @@ public class CspServerInternalBusinessTestFlow1verbs implements CamelRoutes {
     @Autowired
     ErrorMessageHandler errorMessageHandler;
 
+    @Autowired
+    Environment env;
+
     private final IntegrationDataType dataTypeToTest = IntegrationDataType.VULNERABILITY;
     private final String applicationId = "taranis";
 
     @Before
     public void init() throws Exception {
         mvc = webAppContextSetup(webApplicationContext).build();
-        MockitoAnnotations.initMocks(this);
         mockUtils.setSpringCamelContext(springCamelContext);
 
         mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX, routes.apply(DSL), mockedDsl.getEndpointUri());
@@ -139,15 +140,6 @@ public class CspServerInternalBusinessTestFlow1verbs implements CamelRoutes {
         mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX, routes.apply(ECSP), mockedEcsp.getEndpointUri());
         mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX, routes.apply(ELASTIC), mockedElastic.getEndpointUri());
 
-        Mockito.when(camelRestService.send(anyString(), anyObject(), eq("GET"), eq(Team.class)))
-                .thenReturn(mockUtils.getMockedTeam(1, "http://external.csp%s.com"))
-                .thenReturn(mockUtils.getMockedTeam(2, "http://external.csp%s.com"))
-                .thenReturn(mockUtils.getMockedTeam(3, "http://external.csp%s.com"));
-
-
-//        String elasticUri = elasticProtocol + "://" + elasticHost + ":" + elasticPort + elasticPath;
-//        Mockito.when(camelRestService.send(Matchers.contains(elasticUri),anyObject(),anyString()))
-//                .thenReturn(mockUtils.getMockedElasticSearchResponse(2));
     }
 
 
