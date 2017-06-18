@@ -30,6 +30,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.util.HashMap;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -72,7 +73,7 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
 // In this test we mock all other http requests except for tc. TC dummy server is expected on 3001 port.
 // To start the TC dummy server:
 // $ APP_NAME=tc SSL=true PORT=8081 node server.js
-public class CspServerInternalBusinessTestFlow1verbs implements CamelRoutes {
+public class CspServerInternalBusinessTestFlow1dataTypes implements CamelRoutes {
 
     private static final Logger LOG = LoggerFactory.getLogger(CspServerInternalBusinessTestFlow1verbs.class);
 
@@ -116,8 +117,9 @@ public class CspServerInternalBusinessTestFlow1verbs implements CamelRoutes {
     @Autowired
     Environment env;
 
-    private final IntegrationDataType dataTypeToTest = IntegrationDataType.VULNERABILITY;
-    private final String applicationId = "taranis";
+    private Integer numOfCspsToTest = 3;
+    private Integer currentCspId = 0;
+    private HashMap<IntegrationDataType, Integer> internalApps = new HashMap<>();
 
     @Before
     public void init() throws Exception {
@@ -132,6 +134,10 @@ public class CspServerInternalBusinessTestFlow1verbs implements CamelRoutes {
         mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX, routes.apply(ECSP), mockedEcsp.getEndpointUri());
         mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX, routes.apply(ELASTIC), mockedElastic.getEndpointUri());
 
+        //Initialize internalApps Hashmap according application.properties (internal section)
+        internalApps.put(IntegrationDataType.THREAT, 1);
+        internalApps.put(IntegrationDataType.ARTEFACT, 2);
+        internalApps.put(IntegrationDataType.TRUSTCIRCLE, 1);
     }
 
 
@@ -140,21 +146,11 @@ public class CspServerInternalBusinessTestFlow1verbs implements CamelRoutes {
     // endpoint that is then reused in another test method.
     @DirtiesContext
     @Test
-    public void testDslFlow1PostToShare() throws Exception {
-        mockUtils.sendFlow1Data(mvc, applicationId, false, true, this.dataTypeToTest, HttpMethods.POST.name());
+    public void testDslFlow1PostDataTypeThreat() throws Exception {
+        mockUtils.sendFlow1Data(mvc, false, true, IntegrationDataType.THREAT, HttpMethods.POST.name());
 
-        _toSharePostPutFlowImpl();
-
-        //Thread.sleep(10*1000); //to avoid "Rejecting received message because of the listener container having been stopped in the meantime"
-        //be careful when debugging, you might miss breakpoints if the time is not enough
-    }
-
-    @DirtiesContext
-    @Test
-    public void testDslFlow1PutToShare() throws Exception {
-        mockUtils.sendFlow1Data(mvc, applicationId, false, true, this.dataTypeToTest, HttpMethods.PUT.name());
-
-        _toSharePostPutFlowImpl();
+        // Expect 0-messages/teams from ESCP according to CERT-GR configuration for THREAT on csp2.dangerduck.gr
+        _flowImpl(IntegrationDataType.THREAT, 0);
 
         //Thread.sleep(10*1000); //to avoid "Rejecting received message because of the listener container having been stopped in the meantime"
         //be careful when debugging, you might miss breakpoints if the time is not enough
@@ -162,22 +158,11 @@ public class CspServerInternalBusinessTestFlow1verbs implements CamelRoutes {
 
     @DirtiesContext
     @Test
-    public void testDslFlow1DeleteToShare() throws Exception {
-        mockUtils.sendFlow1Data(mvc, applicationId, false, true, this.dataTypeToTest, HttpMethods.DELETE.name());
+    public void testDslFlow1PutDataTypeThreat() throws Exception {
+        mockUtils.sendFlow1Data(mvc, false, true, IntegrationDataType.THREAT, HttpMethods.PUT.name());
 
-        _deleteFlowImpl();
-
-        //Thread.sleep(10*1000); //to avoid "Rejecting received message because of the listener container having been stopped in the meantime"
-        //be careful when debugging, you might miss breakpoints if the time is not enough
-    }
-
-
-    @DirtiesContext
-    @Test
-    public void testDslFlow1PostNotToShare() throws Exception {
-        mockUtils.sendFlow1Data(mvc, applicationId,false, false, this.dataTypeToTest, HttpMethods.POST.name());
-
-        _notToSharePostPutFlowImpl();
+        // Expect 0-messages/teams from ESCP according to CERT-GR configuration for THREAT on csp2.dangerduck.gr
+        _flowImpl(IntegrationDataType.THREAT, 0);
 
         //Thread.sleep(10*1000); //to avoid "Rejecting received message because of the listener container having been stopped in the meantime"
         //be careful when debugging, you might miss breakpoints if the time is not enough
@@ -185,10 +170,11 @@ public class CspServerInternalBusinessTestFlow1verbs implements CamelRoutes {
 
     @DirtiesContext
     @Test
-    public void testDslFlow1PutNotToShare() throws Exception {
-        mockUtils.sendFlow1Data(mvc, applicationId,false, false, this.dataTypeToTest, HttpMethods.PUT.name());
+    public void testDslFlow1PostDataTypeArtefact() throws Exception {
+        mockUtils.sendFlow1Data(mvc, false, true, IntegrationDataType.ARTEFACT, HttpMethods.POST.name());
 
-        _notToSharePostPutFlowImpl();
+        // Expect 0-messages/teams from ESCP according to CERT-GR configuration for ARTEFACT on csp2.dangerduck.gr
+        _flowImpl(IntegrationDataType.ARTEFACT, 0);
 
         //Thread.sleep(10*1000); //to avoid "Rejecting received message because of the listener container having been stopped in the meantime"
         //be careful when debugging, you might miss breakpoints if the time is not enough
@@ -196,17 +182,43 @@ public class CspServerInternalBusinessTestFlow1verbs implements CamelRoutes {
 
     @DirtiesContext
     @Test
-    public void testDslFlow1DeleteNotToShare() throws Exception {
-        mockUtils.sendFlow1Data(mvc, applicationId,false, false, this.dataTypeToTest, HttpMethods.DELETE.name());
+    public void testDslFlow1PutDataTypeArtefact() throws Exception {
+        mockUtils.sendFlow1Data(mvc, false, true, IntegrationDataType.ARTEFACT, HttpMethods.PUT.name());
 
-        _deleteFlowImpl();
+        // Expect 0-messages/teams from ESCP according to CERT-GR configuration for ARTEFACT on csp2.dangerduck.gr
+        _flowImpl(IntegrationDataType.ARTEFACT, 0);
+
+        //Thread.sleep(10*1000); //to avoid "Rejecting received message because of the listener container having been stopped in the meantime"
+        //be careful when debugging, you might miss breakpoints if the time is not enough
+    }
+
+    @DirtiesContext
+    @Test
+    public void testDslFlow1PostDataTypeTrustcircle() throws Exception {
+        mockUtils.sendFlow1Data(mvc, false, true, IntegrationDataType.TRUSTCIRCLE, HttpMethods.POST.name());
+
+        // Expect 3-messages/teams from ESCP according to CERT-GR configuration for TRUSTCIRCLE on csp2.dangerduck.gr
+        _flowImpl(IntegrationDataType.TRUSTCIRCLE, 3);
+
+        //Thread.sleep(10*1000); //to avoid "Rejecting received message because of the listener container having been stopped in the meantime"
+        //be careful when debugging, you might miss breakpoints if the time is not enough
+    }
+
+    @DirtiesContext
+    @Test
+    public void testDslFlow1PutDataTypeTrustcircle() throws Exception {
+        mockUtils.sendFlow1Data(mvc, false, true, IntegrationDataType.TRUSTCIRCLE, HttpMethods.PUT.name());
+
+        // Expect 3-messages/teams from ESCP according to CERT-GR configuration for TRUSTCIRCLE on csp2.dangerduck.gr
+        _flowImpl(IntegrationDataType.TRUSTCIRCLE, 3);
 
         //Thread.sleep(10*1000); //to avoid "Rejecting received message because of the listener container having been stopped in the meantime"
         //be careful when debugging, you might miss breakpoints if the time is not enough
     }
 
 
-    private void _toSharePostPutFlowImpl() throws Exception {
+
+    private void _flowImpl(IntegrationDataType dataType, Integer expectedEscpMessages) throws Exception {
        /*
         DSL
          */
@@ -219,24 +231,21 @@ public class CspServerInternalBusinessTestFlow1verbs implements CamelRoutes {
         for (Exchange exchange : list) {
             Message in = exchange.getIn();
             IntegrationData data = in.getBody(IntegrationData.class);
-            assertThat(data.getDataType(), is(this.dataTypeToTest));
+            assertThat(data.getDataType(), is(dataType));
         }
 
         /*
         APP
          */
-        // The data type to test is defined in line 101-> private IntegrationDataType dataTypeToTest = IntegrationDataType.VULNERABILITY;
-        // The application id is "taranis"
-        // Expect 1-messages according to application.properties (internal.vulnerability.apps:taranis, misp)
-        // *since taranis is emitting the message, it should be excluded from receiving his own message
-        mockedApp.expectedMessageCount(1);
+        //Expect message count according to application.properties
+        mockedApp.expectedMessageCount(internalApps.get(dataType));
         mockedApp.assertIsSatisfied();
 
         list = mockedApp.getReceivedExchanges();
         for (Exchange exchange : list) {
             Message in = exchange.getIn();
             IntegrationData data = in.getBody(IntegrationData.class);
-            assertThat(data.getDataType(), is(this.dataTypeToTest));
+            assertThat(data.getDataType(), is(dataType));
         }
 
         //DDL
@@ -247,7 +256,7 @@ public class CspServerInternalBusinessTestFlow1verbs implements CamelRoutes {
         for (Exchange exchange : list) {
             Message in = exchange.getIn();
             IntegrationData data = in.getBody(IntegrationData.class);
-            assertThat(data.getDataType(), is(this.dataTypeToTest));
+            assertThat(data.getDataType(), is(dataType));
         }
 
         //DCL
@@ -258,7 +267,7 @@ public class CspServerInternalBusinessTestFlow1verbs implements CamelRoutes {
         for (Exchange exchange : list) {
             Message in = exchange.getIn();
             IntegrationData data = in.getBody(IntegrationData.class);
-            assertThat(data.getDataType(), is(this.dataTypeToTest));
+            assertThat(data.getDataType(), is(dataType));
         }
 
         //TC
@@ -269,160 +278,40 @@ public class CspServerInternalBusinessTestFlow1verbs implements CamelRoutes {
         for (Exchange exchange : list) {
             Message in = exchange.getIn();
             IntegrationData data = in.getBody(IntegrationData.class);
-            assertThat(data.getDataType(), is(this.dataTypeToTest));
+            assertThat(data.getDataType(), is(dataType));
             assertThat(exchange.getIn().getHeader(CamelRoutes.ORIGIN_ENDPOINT), is(routes.apply(CamelRoutes.DCL)));
         }
 
         //ESCP
-        mockedEcsp.expectedMessageCount(1);
+        mockedEcsp.expectedMessageCount(expectedEscpMessages);
         mockedEcsp.assertIsSatisfied();
 
         list = mockedEcsp.getReceivedExchanges();
         for (Exchange exchange : list) {
-            Message in = exchange.getIn();
-            EnhancedTeamDTO enhancedTeamDTO = in.getBody(EnhancedTeamDTO.class);
-            assertThat(enhancedTeamDTO.getTeam().getUrl(), is("http://csp2.dangerduck.gr:8081"));
+            /**
+             * @CHECK
+            Assertion on Team's url is meaningless for real teams coming from TC
+             */
+            //Message in = exchange.getIn();
+            //EnhancedTeamDTO enhancedTeamDTO = in.getBody(EnhancedTeamDTO.class);
+            //assertThat(enhancedTeamDTO.getTeam().getUrl(), is("http://csp2.dangerduck.gr:8081"));
         }
 
         //ELASTIC
-        mockedElastic.expectedMessageCount(1);
+        if(IntegrationDataType.TRUSTCIRCLE.equals(dataType)){
+            mockedElastic.expectedMessageCount(0);
+        }else {
+            mockedElastic.expectedMessageCount(1);
+        }
         mockedElastic.assertIsSatisfied();
 
         list = mockedElastic.getReceivedExchanges();
         for (Exchange exchange : list) {
             Message in = exchange.getIn();
             IntegrationData data = in.getBody(IntegrationData.class);
-            assertThat(data.getDataType(), is(this.dataTypeToTest));
-
+            assertThat(data.getDataType(), is(dataType));
         }
     }
 
-
-    private void _deleteFlowImpl() throws Exception {
-       /*
-        DSL
-         */
-        //Expect 1-message
-        mockedDsl.expectedMessageCount(1);
-        mockedDsl.assertIsSatisfied();
-
-        List<Exchange> list = mockedDsl.getReceivedExchanges();
-        for (Exchange exchange : list) {
-            Message in = exchange.getIn();
-            IntegrationData data = in.getBody(IntegrationData.class);
-            assertThat(data.getDataType(), is(this.dataTypeToTest));
-        }
-
-        /*
-        APP
-         */
-        // The data type to test is defined in line 101-> private IntegrationDataType dataTypeToTest = IntegrationDataType.VULNERABILITY;
-        // The application id is "taranis"
-        // Expect 1-messages according to application.properties (internal.vulnerability.apps:taranis, misp)
-        // *since taranis is emitting the message, it should be excluded from receiving his own message
-        mockedApp.expectedMessageCount(1);
-        mockedApp.assertIsSatisfied();
-
-        list = mockedApp.getReceivedExchanges();
-        for (Exchange exchange : list) {
-            Message in = exchange.getIn();
-            IntegrationData data = in.getBody(IntegrationData.class);
-            assertThat(data.getDataType(), is(this.dataTypeToTest));
-        }
-
-        //DDL
-        mockedDdl.expectedMessageCount(1);
-        mockedDdl.assertIsSatisfied();
-
-        list = mockedDdl.getReceivedExchanges();
-        for (Exchange exchange : list) {
-            Message in = exchange.getIn();
-            IntegrationData data = in.getBody(IntegrationData.class);
-            assertThat(data.getDataType(), is(this.dataTypeToTest));
-        }
-
-        /*
-        DCL
-         */
-        //DELETE verb is not propagated to DCL
-        mockedDcl.expectedMessageCount(0);
-        mockedDcl.assertIsSatisfied();
-
-        //ELASTIC
-        mockedElastic.expectedMessageCount(1);
-        mockedElastic.assertIsSatisfied();
-
-        list = mockedElastic.getReceivedExchanges();
-        for (Exchange exchange : list) {
-            Message in = exchange.getIn();
-            IntegrationData data = in.getBody(IntegrationData.class);
-            assertThat(data.getDataType(), is(this.dataTypeToTest));
-        }
-    }
-
-    private void _notToSharePostPutFlowImpl() throws Exception {
-       /*
-        DSL
-         */
-        //Expect 1-message
-        mockedDsl.expectedMessageCount(1);
-        mockedDsl.assertIsSatisfied();
-
-        List<Exchange> list = mockedDsl.getReceivedExchanges();
-        for (Exchange exchange : list) {
-            Message in = exchange.getIn();
-            IntegrationData data = in.getBody(IntegrationData.class);
-            assertThat(data.getDataType(), is(this.dataTypeToTest));
-        }
-
-        /*
-        APP
-         */
-        // The data type to test is defined in line 101-> private IntegrationDataType dataTypeToTest = IntegrationDataType.VULNERABILITY;
-        // The application id is "taranis"
-        // Expect 1-messages according to application.properties (internal.vulnerability.apps:taranis, misp)
-        // *since taranis is emitting the message, it should be excluded from receiving his own message
-        mockedApp.expectedMessageCount(1);
-        mockedApp.assertIsSatisfied();
-
-        list = mockedApp.getReceivedExchanges();
-        for (Exchange exchange : list) {
-            Message in = exchange.getIn();
-            IntegrationData data = in.getBody(IntegrationData.class);
-            assertThat(data.getDataType(), is(this.dataTypeToTest));
-        }
-
-        //DDL
-        mockedDdl.expectedMessageCount(1);
-        mockedDdl.assertIsSatisfied();
-
-        list = mockedDdl.getReceivedExchanges();
-        for (Exchange exchange : list) {
-            Message in = exchange.getIn();
-            IntegrationData data = in.getBody(IntegrationData.class);
-            assertThat(data.getDataType(), is(this.dataTypeToTest));
-        }
-
-        /*
-        DCL
-         */
-        //Do not expect something for NotToShare
-        mockedDcl.expectedMessageCount(0);
-        mockedDcl.assertIsSatisfied();
-
-
-        //TC and ESCP are not called from DCL
-
-
-        //ELASTIC
-        mockedElastic.expectedMessageCount(1);
-        mockedElastic.assertIsSatisfied();
-
-        list = mockedElastic.getReceivedExchanges();
-        for (Exchange exchange : list) {
-            Message in = exchange.getIn();
-            IntegrationData data = in.getBody(IntegrationData.class);
-            assertThat(data.getDataType(), is(this.dataTypeToTest));
-        }
-    }
 }
+

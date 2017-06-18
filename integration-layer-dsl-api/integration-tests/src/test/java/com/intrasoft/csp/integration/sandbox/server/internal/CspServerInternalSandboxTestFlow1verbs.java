@@ -7,6 +7,7 @@ import com.intrasoft.csp.server.CspApp;
 import com.intrasoft.csp.server.routes.RouteUtils;
 import com.intrasoft.csp.server.service.CamelRestService;
 import org.apache.camel.*;
+import org.apache.camel.component.http.HttpMethods;
 import org.apache.camel.component.mock.MockEndpoint;
 import org.apache.camel.spring.SpringCamelContext;
 import org.apache.camel.test.spring.CamelSpringBootRunner;
@@ -140,7 +141,7 @@ public class CspServerInternalSandboxTestFlow1verbs implements CamelRoutes {
     @DirtiesContext
     @Test
     public void testDslFlow1PostToShare() throws Exception {
-        mockUtils.sendFlow1Data(mvc, applicationId,false, true, this.dataTypeToTest, "POST");
+        mockUtils.sendFlow1Data(mvc, applicationId,false, true, this.dataTypeToTest, HttpMethods.POST.name());
 
         _toSharePostPutFlowImpl();
 
@@ -151,7 +152,7 @@ public class CspServerInternalSandboxTestFlow1verbs implements CamelRoutes {
     @DirtiesContext
     @Test
     public void testDslFlow1PutToShare() throws Exception {
-        mockUtils.sendFlow1Data(mvc, applicationId,false, true, this.dataTypeToTest, "PUT");
+        mockUtils.sendFlow1Data(mvc, applicationId,false, true, this.dataTypeToTest, HttpMethods.PUT.name());
 
         _toSharePostPutFlowImpl();
 
@@ -162,7 +163,7 @@ public class CspServerInternalSandboxTestFlow1verbs implements CamelRoutes {
     @DirtiesContext
     @Test
     public void testDslFlow1DeleteToShare() throws Exception {
-        mockUtils.sendFlow1Data(mvc, applicationId,false, true, this.dataTypeToTest, "DELETE");
+        mockUtils.sendFlow1Data(mvc, applicationId,false, true, this.dataTypeToTest, HttpMethods.DELETE.name());
 
         _deleteFlowImpl();
 
@@ -176,7 +177,7 @@ public class CspServerInternalSandboxTestFlow1verbs implements CamelRoutes {
     @DirtiesContext
     @Test
     public void testDslFlow1PostNotToShare() throws Exception {
-        mockUtils.sendFlow1Data(mvc, applicationId,false, false, this.dataTypeToTest, "POST");
+        mockUtils.sendFlow1Data(mvc, applicationId,false, false, this.dataTypeToTest, HttpMethods.POST.name());
 
         _notToSharePostPutFlowImpl();
 
@@ -187,7 +188,7 @@ public class CspServerInternalSandboxTestFlow1verbs implements CamelRoutes {
     @DirtiesContext
     @Test
     public void testDslFlow1PutNotToShare() throws Exception {
-        mockUtils.sendFlow1Data(mvc, applicationId,false, false, this.dataTypeToTest, "PUT");
+        mockUtils.sendFlow1Data(mvc, applicationId,false, false, this.dataTypeToTest, HttpMethods.PUT.name());
 
         _notToSharePostPutFlowImpl();
 
@@ -198,7 +199,7 @@ public class CspServerInternalSandboxTestFlow1verbs implements CamelRoutes {
     @DirtiesContext
     @Test
     public void testDslFlow1DeleteNotToShare() throws Exception {
-        mockUtils.sendFlow1Data(mvc, applicationId,false, false, this.dataTypeToTest, "DELETE");
+        mockUtils.sendFlow1Data(mvc, applicationId,false, false, this.dataTypeToTest, HttpMethods.DELETE.name());
 
         _deleteFlowImpl();
 

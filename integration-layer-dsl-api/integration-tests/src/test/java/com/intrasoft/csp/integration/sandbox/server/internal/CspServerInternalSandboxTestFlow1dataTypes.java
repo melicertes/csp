@@ -7,6 +7,7 @@ import com.intrasoft.csp.server.CspApp;
 import com.intrasoft.csp.server.routes.RouteUtils;
 import com.intrasoft.csp.server.service.CamelRestService;
 import org.apache.camel.*;
+import org.apache.camel.component.http.HttpMethods;
 import org.apache.camel.component.mock.MockEndpoint;
 import org.apache.camel.spring.SpringCamelContext;
 import org.apache.camel.test.spring.CamelSpringBootRunner;
@@ -122,7 +123,7 @@ public class CspServerInternalSandboxTestFlow1dataTypes implements CamelRoutes {
         mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX, routes.apply(APP), mockedApp.getEndpointUri());
         mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX, routes.apply(DCL), mockedDcl.getEndpointUri());
 
-        //Initialize internalApps Hashmap according applicatiopn.properties (internal section)
+        //Initialize internalApps Hashmap according application.properties (internal section)
         internalApps.put(IntegrationDataType.THREAT, 1);
         internalApps.put(IntegrationDataType.ARTEFACT, 2);
         internalApps.put(IntegrationDataType.TRUSTCIRCLE, 1);
@@ -146,7 +147,7 @@ public class CspServerInternalSandboxTestFlow1dataTypes implements CamelRoutes {
         Mockito.when(camelRestService.send(anyString(), anyObject(), eq("GET"), eq(TrustCircle.class)))
                 .thenReturn(mockUtils.getMockedTrustCircle(this.numOfCspsToTest, IntegrationDataType.tcNamingConventionForShortName.get(IntegrationDataType.THREAT)));
 
-        mockUtils.sendFlow1Data(mvc, false, true, IntegrationDataType.THREAT, "POST");
+        mockUtils.sendFlow1Data(mvc, false, true, IntegrationDataType.THREAT, HttpMethods.POST.name());
 
         _flowImpl(IntegrationDataType.THREAT);
 
@@ -163,7 +164,7 @@ public class CspServerInternalSandboxTestFlow1dataTypes implements CamelRoutes {
         Mockito.when(camelRestService.send(anyString(), anyObject(), eq("GET"), eq(TrustCircle.class)))
                 .thenReturn(mockUtils.getMockedTrustCircle(this.numOfCspsToTest, IntegrationDataType.tcNamingConventionForShortName.get(IntegrationDataType.THREAT)));
 
-        mockUtils.sendFlow1Data(mvc, false, true, IntegrationDataType.THREAT, "PUT");
+        mockUtils.sendFlow1Data(mvc, false, true, IntegrationDataType.THREAT, HttpMethods.PUT.name());
 
         _flowImpl(IntegrationDataType.THREAT);
 
@@ -180,7 +181,7 @@ public class CspServerInternalSandboxTestFlow1dataTypes implements CamelRoutes {
         Mockito.when(camelRestService.send(anyString(), anyObject(), eq("GET"), eq(TrustCircle.class)))
                 .thenReturn(mockUtils.getMockedTrustCircle(this.numOfCspsToTest, IntegrationDataType.tcNamingConventionForShortName.get(IntegrationDataType.ARTEFACT)));
 
-        mockUtils.sendFlow1Data(mvc, false, true, IntegrationDataType.ARTEFACT, "POST");
+        mockUtils.sendFlow1Data(mvc, false, true, IntegrationDataType.ARTEFACT, HttpMethods.POST.name());
 
         _flowImpl(IntegrationDataType.ARTEFACT);
 
@@ -214,7 +215,7 @@ public class CspServerInternalSandboxTestFlow1dataTypes implements CamelRoutes {
         Mockito.when(camelRestService.send(anyString(), anyObject(), eq("GET"), eq(TrustCircle.class)))
                 .thenReturn(mockUtils.getMockedTrustCircle(this.numOfCspsToTest, IntegrationDataType.tcNamingConventionForShortName.get(IntegrationDataType.TRUSTCIRCLE)));
 
-        mockUtils.sendFlow1Data(mvc, false, true, IntegrationDataType.TRUSTCIRCLE, "POST");
+        mockUtils.sendFlow1Data(mvc, false, true, IntegrationDataType.TRUSTCIRCLE, HttpMethods.POST.name());
 
         _flowImpl(IntegrationDataType.TRUSTCIRCLE);
 
@@ -231,7 +232,7 @@ public class CspServerInternalSandboxTestFlow1dataTypes implements CamelRoutes {
         Mockito.when(camelRestService.send(anyString(), anyObject(), eq("GET"), eq(TrustCircle.class)))
                 .thenReturn(mockUtils.getMockedTrustCircle(this.numOfCspsToTest, IntegrationDataType.tcNamingConventionForShortName.get(IntegrationDataType.TRUSTCIRCLE)));
 
-        mockUtils.sendFlow1Data(mvc, false, true, IntegrationDataType.TRUSTCIRCLE, "PUT");
+        mockUtils.sendFlow1Data(mvc, false, true, IntegrationDataType.TRUSTCIRCLE, HttpMethods.PUT.name());
 
         _flowImpl(IntegrationDataType.TRUSTCIRCLE);
 
