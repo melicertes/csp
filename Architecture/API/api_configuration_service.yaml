@@ -1,6 +1,6 @@
 swagger: '2.0'
 info:
-  version: 1.0.1
+  version: 1.0.2
   title: CSP Server Configuration API
 schemes:
   - https
@@ -124,6 +124,52 @@ paths:
           schema:
             $ref: '#/definitions/ResponseError'
 
+  '/v1/update/{cspId}/{updateHash}':
+    get:
+      description: |
+        Retrieves a list of available updates, for registered modules of the
+        CSP. See the "register" API call on how to register modules
+      consumes:
+        - application/json
+      produces:
+        - application/json
+        - application/octet-stream
+      parameters:
+        - name: cspId
+          in: path
+          description: | 
+            a unique identifier that defines a Registered and Known CSP. The 
+            csp identifier follows the UUID formatted as text, for 36 characters
+            total, arranged as 8-4-4-4-12. 
+            Example = 123e4567-e89b-12d3-a456-426655440000 
+          required: true
+          type: string
+        - name: updateHash
+          in: path
+          description: | 
+            a unique identifier hash for the given update. The system must verify that this
+            hash is available for this cspId to download; then it provides the byte stream
+            for this update object.
+          required: true
+          type: string
+      responses:
+        '200':
+          description: a byte stream for the data requested
+          schema:
+            type: file
+            format: application/octet-stream
+        '404':
+          description: cspId is not recognized
+          schema:
+            $ref: '#/definitions/ResponseError'
+        '400':
+          description: received when this update is not available for this CSP
+          schema:
+            $ref: '#/definitions/ResponseError'
+        
+  
+
+
 definitions:
   
   VersionDefinition:
@@ -143,6 +189,9 @@ definitions:
         type: string
         example: DFN-Cert CSIRT Installation
         description: CSP name as given by the CSP installation
+      domainName:
+        type: string
+        example: dfncertmain.dfn.cert.org
       registrationDate:
         type: string
         format: date-time
@@ -291,6 +340,8 @@ definitions:
         type: boolean
       hash:
         type: string
+      startPriority:
+        type: number
     example:
       configuration-service-client:
         fullName: 'configuration-service-client:1.0'
