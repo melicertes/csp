@@ -68,7 +68,7 @@ public class ElasticProcessor implements Processor {
 
             //query ES for insertion
             LOG.debug(this.getElasticURI() + "/" + dataType.toString().toLowerCase() + "?pretty");
-            String response = camelRestService.send(this.getElasticURI() + "/" + dataType.toString().toLowerCase() + "?pretty&_source=false", elasticData, HttpMethods.POST.name());
+            String response = camelRestService.send(this.getElasticURI() + "/" + dataType.toString().toLowerCase() + "?pretty", elasticData, HttpMethods.POST.name());
             LOG.info("Elastic - ES Insert response: " + response);
 
         }
