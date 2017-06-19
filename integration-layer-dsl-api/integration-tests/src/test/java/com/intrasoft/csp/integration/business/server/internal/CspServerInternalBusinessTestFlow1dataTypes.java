@@ -57,11 +57,21 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
                 "misp.port: 8082",
                 "misp.path: /adapter/misp",
 
+                "viper.protocol: http",
+                "viper.host: csp2.dangerduck.gr",
+                "viper.port: 8082",
+                "viper.path: /adapter/viper",
+
                 "tc.protocol: http",
                 "tc.host: tc.csp2.dangerduck.gr",
                 "tc.port: 8000",
                 "tc.path.circles: /api/v1/circles",
                 "tc.path.teams: /api/v1/teams",
+
+                "trustcircle.protocol: http",
+                "trustcircle.host: csp2.dangerduck.gr",
+                "trustcircle.port: 8082",
+                "trustcircle.path: /adapter/tc",
 
                 "elastic.protocol: http",
                 "elastic.host: csp2.dangerduck.gr",
@@ -70,7 +80,8 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
         })
 //@MockEndpointsAndSkip("^https4-in://localhost.*adapter.*|https4-in://csp.*|https4-ex://ex.*") // by removing this any http requests will be sent as expected.
 //@MockEndpointsAndSkip("http://external.csp*") // by removing this any http requests will be sent as expected.
-@MockEndpointsAndSkip("^http://csp2.dangerduck.gr:8081/v1/dcl/integrationData")
+@MockEndpointsAndSkip("^http://*.dangerduck.gr:8081/v1/dcl/integrationData")
+
 // In this test we mock all other http requests except for tc. TC dummy server is expected on 3001 port.
 // To start the TC dummy server:
 // $ APP_NAME=tc SSL=true PORT=8081 node server.js
@@ -132,7 +143,7 @@ public class CspServerInternalBusinessTestFlow1dataTypes implements CamelRoutes 
         mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX, routes.apply(DDL), mockedDdl.getEndpointUri());
         mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX, routes.apply(DCL), mockedDcl.getEndpointUri());
         mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX, routes.apply(TC), mockedTC.getEndpointUri());
-        mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX, routes.apply(ECSP), mockedEcsp.getEndpointUri());
+        mockUtils.mockRouteSkipSendToOriginalEndpoint(CamelRoutes.MOCK_PREFIX, routes.apply(ECSP), mockedEcsp.getEndpointUri());
         mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX, routes.apply(ELASTIC), mockedElastic.getEndpointUri());
 
         //Initialize internalApps Hashmap according application.properties (internal section)
@@ -150,8 +161,8 @@ public class CspServerInternalBusinessTestFlow1dataTypes implements CamelRoutes 
     public void testDslFlow1PostDataTypeThreat() throws Exception {
         mockUtils.sendFlow1Data(mvc, false, true, IntegrationDataType.THREAT, HttpMethods.POST.name());
 
-        // Expect 0-messages/teams from ESCP according to CERT-GR configuration for THREAT on csp2.dangerduck.gr
-        _flowImpl(IntegrationDataType.THREAT, 0);
+        // Expect 1-messages/teams from ESCP according to CERT-GR configuration for THREAT on csp2.dangerduck.gr
+        _flowImpl(IntegrationDataType.THREAT, 1);
 
         //Thread.sleep(10*1000); //to avoid "Rejecting received message because of the listener container having been stopped in the meantime"
         //be careful when debugging, you might miss breakpoints if the time is not enough
@@ -162,8 +173,8 @@ public class CspServerInternalBusinessTestFlow1dataTypes implements CamelRoutes 
     public void testDslFlow1PutDataTypeThreat() throws Exception {
         mockUtils.sendFlow1Data(mvc, false, true, IntegrationDataType.THREAT, HttpMethods.PUT.name());
 
-        // Expect 0-messages/teams from ESCP according to CERT-GR configuration for THREAT on csp2.dangerduck.gr
-        _flowImpl(IntegrationDataType.THREAT, 0);
+        // Expect 1-messages/teams from ESCP according to CERT-GR configuration for THREAT on csp2.dangerduck.gr
+        _flowImpl(IntegrationDataType.THREAT, 1);
 
         //Thread.sleep(10*1000); //to avoid "Rejecting received message because of the listener container having been stopped in the meantime"
         //be careful when debugging, you might miss breakpoints if the time is not enough
@@ -174,8 +185,8 @@ public class CspServerInternalBusinessTestFlow1dataTypes implements CamelRoutes 
     public void testDslFlow1PostDataTypeArtefact() throws Exception {
         mockUtils.sendFlow1Data(mvc, false, true, IntegrationDataType.ARTEFACT, HttpMethods.POST.name());
 
-        // Expect 0-messages/teams from ESCP according to CERT-GR configuration for ARTEFACT on csp2.dangerduck.gr
-        _flowImpl(IntegrationDataType.ARTEFACT, 0);
+        // Expect 1-messages/teams from ESCP according to CERT-GR configuration for ARTEFACT on csp2.dangerduck.gr
+        _flowImpl(IntegrationDataType.ARTEFACT, 1);
 
         //Thread.sleep(10*1000); //to avoid "Rejecting received message because of the listener container having been stopped in the meantime"
         //be careful when debugging, you might miss breakpoints if the time is not enough
@@ -186,8 +197,8 @@ public class CspServerInternalBusinessTestFlow1dataTypes implements CamelRoutes 
     public void testDslFlow1PutDataTypeArtefact() throws Exception {
         mockUtils.sendFlow1Data(mvc, false, true, IntegrationDataType.ARTEFACT, HttpMethods.PUT.name());
 
-        // Expect 0-messages/teams from ESCP according to CERT-GR configuration for ARTEFACT on csp2.dangerduck.gr
-        _flowImpl(IntegrationDataType.ARTEFACT, 0);
+        // Expect 1-messages/teams from ESCP according to CERT-GR configuration for ARTEFACT on csp2.dangerduck.gr
+        _flowImpl(IntegrationDataType.ARTEFACT, 1);
 
         //Thread.sleep(10*1000); //to avoid "Rejecting received message because of the listener container having been stopped in the meantime"
         //be careful when debugging, you might miss breakpoints if the time is not enough
