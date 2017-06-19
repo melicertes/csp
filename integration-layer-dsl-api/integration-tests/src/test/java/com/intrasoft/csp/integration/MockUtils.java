@@ -180,7 +180,7 @@ public class MockUtils implements ContextUrl {
         dataParams.setApplicationId(applicationId);
         dataParams.setCspId("CERT-GR");
         integrationData.setDataParams(dataParams);
-        integrationData.setDataObject("{\"t\":\"1234\"}");
+        integrationData.setDataObject(dataParams);
 
 
         if (httpMethod.toLowerCase().equals("post")) {
@@ -220,7 +220,7 @@ public class MockUtils implements ContextUrl {
         dataParams.setDateTime(DateTime.now());
         dataParams.setCspId(cspId);
         integrationData.setDataParams(dataParams);
-        integrationData.setDataObject("{\"t\":\"1234\"}");
+        integrationData.setDataObject(dataParams);
 
 
         if (httpMethod.toLowerCase().equals("post")) {
