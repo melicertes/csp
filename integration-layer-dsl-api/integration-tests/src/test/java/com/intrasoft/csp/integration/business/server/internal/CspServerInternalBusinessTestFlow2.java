@@ -54,6 +54,11 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
                 "misp.port: 8082",
                 "misp.path: /adapter/misp",
 
+                "taranis.protocol: http",
+                "taranis.host: csp2.dangerduck.gr",
+                "taranis.port: 8082",
+                "taranis.path: /adapter/taranis",
+
                 "tc.protocol: http",
                 "tc.host: tc.csp2.dangerduck.gr",
                 "tc.port: 8000",
