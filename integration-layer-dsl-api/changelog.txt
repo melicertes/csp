@@ -1,0 +1,15 @@
+--------------------------
+-- ALPHA Version: 0.0.1 --
+--------------------------
+Release Date: 09/06/2017
+
+Fully Working modules:
+- Integration Layer
+- Integration/Smoke Tests
+- Mutual SSL
+- MockServer
+- Alpha Installation
+- TC
+- VC Bridge
+- Elastic
+- Kibana
