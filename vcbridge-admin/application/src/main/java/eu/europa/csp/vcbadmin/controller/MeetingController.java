@@ -20,6 +20,7 @@ import javax.validation.constraints.Size;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -44,7 +45,9 @@ import eu.europa.csp.vcbadmin.constants.MeetingStatus;
 import eu.europa.csp.vcbadmin.model.Meeting;
 import eu.europa.csp.vcbadmin.model.MeetingForm;
 import eu.europa.csp.vcbadmin.model.MeetingScheduledTask;
+
 import eu.europa.csp.vcbadmin.model.PageWrapper;
+
 import eu.europa.csp.vcbadmin.model.User;
 import eu.europa.csp.vcbadmin.repository.MeetingRepository;
 import eu.europa.csp.vcbadmin.repository.UserRepository;
@@ -177,6 +180,7 @@ public class MeetingController {
 	}
 
 	@GetMapping(value = { "/listMeeting", "/" })
+
 	public String listMeeting(Model model, Authentication auth,@PageableDefault(value=2, page=0) Pageable pageable) {
 		PageWrapper<Meeting> meetings = new PageWrapper<>(meetingRepository.findByUserEmailAndStatusOrStatus(auth.getName(),
 				MeetingStatus.Pending, MeetingStatus.Running,pageable), "/listMeeting");
