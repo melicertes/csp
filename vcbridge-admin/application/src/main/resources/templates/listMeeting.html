@@ -1,28 +1,35 @@
-<!--
- * CoreUI - Open Source Bootstrap Admin Template
- * @version v1.0.0-alpha.4
- * @link http://coreui.io
- * Copyright (c) 2017 creativeLabs Łukasz Holeczek
- * @license MIT
- -->
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
 	xmlns:th="http://www.thymeleaf.org"
 	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	layout:decorator="layout">
 
-	<div layout:fragment="content">
-		<div
-			class="app header-fixed sidebar-fixed aside-menu-fixed aside-menu-hidden container">
+<div layout:fragment="content">
+	<div class="content">
+		<div class="card">
+
 			<ul class="nav nav-tabs">
-				<li class="active"><a data-toggle="tab" href="#scheduled">Scheduled
-						Meetings</a></li>
-				<li><a data-toggle="tab" href="#past">Past Meetings</a></li>
+				<li th:classappend="${past}==false?'active':''"><a
+					th:href="@{/listMeeting/scheduled}">Scheduled Meetings</a></li>
+				<li th:classappend="${past}==true?'active':''"><a
+					th:href="@{/listMeeting/past}">Past Meetings</a></li>
 			</ul>
 
 			<div class="tab-content">
 				<div id="scheduled" class="tab-pane fade in active">
-					<h3>Scheduled Meetings</h3>
+					<div class="row">
+						<!-- <h3 class="col-md-6" th:text="${meetingType}">Meetings</h3> -->
+						<div class="col-md-12 text-right">
+							<button th:if="${past}==false" id="cancel_meeting_button"
+								type="button" class="btn btn-danger"
+								th:classappend="${#lists.size(meetings.content)}>0?'':'disabled'">Cancel
+								meeting</button>
+							<button th:if="${past}==false" id="moreactions_meeting_button"
+								type="button" class="btn btn-info"
+								th:classappend="${#lists.size(meetings.content)}>0?'':'disabled'">More
+								actions</button>
+						</div>
+					</div>
 					<div th:if="${meetings.size==0}">Nothing to display yet</div>
 					<div class="table-responsive" th:unless="${meetings.size==0}">
 						<form id="cancellation-form" action="#"
@@ -30,9 +37,14 @@
 							<table class="table table-striped">
 								<thead>
 									<tr>
-										<th><input type="checkbox" id="selectall" value=""></input></th>
+										<th th:if="${past}==false"><input type="checkbox"
+											id="selectall" value=""></input></th>
 										<th>Subject</th>
-										<th>Start Date and Time</th>
+										<th>Start Date/Time<span class="badge"
+											data-placement="top" data-title="Data/Time Information"
+											data-trigger="hover" data-toggle="popover"
+											data-content="- Time is set in a 24-hour clock basis. - Your timezone is "><i
+												class="glyphicon glyphicon-info-sign"></i></span></th>
 										<th>Duration</th>
 										<th>Participants</th>
 										<th>Status</th>
@@ -41,24 +53,22 @@
 								<tbody>
 									<tr class="currentmeeting"
 										th:each="meeting, stat : ${meetings.content}">
-										<th scope="row"><input class="todelete" type="checkbox"
-											name="id" th:value="${meeting.id}"
-											th:attr="data-date=${{meeting.start}},data-duration=${{meeting.duration}}"></input></th>
+										<td th:if="${past}==false"><input class="todelete"
+											type="checkbox" name="id" th:value="${meeting.id}"
+											th:attr="data-date=${{meeting.start}},data-duration=${{meeting.duration}}"></input>
+										</td>
 										<td th:text="${meeting.subject}">start</td>
 										<td th:text="${{meeting.start}}">start</td>
 										<td th:text="${{meeting.duration}}">duration</td>
 										<td th:text="${#lists.size(meeting.participants)}">#ofparticipants</td>
-										<td th:text="${meeting.status}">status</td>
+										<td><span th:text="${meeting.status}" class="label"
+											th:classappend="|${#strings.equals(meeting.status ,'Running') ? 'label-success': ''} ${#strings.equals(meeting.status ,'Pending') ? 'label-info': ''}|">status</span><sup
+											th:if="${#strings.toString(meeting.status) == 'Error'}">
+												<a href="#" th:href="@{/retryMeeting(id=${meeting.id})}">Retry</a>
+										</sup></td>
 									</tr>
 								</tbody>
 							</table>
-							<div class="row">
-								<div class="col-6">
-
-									<button id="cancel_meeting_button" type="button"
-										class="btn btn-primary px-4">Cancel</button>
-								</div>
-							</div>
 						</form>
 
 					</div>
@@ -79,11 +89,9 @@
 								th:href="@{${meetings.url}(page=${item.number},size=${meetings.size})}"><span
 									th:text="${item.number}">1</span></a></li>
 							<li class="page-item"
-								th:classappend="${meetings.hasNextPage}? '' : 'disabled'">
-								<a
+								th:classappend="${meetings.hasNextPage}? '' : 'disabled'"><a
 								th:href="@{${meetings.url}(page=${meetings.number+1},size=${meetings.size})}"
-								title="Go to next page">»</a>
-							</li>
+								title="Go to next page">»</a></li>
 							<li class="page-item"
 								th:classappend="${meetings.lastPage}? 'disabled' : ''"><a
 								th:href="@{${meetings.url}(page=${meetings.totalPages},size=${meetings.size})}">Last
@@ -91,105 +99,47 @@
 						</ul>
 					</nav>
 				</div>
-				<div id="past" class="tab-pane fade">
-					<h3>Past Meetings</h3>
-					<div th:if="${pastMeetings.size==0}">Nothing to diplay yet</div>
-					<div class="table-responsive" th:unless="${pastMeetings.size==0}">
-						<table class="table table-striped">
-							<thead>
-								<tr>
-									<th>Subject</th>
-									<th>Start Date and Time</th>
-									<th>Duration</th>
-									<th>Participants</th>
-									<th>Status</th>
-								</tr>
-							</thead>
-							<tbody>
-								<tr th:each="meeting, stat : ${pastMeetings.content}">
-									<td th:text="${meeting.subject}">start</td>
-									<td th:text="${{meeting.start}}">start</td>
-									<td th:text="${meeting.durationAsTime}">duration</td>
-									<td th:text="${#lists.size(meeting.participants)}">#ofparticipants</td>
-									<td><span th:text="${meeting.status}"></span><sup
-										th:if="${#strings.toString(meeting.status) == 'Error'}">
-											<a href="#" th:href="@{/retryMeeting(id=${meeting.id})}">Retry</a>
-									</sup></td>
-								</tr>
-							</tbody>
-						</table>
-					</div>
-					<nav>
-						<ul class="pagination">
-							<li class="page-item"
-								th:classappend="${pastMeetings.firstPage}? 'disabled' : ''">
-								<a
-								th:href="@{${pastMeetings.url}(page=1,size=${pastMeetings.size})}">←
-									First</a>
-							</li>
-							<li class="page-item"
-								th:classappend="${pastMeetings.hasPreviousPage}? '' : 'disabled'">
-								<a
-								th:href="@{${pastMeetings.url}(page=${pastMeetings.number-1},size=${pastMeetings.size})}"
-								title="Go to previous page">«</a>
-							</li>
-							<li th:each="item : ${pastMeetings.items}" class="page-item"
-								th:classappend="${item.current}? 'active' : ''"><a
-								th:href="@{${pastMeetings.url}(page=${item.number},size=${pastMeetings.size})}"><span
-									th:text="${item.number}">1</span></a></li>
-							<li class="page-item"
-								th:classappend="${pastMeetings.hasNextPage}? '' : 'disabled'">
-								<a
-								th:href="@{${pastMeetings.url}(page=${pastMeetings.number+1},size=${pastMeetings.size})}"
-								title="Go to next page">»</a>
-							</li>
-							<li class="page-item"
-								th:classappend="${pastMeetings.lastPage}? 'disabled' : ''">
-								<a
-								th:href="@{${pastMeetings.url}(page=${pastMeetings.totalPages},size=${pastMeetings.size})}">Last
-									→</a>
-							</li>
-						</ul>
-					</nav>
-				</div>
+
 			</div>
 
 		</div>
-		<div class="modal fade" id="confirm-cancel" tabindex="-1"
-			role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-			<div class="modal-dialog">
-				<div class="modal-content">
-					<div class="modal-header">Confirm Meeting Cancellation</div>
-					<div class="modal-body">
-						The following meetings are about to be cancelled. On confirmation,
-						all participants will be notified via email and access will be
-						revoked. Please confirm to continue.
-						<table class="table">
-							<thead>
-								<tr>
-									<th>Datetime</th>
-									<th>Duration</th>
-								</tr>
-							</thead>
-							<tbody id="meetingstobecancelled">
-								<tr>
-									<td>dddd</td>
-									<td>ffff</td>
-								</tr>
-							</tbody>
-						</table>
+	</div>
+	
+<div class="modal fade" id="confirm-cancel" tabindex="-1" role="dialog"
+		aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">Confirm Meeting Cancellation</div>
+				<div class="modal-body">
+					The following meetings are about to be cancelled. On confirmation,
+					all participants will be notified via email and access will be
+					revoked. Please confirm to continue.
+					<table class="table">
+						<thead>
+							<tr>
+								<th>Datetime</th>
+								<th>Duration</th>
+							</tr>
+						</thead>
+						<tbody id="meetingstobecancelled">
+							<tr>
+								<td>dddd</td>
+								<td>ffff</td>
+							</tr>
+						</tbody>
+					</table>
 
-					</div>
+				</div>
 
-					<div class="modal-footer">
-						<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-						<a href="#" id="submit-cancellation"
-							class="btn btn-success success">Submit</a>
-					</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+					<a href="#" id="submit-cancellation"
+						class="btn btn-success success">Submit</a>
 				</div>
 			</div>
 		</div>
 	</div>
+</div>
 <div layout:fragment="scripts">
 
 	<script>
@@ -213,6 +163,7 @@
 									.click(
 											function(e) {
 												e.preventDefault();
+												console.log("GEIA SAS");
 												$("#meetingstobecancelled tr")
 														.remove();
 												var i = 0;
@@ -258,6 +209,11 @@
 								$('#cancellation-form').submit();
 							});
 						});
+	</script>
+	<script>
+		$(document).ready(function() {
+			$('[data-toggle="popover"]').popover();
+		});
 	</script>
 </div>
 </html>

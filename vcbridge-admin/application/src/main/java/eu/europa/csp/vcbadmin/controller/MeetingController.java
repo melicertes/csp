@@ -20,8 +20,6 @@ import javax.validation.constraints.Size;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.Authentication;
@@ -32,6 +30,7 @@ import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -45,9 +44,7 @@ import eu.europa.csp.vcbadmin.constants.MeetingStatus;
 import eu.europa.csp.vcbadmin.model.Meeting;
 import eu.europa.csp.vcbadmin.model.MeetingForm;
 import eu.europa.csp.vcbadmin.model.MeetingScheduledTask;
-
 import eu.europa.csp.vcbadmin.model.PageWrapper;
-
 import eu.europa.csp.vcbadmin.model.User;
 import eu.europa.csp.vcbadmin.repository.MeetingRepository;
 import eu.europa.csp.vcbadmin.repository.UserRepository;
@@ -164,7 +161,7 @@ public class MeetingController {
 				// m.getStart().minusMinutes(30))
 				new MeetingScheduledTask(MeetingScheduledTaskType.START_MEETING, invitationDate),
 				new MeetingScheduledTask(MeetingScheduledTaskType.END_MEETING, m.getExpectedEnd().plusMinutes(30))));
-		return "redirect:/listMeeting";
+		return "redirect:/listMeeting/scheduled";
 	}
 
 	@PostMapping("/cancelMeeting")
@@ -176,19 +173,28 @@ public class MeetingController {
 		} catch (MeetingNotFound e) {
 			model.addAttribute("error", e.getMessage());
 		}
-		return "redirect:/listMeeting";
+		return "redirect:/listMeeting/scheduled";
 	}
 
-	@GetMapping(value = { "/listMeeting", "/" })
+	@GetMapping(value = { "/listMeeting/{type}", "/" })
 
-	public String listMeeting(Model model, Authentication auth,@PageableDefault(value=2, page=0) Pageable pageable) {
-		PageWrapper<Meeting> meetings = new PageWrapper<>(meetingRepository.findByUserEmailAndStatusOrStatus(auth.getName(),
-				MeetingStatus.Pending, MeetingStatus.Running,pageable), "/listMeeting");
-		PageWrapper<Meeting> pastMeetings=new PageWrapper<>(meetingRepository.findByUserEmailAndStatusOrStatusOrStatus(auth.getName(),
-				MeetingStatus.Cancel, MeetingStatus.Completed, MeetingStatus.Expired, MeetingStatus.Error,pageable), "/listMeeting");
-		
+	public String listMeeting(Model model, @PathVariable(name = "type", required = false) String past,
+			Authentication auth, @PageableDefault(value = 2, page = 0) Pageable pageable) {
+		PageWrapper<Meeting> meetings;
+		Boolean isPast = "past".equals(past);
+		if (isPast) {
+			meetings = new PageWrapper<>(
+					meetingRepository.findByUserEmailAndStatusOrStatusOrStatus(auth.getName(), MeetingStatus.Cancel,
+							MeetingStatus.Completed, MeetingStatus.Expired, MeetingStatus.Error, pageable),
+					"/listMeeting/" + past);
+		} else {
+			past = "scheduled";
+			meetings = new PageWrapper<>(meetingRepository.findByUserEmailAndStatusOrStatus(auth.getName(),
+					MeetingStatus.Pending, MeetingStatus.Running, pageable), "/listMeeting/" + past);
+		}
+		model.addAttribute("past", isPast);
+		model.addAttribute("meetingType", isPast ? "Past Meetings" : "Scheduled Meetings");
 		model.addAttribute("meetings", meetings);
-		model.addAttribute("pastMeetings", pastMeetings);
 		return "listMeeting";
 	}
 
@@ -197,6 +203,6 @@ public class MeetingController {
 		if (!meetingService.retryMeeting(id)) {
 			model.addFlashAttribute("errors", Collections.singleton("Either too late to retry, or no such meeting"));
 		}
-		return "redirect:/listMeeting";
+		return "redirect:/listMeeting/scheduled";
 	}
 }

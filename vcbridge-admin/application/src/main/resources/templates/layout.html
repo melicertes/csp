@@ -15,13 +15,21 @@
 <!-- <link href="resources/css/bootstrap-select.min.css" rel="stylesheet" /> -->
 <title>VCBridge - Admin Console</title>
 
-<!-- Icons -->
-<link href="resources/css/font-awesome.min.css" rel="stylesheet" />
+
 
 <!-- <link href="resources/css/simple-line-icons.css" rel="stylesheet" /> -->
 
 <!-- Main styles for this application -->
-<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet"/>
+<link href="/resources/css/bootstrap.min.css" rel="stylesheet" />
+<link href="/resources/css/paper-dashboard.css" rel="stylesheet" />
+<link rel="stylesheet" href="/resources/css/bootstrap-datetimepicker.min.css" />
+<!-- Icons -->
+<link href="http://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css" rel="stylesheet">
+<!-- <link href="/resources/css/font-awesome.min.css" rel="stylesheet" /> -->
+<link href="/resources/css/themify-icons.css" rel="stylesheet" />
+<!-- <link
+	href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+	rel="stylesheet" /> -->
 <!-- <link href="resources/css/style.css" rel="stylesheet" /> THIS ONE -->
 
 
@@ -108,7 +116,7 @@
 
 
 			<li class="nav-item px-3"><a class="nav-link" href="#"
-				th:href="@{/listMeeting}">My meetings</a></li>
+				th:href="@{/listMeeting/scheduled}">My meetings</a></li>
 			<li class="nav-item px-3"><a class="nav-link" href="#"
 				th:href="@{/createMeeting}">Create meeting</a></li>
 			<li class="nav-item px-3"><a class="nav-link" href="#"
@@ -150,7 +158,7 @@
 			</div>
 		</div>
 
-		<main class="main" layout:fragment="content"> <!-- Breadcrumb -->
+		<main class="main-panel" layout:fragment="content"> <!-- Breadcrumb -->
 
 
 
@@ -169,12 +177,16 @@
 	</footer>
 
 	<!-- Bootstrap and necessary plugins -->
-	<script src="resources/js/jquery.min.js"></script>
-	<!-- <script src="resources/js/tether.min.js"></script> -->
-	<script src="resources/js/moment-with-locales.min.js"></script>
-	<script src="resources/js/moment.min.js"></script>
+	<script src="/resources/js/jquery-1.10.2.js"></script>
+	<script src="/resources/js/tether.min.js"></script>
+	<script src="/resources/js/moment-with-locales.min.js"></script>
+	<script src="/resources/js/moment.min.js"></script>
+	<script src="/resources/js/bootstrap.min.js"></script>
 	<!-- <script src="resources/js/bootstrap.min.js"></script>  THIS ONE-->
-	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+	<!-- <script
+		src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
+		integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+		crossorigin="anonymous"></script> -->
 
 	<!-- Plugins and scripts required by all views -->
 	<!-- 	<script src="resources/bower_components/chart.js/dist/Chart.min.js"></script> -->
@@ -184,7 +196,7 @@
 
 	<!-- <script src="resources/js/app.js"></script> -->
 	<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js"></script> -->
-
+<script type="text/javascript" src="/resources/js/bootstrap-datetimepicker.min.js"></script>
 	<!-- Datetime picker -->
 
 	<script
@@ -192,6 +204,7 @@
 	<script
 		src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.4/js/bootstrap-datepicker.min.js"></script>
 
+	<script src="/resources/js/paper-dashboard.js"></script>
 	<!-- <script type="text/javascript">$(function() {
 		console.log('hahahaah');
 		$('#datetimepicker1').datetimepicker();

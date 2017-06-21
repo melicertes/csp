@@ -14,118 +14,163 @@
 
 <div layout:fragment="content">
 
-	<div
-		class="app header-fixed sidebar-fixed aside-menu-fixed aside-menu-hidden">
+	<div class="content">
 		<br />
 		<div class="col-md-8">
-			<div class="card-group mb-0">
-				<div class="card p-4">
-					<div class="card-block">
-						<h1>Create meeting</h1>
-						<p class="text-muted">Schedule a conference meeting</p>
-						<div th:if="${param.error}">Invalid username and password.</div>
-						<div th:if="${param.logout}">You have been logged out.</div>
-						<form id="createMeetingForm" action="#"
-							th:action="@{/createMeeting}" th:object="${meetingForm}"
-							method="post">
-							<div class="input-group mb-3"></div>
-							<input hidden="true" type="text"
-								class="form-control datetimeoutput" th:field="*{start}"
-								placeholder="2011-12-03T10:15:30+01:00" />
-							<div class="input-group mb-4"
-								th:classappend="${#fields.hasErrors('start')} ? has-danger">
-								<input class="form-control col-md-4" type="text" maxlength="120" th:field="*{subject}"
-									placeholder="Brief subject" required="required"/>
-								<div th:if="${#fields.hasErrors('subject')}"
-									th:errors="*{subject}" class="form-control-feedback">Error
-									subject</div>
-							</div>
-
-
-							<div class="input-group mb-4"
-								th:classappend="${#fields.hasErrors('start')} ? has-danger">
-								<span class="input-group-addon"><i class="icon-calendar"></i></span>
-								<input id="datepicker" type="text" data-provide="datepicker"
-									data-orientation="auto bottom" data-format="yy-mm-dd"
-									class="form-control date col-md-4" required="true"
-									th:value="${{meetingForm.startDate}}"
-									placeholder="Date e.g., 05-31-2021" /> <span
-									class="input-group-addon"><i class="icon-clock"></i></span> <input
-									id="timepicker"
-									class="form-control  bootstrap-timepicker timepicker col-md-4"
-									data-provide="timepicker" data-template="dropdown"
-									data-minute-step="1" data-show-meridian="false" type="text"
-									required="true" th:value="${{meetingForm.startTime}}"
-									placeholder="Time e.g., 18:20" />
-								<div th:if="${#fields.hasErrors('start')}" th:errors="*{start}"
-									class="form-control-feedback">Error duration</div>
-								<select id="selecttimezone" class="selectpicker col-md-4"
-									name="timeZone"></select>
-								<div th:if="${#fields.hasErrors('timeZone')}"
-									th:errors="*{timeZone}" class="form-control-feedback">Error
-									timezone</div>
-
-							</div>
-
-							<div class="input-group mb-4"
-								th:classappend="${#fields.hasErrors('duration')} ? has-danger">
-								<span class="input-group-addon"><i class="icon-bell"></i>
-								</span> <input id="durationpicker"
-									class="form-control  bootstrap-timepicker timepicker col-md-3"
-									data-provide="timepicker" data-template="dropdown"
-									th:field="*{duration}" data-minute-step="1"
-									data-show-meridian="false" data-max-hours="8"
-									data-default-time="01:00" type="text" required="true"
-									th:value="${{meetingForm.startTime}}"
-									placeholder="Duration e.g., 01:30" />
-								<div th:if="${#fields.hasErrors('duration')}"
-									th:errors="*{duration}" class="form-control-feedback">Error
-									duration</div>
-							</div>
-
-
-							<div class="input-group mb-4"
-								th:classappend="${#fields.hasErrors('emails')} ? has-danger">
-								<span class="input-group-addon"><i class="icon-user"></i></span>
-								<input class="form-control" type="email" id="new_email"
-									placeholder="Enter email" />
-								<div th:if="${#fields.hasErrors('emails')}"
-									th:errors="*{emails}" class="form-control-feedback">Error
-									emails</div>
-								<button id="add_field_button" class="btn btn-primary">Add</button>
-							</div>
-							<table class="table">
-
-								<thead>
-									<tr>
-										<th>Select</th>
-										<th>Participants in meeting</th>
-									</tr>
-								</thead>
-								<tbody class="input_fields_wrap">
-									<tr class="useremail"
-										th:each="email, stat : ${meetingForm.emails}">
-										<td><input class="todelete" type="checkbox" value=""></input></td>
-										<td><input hidden="true" type="text" class="form-control"
-											th:field="*{emails[__${stat.index}__]}" th:value="${email}" />
-											<div th:text="${email}"></div></td>
-									</tr>
-								</tbody>
-							</table>
-							<div class="row">
-								<div class="col-6">
-									<button id="delete_button" class="btn btn-primary px-4">Delete</button>
-								</div>
-								<div class="col-12 text-right">
-									<button value="Create" type="submit"
-										class="btn btn-primary px-4">Create</button>
-									<a th:href="@{/listMeeting}" class="btn btn-primary px-4">Cancel</a>
+			<div class="card p-4">
+				<div class="header">
+					<h4 class="title">Create meeting</h4>
+					<p class="text-muted">Schedule a conference meeting</p>
+				</div>
+				<div class="content">
+					<div th:if="${param.error}">Invalid username and password.</div>
+					<div th:if="${param.logout}">You have been logged out.</div>
+					<form role="form" id="createMeetingForm" action="#"
+						th:action="@{/createMeeting}" th:object="${meetingForm}"
+						method="post">
+						<input class="datetimeoutput" hidden="true" type="text"
+							th:field="*{start}" placeholder="2011-12-03T10:15:30+01:00" />
+						<div class="row">
+							<div class="col-md-12">
+								<div class="form-group has-feedback"
+									th:classappend="${#fields.hasErrors('start')} ? has-danger">
+									<label class="control-label">Subject</label> <input
+										class="form-control border-input col-md-4" type="text"
+										maxlength="120" th:field="*{subject}"
+										placeholder="Brief subject" required="required" />
+									<div th:if="${#fields.hasErrors('subject')}"
+										th:errors="*{subject}" class="form-control-feedback">Error
+										subject</div>
 								</div>
 							</div>
-						</form>
+						</div>
+
+						<div class="row">
+							<div class="col-md-5">
+								<div class="form-group has-feedback"
+									th:classappend="${#fields.hasErrors('start')} ? has-danger">
+									<label class="control-label">Date</label> <input
+										id="datepicker" data-provide="datepicker"
+										data-orientation="auto bottom" data-format="yy-mm-dd"
+										class="form-control border-input date col-sm-4 datetimeinput"
+										required="true" th:value="${{meetingForm.startDate}}"
+										placeholder="e.g., 05-31-2021" />
+								</div>
+							</div>
+							<div class="col-md-4">
+								<div class="form-group has-feedback">
+									<label class="control-label">Time</label> <input
+										id="timepicker"
+										class="form-control border-input  bootstrap-timepicker timepicker col-sm-4"
+										data-provide="timepicker" data-template="dropdown"
+										data-minute-step="1" data-show-meridian="false" type="text"
+										required="true" th:value="${{meetingForm.startTime}}"
+										placeholder="e.g., 18:20" />
+									<div th:if="${#fields.hasErrors('start')}" th:errors="*{start}"
+										class="form-control-feedback">Error duration</div>
+								</div>
+							</div>
+							<div class="col-md-3">
+								<div class="form-group">
+									<label class="control-label">TimeZone</label>
+									<div class="input-group">
+										<span class="input-group-addon"><i
+											class="glyphicon glyphicon-globe"></i></span> <select
+											id="selecttimezone" name="timeZone"></select>
+										<div th:if="${#fields.hasErrors('timeZone')}"
+											th:errors="*{timeZone}" class="form-control-feedback">Error
+											timezone</div>
+										<div th:if="${#fields.hasErrors('start')}"
+											th:errors="*{start}" class="form-control-feedback">Error
+											duration</div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+
+						<div class="row">
+							<div class="col-md-5">
+								<div class="form-group has-feedback"
+									th:classappend="${#fields.hasErrors('duration')} ? has-danger">
+									<label class="control-label">Duration</label> <input
+										id="durationpicker"
+										class="form-control border-input bootstrap-timepicker timepicker col-md-3"
+										data-provide="timepicker" data-template="dropdown"
+										th:field="*{duration}" data-minute-step="1"
+										data-show-meridian="false" data-max-hours="8"
+										data-default-time="01:00" type="text" required="true"
+										th:value="${{meetingForm.startTime}}"
+										placeholder="Duration e.g., 01:30" />
+									<div th:if="${#fields.hasErrors('duration')}"
+										th:errors="*{duration}" class="form-control-feedback">Error
+										duration</div>
+								</div>
+							</div>
+						</div>
+
+
+
+
+
+						<div class="input-group"
+							th:classappend="${#fields.hasErrors('emails')} ? has-danger">
+							<span class="input-group-addon"><i
+								class="glyphicon glyphicon-user"></i></span> <input
+								class="form-control border-input" type="email" id="new_email"
+								placeholder="Enter email" />
+							<div th:if="${#fields.hasErrors('emails')}" th:errors="*{emails}"
+								class="form-control-feedback">Error emails</div>
+							<span class="input-group-btn">
+								<button id="add_field_button" class="btn btn-success">Add</button>
+							</span>
+						</div>
+						<table class="table">
+
+							<thead>
+								<tr>
+									<th>Select</th>
+									<th>Participants in meeting</th>
+								</tr>
+							</thead>
+							<tbody class="input_fields_wrap">
+								<tr class="useremail"
+									th:each="email, stat : ${meetingForm.emails}">
+									<td><input class="todelete" type="checkbox" value=""></input></td>
+									<td><input hidden="true" type="text"
+										th:field="*{emails[__${stat.index}__]}" th:value="${email}" />
+										<div th:text="${email}"></div></td>
+								</tr>
+							</tbody>
+						</table>
+						<div class="row">
+							<div class="col-6">
+								<button id="delete_button" class="btn btn-danger px-4">Delete</button>
+							</div>
+							<div class="col-12 text-right">
+								<button value="Create" type="submit"
+									class="btn btn-success px-4">Create</button>
+								<a th:href="@{/listMeeting}" class="btn btn-warning px-4">Cancel</a>
+							</div>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="container">
+		<div class="row">
+			<div class='col-sm-6'>
+				<div class="form-group">
+					<div class='input-group date' id='datetimepicker1'>
+						<input type='text' class="form-control" /> <span
+							class="input-group-addon"> <span
+							class="glyphicon glyphicon-calendar"></span>
+						</span>
 					</div>
 				</div>
 			</div>
+
 		</div>
 	</div>
 </div>
@@ -161,7 +206,7 @@
 												if (new_email.val() != "") {
 													$(wrapper)
 															.append(
-																	'<tr class="useremail"><td><input class="todelete" type="checkbox" value=""></input></td><td><input hidden="true" class="form-control" type="text" value="'
+																	'<tr class="useremail"><td><input class="todelete" type="checkbox" value=""></input></td><td><input hidden="true" type="text" value="'
 																			+ new_email
 																					.val()
 																			+ '" name="emails['
@@ -189,7 +234,8 @@
 												e.preventDefault(); //prevent form from submitting
 												console.log($(".datetimeinput")
 														.val());
-
+												console.log($("#timepicker")
+														.val());
 												$(".datetimeoutput")
 														.val(
 																moment
@@ -214,20 +260,20 @@
 														.log($(
 																".datetimeoutput")
 																.val());
+
 												this.submit();
 											});
 
 						});
 	</script>
-	<script type="text/javascript" src="resources/js/jquery.timesetter.js">
-		
-	</script>
+	<!-- <script type="text/javascript" src="resources/js/jquery.timesetter.js"> -->
+
 	<!-- <script src="resources/js/bootstrap-select.min.js"></script> -->
 	<!-- <script type="text/javascript" src="resources/js/timezones.js"></script> -->
 
-	<script type="text/javascript" src="resources/js/jquery.timesetter.js">
+	<!-- <script type="text/javascript" src="resources/js/jquery.timesetter.js">
 		
-	</script>
+	</script> -->
 	<script
 		src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.4/js/standalone/selectize.min.js"></script>
 	<script>
@@ -243,14 +289,20 @@
 								'<option value="' + timezone[i] + '">'
 										+ timezone[i] + '</option>');
 					}
-					$('#selecttimezone').selectize();
+					$('#selecttimezone').selectize({
+						inputClass : 'form-control selectize-input'
+					});
 					//$('select').selectpicker();
 				})
 		$(document).ready(
 
 		);
 	</script>
-
+	<script type="text/javascript">
+		$(function() {
+			$('#datetimepicker1').datetimepicker();
+		});
+	</script>
 
 </div>
 
