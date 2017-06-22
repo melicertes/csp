@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	xmlns:sec="http://www.thymeleaf.org">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+<meta name="description" content="VCBridge - Admin Console" />
+<meta name="author" content="Dimis Savva" />
+<link rel="shortcut icon" href="resources/img/logo.png" />
+<!-- <link href="resources/css/bootstrap-select.min.css" rel="stylesheet" /> -->
+<title>VCBridge - Admin Console</title>
+
+<!-- Icons -->
+<link href="resources/css/font-awesome.min.css" rel="stylesheet" />
+
+<!-- <link href="resources/css/simple-line-icons.css" rel="stylesheet" /> -->
+
+<!-- Main styles for this application -->
+<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet"/>
+<!-- <link href="resources/css/style.css" rel="stylesheet" /> THIS ONE -->
+
+
+
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-timepicker/0.5.2/css/bootstrap-timepicker.min.css" />
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.4/css/bootstrap-datepicker.css" />
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.4/css/selectize.min.css" />
+<!-- <link href="resources/css/jquery.timesetter.min.css" rel="stylesheet" /> -->
+<!-- Datetime picker -->
+<!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/css/bootstrap-datetimepicker.min.css" /> -->
+<!-- <link href="resources/css/bootstrap-datetimepicker.min.css" rel="stylesheet" />
+ -->
+
+<!-- Theme included stylesheets -->
+<!-- <link href="//cdn.quilljs.com/1.2.4/quill.snow.css" rel="stylesheet">
+ -->
+<link
+	href="http://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.3/summernote.css"
+	rel="stylesheet">
+
+<style>
+.selectize-input>* {
+	vertical-align: middle;
+}
+
+.selectize-input .item {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	max-width: 150px;
+}
+
+/* respnonsive */
+.selectize-input {
+	display: table !important;
+	table-layout: fixed;
+	width: 100%;
+}
+
+.selectize-input>* {
+	vertical-align: middle;
+}
+
+.selectize-input .item {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	max-width: 80%;
+}
+</style>
+
+</head>
+
+<!-- BODY options, add following classes to body to change options
+
+// Header options
+1. '.header-fixed'					- Fixed Header
+
+// Sidebar options
+1. '.sidebar-fixed'					- Fixed Sidebar
+2. '.sidebar-hidden'				- Hidden Sidebar
+3. '.sidebar-off-canvas'		- Off Canvas Sidebar
+4. '.sidebar-compact'				- Compact Sidebar Navigation (Only icons)
+
+// Aside options
+1. '.aside-menu-fixed'			- Fixed Aside Menu
+2. '.aside-menu-hidden'			- Hidden Aside Menu
+3. '.aside-menu-off-canvas'	- Off Canvas Aside Menu
+
+// Footer options
+1. '.footer-fixed'						- Fixed footer
+
+-->
+
+
+
+<body class="app header-fixed">
+	<header class="app-header navbar">
+		<a class="navbar-brand" href="#" th:href="@{/}"></a>
+		<ul class="nav navbar-nav d-md-down-none">
+
+
+			<li class="nav-item px-3"><a class="nav-link" href="#"
+				th:href="@{/listMeeting}">My meetings</a></li>
+			<li class="nav-item px-3"><a class="nav-link" href="#"
+				th:href="@{/createMeeting}">Create meeting</a></li>
+			<li class="nav-item px-3"><a class="nav-link" href="#"
+				th:href="@{/emailTemplates}">Edit email templates</a></li>
+		</ul>
+		<ul class="nav navbar-nav ml-auto">
+
+			<li class="nav-item dropdown"><a
+				class="nav-link dropdown-toggle nav-link" data-toggle="dropdown"
+				href="#" role="button" aria-haspopup="true" aria-expanded="false">
+					<span class="d-md-down-none" th:inline="text">[[${#httpServletRequest.remoteUser}]]</span>
+			</a>
+				<div class="dropdown-menu dropdown-menu-right">
+
+					<div class="dropdown-header text-center">
+						<strong>Account</strong>
+					</div>
+
+					<a class="dropdown-item" th:href="@{/logout}"><i
+						class="fa fa-lock"></i> Logout</a>
+					<!-- <a class="dropdown-item" href="#"><i class="fa fa-lock"></i> Logout</a> -->
+				</div></li>
+
+
+		</ul>
+	</header>
+
+	<div class="app-body">
+		<!-- Main content -->
+		<div class="" th:each="err, stat : ${errors}">
+			<div class="alert alert-warning alert-dismissible fade show"
+				role="alert">
+				<button type="button" class="close" data-dismiss="alert"
+					aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<strong>Error</strong><span th:text="${err}">You should check
+					in on some of those fields below.</span>
+			</div>
+		</div>
+
+		<main class="main" layout:fragment="content"> <!-- Breadcrumb -->
+
+
+
+
+		<!-- /.conainer-fluid --> </main>
+
+
+
+
+	</div>
+
+	<footer class="app-footer">
+		<a href="#">CSP</a> &copy; 2017. <span class="float-right">Powered
+			by <a href="http://sastix.com">Sastix</a>
+		</span>
+	</footer>
+
+	<!-- Bootstrap and necessary plugins -->
+	<script src="resources/js/jquery.min.js"></script>
+	<!-- <script src="resources/js/tether.min.js"></script> -->
+	<script src="resources/js/moment-with-locales.min.js"></script>
+	<script src="resources/js/moment.min.js"></script>
+	<!-- <script src="resources/js/bootstrap.min.js"></script>  THIS ONE-->
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+	<!-- Plugins and scripts required by all views -->
+	<!-- 	<script src="resources/bower_components/chart.js/dist/Chart.min.js"></script> -->
+
+
+	<!-- GenesisUI main scripts -->
+
+	<!-- <script src="resources/js/app.js"></script> -->
+	<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js"></script> -->
+
+	<!-- Datetime picker -->
+
+	<script
+		src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-timepicker/0.5.2/js/bootstrap-timepicker.min.js"></script>
+	<script
+		src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.4/js/bootstrap-datepicker.min.js"></script>
+
+	<!-- <script type="text/javascript">$(function() {
+		console.log('hahahaah');
+		$('#datetimepicker1').datetimepicker();
+	});</script> -->
+
+
+	<div class="row" layout:fragment="scripts"></div>
+</body>
+
+</html>

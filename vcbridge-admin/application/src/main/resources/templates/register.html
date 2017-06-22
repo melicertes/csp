@@ -1,0 +1,49 @@
+<!DOCTYPE HTML>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorator="layout">
+<div layout:fragment="content">
+	<div class="userForm">
+		<h4>REGISTER YOUR ACCOUNT</h4>
+		<form role="form" th:action="@{/register}" method="post"
+			th:object="${userForm}">
+			<div class="form-group">
+				<label for="firstName" class="sr-only">First Name</label> <input
+					type="text" class="form-control" placeholder="First Name"
+					autofocus="autofocus" th:field="*{firstName}" required="required" />
+			</div>
+
+			<div class="form-group">
+				<label for="lastName" class="sr-only">Last Name</label> <input
+					type="text" class="form-control" placeholder="Last Name"
+					th:field="*{lastName}" required="required" />
+			</div>
+
+			<div class="form-group">
+				<label for="email" class="sr-only">Email address</label> <input
+					type="email" class="form-control" placeholder="E-mail address"
+					th:field="*{email}" required="required" />
+			</div>
+			<div class="form-group">
+				<label for="password" class="sr-only">Password</label> <input
+					type="password" class="form-control" placeholder="Password"
+					th:field="*{password}" required="required" />
+			</div>
+			<div class="form-group">
+				<label for="passwordConfirm" class="sr-only">Confirm
+					Password</label> <input type="password" class="form-control"
+					placeholder="Confirm password" th:field="*{passwordConfirm}"
+					required="required" />
+			</div>
+
+			<button class="btn btn-lg btn-primary btn-block" type="submit">Register</button>
+			<br />
+			<div class="text-center">
+				<a th:href="@{/login}" class="text-center">Go to Login</a>
+			</div>
+			<br />
+		</form>
+	</div>
+</div>
+</html>

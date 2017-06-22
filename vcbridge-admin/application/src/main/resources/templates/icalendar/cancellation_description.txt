@@ -1,0 +1,1 @@
+Dear [(${email})]\nThe meeting at [(${meeting_date})] and [(${meeting_time})] has been cancelled.\nBest regards,\n[(${user_first})], [(${user_lastname})]

@@ -1,0 +1,259 @@
+<!--
+ * CoreUI - Open Source Bootstrap Admin Template
+ * @version v1.0.0-alpha.4
+ * @link http://coreui.io
+ * Copyright (c) 2017 creativeLabs Łukasz Holeczek
+ * @license MIT
+ -->
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorator="layout">
+<div layout:fragment="head"></div>
+
+<div layout:fragment="content">
+
+	<div
+		class="app header-fixed sidebar-fixed aside-menu-fixed aside-menu-hidden">
+		<br />
+		<div class="col-md-8">
+			<div class="card-group mb-0">
+				<div class="card p-4">
+					<div class="card-block">
+						<h1>Create meeting</h1>
+						<p class="text-muted">Schedule a conference meeting</p>
+						<div th:if="${param.error}">Invalid username and password.</div>
+						<div th:if="${param.logout}">You have been logged out.</div>
+						<form id="createMeetingForm" action="#"
+							th:action="@{/createMeeting}" th:object="${meetingForm}"
+							method="post">
+							<div class="input-group mb-3"></div>
+							<input hidden="true" type="text"
+								class="form-control datetimeoutput" th:field="*{start}"
+								placeholder="2011-12-03T10:15:30+01:00" />
+							<div class="input-group mb-4"
+								th:classappend="${#fields.hasErrors('start')} ? has-danger">
+								<input class="form-control col-md-4" type="text" maxlength="120" th:field="*{subject}"
+									placeholder="Brief subject" required="required"/>
+								<div th:if="${#fields.hasErrors('subject')}"
+									th:errors="*{subject}" class="form-control-feedback">Error
+									subject</div>
+							</div>
+
+
+							<div class="input-group mb-4"
+								th:classappend="${#fields.hasErrors('start')} ? has-danger">
+								<span class="input-group-addon"><i class="icon-calendar"></i></span>
+								<input id="datepicker" type="text" data-provide="datepicker"
+									data-orientation="auto bottom" data-format="yy-mm-dd"
+									class="form-control date col-md-4" required="true"
+									th:value="${{meetingForm.startDate}}"
+									placeholder="Date e.g., 05-31-2021" /> <span
+									class="input-group-addon"><i class="icon-clock"></i></span> <input
+									id="timepicker"
+									class="form-control  bootstrap-timepicker timepicker col-md-4"
+									data-provide="timepicker" data-template="dropdown"
+									data-minute-step="1" data-show-meridian="false" type="text"
+									required="true" th:value="${{meetingForm.startTime}}"
+									placeholder="Time e.g., 18:20" />
+								<div th:if="${#fields.hasErrors('start')}" th:errors="*{start}"
+									class="form-control-feedback">Error duration</div>
+								<select id="selecttimezone" class="selectpicker col-md-4"
+									name="timeZone"></select>
+								<div th:if="${#fields.hasErrors('timeZone')}"
+									th:errors="*{timeZone}" class="form-control-feedback">Error
+									timezone</div>
+
+							</div>
+
+							<div class="input-group mb-4"
+								th:classappend="${#fields.hasErrors('duration')} ? has-danger">
+								<span class="input-group-addon"><i class="icon-bell"></i>
+								</span> <input id="durationpicker"
+									class="form-control  bootstrap-timepicker timepicker col-md-3"
+									data-provide="timepicker" data-template="dropdown"
+									th:field="*{duration}" data-minute-step="1"
+									data-show-meridian="false" data-max-hours="8"
+									data-default-time="01:00" type="text" required="true"
+									th:value="${{meetingForm.startTime}}"
+									placeholder="Duration e.g., 01:30" />
+								<div th:if="${#fields.hasErrors('duration')}"
+									th:errors="*{duration}" class="form-control-feedback">Error
+									duration</div>
+							</div>
+
+
+							<div class="input-group mb-4"
+								th:classappend="${#fields.hasErrors('emails')} ? has-danger">
+								<span class="input-group-addon"><i class="icon-user"></i></span>
+								<input class="form-control" type="email" id="new_email"
+									placeholder="Enter email" />
+								<div th:if="${#fields.hasErrors('emails')}"
+									th:errors="*{emails}" class="form-control-feedback">Error
+									emails</div>
+								<button id="add_field_button" class="btn btn-primary">Add</button>
+							</div>
+							<table class="table">
+
+								<thead>
+									<tr>
+										<th>Select</th>
+										<th>Participants in meeting</th>
+									</tr>
+								</thead>
+								<tbody class="input_fields_wrap">
+									<tr class="useremail"
+										th:each="email, stat : ${meetingForm.emails}">
+										<td><input class="todelete" type="checkbox" value=""></input></td>
+										<td><input hidden="true" type="text" class="form-control"
+											th:field="*{emails[__${stat.index}__]}" th:value="${email}" />
+											<div th:text="${email}"></div></td>
+									</tr>
+								</tbody>
+							</table>
+							<div class="row">
+								<div class="col-6">
+									<button id="delete_button" class="btn btn-primary px-4">Delete</button>
+								</div>
+								<div class="col-12 text-right">
+									<button value="Create" type="submit"
+										class="btn btn-primary px-4">Create</button>
+									<a th:href="@{/listMeeting}" class="btn btn-primary px-4">Cancel</a>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<div layout:fragment="scripts">
+	<script>
+		$(document)
+				.ready(
+						function() {
+							var max_fields = 10; //maximum input boxes allowed
+							var wrapper = $(".input_fields_wrap"); //Fields wrapper
+							var add_button = $("#add_field_button"); //Add button ID
+							var delete_button = $("#delete_button"); //Delete button
+							var new_email = $("#new_email"); // new email input
+							var x = 0; //initlal text box count
+
+							$(delete_button).click(
+									function(e) {
+										e.preventDefault();
+										$("tr.useremail").each(
+												function() {
+													$this = $(this)
+													if ($(this).find(
+															"input.todelete")
+															.is(":checked")) {
+														$(this).remove();
+													}
+												});
+									});
+							$(add_button)
+									.click(
+											function(e) { //on add input button click
+												e.preventDefault();
+												if (new_email.val() != "") {
+													$(wrapper)
+															.append(
+																	'<tr class="useremail"><td><input class="todelete" type="checkbox" value=""></input></td><td><input hidden="true" class="form-control" type="text" value="'
+																			+ new_email
+																					.val()
+																			+ '" name="emails['
+																			+ x
+																			+ ']"/><div>'
+																			+ new_email
+																					.val()
+																			+ '</div></td></tr>'); //add input box
+													new_email.val("");
+													new_email.focus();
+													x++; //text box increment
+												}
+											});
+							$(wrapper).on("click", ".remove_field",
+									function(e) { //user click on remove text
+										e.preventDefault();
+										$(this).parent('div').remove();
+										x--;
+									});
+
+							$('#createMeetingForm')
+									.on(
+											'submit',
+											function(e) { //use on if jQuery 1.7+
+												e.preventDefault(); //prevent form from submitting
+												console.log($(".datetimeinput")
+														.val());
+
+												$(".datetimeoutput")
+														.val(
+																moment
+																		.tz(
+																				$(
+																						"#datepicker")
+																						.val()
+																						+ 'T'
+																						+ $(
+																								"#timepicker")
+																								.val(),
+																				'MM-DD-YYYYTHH:mm',
+																				$(
+																						"#selecttimezone")
+																						.val())
+																		.format());
+												console
+														.log($(
+																"#selecttimezone")
+																.val());
+												console
+														.log($(
+																".datetimeoutput")
+																.val());
+												this.submit();
+											});
+
+						});
+	</script>
+	<script type="text/javascript" src="resources/js/jquery.timesetter.js">
+		
+	</script>
+	<!-- <script src="resources/js/bootstrap-select.min.js"></script> -->
+	<!-- <script type="text/javascript" src="resources/js/timezones.js"></script> -->
+
+	<script type="text/javascript" src="resources/js/jquery.timesetter.js">
+		
+	</script>
+	<script
+		src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.4/js/standalone/selectize.min.js"></script>
+	<script>
+		$(document).ready($('#datepicker').datepicker({
+			format : "mm-dd-yyyy",
+			orientation : "auto bottom"
+		}))
+		$(document).ready(
+				function() {
+					timezone = moment.tz.names();
+					for (var i = 0; i < timezone.length; i++) {
+						$('select').append(
+								'<option value="' + timezone[i] + '">'
+										+ timezone[i] + '</option>');
+					}
+					$('#selecttimezone').selectize();
+					//$('select').selectpicker();
+				})
+		$(document).ready(
+
+		);
+	</script>
+
+
+</div>
+
+
+
+</html>
