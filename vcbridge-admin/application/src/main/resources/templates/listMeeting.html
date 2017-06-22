@@ -5,7 +5,10 @@
 	layout:decorator="layout">
 
 <div layout:fragment="content">
-	<div class="content">
+	<div class="container">
+		<div class="row">
+			<div class="col-md-12">&nbsp;<br/><br/><br/></div>
+		</div>
 		<div class="card">
 
 			<ul class="nav nav-tabs">
@@ -40,7 +43,7 @@
 										<th th:if="${past}==false"><input type="checkbox"
 											id="selectall" value=""></input></th>
 										<th>Subject</th>
-										<th>Start Date/Time<span class="badge"
+										<th>Start Date/Time <span 
 											data-placement="top" data-title="Data/Time Information"
 											data-trigger="hover" data-toggle="popover"
 											data-content="- Time is set in a 24-hour clock basis. - Your timezone is "><i
@@ -62,7 +65,7 @@
 										<td th:text="${{meeting.duration}}">duration</td>
 										<td th:text="${#lists.size(meeting.participants)}">#ofparticipants</td>
 										<td><span th:text="${meeting.status}" class="label"
-											th:classappend="|${#strings.equals(meeting.status ,'Running') ? 'label-success': ''} ${#strings.equals(meeting.status ,'Pending') ? 'label-info': ''}|">status</span><sup
+											th:classappend="|${#strings.equals(meeting.status ,'Running') ? 'label-success': ''} ${#strings.equals(meeting.status ,'Completed') ? 'label-info': ''} ${#strings.equals(meeting.status ,'Pending') ? 'label-warning': ''} ${#strings.equals(meeting.status ,'Error') ? 'label-danger': ''} ${#strings.equals(meeting.status ,'Cancel') ? 'label-default': ''}|">status</span><sup
 											th:if="${#strings.toString(meeting.status) == 'Error'}">
 												<a href="#" th:href="@{/retryMeeting(id=${meeting.id})}">Retry</a>
 										</sup></td>
@@ -104,8 +107,8 @@
 
 		</div>
 	</div>
-	
-<div class="modal fade" id="confirm-cancel" tabindex="-1" role="dialog"
+
+	<div class="modal fade" id="confirm-cancel" tabindex="-1" role="dialog"
 		aria-labelledby="myModalLabel" aria-hidden="true">
 		<div class="modal-dialog">
 			<div class="modal-content">
