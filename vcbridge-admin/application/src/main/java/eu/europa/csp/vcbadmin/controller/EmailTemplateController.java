@@ -63,7 +63,7 @@ public class EmailTemplateController {
 			user.get().getCancellation().setSubject("Meeting cancellation: [(${meeting_date})] [(${meeting_time})]");
 			content = new Scanner(cancellationHTML.getInputStream(), "utf-8").useDelimiter("\\Z").next();
 			user.get().getCancellation().setContent(content);
-			
+
 		} else {
 			user.get().getInvitation().setSubject(emailTemplates.getInvitation().getSubject());
 			user.get().getInvitation().setContent(emailTemplates.getInvitation().getContent());
@@ -72,6 +72,6 @@ public class EmailTemplateController {
 		}
 
 		userRepository.save(user.get());
-		return "redirect:/listMeeting";
+		return "redirect:/listMeeting/scheduled";
 	}
 }

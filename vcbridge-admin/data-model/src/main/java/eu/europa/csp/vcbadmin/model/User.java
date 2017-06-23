@@ -45,6 +45,9 @@ public class User {
 	@Column(name = "password")
 	private String password;
 
+	@Column(name = "tz")
+	private String timezone;
+
 	@Enumerated(EnumType.STRING)
 	@Column(name = "role")
 	private UserRole role = UserRole.USER;
@@ -140,9 +143,18 @@ public class User {
 		this.meetings = meetings;
 	}
 
+	public String getTimezone() {
+		return timezone;
+	}
+
+	public void setTimezone(String timezone) {
+		this.timezone = timezone;
+	}
+
 	@Override
 	public String toString() {
 		return "User [id=" + id + ", firstName=" + firstName + ", lastName=" + lastName + ", email=" + email
 				+ ", password=" + password + ", role=" + role + "]";
 	}
+
 }

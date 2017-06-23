@@ -25,11 +25,11 @@
 						<div class="col-md-12 text-right">
 							<button th:if="${past}==false" id="cancel_meeting_button"
 								type="button" class="btn btn-danger"
-								th:classappend="${#lists.size(meetings.content)}>0?'':'disabled'">Cancel
+								th:classappend="${#lists.size(meetings.content)}>0?'':'disabled'"><span class="glyphicon glyphicon-remove"></span> Cancel
 								meeting</button>
 							<button th:if="${past}==false" id="moreactions_meeting_button"
 								type="button" class="btn btn-info"
-								th:classappend="${#lists.size(meetings.content)}>0?'':'disabled'">More
+								th:classappend="${#lists.size(meetings.content)}>0?'':'disabled'"><span class="glyphicon glyphicon-wrench"></span> More
 								actions</button>
 						</div>
 					</div>
@@ -120,7 +120,7 @@
 					<table class="table">
 						<thead>
 							<tr>
-								<th>Datetime</th>
+								<th>Date/Time</th>
 								<th>Duration</th>
 							</tr>
 						</thead>
@@ -135,9 +135,9 @@
 				</div>
 
 				<div class="modal-footer">
-					<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
 					<a href="#" id="submit-cancellation"
-						class="btn btn-success success">Submit</a>
+						class="btn btn-warning">Yes, cancel these meetings</a>
+					<button type="button" class="btn btn-default" data-dismiss="modal">No, don't cancel</button>
 				</div>
 			</div>
 		</div>

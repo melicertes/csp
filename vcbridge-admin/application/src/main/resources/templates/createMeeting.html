@@ -17,7 +17,7 @@
 	<div class="container">
 		<div class="row">
 			<div class="col-md-12">
-				&nbsp;<br /> <br /> <br />
+				&nbsp;<br /> <br /> <br /> <span th:text="${timezone}"></span>
 			</div>
 		</div>
 		<div class="col-md-8">
@@ -49,7 +49,7 @@
 							</div>
 						</div>
 
-							<div class="row form-group">
+						<div class="row form-group">
 							<div class="col-md-5">
 								<div class="form-group"
 									th:classappend="${#fields.hasErrors('start')} ? 'has-error':''">
@@ -66,7 +66,8 @@
 								</div>
 							</div>
 							<div class="col-md-3">
-								<div class="form-group" th:classappend="${#fields.hasErrors('start')}  ? 'has-error' :''">
+								<div class="form-group"
+									th:classappend="${#fields.hasErrors('start')}  ? 'has-error' :''">
 									<label class="control-label">Time</label>
 									<div class="input-group">
 										<span class="input-group-addon"><i
@@ -80,7 +81,8 @@
 								</div>
 							</div>
 							<div class="col-md-4">
-								<div class="form-group" th:classappend="${#fields.hasErrors('timeZone')} or ${#fields.hasErrors('start')}  ? 'has-error' :''">
+								<div class="form-group"
+									th:classappend="${#fields.hasErrors('timeZone')} or ${#fields.hasErrors('start')}  ? 'has-error' :''">
 									<label class="control-label">TimeZone</label>
 									<div class="input-group">
 										<span class="input-group-addon"><i
@@ -92,19 +94,21 @@
 										TimeZone</label>
 								</div>
 							</div>
-							
+
 						</div>
-						<div class="form-group"><label th:if="${#fields.hasErrors('start')}"
-										th:errors="*{start}" class="control-label text-danger">Error
-										start</label></div>
+						<div class="form-group">
+							<label th:if="${#fields.hasErrors('start')}" th:errors="*{start}"
+								class="control-label text-danger">Error start</label>
+						</div>
 
 
 						<div class="row">
-							<div class="col-md-5">
+							<div class="col-md-8">
 								<div class="form-group"
 									th:classappend="${#fields.hasErrors('duration')} ? has-danger">
 									<label class="control-label">Duration</label>
-									<div class="input-group"  th:classappend="${#fields.hasErrors('duration')}?'has-error':''">
+									<div class="input-group"
+										th:classappend="${#fields.hasErrors('duration')}?'has-error':''">
 										<span class="input-group-addon"><i
 											class="glyphicon glyphicon-bell"></i></span> <input
 											id="durationpicker"
@@ -127,10 +131,15 @@
 
 
 						<div class="row">
-							<div class="col-md-5">
+							<div class="col-md-8">
 								<div class="form-group">
-									<label class="control-label">Add participant</label>
-									<div class="input-group" th:classappend="${#fields.hasErrors('emails')}?'has-error':''">
+									<label class="control-label">Add participant <a
+										id="add_me"> <small>Include me (<span
+												th:inline="text">[[${#httpServletRequest.remoteUser}]]</span>
+										</small>)
+									</a></label>
+									<div class="input-group"
+										th:classappend="${#fields.hasErrors('emails')}?'has-error':''">
 										<span class="input-group-addon"><i
 											class="glyphicon glyphicon-user"></i></span> <input
 											class="form-control border-input" type="email" id="new_email"
@@ -139,8 +148,7 @@
 										</span>
 									</div>
 									<label th:if="${#fields.hasErrors('emails')}"
-										th:errors="*{emails}" class="text-danger">Error
-										emails</label>
+										th:errors="*{emails}" class="text-danger">Error emails</label>
 								</div>
 							</div>
 						</div>
@@ -194,17 +202,34 @@
 	</div>
 </div>
 <div layout:fragment="scripts">
-	<script>
+	<script th:inline="javascript">
 		$(document)
 				.ready(
 						function() {
 							var max_fields = 10; //maximum input boxes allowed
 							var wrapper = $(".input_fields_wrap"); //Fields wrapper
 							var add_button = $("#add_field_button"); //Add button ID
+							var add_me = $("#add_me"); //Add button ID
 							var delete_button = $("#delete_button"); //Delete button
 							var new_email = $("#new_email"); // new email input
+							/*<![CDATA[*/
+							var me=[[${#httpServletRequest.remoteUser}]];
+							/*]]>*/
+							
 							var x = 0; //initlal text box count
 
+							
+									$(wrapper)
+									.append(
+											'<tr class="useremail"><td><input class="todelete" type="checkbox" value=""></input></td><td><input hidden="true" type="text" value="'
+													+ me
+													+ '" name="emails['
+													+ x
+													+ ']"></input><div>'
+													+ me
+													+ '</div></td></tr>'); //add input box
+							x++; //text box increment
+							
 							$(delete_button).click(
 									function(e) {
 										e.preventDefault();
@@ -238,6 +263,24 @@
 													new_email.focus();
 													x++; //text box increment
 												}
+											});
+							$(add_me)
+									.click(
+											function(e) { //on add input button click
+												e.preventDefault();
+												$(wrapper)
+														.append(
+																'<tr class="useremail"><td><input class="todelete" type="checkbox" value=""></input></td><td><input hidden="true" type="text" value="'
+																		+ me
+																		+ '" name="emails['
+																		+ x
+																		+ ']"/><div>'
+																		+ me
+																		+ '</div></td></tr>'); //add input box
+												new_email.val("");
+												new_email.focus();
+												x++; //text box increment
+												$(add_me).remove();
 											});
 							$(wrapper).on("click", ".remove_field",
 									function(e) { //user click on remove text
@@ -295,7 +338,10 @@
 	</script> -->
 	<script
 		src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.4/js/standalone/selectize.min.js"></script>
-	<script>
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+		var userTZ=[[${userTZ}]];
+		/*]]>*/
 		$(document).ready($('#datepicker').datepicker({
 			format : "mm-dd-yyyy",
 			orientation : "auto bottom"
@@ -305,17 +351,14 @@
 					timezone = moment.tz.names();
 					for (var i = 0; i < timezone.length; i++) {
 						$('select').append(
-								'<option value="' + timezone[i] + '">'
+								'<option' + ((userTZ==timezone[i])?' selected="selected"':'') +' value="' + timezone[i] + '">'
 										+ timezone[i] + '</option>');
 					}
 					$('#selecttimezone').selectize({
 						inputClass : 'form-control selectize-input'
 					});
 					//$('select').selectpicker();
-				})
-		$(document).ready(
-
-		);
+				});
 	</script>
 	<script type="text/javascript">
 		$(function() {

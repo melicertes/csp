@@ -41,6 +41,7 @@ import eu.europa.csp.vcbadmin.config.editors.DurationEditor;
 import eu.europa.csp.vcbadmin.config.editors.ZoneDateTimeEditor;
 import eu.europa.csp.vcbadmin.constants.MeetingScheduledTaskType;
 import eu.europa.csp.vcbadmin.constants.MeetingStatus;
+import eu.europa.csp.vcbadmin.model.CustomUserDetails;
 import eu.europa.csp.vcbadmin.model.Meeting;
 import eu.europa.csp.vcbadmin.model.MeetingForm;
 import eu.europa.csp.vcbadmin.model.MeetingScheduledTask;
@@ -71,7 +72,8 @@ public class MeetingController {
 	VcbadminProperties vcbadminProperties;
 
 	@GetMapping("/createMeeting")
-	public String showForm(MeetingForm formMeeting) {
+	public String showForm(MeetingForm formMeeting, Model model, Authentication auth) {
+		model.addAttribute("userTZ", ((CustomUserDetails) auth.getPrincipal()).getTimezone());
 		return "createMeeting";
 	}
 
@@ -98,7 +100,7 @@ public class MeetingController {
 			BindingResult bindingResult, Authentication auth) {
 		List<String> emails = meetingForm.getEmails().stream().filter(s -> Objects.nonNull(s) && !s.trim().isEmpty())
 				.collect(Collectors.toList());
-		System.out.println(emails);
+		log.debug(emails.toString());
 		if (emails.isEmpty()) {
 			bindingResult.rejectValue("emails", "errors.emails.empty", "Please provide at least one participant");
 		} else {
@@ -165,7 +167,7 @@ public class MeetingController {
 	}
 
 	@PostMapping("/cancelMeeting")
-	public String checkPersonInfo(
+	public String cancelMeeting(
 			@RequestParam(value = "id") @Size(min = 1, message = "Please select at least one meeting to cancel") Long[] ids,
 			Model model) throws IOException {
 		try {
@@ -179,7 +181,7 @@ public class MeetingController {
 	@GetMapping(value = { "/listMeeting/{type}", "/" })
 
 	public String listMeeting(Model model, @PathVariable(name = "type", required = false) String past,
-			Authentication auth, @PageableDefault(value = 2, page = 0) Pageable pageable) {
+			Authentication auth, @PageableDefault(value = 10, page = 0) Pageable pageable) {
 		PageWrapper<Meeting> meetings;
 		Boolean isPast = "past".equals(past);
 		if (isPast) {
@@ -199,7 +201,7 @@ public class MeetingController {
 	}
 
 	@GetMapping(value = { "/retryMeeting" })
-	public String showMeeting(Long id, RedirectAttributes model, Authentication auth) {
+	public String retryMeeting(Long id, RedirectAttributes model, Authentication auth) {
 		if (!meetingService.retryMeeting(id)) {
 			model.addFlashAttribute("errors", Collections.singleton("Either too late to retry, or no such meeting"));
 		}

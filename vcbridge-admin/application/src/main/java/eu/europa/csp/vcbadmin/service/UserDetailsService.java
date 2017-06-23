@@ -12,6 +12,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import eu.europa.csp.vcbadmin.model.CustomUserDetails;
 import eu.europa.csp.vcbadmin.model.User;
 import eu.europa.csp.vcbadmin.repository.UserRepository;
 
@@ -31,13 +32,16 @@ public class UserDetailsService implements org.springframework.security.core.use
 	public UserDetails loadUserByUsername(final String login) {
 
 		log.debug("Authenticating {}", login);
-		 User user = userRepository.findByEmail(login.toLowerCase())
-	                .orElseThrow(() -> new UsernameNotFoundException(String.format("User with email=%s was not found", login)));
-	    				
+		User user = userRepository.findByEmail(login.toLowerCase()).orElseThrow(
+				() -> new UsernameNotFoundException(String.format("User with email=%s was not found", login)));
+
 		Collection<GrantedAuthority> grantedAuthorities = new ArrayList<>();
 		GrantedAuthority grantedAuthority = new SimpleGrantedAuthority(user.getRole().name());
 		grantedAuthorities.add(grantedAuthority);
-		return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(), grantedAuthorities);
+		return new CustomUserDetails(user.getEmail(), user.getPassword(), grantedAuthorities, user.getTimezone());
+		// return new
+		// org.springframework.security.core.userdetails.User(user.getEmail(),
+		// user.getPassword(), grantedAuthorities);
 
 	}
 }
