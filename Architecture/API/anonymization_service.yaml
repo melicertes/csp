@@ -7,7 +7,7 @@ info:
   version: 1.0.0
   title: Anonymization API
 host: int.csp.org
-basePath: /v2
+basePath: /v1
 tags:
   - name: anon
     description: Anonymize data
@@ -19,8 +19,11 @@ paths:
     post:
       tags:
         - anon
-      summary: post data to anonymize
-      description: ''
+      summary: Post integration data to anonymize
+      description: >-
+        Integration Layer posts integration data to the anonymization service.
+        The anonymization service responds with the integration data anonymized
+        based on internal rules.
       operationId: anonData
       consumes:
         - application/json
@@ -36,6 +39,8 @@ paths:
       responses:
         '200':
           description: Successful operation
+          schema:
+            $ref: '#/definitions/IndegrationAnonData'
         '400':
           description: Malformed Integration Data Structure
         '500':
