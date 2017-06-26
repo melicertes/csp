@@ -6,13 +6,12 @@ info:
     anonymized the appropriate fields of the dataObject json string.
   version: 1.0.0
   title: Anonymization API
-host: int.csp.org
+host: anon.csp.org
 basePath: /v1
 tags:
   - name: anon
     description: Anonymize data
 schemes:
-  - http
   - https
 paths:
   /anon:
@@ -42,11 +41,17 @@ paths:
           schema:
             $ref: '#/definitions/IndegrationAnonData'
         '400':
-          description: Malformed Integration Data Structure
+          description: Malformed Data Structure
+        '404':
+          description: >-
+            mapping not found; failure to identify (cspId, dataType,
+            ruleFilePath) tuple presented
+          schema:
+            $ref: '#/definitions/ResponseError'
         '500':
-          description: Internal server error
-        '503':
-          description: Service unavailable
+          description: Systemic failure
+          schema:
+            $ref: '#/definitions/ResponseError'
 definitions:
   IndegrationAnonData:
     type: object
@@ -57,18 +62,6 @@ definitions:
         $ref: '#/definitions/IntegrationDataType'
       dataObject:
         type: string
-  DataParams:
-    type: object
-    properties:
-      cspId:
-        type: string
-      applicationId:
-        type: string
-      recordId:
-        type: string
-      timestamp:
-        type: string
-        format: dateTime
   IntegrationDataType:
     type: string
     enum:
@@ -81,3 +74,23 @@ definitions:
       - file
       - contact
       - trustCircle
+  ResponseError:
+    description: Failed Response object
+    properties:
+      responseCode:
+        type: integer
+        minimum: 1000
+        maximum: 9999
+        example: 1020
+        description: the response code; code > 0 = Error (see detailed response)
+      responseText:
+        type: string
+        example: Transaction failure
+        description: the response received in a textual format
+      responseException:
+        type: string
+        example: Exception as received from the backend
+    required:
+      - responseCode
+      - responseText
+      - responseException
