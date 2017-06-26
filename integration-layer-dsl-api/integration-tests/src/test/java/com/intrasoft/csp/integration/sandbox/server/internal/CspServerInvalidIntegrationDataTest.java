@@ -9,7 +9,6 @@ import com.intrasoft.csp.commons.model.IntegrationDataType;
 import com.intrasoft.csp.commons.model.SharingParams;
 import com.intrasoft.csp.commons.routes.CamelRoutes;
 import com.intrasoft.csp.commons.routes.ContextUrl;
-import com.intrasoft.csp.integration.MockUtils;
 import com.intrasoft.csp.integration.TestUtil;
 import com.intrasoft.csp.server.CspApp;
 import org.apache.camel.test.spring.CamelSpringBootRunner;

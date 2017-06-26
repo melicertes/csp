@@ -1,11 +1,6 @@
 package com.intrasoft.csp.integration.sandbox.server.internal;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.intrasoft.csp.commons.apiHttpStatusResponse.HttpStatusResponseType;
-import com.intrasoft.csp.commons.model.DataParams;
-import com.intrasoft.csp.commons.model.IntegrationData;
-import com.intrasoft.csp.commons.model.IntegrationDataType;
-import com.intrasoft.csp.commons.model.SharingParams;
 import com.intrasoft.csp.commons.routes.ContextUrl;
 import com.intrasoft.csp.commons.validators.IntegrationDataValidator;
 import com.intrasoft.csp.integration.TestUtil;
@@ -13,23 +8,17 @@ import com.intrasoft.csp.server.CspApp;
 import org.apache.camel.test.spring.CamelSpringBootRunner;
 import org.apache.camel.test.spring.MockEndpointsAndSkip;
 import org.apache.commons.io.FileUtils;
-import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.validation.BeanPropertyBindingResult;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.io.File;
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.Charset;
 
