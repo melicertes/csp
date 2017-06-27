@@ -2,6 +2,7 @@ package eu.europa.csp.vcbadmin.controller;
 
 import java.io.IOException;
 import java.time.Duration;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
@@ -20,6 +21,7 @@ import javax.validation.constraints.Size;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.Authentication;
@@ -71,11 +73,8 @@ public class MeetingController {
 	@Autowired
 	VcbadminProperties vcbadminProperties;
 
-	@GetMapping("/createMeeting")
-	public String showForm(MeetingForm formMeeting, Model model, Authentication auth) {
-		model.addAttribute("userTZ", ((CustomUserDetails) auth.getPrincipal()).getTimezone());
-		return "createMeeting";
-	}
+	@Value(value = "${event.show.timezone.default:Europe/Athens}")
+	String tz_default;
 
 	@Autowired
 	public MeetingController(OpenfireProperties properties) {
@@ -93,6 +92,18 @@ public class MeetingController {
 		// "duration");
 		// binder.addCustomFormatter(new
 		// ZoneDateTimeFormatter(DateTimeFormatter.ISO_ZONED_DATE_TIME),"start");
+	}
+
+	@GetMapping("/createMeeting")
+	public String showForm(MeetingForm formMeeting, Model model, Authentication auth) {
+		String user_tz = ((CustomUserDetails) auth.getPrincipal()).getTimezone();
+		try {
+			ZoneId.of(user_tz);
+		} catch (Exception e) {
+			user_tz = tz_default;
+		}
+		model.addAttribute("userTZ", user_tz);
+		return "createMeeting";
 	}
 
 	@PostMapping("/createMeeting")
@@ -173,7 +184,7 @@ public class MeetingController {
 		try {
 			meetingService.cancelMeetings(ids);
 		} catch (MeetingNotFound e) {
-			model.addAttribute("error", e.getMessage());
+			model.addAttribute("errors", e.getMessage());
 		}
 		return "redirect:/listMeeting/scheduled";
 	}
@@ -197,6 +208,13 @@ public class MeetingController {
 		model.addAttribute("past", isPast);
 		model.addAttribute("meetingType", isPast ? "Past Meetings" : "Scheduled Meetings");
 		model.addAttribute("meetings", meetings);
+		String user_tz = ((CustomUserDetails) auth.getPrincipal()).getTimezone();
+		try {
+			ZoneId.of(user_tz);
+		} catch (Exception e) {
+			user_tz = tz_default;
+		}
+		model.addAttribute("userTZ", user_tz);
 		return "listMeeting";
 	}
 

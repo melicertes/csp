@@ -1,0 +1,202 @@
+<!--
+ * @version v1.0.0
+ * Copyright (c) 2017 Sastix Ltd
+ -->
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" th:include="layout :: page">
+<head th:fragment="header">
+<link href="http://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.3/summernote.css" rel="stylesheet">
+<style>
+table th, .table td { 
+     border-top: none !important; 
+ }
+</style>
+</head>
+<div th:fragment="content">
+
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        &nbsp;<br /> <br /> <br /> <span th:text="${timezone}"></span>
+      </div>
+    </div>
+    <div class="card">
+      <form role="form" id="createTemplateForm" action="#" th:action="@{/emailTemplate}" th:object="${emailTmpltForm}" method="post">
+        <div class="header">
+          <div class="row">
+            <div class="col-md-6">
+              <h3 style="margin-top: 0px">
+                <span th:text="${emailTmpltForm.id == null ? 'Create' : 'Update'}">Create</span> email template
+              </h3>
+              <p class="text-muted">Customize the email template using WYSIWIG editor &amp; shortcodes.</p>
+            </div>
+            <div class="col-md-6 text-right">
+              <a th:href="@{/listEmailTemplates}" class="btn btn-default">Cancel</a>
+              <button value="Create" type="submit" class="btn btn-success">Save template</button>
+            </div>
+          </div>
+        </div>
+        <div class="content">
+
+          <div class="row">
+            <div class="col-md-8">
+              <input type="text" th:field="*{id}" hidden="true" />
+
+              <div class="row">
+                <div class="col-md-10">
+                  <div class="form-group" th:classappend="${#fields.hasErrors('name')} ? has-error">
+                    <label class="control-label">Name</label>
+                    <!-- <span class="input-group-addon"><i class="glyphicon glyphicon-bell"></i></span> -->
+                    <input type="text" th:field="*{name}" required="required" class="form-control" placeholder="Enter a name for the template.." />
+                    <label th:if="${#fields.hasErrors('name')}" th:errors="*{name}" class="text-danger">Error name</label>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-md-8">
+                  <div class="form-group" th:classappend="${#fields.hasErrors('type')} ? has-error">
+                    <label class="control-label">Type</label>
+                    <!-- <span class="input-group-addon"><i class="glyphicon glyphicon-bell"></i></span> -->
+                    <select id="selecttype" required="required" th:field="*{type}">
+                      <option value="INVITATION">Invitation</option>
+                      <option value="CANCELLATION">Cancellation</option>
+                    </select>
+                    <label th:if="${#fields.hasErrors('type')}" th:errors="*{type}" class="text-danger">Error type</label>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-group" th:classappend="${#fields.hasErrors('active')} ? has-danger">
+                    <label class="control-label">Set default</label>
+                    <div class="checkbox">
+                      <label class="control-label">
+                        <input type="checkbox" th:field="*{active}">
+                        Active
+                      </label>
+                    </div>
+                    <label th:if="${#fields.hasErrors('active')}" th:errors="*{active}" class="text-danger">Error active</label>
+                  </div>
+                </div>
+              </div>
+
+
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="form-group" th:classappend="${#fields.hasErrors('subject')} ? has-error">
+                    <label class="control-label">Subject</label>
+                    <input type="text" required="required" th:field="*{subject}" class="form-control" placeholder="Enter invitation subject.." />
+                    <label th:if="${#fields.hasErrors('subject')}" th:errors="*{subject}" class="text-danger">Error subject</label>
+                  </div>
+                </div>
+              </div>
+
+
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="form-group" th:classappend="${#fields.hasErrors('content')} ? has-danger">
+                    <label class="control-label">Message</label>
+                    <textarea id="invitation-input" required="required" th:field="*{content}" class="form-control" placeholder="Enter invitation content.."></textarea>
+                    <label th:if="${#fields.hasErrors('content')}" th:errors="*{content}" class="text-danger">Error subject</label>
+                  </div>
+                </div>
+              </div>
+
+
+
+
+
+
+            </div>
+            <div class="col-md-4">
+              <div class="panel panel-default">
+                <div class="panel-heading text-center">
+                  <strong>Shortcodes</strong>
+                </div>
+
+                <div class="panel-body">
+                  <table class="table table-hover table-borderless">
+                    <tbody>
+                      <tr>
+                        <td class="text-right"><b>{email}</b></td>
+                        <td>user email</td>
+                      </tr>
+                      <tr>
+                        <td class="text-right"><b>{meeting_date}</b></td>
+                        <td>date in dd/MM/yyyy format</td>
+                      </tr>
+                      <tr>
+                        <td class="text-right"><b>{meeting_time}</b></td>
+                        <td>time in HH:mm ZZZ (timezone) format</td>
+                      </tr>
+                      <tr>
+                        <td class="text-right"><b>{meeting_duration_str}</b></td>
+                        <td>Meeting duration e.g., 2 hour(s) and 10 minutes</td>
+                      </tr>
+                      <tr>
+                        <td class="text-right"><b>{meeting_duration_str}</b></td>
+                        <td>Meeting duration e.g., 2 hour(s) and 10 minutes</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  <div class="row"><div class="col-md-12"><br/></div></div>
+                  <table class="table table-hover">
+                    <tbody>
+                      <tr>
+                        <td class="text-right"><b>{meeting_username}</b></td>
+                        <td>the generated/unique username for the participant</td>
+                      </tr>
+                      <tr>
+                        <td class="text-right"><b>{meeting_password}</b></td>
+                        <td>the generated/unique password for the participant</td>
+                      </tr>
+                      <tr>
+                        <td class="text-right"><b>{user_first}</b></td>
+                        <td>user first name</td>
+                      </tr>
+                      <tr>
+                        <td class="text-right"><b>{user_lastname}</b></td>
+                        <td>user last name</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+
+</div>
+
+<div th:fragment="scripts">
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.3/summernote.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.4/js/standalone/selectize.min.js"></script>
+  <script>
+      $(document).ready(function() {
+        $('#invitation-input').summernote({
+          onKeyup : function(e) {
+            $("#lawsContent").val($("#summernote").code());
+          }
+        });
+        $('#cancellation-input').summernote({
+          onKeyup : function(e) {
+            $("#lawsContent").val($("#summernote").code());
+          }
+        });
+        $('#selecttype').selectize({
+          inputClass : 'form-control selectize-input'
+        });
+      });
+    </script>
+</div>
+
+
+
+
+
+
+
+</html>

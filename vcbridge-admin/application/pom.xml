@@ -108,6 +108,23 @@
 				</dependencies>
 			</plugin>
 		</plugins>
+		<resources>
+			<resource>
+				<directory>${project.basedir}/src/main/resources</directory>
+				<filtering>true</filtering>
+				<excludes>
+					<exclude>public/fonts/**</exclude>
+				</excludes>
+			</resource>
+
+			<resource>
+				<directory>${project.basedir}/src/main/resources</directory>
+				<filtering>false</filtering>
+				<includes>
+					<include>public/fonts/**</include>
+				</includes>
+			</resource>
+		</resources>
 	</build>
 
 </project>

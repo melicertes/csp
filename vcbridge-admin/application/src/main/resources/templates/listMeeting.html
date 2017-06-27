@@ -1,222 +1,196 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml"
-	xmlns:th="http://www.thymeleaf.org"
-	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-	layout:decorator="layout">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" th:include="layout :: page">
+<head th:fragment="header">
+</head>
+<div th:fragment="content">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        &nbsp;<br /> <br /> <br />
+      </div>
+    </div>
+    <div class="card">
+      <div class="row">
+        <div class="col-md-6">
+          <h3 style="margin-top: 0px">My Meetings</h3>
+        </div>
+        <div class="col-md-6 text-right">
+          <a th:href="@{/createMeeting}" class="btn btn-primary">Create meeting</a>
+        </div>
+      </div>
+      <ul class="nav nav-tabs">
+        <li th:classappend="${past}==false?'active':''"><a th:href="@{/listMeeting/scheduled}">Scheduled Meetings</a></li>
+        <li th:classappend="${past}==true?'active':''"><a th:href="@{/listMeeting/past}">Past Meetings</a></li>
+      </ul>
 
-<div layout:fragment="content">
-	<div class="container">
-		<div class="row">
-			<div class="col-md-12">&nbsp;<br/><br/><br/></div>
-		</div>
-		<div class="card">
+      <div class="tab-content">
+        <div id="scheduled" class="tab-pane fade in active">
 
-			<ul class="nav nav-tabs">
-				<li th:classappend="${past}==false?'active':''"><a
-					th:href="@{/listMeeting/scheduled}">Scheduled Meetings</a></li>
-				<li th:classappend="${past}==true?'active':''"><a
-					th:href="@{/listMeeting/past}">Past Meetings</a></li>
-			</ul>
+          <p th:if="${#lists.isEmpty(meetings.items)}">
+            <br />Nothing to display yet.
+            <a th:href="@{/createMeeting}">Create a new meeting now</a>
+          </p>
+          <div th:unless="${#lists.isEmpty(meetings.items)}">
+            <div class="row">
+              <div class="col-md-12">&nbsp;</div>
+            </div>
+            <div class="row">
+              <div class="col-md-8">
+                <form class="form form-inline">
+                  <div class="form-group">
+                    <input class="form-control-sm" type="text" placeholder="Search by subject" />
+                  </div>
+                  <div class="form-group">
+                    <button type="submit" class="btn btn-primary">Search</button>
+                    <button type="submit" class="btn btn-default">Reset</button>
+                  </div>
+                </form>
+              </div>
+              <div class="col-md-4 text-right">
+                <button th:if="${past}==false" id="cancel_meeting_button" type="button" class="btn btn-danger btn-outline" th:classappend="${#lists.size(meetings.content)}>0?'':'disabled'">
+                  <span class="glyphicon glyphicon-remove"></span> Cancel meeting
+                </button>
+                <button th:if="${past}==false" id="moreactions_meeting_button" type="button" class="btn btn-primary btn-outline" th:classappend="${#lists.size(meetings.content)}>0?'':'disabled'">
+                  <span class="glyphicon glyphicon-wrench"></span> More actions
+                </button>
+              </div>
+            </div>
+            <br />
+            <div class="row">
+              <p class="col-md-12 text-muted" th:text="'Showing ' + ${meetings.showingStart} + '-' + ${meetings.showingEnd} + ' of ' + ${#lists.size(meetings.content)}">Meetings</p>
+            </div>
+            <div class="table-responsive">
+              <form id="cancellation-form" action="#" th:action="@{/cancelMeeting}" method="post">
+                <table class="table table-striped">
+                  <thead>
+                    <tr>
+                      <th th:if="${past}==false"><input type="checkbox" id="selectall" value=""></input></th>
+                      <th>Subject</th>
+                      <th>Start Date/Time <span data-placement="top" data-title="Data/Time Information" data-trigger="hover" data-toggle="popover"
+                        th:attr="data-content='- Time is set in a 24-hour clock basis. - Your timezone is ' + ${userTZ}"><i class="glyphicon glyphicon-info-sign"></i></span></th>
+                      <th>Duration</th>
+                      <th>Participants</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr class="currentmeeting" th:each="meeting, stat : ${meetings.content}">
+                      <td th:if="${past}==false"><input class="todelete" type="checkbox" name="id" th:value="${meeting.id}"
+                          th:attr="data-subject=${meeting.subject},data-date=${{meeting.start}},data-duration=${{meeting.duration}}"></input></td>
+                      <td th:text="${meeting.subject}">start</td>
+                      <td th:text="${{meeting.start}}">start</td>
+                      <td th:text="${{meeting.duration}}">duration</td>
+                      <td th:text="${#lists.size(meeting.participants)}">#ofparticipants</td>
+                      <td><span th:text="${meeting.status}" class="label"
+                        th:classappend="|${#strings.equals(meeting.status ,'Running') ? 'label-success': ''} ${#strings.equals(meeting.status ,'Completed') ? 'label-info': ''} ${#strings.equals(meeting.status ,'Pending') ? 'label-warning': ''} ${#strings.equals(meeting.status ,'Error') ? 'label-danger': ''} ${#strings.equals(meeting.status ,'Cancel') ? 'label-default': ''}|">status</span><sup
+                        th:if="${#strings.toString(meeting.status) == 'Error'}"> <a href="#" th:href="@{/retryMeeting(id=${meeting.id})}">Retry</a>
+                      </sup></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </form>
 
-			<div class="tab-content">
-				<div id="scheduled" class="tab-pane fade in active">
-					<div class="row">
-						<!-- <h3 class="col-md-6" th:text="${meetingType}">Meetings</h3> -->
-						<div class="col-md-12 text-right">
-							<button th:if="${past}==false" id="cancel_meeting_button"
-								type="button" class="btn btn-danger"
-								th:classappend="${#lists.size(meetings.content)}>0?'':'disabled'"><span class="glyphicon glyphicon-remove"></span> Cancel
-								meeting</button>
-							<button th:if="${past}==false" id="moreactions_meeting_button"
-								type="button" class="btn btn-info"
-								th:classappend="${#lists.size(meetings.content)}>0?'':'disabled'"><span class="glyphicon glyphicon-wrench"></span> More
-								actions</button>
-						</div>
-					</div>
-					<div th:if="${meetings.size==0}">Nothing to display yet</div>
-					<div class="table-responsive" th:unless="${meetings.size==0}">
-						<form id="cancellation-form" action="#"
-							th:action="@{/cancelMeeting}" method="post">
-							<table class="table table-striped">
-								<thead>
-									<tr>
-										<th th:if="${past}==false"><input type="checkbox"
-											id="selectall" value=""></input></th>
-										<th>Subject</th>
-										<th>Start Date/Time <span 
-											data-placement="top" data-title="Data/Time Information"
-											data-trigger="hover" data-toggle="popover"
-											data-content="- Time is set in a 24-hour clock basis. - Your timezone is "><i
-												class="glyphicon glyphicon-info-sign"></i></span></th>
-										<th>Duration</th>
-										<th>Participants</th>
-										<th>Status</th>
-									</tr>
-								</thead>
-								<tbody>
-									<tr class="currentmeeting"
-										th:each="meeting, stat : ${meetings.content}">
-										<td th:if="${past}==false"><input class="todelete"
-											type="checkbox" name="id" th:value="${meeting.id}"
-											th:attr="data-date=${{meeting.start}},data-duration=${{meeting.duration}}"></input>
-										</td>
-										<td th:text="${meeting.subject}">start</td>
-										<td th:text="${{meeting.start}}">start</td>
-										<td th:text="${{meeting.duration}}">duration</td>
-										<td th:text="${#lists.size(meeting.participants)}">#ofparticipants</td>
-										<td><span th:text="${meeting.status}" class="label"
-											th:classappend="|${#strings.equals(meeting.status ,'Running') ? 'label-success': ''} ${#strings.equals(meeting.status ,'Completed') ? 'label-info': ''} ${#strings.equals(meeting.status ,'Pending') ? 'label-warning': ''} ${#strings.equals(meeting.status ,'Error') ? 'label-danger': ''} ${#strings.equals(meeting.status ,'Cancel') ? 'label-default': ''}|">status</span><sup
-											th:if="${#strings.toString(meeting.status) == 'Error'}">
-												<a href="#" th:href="@{/retryMeeting(id=${meeting.id})}">Retry</a>
-										</sup></td>
-									</tr>
-								</tbody>
-							</table>
-						</form>
+            </div>
+            <nav class="pull-right">
+              <ul class="pagination">
+                <li class="page-item" th:classappend="${meetings.firstPage}? 'disabled' : ''"><a th:href="@{${meetings.url}(page=1,size=${meetings.size})}">← First</a></li>
+                <li class="page-item" th:classappend="${meetings.hasPreviousPage}? '' : 'disabled'"><a class="btn-link"
+                    th:href="@{${meetings.url}(page=${meetings.number-1},size=${meetings.size})}" title="Go to previous page">«</a></li>
+                <li th:each="item : ${meetings.items}" class="page-item" th:classappend="${item.current}? 'active' : ''"><a th:href="@{${meetings.url}(page=${item.number},size=${meetings.size})}">
+                    <span th:text="${item.number}">1</span>
+                  </a></li>
+                <li class="page-item" th:classappend="${meetings.hasNextPage}? '' : 'disabled'"><a th:href="@{${meetings.url}(page=${meetings.number+1},size=${meetings.size})}"
+                    title="Go to next page">»</a></li>
+                <li class="page-item" th:classappend="${meetings.lastPage}? 'disabled' : ''"><a th:href="@{${meetings.url}(page=${meetings.totalPages},size=${meetings.size})}">Last →</a></li>
+              </ul>
+            </nav>
+          </div>
 
-					</div>
-					<nav>
-						<ul class="pagination">
-							<li class="page-item"
-								th:classappend="${meetings.firstPage}? 'disabled' : ''"><a
-								th:href="@{${meetings.url}(page=1,size=${meetings.size})}">←
-									First</a></li>
-							<li class="page-item"
-								th:classappend="${meetings.hasPreviousPage}? '' : 'disabled'">
-								<a
-								th:href="@{${meetings.url}(page=${meetings.number-1},size=${meetings.size})}"
-								title="Go to previous page">«</a>
-							</li>
-							<li th:each="item : ${meetings.items}" class="page-item"
-								th:classappend="${item.current}? 'active' : ''"><a
-								th:href="@{${meetings.url}(page=${item.number},size=${meetings.size})}"><span
-									th:text="${item.number}">1</span></a></li>
-							<li class="page-item"
-								th:classappend="${meetings.hasNextPage}? '' : 'disabled'"><a
-								th:href="@{${meetings.url}(page=${meetings.number+1},size=${meetings.size})}"
-								title="Go to next page">»</a></li>
-							<li class="page-item"
-								th:classappend="${meetings.lastPage}? 'disabled' : ''"><a
-								th:href="@{${meetings.url}(page=${meetings.totalPages},size=${meetings.size})}">Last
-									→</a></li>
-						</ul>
-					</nav>
-				</div>
+        </div>
 
-			</div>
+      </div>
 
-		</div>
-	</div>
+    </div>
+  </div>
 
-	<div class="modal fade" id="confirm-cancel" tabindex="-1" role="dialog"
-		aria-labelledby="myModalLabel" aria-hidden="true">
-		<div class="modal-dialog">
-			<div class="modal-content">
-				<div class="modal-header">Confirm Meeting Cancellation</div>
-				<div class="modal-body">
-					The following meetings are about to be cancelled. On confirmation,
-					all participants will be notified via email and access will be
-					revoked. Please confirm to continue.
-					<table class="table">
-						<thead>
-							<tr>
-								<th>Date/Time</th>
-								<th>Duration</th>
-							</tr>
-						</thead>
-						<tbody id="meetingstobecancelled">
-							<tr>
-								<td>dddd</td>
-								<td>ffff</td>
-							</tr>
-						</tbody>
-					</table>
+  <div class="modal fade" id="confirm-cancel" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header well">
+          <h4>Cancel meeting</h4>
+        </div>
+        <div class="modal-body">
+          <p>
+            Are you sure you want to cancel the following meetings: <br />
+          </p>
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Subject</th>
+                <th>Date/Time</th>
+                <th>Duration</th>
+              </tr>
+            </thead>
+            <tbody id="meetingstobecancelled">
+              <tr>
+                <th>subject</th>
+                <td>datetime</td>
+                <td>duration</td>
+              </tr>
+            </tbody>
+          </table>
+          If you select 'Yes' all participants will be notified via email and their access will be revoked.
+        </div>
 
-				</div>
-
-				<div class="modal-footer">
-					<a href="#" id="submit-cancellation"
-						class="btn btn-warning">Yes, cancel these meetings</a>
-					<button type="button" class="btn btn-default" data-dismiss="modal">No, don't cancel</button>
-				</div>
-			</div>
-		</div>
-	</div>
+        <div class="modal-footer">
+          <a href="#" id="submit-cancellation" class="btn btn-primary">Yes, cancel these meetings</a>
+          <button type="button" class="btn btn-default" data-dismiss="modal">No, don't cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
-<div layout:fragment="scripts">
+<div th:fragment="scripts">
 
-	<script>
-		$(document)
-				.ready(
-						function() {
+  <script>
+      $(document).ready(function() {
 
-							$("#selectall").change(
-									function() {
-										checked = this.checked;
-										$("tr.currentmeeting").each(
-												function() {
-													$this = $(this);
-													$(this).find(
-															"input.todelete")
-															.prop('checked',
-																	checked);
-												});
-									});
-							$("#cancel_meeting_button")
-									.click(
-											function(e) {
-												e.preventDefault();
-												console.log("GEIA SAS");
-												$("#meetingstobecancelled tr")
-														.remove();
-												var i = 0;
-												$("tr.currentmeeting")
-														.each(
-																function() {
+        $("#selectall").change(function() {
+          checked = this.checked;
+          $("tr.currentmeeting").each(function() {
+            $this = $(this);
+            $(this).find("input.todelete").prop('checked', checked);
+          });
+        });
+        $("#cancel_meeting_button").click(function(e) {
+          e.preventDefault();
+          console.log("GEIA SAS");
+          $("#meetingstobecancelled tr").remove();
+          var i = 0;
+          $("tr.currentmeeting").each(function() {
 
-																	$this = $(this);
-																	$(this)
-																			.find(
-																					"input.todelete")
-																			.each(
-																					function() {
-																						if ($(
-																								this)
-																								.prop(
-																										'checked') == true) {
-																							i++;
-																							$(
-																									"#meetingstobecancelled")
-																									.append(
-																											'<tr><td>'
-																													+ $(
-																															this)
-																															.attr(
-																																	"data-date")
-																													+ '</td><td>'
-																													+ $(
-																															this)
-																															.attr(
-																																	"data-duration")
-																													+ '</td></tr>');
-																						}
-																					});
-																}
+            $this = $(this);
+            $(this).find("input.todelete").each(function() {
+              if ($(this).prop('checked') == true) {
+                i++;
+                $("#meetingstobecancelled").append('<tr><td>' + $(this).attr("data-subject") + '</td><td>' + $(this).attr("data-date") + '</td><td>' + $(this).attr("data-duration") + '</td></tr>');
+              }
+            });
+          }
 
-														);
-												if (i > 0)
-													$('#confirm-cancel').modal(
-															'show');
-											});
-							$('#submit-cancellation').click(function() {
-								$('#cancellation-form').submit();
-							});
-						});
-	</script>
-	<script>
-		$(document).ready(function() {
-			$('[data-toggle="popover"]').popover();
-		});
-	</script>
+          );
+          if (i > 0)
+            $('#confirm-cancel').modal('show');
+        });
+        $('#submit-cancellation').click(function() {
+          $('#cancellation-form').submit();
+        });
+      });
+    </script>
+  <script>
+      $(document).ready(function() {
+        $('[data-toggle="popover"]').popover();
+      });
+    </script>
 </div>
 </html>

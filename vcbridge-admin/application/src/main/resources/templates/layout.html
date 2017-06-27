@@ -1,254 +1,150 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org"
-	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-	xmlns:sec="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:fragment="page">
 
 <head>
 
 <meta charset="utf-8" />
 <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-<meta name="viewport"
-	content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
 <meta name="description" content="VCBridge - Admin Console" />
 <meta name="author" content="Dimis Savva" />
 <link rel="shortcut icon" href="resources/img/logo.png" />
-<!-- <link href="resources/css/bootstrap-select.min.css" rel="stylesheet" /> -->
 <title>VCBridge - Admin Console</title>
 
 
-
-<!-- <link href="resources/css/simple-line-icons.css" rel="stylesheet" /> -->
-
 <!-- Main styles for this application -->
 <link href="/resources/css/bootstrap.min.css" rel="stylesheet" />
-<!-- <link href="/resources/css/paper-dashboard.css" rel="stylesheet" /> -->
-<link rel="stylesheet"
-	href="/resources/css/bootstrap-datetimepicker.min.css" />
+<link rel="stylesheet" th:href="@{/resources/css/bootstrap-datetimepicker.min.css}" />
 <!-- Icons -->
-<link
-	href="http://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css"
-	rel="stylesheet">
-<!-- <link href="/resources/css/font-awesome.min.css" rel="stylesheet" /> -->
-<!-- <link href="/resources/css/themify-icons.css" rel="stylesheet" /> -->
-<!-- <link
-	href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
-	rel="stylesheet" /> -->
-<!-- <link href="resources/css/style.css" rel="stylesheet" /> THIS ONE -->
+<link href="http://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css" th:href="@{/resources/css/font-awesome.min.css}" rel="stylesheet">
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-timepicker/0.5.2/css/bootstrap-timepicker.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.4/css/bootstrap-datepicker.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.4/css/selectize.min.css" />
 
 
-
-<link rel="stylesheet"
-	href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-timepicker/0.5.2/css/bootstrap-timepicker.min.css" />
-<link rel="stylesheet"
-	href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.4/css/bootstrap-datepicker.css" />
-<link rel="stylesheet"
-	href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.4/css/selectize.min.css" />
-<!-- <link href="resources/css/jquery.timesetter.min.css" rel="stylesheet" /> -->
-<!-- Datetime picker -->
-<!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/css/bootstrap-datetimepicker.min.css" /> -->
-<!-- <link href="resources/css/bootstrap-datetimepicker.min.css" rel="stylesheet" />
- -->
-
-<!-- Theme included stylesheets -->
-<!-- <link href="//cdn.quilljs.com/1.2.4/quill.snow.css" rel="stylesheet">
- -->
-<link
-	href="http://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.3/summernote.css"
-	rel="stylesheet">
-
-<style>
-.selectize-input>* {
-	vertical-align: middle;
-}
-
-.selectize-input .item {
-	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
-	max-width: 150px;
-}
-
-/* respnonsive */
-.selectize-input {
-	display: table !important;
-	table-layout: fixed;
-	width: 100%;
-}
-
-.selectize-input>* {
-	vertical-align: middle;
-}
-
-.selectize-input .item {
-	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
-	max-width: 80%;
-}
-</style>
-
+<link th:href="@{/resources/css/main.css}" rel="stylesheet" />
+<object th:include="this :: header" th:remove="tag"></object>
 </head>
 
 
 
 <body class="app header-fixed">
-	<nav class="navbar navbar-inverse navbar-fixed-top">
-		<div class="container">
-			<div class="navbar-header">
-				<button type="button" class="navbar-toggle collapsed"
-					data-toggle="collapse" data-target="#navbar" aria-expanded="false"
-					aria-controls="navbar">
-					<span class="sr-only">Toggle navigation</span> <span
-						class="icon-bar"></span> <span class="icon-bar"></span> <span
-						class="icon-bar"></span>
-				</button>
-				<a class="navbar-brand" th:href="@{/}">VCBridge Admin</a>
+  <nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+          <span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" th:href="@{/}">VCBridge Admin</a>
 
 
-			</div>
-			<ul class="nav navbar-nav">
+      </div>
+      <ul class="nav navbar-nav">
 
-				<li class=""><a th:href="@{/listMeeting/scheduled}"><i
-						class="fa fa-list "></i> Meetings</a></li>
-				<li class=""><a th:href="@{/createMeeting}"><i
-						class="fa fa-pencil "></i> Create</a></li>
-				<li class=""><a th:href="@{/emailTemplates}"><i
-						class="fa fa-wrench "></i> Email Templates</a></li>
-			</ul>
-			<div id="navbar" class="navbar-collapse collapse">
-				<!--------------------------->
-				<ul class="nav navbar-nav navbar-right">
-					<li class="dropdown"><a href="#" class="dropdown-toggle"
-						data-toggle="dropdown"> <span class="glyphicon glyphicon-user"></span>
-							<strong th:inline="text">[[${#httpServletRequest.remoteUser}]]</strong>
-							<span class="glyphicon glyphicon-chevron-down"></span>
-					</a>
-						<ul class="dropdown-menu">
-							<li>
-								<div class="navbar-login">
-									<div class="row">
-										<div class="col-lg-4">
-											<p class="text-center">
-												<span class="glyphicon glyphicon-user icon-size"></span>
-											</p>
-										</div>
-										<div class="col-lg-8">
-											<p class="text-left">Profile</p>
-											<p class="text-left">
-												<strong> </strong>
-											</p>
-											<p class="text-left small"></p>
-										</div>
-									</div>
-								</div>
-							</li>
-							<li class="divider"></li>
-							<li>
-								<div class="navbar-login navbar-login-session">
-									<div class="row">
-										<div class="col-lg-12">
-											<p>
-												<a th:href="@{/logout}" class="btn btn-danger btn-block">Logout</a>
-											</p>
-										</div>
-									</div>
-								</div>
-							</li>
-						</ul></li>
-				</ul>
-
-				<!----------- --------------->
-				<form class="navbar-form navbar-right" method="get"
-					action="/web/search/">
-					<div class="form-group">
-						<input type="text" placeholder="Search" name="q" id="q" value=""
-							class="form-control">
-					</div>
-					<button type="submit" class="btn btn-success">Go</button>
-				</form>
-
-			</div>
-			<!--/.navbar-collapse -->
+        <li class=""><a th:href="@{/listMeeting/scheduled}">
+            <i class="fa fa-list "></i> My Meetings
+          </a></li>
+        <!-- <li class=""><a th:href="@{/createMeeting}">
+            <i class="fa fa-pencil "></i> Create
+          </a></li> -->
+        <li class=""><a th:href="@{/listEmailTemplates}">
+            <i class="fa fa-wrench "></i> Email Templates
+          </a></li>
+      </ul>
+      <div id="navbar" class="navbar-collapse collapse">
+        <!--------------------------->
+        <ul class="nav navbar-nav navbar-right">
+          <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">
+              <span class="glyphicon glyphicon-user"></span> <strong th:inline="text">[[${#httpServletRequest.remoteUser}]]</strong> <span class="glyphicon glyphicon-chevron-down"></span>
+            </a>
+            <ul class="dropdown-menu">
+              <li>
+                <div class="navbar-login">
+                  <div class="row">
+                    <div class="col-lg-4">
+                      <p class="text-center">
+                        <span class="glyphicon glyphicon-user icon-size"></span>
+                      </p>
+                    </div>
+                    <div class="col-lg-8">
+                      <p class="text-left">Profile</p>
+                    </div>
+                  </div>
+                </div>
+              </li>
+              <li class="divider"></li>
+              <li>
+                <div class="navbar-login navbar-login-session">
+                  <div class="row">
+                    <div class="col-lg-12">
+                      <p>
+                        <a th:href="@{/logout}" class="btn btn-danger btn-block">Logout</a>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </li>
+            </ul></li>
+        </ul>
 
 
-		</div>
-	</nav>
+
+      </div>
+      <!--/.navbar-collapse -->
+
+
+    </div>
+  </nav>
 
 
 
 
-	<div class="app-body">
-		<!-- Main content -->
-		<div class="" th:each="err, stat : ${errors}">
-			<div class="alert alert-warning alert-dismissible fade show"
-				role="alert">
-				<button type="button" class="close" data-dismiss="alert"
-					aria-label="Close">
-					<span aria-hidden="true">&times;</span>
-				</button>
-				<strong>Error</strong><span th:text="${err}">You should check
-					in on some of those fields below.</span>
-			</div>
-		</div>
+  <div class="container">
+    <!-- Main content -->
+    <br /> <br />
+    <div class="" th:each="err, stat : ${errors}">
+      <div class="alert alert-warning alert-dismissible show" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <strong>Error</strong><span th:text="${err}">You should check in on some of those fields below.</span>
+      </div>
+    </div>
 
-		<div class="main-panel" layout:fragment="content">
+    <div th:include="this :: content"></div>
 
 
 
 
-			<!-- /.conainer-fluid -->
-		</div>
+  </div>
+
+  <div class="footer navbar-fixed-bottom">
+    <a href="#">CSP</a>
+    &copy; 2017. <span class="float-right">Powered by <a href="http://sastix.com">Sastix</a>
+    </span>
+  </div>
 
 
 
+  <!-- Bootstrap and necessary plugins -->
+  <script src="/resources/js/jquery-1.10.2.js"></script>
+  <script src="/resources/js/tether.min.js"></script>
+  <script src="/resources/js/moment-with-locales.min.js"></script>
+  <script src="/resources/js/moment.min.js"></script>
+  <script src="/resources/js/bootstrap.min.js"></script>
+  <script type="text/javascript" src="/resources/js/bootstrap-datetimepicker.min.js"></script>
+  <!-- Date/Time picker -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-timepicker/0.5.2/js/bootstrap-timepicker.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.4/js/bootstrap-datepicker.min.js"></script>
 
-	</div>
-	
-	<div class="footer navbar-fixed-bottom">
-	<a href="#">CSP</a> &copy; 2017. <span class="float-right">Powered
-			by <a href="http://sastix.com">Sastix</a>
-		</span>
-	</div>
-
-
-
-	<!-- Bootstrap and necessary plugins -->
-	<script src="/resources/js/jquery-1.10.2.js"></script>
-	<script src="/resources/js/tether.min.js"></script>
-	<script src="/resources/js/moment-with-locales.min.js"></script>
-	<script src="/resources/js/moment.min.js"></script>
-	<script src="/resources/js/bootstrap.min.js"></script>
-	<!-- <script src="resources/js/bootstrap.min.js"></script>  THIS ONE-->
-	<!-- <script
-		src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
-		integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
-		crossorigin="anonymous"></script> -->
-
-	<!-- Plugins and scripts required by all views -->
-	<!-- 	<script src="resources/bower_components/chart.js/dist/Chart.min.js"></script> -->
-
-
-	<!-- GenesisUI main scripts -->
-
-	<!-- <script src="resources/js/app.js"></script> -->
-	<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js"></script> -->
-	<script type="text/javascript"
-		src="/resources/js/bootstrap-datetimepicker.min.js"></script>
-	<!-- Datetime picker -->
-
-	<script
-		src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-timepicker/0.5.2/js/bootstrap-timepicker.min.js"></script>
-	<script
-		src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.4/js/bootstrap-datepicker.min.js"></script>
-
-	<!-- <script src="/resources/js/paper-dashboard.js"></script> -->
-	<!-- <script type="text/javascript">$(function() {
-		console.log('hahahaah');
-		$('#datetimepicker1').datetimepicker();
-	});</script> -->
-
-
-	<div class="row" layout:fragment="scripts"></div>
+  <!-- Make all buttons small -->
+  <script>
+      $(document).ready(function() {
+        $(".btn").addClass("btn-sm")
+      })
+    </script>
+  <object th:include="this :: scripts" th:remove="tag"></object>
 </body>
 
 </html>

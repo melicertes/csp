@@ -1,8 +1,8 @@
 package eu.europa.csp.vcbadmin.model;
 
 import java.util.List;
+import java.util.Set;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -10,11 +10,12 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 //import javax.validation.constraints.NotNull;
 import javax.validation.constraints.NotNull;
+
+import eu.europa.csp.vcbadmin.constants.EmailTemplateType;
 
 //import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -59,26 +60,48 @@ public class User {
 	}
 
 	public EmailTemplate getInvitation() {
+		EmailTemplate invitation = null;
+		for (EmailTemplate t : getTemplates()) {
+			if (t.getActive()) {
+				if (t.getType().equals(EmailTemplateType.INVITATION)) {
+					invitation = t;
+					break;
+				}
+			}
+		}
 		return invitation;
 	}
 
-	public void setInvitation(EmailTemplate invitation) {
-		this.invitation = invitation;
-	}
-
+	//
+	// public void setInvitation(EmailTemplate invitation) {
+	// this.invitation = invitation;
+	// }
+	//
 	public EmailTemplate getCancellation() {
+		EmailTemplate cancellation = null;
+		for (EmailTemplate t : getTemplates()) {
+			if (t.getActive()) {
+				if (t.getType().equals(EmailTemplateType.CANCELLATION)) {
+					cancellation = t;
+					break;
+				}
+			}
+		}
 		return cancellation;
 	}
+	//
+	// public void setCancellation(EmailTemplate cancellation) {
+	// this.cancellation = cancellation;
+	// }
 
-	public void setCancellation(EmailTemplate cancellation) {
-		this.cancellation = cancellation;
-	}
+	// @OneToOne(cascade = CascadeType.ALL)
+	// private EmailTemplate invitation;
+	//
+	// @OneToOne(cascade = CascadeType.ALL)
+	// private EmailTemplate cancellation;
 
-	@OneToOne(cascade = CascadeType.ALL)
-	private EmailTemplate invitation;
-
-	@OneToOne(cascade = CascadeType.ALL)
-	private EmailTemplate cancellation;
+	@OneToMany(mappedBy = "user")
+	private Set<EmailTemplate> templates;
 
 	@OneToMany(mappedBy = "user")
 	private List<Meeting> meetings;
@@ -155,6 +178,14 @@ public class User {
 	public String toString() {
 		return "User [id=" + id + ", firstName=" + firstName + ", lastName=" + lastName + ", email=" + email
 				+ ", password=" + password + ", role=" + role + "]";
+	}
+
+	public Set<EmailTemplate> getTemplates() {
+		return templates;
+	}
+
+	public void setTemplates(Set<EmailTemplate> templates) {
+		this.templates = templates;
 	}
 
 }

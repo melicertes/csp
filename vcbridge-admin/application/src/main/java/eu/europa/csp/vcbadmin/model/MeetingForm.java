@@ -32,7 +32,7 @@ public class MeetingForm {
 
 	@NotNull
 	private String timeZone = "Europe/Athens";
-	
+
 	@NotEmpty
 	private String subject;
 

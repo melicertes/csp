@@ -57,6 +57,15 @@ public class PageWrapper<T> {
 		return currentNumber;
 	}
 
+	public long getShowingStart() {
+		return (currentNumber - 1) * getSize() + 1;
+	}
+
+	public long getShowingEnd() {
+		long virtual_max = getShowingStart() + getSize();
+		return virtual_max > page.getTotalElements() ? page.getTotalElements() : virtual_max;
+	}
+
 	public List<T> getContent() {
 		return page.getContent();
 	}
