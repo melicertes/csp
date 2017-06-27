@@ -1,14 +1,10 @@
 swagger: '2.0'
 info:
-  version: 1.0.2
+  version: 1.0.4
   title: CSP Server Configuration API
+  description: ''
 schemes:
   - https
-
-# basePath does not contain the version so we can support multiple in the future
-basePath: /csp/confservice
-
-# paths may include a 'vXYZ' path if they are versioned
 paths:
   '/v1/updates/{cspId}':
     get:
@@ -22,7 +18,7 @@ paths:
       parameters:
         - name: cspId
           in: path
-          description: | 
+          description: |
             a unique identifier that defines a Registered and Known CSP. The 
             csp identifier follows the UUID formatted as text, for 36 characters
             total, arranged as 8-4-4-4-12. 
@@ -30,11 +26,11 @@ paths:
           required: true
           type: string
       responses:
-        '200': 
+        '200':
           description: List of available updates by module
-          schema: 
+          schema:
             $ref: '#/definitions/UpdateInformation'
-        '404': 
+        '404':
           description: cspId not found; failure to identify cspId presented
           schema:
             $ref: '#/definitions/ResponseError'
@@ -42,7 +38,6 @@ paths:
           description: Systemic failure
           schema:
             $ref: '#/definitions/ResponseError'
-            
   '/v1/appInfo/{cspId}':
     post:
       description: |
@@ -54,7 +49,7 @@ paths:
       parameters:
         - name: cspId
           in: path
-          description: | 
+          description: |
             a unique identifier that defines a Registered and Known CSP. The 
             csp identifier follows the UUID formatted as text, for 36 characters
             total, arranged as 8-4-4-4-12. 
@@ -72,7 +67,7 @@ paths:
           description: Successful response
           schema:
             $ref: '#/definitions/Response'
-        '404': 
+        '404':
           description: cspId not found; failure to identify cspId presented
           schema:
             $ref: '#/definitions/ResponseError'
@@ -80,11 +75,11 @@ paths:
           description: Systemic failure
           schema:
             $ref: '#/definitions/ResponseError'
-
   '/v1/register/{cspId}':
     post:
-      description: |
-        Register a NEW csp or register for an existing CSP the modules that are being installed
+      description: >
+        Register a NEW csp or register for an existing CSP the modules that are
+        being installed
       consumes:
         - application/json
       produces:
@@ -92,7 +87,7 @@ paths:
       parameters:
         - name: cspId
           in: path
-          description: | 
+          description: |
             a unique identifier that defines a Registered and Known CSP. The 
             csp identifier follows the UUID formatted as text, for 36 characters
             total, arranged as 8-4-4-4-12. 
@@ -110,20 +105,22 @@ paths:
           description: received when the CSP is registered successfully
           schema:
             $ref: '#/definitions/Response'
-        '404':
-          description: received when CSP requests update but original entry does not exist OR 
-            when cspId is not recognized
-          schema:
-            $ref: '#/definitions/ResponseError'
         '400':
-          description: received when CSP updates entries with "registrationIsUpdate = false"
+          description: >-
+            received when CSP updates entries with "registrationIsUpdate =
+            false"
           schema:
             $ref: '#/definitions/ResponseError'
-        '500': 
+        '404':
+          description: >-
+            received when CSP requests update but original entry does not exist
+            OR when cspId is not recognized
+          schema:
+            $ref: '#/definitions/ResponseError'
+        '500':
           description: received when the CSP is not registered due to system error
           schema:
             $ref: '#/definitions/ResponseError'
-
   '/v1/update/{cspId}/{updateHash}':
     get:
       description: |
@@ -137,7 +134,7 @@ paths:
       parameters:
         - name: cspId
           in: path
-          description: | 
+          description: |
             a unique identifier that defines a Registered and Known CSP. The 
             csp identifier follows the UUID formatted as text, for 36 characters
             total, arranged as 8-4-4-4-12. 
@@ -146,9 +143,13 @@ paths:
           type: string
         - name: updateHash
           in: path
-          description: | 
-            a unique identifier hash for the given update. The system must verify that this
-            hash is available for this cspId to download; then it provides the byte stream
+          description: >
+            a unique identifier hash for the given update. The system must
+            verify that this
+
+            hash is available for this cspId to download; then it provides the
+            byte stream
+
             for this update object.
           required: true
           type: string
@@ -158,20 +159,15 @@ paths:
           schema:
             type: file
             format: application/octet-stream
-        '404':
-          description: cspId is not recognized
-          schema:
-            $ref: '#/definitions/ResponseError'
         '400':
           description: received when this update is not available for this CSP
           schema:
             $ref: '#/definitions/ResponseError'
-        
-  
-
-
+        '404':
+          description: cspId is not recognized
+          schema:
+            $ref: '#/definitions/ResponseError'
 definitions:
-  
   VersionDefinition:
     description: |
       the version definition used for communicating with the CSP APIs;
@@ -181,7 +177,6 @@ definitions:
     type: integer
     minimum: 10000
     maximum: 90000
-    
   Registration:
     description: Registration object for a new CSP
     properties:
@@ -199,7 +194,7 @@ definitions:
         description: Date and Time in UTC ISODate for the record timestamp
       externalIPs:
         type: array
-        items: 
+        items:
           type: string
         minItems: 1
         maxItems: 10
@@ -207,11 +202,11 @@ definitions:
         type: array
         minItems: 1
         maxItems: 10
-        items: 
+        items:
           type: string
       registrationIsUpdate:
         type: boolean
-        description: "true if this is an update of existing CSP registration"
+        description: true if this is an update of existing CSP registration
       contacts:
         type: array
         items:
@@ -222,12 +217,11 @@ definitions:
         $ref: '#/definitions/ModulesInfo'
     required:
       - name
-      - registrationDate   
+      - registrationDate
       - externalIPs
       - internalIPs
       - registrationIsUpdate
       - contacts
-      
   ContactDetails:
     properties:
       personName:
@@ -237,17 +231,16 @@ definitions:
         format: email
       contactType:
         type: string
-        description: 'type of contact details'
+        description: type of contact details
         default: tech-admin
         enum:
-        - tech-admin
-        - contact
-        - securityofficer
+          - tech-admin
+          - contact
+          - securityofficer
     required:
       - personName
       - personEmail
       - contactType
-      
   AppInfo:
     description: AppInfo object
     properties:
@@ -302,37 +295,27 @@ definitions:
       - responseCode
       - responseText
       - responseException
-      
-      
   ModulesInfo:
     description: The json object that contains information on the modules installed
     properties:
       modules:
         type: array
-        items: 
-          type: string
-          example:
-            - configuration-service-client
-            - misp-installation
-        description: 'array of the modules names, see example'
-      data:
-        properties:
-          name: 
-            type: string
-            example: 'configuration-service-client'
-          additionalProperties:
-            $ref: '#/definitions/ModuleData'
+        items:
+          properties:
+            name:
+              type: string
+              example: configuration-service-client
+            additionalProperties:
+              $ref: '#/definitions/ModuleData'
     required:
       - modules
-      - data
-      
   ModuleData:
     description: Map of data specific to a module
     properties:
       fullName:
         type: string
       version:
-        $ref: "#/definitions/VersionDefinition"
+        $ref: '#/definitions/VersionDefinition'
       installedOn:
         type: string
         format: date
@@ -348,14 +331,13 @@ definitions:
         version: 10000
         installed: '2017-04-24T11:59:35Z'
         active: true
-        hash: 'c0535e4be2b79ffd93291305436bf889314e4a3faec05ecffcbb7df31ad9e51a'
+        hash: c0535e4be2b79ffd93291305436bf889314e4a3faec05ecffcbb7df31ad9e51a
     required:
       - fullName
       - version
       - installedOn
       - active
       - hash
-      
   UpdateInformation:
     description: contains update information for the selected CSP
     properties:
@@ -372,18 +354,15 @@ definitions:
               description: Rolling update of 20170331 to fix CSR-3988
               version: 10129
               released: '2017-03-30T11:12:33Z'
-              isIncremental: true
             - name: 'configuration-service-client:1.0.2'
               description: Rolling update of 20170403 to fix CSR-3989
               version: 10200
               released: '2017-04-03T12:12:33Z'
-              isIncremental: true
         additionalProperties:
           $ref: '#/definitions/ModuleUpdateInfo'
     required:
       - dateChanged
       - available
-      
   ModuleUpdateInfo:
     description: list of available updates for a module
     properties:
@@ -392,31 +371,24 @@ definitions:
       description:
         type: string
       version:
-        $ref: "#/definitions/VersionDefinition"
+        $ref: '#/definitions/VersionDefinition'
       released:
         type: string
         format: date-time
-      isIncremental:
-        type: boolean
-        description: >-
-          Value is true if the update needs the previous update installed to
-          work.
       hash:
         type: string
         description: |
           the SHA256 hash of the update archive
-        example: 'c0535e4be2b79ffd93291305436bf889314e4a3faec05ecffcbb7df31ad9e51a'
+        example: c0535e4be2b79ffd93291305436bf889314e4a3faec05ecffcbb7df31ad9e51a
     required:
       - name
       - description
       - version
       - released
-      - isIncremental
       - hash
     example:
       name: 'configuration-service-client:1.0.1'
-      description: 'Rolling update of 20170331 to fix CSR-3988'
+      description: Rolling update of 20170331 to fix CSR-3988
       version: 10100
       released: '2017-03-30T11:12:33Z'
-      isIncremental: true
-      hash: 'c0535e4be2b79ffd93291305436bf889314e4a3faec05ecffcbb7df31ad9e51a'
+      hash: c0535e4be2b79ffd93291305436bf889314e4a3faec05ecffcbb7df31ad9e51a
