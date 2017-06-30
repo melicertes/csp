@@ -11,8 +11,6 @@ import java.util.HashMap;
  */
 public enum IntegrationDataType {
 
-  DUMMY("dummy"),
-
   THREAT("threat"),
 
   EVENT("event"),
@@ -37,7 +35,7 @@ public enum IntegrationDataType {
     this.value = value;
   }
 
-  @Override
+/*  @Override
   @JsonValue
   public String toString() {
     return String.valueOf(value);
@@ -51,7 +49,7 @@ public enum IntegrationDataType {
       }
     }
     return null;
-  }
+  }*/
 
   public static final HashMap<IntegrationDataType, String> tcNamingConventionForShortName;
 
@@ -62,7 +60,6 @@ public enum IntegrationDataType {
     tcNamingConventionForShortName.put(IntegrationDataType.ARTEFACT, "CTC::SHARING_DATA_ARTEFACT");
     tcNamingConventionForShortName.put(IntegrationDataType.CHAT, "CTC::SHARING_DATA_CHAT");
     tcNamingConventionForShortName.put(IntegrationDataType.CONTACT, "CTC::SHARING_DATA_CONTACT");
-    tcNamingConventionForShortName.put(IntegrationDataType.DUMMY, "dummy");
     tcNamingConventionForShortName.put(IntegrationDataType.EVENT, "CTC::SHARING_DATA_EVENT");
     tcNamingConventionForShortName.put(IntegrationDataType.FILE, "CTC::SHARING_DATA_FILE");
     tcNamingConventionForShortName.put(IntegrationDataType.INCIDENT, "CTC::SHARING_DATA_INCIDENT");
