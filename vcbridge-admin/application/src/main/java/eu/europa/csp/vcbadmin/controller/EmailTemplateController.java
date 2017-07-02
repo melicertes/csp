@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.security.access.AccessDeniedException;
@@ -141,6 +142,12 @@ public class EmailTemplateController {
 			emailTemplateService.saveEmailTemplate(t, auth);
 		} catch (CannotRemainWithNoActiveTemplates e) {
 			model.addAttribute("errors", Collections.singleton(e.getMessage()));
+			return "createTemplate";
+		} catch (DataIntegrityViolationException ex) {
+			bindingResult.rejectValue("name", "email.template.name", "Duplicate name");
+			return "createTemplate";
+		} catch (Exception ex) {
+			model.addAttribute("errors", Collections.singleton(ex.getMessage()));
 			return "createTemplate";
 		}
 		// emailTemplateRepository.save(t);

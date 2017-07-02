@@ -1,6 +1,11 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" th:include="layout :: page">
 <head th:fragment="header">
+<style type="text/css">
+.popover {
+	max-width: none;
+}
+</style>
 </head>
 <div th:fragment="content">
   <div class="container">
@@ -36,7 +41,7 @@
             </div>
             <div class="row">
               <div class="col-md-8">
-                <form class="form form-inline">
+                <!-- <form class="form form-inline">
                   <div class="form-group">
                     <input class="form-control-sm" type="text" placeholder="Search by subject" />
                   </div>
@@ -44,15 +49,15 @@
                     <button type="submit" class="btn btn-primary">Search</button>
                     <button type="submit" class="btn btn-default">Reset</button>
                   </div>
-                </form>
+                </form> -->
               </div>
               <div class="col-md-4 text-right">
                 <button th:if="${past}==false" id="cancel_meeting_button" type="button" class="btn btn-danger btn-outline" th:classappend="${#lists.size(meetings.content)}>0?'':'disabled'">
                   <span class="glyphicon glyphicon-remove"></span> Cancel meeting
                 </button>
-                <button th:if="${past}==false" id="moreactions_meeting_button" type="button" class="btn btn-primary btn-outline" th:classappend="${#lists.size(meetings.content)}>0?'':'disabled'">
+                <!-- <button th:if="${past}==false" id="moreactions_meeting_button" type="button" class="btn btn-primary btn-outline" th:classappend="${#lists.size(meetings.content)}>0?'':'disabled'">
                   <span class="glyphicon glyphicon-wrench"></span> More actions
-                </button>
+                </button> -->
               </div>
             </div>
             <br />
@@ -80,7 +85,8 @@
                       <td th:text="${meeting.subject}">start</td>
                       <td th:text="${{meeting.start}}">start</td>
                       <td th:text="${{meeting.duration}}">duration</td>
-                      <td th:text="${#lists.size(meeting.participants)}">#ofparticipants</td>
+                      <td><span th:text="${#lists.size(meeting.participants)}">#ofparticipants</span> <span class="participants-popover" data-placement="top"
+                        th:attr="data-popover-content='#a'+${stat.index}" data-title="Data/Time Information" data-trigger="hover" data-toggle="popover"><i class="glyphicon glyphicon-info-sign"></i></span></td>
                       <td><span th:text="${meeting.status}" class="label"
                         th:classappend="|${#strings.equals(meeting.status ,'Running') ? 'label-success': ''} ${#strings.equals(meeting.status ,'Completed') ? 'label-info': ''} ${#strings.equals(meeting.status ,'Pending') ? 'label-warning': ''} ${#strings.equals(meeting.status ,'Error') ? 'label-danger': ''} ${#strings.equals(meeting.status ,'Cancel') ? 'label-default': ''}|">status</span><sup
                         th:if="${#strings.toString(meeting.status) == 'Error'}"> <a href="#" th:href="@{/retryMeeting(id=${meeting.id})}">Retry</a>
@@ -112,7 +118,29 @@
 
     </div>
   </div>
-
+  <div th:id="'a' + ${stat.index}" class="hidden" th:each="meeting, stat : ${meetings.content}">
+    <div class="popover-heading">Participants</div>
+    <div class="popover-body">
+      <table class="table table-responsive">
+        <thead>
+          <tr>
+            <th>Email</th>
+            <th>Fullname</th>
+            <th>Username</th>
+            <th>Password</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr th:each="p : ${meeting.participants}">
+            <td th:text="${p.email}">d@d.d</td>
+            <td th:text="${p.fullname}">dimis savva</td>
+            <td th:text="${p.username}">d1dlk</td>
+            <td th:text="${p.password}">lkso201938</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
   <div class="modal fade" id="confirm-cancel" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -153,6 +181,19 @@
 <div th:fragment="scripts">
 
   <script>
+      $(function() {
+        $(".participants-popover[data-toggle=popover]").popover({
+          html : true,
+          content : function() {
+            var content = $(this).attr("data-popover-content");
+            return $(content).children(".popover-body").html();
+          },
+          title : function() {
+            var title = $(this).attr("data-popover-content");
+            return $(title).children(".popover-heading").html();
+          }
+        });
+      });
       $(document).ready(function() {
 
         $("#selectall").change(function() {

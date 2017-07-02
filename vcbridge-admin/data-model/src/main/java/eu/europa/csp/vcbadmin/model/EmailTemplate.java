@@ -2,7 +2,6 @@ package eu.europa.csp.vcbadmin.model;
 
 import java.time.ZonedDateTime;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -12,22 +11,21 @@ import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.NotBlank;
-import org.hibernate.validator.constraints.NotEmpty;
 
 import eu.europa.csp.vcbadmin.constants.EmailTemplateType;
 
 @Entity
-@Table(name = "vcb_emailtemplate")
+@Table(name = "vcb_emailtemplate",uniqueConstraints={@UniqueConstraint(columnNames={"name","user_id"})})
 public class EmailTemplate {
 	@Id
 	@GeneratedValue
 	private Long id;
 
 	@NotBlank
-	@Column(unique = true)
 	private String name;
 
 	@NotNull

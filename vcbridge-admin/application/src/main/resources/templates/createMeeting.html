@@ -94,7 +94,7 @@
 
               <div class="row">
                 <div class="col-md-8">
-                  <div class="form-group" th:classappend="${#fields.hasErrors('duration')} ? has-danger">
+                  <div class="form-group" th:classappend="${#fields.hasErrors('duration')} ? has-error">
                     <label class="control-label">Duration</label>
                     <div class="input-group" th:classappend="${#fields.hasErrors('duration')}?'has-error':''">
                       <span class="input-group-addon"><i class="glyphicon glyphicon-bell"></i></span>
@@ -121,16 +121,15 @@
                       Add Participant<span class="caret"></span>
                     </button>
                     <ul class="dropdown-menu" aria-labelledby="add_participants_btn">
-                      <li><div class="form-group">
+                      <li>
                           <div class="input-group" th:classappend="${#fields.hasErrors('emails')}?'has-error':''">
-                            <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
                             <input class="form-control border-input" type="email" id="new_email" placeholder="Enter email" />
                             <span class="input-group-btn">
                               <button id="add_field_button" class="btn btn-default">Add</button>
                             </span>
                           </div>
                           <label th:if="${#fields.hasErrors('emails')}" th:errors="*{emails}" class="text-danger">Error emails</label>
-                        </div></li>
+                        </li>
                       <li><a class="btn" data-toggle="modal" data-target="#participants_bulk_modal">
                           <span class="fa  fa-list-ol"></span> Add in Bulk
                         </a></li>
@@ -141,21 +140,27 @@
                 </div>
               </div>
 
-
+              <!-- <label th:if="${#fields.hasErrors('emails[]')}" th:errors="*{emails}" class="text-danger">Error emails</label> -->
               <table class="table">
 
                 <thead>
                   <tr>
                     <th>Select</th>
+                    <th>Firstname</th>
+                    <th>Lastname</th>
                     <th>Email address</th>
-                    <th>Date added</th>
                   </tr>
                 </thead>
                 <tbody class="input_fields_wrap">
                   <tr class="useremail" th:each="email, stat : ${meetingForm.emails}">
                     <td><input class="todelete" type="checkbox" value=""></input></td>
-                    <td><input hidden="true" type="text" th:field="*{emails[__${stat.index}__]}" th:value="${email}" />
-                      <div th:text="${email}"></div></td>
+                    <td><input hidden="true" type="text" th:field="*{emails[__${stat.index}__].name}" th:value="${email.name}" />
+                      <div th:text="${email.name}"></div></td>
+                    <td><input hidden="true" type="text" th:field="*{emails[__${stat.index}__].surname}" th:value="${email.surname}" />
+                      <div th:text="${email.surname}"></div></td>
+                    <td th:classappend="${#fields.hasErrors('emails[__${stat.index}__].email') ? 'danger':''}"><input hidden="true" type="text" th:field="*{emails[__${stat.index}__].email}"
+                        th:value="${email.email}" />
+                      <div th:text="${email.email}"></div></td>
                   </tr>
                 </tbody>
               </table>
@@ -176,7 +181,7 @@
         </div>
         <div class="modal-body">
           <div class="form-group">
-            <label for="participants_bulk_ta">Enter participants' email addresses on separate lines or separated by semicolons(;).</label>
+            <label for="participants_bulk_ta">Enter participants' email addresses (any format).</label>
             <textarea tabindex="0" class="form-control" rows="5" id="participants_bulk_ta"></textarea>
           </div>
         </div>
@@ -192,28 +197,11 @@
 </div>
 
 <div th:fragment="scripts">
+  <script type="text/javascript" th:src="@{/resources/js/email-parser.js}"></script>
   <script type="text/javascript" th:src="@{/resources/js/createMeeting.js}"></script>
 
 
-  <script th:inline="javascript" type="text/javascript">
-  $(document)
-  .ready(
-      function() {
-  var wrapper = $(".input_fields_wrap"); //Fields wrapper
-  var add_me = $("#add_me"); //Add button ID
-
-        /*<![CDATA[*/
-        var me=[[${#httpServletRequest.remoteUser}]];
-        /*]]>*/
-            $(wrapper)
-            .append(
-                '<tr class="useremail"><td><input class="todelete" type="checkbox" value=""></input></td><td><input hidden="true" type="text" value="'
-                    + me
-                    + '" name="emails[0]"></input><div>'
-                    + me
-                    + '</div></td></tr>'); //add input box
-      });
-  </script>
+  
   <script src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.4/js/standalone/selectize.min.js"></script>
   <script th:inline="javascript">
     /*<![CDATA[*/

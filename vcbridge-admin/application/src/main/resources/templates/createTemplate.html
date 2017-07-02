@@ -7,9 +7,9 @@
 <head th:fragment="header">
 <link href="http://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.3/summernote.css" rel="stylesheet">
 <style>
-table th, .table td { 
-     border-top: none !important; 
- }
+table th, .table td {
+	border-top: none !important;
+}
 </style>
 </head>
 <div th:fragment="content">
@@ -117,44 +117,48 @@ table th, .table td {
                   <table class="table table-hover table-borderless">
                     <tbody>
                       <tr>
-                        <td class="text-right"><b>{email}</b></td>
+                        <td class="text-right"><b>&#91;&#91;${email}&#93;&#93;</b></td>
                         <td>user email</td>
                       </tr>
                       <tr>
-                        <td class="text-right"><b>{meeting_date}</b></td>
+                        <td class="text-right"><b>&#91;&#91;${meeting_date}&#93;&#93;</b></td>
                         <td>date in dd/MM/yyyy format</td>
                       </tr>
                       <tr>
-                        <td class="text-right"><b>{meeting_time}</b></td>
+                        <td class="text-right"><b>&#91;&#91;${meeting_time}&#93;&#93;</b></td>
                         <td>time in HH:mm ZZZ (timezone) format</td>
                       </tr>
                       <tr>
-                        <td class="text-right"><b>{meeting_duration_str}</b></td>
+                        <td class="text-right"><b>&#91;&#91;${meeting_duration_str}&#93;&#93;</b></td>
                         <td>Meeting duration e.g., 2 hour(s) and 10 minutes</td>
                       </tr>
                       <tr>
-                        <td class="text-right"><b>{meeting_duration_str}</b></td>
+                        <td class="text-right"><b>&#91;&#91;${meeting_duration_str}&#93;&#93;</b></td>
                         <td>Meeting duration e.g., 2 hour(s) and 10 minutes</td>
                       </tr>
                     </tbody>
                   </table>
-                  <div class="row"><div class="col-md-12"><br/></div></div>
+                  <div class="row">
+                    <div class="col-md-12">
+                      <br />
+                    </div>
+                  </div>
                   <table class="table table-hover">
                     <tbody>
                       <tr>
-                        <td class="text-right"><b>{meeting_username}</b></td>
+                        <td class="text-right"><b>&#91;&#91;${meeting_username}&#93;&#93;</b></td>
                         <td>the generated/unique username for the participant</td>
                       </tr>
                       <tr>
-                        <td class="text-right"><b>{meeting_password}</b></td>
+                        <td class="text-right"><b>&#91;&#91;${meeting_password}&#93;&#93;</b></td>
                         <td>the generated/unique password for the participant</td>
                       </tr>
                       <tr>
-                        <td class="text-right"><b>{user_first}</b></td>
+                        <td class="text-right"><b>&#91;&#91;${user_first}&#93;&#93;</b></td>
                         <td>user first name</td>
                       </tr>
                       <tr>
-                        <td class="text-right"><b>{user_lastname}</b></td>
+                        <td class="text-right"><b>&#91;&#91;${user_lastname}&#93;&#93;</b></td>
                         <td>user last name</td>
                       </tr>
                     </tbody>
@@ -177,11 +181,6 @@ table th, .table td {
   <script>
       $(document).ready(function() {
         $('#invitation-input').summernote({
-          onKeyup : function(e) {
-            $("#lawsContent").val($("#summernote").code());
-          }
-        });
-        $('#cancellation-input').summernote({
           onKeyup : function(e) {
             $("#lawsContent").val($("#summernote").code());
           }

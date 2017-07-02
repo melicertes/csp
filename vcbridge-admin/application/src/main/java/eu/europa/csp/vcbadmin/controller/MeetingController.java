@@ -48,11 +48,13 @@ import eu.europa.csp.vcbadmin.model.Meeting;
 import eu.europa.csp.vcbadmin.model.MeetingForm;
 import eu.europa.csp.vcbadmin.model.MeetingScheduledTask;
 import eu.europa.csp.vcbadmin.model.PageWrapper;
+import eu.europa.csp.vcbadmin.model.ParticipantForm;
 import eu.europa.csp.vcbadmin.model.User;
 import eu.europa.csp.vcbadmin.repository.MeetingRepository;
 import eu.europa.csp.vcbadmin.repository.UserRepository;
 import eu.europa.csp.vcbadmin.service.MeetingService;
 import eu.europa.csp.vcbadmin.service.exception.MeetingNotFound;
+import jersey.repackaged.com.google.common.collect.Lists;
 
 @Controller
 public class MeetingController {
@@ -95,35 +97,44 @@ public class MeetingController {
 	}
 
 	@GetMapping("/createMeeting")
-	public String showForm(MeetingForm formMeeting, Model model, Authentication auth) {
-		String user_tz = ((CustomUserDetails) auth.getPrincipal()).getTimezone();
+	public String showForm(Model model, Authentication auth) {
+		CustomUserDetails principal = ((CustomUserDetails) auth.getPrincipal());
+		String user_tz = principal.getTimezone();
 		try {
 			ZoneId.of(user_tz);
 		} catch (Exception e) {
 			user_tz = tz_default;
 		}
+		MeetingForm formMeeting = new MeetingForm();
+		LinkedList<ParticipantForm> l = new LinkedList<>();
+		l.add(new ParticipantForm(principal.getFirstname(), principal.getLastname(), principal.getUsername()));
+		formMeeting.setEmails(l);
 		model.addAttribute("userTZ", user_tz);
+		model.addAttribute("meetingForm", formMeeting);
 		return "createMeeting";
 	}
 
 	@PostMapping("/createMeeting")
 	public String createMeeting(@Valid @ModelAttribute("meetingForm") MeetingForm meetingForm,
 			BindingResult bindingResult, Authentication auth) {
-		List<String> emails = meetingForm.getEmails().stream().filter(s -> Objects.nonNull(s) && !s.trim().isEmpty())
+		List<ParticipantForm> emails = meetingForm.getEmails().stream()
+				.filter(s -> Objects.nonNull(s) && s.getEmail() != null && (!s.getEmail().trim().isEmpty()))
 				.collect(Collectors.toList());
-		log.debug(emails.toString());
-		if (emails.isEmpty()) {
-			bindingResult.rejectValue("emails", "errors.emails.empty", "Please provide at least one participant");
-		} else {
-			for (String email : emails) {
-				System.out.println(email);
-				Pattern pattern = Pattern.compile(EMAIL_PATTERN);
-				Matcher matcher = pattern.matcher(email);
-				if (!matcher.matches()) {
-					bindingResult.rejectValue("emails", "errors.emails.malformed", "Some emails are not well-formed");
-				}
-			}
-		}
+		// log.debug(emails.toString());
+		// if (emails.isEmpty()) {
+		// bindingResult.rejectValue("emails", "errors.emails.empty", "Please
+		// provide at least one participant");
+		// } else {
+		// for (String email : emails) {
+		// System.out.println(email);
+		// Pattern pattern = Pattern.compile(EMAIL_PATTERN);
+		// Matcher matcher = pattern.matcher(email);
+		// if (!matcher.matches()) {
+		// bindingResult.rejectValue("emails", "errors.emails.malformed", "Some
+		// emails are not well-formed");
+		// }
+		// }
+		// }
 		if (meetingForm.getDuration() != null) {
 			if (meetingForm.getDuration().compareTo(Duration.ofMinutes(vcbadminProperties.getMaxMeetingDuration())) > 0
 					|| meetingForm.getDuration()
@@ -138,13 +149,14 @@ public class MeetingController {
 						"Start datetime cannot refer to past");
 			}
 		}
+		meetingForm.setEmails(new LinkedList<>(emails)); // important: update
+		// the correct email
+		// list
+
 		if (bindingResult.hasErrors()) {
+			log.info("{}", bindingResult.getAllErrors().toString());
 			return "createMeeting";
 		}
-
-		meetingForm.setEmails(new LinkedList<>(emails)); // important: update
-															// the correct email
-															// list
 
 		log.debug("Meeting validated ok: {}", meetingForm);
 		log.debug(meetingForm.toString());

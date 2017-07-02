@@ -38,7 +38,8 @@ public class UserDetailsService implements org.springframework.security.core.use
 		Collection<GrantedAuthority> grantedAuthorities = new ArrayList<>();
 		GrantedAuthority grantedAuthority = new SimpleGrantedAuthority(user.getRole().name());
 		grantedAuthorities.add(grantedAuthority);
-		return new CustomUserDetails(user.getEmail(), user.getPassword(), grantedAuthorities, user.getTimezone());
+		return new CustomUserDetails(user.getEmail(), user.getPassword(), grantedAuthorities, user.getTimezone(),
+				user.getFirstName(), user.getLastName());
 		// return new
 		// org.springframework.security.core.userdetails.User(user.getEmail(),
 		// user.getPassword(), grantedAuthorities);

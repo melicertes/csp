@@ -1,12 +1,69 @@
+var x = 1;
+var max_fields = 10; // maximum input boxes allowed
+var wrapper = $(".input_fields_wrap"); // Fields wrapper
+var add_button = $("#add_field_button"); // Add button ID
+
+var delete_button = $("#delete_button"); // Delete button
+var new_email = $("#new_email"); // new email input
+
+var addParticipants = function(input) {
+  var contacts = [];
+  var phrases = input.split(/[\n,;]+/);
+  // console.log(phrases);
+  for (var i = 0; i < phrases.length; i++) {
+    if (phrases[i].trim() != "") {
+      // console.log('Checking phrase ' + phrases[i]);
+      var tokens = phrases[i].trim().split(/\s+/);
+      if (tokens.length == 3) {
+        if (makeEmailList(tokens[2]).length == 0) {
+          var extracted_emails = makeEmailList(phrases[i]).split(/[\s,;]+/);
+          for (var j = 0; j < extracted_emails.length; j++) {
+            if (extracted_emails[k].trim() != '') {
+              // console.log('Adding no-name contact ' + extracted_emails[j]);
+              contacts.push({
+                name : '',
+                surname : '',
+                email : extracted_emails[j]
+              });
+            }
+          }
+        } else {
+          // console.log('Adding contact ' +
+          // makeEmailList(tokens[2]).split(/[\s,;]+/));
+          contacts.push({
+            name : tokens[0].trim(),
+            surname : tokens[1].trim(),
+            email : makeEmailList(tokens[2]).split(/[\s,;]+/)
+          });
+        }
+      } else {
+        var extracted_emails = makeEmailList(phrases[i]).split(/[\s,;]+/);
+        for (var k = 0; k < extracted_emails.length; k++) {
+          if (extracted_emails[k].trim() != '') {
+            // console.log('Adding no-name [2] contact ' + extracted_emails[k]);
+            contacts.push({
+              name : '',
+              surname : '',
+              email : extracted_emails[k]
+            });
+          }
+        }
+      }
+
+    }
+  }
+  for (var i = 0; i < contacts.length; i++) {
+    $(wrapper).append(
+        '<tr class="useremail"><td><input class="todelete" type="checkbox" value=""></input></td>    <td><input hidden="true" type="text" value="' + contacts[i].name + '" name="emails[' + x + '].name"/><div>' + contacts[i].name + '</div></td>    <td><input hidden="true" type="text" value="'
+            + contacts[i].surname + '" name="emails[' + x + '].surname"/><div>' + contacts[i].surname + '</div></td>    <td><input hidden="true" type="text" value="' + contacts[i].email + '" name="emails[' + x + '].email"/><div>' + contacts[i].email + '</div></td></tr>'); // add
+    // input
+    // box
+    x++; // text box increment
+  }
+}
 $(document).ready(function() {
-  var max_fields = 10; // maximum input boxes allowed
-  var wrapper = $(".input_fields_wrap"); // Fields wrapper
-  var add_button = $("#add_field_button"); // Add button ID
 
-  var delete_button = $("#delete_button"); // Delete button
-  var new_email = $("#new_email"); // new email input
-
-  var x = 1; // initlal text box count
+  // var x = 1; // initlal text box count
 
   $(delete_button).click(function(e) {
     e.preventDefault();
@@ -20,32 +77,29 @@ $(document).ready(function() {
   $(add_button).click(function(e) { // on add input
     // button click
     e.preventDefault();
-    if (new_email.val().trim() != "") {
-      $(wrapper).append('<tr class="useremail"><td><input class="todelete" type="checkbox" value=""></input></td><td><input hidden="true" type="text" value="' + new_email.val() + '" name="emails[' + x + ']"/><div>' + new_email.val() + '</div></td></tr>'); // add
-      // input
-      // box
+    addParticipants(new_email.val());
+    new_email.val("");
+  });
+
+  $(new_email).on('keyup', function(e) {
+    e.preventDefault();
+    console.log("HIIHIHIHIHI" + e.keyCode);
+
+    if (e.keyCode == 13) {
+      addParticipants(new_email.val());
       new_email.val("");
-      new_email.focus();
-      x++; // text box increment
     }
   });
 
-  $(wrapper).on("click", ".remove_field", function(e) { // user click on remove
+  $(wrapper).on("click", ".remove_field", function(e) { // user click on
+    // remove
     // text
     e.preventDefault();
     $(this).parent('div').remove();
     x--;
   });
   $('#submit-participants').click(function() {
-    var lines = $('#participants_bulk_ta').val().split(/[\s,;]+/);
-    for (var i = 0; i < lines.length; i++) {
-      if (lines[i].trim() != "") {
-        $(wrapper).append('<tr class="useremail"><td><input class="todelete" type="checkbox" value=""></input></td><td><input hidden="true" type="text" value="' + lines[i] + '" name="emails[' + x + ']"/><div>' + lines[i] + '</div></td></tr>'); // add
-        // input
-        // box
-        x++; // text box increment
-      }
-    }
+    addParticipants($('#participants_bulk_ta').val());
     $('#participants_bulk_ta').val("");
   });
   $('#createMeetingForm').on('submit', function(e) { // use on if jQuery
@@ -61,10 +115,20 @@ $(document).ready(function() {
 
     this.submit();
   });
+  $('#createMeetingForm').on('keyup keypress', function(e) {
+    var keyCode = e.keyCode || e.which;
+    if (keyCode === 13) {
+      e.preventDefault();
+      return false;
+    }
+  });
 
   $('#datepicker').datepicker({
     format : "mm-dd-yyyy",
-    orientation : "auto bottom"
+    orientation : "auto bottom",
+    todayHighlight : "true",
+    todayBtn : "true",
+    autoclose : "true"
   });
 
 });
