@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+<meta name="description" content="Login" />
+<meta name="author" content="Dimis - Sastix" />
+<meta name="keyword" content="SCX videoconference" />
+<!-- <link rel="shortcut icon" href="assets/ico/favicon.png"> -->
+<title>Meeting notification</title>
+</head>
+<body th:inline="text" class="app flex-row align-items-center">
+	<h3>Dear [[${email}]],</h3>
+	<p>You have been invited to a meeting to be held at [[${meeting_date}]] and [[${meeting_time}]] (planned meeting duration: [[${meeting_duration_str}]]).</p>
+	<p>To connect use the following details:</p>
+	<p>Meeting URL: [[${meeting_url}]] - this meeting uses WebRTC technology: please use Chrome (latest).</p>
+	<p>Username: [[${meeting_username}]]</p>
+	<p>Password: [[${meeting_password}]]</p>
+	
+	Thank you,
+	<p>[[${user_first}]], [[${user_lastname}]]</p>
+</body>
+</html>

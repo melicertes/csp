@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments::head(title='Modules', description='modules description')"></head>
+
+<body>
+
+<nav class="navbar navbar-inverse navbar-fixed-top">
+    <div th:replace="fragments::nav"></div>
+</nav>
+
+<div class="container">
+
+    <div class="row">
+        <div class="col-md-12">
+            <p>&nbsp;</p>
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="col-md-12">
+            <h2 class="page-header"><i class="fa fa-circle-o-notch"></i> Register Module</h2>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <form method="POST" action="#" enctype="multipart/form-data" id="module-form">
+                <input name="csrfmiddlewaretoken" value="zKg9kV2yr6LySN4mmfgaQGBJ6doeTrOw" type="hidden"></input>
+
+                <div class="row">
+                    <div class="col-md-12" style="text-align: right">
+                        <a href="pages/module/list.html" th:href="${moduleListUrl}" class="save btn btn-default">Cancel</a>
+                        <button type="submit" class="save btn btn-success">Save</button>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-4 col-xs-12">
+                        <div class="form-group">
+                            <label for="module_short_name">Short Name:</label>
+                            <input class="form-control" id="module_short_name" name="module_short_name" type="text"></input>
+                        </div>
+                    </div>
+                    <div class="col-md-8 col-xs-12">
+                        <div class="form-group">
+                            <label for="module_full_name">Full Name:</label>
+                            <input class="form-control" id="module_full_name" name="module_full_name" type="text"></input>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-2 col-xs-12">
+                        <div class="form-group">
+                            <label for="module_version">Version:</label>
+                            <input class="form-control v" id="module_version" maxlength="5" name="module_version" type="text"></input>
+                        </div>
+                    </div>
+                    <div class="col-md-2 col-xs-12">
+                        <div class="form-group">
+                            <label for="module_default">Default:</label>
+                            <br/>
+                            <input class="form-control" id="module_default" name="module_default" type="checkbox"></input>
+                        </div>
+                    </div>
+                    <div class="col-md-2 col-xs-12">
+                        <div class="form-group">
+                            <label for="module_priority">Start Priority:</label>
+                            <input class="form-control p" id="module_priority" maxlength="3" name="module_priority" type="text"></input>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-xs-12">
+                        <div class="form-group">
+                            <label for="module_file">File:</label>
+                            <input id="module_file" name="module_file" type="file" class="file-loading"></input>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12 col-sm-12">
+                        <p>&nbsp;</p>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12" style="text-align: right">
+                        <a href="pages/module/list.html" th:href="${moduleListUrl}" class="save btn btn-default">Cancel</a>
+                        <button type="submit" class="save btn btn-success">Save</button>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12 col-sm-12">
+                        <p>&nbsp;</p>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12" id="result"></div>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+</div>
+
+
+<th:block th:replace="fragments::scripts"></th:block>
+<script th:src="@{/assets/js/vendor/jquery.validate.min.js}" src="../static/assets/js/vendor/jquery.validate.min.js"></script>
+<script th:src="@{/assets/js/vendor/jquery.validate.additional-methods.min.js}" src="../static/assets/js/vendor/jquery.validate.additional-methods.min.js"></script>
+<script th:src="@{/assets/js/vendor/jquery.mask.min.js}" src="../static/assets/js/vendor/jquery.mask.min.js"></script>
+<script th:src="@{/bootstrap-fileinput/js/fileinput.min.js}" src="../static/bootstrap-fileinput/js/fileinput.min.js"></script>
+<script th:src="@{/bootstrap-checkbox/bootstrap-checkbox.min.js}" src="../static/bootstrap-checkbox/bootstrap-checkbox.min.js"></script>
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    var POST_URL = [[${moduleSaveUrl}]];
+    var REDIRECT_URL = [[${moduleListUrl}]];
+    /*]]>*/
+</script>
+
+
+<script th:src="@{/assets/js/pages/module.js}" src="../static/assets/js/pages/module.js"></script>
+
+</body>
+
+</html>

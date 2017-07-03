@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>EU CCSPI | Register Module</title>
+
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="static/bootstrap/css/bootstrap.min.css">
+
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <link rel="stylesheet" href="static/assets/css/ie10-viewport-bug-workaround.css">
+
+    <!-- Custom styles for this template -->
+    <link rel="stylesheet" href="static/theme/css/jumbotron.css">
+    <link rel="stylesheet" href="static/theme/css/custom.css">
+
+    <!-- Bootstrap Table -->
+    <link rel="stylesheet" href="static/bootstrap-table/bootstrap-table.css">
+
+    <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
+    <!--[if lt IE 9]>
+    <script src="static/assets/js/ie8-responsive-file-warning.js"></script>
+    <![endif]-->
+    <script src="static/assets/js/ie-emulation-modes-warning.js"></script>
+
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="static/bootstrap-select/css/bootstrap-select.min.css">
+    <link rel="stylesheet" href="static/bootstrap-datepicker/css/bootstrap-datepicker.min.css">
+    <link rel="stylesheet" href="static/font-awesome/css/font-awesome.min.css">
+
+    <!-- Page -->
+    <link rel="stylesheet" href="static/bootstrap-fileinput/css/fileinput.min.css">
+
+    <link rel="shortcut icon" type="image/x-icon" href="static/assets/favicon.ico">
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+
+<body>
+
+<nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container" w3-include-html="_navigation.html"></div>
+</nav>
+
+<div class="container">
+
+    <div class="row">
+        <div class="col-md-12">
+            <p>&nbsp;</p>
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="col-md-12">
+            <h2 class="page-header"><i class="fa fa-cog"></i> Register Module</h2>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <form method="POST" class="team-form" id="team-form">
+                <input name="csrfmiddlewaretoken" value="zKg9kV2yr6LySN4mmfgaQGBJ6doeTrOw" type="hidden">
+
+                <div class="row">
+                    <div class="col-md-12" style="text-align: right">
+                        <a href="module-index.html" class="save btn btn-default">Cancel</a>
+                        <button type="submit" class="save btn btn-success">Save</button>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-4 col-xs-12">
+                        <div class="form-group">
+                            <label for="module_short_name">Short Name:</label>
+                            <input class="form-control" id="module_short_name" name="module_short_name" type="text">
+                        </div>
+                    </div>
+                    <div class="col-md-8 col-xs-12">
+                        <div class="form-group">
+                            <label for="module_full_name">Full Name:</label>
+                            <input class="form-control" id="module_full_name" name="module_full_name" type="text">
+                        </div>
+                    </div>
+
+                    <div class="col-md-2 col-xs-12">
+                        <div class="form-group">
+                            <label for="module_version">Version:</label>
+                            <input class="form-control v" id="module_version" maxlength="5" name="module_version" type="text">
+                        </div>
+                    </div>
+                    <div class="col-md-2 col-xs-12">
+                        <div class="form-group">
+                            <label for="module_default">Default:</label>
+                            <br>
+                            <input class="form-control" id="module_default" name="module_default" type="checkbox">
+                        </div>
+                    </div>
+                    <div class="col-md-2 col-xs-12">
+                        <div class="form-group">
+                            <label for="module_priority">Start Priority:</label>
+                            <input class="form-control p" id="module_priority" maxlength="3" name="module_priority" type="text">
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-xs-12">
+                        <div class="form-group">
+                            <label for="module_file">File:</label>
+                            <input id="module_file" name="module_file" type="file" class="file-loading" accept="application/zip">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12 col-sm-12">
+                        <p>&nbsp;</p>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12" style="text-align: right">
+                        <a href="module-index.html" class="save btn btn-default">Cancel</a>
+                        <button type="submit" class="save btn btn-success">Save</button>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+</div>
+
+<!-- jQuery and Bootstrap -->
+<script src="static/assets/js/vendor/jquery.min.js"></script>
+<script src="static/bootstrap/js/bootstrap.min.js"></script>
+<!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+<script src="static/assets/js/ie10-viewport-bug-workaround.js"></script>
+
+<!-- Bootstrap Select -->
+<script src="static/bootstrap-select/js/bootstrap-select.min.js"></script>
+<!-- Bootstrap Table -->
+<script src="static/bootstrap-table/bootstrap-table.js"></script>
+<script src="static/bootstrap-table/locale/bootstrap-table-en-US.js"></script>
+<!-- Bootstrap Confirmation -->
+<script src="static/bootstrap-confirmation/bootstrap-transition.js"></script>
+<script src="static/bootstrap-confirmation/bootstrap-tooltip.js"></script>
+<script src="static/bootstrap-confirmation/bootstrap-confirmation.min.js"></script>
+<!-- Bootstrap Editable -->
+<script src="static/bootstrap3-editable/js/bootstrap-editable.min.js"></script>
+<!-- Bootstrap Datepicker -->
+<script src="static/bootstrap-datepicker/js/bootstrap-datepicker.min.js"></script>
+
+<script src="static/assets/js/custom.js"></script>
+
+<!-- Page -->
+<script src="static/assets/js/vendor/jquery.mask.min.js"></script>
+<script src="static/bootstrap-fileinput/js/fileinput.min.js"></script>
+<script src="static/bootstrap-checkbox/bootstrap-checkbox.min.js"></script>
+<script>
+    $(document).ready(function(){
+        $("#module_file").fileinput({
+            browseClass: "btn btn-default",
+            showCaption: true,
+            showRemove: true,
+            showUpload: false,
+            showPreview: false,
+            allowedFileExtensions: ['zip']
+        });
+
+        //099.099.099.099
+        $('.v').mask("0.0.000", {placeholder: "_._.___"});
+        $('.p').mask("###", {placeholder: "___"});
+
+        $('#module_default').checkboxpicker({
+            html: true,
+            offLabel: '<span class="glyphicon glyphicon-remove">',
+            onLabel: '<span class="glyphicon glyphicon-ok">'
+        });
+    });
+</script>
+
+<!-- Demo only -->
+<script src="https://www.w3schools.com/lib/w3.js"></script>
+<script>
+    w3.includeHTML();
+</script>
+<!-- //Demo only -->
+
+</body>
+</html>
