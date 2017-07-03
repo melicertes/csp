@@ -44,14 +44,10 @@ public class DurationEditor extends PropertyEditorSupport {
 					"Could not parse date: it is not exactly" + this.exactDateLength + "characters long");
 		} else {
 			try {
-				System.out.println("EDW1");
 				LocalTime time = LocalTime.parse(text, this.dateFormat);
 				setValue(Duration.ofHours(time.getHour() >= 12 ? time.getHour() - 12 : time.getHour())
 						.plusMinutes(time.getMinute()));
-				System.out.println("EDW@ "+time);
 			} catch (DateTimeParseException ex) {
-				System.out.println("EDW2");
-
 				// throw new IllegalArgumentException("Could not parse date: " +
 				// ex.getMessage(), ex);
 				setValue(null);
