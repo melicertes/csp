@@ -3,8 +3,6 @@ version: '2'
 services:
   sastimex-server:
     restart: always
-    depends_on:
-      - mysql
     container_name: sastimex-server
     image: openjdk:8
     volumes:
