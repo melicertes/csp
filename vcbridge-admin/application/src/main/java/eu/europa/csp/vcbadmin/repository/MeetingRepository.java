@@ -33,7 +33,8 @@ public interface MeetingRepository extends JpaRepository<Meeting, Long> {
 	List<Meeting> findById(Long id);
 
 	@Modifying(clearAutomatically = true)
-	@Query(value = "update vcb_meeting set status = 'Expired' where status='Running' and TIMESTAMPADD(SECOND, duration/1000/1000/1000, start)<?1", nativeQuery = true)
+	@Query(value = "update vcb_meeting set status = 'Expired' where status='Running' and (start + (duration || ' SECOND')\\:\\:INTERVAL)<?1", nativeQuery = true)
+	//@Query(value = "update vcb_meeting set status = 'Expired' where status='Running' and TIMESTAMPADD(SECOND, duration/1000/1000/1000, start)<?1", nativeQuery = true) // latest working
 	// @Query(value = "update vcb_meeting set status = 'Expired' where status='Running' and DATE_ADD(start,INTERVAL duration/1000 MICROSECOND)<?1", nativeQuery = true)
 	void updateRunningToExpired(ZonedDateTime now);
 
