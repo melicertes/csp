@@ -115,6 +115,7 @@ public class TcProcessor implements Processor,CamelRoutes{
     }
 
     private void handleDclFlowAndSendToECSP(String httpMethod, Team team, IntegrationData integrationData){
+        //TODO: SXCSP-85 Sharing Policy to be integrated only when sending to ECSP
         EnhancedTeamDTO enhancedTeamDTO = new EnhancedTeamDTO(team, integrationData);
         Map<String, Object> headers = new HashMap<>();
 
