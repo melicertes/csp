@@ -14,4 +14,4 @@ $ cd integration-layer-dsl-api/integration-tests/target
 
 3. Run one or more test-classes by providing the package+classnames as arguments
 --------------------------------------------------------------------------------
-$ java -jar integration-tests-0.0.1-SNAPSHOT.jar com.intrasoft.csp.integration.sandbox.server.internal.CspServerInternalSandboxTest
+$ java -jar integration-tests-0.1.0-SNAPSHOT.jar com.intrasoft.csp.integration.sandbox.server.internal.CspServerInternalSandboxTest
