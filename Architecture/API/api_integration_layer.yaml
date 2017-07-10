@@ -5,12 +5,12 @@ info:
     applications and the integration layer performs synchronization of that data
     between eligible applications, indexing and collaboration with external
     CSPs, i.e. sends the data to external CSPs based on the data specific trust
-    circles. DCL accepts data from external CSPs, authorizes that data based on
-    data specific trust circles and the integration layer performs
-    synchronization of that data between eligible applications.
-  version: 1.0.1
+    circles or the predefined [trust circle OR team] ID. DCL accepts data from 
+    external CSPs, authorizes that data based on data specific trust circles and
+    the integration layer performs synchronization of that data between eligible
+    applications.
+  version: 1.0.4
   title: Integration Layer API
-host: int.csp.org
 schemes:
   - https
 paths:
@@ -37,10 +37,6 @@ paths:
           description: Successful operation
         '400':
           description: Malformed Integration Data Structure
-        '500':
-          description: Internal server error
-        '503':
-          description: Service unavailable
     put:
       tags:
         - dsl
@@ -64,10 +60,6 @@ paths:
           description: Successful operation
         '400':
           description: Malformed Integration Data Structure
-        '500':
-          description: Internal server error
-        '503':
-          description: Service unavailable
     delete:
       tags:
         - dsl
@@ -92,10 +84,6 @@ paths:
           description: Successful operation
         '400':
           description: Malformed Integration Data Structure
-        '500':
-          description: Internal server error
-        '503':
-          description: Service unavailable
   /v1/dcl/integrationData:
     post:
       tags:
@@ -129,10 +117,6 @@ paths:
           description: >-
             Unsupported data type. Local CSP does not support given data type.
             No application that handles given data type is installed
-        '500':
-          description: Internal server error
-        '503':
-          description: Service unavailable
 definitions:
   IntegrationData:
     type: object
@@ -145,8 +129,23 @@ definitions:
         $ref: '#/definitions/IntegrationDataType'
       dataObject:
         type: string
+        format: json
   DataParams:
     type: object
+    description: >
+      origin[Csp/Application/Record]Id are only set by the application that
+      initiates flow #1 (see SAD).
+
+      In this case Origin[csp/application/record]Id and
+      [csp/application/record]Id are equal.
+
+      In the case where a principal application adapter gets data from external
+      CSP and re-emitts them for indexing,
+
+      [csp/application/record]Id are set to that of the principal application
+      while Origin[csp/application/record]Id
+
+      remain unchanged.
     properties:
       originCspId:
         type: string
@@ -163,10 +162,22 @@ definitions:
       dateTime:
         type: string
         format: dateTime
-      reference:
-        type: string
+        description: |
+          timestamp of the record emission
       url:
         type: string
+        format: url
+        description: |
+          reference to the emmitted record based on [csp/application/record]Id.
+          (see SAD)
+    required:
+      - originCspId
+      - originApplicationId
+      - originRecordId
+      - cspId
+      - applicationId
+      - recordId
+      - dateTime
   IntegrationDataType:
     type: string
     enum:
@@ -181,8 +192,19 @@ definitions:
       - trustCircle
   SharingParams:
     type: object
+    description: |
+      only one of the trustCircleId or teamId should exist.
+      If none exists, sharing is done based on data specific
+      trust circles
     properties:
       toShare:
         type: boolean
       isExternal:
         type: boolean
+      trustCircleId:
+        type: string
+      teamId:
+        type: string
+    required:
+      - toShare
+      - isExternal
