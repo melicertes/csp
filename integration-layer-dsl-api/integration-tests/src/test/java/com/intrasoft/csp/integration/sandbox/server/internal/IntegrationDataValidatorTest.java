@@ -61,10 +61,11 @@ public class IntegrationDataValidatorTest implements ContextUrl {
     @Autowired
     private WebApplicationContext webApplicationContext;
 
-    URL null_datatype = getClass().getClassLoader().getResource("null_datatype.json");
-    URL missing_integration_data = getClass().getClassLoader().getResource("missing_integration_data.json");
-    URL integration_data_vulnerability = getClass().getClassLoader().getResource("integration_data_vulnerability.json");
-    URL invalid_integration_data_vulnerability = getClass().getClassLoader().getResource("invalid_integration_data_vulnerability.json");
+    URL incident_data_example1 = getClass().getClassLoader().getResource("json/incident_data_example1.json");
+    URL null_datatype = getClass().getClassLoader().getResource("json/null_datatype.json");
+    URL missing_integration_data = getClass().getClassLoader().getResource("json/missing_integration_data.json");
+    URL integration_data_vulnerability = getClass().getClassLoader().getResource("json/integration_data_vulnerability.json");
+    URL invalid_integration_data_vulnerability = getClass().getClassLoader().getResource("json/invalid_integration_data_vulnerability.json");
 
     @Before
     public void init() throws Exception {
@@ -75,6 +76,16 @@ public class IntegrationDataValidatorTest implements ContextUrl {
     @Test
     public void validIntegrationDataTest() throws Exception {
         String json = FileUtils.readFileToString(new File(integration_data_vulnerability.toURI()),Charset.forName("UTF-8"));
+        mvc.perform(post("/v"+REST_API_V1+"/"+DSL_INTEGRATION_DATA).accept(MediaType.TEXT_PLAIN)
+                .content(json)
+                .contentType(TestUtil.APPLICATION_JSON_UTF8))
+                .andExpect(status().isOk())
+                .andExpect(content().string(HttpStatusResponseType.SUCCESSFUL_OPERATION.getReasonPhrase()));
+    }
+
+    @Test
+    public void validIntegrationDataExample1Test() throws Exception {
+        String json = FileUtils.readFileToString(new File(incident_data_example1.toURI()),Charset.forName("UTF-8"));
         mvc.perform(post("/v"+REST_API_V1+"/"+DSL_INTEGRATION_DATA).accept(MediaType.TEXT_PLAIN)
                 .content(json)
                 .contentType(TestUtil.APPLICATION_JSON_UTF8))

@@ -22,8 +22,9 @@ public class DurationFormatter implements Formatter<Duration> {
 
 	@Override
 	public String print(Duration object, Locale locale) {
-		return LocalTime.of(Long.valueOf(object.toHours()).intValue(), Long.valueOf(object.toMinutes()).intValue() % 60)
-				.format(dateTimeFormatter);
+//		return LocalTime.of(Long.valueOf(object.toHours()).intValue(), Long.valueOf(object.toMinutes()).intValue() % 60)
+//				.format(dateTimeFormatter);
+		return Long.valueOf(object.toHours()).intValue() +"h "+ Long.valueOf(object.toMinutes()).intValue() % 60 + "m";
 	}
 
 	@Override

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments::head(title='Dashboard', description='dashboard description')"></head>
+
+<body>
+
+<nav class="navbar navbar-inverse navbar-fixed-top">
+    <div th:replace="fragments::nav"></div>
+</nav>
+
+<div class="container">
+
+    <div class="row">
+        <div class="col-md-12">
+            <p>&nbsp;</p>
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="col-md-12">
+            <h2 class="page-header"><i class="fa fa-list"></i> CSP Mappings</h2>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12 col-sm-12">
+            <div class="row" data-duplicate="contact" data-duplicate-min="2" data-duplicate-max="10">
+                <form action="#" th:action="@{/}" th:object="${integrationAnonData}" method="post">
+                    <div class="col-md-6 col-xs-12">
+                        <div class="form-group">
+                            <label>CSP id:</label>
+                            <input class="form-control" th:field="*{cspId}" name="cspId" type="text"/>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-xs-12">
+                        <label>Data Type:</label>
+                        <div class="input-group" style="width: 100%;">
+                            <select th:field="*{dataType}" class="form-control">
+                                <option th:each="dataType : ${T(com.intrasoft.anonymization.model.IntegrationDataType).values()}"
+                                        th:value="${dataType}"
+                                        th:text="${dataType}">
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-9 col-xs-12">
+                        <div class="form-group">
+                            <label for="module_file">File:</label>
+                            <input id="module_file" name="module_file" type="file" class="file-loading"></input>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-xs-12" style="text-align: right">
+                        <div class="form-group">
+                            <p>&nbsp;</p>
+                            <button type="submit" value="Submit" class="save btn btn-success">Save</button>&nbsp;
+                            <button type="reset" value="Reset" class="save btn btn-default pull-right">Clear</button>
+                        </div>
+                    </div>
+                </form>
+                <div class="row">
+                    <div class="col-md-12">
+                        <table data-toggle="table" data-page-size="20" data-pagination="true">
+                            <thead>
+                            <tr>
+                                <th><i class="fa  fa-file-code-o"></i></th>
+                                <th data-sortable="true" data-sort-name="TCName_sort">cspId</th>
+                                <th data-sortable="true" data-sort-name="TCName_sort">datatype</th>
+                                <th data-sortable="true" data-sort-name="TCName_sort">path</th>
+                                <th>Actions</th>
+                            </tr>
+                            </thead>
+                            <tr th:id="${integrationAnonData.id}" th:each="integrationAnonData,iterStat: ${integrationAnonDataAll}">
+                                <td th:text="${iterStat.count}"></td>
+                                <td th:text="${integrationAnonData.cspId}"></td>
+                                <td th:text="${integrationAnonData.dataType}"></td>
+                                <td th:text="${integrationAnonData.configurationFile}"></td>
+                                <td></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<th:block th:replace="fragments::scripts"></th:block>
+<script th:src="@{/assets/js/vendor/jquery.validate.min.js}" src="../static/assets/js/vendor/jquery.validate.min.js"></script>
+<script th:src="@{/assets/js/vendor/jquery.validate.additional-methods.min.js}" src="../static/assets/js/vendor/jquery.validate.additional-methods.min.js"></script>
+<script th:src="@{/assets/js/vendor/jquery.mask.min.js}" src="../static/assets/js/vendor/jquery.mask.min.js"></script>
+<script th:src="@{/bootstrap-fileinput/js/fileinput.min.js}" src="../static/bootstrap-fileinput/js/fileinput.min.js"></script>
+<script th:src="@{/bootstrap-checkbox/bootstrap-checkbox.min.js}" src="../static/bootstrap-checkbox/bootstrap-checkbox.min.js"></script>
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    var POST_URL = [[${moduleSaveUrl}]];
+    var REDIRECT_URL = [[${moduleListUrl}]];
+    /*]]>*/
+</script>
+
+
+<script th:src="@{/assets/js/pages/module.js}" src="../static/assets/js/pages/module.js"></script>
+
+</body>
+
+</html>

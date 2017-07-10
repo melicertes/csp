@@ -105,7 +105,13 @@
                             <input class="form-control" id="module_default" name="module_default" type="checkbox">
                         </div>
                     </div>
-                    <div class="col-md-8 col-xs-12">
+                    <div class="col-md-2 col-xs-12">
+                        <div class="form-group">
+                            <label for="module_priority">Start Priority:</label>
+                            <input class="form-control p" id="module_priority" maxlength="3" name="module_priority" type="text">
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-xs-12">
                         <div class="form-group">
                             <label for="module_file">File:</label>
                             <input id="module_file" name="module_file" type="file" class="file-loading" accept="application/zip">
@@ -171,6 +177,7 @@
 
         //099.099.099.099
         $('.v').mask("0.0.000", {placeholder: "_._.___"});
+        $('.p').mask("###", {placeholder: "___"});
 
         $('#module_default').checkboxpicker({
             html: true,

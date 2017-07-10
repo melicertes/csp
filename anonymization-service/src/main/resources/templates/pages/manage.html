@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments::head(title='Dashboard', description='dashboard description')"></head>
+
+<body>
+
+<nav class="navbar navbar-inverse navbar-fixed-top">
+    <div th:replace="fragments::nav"></div>
+</nav>
+
+<div class="container">
+
+    <div class="row">
+        <div class="col-md-12">
+            <p>&nbsp;</p>
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="col-md-12">
+            <h2 class="page-header"><i class="fa fa-cog"></i> Manage CSP DFN-Cert CSIRT Installation</h2>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <form method="POST" class="team-form" id="team-form">
+                <input name="csrfmiddlewaretoken" value="zKg9kV2yr6LySN4mmfgaQGBJ6doeTrOw" type="hidden"></input>
+
+                <div class="row">
+                    <div class="col-md-12" style="text-align: right">
+                        <a th:href="@{/dashboard.html}" href="dashboard.html" class="save btn btn-default">Cancel</a>
+                        <button type="submit" class="save btn btn-success">Save</button>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12 col-sm-12">
+                        <p>&nbsp;</p>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-2 col-xs-12">
+                        <div class="form-group">
+                            <label for="module_enable1">Enable:</label>
+                            <br/>
+                            <input class="form-control checkbox-app" id="module_enable1" name="module_enable[]" type="checkbox" data-module-id="1"></input>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-xs-12">
+                        <div class="form-group">
+                            <label for="module_short_name1">Short Name:</label>
+                            <input class="form-control" id="module_short_name1" name="module_short_name[]" type="text" value="configuration-service-client" readonly="readonly" data-module-id="1"></input>
+                        </div>
+                    </div>
+                    <div class="col-md-2 col-xs-12">
+                        <div class="form-group">
+                            <label for="module_installed_version1">Installed Version:</label>
+                            <input class="form-control v" id="module_installed_version1" maxlength="5" name="module_installed_version[]" type="text" value="10000" readonly="readonly" data-module-id="1"></input>
+                        </div>
+                    </div>
+                    <div class="col-md-2 col-xs-12">
+                        <div class="form-group">
+                            <label for="module_set_version1">Set Version:</label>
+                            <select class="form-control" id="module_set_version1" name="module_set_version[]" disabled="disabled" data-module-id="1">
+                                <option></option>
+                                <option>1.1.000</option>
+                                <option>1.1.001</option>
+                                <option>1.1.002</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-2 col-xs-12">
+                        <div class="form-group">
+                            <input class="form-control checkbox-app" id="module_enable2" name="module_enable[]" type="checkbox" data-module-id="2" checked="checked"></input>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-xs-12">
+                        <div class="form-group">
+                            <input class="form-control" id="module_short_name2" name="module_short_name[]" type="text" value="misp-installation" readonly="readonly" data-module-id="2"></input>
+                        </div>
+                    </div>
+                    <div class="col-md-2 col-xs-12">
+                        <div class="form-group">
+                            <input class="form-control v" id="module_installed_version2" maxlength="5" name="module_installed_version[]" type="text" value="11000" readonly="readonly" data-module-id="2"></input>
+                        </div>
+                    </div>
+                    <div class="col-md-2 col-xs-12">
+                        <div class="form-group">
+                            <select class="form-control" id="module_set_version2" name="module_set_version[]" data-module-id="2">
+                                <option></option>
+                                <option>1.1.001</option>
+                                <option>1.1.002</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="row">
+                    <div class="col-md-12 col-sm-12">
+                        <p>&nbsp;</p>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12" style="text-align: right">
+                        <a th:href="@{/dashboard.html}" href="dashboard.html" class="save btn btn-default">Cancel</a>
+                        <button type="submit" class="save btn btn-success">Save</button>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+</div>
+
+<th:block th:replace="fragments::scripts"></th:block>
+<script th:src="@{/assets/js/vendor/jquery.mask.min.js}" src="..static/assets/js/vendor/jquery.mask.min.js"></script>
+<script th:src="@{/bootstrap-checkbox/bootstrap-checkbox.min.js}" src="../static/bootstrap-checkbox/bootstrap-checkbox.min.js"></script>
+<script th:src="@{/assets/js/pages/manage.js}" src="../static/assets/js/pages/manage.js"></script>
+
+</body>
+
+
+</html>

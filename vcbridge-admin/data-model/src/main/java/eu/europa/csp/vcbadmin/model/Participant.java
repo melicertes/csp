@@ -14,11 +14,18 @@ public class Participant {
 
 	}
 
-	public Participant(String email, String username, String password, Meeting meeting) {
+	public Participant(String email, String username, String firstname, String lastname, String password,
+			Meeting meeting) {
+		this(email, username, firstname, lastname, password);
+		this.meeting = meeting;
+	}
+
+	public Participant(String email, String username, String firstname, String lastname, String password) {
 		this.email = email;
 		this.username = username;
 		this.password = password;
-		this.meeting = meeting;
+		this.firstname = firstname;
+		this.lastname = lastname;
 	}
 
 	public Long getId() {
@@ -67,6 +74,8 @@ public class Participant {
 	private String email;
 	private String username;
 	private String password;
+	private String firstname;
+	private String lastname;
 
 	@NotNull
 	@ManyToOne
@@ -75,5 +84,25 @@ public class Participant {
 	@Override
 	public String toString() {
 		return "Participant [id=" + id + ", email=" + email + ", username=" + username + ", password=" + password + "]";
+	}
+
+	public String getFirstname() {
+		return firstname;
+	}
+
+	public void setFirstname(String firstname) {
+		this.firstname = firstname;
+	}
+
+	public String getLastname() {
+		return lastname;
+	}
+
+	public void setLastname(String lastname) {
+		this.lastname = lastname;
+	}
+
+	public String getFullname() {
+		return this.firstname + " " + this.lastname;
 	}
 }

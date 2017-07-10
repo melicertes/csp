@@ -62,7 +62,7 @@ public class RegisterController {
 		User user = userRepository.save(userForm);
 
 		log.debug("Constructing init invitation email for user {}", user.getEmail());
-		EmailTemplate et = new EmailTemplate();
+		EmailTemplate et = new EmailTemplate("Auto-generated Invitation", true);
 		et.setSubject("Invitation: [(${meeting_subject})]");
 		String content = new Scanner(invitationHTML.getInputStream(), "utf-8").useDelimiter("\\Z").next();
 		et.setContent(content);
@@ -71,7 +71,7 @@ public class RegisterController {
 		EmailTemplate invitation = emailTemplateRepository.save(et);
 
 		log.debug("Constructing init cancellation email for user {}", user.getEmail());
-		et = new EmailTemplate();
+		et = new EmailTemplate("Auto-generated Cancellation", true);
 		et.setSubject("Cancelled: [(${meeting_subject})]");
 		content = new Scanner(cancellationHTML.getInputStream(), "utf-8").useDelimiter("\\Z").next();
 		et.setContent(content);
@@ -79,10 +79,10 @@ public class RegisterController {
 		et.setUser(user);
 		EmailTemplate cancellation = emailTemplateRepository.save(et);
 
-		user.setInvitation(invitation);
-		user.setCancellation(cancellation);
+		// user.setInvitation(invitation);
+		// user.setCancellation(cancellation);
 
-		userRepository.save(user);
+		// userRepository.save(user);
 
 		return "redirect:/login";
 	}

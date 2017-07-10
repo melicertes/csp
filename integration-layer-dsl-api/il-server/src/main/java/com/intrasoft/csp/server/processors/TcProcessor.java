@@ -65,6 +65,9 @@ public class TcProcessor implements Processor,CamelRoutes{
         IntegrationData integrationData = exchange.getIn().getBody(IntegrationData.class);
         String httpMethod = (String) exchange.getIn().getHeader(Exchange.HTTP_METHOD);
 
+
+        //TODO: SXCSP-185. tcId and teamId logic to be implemented - if both throw exception - Malformed 4xx
+
         //make all TC calls
 
         String uri = null;
@@ -91,6 +94,7 @@ public class TcProcessor implements Processor,CamelRoutes{
                         "Team: "+team.toString());
             }
 
+            //TODO: TC bug here, see SXCSP-255. We should use cspId and not shortName
             if (!team.getShortName().toLowerCase().trim().equals(serverName.toLowerCase().trim())){
                 teams.add(team);
             }
@@ -111,6 +115,7 @@ public class TcProcessor implements Processor,CamelRoutes{
     }
 
     private void handleDclFlowAndSendToECSP(String httpMethod, Team team, IntegrationData integrationData){
+        //TODO: SXCSP-85 Sharing Policy to be integrated only when sending to ECSP
         EnhancedTeamDTO enhancedTeamDTO = new EnhancedTeamDTO(team, integrationData);
         Map<String, Object> headers = new HashMap<>();
 
@@ -120,6 +125,7 @@ public class TcProcessor implements Processor,CamelRoutes{
 
     private void handleExternalDclFlowAndSendToDSL(Exchange exchange,String httpMethod,List<Team> teams, IntegrationData integrationData){
 
+        //TODO: TC bug here, see SXCSP-255. We should use cspId and not shortName
         boolean authorized = teams.stream().anyMatch(t->t.getShortName().toLowerCase().equals(integrationData.getDataParams().getCspId().toLowerCase()));
         LOG.info("Authorized (cspId or shortName="+integrationData.getDataParams().getCspId().toLowerCase()+"): "+authorized);
         if (authorized){

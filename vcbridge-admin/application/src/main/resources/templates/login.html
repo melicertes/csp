@@ -1,12 +1,9 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml"
-	xmlns:th="http://www.thymeleaf.org"
-	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" lang="en">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" lang="en">
 <head>
 <meta charset="utf-8" />
 <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-<meta name="viewport"
-	content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
 <meta name="description" content="Login" />
 <meta name="author" content="Dimis - Sastix" />
 <meta name="keyword" content="SCX videoconference Login" />
@@ -14,34 +11,25 @@
 <title>VCBridge - Admin Console - Login</title>
 <!-- Icons -->
 <link href="resources/css/font-awesome.min.css" rel="stylesheet" />
-<!-- <link href="resources/css/simple-line-icons.css" rel="stylesheet" /> -->
-<!-- Main styles for this application -->
-<!-- <link href="resources/css/style.css" rel="stylesheet" /> -->
-<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet"/>
+<link href="resources/css/bootstrap.min.css" rel="stylesheet" />
 <link href="resources/css/signin.css" rel="stylesheet" />
 </head>
 <body class="app flex-row align-items-center">
-	<div class="container">
-		<form class="form-signin" th:action="@{/login}" method="post">
-			<h2 class="form-signin-heading">Please sign in</h2>
-			<div th:if="${param.error}">Invalid username and password.</div>
-			<div th:if="${param.logout}">You have been logged out.</div>
-			<label for="username" class="sr-only">Email address</label> <input
-				type="email" id="username" name="username" class="form-control"
-				placeholder="Email address" required autofocus/>
-			
-			 <label
-				for="password" class="sr-only">Password</label> <input
-				type="password" id="password" name="password" class="form-control"
-				placeholder="Password" required>
-			<button class="btn btn-lg btn-primary btn-block" type="submit">Sign
-				in</button>
-		</form>
-	</div>
-	<!-- Bootstrap and necessary plugins -->
-	<script src="resources/js/jquery.min.js"></script>
-	<!-- <script src="resources/js/tether.min.js"></script> -->
-	<!-- <script src="resources/js/bootstrap.min.js"></script> -->
-	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+  <div class="container">
+    <form class="form-signin" th:action="@{/login}" method="post">
+      <h2 class="form-signin-heading">Please sign in</h2>
+      <div th:if="${param.error}">Invalid username and password.</div>
+      <div th:if="${param.logout}">You have been logged out.</div>
+      <label for="username" class="sr-only">Email address</label>
+      <input type="email" id="username" name="username" class="form-control" placeholder="Email address" required autofocus />
+
+      <label for="password" class="sr-only">Password</label>
+      <input type="password" id="password" name="password" class="form-control" placeholder="Password" required>
+      <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+    </form>
+  </div>
+  <!-- Bootstrap and necessary plugins -->
+  <script src="/resources/js/jquery-1.10.2.js"></script>
+  <script src="resources/js/bootstrap.min.js"></script>
 </body>
 </html>

@@ -165,6 +165,11 @@ public class CspServerInternalSandboxTest implements CamelRoutes{
             Message in = exchange.getIn();
             IntegrationData data = in.getBody(IntegrationData.class);
             assertThat(data.getDataType(), is(IntegrationDataType.INCIDENT));
+            assertThat(data.getDataParams().getOriginCspId(), is("origin-testCspId"));
+            assertThat(data.getDataParams().getOriginApplicationId(), is("origin-test1"));
+            assertThat(data.getDataParams().getOriginRecordId(), is("origin-recordId"));
+            assertThat(data.getDataParams().getReference(), is("<a href=\"http://rt.cert-gr.melecertes.eu/Ticket/Display.html?id=23453\" data-origin=\"cert-gr;rt;23453\">Incident title</a>"));
+            assertThat(data.getDataParams().getUrl(), is("http://rt.cert-gr.melecertes.eu/Ticket/Display.html?id=23453"));
         }
 
         mockedEcsp.expectedMessageCount(3);
