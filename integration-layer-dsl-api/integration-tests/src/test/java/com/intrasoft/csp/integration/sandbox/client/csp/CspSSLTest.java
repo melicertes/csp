@@ -93,7 +93,8 @@ public class CspSSLTest implements ContextUrl {
     public void sendPostIntegrationDataTest() throws IOException {
         IntegrationData integrationData = new IntegrationData();
         DataParams dataParams = new DataParams("cspId","applicationId","recordId"
-                ,DateTime.parse("2014-12-13 09:30:17", DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss")));
+                ,DateTime.parse("2014-12-13 09:30:17", DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss")),
+                "originCspId","originAppId","originRecId");
         integrationData.setDataParams(dataParams);
         integrationData.setDataType(IntegrationDataType.INCIDENT);
         SharingParams sharingParams = new SharingParams();

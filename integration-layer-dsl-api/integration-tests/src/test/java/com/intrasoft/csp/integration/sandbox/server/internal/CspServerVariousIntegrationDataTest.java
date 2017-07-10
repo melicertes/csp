@@ -60,7 +60,7 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
                 "taranis.protocol:http",
         })
 @MockEndpointsAndSkip("http:*")
-public class CspServerInvalidIntegrationDataTest implements CamelRoutes, ContextUrl{
+public class CspServerVariousIntegrationDataTest implements CamelRoutes, ContextUrl{
     private MockMvc mvc;
 
     private HttpMessageConverter mappingJackson2HttpMessageConverter;
@@ -126,16 +126,6 @@ public class CspServerInvalidIntegrationDataTest implements CamelRoutes, Context
 
     @Test
     public void integrationDataJsonTest() throws Exception {
-        String jsonStr = "{\"dataParams\":" +
-                "{\"cspId\":\"cspId\",\"applicationId\":\"appId\",\"recordId\":\"222\",\"dateTime\":\"2017-06-13T09:52:53+0000\"}," +
-                "\"sharingParams\":{\"toShare\":false,\"isExternal\":true},\"dataType\":\"vulnerability\"," +
-                "\"dataObject\":{\"t\":\"1234\"}}";
-
-        mvc.perform(post("/v"+REST_API_V1+"/"+DSL_INTEGRATION_DATA).accept(MediaType.TEXT_PLAIN)
-                .content(jsonStr)
-                .contentType(TestUtil.APPLICATION_JSON_UTF8))
-                .andExpect(status().isOk())
-                .andExpect(content().string(HttpStatusResponseType.SUCCESSFUL_OPERATION.getReasonPhrase()));
 
         IntegrationData integrationData = new IntegrationData();
         integrationData.setDataType(IntegrationDataType.VULNERABILITY);
@@ -148,9 +138,12 @@ public class CspServerInvalidIntegrationDataTest implements CamelRoutes, Context
         dataParams.setApplicationId("appId");
         dataParams.setDateTime(DateTime.now());
         dataParams.setCspId("cspId");
+        dataParams.setOriginCspId("origin-testCspId");
+        dataParams.setOriginApplicationId("origin-test1");
+        dataParams.setOriginRecordId("origin-recordId");
         integrationData.setDataParams(dataParams);
         integrationData.setDataObject(25d);
-        jsonStr = json(integrationData);
+        String jsonStr = json(integrationData);
         mvc.perform(post("/v"+REST_API_V1+"/"+DSL_INTEGRATION_DATA).accept(MediaType.TEXT_PLAIN)
                 .content(jsonStr)
                 .contentType(TestUtil.APPLICATION_JSON_UTF8))

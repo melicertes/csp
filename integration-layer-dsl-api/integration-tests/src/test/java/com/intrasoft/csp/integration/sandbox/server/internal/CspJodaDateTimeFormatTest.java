@@ -33,7 +33,7 @@ public class CspJodaDateTimeFormatTest {
         DateTime dateTime = DateTime.parse("2014-12-13 09:30:17", DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss")).withZone(DateTimeZone.UTC);
         DateTime dateTimeOtherFormat = DateTime.parse("2014-12-13T07:30:17+0000", DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ssZ")).withZone(DateTimeZone.UTC);
         IntegrationData integrationData = new IntegrationData();
-        DataParams dataParams = new DataParams("cspId","applicationId","recordId", dateTime);
+        DataParams dataParams = new DataParams("cspId","applicationId","recordId", dateTime,"originCspId","originAppId","originRecId");
         integrationData.setDataParams(dataParams);
         integrationData.setDataType(IntegrationDataType.INCIDENT);
         SharingParams sharingParams = new SharingParams();

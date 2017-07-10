@@ -1,0 +1,21 @@
+{
+  "dataParams": {
+    "cspId": "CERT-GR",
+    "applicationId": "rt",
+    "recordId": "23453",
+    "originCspId": "CERT-GR",
+    "originApplicationId": "rt",
+    "originRecordId": "23453",
+    "reference": "<a href=\"http://rt.cert-gr.melecertes.eu/Ticket/Display.html?id=23453\" data-origin=\"cert-gr;rt;23453\">Incident title</a>",
+    "url": "http://rt.cert-gr.melecertes.eu/Ticket/Display.html?id=23453",
+    "dateTime": "2017-05-29T07:30:17+0000"
+  },
+  "sharingParams": {
+    "toShare": false,
+    "isExternal": true
+  },
+  "dataType": "vulnerability",
+  "dataObject": {
+    "t": "1234"
+  }
+}
