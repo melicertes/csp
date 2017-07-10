@@ -75,9 +75,9 @@ paths:
       description: >
         Integration layer gets deletion request from an application on a
         specific integration data record. Forwards the deletion request to
-        eligible applications. toShare is always set to false. Deletes the existing indexed
-        document from Elastic. No deletion requests are forwarded to external
-        CSPs. dataObject is always null.
+        eligible applications. toShare is always set to false. Deletes the
+        existing indexed document from Elastic. No deletion requests are
+        forwarded to external CSPs. dataObject is always null.
       operationId: synchDeletedIntData
       consumes:
         - application/json
@@ -148,15 +148,25 @@ definitions:
   DataParams:
     type: object
     properties:
+      originCspId:
+        type: string
+      originApplicationId:
+        type: string
+      originRecordId:
+        type: string
       cspId:
         type: string
       applicationId:
         type: string
       recordId:
         type: string
-      timestamp:
+      dateTime:
         type: string
         format: dateTime
+      reference:
+        type: string
+      url:
+        type: string
   IntegrationDataType:
     type: string
     enum:
