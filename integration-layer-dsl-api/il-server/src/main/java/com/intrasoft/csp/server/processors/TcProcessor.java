@@ -2,6 +2,7 @@ package com.intrasoft.csp.server.processors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.intrasoft.csp.commons.exceptions.CspBusinessException;
+import com.intrasoft.csp.commons.exceptions.InvalidSharingParamsException;
 import com.intrasoft.csp.commons.model.*;
 import com.intrasoft.csp.commons.routes.CamelRoutes;
 import com.intrasoft.csp.server.service.CamelRestService;
@@ -13,8 +14,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import javax.annotation.PostConstruct;
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -65,19 +68,42 @@ public class TcProcessor implements Processor,CamelRoutes{
         IntegrationData integrationData = exchange.getIn().getBody(IntegrationData.class);
         String httpMethod = (String) exchange.getIn().getHeader(Exchange.HTTP_METHOD);
 
-        //make all TC calls
 
-        String uri = null;
+        //TODO: SXCSP-185. tcId and teamId logic to be implemented - if both throw exception - Malformed 4xx
+        if (!StringUtils.isEmpty(integrationData.getSharingParams().getTcId())
+                && !StringUtils.isEmpty(integrationData.getSharingParams().getTeamId())) {
+            throw new InvalidSharingParamsException("Invalid sharing params provided: tcId and team were both provided. " +
+                    "Only one or none should be provided. "+integrationData.getSharingParams().toString());
+        }
+
+        if (!StringUtils.isEmpty(integrationData.getSharingParams().getTcId())) {
+            //send by tcId provided
+            sendByTcId(integrationData.getSharingParams().getTcId(),exchange);
+        }else if(!StringUtils.isEmpty(integrationData.getSharingParams().getTeamId())){
+            //send by teamId provided
+            sendByTeamId(integrationData.getSharingParams().getTeamId(),exchange);
+        }else{
+            //send by dataType
+            sendByDataType(integrationData,exchange,originEndpoint,httpMethod);
+        }
+
+    }
+
+    private void sendByDataType(IntegrationData integrationData, Exchange exchange, String originEndpoint, String httpMethod) throws IOException {
+        //make all-TCs call
         String getAllTcUri = this.getTcCirclesURI();
         List<TrustCircle> tcList = camelRestService.sendAndGetList(getAllTcUri, null,  HttpMethod.GET.name(), TrustCircle.class,null);
 
         Optional<TrustCircle> optionalTc  = tcList.stream().filter(t->t.getShortName().toLowerCase().contains(IntegrationDataType.tcNamingConventionForShortName.get(integrationData.getDataType()).toString().toLowerCase())).findAny();
         if(optionalTc.isPresent()){
-            uri = this.getTcCirclesURI() + "/" + optionalTc.get().getId();
+            sendByTcId(optionalTc.get().getId(),exchange);
         }else{
             throw new CspBusinessException("Could not find trust circle id for this data. "+integrationData.toString());
         }
+    }
 
+    private void sendByTcId(String tcId, Exchange exchange) throws IOException {
+        String uri = this.getTcCirclesURI() + "/" + tcId;
         TrustCircle tc = camelRestService.send(uri, null,  HttpMethod.GET.name(), TrustCircle.class);
 
         List<Team> teams = new ArrayList<>();
@@ -91,6 +117,7 @@ public class TcProcessor implements Processor,CamelRoutes{
                         "Team: "+team.toString());
             }
 
+            //TODO: TC bug here, see SXCSP-255. We should use cspId and not shortName
             if (!team.getShortName().toLowerCase().trim().equals(serverName.toLowerCase().trim())){
                 teams.add(team);
             }
@@ -98,19 +125,49 @@ public class TcProcessor implements Processor,CamelRoutes{
         //all TC calls have been made up to this point, TEAMS list has been populated
 
         // Decide the flow
+        decideTheFlow(teams,exchange);
+    }
+    private void sendByTeamId(String teamId, Exchange exchange) throws IOException {
+        Team team = getTeamByRestCall(teamId);
+        List<Team> teams = new ArrayList<>();
+        //TODO: TC bug here, see SXCSP-255. We should use cspId and not shortName
+        if (!team.getShortName().toLowerCase().trim().equals(serverName.toLowerCase().trim())){
+            teams.add(team);
+            decideTheFlow(teams,exchange);
+        }else{
+            LOG.warn("Sending by team id("+teamId+") to itself(serverName: "+serverName.toLowerCase().trim()+") is not " +
+                    "supported - Nothing to send.");
+        }
+    }
+
+    private void decideTheFlow(List<Team> teams, Exchange exchange){
+        String originEndpoint = (String) exchange.getIn().getHeader(CamelRoutes.ORIGIN_ENDPOINT);
+        IntegrationData integrationData = exchange.getIn().getBody(IntegrationData.class);
+        String httpMethod = (String) exchange.getIn().getHeader(Exchange.HTTP_METHOD);
+        // Decide the flow
         if(originEndpoint.equals(routes.apply(CamelRoutes.DCL))) {
-            for(Team team:teams) {
+            for(Team t:teams) {
                 //send to ECSP
-                LOG.info(team.toString());
+                LOG.info(t.toString());
                 LOG.info(integrationData.toString());
-                handleDclFlowAndSendToECSP(httpMethod, team, integrationData);
+                handleDclFlowAndSendToECSP(httpMethod, t, integrationData);
             }
         }else if(originEndpoint.equals(routes.apply(CamelRoutes.EDCL))){
             handleExternalDclFlowAndSendToDSL(exchange,httpMethod, teams, integrationData);
         }
     }
 
+    private Team getTeamByRestCall(String teamId) throws IOException {
+        Team team = camelRestService.send(this.getTcTeamsURI() + "/" + teamId, teamId, HttpMethod.GET.name(), Team.class);
+        if(team.getShortName()==null){
+            throw new CspBusinessException("Team short name received from TC API is null - cannot proceed. \n" +
+                    "Team: "+team.toString());
+        }
+        return team;
+    }
+
     private void handleDclFlowAndSendToECSP(String httpMethod, Team team, IntegrationData integrationData){
+        //TODO: SXCSP-85 Sharing Policy to be integrated only when sending to ECSP
         EnhancedTeamDTO enhancedTeamDTO = new EnhancedTeamDTO(team, integrationData);
         Map<String, Object> headers = new HashMap<>();
 
@@ -120,6 +177,7 @@ public class TcProcessor implements Processor,CamelRoutes{
 
     private void handleExternalDclFlowAndSendToDSL(Exchange exchange,String httpMethod,List<Team> teams, IntegrationData integrationData){
 
+        //TODO: TC bug here, see SXCSP-255. We should use cspId and not shortName
         boolean authorized = teams.stream().anyMatch(t->t.getShortName().toLowerCase().equals(integrationData.getDataParams().getCspId().toLowerCase()));
         LOG.info("Authorized (cspId or shortName="+integrationData.getDataParams().getCspId().toLowerCase()+"): "+authorized);
         if (authorized){

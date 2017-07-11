@@ -18,7 +18,7 @@ public interface MeetingRepository extends JpaRepository<Meeting, Long> {
 	
 	Page<Meeting> findByUserEmailAndStatus(String email, MeetingStatus status,Pageable pageable);
 	
-		@Query("select m from Meeting m where m.user.email = ?1 and (m.status=?2 or m.status=?3)")
+		@Query("select m from Meeting m where m.user.email = ?1 and (m.status=?2 or m.status=?3) order by start DESC")
 	Page<Meeting> findByUserEmailAndStatusOrStatus(String email, MeetingStatus status1, MeetingStatus status2,Pageable pageable);
 
 	
@@ -26,14 +26,15 @@ public interface MeetingRepository extends JpaRepository<Meeting, Long> {
 	List<Meeting> findByUserEmailAndStatusOrStatusOrStatus(String email, MeetingStatus status1, MeetingStatus status2,
 			MeetingStatus status3, MeetingStatus status4);
 	
-	@Query("select m from Meeting m where m.user.email = ?1 and (m.status=?2 or m.status=?3 or m.status=?4 or m.status=?5)")
+	@Query("select m from Meeting m where m.user.email = ?1 and (m.status=?2 or m.status=?3 or m.status=?4 or m.status=?5) order by start DESC")
 	Page<Meeting> findByUserEmailAndStatusOrStatusOrStatus(String email, MeetingStatus status1, MeetingStatus status2,
 			MeetingStatus status3, MeetingStatus status4,Pageable pageable);
 
 	List<Meeting> findById(Long id);
 
 	@Modifying(clearAutomatically = true)
-	@Query(value = "update vcb_meeting set status = 'Expired' where status='Running' and TIMESTAMPADD(SECOND, duration/1000/1000/1000, start)<?1", nativeQuery = true)
+	@Query(value = "update vcb_meeting set status = 'Expired' where status='Running' and (start + (duration || ' SECOND')\\:\\:INTERVAL)<?1", nativeQuery = true)
+	//@Query(value = "update vcb_meeting set status = 'Expired' where status='Running' and TIMESTAMPADD(SECOND, duration/1000/1000/1000, start)<?1", nativeQuery = true) // latest working
 	// @Query(value = "update vcb_meeting set status = 'Expired' where status='Running' and DATE_ADD(start,INTERVAL duration/1000 MICROSECOND)<?1", nativeQuery = true)
 	void updateRunningToExpired(ZonedDateTime now);
 

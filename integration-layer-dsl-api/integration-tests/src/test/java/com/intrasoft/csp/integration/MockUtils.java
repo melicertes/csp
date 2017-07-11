@@ -146,7 +146,12 @@ public class MockUtils implements ContextUrl {
         dataParams.setApplicationId("test1");
         dataParams.setCspId("testCspId");
         dataParams.setRecordId("recordId");
+        dataParams.setOriginCspId("origin-testCspId");
+        dataParams.setOriginApplicationId("origin-test1");
+        dataParams.setOriginRecordId("origin-recordId");
         dataParams.setDateTime(DateTime.now());
+        dataParams.setUrl("http://rt.cert-gr.melecertes.eu/Ticket/Display.html?id=23453");
+        dataParams.setReference("<a href=\"http://rt.cert-gr.melecertes.eu/Ticket/Display.html?id=23453\" data-origin=\"cert-gr;rt;23453\">Incident title</a>");
         SharingParams sharingParams = new SharingParams();
         sharingParams.setIsExternal(isExternal);
         sharingParams.setToShare(true);
@@ -179,6 +184,9 @@ public class MockUtils implements ContextUrl {
         dataParams.setDateTime(DateTime.now());
         dataParams.setApplicationId(applicationId);
         dataParams.setCspId("CERT-GR");
+        dataParams.setOriginCspId("origin-CERT-GR");
+        dataParams.setOriginApplicationId("origin-"+applicationId);
+        dataParams.setOriginRecordId("origin-222");
         integrationData.setDataParams(dataParams);
         integrationData.setDataObject(dataParams);
 
@@ -217,6 +225,9 @@ public class MockUtils implements ContextUrl {
         DataParams dataParams = new DataParams();
         dataParams.setRecordId("222");
         dataParams.setApplicationId(applicationId);
+        dataParams.setOriginCspId("origin-"+cspId);
+        dataParams.setOriginApplicationId("origin-"+applicationId);
+        dataParams.setOriginRecordId("origin-222");
         dataParams.setDateTime(DateTime.now());
         dataParams.setCspId(cspId);
         integrationData.setDataParams(dataParams);

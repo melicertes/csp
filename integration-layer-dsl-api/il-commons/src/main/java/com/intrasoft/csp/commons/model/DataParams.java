@@ -26,9 +26,27 @@ public class DataParams implements Serializable {
     @JsonProperty("recordId")
     private String recordId;
 
-    //temporary comment out@NotNull
+    @NotNull
     @JsonProperty("dateTime")
     private DateTime dateTime;
+
+    @NotNull
+    @JsonProperty("originCspId")
+    private String originCspId;
+
+    @NotNull
+    @JsonProperty("originApplicationId")
+    private String originApplicationId;
+
+    @NotNull
+    @JsonProperty("originRecordId")
+    private String originRecordId;
+
+    @JsonProperty("reference")
+    private String reference;
+
+    @JsonProperty("url")
+    private String url;
 
     public DataParams() {
     }
@@ -39,11 +57,14 @@ public class DataParams implements Serializable {
         this.recordId = recordId;
     }
 
-    public DataParams(String cspId, String applicationId, String recordId, DateTime dateTime) {
+    public DataParams(String cspId, String applicationId, String recordId, DateTime dateTime, String originCspId, String originApplicationId, String originRecordId) {
         this.cspId = cspId;
         this.applicationId = applicationId;
         this.recordId = recordId;
         this.dateTime = dateTime;
+        this.originCspId = originCspId;
+        this.originApplicationId = originApplicationId;
+        this.originRecordId = originRecordId;
     }
 
     public String getCspId() {
@@ -76,6 +97,46 @@ public class DataParams implements Serializable {
 
     public void setDateTime(DateTime dateTime) {
         this.dateTime = dateTime;
+    }
+
+    public String getOriginCspId() {
+        return originCspId;
+    }
+
+    public void setOriginCspId(String originCspId) {
+        this.originCspId = originCspId;
+    }
+
+    public String getOriginApplicationId() {
+        return originApplicationId;
+    }
+
+    public void setOriginApplicationId(String originApplicationId) {
+        this.originApplicationId = originApplicationId;
+    }
+
+    public String getOriginRecordId() {
+        return originRecordId;
+    }
+
+    public void setOriginRecordId(String originRecordId) {
+        this.originRecordId = originRecordId;
+    }
+
+    public String getReference() {
+        return reference;
+    }
+
+    public void setReference(String reference) {
+        this.reference = reference;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
     }
 
     @Override
