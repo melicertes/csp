@@ -6,7 +6,7 @@ $(document).ready(function() {
     $('body').on('click', '.btn-action', function(e) {
         e.preventDefault();
     });
-    $('.btn-add').trigger('click');
+    $('.btn-remove').trigger('click');
 
     //8-4-4-4-12
     //$('.uuid').mask("00000000-0000-0000-0000-000000000000", {placeholder: "________-____-____-____-____________"});
@@ -44,43 +44,41 @@ $(document).ready(function() {
             csp_id: {
                 required: true
             },
-            /*
-            module_full_name: {
+            csp_name: {
                 required: true
             },
-            module_version: {
+            csp_domain_name: {
                 required: true
             },
-            module_priority: {
-                required: true
-            },
-            module_file: {
+            "csp_contact_name[]": {
                 required: true,
-                extension: "zip"
+                require_from_group: [$(".csp_contact_name").length, ".csp_contact_name"]
+            },
+            "csp_contact_email[]": {
+                required: true,
+                email: true,
+                require_from_group: [$(".csp_contact_email").length, ".csp_contact_email"]
+            },
+            "csp_contact_type[]": {
+                required: true,
+                require_from_group: [$(".csp_contact_type").length, ".csp_contact_type"]
+            },
+            "csp_internal_ip[]": {
+                required: true
+            },
+            "csp_external_ip[]": {
+                required: true
             }
-            */
         }
     });
     form.submit(function (e) {
         e.preventDefault();
 
         if (form.valid()) {
-            var f = document.getElementById('csp-form');
-            //var formData = new FormData(f);
-            //var formData = JSON.stringify(new FormData(f))
-            //var formData = $("#csp-form").serialize();
-            var formData = $("#csp-form").serializeObject();
-            var data = {};
-            var formData = $("#csp-form").serializeArray().map(function(x){data[x.name] = x.value;});
-
-            ///WORKS..................
-            var formData = JSON.stringify($('#csp-form').serializeObject())
-
-
-console.log(formData);
+            var formData = JSON.stringify($('#csp-form').serializeObject());
             $.ajax({
                 type: 'POST',
-                url: POST_URL,
+                url: POST_URL + "/" + $("#csp_id").val(),
                 data: formData,
                 processData: false,
                 contentType:"application/json; charset=utf-8",

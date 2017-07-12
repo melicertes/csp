@@ -21,6 +21,12 @@ public enum HttpStatusResponseType {
 
     //CSP PAGES 6000
     DATA_CSP_SAVE_OK(0, "Successful operation. CSP information saved", ""),
+    DATA_CSP_SAVE_RECORD_EXISTS(6000, "CSP ID provided already exists", "Data integrity violation"),
+    DATA_CSP_SAVE_INCONSISTENT_CONTACT(6001, "CSP contacts are not stated correctly", "Data integrity violation"),
+    DATA_CSP_DELETE_ERROR(6002, "CSP cannot be deleted", ""),
+    DATA_CSP_DELETE_OK(0, "Successful operation. CSP information removed", ""),
+    DATA_CSP_UPDATE_ERROR(6002, "CSP cannot be updated", ""),
+    DATA_CSP_UPDATE_OK(0, "Successful operation. CSP information updated", ""),
 
     //MODULE PAGES 7000
     DATA_MODULE_SAVE_OK(0, "Successful operation. Module information saved", ""),

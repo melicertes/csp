@@ -172,6 +172,12 @@
             <artifactId>jquery-validation</artifactId>
             <version>1.16.0</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/org.webjars.bower/bootstrap3-dialog -->
+        <dependency>
+            <groupId>org.webjars.bower</groupId>
+            <artifactId>bootstrap3-dialog</artifactId>
+            <version>1.35.3</version>
+        </dependency>
 
 
 

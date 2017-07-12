@@ -3,9 +3,10 @@ package com.instrasoft.csp.ccs.domain.data;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class CspRegistration {
+public class CspForm {
 
     @JsonProperty("csp_id")
     private String cspId;
@@ -96,6 +97,18 @@ public class CspRegistration {
         this.externalIps = externalIps;
     }
 
+
+    public List<Contact> getContacts() {
+        List<Contact> contacts = new ArrayList<>();
+        for(int i=0; i<contactNames.size(); i++) {
+            Contact contact = new Contact();
+            contact.setPersonName(contactNames.get(i));
+            contact.setPersonEmail(contactEmails.get(i));
+            contact.setContactType(contactTypes.get(i));
+            contacts.add(contact);
+        }
+        return contacts;
+    }
 
     @Override
     public String toString() {

@@ -1,25 +1,17 @@
 package com.instrasoft.csp.ccs.controller;
 
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.instrasoft.csp.ccs.config.DataContextUrl;
 import com.instrasoft.csp.ccs.config.HttpStatusResponseType;
 import com.instrasoft.csp.ccs.config.PagesContextUrl;
 import com.instrasoft.csp.ccs.domain.api.Response;
 import com.instrasoft.csp.ccs.domain.api.ResponseError;
-import com.instrasoft.csp.ccs.domain.data.CspRegistration;
-import com.instrasoft.csp.ccs.domain.data.CspRow;
-import com.instrasoft.csp.ccs.domain.data.DashboardRow;
-import com.instrasoft.csp.ccs.domain.data.ModuleRow;
-import com.instrasoft.csp.ccs.domain.postgresql.Csp;
-import com.instrasoft.csp.ccs.domain.postgresql.CspContact;
-import com.instrasoft.csp.ccs.domain.postgresql.Module;
-import com.instrasoft.csp.ccs.domain.postgresql.ModuleVersion;
+import com.instrasoft.csp.ccs.domain.data.*;
+import com.instrasoft.csp.ccs.domain.postgresql.*;
 import com.instrasoft.csp.ccs.repository.*;
+import com.instrasoft.csp.ccs.utils.FileHelper;
 import com.instrasoft.csp.ccs.utils.JodaConverter;
-import com.instrasoft.csp.ccs.utils.JsonPrinter;
 import com.instrasoft.csp.ccs.utils.VersionParser;
-import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,20 +19,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.view.RedirectView;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.*;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -72,6 +56,9 @@ public class DataController implements DataContextUrl, PagesContextUrl {
     ModuleVersionRepository moduleVersionRepository;
 
 
+    /*
+    Dashboard and Manage
+     */
     @RequestMapping(value = DATA_BASEURL + DATA_DASHBOARD,
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
@@ -104,6 +91,9 @@ public class DataController implements DataContextUrl, PagesContextUrl {
     }
 
 
+    /*
+    CSP
+     */
     @RequestMapping(value = DATA_BASEURL + DATA_CSPS,
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
@@ -131,7 +121,7 @@ public class DataController implements DataContextUrl, PagesContextUrl {
 
             row.setBtn("<a class=\"btn btn-xs btn-success\" href=\""+PAGES_CSP_UPDATE+"?cspId=" + csp.getId()+"\"><i class=\"fa fa-edit\"></i></a>"+
                     "&nbsp;"+
-                    "<a class=\"btn btn-xs btn-default\" href=\"#\"><i class=\"fa fa-remove\"></i></a>");
+                    "<a class=\"btn btn-xs btn-default csp-delete\" data-csp-id=\""+csp.getId()+"\" href=\"#\"><i class=\"fa fa-remove\"></i></a>");
 
             rows.add(row);
         }
@@ -139,7 +129,86 @@ public class DataController implements DataContextUrl, PagesContextUrl {
         return new ResponseEntity<>(rows, HttpStatus.OK);
     }
 
+    @RequestMapping(value = DATA_BASEURL + DATA_CSP_SAVE,
+            consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
+            produces = MediaType.APPLICATION_JSON_UTF8_VALUE,
+            method = RequestMethod.POST)
+    public ResponseEntity registerCsp(@RequestBody CspForm cspForm) {
+        LOG.info(DATA_BASEURL + DATA_CSP_SAVE + ": POST received");
 
+        /**
+         * @TODO
+         * Error checking. Send 200 HTTP response to be easily managed from js.
+         * Shall name, domain_name be unique ???
+         */
+        //Check if contact name, email, type are of equal size
+        if ((cspForm.getContactNames().size()+ cspForm.getContactEmails().size()+ cspForm.getContactTypes().size()) % 3 != 0) {
+            ResponseError error = new ResponseError(HttpStatusResponseType.DATA_CSP_SAVE_INCONSISTENT_CONTACT.code(), HttpStatusResponseType.DATA_CSP_SAVE_INCONSISTENT_CONTACT.text(), HttpStatusResponseType.DATA_CSP_SAVE_INCONSISTENT_CONTACT.exception());
+            return new ResponseEntity<>(error, HttpStatus.OK);
+        }
+
+        //Check if csp_id exists
+        if (cspRepository.findOne(cspForm.getCspId()) != null) {
+            ResponseError error = new ResponseError(HttpStatusResponseType.DATA_CSP_SAVE_RECORD_EXISTS.code(), HttpStatusResponseType.DATA_CSP_SAVE_RECORD_EXISTS.text(), HttpStatusResponseType.DATA_CSP_SAVE_RECORD_EXISTS.exception());
+            return new ResponseEntity<>(error, HttpStatus.OK);
+        }
+
+
+        //save csp
+        Csp csp = new Csp();
+        csp.setId(cspForm.getCspId());
+        csp = this.persistCsp(csp, cspForm);
+
+        Response response = new Response(HttpStatusResponseType.DATA_CSP_SAVE_OK.code(), HttpStatusResponseType.DATA_CSP_SAVE_OK.text());
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = DATA_BASEURL + DATA_CSP_UPDATE + "/{cspId}",
+            consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
+            produces = MediaType.APPLICATION_JSON_UTF8_VALUE,
+            method = RequestMethod.POST)
+    public ResponseEntity updateCsp(@PathVariable String cspId, @RequestBody CspForm cspForm) {
+        LOG.info(DATA_BASEURL + DATA_CSP_UPDATE + ": POST received");
+
+        try {
+            cspContactRepository.removeByCspId(cspId);
+            cspIpRepository.removeByCspId(cspId);
+        } catch (Exception e) {
+            ResponseError error = new ResponseError(HttpStatusResponseType.DATA_CSP_UPDATE_ERROR.code(), HttpStatusResponseType.DATA_CSP_UPDATE_ERROR.text(), e.getMessage());
+            return new ResponseEntity<>(error, HttpStatus.OK);
+        }
+
+        Csp csp = cspRepository.findOne(cspId);
+        csp = this.persistCsp(csp, cspForm);
+
+
+
+        Response response = new Response(HttpStatusResponseType.DATA_CSP_UPDATE_OK.code(), HttpStatusResponseType.DATA_CSP_UPDATE_OK.text());
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = DATA_BASEURL + DATA_CSP_REMOVE + "/{cspId}",
+            method = RequestMethod.POST,
+            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity removeCsp(@PathVariable String cspId) {
+        LOG.info(DATA_BASEURL + DATA_CSP_REMOVE  + "/" + cspId + ": POST received");
+
+        try {
+            cspContactRepository.removeByCspId(cspId);
+            cspIpRepository.removeByCspId(cspId);
+            cspRepository.delete(cspId);
+        } catch (Exception e) {
+            ResponseError error = new ResponseError(HttpStatusResponseType.DATA_CSP_DELETE_ERROR.code(), HttpStatusResponseType.DATA_CSP_DELETE_ERROR.text(), e.getMessage());
+            return new ResponseEntity<>(error, HttpStatus.OK);
+        }
+
+        Response response = new Response(HttpStatusResponseType.DATA_CSP_DELETE_OK.code(), HttpStatusResponseType.DATA_CSP_DELETE_OK.text());
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    /*
+    Modules
+     */
     @RequestMapping(value = DATA_BASEURL + DATA_MODULES,
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
@@ -177,21 +246,6 @@ public class DataController implements DataContextUrl, PagesContextUrl {
 
 
 
-    @RequestMapping(value = DATA_BASEURL + DATA_CSP_SAVE,
-            //headers=("content-type=application/x-www-form-urlencoded"),
-            consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE,
-            method = RequestMethod.POST)
-    public ResponseEntity registerCsp(@RequestBody CspRegistration cspRegistration) {
-
-
-        LOG.error(JsonPrinter.toJsonPrettyString(cspRegistration));
-
-
-        Response response = new Response(HttpStatusResponseType.DATA_CSP_SAVE_OK.code(), HttpStatusResponseType.DATA_CSP_SAVE_OK.text());
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
-
 
     @RequestMapping(value = DATA_BASEURL + DATA_MODULE_SAVE,
             headers=("content-type=multipart/*"),
@@ -217,7 +271,7 @@ public class DataController implements DataContextUrl, PagesContextUrl {
             if (isDefault.equals("on")) {
                 module.setIsDefault(1);
             }
-            String hash = this.saveUploadedFile(uploadFile);
+            String hash = FileHelper.saveUploadedFile(fileTemp, fileRepository, uploadFile, digestAlgorithm);
 
             //save after all exceptions
             module = moduleRepository.save(module);
@@ -248,59 +302,43 @@ public class DataController implements DataContextUrl, PagesContextUrl {
         }
     }
 
-    private String saveUploadedFile(MultipartFile file) throws IOException, NoSuchAlgorithmException {
-        /*
-        Save file to temp
-         */
-        byte[] bytes = file.getBytes();
-        File f = new File(fileTemp + file.getOriginalFilename());
-        Path path = Paths.get(f.getAbsolutePath());
-        Files.write(path, bytes);
 
-        /*
-        Calculate hash
-         */
-        String hash = this.hashFile(f.getAbsolutePath());
 
-        /*
-        Clean up files
-         */
-        /**
-         * @TODO What is file has the same hash? Can it happen?? Hash Unique
-         */
-        //overwrite existing file, if exists
-        CopyOption[] options = new CopyOption[]{
-                StandardCopyOption.REPLACE_EXISTING,
-                StandardCopyOption.COPY_ATTRIBUTES
-        };
-        File target = new File(fileRepository + hash + "." + FilenameUtils.getExtension(f.getAbsolutePath()));
-        Path FROM = Paths.get(f.getAbsolutePath());
-        Path TO = Paths.get(target.getAbsolutePath());
-        Files.copy(FROM, TO, options);
-        Files.delete(FROM);
 
-        return hash;
-    }
+    private Csp persistCsp(Csp csp, CspForm cspForm) {
+        csp.setName(cspForm.getName());
+        csp.setDomainName(cspForm.getDomainName());
+        csp.setRegistrationDate(JodaConverter.getCurrentJodaString());
+        csp = cspRepository.save(csp);
 
-    private String hashFile(String filePath) throws NoSuchAlgorithmException, IOException {
-        MessageDigest md = MessageDigest.getInstance(digestAlgorithm);
-        FileInputStream fis = new FileInputStream(filePath);
-
-        byte[] dataBytes = new byte[1024];
-
-        int nread = 0;
-        while ((nread = fis.read(dataBytes)) != -1) {
-            md.update(dataBytes, 0, nread);
-        };
-        byte[] mdbytes = md.digest();
-        fis.close();
-
-        //convert the byte to hex format
-        StringBuffer hexString = new StringBuffer();
-        for (int i=0;i<mdbytes.length;i++) {
-            hexString.append(Integer.toHexString(0xFF & mdbytes[i]));
+        //save csp contacts
+        cspContactRepository.removeByCspId(csp.getId());
+        for (Contact contact : cspForm.getContacts()) {
+            CspContact cspContact = new CspContact();
+            cspContact.setCspId(csp.getId());
+            cspContact.setPersonName(contact.getPersonName());
+            cspContact.setPersonEmail(contact.getPersonEmail());
+            cspContact.setContactType(contact.getContactType());
+            cspContactRepository.save(cspContact);
         }
 
-        return hexString.toString();
+        //save IPs
+        cspIpRepository.removeByCspId(csp.getId());
+        for (String ip : cspForm.getInternalIps()) {
+            CspIp cspIp = new CspIp();
+            cspIp.setCspId(csp.getId());
+            cspIp.setIp(ip);
+            cspIp.setExternal(0);
+            cspIpRepository.save(cspIp);
+        }
+        for (String ip : cspForm.getExternalIps()) {
+            CspIp cspIp = new CspIp();
+            cspIp.setCspId(csp.getId());
+            cspIp.setIp(ip);
+            cspIp.setExternal(1);
+            cspIpRepository.save(cspIp);
+        }
+
+        return csp;
     }
 }

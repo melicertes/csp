@@ -83,23 +83,23 @@
                             <div class="col-md-4 col-xs-12">
                                 <div class="form-group">
                                     <label>Name:</label>
-                                    <input class="form-control" name="csp_contact_name[]" type="text"></input>
+                                    <input class="form-control csp_contact_name" name="csp_contact_name[]" type="text"></input>
                                 </div>
                             </div>
                             <div class="col-md-4 col-xs-12">
                                 <div class="form-group">
                                     <label>Email:</label>
-                                    <input class="form-control" name="csp_contact_email[]" type="text"></input>
+                                    <input class="form-control csp_contact_email" name="csp_contact_email[]" type="text"></input>
                                 </div>
                             </div>
                             <div class="col-md-4 col-xs-12">
                                 <label>Type:</label>
-                                <div class="input-group">
-                                    <select class="form-control" name="csp_contact_type[]">
-                                        <option></option>
-                                        <option>tech-admin</option>
-                                        <option>contact</option>
-                                        <option>securityofficer</option>
+                                <div class="form-group input-group">
+                                    <select class="form-control csp_contact_type" name="csp_contact_type[]">
+                                        <option selected="selected"></option>
+                                        <option value="tech-admin">tech-admin</option>
+                                        <option value="contact">contact</option>
+                                        <option value="securityofficer">securityofficer</option>
                                     </select>
                                     <span class="input-group-btn">
                                         <button data-duplicate-remove="contact" class="btn btn-success" type="button"><i class="fa fa-minus"></i></button>
@@ -191,7 +191,7 @@
     var REDIRECT_URL = [[${cspListUrl}]];
     /*]]>*/
 </script>
-<script th:src="@{/assets/js/pages/csp.js}"></script>
+<script th:src="@{/assets/js/pages/csp/register.js}"></script>
 
 </body>
 

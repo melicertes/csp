@@ -134,7 +134,7 @@ label.error{
     color: #c9302c;
     display: block;
 }
-input.error {
+input.error, select.error {
     border-color: #c9302c;
 }
 

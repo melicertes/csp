@@ -2,6 +2,11 @@ package com.instrasoft.csp.ccs.controller;
 
 import com.instrasoft.csp.ccs.config.DataContextUrl;
 import com.instrasoft.csp.ccs.config.PagesContextUrl;
+import com.instrasoft.csp.ccs.domain.postgresql.Csp;
+import com.instrasoft.csp.ccs.domain.postgresql.CspIp;
+import com.instrasoft.csp.ccs.repository.CspContactRepository;
+import com.instrasoft.csp.ccs.repository.CspIpRepository;
+import com.instrasoft.csp.ccs.repository.CspRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +24,16 @@ import javax.servlet.http.HttpServletResponse;
 public class MvcController implements PagesContextUrl, DataContextUrl {
 
     private static final Logger LOG = LoggerFactory.getLogger(MvcController.class);
+
+
+    @Autowired
+    CspRepository cspRepository;
+
+    @Autowired
+    CspContactRepository cspContactRepository;
+
+    @Autowired
+    CspIpRepository cspIpRepository;
 
 //    @Autowired
 //    private ErrorAttributes errorAttributes;
@@ -50,21 +65,6 @@ public class MvcController implements PagesContextUrl, DataContextUrl {
     }
 
 
-
-//    @ExceptionHandler
-//    @RequestMapping(value = PAGES_ERROR)
-//    public ModelAndView error(Model model) {
-//        //model = this.init(model);
-//LOG.error("@HERE");
-//        //return "error";
-//        return new ModelAndView("pages/error", "error", null);
-//    }
-
-//    @Override
-//    public String getErrorPath() {
-//        return PAGES_ERROR;
-//    }
-
     /*
     CSP Pages
      */
@@ -73,6 +73,7 @@ public class MvcController implements PagesContextUrl, DataContextUrl {
         model = this.init(model);
         model.addAttribute("addCspUrl", PAGES_CSP_REGISTER);
         model.addAttribute("dataCspUrl", DATA_BASEURL + DATA_CSPS);
+        model.addAttribute("removeCspUrl", DATA_BASEURL + DATA_CSP_REMOVE);
         model.addAttribute("navCspClassActive", "active");
         return new ModelAndView("pages/csp/list", "list", model);
     }
@@ -85,6 +86,29 @@ public class MvcController implements PagesContextUrl, DataContextUrl {
         model.addAttribute("navCspClassActive", "active");
         return new ModelAndView("pages/csp/register", "register", model);
     }
+
+    @RequestMapping(value = PAGES_CSP_UPDATE, method = RequestMethod.GET)
+    public ModelAndView cspUpdate(@RequestParam("cspId") String cspId, Model model) {
+        model = this.init(model);
+
+        Csp csp = cspRepository.findOne(cspId);
+        if (csp == null) {
+            return new ModelAndView("error", "error", model);
+        }
+
+        model.addAttribute("cspUpdateUrl", DATA_BASEURL + DATA_CSP_UPDATE);
+        model.addAttribute("cspListUrl", PAGES_CSP_LIST);
+
+        model.addAttribute("cspData", cspRepository.findOne(cspId));
+        model.addAttribute("cspContacts", cspContactRepository.findByCspId(cspId));
+        model.addAttribute("cspInternalIps", cspIpRepository.findByCspIdAndExternal(cspId, 0));
+        model.addAttribute("cspExternalIps", cspIpRepository.findByCspIdAndExternal(cspId, 1));
+
+        model.addAttribute("navCspClassActive", "active");
+        return new ModelAndView("pages/csp/update", "update", model);
+    }
+
+
 
     /*
     MODULE PAGES
