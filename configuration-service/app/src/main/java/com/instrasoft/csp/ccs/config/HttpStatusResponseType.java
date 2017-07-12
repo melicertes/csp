@@ -20,6 +20,7 @@ public enum HttpStatusResponseType {
     DATA_DASHBOARD_500(5000, "Generic system error", "Failed to fetch data for page"),
 
     //CSP PAGES 6000
+    DATA_CSP_SAVE_OK(0, "Successful operation. CSP information saved", ""),
 
     //MODULE PAGES 7000
     DATA_MODULE_SAVE_OK(0, "Successful operation. Module information saved", ""),

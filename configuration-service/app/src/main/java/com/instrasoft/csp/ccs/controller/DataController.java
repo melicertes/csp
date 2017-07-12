@@ -1,20 +1,23 @@
 package com.instrasoft.csp.ccs.controller;
 
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.instrasoft.csp.ccs.config.DataContextUrl;
 import com.instrasoft.csp.ccs.config.HttpStatusResponseType;
 import com.instrasoft.csp.ccs.config.PagesContextUrl;
 import com.instrasoft.csp.ccs.domain.api.Response;
 import com.instrasoft.csp.ccs.domain.api.ResponseError;
+import com.instrasoft.csp.ccs.domain.data.CspRegistration;
+import com.instrasoft.csp.ccs.domain.data.CspRow;
 import com.instrasoft.csp.ccs.domain.data.DashboardRow;
 import com.instrasoft.csp.ccs.domain.data.ModuleRow;
 import com.instrasoft.csp.ccs.domain.postgresql.Csp;
+import com.instrasoft.csp.ccs.domain.postgresql.CspContact;
 import com.instrasoft.csp.ccs.domain.postgresql.Module;
 import com.instrasoft.csp.ccs.domain.postgresql.ModuleVersion;
-import com.instrasoft.csp.ccs.repository.CspRepository;
-import com.instrasoft.csp.ccs.repository.ModuleRepository;
-import com.instrasoft.csp.ccs.repository.ModuleVersionRepository;
+import com.instrasoft.csp.ccs.repository.*;
 import com.instrasoft.csp.ccs.utils.JodaConverter;
+import com.instrasoft.csp.ccs.utils.JsonPrinter;
 import com.instrasoft.csp.ccs.utils.VersionParser;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
@@ -57,6 +60,12 @@ public class DataController implements DataContextUrl, PagesContextUrl {
     CspRepository cspRepository;
 
     @Autowired
+    CspIpRepository cspIpRepository;
+
+    @Autowired
+    CspContactRepository cspContactRepository;
+
+    @Autowired
     ModuleRepository moduleRepository;
 
     @Autowired
@@ -65,7 +74,7 @@ public class DataController implements DataContextUrl, PagesContextUrl {
 
     @RequestMapping(value = DATA_BASEURL + DATA_DASHBOARD,
             method = RequestMethod.GET,
-            produces = "application/json")
+            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity dashboard() {
         List<DashboardRow> rows = new ArrayList<>();
         List<Csp> csps = cspRepository.findAll();
@@ -95,15 +104,52 @@ public class DataController implements DataContextUrl, PagesContextUrl {
     }
 
 
+    @RequestMapping(value = DATA_BASEURL + DATA_CSPS,
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity csps() {
+        List<CspRow> rows = new ArrayList<>();
+        List<Csp> csps = cspRepository.findAll();
+
+        for (Csp csp : csps) {
+            CspRow row = new CspRow();
+
+            row.setIcon("<i class=\"fa fa-cog\"></i>");
+            row.setCspId(csp.getId());
+            row.setName(csp.getName());
+            row.setDomainName(csp.getDomainName());
+            row.setRegistrationDate(csp.getRegistrationDate());
+            row.setInternalIps(cspIpRepository.findByCspIdAndExternal(csp.getId(), 0));
+            row.setExternalIps(cspIpRepository.findByCspIdAndExternal(csp.getId(), 1));
+
+            List<CspContact> cspContacts = cspContactRepository.findByCspId(csp.getId());
+            List<String> contacts = new ArrayList<>();
+            for (CspContact cspContact : cspContacts) {
+                contacts.add(cspContact.toRow());
+            }
+            row.setContacts(contacts);
+
+            row.setBtn("<a class=\"btn btn-xs btn-success\" href=\""+PAGES_CSP_UPDATE+"?cspId=" + csp.getId()+"\"><i class=\"fa fa-edit\"></i></a>"+
+                    "&nbsp;"+
+                    "<a class=\"btn btn-xs btn-default\" href=\"#\"><i class=\"fa fa-remove\"></i></a>");
+
+            rows.add(row);
+        }
+
+        return new ResponseEntity<>(rows, HttpStatus.OK);
+    }
+
+
     @RequestMapping(value = DATA_BASEURL + DATA_MODULES,
             method = RequestMethod.GET,
-            produces = "application/json")
+            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity modules() {
         List<ModuleRow> rows = new ArrayList<>();
         List<Module> modules = moduleRepository.findAll();
 
         for (Module module : modules) {
             ModuleRow row = new ModuleRow();
+
             row.setIcon("<i class=\"fa fa-circle-o-notch\"></i>");
             row.setShortName(module.getName());
 
@@ -129,11 +175,29 @@ public class DataController implements DataContextUrl, PagesContextUrl {
         return new ResponseEntity<>(rows, HttpStatus.OK);
     }
 
+
+
+    @RequestMapping(value = DATA_BASEURL + DATA_CSP_SAVE,
+            //headers=("content-type=application/x-www-form-urlencoded"),
+            consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
+            produces = MediaType.APPLICATION_JSON_UTF8_VALUE,
+            method = RequestMethod.POST)
+    public ResponseEntity registerCsp(@RequestBody CspRegistration cspRegistration) {
+
+
+        LOG.error(JsonPrinter.toJsonPrettyString(cspRegistration));
+
+
+        Response response = new Response(HttpStatusResponseType.DATA_CSP_SAVE_OK.code(), HttpStatusResponseType.DATA_CSP_SAVE_OK.text());
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+
     @RequestMapping(value = DATA_BASEURL + DATA_MODULE_SAVE,
             headers=("content-type=multipart/*"),
             consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE,
             method = RequestMethod.POST)
-    public ResponseEntity addModule(@RequestParam("module_short_name") String shortName,
+    public ResponseEntity registerModule(@RequestParam("module_short_name") String shortName,
                                   @RequestParam("module_full_name") String fullName,
                                   @RequestParam("module_version") String version,
                                   @RequestParam(value = "module_default", required = false, defaultValue = "") String isDefault,

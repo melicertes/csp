@@ -2,11 +2,7 @@ $(document).ready(function(){
     //099.099.099.099
     $('.v').mask("0.0.000", {placeholder: "_._.___"});
 
-    $('.checkbox-app').checkboxpicker({
-        html: true,
-        offLabel: '<span class="glyphicon glyphicon-remove">',
-        onLabel: '<span class="glyphicon glyphicon-ok">'
-    });
+    $('.checkbox-app').checkboxpicker({});
 
     $('.checkbox-app').on('change', function(){
         var $moduleId = $(this).attr('data-module-id');

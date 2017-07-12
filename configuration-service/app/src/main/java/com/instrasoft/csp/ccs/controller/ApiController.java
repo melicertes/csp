@@ -48,7 +48,7 @@ public class ApiController implements ApiContextUrl {
 
     @RequestMapping(value = API_BASEURL + "/v" + API_V1 + API_UPDATES + "/{cspId}",
             method = RequestMethod.GET,
-            produces = "application/json")
+            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity updates(@PathVariable String cspId) {
 
         LOG.info("/v" + API_V1 + API_UPDATES + "/" + cspId + ": GET received");
@@ -104,8 +104,8 @@ public class ApiController implements ApiContextUrl {
 
     @RequestMapping(value = API_BASEURL + "/v" + API_V1 + API_REGISTER + "/{cspId}",
             method = RequestMethod.POST,
-            consumes = "application/json",
-            produces = "application/json")
+            consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
+            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity register(@PathVariable String cspId, @RequestBody Registration cspRegistration) {
         LOG.info("/v" + API_V1 + API_UPDATES + "/" + cspId + ": POST received");
 

@@ -81,4 +81,8 @@ public class CspContact {
                 ", contactType='" + contactType + '\'' +
                 '}';
     }
+
+    public String toRow() {
+        return this.personName + " / " + this.contactType + " (" + this.personEmail + ")";
+    }
 }
