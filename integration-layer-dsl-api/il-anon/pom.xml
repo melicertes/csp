@@ -10,7 +10,7 @@
 	</parent>
 
 	<groupId>com.intrasoft.csp</groupId>
-    <artifactId>anonymization-server</artifactId>
+    <artifactId>il-anon</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
 
