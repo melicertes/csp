@@ -8,8 +8,8 @@ public class DashboardRow {
     private String icon;
     private String name;
     private String domain;
-    private String ts;
-    private String status;
+    private String registrationDate;
+    private String lastUpdate;
     private List<String> confUpdates;
     private List<String> reportUpdates;
     private String btn;
@@ -39,20 +39,20 @@ public class DashboardRow {
         this.domain = domain;
     }
 
-    public String getTs() {
-        return ts;
+    public String getRegistrationDate() {
+        return registrationDate;
     }
 
-    public void setTs(String ts) {
-        this.ts = ts;
+    public void setRegistrationDate(String registrationDate) {
+        this.registrationDate = registrationDate;
     }
 
-    public String getStatus() {
-        return status;
+    public String getLastUpdate() {
+        return lastUpdate;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
+    public void setLastUpdate(String lastUpdate) {
+        this.lastUpdate = lastUpdate;
     }
 
     public List<String> getConfUpdates() {
@@ -86,8 +86,8 @@ public class DashboardRow {
                 "icon='" + icon + '\'' +
                 ", name='" + name + '\'' +
                 ", domain='" + domain + '\'' +
-                ", ts='" + ts + '\'' +
-                ", status='" + status + '\'' +
+                ", registrationDate='" + registrationDate + '\'' +
+                ", lastUpdate='" + lastUpdate + '\'' +
                 ", confUpdates=" + confUpdates +
                 ", reportUpdates=" + reportUpdates +
                 ", btn='" + btn + '\'' +

@@ -29,9 +29,12 @@ public class ModuleVersion {
     @NotNull
     private String releasedOn;
 
-    @Column(name="hash")
+    @Column(name="hash", unique = true)
     @NotNull
     private String hash;
+
+    @Column(name="description")
+    private String description;
 
 
     public Long getId() {
@@ -82,6 +85,13 @@ public class ModuleVersion {
         this.hash = hash;
     }
 
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
     @Override
     public String toString() {
@@ -92,6 +102,7 @@ public class ModuleVersion {
                 ", version=" + version +
                 ", releasedOn='" + releasedOn + '\'' +
                 ", hash='" + hash + '\'' +
+                ", description='" + description + '\'' +
                 '}';
     }
 }

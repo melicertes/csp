@@ -2,11 +2,10 @@ package com.instrasoft.csp.ccs.controller;
 
 import com.instrasoft.csp.ccs.config.DataContextUrl;
 import com.instrasoft.csp.ccs.config.PagesContextUrl;
-import com.instrasoft.csp.ccs.domain.postgresql.Csp;
-import com.instrasoft.csp.ccs.domain.postgresql.CspIp;
-import com.instrasoft.csp.ccs.repository.CspContactRepository;
-import com.instrasoft.csp.ccs.repository.CspIpRepository;
-import com.instrasoft.csp.ccs.repository.CspRepository;
+import com.instrasoft.csp.ccs.domain.data.ManagementRow;
+import com.instrasoft.csp.ccs.domain.postgresql.*;
+import com.instrasoft.csp.ccs.repository.*;
+import com.instrasoft.csp.ccs.utils.VersionParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +18,8 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.List;
 
 @Controller
 public class MvcController implements PagesContextUrl, DataContextUrl {
@@ -35,8 +36,21 @@ public class MvcController implements PagesContextUrl, DataContextUrl {
     @Autowired
     CspIpRepository cspIpRepository;
 
-//    @Autowired
-//    private ErrorAttributes errorAttributes;
+    @Autowired
+    CspInfoRepository cspInfoRepository;
+
+    @Autowired
+    CspModuleInfoRepository cspModuleInfoRepository;
+
+    @Autowired
+    CspManagementRepository cspManagementRepository;
+
+    @Autowired
+    ModuleRepository moduleRepository;
+
+    @Autowired
+    ModuleVersionRepository moduleVersionRepository;
+
 
     /*
     MAIN Pages
@@ -60,7 +74,51 @@ public class MvcController implements PagesContextUrl, DataContextUrl {
     @RequestMapping(value = PAGES_MANAGE, method = RequestMethod.GET)
     public ModelAndView manage(@RequestParam("cspId") String cspId, Model model) {
         model = this.init(model);
-        //model.addAttribute("navHomeClassActive", "");
+
+        model.addAttribute("navHomeClassActive", "active");
+
+        List<ManagementRow> managementRows = new ArrayList<>();
+        List<Module> modules = moduleRepository.findAll();
+        for(Module module : modules) {
+            ManagementRow row = new ManagementRow();
+
+            row.setModuleId(module.getId());
+            row.setIsModuleDefault(module.getIsDefault());
+            row.setModuleShortName(module.getName());
+
+            CspInfo cspInfo = cspInfoRepository.findByCspId(cspId).get(0);
+            List<CspModuleInfo> cspModuleInfos = cspModuleInfoRepository.findByCspInfoId(cspInfo.getId());
+            List<CspManagement> cspManagementList = cspManagementRepository.findByCspIdAndModuleId(cspId, module.getId());
+            if (cspManagementList.size() == 0) {
+                row.setModuleEnabled(false);
+            }
+            else {
+                row.setModuleEnabled(true);
+            }
+            row.setInstalledVersion(moduleVersionRepository.findOne(cspModuleInfos.get(0).getModuleVersionId()).getVersion());
+
+            List<Integer> availableVersions = moduleVersionRepository.findVersionsByModuleId(module.getId());
+            row.setAvailableVersions(availableVersions);
+            List<String> availableVersionsT = new ArrayList<>();
+            for(int i=0; i<availableVersions.size(); i++) {
+                availableVersionsT.add(VersionParser.toString(availableVersions.get(i)));
+            }
+            row.setAvailableVersionsT(availableVersionsT);
+
+            row.setSelectedVersion(null);
+            if (cspManagementList.size() != 0) {
+                row.setSelectedVersion(moduleVersionRepository.findOne(cspManagementList.get(0).getModuleVersionId()).getVersion());
+            }
+
+
+            managementRows.add(row);
+        }
+        model.addAttribute("managementRows", managementRows);
+        model.addAttribute("cspId", cspId);
+
+        model.addAttribute("dashboardUrl", PAGES_DASHBOARD);
+        model.addAttribute("saveUrl", DATA_BASEURL + DATA_MANAGE);
+
         return new ModelAndView("pages/manage", "manage", model);
     }
 

@@ -50,6 +50,15 @@ public class DataController implements DataContextUrl, PagesContextUrl {
     CspContactRepository cspContactRepository;
 
     @Autowired
+    CspInfoRepository cspInfoRepository;
+
+    @Autowired
+    CspModuleInfoRepository cspModuleInfoRepository;
+
+    @Autowired
+    CspManagementRepository cspManagementRepository;
+
+    @Autowired
     ModuleRepository moduleRepository;
 
     @Autowired
@@ -63,25 +72,37 @@ public class DataController implements DataContextUrl, PagesContextUrl {
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity dashboard() {
+        LOG.info(DATA_BASEURL + DATA_DASHBOARD + ": GET received");
+
         List<DashboardRow> rows = new ArrayList<>();
         List<Csp> csps = cspRepository.findAll();
 
 
         for (Csp csp : csps) {
+            CspInfo cspInfo = cspInfoRepository.findByCspId(csp.getId()).get(0);
+
             DashboardRow row = new DashboardRow();
 
             row.setIcon("<i class=\"fa fa-cog\"></i>");
             row.setName(csp.getName());
             row.setDomain(csp.getDomainName());
-            row.setTs("<span class=\"text-success\">" + csp.getRegistrationDate() + "</span>");
-            /**
-             * @TODO
-             */
-            row.setStatus("<span class=\"text-success\"><i class=\"fa fa-info-circle\"></i> Up-to-date</span>");
+            row.setRegistrationDate(csp.getRegistrationDate());
+            row.setLastUpdate(cspInfo.getRecordDateTime());
+
             List<String> confUpdates = new ArrayList<>();
-            List<String> reportUpdates = new ArrayList<>();
+            List<CspManagement> cspManagements = cspManagementRepository.findByCspId(csp.getId());
+            for(CspManagement cspManagement : cspManagements) {
+                confUpdates.add(moduleVersionRepository.findOne(cspManagement.getModuleVersionId()).getFullName());
+            }
             row.setConfUpdates(confUpdates);
+
+            List<String> reportUpdates = new ArrayList<>();
+            List<CspModuleInfo> cspModuleInfos = cspModuleInfoRepository.findByCspInfoId(cspInfo.getId());
+            for(CspModuleInfo cspModuleInfo : cspModuleInfos) {
+                reportUpdates.add(moduleVersionRepository.findOne(cspModuleInfo.getModuleVersionId()).getFullName());
+            }
             row.setReportUpdates(reportUpdates);
+
             row.setBtn("<a class=\"btn btn-xs btn-default\" href=\""+PAGES_MANAGE+"?cspId=" + csp.getId() + "\"><i class=\"fa fa-wrench\"></i> Manage</a>");
 
             rows.add(row);
@@ -90,6 +111,39 @@ public class DataController implements DataContextUrl, PagesContextUrl {
         return new ResponseEntity<>(rows, HttpStatus.OK);
     }
 
+
+    @RequestMapping(value = DATA_BASEURL + DATA_MANAGE,
+            method = RequestMethod.POST,
+            consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
+            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity manage(@RequestBody ManagementForm managementForm) {
+        LOG.info(DATA_BASEURL + DATA_MANAGE + ": POST received");
+
+        String cspId = managementForm.getCspId();
+        List<ManagementFormModule> managementFormModules = managementForm.getModules();
+        for (ManagementFormModule formModule : managementFormModules) {
+            if (formModule.getEnabled()) {
+                if (cspManagementRepository.findByCspIdAndModuleId(cspId, formModule.getModuleId()).size() != 0) {
+                    //remove old versions
+                    cspManagementRepository.removeByCspIdAndModuleId(cspId, formModule.getModuleId());
+                }
+                //insert new row
+                CspManagement cspManagement = new CspManagement();
+                cspManagement.setCspId(cspId);
+                cspManagement.setModuleId(formModule.getModuleId());
+                ModuleVersion moduleVersion = moduleVersionRepository.findByModuleIdAndVersion(formModule.getModuleId(), VersionParser.fromString(formModule.getSetVersion()));
+                cspManagement.setModuleVersionId(moduleVersion.getId());
+                cspManagementRepository.save(cspManagement);
+            }
+            else{
+                cspManagementRepository.removeByCspIdAndModuleId(cspId, formModule.getModuleId());
+            }
+        }
+
+
+        Response response = new Response(HttpStatusResponseType.DATA_DASHBOARD_MANAGE_OK.code(), HttpStatusResponseType.DATA_DASHBOARD_MANAGE_OK.text());
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 
     /*
     CSP

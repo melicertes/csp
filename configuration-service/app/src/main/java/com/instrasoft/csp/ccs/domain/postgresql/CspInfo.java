@@ -19,10 +19,9 @@ public class CspInfo {
     @NotNull
     private String cspId;
 
-    @Column(name="record_date_time", columnDefinition="timestampt with time zone")
-    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name="record_date_time")
     @NotNull
-    private Date recordDateTime;
+    private String recordDateTime;
 
 
     public Long getId() {
@@ -41,11 +40,11 @@ public class CspInfo {
         this.cspId = cspId;
     }
 
-    public Date getRecordDateTime() {
+    public String getRecordDateTime() {
         return recordDateTime;
     }
 
-    public void setRecordDateTime(Date recordDateTime) {
+    public void setRecordDateTime(String recordDateTime) {
         this.recordDateTime = recordDateTime;
     }
 
