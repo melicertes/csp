@@ -58,9 +58,16 @@ public class Rule {
         PSEUDO
     }
 
+    /*
+     * numbers are hashes #
+     * chars are asterisks *
+     * IP pseudonymization ###.###.###.###
+     * EMAIL pseudonymization ****@********
+     */
     private enum FieldType {
-        DATE,
         IP,
-        EMAIL
+        EMAIL,
+        STRING,
+        NUMBER
     }
 }

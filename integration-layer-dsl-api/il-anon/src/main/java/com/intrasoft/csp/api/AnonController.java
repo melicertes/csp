@@ -11,6 +11,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+
 
 @RestController
 public class AnonController {
@@ -23,7 +26,7 @@ public class AnonController {
     @RequestMapping(value = "anon",
             consumes = {"application/json"},
             method = RequestMethod.POST)
-    public ResponseEntity<String> anonNewIntData(@RequestBody IntegrationAnonData integrationAnonData) {
+    public ResponseEntity<String> anonNewIntData(@RequestBody IntegrationAnonData integrationAnonData) throws InvalidKeyException, NoSuchAlgorithmException {
         LOG.info("Anon Endpoint: POST received");
         return apiDataHandler.handleAnonIntegrationData(integrationAnonData);
     }
