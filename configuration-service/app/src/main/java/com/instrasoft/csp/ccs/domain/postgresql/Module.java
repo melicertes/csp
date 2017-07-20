@@ -13,7 +13,7 @@ public class Module {
     @SequenceGenerator(name="module_id_seq", sequenceName="module_id_seq", allocationSize=1)
     private Long id;
 
-    @Column(name="name")
+    @Column(name="name", unique = true)
     @NotNull
     private String name;
 

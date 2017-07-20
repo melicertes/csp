@@ -1,8 +1,6 @@
 package com.instrasoft.csp.ccs.domain.api;
 
 
-import com.instrasoft.csp.ccs.config.ContactType;
-
 public class ContactDetails {
 
     private String personName;

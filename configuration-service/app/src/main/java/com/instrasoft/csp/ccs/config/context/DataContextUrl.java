@@ -1,4 +1,4 @@
-package com.instrasoft.csp.ccs.config;
+package com.instrasoft.csp.ccs.config.context;
 
 
 public interface DataContextUrl {

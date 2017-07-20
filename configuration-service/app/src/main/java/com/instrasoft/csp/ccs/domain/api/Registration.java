@@ -1,9 +1,6 @@
 package com.instrasoft.csp.ccs.domain.api;
 
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.util.List;
 
 public class Registration {
@@ -79,8 +76,8 @@ public class Registration {
         return moduleInfo;
     }
 
-    public void setModuleInfo(ModulesInfo moduleInfo) {
-        this.moduleInfo = moduleInfo;
+    public void setModuleInfo(ModulesInfo modulesInfo) {
+        this.moduleInfo = modulesInfo;
     }
 
 
@@ -94,7 +91,7 @@ public class Registration {
                 ", internalIPs=" + internalIPs +
                 ", registrationIsUpdate=" + registrationIsUpdate +
                 ", contacts=" + contacts +
-                ", moduleInfo=" + moduleInfo +
+                ", modulesInfo=" + moduleInfo +
                 '}';
     }
 }

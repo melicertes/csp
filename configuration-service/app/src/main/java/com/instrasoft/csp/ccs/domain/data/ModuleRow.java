@@ -11,6 +11,7 @@ public class ModuleRow {
     private String isDefault;
     private Integer priority;
     private String hash;
+    private String description;
     private String btn;
 
 
@@ -78,6 +79,14 @@ public class ModuleRow {
         this.hash = hash;
     }
 
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     public String getBtn() {
         return btn;
     }
@@ -98,6 +107,7 @@ public class ModuleRow {
                 ", isDefault='" + isDefault + '\'' +
                 ", priority=" + priority +
                 ", hash='" + hash + '\'' +
+                ", description='" + description + '\'' +
                 ", btn='" + btn + '\'' +
                 '}';
     }

@@ -1,7 +1,8 @@
-package com.instrasoft.csp.ccs.config;
+package com.instrasoft.csp.ccs.config.context;
 
 public interface ApiContextUrl {
     String API_BASEURL = "/csp/confservice";
+
     String API_UPDATES = "/updates";
     String API_APPINFO = "/appInfo";
     String API_REGISTER = "/register";

@@ -5,7 +5,7 @@ public class ModuleUpdateInfo {
 
     private String name;
     private String description;
-    private Integer version;
+    private String version;
     private String released;
     private String hash;
 
@@ -26,11 +26,11 @@ public class ModuleUpdateInfo {
         this.description = description;
     }
 
-    public Integer getVersion() {
+    public String getVersion() {
         return version;
     }
 
-    public void setVersion(Integer version) {
+    public void setVersion(String version) {
         this.version = version;
     }
 

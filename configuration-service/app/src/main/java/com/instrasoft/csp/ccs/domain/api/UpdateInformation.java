@@ -2,13 +2,14 @@ package com.instrasoft.csp.ccs.domain.api;
 
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 public class UpdateInformation {
 
     private String dateChanged;
-    private HashMap<String, List<ModuleUpdateInfo>> available;
+    private LinkedHashMap<String, List<ModuleUpdateInfo>> available;
 
 
     public String getDateChanged() {
@@ -19,11 +20,11 @@ public class UpdateInformation {
         this.dateChanged = dateChanged;
     }
 
-    public HashMap<String, List<ModuleUpdateInfo>> getAvailable() {
+    public LinkedHashMap<String, List<ModuleUpdateInfo>> getAvailable() {
         return available;
     }
 
-    public void setAvailable(HashMap<String, List<ModuleUpdateInfo>> available) {
+    public void setAvailable(LinkedHashMap<String, List<ModuleUpdateInfo>> available) {
         this.available = available;
     }
 

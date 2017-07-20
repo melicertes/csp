@@ -4,14 +4,30 @@ package com.instrasoft.csp.ccs.utils;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.*;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 public class FileHelper {
+
+    public static String getFileFromHash(String filePath, String hash) throws FileNotFoundException {
+        File folder = new File(filePath);
+        File[] files = folder.listFiles();
+        String fileName;
+        int lastPeriodPos;
+        for (int i = 0; i < files.length; i++) {
+            if (files[i].isFile()) {
+                fileName = files[i].getName();
+                lastPeriodPos = fileName.lastIndexOf('.');
+                if (lastPeriodPos > 0 && fileName.substring(0, lastPeriodPos).equals(hash)) {
+                    return fileName;
+                }
+            }
+        }
+
+        return null;
+    }
 
     public static String saveUploadedFile(String fileTemp, String fileRepository, MultipartFile file, String digestAlgorithm) throws IOException, NoSuchAlgorithmException {
         /*
@@ -29,9 +45,6 @@ public class FileHelper {
 
         /*
         Clean up files
-         */
-        /**
-         * @TODO What is file has the same hash? Can it happen?? Hash Unique
          */
         //overwrite existing file, if exists
         CopyOption[] options = new CopyOption[]{

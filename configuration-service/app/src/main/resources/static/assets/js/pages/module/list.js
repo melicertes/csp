@@ -8,15 +8,19 @@ function queryParams() {
     };
 }
 
-$(document).ready(function() {
-
-    $('body').on('click', 'a.csp-delete', function(e) {
+$(document).ready(function(){
+    $('a.disabled').on('click', function(e){
         e.preventDefault();
-        var cspId = $(this).attr('data-csp-id');
+    });
+
+    $('body').on('click', 'a.module-version-delete', function(e) {
+        e.preventDefault();
+        var moduleVersionId = $(this).attr('data-module-version-id');
+        var moduleVersionName = $(this).attr('data-module-version-name');
         BootstrapDialog.confirm({
             title: 'Confirmation',
             size: BootstrapDialog.SIZE_SMALL,
-            message: 'Are you sure to delete CSP:<br><strong>' + cspId + '</strong><br> and its related information?',
+            message: 'Are you sure to delete Module Version:<br><strong>' + moduleVersionName + '</strong><br> and its related information?',
             type: BootstrapDialog.TYPE_WARNING,
             closable: false,
             draggable: true,
@@ -28,7 +32,7 @@ $(document).ready(function() {
                 if(result) {
                     $.ajax({
                         type: 'POST',
-                        url: REMOVE_URL + "/" + cspId,
+                        url: REMOVE_URL + "/" + moduleVersionId,
                         processData: false,
                         contentType:"application/json; charset=utf-8",
                         dataType:"json",
@@ -37,7 +41,7 @@ $(document).ready(function() {
 
                             if (response.responseCode === 0) {
                                 setTimeout(function () {
-                                    $('#csp-table').bootstrapTable('refresh');
+                                    $('#module-table').bootstrapTable('refresh');
                                 }, 100);
                             }
                             else {
@@ -65,5 +69,4 @@ $(document).ready(function() {
             }
         });
     });
-
 });
