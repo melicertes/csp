@@ -1,7 +1,7 @@
 package com.instrasoft.csp.ccs.controller;
 
-import com.instrasoft.csp.ccs.config.DataContextUrl;
-import com.instrasoft.csp.ccs.config.PagesContextUrl;
+import com.instrasoft.csp.ccs.config.context.DataContextUrl;
+import com.instrasoft.csp.ccs.config.context.PagesContextUrl;
 import com.instrasoft.csp.ccs.domain.data.ManagementRow;
 import com.instrasoft.csp.ccs.domain.postgresql.*;
 import com.instrasoft.csp.ccs.repository.*;
@@ -9,15 +9,11 @@ import com.instrasoft.csp.ccs.utils.VersionParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.web.ErrorAttributes;
-import org.springframework.boot.autoconfigure.web.ErrorController;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -91,11 +87,13 @@ public class MvcController implements PagesContextUrl, DataContextUrl {
             List<CspManagement> cspManagementList = cspManagementRepository.findByCspIdAndModuleId(cspId, module.getId());
             if (cspManagementList.size() == 0) {
                 row.setModuleEnabled(false);
+                row.setInstalledVersion(null);
             }
             else {
                 row.setModuleEnabled(true);
+                row.setInstalledVersion(moduleVersionRepository.findOne(cspModuleInfos.get(0).getModuleVersionId()).getVersion());
             }
-            row.setInstalledVersion(moduleVersionRepository.findOne(cspModuleInfos.get(0).getModuleVersionId()).getVersion());
+
 
             List<Integer> availableVersions = moduleVersionRepository.findVersionsByModuleId(module.getId());
             row.setAvailableVersions(availableVersions);
@@ -176,6 +174,7 @@ public class MvcController implements PagesContextUrl, DataContextUrl {
         model = this.init(model);
         model.addAttribute("addModuleUrl", PAGES_MODULE_REGISTER);
         model.addAttribute("dataModuleUrl", DATA_BASEURL + DATA_MODULES);
+        model.addAttribute("removeModuleUrl", DATA_BASEURL + DATA_MODULE_REMOVE);
         model.addAttribute("navModuleClassActive", "active");
         return new ModelAndView("pages/module/list", "list", model);
     }

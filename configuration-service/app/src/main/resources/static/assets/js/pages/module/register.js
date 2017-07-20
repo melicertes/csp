@@ -59,6 +59,9 @@ $(document).ready(function(){
             module_file: {
                 required: true,
                 extension: "zip"
+            },
+            module_description: {
+                required: true
             }
         }
     });

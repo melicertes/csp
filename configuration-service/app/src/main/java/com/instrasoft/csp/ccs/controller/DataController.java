@@ -1,9 +1,9 @@
 package com.instrasoft.csp.ccs.controller;
 
 
-import com.instrasoft.csp.ccs.config.DataContextUrl;
-import com.instrasoft.csp.ccs.config.HttpStatusResponseType;
-import com.instrasoft.csp.ccs.config.PagesContextUrl;
+import com.instrasoft.csp.ccs.config.context.DataContextUrl;
+import com.instrasoft.csp.ccs.config.types.HttpStatusResponseType;
+import com.instrasoft.csp.ccs.config.context.PagesContextUrl;
 import com.instrasoft.csp.ccs.domain.api.Response;
 import com.instrasoft.csp.ccs.domain.api.ResponseError;
 import com.instrasoft.csp.ccs.domain.data.*;
@@ -103,7 +103,7 @@ public class DataController implements DataContextUrl, PagesContextUrl {
             }
             row.setReportUpdates(reportUpdates);
 
-            row.setBtn("<a class=\"btn btn-xs btn-default\" href=\""+PAGES_MANAGE+"?cspId=" + csp.getId() + "\"><i class=\"fa fa-wrench\"></i> Manage</a>");
+            row.setBtn("<a class=\"btn btn-xs btn-default\" title=\"Manage CSP: " + csp.getName() + " \" href=\""+PAGES_MANAGE+"?cspId=" + csp.getId() + "\"><i class=\"fa fa-wrench\"></i></a>");
 
             rows.add(row);
         }
@@ -173,9 +173,9 @@ public class DataController implements DataContextUrl, PagesContextUrl {
             }
             row.setContacts(contacts);
 
-            row.setBtn("<a class=\"btn btn-xs btn-success\" href=\""+PAGES_CSP_UPDATE+"?cspId=" + csp.getId()+"\"><i class=\"fa fa-edit\"></i></a>"+
+            row.setBtn("<a class=\"btn btn-xs btn-success\" title=\"Delete CSP: " + csp.getName() + "\" href=\""+PAGES_CSP_UPDATE+"?cspId=" + csp.getId() + "\"><i class=\"fa fa-edit\"></i></a>"+
                     "&nbsp;"+
-                    "<a class=\"btn btn-xs btn-default csp-delete\" data-csp-id=\""+csp.getId()+"\" href=\"#\"><i class=\"fa fa-remove\"></i></a>");
+                    "<a class=\"btn btn-xs btn-default csp-delete\" title=\"Delete CSP: " + csp.getName() + "\" data-csp-id=\"" + csp.getId() + "\" href=\"#\"><i class=\"fa fa-remove\"></i></a>");
 
             rows.add(row);
         }
@@ -271,46 +271,52 @@ public class DataController implements DataContextUrl, PagesContextUrl {
         List<Module> modules = moduleRepository.findAll();
 
         for (Module module : modules) {
-            ModuleRow row = new ModuleRow();
 
-            row.setIcon("<i class=\"fa fa-circle-o-notch\"></i>");
-            row.setShortName(module.getName());
+            List<ModuleVersion> moduleVersions = moduleVersionRepository.findByModuleId(module.getId());
+            for(ModuleVersion moduleVersion : moduleVersions) {
+                ModuleRow row = new ModuleRow();
 
-            ModuleVersion moduleVersion = moduleVersionRepository.findByModuleId(module.getId());
-            row.setFullName(moduleVersion.getFullName());
-            row.setVersion(VersionParser.toString(moduleVersion.getVersion()));
-            row.setReleased(moduleVersion.getReleasedOn());
+                row.setIcon("<i class=\"fa fa-circle-o-notch\"></i>");
+                row.setShortName(module.getName());
+                row.setFullName(moduleVersion.getFullName());
+                row.setVersion(VersionParser.toString(moduleVersion.getVersion()));
+                row.setReleased(moduleVersion.getReleasedOn());
 
-            row.setIsDefault("<i class=\"fa fa-square-o\"></i>");
-            if (module.getIsDefault() == 1) {
-                row.setIsDefault("<i class=\"fa fa-square text-success\"></i>");
+                row.setIsDefault("<i class=\"fa fa-square-o\"></i>");
+                if (module.getIsDefault() == 1) {
+                    row.setIsDefault("<i class=\"fa fa-square text-success\"></i>");
+                }
+
+                row.setPriority(module.getStartPriority());
+                row.setHash(moduleVersion.getHash());
+                row.setDescription(moduleVersion.getDescription());
+
+                String disabled = "";
+                if (cspManagementRepository.findByModuleIdAndModuleVersionId(module.getId(), moduleVersion.getId()).size() != 0) {
+                    disabled = " disabled ";
+                }
+                row.setBtn("<a class=\"btn btn-xs btn-success " + disabled + " \" title=\"Edit Module: " + module.getName() + "\" href=\""+PAGES_MODULE_UPDATE+"?moduleId=" + module.getId() + "&moduleVersionId=" + moduleVersion.getId() + "\"><i class=\"fa fa-edit\"></i></a>"+
+                        "&nbsp;"+
+                        "<a class=\"btn btn-xs btn-default module-version-delete " + disabled + " \" + title=\"Delete Module Version: " + moduleVersion.getFullName() + "\" data-module-version-name=\"" + moduleVersion.getFullName() + "\" data-module-version-id=\"" + moduleVersion.getId() + "\" href=\"#\"><i class=\"fa fa-remove\"></i></a>");
+
+                rows.add(row);
             }
-
-            row.setPriority(module.getStartPriority());
-            row.setHash(moduleVersion.getHash());
-            row.setBtn("<a class=\"btn btn-xs btn-success\" href=\""+PAGES_MODULE_UPDATE+"?moduleId=" + module.getId()+"\"><i class=\"fa fa-edit\"></i></a>"+
-                    "&nbsp;"+
-                    "<a class=\"btn btn-xs btn-default\" href=\"#\"><i class=\"fa fa-remove\"></i></a>");
-
-            rows.add(row);
         }
 
         return new ResponseEntity<>(rows, HttpStatus.OK);
     }
-
-
-
 
     @RequestMapping(value = DATA_BASEURL + DATA_MODULE_SAVE,
             headers=("content-type=multipart/*"),
             consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE,
             method = RequestMethod.POST)
     public ResponseEntity registerModule(@RequestParam("module_short_name") String shortName,
-                                  @RequestParam("module_full_name") String fullName,
-                                  @RequestParam("module_version") String version,
-                                  @RequestParam(value = "module_default", required = false, defaultValue = "") String isDefault,
-                                  @RequestParam("module_priority") Integer priority,
-                                  @RequestParam("module_file") MultipartFile uploadFile) {
+                                         @RequestParam("module_full_name") String fullName,
+                                         @RequestParam("module_version") String version,
+                                         @RequestParam(value = "module_default", required = false, defaultValue = "") String isDefault,
+                                         @RequestParam("module_priority") Integer priority,
+                                         @RequestParam("module_file") MultipartFile uploadFile,
+                                         @RequestParam("module_description") String description) {
 
         if (uploadFile.isEmpty()) {
             ResponseError error = new ResponseError(HttpStatusResponseType.DATA_MODULE_SAVE_EMPTY_FILE.code(), HttpStatusResponseType.DATA_MODULE_SAVE_EMPTY_FILE.text(), HttpStatusResponseType.DATA_MODULE_SAVE_EMPTY_FILE.exception());
@@ -336,10 +342,13 @@ public class DataController implements DataContextUrl, PagesContextUrl {
             moduleVersion.setVersion(VersionParser.fromString(version));
             moduleVersion.setReleasedOn(JodaConverter.getCurrentJodaString());
             moduleVersion.setHash(hash);
+            moduleVersion.setDescription(description);
             moduleVersionRepository.save(moduleVersion);
 
             /**
-             * @TODO Check if {@link ModuleVersion exists}????
+             * @TODO Check if {@link ModuleVersion} exists????
+             *
+             * @TODO Check if {@link Module} exists??? We operate Module and ModuleVersion from single form, shall Module name not be Unique?
              */
             Response response = new Response(HttpStatusResponseType.DATA_MODULE_SAVE_OK.code(), HttpStatusResponseType.DATA_MODULE_SAVE_OK.text());
             return new ResponseEntity<>(response, HttpStatus.OK);
@@ -354,6 +363,28 @@ public class DataController implements DataContextUrl, PagesContextUrl {
                 return new ResponseEntity<>(error, HttpStatus.OK);
             }
         }
+    }
+
+
+    @RequestMapping(value = DATA_BASEURL + DATA_MODULE_REMOVE + "/{moduleVersionId}",
+            method = RequestMethod.POST,
+            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity removeModule(@PathVariable Long moduleVersionId) {
+        LOG.info(DATA_BASEURL + DATA_MODULE_REMOVE  + "/" + moduleVersionId + ": POST received");
+
+        try {
+            /**
+             * @TODO Check if removal can be done by management table
+             */
+            //delete module version
+            moduleVersionRepository.delete(moduleVersionId);
+        } catch (Exception e) {
+            ResponseError error = new ResponseError(HttpStatusResponseType.DATA_MODULE_DELETE_ERROR.code(), HttpStatusResponseType.DATA_MODULE_DELETE_ERROR.text(), e.toString());
+            return new ResponseEntity<>(error, HttpStatus.OK);
+        }
+
+        Response response = new Response(HttpStatusResponseType.DATA_MODULE_DELETE_OK.code(), HttpStatusResponseType.DATA_MODULE_DELETE_OK.text());
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
 

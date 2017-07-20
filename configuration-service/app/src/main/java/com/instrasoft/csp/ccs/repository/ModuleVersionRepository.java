@@ -12,7 +12,7 @@ import java.util.List;
 @Repository
 public interface ModuleVersionRepository extends JpaRepository<ModuleVersion, Long> {
 
-    public ModuleVersion findByModuleId(Long moduleId);
+    public List<ModuleVersion> findByModuleId(Long moduleId);
 
     public ModuleVersion findByModuleIdAndVersion(Long moduleId, Integer version);
 

@@ -16,6 +16,8 @@ public interface CspManagementRepository extends JpaRepository<CspManagement, Lo
 
     List<CspManagement> findByCspIdAndModuleId(String cspId, Long moduleId);
 
+    List<CspManagement> findByModuleIdAndModuleVersionId(Long moduleId, Long moduleVersionId);
+
     @Transactional
     List<CspManagement> removeByCspId(String cspId);
 

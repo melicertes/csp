@@ -5,7 +5,7 @@ public class AppInfo {
 
     private String name;
     private String recordDateTime;
-    private ModuleInfo moduleInfo;
+    private ModulesInfo modulesInfo;
 
 
     public String getName() {
@@ -24,12 +24,12 @@ public class AppInfo {
         this.recordDateTime = recordDateTime;
     }
 
-    public ModuleInfo getModuleInfo() {
-        return moduleInfo;
+    public ModulesInfo getModulesInfo() {
+        return modulesInfo;
     }
 
-    public void setModuleInfo(ModuleInfo moduleInfo) {
-        this.moduleInfo = moduleInfo;
+    public void setModuleInfo(ModulesInfo moduleInfo) {
+        this.modulesInfo = moduleInfo;
     }
 
 
@@ -38,7 +38,7 @@ public class AppInfo {
         return "AppInfo{" +
                 "name='" + name + '\'' +
                 ", recordDateTime='" + recordDateTime + '\'' +
-                ", moduleInfo=" + moduleInfo +
+                ", modulesInfo=" + modulesInfo +
                 '}';
     }
 }

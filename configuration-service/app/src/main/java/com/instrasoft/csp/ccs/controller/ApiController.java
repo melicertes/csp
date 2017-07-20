@@ -1,29 +1,26 @@
 package com.instrasoft.csp.ccs.controller;
 
-import com.instrasoft.csp.ccs.config.ApiContextUrl;
-import com.instrasoft.csp.ccs.config.HttpStatusResponseType;
+import com.instrasoft.csp.ccs.config.context.ApiContextUrl;
+import com.instrasoft.csp.ccs.config.types.HttpStatusResponseType;
+import com.instrasoft.csp.ccs.config.exception.api.*;
 import com.instrasoft.csp.ccs.domain.api.*;
 import com.instrasoft.csp.ccs.domain.postgresql.*;
 import com.instrasoft.csp.ccs.repository.*;
 import com.instrasoft.csp.ccs.utils.FileHelper;
 import com.instrasoft.csp.ccs.utils.JodaConverter;
+import com.instrasoft.csp.ccs.utils.JsonPrinter;
 import com.instrasoft.csp.ccs.utils.VersionParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.*;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.EntityNotFoundException;
 import java.io.*;
-import java.nio.file.Files;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -112,20 +109,23 @@ public class ApiController implements ApiContextUrl {
 
             updateInformation.setAvailable(available);
 
-            LOG.info(logInfo + HttpStatusResponseType.API_UPDATES_OK.text());
+            LOG.info(logInfo + HttpStatusResponseType.API_OK.text());
             return new ResponseEntity<>(updateInformation, HttpStatus.OK);
 
         } catch (Exception e) {
+            int code = HttpStatusResponseType.API_FAILURE.code();
+            String text = HttpStatusResponseType.API_FAILURE.text();
+            HttpStatus status = HttpStatus.BAD_REQUEST;
+
             if (e instanceof EntityNotFoundException) {
-                LOG.error(logInfo + HttpStatusResponseType.API_UPDATES_NOT_FOUND.text() + "; " + HttpStatusResponseType.API_UPDATE_NOT_FOUND.exception());
-                ResponseError error = new ResponseError(HttpStatusResponseType.API_UPDATES_NOT_FOUND.code(),
-                        HttpStatusResponseType.API_UPDATES_NOT_FOUND.text(), e.toString());
-                return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+                code = HttpStatusResponseType.API_UPDATES_NOT_FOUND.code();
+                text = HttpStatusResponseType.API_UPDATES_NOT_FOUND.text();
+                status = HttpStatus.NOT_FOUND;
             }
-            LOG.error(logInfo + HttpStatusResponseType.API_UPDATES_FAILURE.text() + "; " + HttpStatusResponseType.API_UPDATES_FAILURE.exception());
-            ResponseError error = new ResponseError(HttpStatusResponseType.API_UPDATES_FAILURE.code(),
-                    HttpStatusResponseType.API_UPDATES_FAILURE.text(), e.toString());
-            return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+
+            LOG.error(logInfo + text + "; " + e.toString());
+            ResponseError error = new ResponseError(code, text, e.toString());
+            return new ResponseEntity<>(error, status);
         }
 
     }
@@ -160,16 +160,10 @@ public class ApiController implements ApiContextUrl {
                 cspRepository.save(csp);
             }
             else if (cspRepository.exists(cspId) && !cspRegistration.getRegistrationIsUpdate()) {
-                LOG.error(logInfo + HttpStatusResponseType.API_REGISTER_NOT_UPDATABLE.text() + "; " + HttpStatusResponseType.API_REGISTER_NOT_UPDATABLE.exception());
-                ResponseError error = new ResponseError(HttpStatusResponseType.API_REGISTER_NOT_UPDATABLE.code(),
-                        HttpStatusResponseType.API_REGISTER_NOT_UPDATABLE.text(), HttpStatusResponseType.API_REGISTER_NOT_UPDATABLE.exception());
-                return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+                throw new CspNotUpdatableException();
             }
             else {
-                LOG.error(logInfo + HttpStatusResponseType.API_REGISTER_INVALID_CSP_ENTRY.text() + "; " + HttpStatusResponseType.API_REGISTER_INVALID_CSP_ENTRY.exception());
-                ResponseError error = new ResponseError(HttpStatusResponseType.API_REGISTER_INVALID_CSP_ENTRY.code(),
-                        HttpStatusResponseType.API_REGISTER_INVALID_CSP_ENTRY.text(), HttpStatusResponseType.API_REGISTER_INVALID_CSP_ENTRY.exception());
-                return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+                throw new InvalidCspEntryException();
             }
 
             //IPs (external and internal)
@@ -183,75 +177,48 @@ public class ApiController implements ApiContextUrl {
 
             //ModuleInfo
             List<ModuleInfo> moduleInfoList = cspRegistration.getModuleInfo().getModules();
-            for(ModuleInfo moduleInfo : moduleInfoList) {
-                /*
-                Check for errors
-                 */
-                Module module = moduleRepository.findByName(moduleInfo.getName());
-                if (module == null) {
-                    LOG.error(logInfo + HttpStatusResponseType.API_REGISTER_INVALID_MODULE_HASH.text() + "; " + HttpStatusResponseType.API_REGISTER_INVALID_MODULE_NAME.exception());
-                    ResponseError error = new ResponseError(HttpStatusResponseType.API_REGISTER_INVALID_MODULE_NAME.code(),
-                            HttpStatusResponseType.API_REGISTER_INVALID_MODULE_NAME.text(), HttpStatusResponseType.API_REGISTER_INVALID_MODULE_NAME.exception());
-                    return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
-                }
-                ModuleVersion moduleVersion = moduleVersionRepository.findByFullName(moduleInfo.getAdditionalProperties().getFullName());
-                if (moduleVersion == null) {
-                    LOG.error(logInfo + HttpStatusResponseType.API_REGISTER_INVALID_MODULE_VERSION.text() + "; " + HttpStatusResponseType.API_REGISTER_INVALID_MODULE_VERSION.exception());
-                    ResponseError error = new ResponseError(HttpStatusResponseType.API_REGISTER_INVALID_MODULE_VERSION.code(),
-                            HttpStatusResponseType.API_REGISTER_INVALID_MODULE_VERSION.text(), HttpStatusResponseType.API_REGISTER_INVALID_MODULE_VERSION.exception());
-                    return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
-                }
-                moduleVersion = moduleVersionRepository.findByHash(moduleInfo.getAdditionalProperties().getHash());
-                if (moduleVersion == null) {
-                    LOG.error(logInfo + HttpStatusResponseType.API_REGISTER_INVALID_MODULE_HASH.text() + "; " + HttpStatusResponseType.API_REGISTER_INVALID_MODULE_HASH.exception());
-                    ResponseError error = new ResponseError(HttpStatusResponseType.API_REGISTER_INVALID_MODULE_HASH.code(),
-                            HttpStatusResponseType.API_REGISTER_INVALID_MODULE_HASH.text(), HttpStatusResponseType.API_REGISTER_INVALID_MODULE_HASH.exception());
-                    return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
-                }
+            this.updateModulesInfo(cspId, moduleInfoList);
 
-                /*
-                Clear old records, before persisting
-                 */
-                List<CspInfo> cspInfoList = cspInfoRepository.findByCspId(cspId);
-                //cspModuleRepository.removeByCspId(cspId);
-                for(CspInfo cspInfo : cspInfoList) {
-                    cspModuleInfoRepository.removeByCspInfoId(cspInfo.getId());
-                }
-                cspInfoRepository.removeByCspId(cspId);
-
-                /*
-                Persist data
-                 */
-                CspInfo cspInfo = new CspInfo();
-                cspInfo.setCspId(cspId);
-                cspInfo.setRecordDateTime(JodaConverter.getCurrentJodaString());
-                cspInfo = cspInfoRepository.save(cspInfo);
-
-//                CspModule cspModule = new CspModule();
-//                cspModule.setCspId(cspId);
-//                cspModule.setModuleId(module.getId());
-//                cspModule.setModuleVersionId(moduleVersion.getId());
-//                cspModule = cspModuleRepository.save(cspModule);
-
-                CspModuleInfo cspModuleInfo = new CspModuleInfo();
-                cspModuleInfo.setCspInfoId(cspInfo.getId());
-                cspModuleInfo.setModuleVersionId(moduleVersion.getId());
-                cspModuleInfo.setModuleInstalledOn(moduleInfo.getAdditionalProperties().getInstalledOn());
-                int val = moduleInfo.getAdditionalProperties().getActive() ? 1 : 0;
-                cspModuleInfo.setModuleIsActive(val);
-                cspModuleInfo = cspModuleInfoRepository.save(cspModuleInfo);
-
-                LOG.info(logInfo + HttpStatusResponseType.API_REGISTER_OK.text());
-            }
+            LOG.info(logInfo + HttpStatusResponseType.API_OK.text());
 
         } catch (Exception e) {
-            LOG.error(logInfo + HttpStatusResponseType.API_REGISTER_FAILURE.text() + "; " + HttpStatusResponseType.API_REGISTER_FAILURE.exception());
-            ResponseError error = new ResponseError(HttpStatusResponseType.API_REGISTER_FAILURE.code(), HttpStatusResponseType.API_REGISTER_FAILURE.text(), e.getMessage());
-            return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+            int code = HttpStatusResponseType.API_FAILURE.code();
+            String text = HttpStatusResponseType.API_FAILURE.text();
+            HttpStatus status = HttpStatus.BAD_REQUEST;
+
+            if (e instanceof CspNotUpdatableException) {
+                code = HttpStatusResponseType.API_REGISTER_NOT_UPDATABLE.code();
+                text = HttpStatusResponseType.API_REGISTER_NOT_UPDATABLE.text();
+                status = HttpStatus.NOT_FOUND;
+            }
+            else if (e instanceof InvalidCspEntryException) {
+                code = HttpStatusResponseType.API_INVALID_CSP_ENTRY.code();
+                text = HttpStatusResponseType.API_INVALID_CSP_ENTRY.text();
+                status = HttpStatus.NOT_FOUND;
+            }
+            else if (e instanceof InvalidModuleNameException) {
+                code = HttpStatusResponseType.API_INVALID_MODULE_NAME.code();
+                text = HttpStatusResponseType.API_INVALID_MODULE_NAME.text();
+                status = HttpStatus.NOT_FOUND;
+            }
+            else if (e instanceof InvalidModuleVersionException) {
+                code = HttpStatusResponseType.API_INVALID_MODULE_VERSION.code();
+                text = HttpStatusResponseType.API_INVALID_MODULE_VERSION.text();
+                status = HttpStatus.NOT_FOUND;
+            }
+            else if (e instanceof InvalidModuleHashException) {
+                code = HttpStatusResponseType.API_INVALID_MODULE_HASH.code();
+                text = HttpStatusResponseType.API_INVALID_MODULE_HASH.text();
+                status = HttpStatus.NOT_FOUND;
+            }
+
+            LOG.error(logInfo + text + "; " + e.toString());
+            ResponseError error = new ResponseError(code, text, e.toString());
+            return new ResponseEntity<>(error, status);
         }
 
 
-        Response response = new Response(HttpStatusResponseType.API_REGISTER_OK.code(), HttpStatusResponseType.API_REGISTER_OK.text());
+        Response response = new Response(HttpStatusResponseType.API_OK.code(), HttpStatusResponseType.API_OK.text());
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -287,10 +254,7 @@ public class ApiController implements ApiContextUrl {
                 }
             }
             if (!found) {
-                LOG.error(logInfo + HttpStatusResponseType.API_UPDATE_INVALID_HASH_ENTRY.text() + "; " + HttpStatusResponseType.API_UPDATE_INVALID_HASH_ENTRY.exception());
-                ResponseError error = new ResponseError(HttpStatusResponseType.API_UPDATE_INVALID_HASH_ENTRY.code(),
-                        HttpStatusResponseType.API_UPDATE_INVALID_HASH_ENTRY.text(), HttpStatusResponseType.API_UPDATE_INVALID_HASH_ENTRY.exception());
-                return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+                throw new HashNotFoundException();
             }
 
             File updateFile = new File(fileRepository + FileHelper.getFileFromHash(fileRepository, updateHash));
@@ -302,7 +266,7 @@ public class ApiController implements ApiContextUrl {
 
             InputStreamResource inputStreamResource = new InputStreamResource(new FileInputStream(updateFile));
 
-            LOG.info(logInfo + HttpStatusResponseType.API_UPDATE_OK.text());
+            LOG.info(logInfo + HttpStatusResponseType.API_OK.text());
             return ResponseEntity
                     .ok()
                     .headers(headers)
@@ -311,22 +275,98 @@ public class ApiController implements ApiContextUrl {
                     .body(new InputStreamResource(new FileInputStream(updateFile)));
 
         } catch (Exception e) {
+            int code = HttpStatusResponseType.API_FAILURE.code();
+            String text = HttpStatusResponseType.API_FAILURE.text();
+
             if (e instanceof EntityNotFoundException) {
-                LOG.error(logInfo + HttpStatusResponseType.API_UPDATE_INVALID_CSP_ENTRY.text() + "; " + HttpStatusResponseType.API_UPDATE_INVALID_CSP_ENTRY.exception());
-                ResponseError error = new ResponseError(HttpStatusResponseType.API_UPDATE_INVALID_CSP_ENTRY.code(),
-                        HttpStatusResponseType.API_UPDATE_INVALID_CSP_ENTRY.text(), e.toString());
+                code = HttpStatusResponseType.API_UPDATE_INVALID_CSP_ENTRY.code();
+                text = HttpStatusResponseType.API_UPDATE_INVALID_CSP_ENTRY.text();
+                LOG.error(logInfo + text + "; " + e.toString());
+                ResponseError error = new ResponseError(code, text, e.toString());
+                return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+            }
+            if (e instanceof HashNotFoundException) {
+                code = HttpStatusResponseType.API_UPDATE_INVALID_HASH_ENTRY.code();
+                text = HttpStatusResponseType.API_UPDATE_INVALID_HASH_ENTRY.text();
+                LOG.error(logInfo + text + "; " + e.toString());
+                ResponseError error = new ResponseError(code, text, e.toString());
                 return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
             }
             if (e instanceof FileNotFoundException) {
-                LOG.error(logInfo + HttpStatusResponseType.API_UPDATE_NOT_FOUND.text() + "; " + HttpStatusResponseType.API_UPDATE_NOT_FOUND.exception());
-                ResponseError error = new ResponseError(HttpStatusResponseType.API_UPDATE_NOT_FOUND.code(),
-                        HttpStatusResponseType.API_UPDATE_NOT_FOUND.text(), e.toString());
+                code = HttpStatusResponseType.API_UPDATE_NOT_FOUND.code();
+                text = HttpStatusResponseType.API_UPDATE_NOT_FOUND.text();
+                LOG.error(logInfo + text + "; " + e.toString());
+                ResponseError error = new ResponseError(code, text, e.toString());
                 return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
             }
-            LOG.error(logInfo + HttpStatusResponseType.API_UPDATE_FAILURE.text() + "; " + HttpStatusResponseType.API_UPDATE_FAILURE.exception());
-            ResponseError error = new ResponseError(HttpStatusResponseType.API_UPDATE_FAILURE.code(), HttpStatusResponseType.API_UPDATE_FAILURE.text(), e.getMessage());
+            LOG.error(logInfo + text + "; " + e.toString());
+            ResponseError error = new ResponseError(code, text, e.toString());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).headers(headers).contentType(MediaType.APPLICATION_JSON).body(error);
         }
+    }
+
+
+    /**
+     * Submits a body that contains information of the CSP
+     * @param cspId A unique identifier that defines a Registered and Known CSP. The csp identifier follows the UUID
+     *              formatted as text, for 36 characters total, arranged as 8-4-4-4-12.
+     * @return ResponseEntity
+     */
+    @RequestMapping(value = API_BASEURL + "/v" + API_V1 + API_APPINFO + "/{cspId}",
+            method = RequestMethod.POST,
+            consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
+            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity appInfo(@PathVariable String cspId, @RequestBody AppInfo appInfo) {
+        String logInfo = "/v" + API_V1 + API_APPINFO + "/" + cspId + ": ";
+        LOG.info(logInfo + "POST received");
+
+
+        System.out.println(JsonPrinter.toJsonPrettyString(appInfo));
+
+        try {
+            //search for CSP
+            Csp csp = cspRepository.findOne(cspId);
+            if (csp == null) throw new EntityNotFoundException();
+
+            //ModuleInfo
+            List<ModuleInfo> moduleInfoList = appInfo.getModulesInfo().getModules();
+            this.updateModulesInfo(cspId, moduleInfoList);
+
+            LOG.info(logInfo + HttpStatusResponseType.API_OK.text());
+
+        } catch (Exception e) {
+            int code = HttpStatusResponseType.API_FAILURE.code();
+            String text = HttpStatusResponseType.API_FAILURE.text();
+            HttpStatus status = HttpStatus.BAD_REQUEST;
+
+            if (e instanceof EntityNotFoundException) {
+                code = HttpStatusResponseType.API_INVALID_CSP_ENTRY.code();
+                text = HttpStatusResponseType.API_INVALID_CSP_ENTRY.text();
+                status = HttpStatus.NOT_FOUND;
+            }
+            else if (e instanceof InvalidModuleNameException) {
+                code = HttpStatusResponseType.API_INVALID_MODULE_NAME.code();
+                text = HttpStatusResponseType.API_INVALID_MODULE_NAME.text();
+                status = HttpStatus.NOT_FOUND;
+            }
+            else if (e instanceof InvalidModuleVersionException) {
+                code = HttpStatusResponseType.API_INVALID_MODULE_VERSION.code();
+                text = HttpStatusResponseType.API_INVALID_MODULE_VERSION.text();
+                status = HttpStatus.NOT_FOUND;
+            }
+            else if (e instanceof InvalidModuleHashException) {
+                code = HttpStatusResponseType.API_INVALID_MODULE_HASH.code();
+                text = HttpStatusResponseType.API_INVALID_MODULE_HASH.text();
+                status = HttpStatus.NOT_FOUND;
+            }
+
+            LOG.error(logInfo + text + "; " + e.toString());
+            ResponseError error = new ResponseError(code, text, e.toString());
+            return new ResponseEntity<>(error, status);
+        }
+
+        Response response = new Response(HttpStatusResponseType.API_OK.code(), HttpStatusResponseType.API_OK.text());
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
 
@@ -365,6 +405,63 @@ public class ApiController implements ApiContextUrl {
             cspContact.setPersonEmail(contact.getPersonEmail());
             cspContact.setContactType(contact.getContactType());
             cspContactRepository.save(cspContact);
+        }
+    }
+
+    private void updateModulesInfo(String cspId, List<ModuleInfo> moduleInfoList) throws Exception {
+        for(ModuleInfo moduleInfo : moduleInfoList) {
+            /*
+            Check for errors
+             */
+            Module module = moduleRepository.findByName(moduleInfo.getName());
+            if (module == null) {
+                throw new InvalidModuleNameException();
+            }
+            ModuleVersion moduleVersion = moduleVersionRepository.findByFullName(moduleInfo.getAdditionalProperties().getFullName());
+            if (moduleVersion == null) {
+                throw new InvalidModuleVersionException();
+            }
+            moduleVersion = moduleVersionRepository.findByModuleIdAndVersion(module.getId(), moduleInfo.getAdditionalProperties().getVersion());
+            if (moduleVersion == null) {
+                throw new InvalidModuleVersionException();
+            }
+            moduleVersion = moduleVersionRepository.findByHash(moduleInfo.getAdditionalProperties().getHash());
+            if (moduleVersion == null) {
+                throw new InvalidModuleHashException();
+            }
+
+            /*
+            Clear old records, before persisting
+             */
+            List<CspInfo> cspInfoList = cspInfoRepository.findByCspId(cspId);
+            //cspModuleRepository.removeByCspId(cspId);
+            for(CspInfo cspInfo : cspInfoList) {
+                cspModuleInfoRepository.removeByCspInfoId(cspInfo.getId());
+            }
+            cspInfoRepository.removeByCspId(cspId);
+
+            /*
+            Persist data
+             */
+            CspInfo cspInfo = new CspInfo();
+            cspInfo.setCspId(cspId);
+            cspInfo.setRecordDateTime(JodaConverter.getCurrentJodaString());
+            cspInfo = cspInfoRepository.save(cspInfo);
+
+//                CspModule cspModule = new CspModule();
+//                cspModule.setCspId(cspId);
+//                cspModule.setModuleId(module.getId());
+//                cspModule.setModuleVersionId(moduleVersion.getId());
+//                cspModule = cspModuleRepository.save(cspModule);
+
+            CspModuleInfo cspModuleInfo = new CspModuleInfo();
+            cspModuleInfo.setCspInfoId(cspInfo.getId());
+            cspModuleInfo.setModuleVersionId(moduleVersion.getId());
+            cspModuleInfo.setModuleInstalledOn(moduleInfo.getAdditionalProperties().getInstalledOn());
+            int val = moduleInfo.getAdditionalProperties().getActive() ? 1 : 0;
+            cspModuleInfo.setModuleIsActive(val);
+            cspModuleInfo = cspModuleInfoRepository.save(cspModuleInfo);
+
         }
     }
 }
