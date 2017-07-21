@@ -1,6 +1,9 @@
 package com.intrasoft.csp.controller;
 
+import com.intrasoft.csp.commons.model.IntegrationData;
+import com.intrasoft.csp.commons.model.IntegrationDataType;
 import com.intrasoft.csp.model.IntegrationAnonData;
+import com.intrasoft.csp.model.Ruleset;
 import com.intrasoft.csp.repository.IntegrationAnonDataRepository;
 import com.intrasoft.csp.repository.RulesetRepository;
 import org.slf4j.Logger;
@@ -11,6 +14,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
@@ -31,23 +35,36 @@ public class MappingsController {
     @Autowired
     RulesetRepository rulesetRepository ;
 
+    @ModelAttribute("integrationDataTypes")
+    public IntegrationDataType[] integrationDataTypes() {
+        return IntegrationDataType.values();
+    }
+
+    @ModelAttribute("integrationAnonDataAll")
+    public List<IntegrationAnonData> integrationAnonDataAll() {
+        return integrationAnonDataRepository.findAll();
+    }
+
+    @ModelAttribute("rulesets")
+    public List<Ruleset> rulesets() {
+        return rulesetRepository.findAll();
+    }
+
     @GetMapping("/")
-    public String showRecords(IntegrationAnonData integrationAnonData, Model model) {
-        model.addAttribute("integrationAnonData", integrationAnonData);
-        List<IntegrationAnonData> integrationAnonDataAll =integrationAnonDataRepository.findAll();
-        model.addAttribute("integrationAnonDataAll", integrationAnonDataAll);
-        model.addAttribute("rulesets", rulesetRepository.findAll());
-        return "pages/mappings";
+    public ModelAndView showRecords(IntegrationAnonData integrationAnonData, Model model) {
+        ModelAndView mav = new ModelAndView("pages/mappings");
+        mav.addObject(integrationAnonData);
+        return mav;
     }
 
     @PostMapping("/")
-    public String addMapping(RedirectAttributes redirectAttributes, @ModelAttribute IntegrationAnonData integrationAnonData, Model model) throws IOException {
-        LOG.info("POST1: " + integrationAnonData.toString());
-        model.addAttribute("integrationAnonData", integrationAnonData);
-        List<IntegrationAnonData> integrationAnonDataAll =integrationAnonDataRepository.findAll();
-        model.addAttribute("integrationAnonDataAll", integrationAnonDataAll);
+    public ModelAndView addMapping(RedirectAttributes redirectAttributes, @ModelAttribute IntegrationAnonData integrationAnonData, Model model) throws IOException {
+        LOG.info("POST: " + integrationAnonData.toString());
         integrationAnonDataRepository.save(integrationAnonData);
-        return "pages/mappings";
+        ModelAndView mav = new ModelAndView("pages/mappings");
+        mav.addObject(integrationAnonData);
+        mav.addObject(integrationAnonDataAll());
+        return mav;
     }
 
 }

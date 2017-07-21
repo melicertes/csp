@@ -37,8 +37,8 @@
                         <label>Data Type:</label>
                         <div class="input-group" style="width: 100%;">
                             <select th:field="*{dataType}" class="form-control" th:selected="null">
-                                <option th:each="dataType : ${T(com.intrasoft.csp.model.IntegrationDataType).values()}"
-                                        th:value="${dataType}"
+                                <option th:each="dataType : ${integrationDataTypes}"
+                                        th:value="${dataType.name()}"
                                         th:text="${dataType}">
                                 </option>
                             </select>

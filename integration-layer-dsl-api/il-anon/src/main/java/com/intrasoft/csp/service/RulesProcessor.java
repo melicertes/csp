@@ -1,7 +1,6 @@
 package com.intrasoft.csp.service;
 
-import com.intrasoft.csp.model.IntegrationDataType;
-import com.intrasoft.csp.model.Rule;
+import com.intrasoft.csp.commons.model.IntegrationDataType;
 import com.intrasoft.csp.model.Rules;
 import org.springframework.stereotype.Service;
 

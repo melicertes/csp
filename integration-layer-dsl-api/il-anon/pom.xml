@@ -14,6 +14,12 @@
 	<version>0.2.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
+	<properties>
+		<thymeleaf.version>3.0.6.RELEASE</thymeleaf.version>
+		<thymeleaf-layout-dialect.version>2.2.1</thymeleaf-layout-dialect.version>
+	</properties>
+
+
 	<dependencies>
 		<dependency>
 			<groupId>com.intrasoft.csp</groupId>
@@ -74,7 +80,6 @@
 			<version>4.4.0</version>
 		</dependency>
 
-		<!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>

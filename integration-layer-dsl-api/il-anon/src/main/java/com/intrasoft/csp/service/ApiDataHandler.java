@@ -1,8 +1,10 @@
 package com.intrasoft.csp.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.intrasoft.csp.api.HttpStatusResponseType;
+import com.intrasoft.csp.commons.model.IntegrationDataType;
 import com.intrasoft.csp.model.IntegrationAnonData;
-import com.intrasoft.csp.model.IntegrationDataType;
 import com.intrasoft.csp.model.Rule;
 import com.intrasoft.csp.model.Rules;
 import org.apache.tomcat.util.codec.binary.Base64;
@@ -23,7 +25,7 @@ public class ApiDataHandler {
     RulesProcessor rulesProcessor;
 
 
-    public ResponseEntity<String> handleAnonIntegrationData(IntegrationAnonData integrationAnonData) throws NoSuchAlgorithmException, InvalidKeyException {
+    public ResponseEntity<String> handleAnonIntegrationData(IntegrationAnonData integrationAnonData) throws NoSuchAlgorithmException, InvalidKeyException, JsonProcessingException {
 
         // @TODO Handle integrationData, send IntegrationData to the anonymization service and receive anonymized intagrationData
 
@@ -32,6 +34,12 @@ public class ApiDataHandler {
         byte[] File = integrationAnonData.getFile();
 
         Rules rules = rulesProcessor.getRule(dataType, cspId);
+
+        if (rules == null){
+            ObjectMapper mapper = new ObjectMapper();
+            return new ResponseEntity<String>(mapper.writeValueAsString(integrationAnonData.getIntegrationData()),
+                    HttpStatus.OK);
+        }
 
         for (Rule rule : rules.getRules()){
 
