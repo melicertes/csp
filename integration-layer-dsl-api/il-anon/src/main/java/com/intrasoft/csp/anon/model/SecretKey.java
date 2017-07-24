@@ -11,7 +11,9 @@ public class SecretKey {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    @Column(name = "seckey") //key is a reserved word in mysql and it will fail if selected; thus, changing to seckey
     private String key;
+
     Date createdAt;
 
     public SecretKey() {

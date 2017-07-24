@@ -2,6 +2,7 @@ package com.intrasoft.csp.integration.sandbox.client.anon;
 
 import com.intrasoft.csp.anon.AnonApp;
 import com.intrasoft.csp.client.AnonClient;
+import com.intrasoft.csp.client.config.AnonClientConfig;
 import com.intrasoft.csp.client.config.CspRestTemplateConfiguration;
 import com.intrasoft.csp.client.impl.AnonClientImpl;
 import com.intrasoft.csp.commons.client.ApiVersionClient;
@@ -30,7 +31,7 @@ import static org.hamcrest.Matchers.is;
 
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = {AnonApp.class, CspRestTemplateConfiguration.class, AnonClient.class},
+@SpringBootTest(classes = {AnonApp.class, AnonClientConfig.class, CspRestTemplateConfiguration.class},
         webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT,
         properties = {
                 "server.port: 8585",
@@ -39,9 +40,10 @@ import static org.hamcrest.Matchers.is;
                 "api.version: 1",
                 "csp.retry.backOffPeriod:10",
                 "csp.retry.maxAttempts:1",
-                "spring.datasource.url=jdbc:postgresql://localhost:5432/anonymization",
-                "spring.datasource.username=anon",
-                "spring.datasource.password=@n0nu$er",
+                //these are already defined in application.properties OR application-mysql.properties
+//                "spring.datasource.url=jdbc:postgresql://localhost:5432/anonymization",
+//                "spring.datasource.username=anon",
+//                "spring.datasource.password=@n0nu$er",
                 "key.update=10000"
         })
 public class AnonClientTest {
