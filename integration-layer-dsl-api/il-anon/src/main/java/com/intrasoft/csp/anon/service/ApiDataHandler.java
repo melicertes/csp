@@ -40,14 +40,11 @@ public class ApiDataHandler {
 
     public ResponseEntity<String> handleAnonIntegrationData(IntegrationAnonData integrationAnonData) throws NoSuchAlgorithmException, InvalidKeyException, IOException {
 
-        // @TODO Handle integrationData, send IntegrationData to the anonymization service and receive anonymized intagrationData
-
         String cspId = integrationAnonData.getCspId();
         IntegrationDataType dataType = integrationAnonData.getDataType();
 
         String jsonString = mapper.writeValueAsString(integrationAnonData.getIntegrationData().getDataObject());
         JsonNode root = (ObjectNode)mapper.readTree(jsonString.getBytes());
-        ((ObjectNode) root.path("trustcircle")).put("short_name", "**********");
 
         Rules rules = rulesService.getRule(dataType, cspId);
 
@@ -93,15 +90,13 @@ public class ApiDataHandler {
         }
     }
 
-    // @TODO Implement anonymize
     private String anonField(String val){
         return "*********";
     }
 
-    // @TODO Implement pseudomize
     private String pseudoField(String val) throws NoSuchAlgorithmException, InvalidKeyException {
 
-        String secret = hmac.getKey();
+        String secret = hmac.getKey().getKey();
         Mac sha256_HMAC = Mac.getInstance("HmacSHA256");
         SecretKeySpec secret_key = new SecretKeySpec(secret.getBytes(), "HmacSHA256");
         sha256_HMAC.init(secret_key);

@@ -14,6 +14,14 @@ public class SecretKey {
     private String key;
     Date createdAt;
 
+    public SecretKey() {
+    }
+
+    public SecretKey(String key, Date createdAt) {
+        this.key = key;
+        this.createdAt = createdAt;
+    }
+
     public long getId() {
         return id;
     }

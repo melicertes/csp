@@ -1,31 +1,34 @@
 package com.intrasoft.csp.anon.utils;
 
+import com.intrasoft.csp.anon.model.SecretKey;
+import com.intrasoft.csp.anon.repository.SecretKeyRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.util.Date;
 import java.util.UUID;
 
 @Component
 public class HMAC {
 
-    private String key;
+    @Autowired
+    SecretKeyRepository secretKeyRepository;
+
+    SecretKey key;
 
     @PostConstruct
     public void init(){
-        setKey(UUID.randomUUID().toString());
+        key = secretKeyRepository.save(new SecretKey(UUID.randomUUID().toString(), new Date()));
     }
 
     @Scheduled(fixedDelayString="${key.update}")
     public void updateKey(){
-        setKey(UUID.randomUUID().toString());
+        key = secretKeyRepository.save(new SecretKey(UUID.randomUUID().toString(), new Date()));
     }
 
-    public String getKey() {
+    public SecretKey getKey() {
         return key;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
     }
 }
