@@ -3,7 +3,7 @@ package com.intrasoft.csp.client.impl;
 import com.intrasoft.csp.client.AnonClient;
 import com.intrasoft.csp.client.impl.TrustCirclesClientImpl;
 import com.intrasoft.csp.commons.client.RetryRestTemplate;
-import com.intrasoft.csp.commons.model.IntegrationAnonData;
+//import com.intrasoft.csp.commons.model.IntegrationAnonData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,11 +31,11 @@ public class AnonClientImpl implements AnonClient {
         return context;
     }
 
-    @Override
-    public IntegrationAnonData getAnonData(Object object) {
-        String url = context;
-        LOG.debug("API call [post]: " + url);
-        IntegrationAnonData integrationAnonData = retryRestTemplate.postForObject(context, object,IntegrationAnonData.class);
-        return integrationAnonData;
-    }
+//    @Override
+//    public IntegrationAnonData getAnonData(Object object) {
+//        String url = context;
+//        LOG.debug("API call [post]: " + url);
+//        IntegrationAnonData integrationAnonData = retryRestTemplate.postForObject(context, object,IntegrationAnonData.class);
+//        return integrationAnonData;
+//    }
 }
