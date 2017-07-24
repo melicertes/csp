@@ -3,7 +3,6 @@ package com.intrasoft.csp.client;
 
 //import com.intrasoft.csp.commons.model.IntegrationAnonData;
 
-import com.intrasoft.csp.anon.model.IntegrationAnonData;
 import com.intrasoft.csp.commons.exceptions.InvalidDataTypeException;
 import com.intrasoft.csp.commons.model.IntegrationData;
 import org.springframework.http.ResponseEntity;

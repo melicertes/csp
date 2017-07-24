@@ -1,8 +1,6 @@
 package com.intrasoft.csp.client.impl;
 
-import com.intrasoft.csp.anon.model.IntegrationAnonData;
 import com.intrasoft.csp.client.AnonClient;
-import com.intrasoft.csp.client.impl.TrustCirclesClientImpl;
 import com.intrasoft.csp.commons.client.ApiVersionClient;
 import com.intrasoft.csp.commons.client.RetryRestTemplate;
 //import com.intrasoft.csp.commons.model.IntegrationAnonData;
