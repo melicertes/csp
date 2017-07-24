@@ -39,6 +39,8 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
 @RunWith(CamelSpringBootRunner.class)
 @SpringBootTest(classes = {CspApp.class, MockUtils.class},
         properties = {
+        /*
+        //added in application-dangerduck.properties
                 "consume.errorq.on.interval:false",
                 "csp.retry.backOffPeriod:10",
                 "csp.retry.maxAttempts:1",
@@ -65,7 +67,7 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
                 "elastic.protocol: http",
                 "elastic.host: csp2.dangerduck.gr",
                 "elastic.port: 9200",
-                "elastic.path: /cspdata"
+                "elastic.path: /cspdata"*/
         })
 //@MockEndpointsAndSkip("^https4-in://localhost.*adapter.*|https4-in://csp.*|https4-ex://ex.*") // by removing this any http requests will be sent as expected.
 //@MockEndpointsAndSkip("http://external.csp*") // by removing this any http requests will be sent as expected.
