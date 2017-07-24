@@ -37,7 +37,7 @@ public class AnonController {
         IntegrationAnonData integrationAnonData = new IntegrationAnonData();
         integrationAnonData.setIntegrationData(integrationData);
         integrationAnonData.setCspId(integrationData.getDataParams().getCspId());
-        integrationAnonData.setDataType(integrationData.getDataType().name());
+        integrationAnonData.setDataType(integrationData.getDataType().toString());
         return apiDataHandler.handleAnonIntegrationData(integrationAnonData);
     }
 

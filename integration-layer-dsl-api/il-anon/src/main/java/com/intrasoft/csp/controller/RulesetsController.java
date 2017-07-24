@@ -70,16 +70,12 @@ public class RulesetsController {
             LOG.info(file.getOriginalFilename());
             byte[] bytes = file.getBytes();
             Path path = Paths.get(file.getOriginalFilename());
-            Files.write(path, bytes);
-            ruleset.setFile(file.getBytes());
+            ruleset.setFile(bytes);
             ruleset.setFilename(file.getOriginalFilename());
         } catch (IOException e) {
             redirectAttributes.addFlashAttribute("message", "Something went wrong");
             return "pages/rulesets";
         }
-
-        Rules rules = new ObjectMapper().readerFor(Rules.class).readValue(new String(file.getBytes()));
-        LOG.info(rules.toString());
 
         rulesetRepository.save(ruleset);
         List<Ruleset> rulesets =rulesetRepository.findAll();
