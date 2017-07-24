@@ -1,6 +1,5 @@
-package com.intrasoft.csp.model;
+package com.intrasoft.csp.anon.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.intrasoft.csp.commons.model.IntegrationData;
 import com.intrasoft.csp.commons.model.IntegrationDataType;

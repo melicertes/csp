@@ -1,4 +1,4 @@
-package com.intrasoft.csp.config;
+package com.intrasoft.csp.anon.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;

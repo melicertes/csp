@@ -1,4 +1,4 @@
-package com.intrasoft.csp.model;
+package com.intrasoft.csp.anon.model;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;

@@ -1,9 +1,9 @@
-package com.intrasoft.csp.api;
+package com.intrasoft.csp.anon.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.intrasoft.csp.commons.model.IntegrationData;
-import com.intrasoft.csp.model.IntegrationAnonData;
-import com.intrasoft.csp.service.ApiDataHandler;
+import com.intrasoft.csp.anon.model.IntegrationAnonData;
+import com.intrasoft.csp.anon.service.ApiDataHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

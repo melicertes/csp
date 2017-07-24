@@ -1,13 +1,14 @@
-package com.intrasoft.csp.service;
+package com.intrasoft.csp.anon.service;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.intrasoft.csp.anon.utils.HMAC;
 import com.intrasoft.csp.commons.model.IntegrationDataType;
-import com.intrasoft.csp.model.IntegrationAnonData;
-import com.intrasoft.csp.model.Rule;
-import com.intrasoft.csp.model.Rules;
+import com.intrasoft.csp.anon.model.IntegrationAnonData;
+import com.intrasoft.csp.anon.model.Rule;
+import com.intrasoft.csp.anon.model.Rules;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,10 +30,10 @@ public class ApiDataHandler {
     private static final Logger LOG = LoggerFactory.getLogger(ApiDataHandler.class);
 
     @Autowired
-    RulesProcessor rulesProcessor;
+    RulesService rulesService;
 
     @Autowired
-    SecretKey secretKey;
+    HMAC hmac;
 
     private static ObjectMapper mapper = new ObjectMapper();
 
@@ -43,13 +44,12 @@ public class ApiDataHandler {
 
         String cspId = integrationAnonData.getCspId();
         IntegrationDataType dataType = integrationAnonData.getDataType();
-        byte[] file = (integrationAnonData.getIntegrationData().getDataObject().toString()).getBytes();
 
         String jsonString = mapper.writeValueAsString(integrationAnonData.getIntegrationData().getDataObject());
         JsonNode root = (ObjectNode)mapper.readTree(jsonString.getBytes());
         ((ObjectNode) root.path("trustcircle")).put("short_name", "**********");
 
-        Rules rules = rulesProcessor.getRule(dataType, cspId);
+        Rules rules = rulesService.getRule(dataType, cspId);
 
         if (rules == null){
             ObjectMapper mapper = new ObjectMapper();
@@ -101,7 +101,7 @@ public class ApiDataHandler {
     // @TODO Implement pseudomize
     private String pseudoField(String val) throws NoSuchAlgorithmException, InvalidKeyException {
 
-        String secret = secretKey.getKey();
+        String secret = hmac.getKey();
         Mac sha256_HMAC = Mac.getInstance("HmacSHA256");
         SecretKeySpec secret_key = new SecretKeySpec(secret.getBytes(), "HmacSHA256");
         sha256_HMAC.init(secret_key);

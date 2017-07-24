@@ -1,4 +1,4 @@
-package com.intrasoft.csp.service;
+package com.intrasoft.csp.anon.utils;
 
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -7,7 +7,7 @@ import javax.annotation.PostConstruct;
 import java.util.UUID;
 
 @Component
-public class SecretKey {
+public class HMAC {
 
     private String key;
 

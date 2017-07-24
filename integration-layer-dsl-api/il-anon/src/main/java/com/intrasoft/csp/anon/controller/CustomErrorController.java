@@ -1,4 +1,4 @@
-package com.intrasoft.csp.controller;
+package com.intrasoft.csp.anon.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.web.ErrorAttributes;

@@ -1,13 +1,12 @@
-package com.intrasoft.csp.service.impl;
+package com.intrasoft.csp.anon.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.intrasoft.csp.commons.model.IntegrationDataType;
-import com.intrasoft.csp.model.Ruleset;
-import com.intrasoft.csp.model.IntegrationAnonData;
-import com.intrasoft.csp.model.Rules;
-import com.intrasoft.csp.repository.IntegrationAnonDataRepository;
-import com.intrasoft.csp.repository.RulesetRepository;
-import com.intrasoft.csp.service.RulesProcessor;
+import com.intrasoft.csp.anon.model.IntegrationAnonData;
+import com.intrasoft.csp.anon.model.Rules;
+import com.intrasoft.csp.anon.repository.IntegrationAnonDataRepository;
+import com.intrasoft.csp.anon.repository.RulesetRepository;
+import com.intrasoft.csp.anon.service.RulesService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,8 +15,8 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 
 @Component
-public class RulesProcessorImpl implements RulesProcessor{
-    private static final Logger LOG = LoggerFactory.getLogger(RulesProcessor.class);
+public class RulesServiceImpl implements RulesService {
+    private static final Logger LOG = LoggerFactory.getLogger(RulesService.class);
 
     @Autowired
     RulesetRepository rulesetRepository;

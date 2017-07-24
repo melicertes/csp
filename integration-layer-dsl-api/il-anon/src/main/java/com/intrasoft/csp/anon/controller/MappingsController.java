@@ -1,11 +1,10 @@
-package com.intrasoft.csp.controller;
+package com.intrasoft.csp.anon.controller;
 
-import com.intrasoft.csp.commons.model.IntegrationData;
 import com.intrasoft.csp.commons.model.IntegrationDataType;
-import com.intrasoft.csp.model.IntegrationAnonData;
-import com.intrasoft.csp.model.Ruleset;
-import com.intrasoft.csp.repository.IntegrationAnonDataRepository;
-import com.intrasoft.csp.repository.RulesetRepository;
+import com.intrasoft.csp.anon.model.IntegrationAnonData;
+import com.intrasoft.csp.anon.model.Ruleset;
+import com.intrasoft.csp.anon.repository.IntegrationAnonDataRepository;
+import com.intrasoft.csp.anon.repository.RulesetRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
