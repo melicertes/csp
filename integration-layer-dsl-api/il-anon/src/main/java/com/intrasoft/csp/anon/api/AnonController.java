@@ -17,6 +17,9 @@ import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 
+import static com.intrasoft.csp.commons.routes.ContextUrl.DATA_ANONYMIZATION;
+import static com.intrasoft.csp.commons.routes.ContextUrl.REST_API_V1;
+
 
 @RestController
 public class AnonController {
@@ -26,7 +29,7 @@ public class AnonController {
     @Autowired
     ApiDataHandler apiDataHandler;
 
-    @RequestMapping(value = "anon",
+    @RequestMapping(value = "/v"+REST_API_V1+"/"+DATA_ANONYMIZATION,
             consumes = {"application/json"},
             produces = {"application/json"},
             method = RequestMethod.POST)

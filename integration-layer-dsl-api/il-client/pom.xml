@@ -35,6 +35,11 @@
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.intrasoft.csp</groupId>
+            <artifactId>il-anon</artifactId>
+            <version>0.2.0-SNAPSHOT</version>
+        </dependency>
 
     </dependencies>
 
