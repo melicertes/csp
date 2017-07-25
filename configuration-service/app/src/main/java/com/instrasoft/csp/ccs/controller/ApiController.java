@@ -29,7 +29,6 @@ import java.util.List;
 @RestController
 public class ApiController implements ApiContextUrl {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ApiController.class);
     private static Logger LOG_AUDIT = LoggerFactory.getLogger("audit-log");
     private static Logger LOG_EXCEPTION = LoggerFactory.getLogger("exc-log");
 
@@ -74,26 +73,18 @@ public class ApiController implements ApiContextUrl {
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity updates(@PathVariable String cspId) {
         String user = "system";
-        String logInfo = user + ", POST: " + "/v" + API_V1 + API_UPDATES + "/" + cspId + ": ";
-        LOG_AUDIT.info(logInfo + "GET received");
-
-        LOG_AUDIT.error("1234");
-        LOG_EXCEPTION.info("1234");
-        LOG_EXCEPTION.error("1234");
-
+        String logInfo = user + ", GET: " + "/v" + API_V1 + API_UPDATES + "/" + cspId + ": ";
+        LOG_AUDIT.info(logInfo + "Request received");
 
         try {
             //search for CSP
             Csp csp = cspRepository.findOne(cspId);
             if (csp == null) throw new EntityNotFoundException();
+
             //continue to updates
             LinkedHashMap<String, List<ModuleUpdateInfo>> available = new LinkedHashMap<>();
 
-
             UpdateInformation updateInformation = new UpdateInformation();
-            /**
-             * @TODO DateChanged in CSP Management is not available. If added, it will at entry level.
-             */
             updateInformation.setDateChanged(cspManagementRepository.findTop1ByCspIdOrderByDateChangedDesc(cspId).getDateChanged());
 
             //get modules by priority
@@ -113,14 +104,12 @@ public class ApiController implements ApiContextUrl {
 
                         updates.add(moduleUpdateInfo);
                     }
-
                     available.put(module.getName(), updates);
                 }
             }
-
             updateInformation.setAvailable(available);
 
-            LOG.info(logInfo + HttpStatusResponseType.API_OK.text());
+            LOG_AUDIT.info(logInfo + HttpStatusResponseType.API_OK.text());
             return new ResponseEntity<>(updateInformation, HttpStatus.OK);
 
         } catch (Exception e) {
@@ -129,16 +118,15 @@ public class ApiController implements ApiContextUrl {
             HttpStatus status = HttpStatus.BAD_REQUEST;
 
             if (e instanceof EntityNotFoundException) {
-                code = HttpStatusResponseType.API_UPDATES_NOT_FOUND.code();
-                text = HttpStatusResponseType.API_UPDATES_NOT_FOUND.text();
+                code = HttpStatusResponseType.API_INVALID_CSP_ENTRY.code();
+                text = HttpStatusResponseType.API_INVALID_CSP_ENTRY.text();
                 status = HttpStatus.NOT_FOUND;
             }
 
-            LOG.error(logInfo + text + "; " + e.toString());
+            LOG_EXCEPTION.error(logInfo + text + "; " + e.toString());
             ResponseError error = new ResponseError(code, text, e.toString());
             return new ResponseEntity<>(error, status);
         }
-
     }
 
 
@@ -154,8 +142,9 @@ public class ApiController implements ApiContextUrl {
             consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity register(@PathVariable String cspId, @RequestBody Registration cspRegistration) {
-        String logInfo = "/v" + API_V1 + API_REGISTER + "/" + cspId + ": ";
-        LOG.info(logInfo + "POST received");
+        String user = "system";
+        String logInfo = user + ", POST: " +  "/v" + API_V1 + API_REGISTER + "/" + cspId + ": ";
+        LOG_AUDIT.info(logInfo + "Request received");
 
         try {
             if (cspRepository.exists(cspId) && cspRegistration.getRegistrationIsUpdate()) {
@@ -190,7 +179,9 @@ public class ApiController implements ApiContextUrl {
             List<ModuleInfo> moduleInfoList = cspRegistration.getModuleInfo().getModules();
             this.updateModulesInfo(cspId, moduleInfoList);
 
-            LOG.info(logInfo + HttpStatusResponseType.API_OK.text());
+            LOG_AUDIT.info(logInfo + HttpStatusResponseType.API_OK.text());
+            Response response = new Response(HttpStatusResponseType.API_OK.code(), HttpStatusResponseType.API_OK.text());
+            return new ResponseEntity<>(response, HttpStatus.OK);
 
         } catch (Exception e) {
             int code = HttpStatusResponseType.API_FAILURE.code();
@@ -223,14 +214,10 @@ public class ApiController implements ApiContextUrl {
                 status = HttpStatus.NOT_FOUND;
             }
 
-            LOG.error(logInfo + text + "; " + e.toString());
+            LOG_EXCEPTION.error(logInfo + text + "; " + e.toString());
             ResponseError error = new ResponseError(code, text, e.toString());
             return new ResponseEntity<>(error, status);
         }
-
-
-        Response response = new Response(HttpStatusResponseType.API_OK.code(), HttpStatusResponseType.API_OK.text());
-        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
 
@@ -246,8 +233,9 @@ public class ApiController implements ApiContextUrl {
             method = RequestMethod.GET,
             consumes = MediaType.ALL_VALUE)
     public ResponseEntity update(@PathVariable String cspId, @PathVariable String updateHash) {
-        String logInfo = "/v" + API_V1 + API_UPDATE + "/" + cspId + "/" + updateHash + ": ";
-        LOG.info(logInfo + "GET received");
+        String user = "system";
+        String logInfo = user + ", GET: " + "/v" + API_V1 + API_UPDATE + "/" + cspId + "/" + updateHash + ": ";
+        LOG_AUDIT.info(logInfo + "Request received");
 
         HttpHeaders headers = new HttpHeaders();
 
@@ -277,7 +265,7 @@ public class ApiController implements ApiContextUrl {
 
             InputStreamResource inputStreamResource = new InputStreamResource(new FileInputStream(updateFile));
 
-            LOG.info(logInfo + HttpStatusResponseType.API_OK.text());
+            LOG_AUDIT.info(logInfo + HttpStatusResponseType.API_OK.text());
             return ResponseEntity
                     .ok()
                     .headers(headers)
@@ -288,31 +276,27 @@ public class ApiController implements ApiContextUrl {
         } catch (Exception e) {
             int code = HttpStatusResponseType.API_FAILURE.code();
             String text = HttpStatusResponseType.API_FAILURE.text();
+            HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
 
             if (e instanceof EntityNotFoundException) {
-                code = HttpStatusResponseType.API_UPDATE_INVALID_CSP_ENTRY.code();
-                text = HttpStatusResponseType.API_UPDATE_INVALID_CSP_ENTRY.text();
-                LOG.error(logInfo + text + "; " + e.toString());
-                ResponseError error = new ResponseError(code, text, e.toString());
-                return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+                code = HttpStatusResponseType.API_INVALID_CSP_ENTRY.code();
+                text = HttpStatusResponseType.API_INVALID_CSP_ENTRY.text();
+                status = HttpStatus.NOT_FOUND;
             }
-            if (e instanceof HashNotFoundException) {
+            else if (e instanceof HashNotFoundException) {
                 code = HttpStatusResponseType.API_UPDATE_INVALID_HASH_ENTRY.code();
                 text = HttpStatusResponseType.API_UPDATE_INVALID_HASH_ENTRY.text();
-                LOG.error(logInfo + text + "; " + e.toString());
-                ResponseError error = new ResponseError(code, text, e.toString());
-                return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+                status = HttpStatus.NOT_FOUND;
             }
-            if (e instanceof FileNotFoundException) {
+            else if (e instanceof FileNotFoundException) {
                 code = HttpStatusResponseType.API_UPDATE_NOT_FOUND.code();
                 text = HttpStatusResponseType.API_UPDATE_NOT_FOUND.text();
-                LOG.error(logInfo + text + "; " + e.toString());
-                ResponseError error = new ResponseError(code, text, e.toString());
-                return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+                status = HttpStatus.NOT_FOUND;
             }
-            LOG.error(logInfo + text + "; " + e.toString());
+
+            LOG_EXCEPTION.error(logInfo + text + "; " + e.toString());
             ResponseError error = new ResponseError(code, text, e.toString());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).headers(headers).contentType(MediaType.APPLICATION_JSON).body(error);
+            return ResponseEntity.status(status).headers(headers).contentType(MediaType.APPLICATION_JSON).body(error);
         }
     }
 
@@ -328,11 +312,9 @@ public class ApiController implements ApiContextUrl {
             consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity appInfo(@PathVariable String cspId, @RequestBody AppInfo appInfo) {
-        String logInfo = "/v" + API_V1 + API_APPINFO + "/" + cspId + ": ";
-        LOG.info(logInfo + "POST received");
-
-
-        System.out.println(JsonPrinter.toJsonPrettyString(appInfo));
+        String user = "";
+        String logInfo = user + ", POST: " + "/v" + API_V1 + API_APPINFO + "/" + cspId + ": ";
+        LOG_AUDIT.info(logInfo + "Request received");
 
         try {
             //search for CSP
@@ -343,7 +325,9 @@ public class ApiController implements ApiContextUrl {
             List<ModuleInfo> moduleInfoList = appInfo.getModulesInfo().getModules();
             this.updateModulesInfo(cspId, moduleInfoList);
 
-            LOG.info(logInfo + HttpStatusResponseType.API_OK.text());
+            LOG_AUDIT.info(logInfo + HttpStatusResponseType.API_OK.text());
+            Response response = new Response(HttpStatusResponseType.API_OK.code(), HttpStatusResponseType.API_OK.text());
+            return new ResponseEntity<>(response, HttpStatus.OK);
 
         } catch (Exception e) {
             int code = HttpStatusResponseType.API_FAILURE.code();
@@ -371,14 +355,12 @@ public class ApiController implements ApiContextUrl {
                 status = HttpStatus.NOT_FOUND;
             }
 
-            LOG.error(logInfo + text + "; " + e.toString());
+            LOG_EXCEPTION.error(logInfo + text + "; " + e.toString());
             ResponseError error = new ResponseError(code, text, e.toString());
             return new ResponseEntity<>(error, status);
         }
-
-        Response response = new Response(HttpStatusResponseType.API_OK.code(), HttpStatusResponseType.API_OK.text());
-        return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
 
 
     private Csp getCspFromRegistration(Registration cspRegistration) throws ParseException {
@@ -458,12 +440,6 @@ public class ApiController implements ApiContextUrl {
             cspInfo.setCspId(cspId);
             cspInfo.setRecordDateTime(JodaConverter.getCurrentJodaString());
             cspInfo = cspInfoRepository.save(cspInfo);
-
-//                CspModule cspModule = new CspModule();
-//                cspModule.setCspId(cspId);
-//                cspModule.setModuleId(module.getId());
-//                cspModule.setModuleVersionId(moduleVersion.getId());
-//                cspModule = cspModuleRepository.save(cspModule);
 
             CspModuleInfo cspModuleInfo = new CspModuleInfo();
             cspModuleInfo.setCspInfoId(cspInfo.getId());

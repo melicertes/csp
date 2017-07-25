@@ -1,11 +1,13 @@
 package com.instrasoft.csp.ccs.domain.api;
 
 
+import com.instrasoft.csp.ccs.config.types.ContactType;
+
 public class ContactDetails {
 
     private String personName;
     private String personEmail;
-    private String contactType;
+    private ContactType contactType;
 
 
     public String getPersonName() {
@@ -24,11 +26,11 @@ public class ContactDetails {
         this.personEmail = personEmail;
     }
 
-    public String getContactType() {
+    public ContactType getContactType() {
         return contactType;
     }
 
-    public void setContactType(String contactType) {
+    public void setContactType(ContactType contactType) {
         this.contactType = contactType;
     }
 

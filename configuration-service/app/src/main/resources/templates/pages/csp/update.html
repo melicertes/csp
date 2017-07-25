@@ -97,12 +97,17 @@
                                 <div class="col-md-4 col-xs-12">
                                     <label>Type:</label>
                                     <div class="form-group input-group">
-                                        <select class="form-control csp_contact_type" name="csp_contact_type[]">
-                                            <option></option>
-                                            <option value="tech-admin" th:selected="${cspContacts.get(row.index).getContactType().equals('tech-admin')}">tech-admin</option>
-                                            <option value="contact" th:selected="${cspContacts.get(row.index).getContactType().equals('contact')}">contact</option>
-                                            <option value="securityofficer" th:selected="${cspContacts.get(row.index).getContactType().equals('securityofficer')}">securityofficer</option>
+                                        <select class="form-control csp_contact_type" th:selected="null" name="csp_contact_type[]">
+                                            <option selected="selected"></option>
+                                            <option th:each="contactType : ${csp_contact_types}"
+                                                    th:selected="${cspContacts.get(row.index).getContactType().equals(contactType)}"
+                                                    th:value="${contactType.getValue()}"
+                                                    th:text="${contactType}">
+                                            </option>
                                         </select>
+
+
+
                                         <span class="input-group-btn">
                                         <button data-duplicate-remove="contact" class="btn btn-success" type="button"><i class="fa fa-minus"></i></button>
                                     </span>

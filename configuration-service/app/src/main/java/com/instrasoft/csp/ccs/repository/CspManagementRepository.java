@@ -20,6 +20,8 @@ public interface CspManagementRepository extends JpaRepository<CspManagement, Lo
 
     public CspManagement findTop1ByCspIdOrderByDateChangedDesc(String cspId);
 
+    public CspManagement findTop1ByCspIdAndModuleIdOrderByDateChangedDesc(String cspId, Long moduleId);
+
     @Transactional
     List<CspManagement> removeByCspId(String cspId);
 

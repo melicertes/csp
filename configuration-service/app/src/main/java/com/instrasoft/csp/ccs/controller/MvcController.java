@@ -48,9 +48,9 @@ public class MvcController implements PagesContextUrl, DataContextUrl {
     @Autowired
     ModuleVersionRepository moduleVersionRepository;
 
-    @ModelAttribute("csp_contact_type")
+    @ModelAttribute("csp_contact_types")
     public ContactType[] contactTypes() {
-        return IntegrationDataType.values();
+        return ContactType.values();
     }
 
     /*
@@ -81,6 +81,7 @@ public class MvcController implements PagesContextUrl, DataContextUrl {
         List<ManagementRow> managementRows = new ArrayList<>();
         List<Module> modules = moduleRepository.findAll();
         for(Module module : modules) {
+            //send only Modules having versions
             if (moduleVersionRepository.countByModuleId(module.getId()) > 0) {
                 ManagementRow row = new ManagementRow();
 
@@ -88,38 +89,47 @@ public class MvcController implements PagesContextUrl, DataContextUrl {
                 row.setIsModuleDefault(module.getIsDefault());
                 row.setModuleShortName(module.getName());
 
-                CspInfo cspInfo = cspInfoRepository.findByCspId(cspId).get(0);
-                List<CspModuleInfo> cspModuleInfos = cspModuleInfoRepository.findByCspInfoId(cspInfo.getId());
+                //get last csp heartbeat
+                CspInfo cspInfo = cspInfoRepository.findTop1ByCspIdOrderByRecordDateTimeDesc(cspId);
+                if (cspInfo != null) {
+                    CspModuleInfo cspModuleInfo = cspModuleInfoRepository.findTop1ByCspInfoIdOrderByCspInfoIdDesc(cspInfo.getId());
+                    ModuleVersion moduleVersion = moduleVersionRepository.findOne(cspModuleInfo.getModuleVersionId());
+                    row.setInstalledVersion(moduleVersion.getVersion());
+                }
+                else {
+                    row.setInstalledVersion(null);
+                }
+
+                //get management info for this module and cspId
                 List<CspManagement> cspManagementList = cspManagementRepository.findByCspIdAndModuleId(cspId, module.getId());
                 if (cspManagementList.size() == 0) {
                     row.setModuleEnabled(false);
-                    row.setInstalledVersion(null);
+                    row.setSelectedVersion(null);
                 }
                 else {
                     row.setModuleEnabled(true);
-                    row.setInstalledVersion(moduleVersionRepository.findOne(cspModuleInfos.get(0).getModuleVersionId()).getVersion());
+                    CspManagement cspManagement = cspManagementRepository.findTop1ByCspIdAndModuleIdOrderByDateChangedDesc(cspId, module.getId());
+                    ModuleVersion moduleVersion = moduleVersionRepository.findOne(cspManagement.getModuleVersionId());
+                    row.setSelectedVersion(moduleVersion.getVersion());
                 }
 
-
+                //get available versions
                 List<Integer> availableVersions = moduleVersionRepository.findVersionsByModuleId(module.getId());
                 row.setAvailableVersions(availableVersions);
+
                 List<String> availableVersionsT = new ArrayList<>();
+                List<ModuleVersion> moduleVersions = moduleVersionRepository.findByModuleId(module.getId());
                 for(int i=0; i<availableVersions.size(); i++) {
                     availableVersionsT.add(VersionParser.toString(availableVersions.get(i)));
                 }
                 row.setAvailableVersionsT(availableVersionsT);
-
-                row.setSelectedVersion(null);
-                if (cspManagementList.size() != 0) {
-                    row.setSelectedVersion(moduleVersionRepository.findOne(cspManagementList.get(0).getModuleVersionId()).getVersion());
-                }
-
 
                 managementRows.add(row);
             }
         }
         model.addAttribute("managementRows", managementRows);
         model.addAttribute("cspId", cspId);
+        model.addAttribute("cspName", cspRepository.findOne(cspId).getName());
 
         model.addAttribute("dashboardUrl", PAGES_DASHBOARD);
         model.addAttribute("saveUrl", DATA_BASEURL + DATA_MANAGE);
@@ -276,6 +286,7 @@ public class MvcController implements PagesContextUrl, DataContextUrl {
         m.addAttribute("cspListUrl", PAGES_CSP_LIST);
         m.addAttribute("moduleListUrl", PAGES_MODULE_LIST);
 
+        m.addAttribute("user", "admin");
         return m;
     }
 }

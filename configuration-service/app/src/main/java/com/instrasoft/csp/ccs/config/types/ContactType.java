@@ -1,6 +1,8 @@
 package com.instrasoft.csp.ccs.config.types;
 
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+
 public enum ContactType {
     TECH_ADMIN("tech-admin"),
     CONTACT("contact"),
@@ -15,4 +17,15 @@ public enum ContactType {
     public String getValue() {
         return this.value;
     }
+
+    @JsonCreator
+    public static ContactType fromValue(String text) {
+        for (ContactType b : ContactType.values()) {
+            if (String.valueOf(b.value).equals(text)) {
+                return b;
+            }
+        }
+        return null;
+    }
+    
 }

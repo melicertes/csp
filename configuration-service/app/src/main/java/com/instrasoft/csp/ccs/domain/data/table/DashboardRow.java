@@ -10,6 +10,7 @@ public class DashboardRow {
     private String domain;
     private String registrationDate;
     private String lastUpdate;
+    private String lastManaged;
     private List<String> confUpdates;
     private List<String> reportUpdates;
     private String btn;
@@ -55,6 +56,14 @@ public class DashboardRow {
         this.lastUpdate = lastUpdate;
     }
 
+    public String getLastManaged() {
+        return lastManaged;
+    }
+
+    public void setLastManaged(String lastManaged) {
+        this.lastManaged = lastManaged;
+    }
+
     public List<String> getConfUpdates() {
         return confUpdates;
     }
@@ -88,6 +97,7 @@ public class DashboardRow {
                 ", domain='" + domain + '\'' +
                 ", registrationDate='" + registrationDate + '\'' +
                 ", lastUpdate='" + lastUpdate + '\'' +
+                ", lastManaged='" + lastManaged + '\'' +
                 ", confUpdates=" + confUpdates +
                 ", reportUpdates=" + reportUpdates +
                 ", btn='" + btn + '\'' +

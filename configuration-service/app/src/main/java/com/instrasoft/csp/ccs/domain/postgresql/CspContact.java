@@ -1,5 +1,7 @@
 package com.instrasoft.csp.ccs.domain.postgresql;
 
+import com.instrasoft.csp.ccs.config.types.ContactType;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
@@ -27,7 +29,7 @@ public class CspContact {
 
     @Column(name="contact_type")
     @NotNull
-    private String contactType;
+    private ContactType contactType;
 
 
     public Long getId() {
@@ -62,11 +64,11 @@ public class CspContact {
         this.personEmail = personEmail;
     }
 
-    public String getContactType() {
+    public ContactType getContactType() {
         return contactType;
     }
 
-    public void setContactType(String contactType) {
+    public void setContactType(ContactType contactType) {
         this.contactType = contactType;
     }
 
