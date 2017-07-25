@@ -5,8 +5,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.intrasoft.csp.anon.utils.HMAC;
+import com.intrasoft.csp.commons.model.IntegrationAnonData;
 import com.intrasoft.csp.commons.model.IntegrationDataType;
-import com.intrasoft.csp.anon.model.IntegrationAnonData;
 import com.intrasoft.csp.anon.model.Rule;
 import com.intrasoft.csp.anon.model.Rules;
 import org.apache.tomcat.util.codec.binary.Base64;
@@ -43,14 +43,14 @@ public class ApiDataHandler {
         String cspId = integrationAnonData.getCspId();
         IntegrationDataType dataType = integrationAnonData.getDataType();
 
-        String jsonString = mapper.writeValueAsString(integrationAnonData.getIntegrationData().getDataObject());
+        String jsonString = mapper.writeValueAsString(integrationAnonData.getDataObject());
         JsonNode root = (ObjectNode)mapper.readTree(jsonString.getBytes());
 
         Rules rules = rulesService.getRule(dataType, cspId);
 
         if (rules == null){
             ObjectMapper mapper = new ObjectMapper();
-            return new ResponseEntity<String>(mapper.writeValueAsString(integrationAnonData.getIntegrationData()),
+            return new ResponseEntity<String>(mapper.writeValueAsString(integrationAnonData.getDataObject()),
                     HttpStatus.OK);
         }
 

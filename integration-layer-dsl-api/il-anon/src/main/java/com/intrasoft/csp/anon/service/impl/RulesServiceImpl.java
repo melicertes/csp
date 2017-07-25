@@ -1,10 +1,10 @@
 package com.intrasoft.csp.anon.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.intrasoft.csp.anon.model.Mapping;
 import com.intrasoft.csp.commons.model.IntegrationDataType;
-import com.intrasoft.csp.anon.model.IntegrationAnonData;
 import com.intrasoft.csp.anon.model.Rules;
-import com.intrasoft.csp.anon.repository.IntegrationAnonDataRepository;
+import com.intrasoft.csp.anon.repository.MappingRepository;
 import com.intrasoft.csp.anon.repository.RulesetRepository;
 import com.intrasoft.csp.anon.service.RulesService;
 import org.slf4j.Logger;
@@ -22,13 +22,13 @@ public class RulesServiceImpl implements RulesService {
     RulesetRepository rulesetRepository;
 
     @Autowired
-    IntegrationAnonDataRepository integrationAnonDataRepository;
+    MappingRepository mappingRepository;
 
     @Override
     public Rules getRule(IntegrationDataType integrationDataType, String cspId) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
-        IntegrationAnonData integrationAnonData = integrationAnonDataRepository.findDistinctByDataType(integrationDataType).get(0);
-        Rules rules = new ObjectMapper().readerFor(Rules.class).readValue(new String(integrationAnonData.getRuleset().getFile()));
+        Mapping mapping = mappingRepository.findDistinctByDataType(integrationDataType).get(0);
+        Rules rules = new ObjectMapper().readerFor(Rules.class).readValue(new String(mapping.getRuleset().getFile()));
         return rules;
     }
 }

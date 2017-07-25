@@ -1,8 +1,8 @@
 package com.intrasoft.csp.anon.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.intrasoft.csp.commons.model.IntegrationAnonData;
 import com.intrasoft.csp.commons.model.IntegrationData;
-import com.intrasoft.csp.anon.model.IntegrationAnonData;
 import com.intrasoft.csp.anon.service.ApiDataHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,11 +36,11 @@ public class AnonController {
     public ResponseEntity<String> anonNewIntData(@RequestBody String postData) throws InvalidKeyException, NoSuchAlgorithmException, IOException {
         LOG.info("Anon Endpoint: POST received");
         ObjectMapper mapper = new ObjectMapper();
-        IntegrationData integrationData = mapper.readValue(postData, IntegrationData.class);
-        IntegrationAnonData integrationAnonData = new IntegrationAnonData();
-        integrationAnonData.setIntegrationData(integrationData);
-        integrationAnonData.setCspId(integrationData.getDataParams().getCspId());
-        integrationAnonData.setDataType(integrationData.getDataType().toString());
+        IntegrationAnonData integrationAnonData = mapper.readValue(postData, IntegrationAnonData.class);
+//        IntegrationAnonData integrationAnonData = new IntegrationAnonData();
+//        integrationAnonData.setIntegrationData(integrationData);
+//        integrationAnonData.setCspId(integrationData.getDataParams().getCspId());
+//        integrationAnonData.setDataType(integrationData.getDataType().toString());
         return apiDataHandler.handleAnonIntegrationData(integrationAnonData);
     }
 

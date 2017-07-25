@@ -1,9 +1,9 @@
 package com.intrasoft.csp.anon.controller;
 
+import com.intrasoft.csp.anon.model.Mapping;
 import com.intrasoft.csp.commons.model.IntegrationDataType;
-import com.intrasoft.csp.anon.model.IntegrationAnonData;
 import com.intrasoft.csp.anon.model.Ruleset;
-import com.intrasoft.csp.anon.repository.IntegrationAnonDataRepository;
+import com.intrasoft.csp.anon.repository.MappingRepository;
 import com.intrasoft.csp.anon.repository.RulesetRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +29,7 @@ public class MappingsController {
     private static final Logger LOG = LoggerFactory.getLogger(MappingsController.class);
 
     @Autowired
-    IntegrationAnonDataRepository integrationAnonDataRepository;
+    MappingRepository mappingRepository;
 
     @Autowired
     RulesetRepository rulesetRepository ;
@@ -39,9 +39,9 @@ public class MappingsController {
         return IntegrationDataType.values();
     }
 
-    @ModelAttribute("integrationAnonDataAll")
-    public List<IntegrationAnonData> integrationAnonDataAll() {
-        return integrationAnonDataRepository.findAll();
+    @ModelAttribute("mappings")
+    public List<Mapping> getMappings() {
+        return mappingRepository.findAll();
     }
 
     @ModelAttribute("rulesets")
@@ -50,19 +50,19 @@ public class MappingsController {
     }
 
     @GetMapping("/")
-    public ModelAndView showRecords(IntegrationAnonData integrationAnonData, Model model) {
+    public ModelAndView showMappings(Mapping mapping, Model model) {
         ModelAndView mav = new ModelAndView("pages/mappings");
-        mav.addObject(integrationAnonData);
+        mav.addObject(mapping);
         return mav;
     }
 
     @PostMapping("/")
-    public ModelAndView addMapping(RedirectAttributes redirectAttributes, @ModelAttribute IntegrationAnonData integrationAnonData, Model model) throws IOException {
-        LOG.info("POST: " + integrationAnonData.toString());
-        integrationAnonDataRepository.save(integrationAnonData);
+    public ModelAndView addMapping(RedirectAttributes redirectAttributes, @ModelAttribute Mapping mapping, Model model) throws IOException {
+        LOG.info("POST: " + mapping.toString());
+        mappingRepository.save(mapping);
         ModelAndView mav = new ModelAndView("pages/mappings");
-        mav.addObject(integrationAnonData);
-        mav.addObject(integrationAnonDataAll());
+        mav.addObject(mapping);
+        mav.addObject(getMappings());
         return mav;
     }
 
