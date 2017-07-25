@@ -30,6 +30,8 @@ import java.util.List;
 public class ApiController implements ApiContextUrl {
 
     private static final Logger LOG = LoggerFactory.getLogger(ApiController.class);
+    private static Logger LOG_AUDIT = LoggerFactory.getLogger("audit-log");
+    private static Logger LOG_EXCEPTION = LoggerFactory.getLogger("exc-log");
 
     @Value("${server.file.mediaType}")
     String fileMediaType;
@@ -71,8 +73,14 @@ public class ApiController implements ApiContextUrl {
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity updates(@PathVariable String cspId) {
-        String logInfo = "/v" + API_V1 + API_UPDATES + "/" + cspId + ": ";
-        LOG.info(logInfo + "GET received");
+        String user = "system";
+        String logInfo = user + ", POST: " + "/v" + API_V1 + API_UPDATES + "/" + cspId + ": ";
+        LOG_AUDIT.info(logInfo + "GET received");
+
+        LOG_AUDIT.error("1234");
+        LOG_EXCEPTION.info("1234");
+        LOG_EXCEPTION.error("1234");
+
 
         try {
             //search for CSP
@@ -86,25 +94,28 @@ public class ApiController implements ApiContextUrl {
             /**
              * @TODO DateChanged in CSP Management is not available. If added, it will at entry level.
              */
-            updateInformation.setDateChanged("2017-06-25T20:30:54.844Z");
+            updateInformation.setDateChanged(cspManagementRepository.findTop1ByCspIdOrderByDateChangedDesc(cspId).getDateChanged());
 
-            //get modules by priority, DESC as HashMap reverses the Order
+            //get modules by priority
             List<Module> moduleList = moduleRepository.findAll(new Sort(Sort.Direction.ASC, "StartPriority"));
             for (Module module : moduleList) {
                 List<ModuleUpdateInfo> updates = new ArrayList<>();
                 List<CspManagement> cspManagementList = cspManagementRepository.findByCspIdAndModuleId(cspId, module.getId());
-                for (CspManagement cspManagement : cspManagementList) {
-                    ModuleUpdateInfo moduleUpdateInfo = new ModuleUpdateInfo();
-                    moduleUpdateInfo.setName(moduleVersionRepository.findOne(cspManagement.getModuleVersionId()).getFullName());
-                    moduleUpdateInfo.setDescription(moduleVersionRepository.findOne(cspManagement.getModuleVersionId()).getDescription());
-                    moduleUpdateInfo.setVersion(VersionParser.toString(moduleVersionRepository.findOne(cspManagement.getModuleVersionId()).getVersion()));
-                    moduleUpdateInfo.setReleased(moduleVersionRepository.findOne(cspManagement.getModuleVersionId()).getReleasedOn());
-                    moduleUpdateInfo.setReleased(moduleVersionRepository.findOne(cspManagement.getModuleVersionId()).getHash());
+                //return only modules having versions
+                if (cspManagementList.size() > 0) {
+                    for (CspManagement cspManagement : cspManagementList) {
+                        ModuleUpdateInfo moduleUpdateInfo = new ModuleUpdateInfo();
+                        moduleUpdateInfo.setName(moduleVersionRepository.findOne(cspManagement.getModuleVersionId()).getFullName());
+                        moduleUpdateInfo.setDescription(moduleVersionRepository.findOne(cspManagement.getModuleVersionId()).getDescription());
+                        moduleUpdateInfo.setVersion(VersionParser.toString(moduleVersionRepository.findOne(cspManagement.getModuleVersionId()).getVersion()));
+                        moduleUpdateInfo.setReleased(moduleVersionRepository.findOne(cspManagement.getModuleVersionId()).getReleasedOn());
+                        moduleUpdateInfo.setReleased(moduleVersionRepository.findOne(cspManagement.getModuleVersionId()).getHash());
 
-                    updates.add(moduleUpdateInfo);
+                        updates.add(moduleUpdateInfo);
+                    }
+
+                    available.put(module.getName(), updates);
                 }
-
-                available.put(module.getName(), updates);
             }
 
             updateInformation.setAvailable(available);

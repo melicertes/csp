@@ -26,6 +26,9 @@ public class CspManagement {
     @NotNull
     private Long moduleVersionId;
 
+    @Column(name="date_changed")
+    private String dateChanged;
+
 
     public Long getId() {
         return id;
@@ -59,14 +62,23 @@ public class CspManagement {
         this.moduleVersionId = moduleVersionId;
     }
 
+    public String getDateChanged() {
+        return dateChanged;
+    }
+
+    public void setDateChanged(String dateChanged) {
+        this.dateChanged = dateChanged;
+    }
+
 
     @Override
     public String toString() {
-        return "CspModule{" +
+        return "CspManagement{" +
                 "id=" + id +
                 ", cspId='" + cspId + '\'' +
                 ", moduleId=" + moduleId +
                 ", moduleVersionId=" + moduleVersionId +
+                ", dateChanged='" + dateChanged + '\'' +
                 '}';
     }
 }

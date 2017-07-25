@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="fragments::head(title='Update CSP', description='update csp description')">
-    <script src="../../../static/assets/js/pages/csp/update.js"></script>
 </head>
 
 <body>
@@ -33,7 +32,7 @@
 
                 <div class="row">
                     <div class="col-md-12" style="text-align: right">
-                        <a href="list.html" th:href="${cspListUrl}" class="save btn btn-default">Cancel</a>
+                        <a th:href="${cspListUrl}" class="save btn btn-default">Cancel</a>
                         <button type="submit" class="save btn btn-success">Save</button>
                     </div>
                 </div>
@@ -192,7 +191,7 @@
 
                 <div class="row">
                     <div class="col-md-12" style="text-align: right">
-                        <a href="list.html" th:href="${cspListUrl}" class="save btn btn-default">Cancel</a>
+                        <a th:href="${cspListUrl}" class="save btn btn-default">Cancel</a>
                         <button type="submit" class="save btn btn-success">Save</button>
                     </div>
                 </div>

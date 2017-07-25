@@ -1,4 +1,4 @@
-package com.instrasoft.csp.ccs.domain.data;
+package com.instrasoft.csp.ccs.domain.data.table;
 
 
 import java.util.List;

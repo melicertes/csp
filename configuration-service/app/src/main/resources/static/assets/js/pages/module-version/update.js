@@ -1,15 +1,24 @@
 $(document).ready(function(){
 
     /*
-    UI handlers
+     UI handlers
      */
-    $('.p').mask("###", {placeholder: "___"});
+    $("#module_file").fileinput({
+        browseClass: "btn btn-default",
+        showCaption: true,
+        showRemove: true,
+        showUpload: false,
+        showPreview: false,
+        allowedFileExtensions: ['zip']
+    });
 
-    $('#module_is_default').checkboxpicker({});
+    //099.099.099.099
+    $('.v').mask("0.0.000", {placeholder: "_._.___"});
+
 
 
     /*
-    Validation
+     Validation
      */
     $.validator.setDefaults({
         highlight: function(element) {
@@ -30,13 +39,19 @@ $(document).ready(function(){
             }
         }
     });
-    var form = $("#module-form");
+    var form = $("#module-version-form");
     form.validate({
         rules: {
-            module_short_name: {
+            module_full_name: {
                 required: true
             },
-            module_start_priority: {
+            module_version: {
+                required: true
+            },
+            module_file: {
+                extension: "zip"
+            },
+            module_description: {
                 required: true
             }
         }
@@ -45,25 +60,28 @@ $(document).ready(function(){
         e.preventDefault();
 
         if (form.valid()) {
-            var formData = JSON.stringify($('#module-form').serializeObject());
+            var f = document.getElementById('module-version-form');
+            var formData = new FormData(f);
+
             $.ajax({
                 type: 'POST',
-                url: POST_URL,
+                url: POST_URL + "/" + $("#module_version_id").val(),
                 data: formData,
                 processData: false,
-                contentType:"application/json; charset=utf-8",
-                dataType:"json",
+                contentType: false,
                 success: function (response) {
+                    console.log(response);
+
                     if (response.responseCode === 0) {
-                        $('#module-form').find('input, textarea, button, select').val('');
-                        $('#module-form').find('input, textarea, button, select').attr('disabled', 'disabled');
+                        $('#module-version-form').find('input, textarea, button, select').val('');
+                        $('#module-version-form').find('input, textarea, button, select').attr('disabled', 'disabled');
                         $('#result').html('<div class="alert alert-dismissable alert-success"><a class="close" data-dismiss="alert" href="#" aria-hidden="true">×</a>'+response.responseText+'</div>');
                         setTimeout(function () {
                             window.location = REDIRECT_URL;
                         }, 100);
                     }
                     else {
-                        $('#result').html('<div class="alert alert-dismissable alert-danger"><a class="close" data-dismiss="alert" href="#" aria-hidden="true">×</a><strong>Error!</strong><br>'+response.responseText+'</div>');
+                        $('#result').html('<div class="alert alert-dismissable alert-danger"><a class="close" data-dismiss="alert" href="#" aria-hidden="true">×</a><strong>'+response.responseText+'</strong></div>');
                     }
                 }
             });

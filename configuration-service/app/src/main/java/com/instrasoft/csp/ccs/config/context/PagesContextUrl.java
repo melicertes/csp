@@ -14,4 +14,8 @@ public interface PagesContextUrl {
     String PAGES_MODULE_UPDATE = "/module/update.html";
     String PAGES_MODULE_REGISTER = "/module/register.html";
 
+    String PAGES_MODULE_VERSION_LIST = "/module/version/list.html";
+    String PAGES_MODULE_VERSION_UPDATE = "/module/version/update.html";
+    String PAGES_MODULE_VERSION_REGISTER = "/module/version/register.html";
+
 }

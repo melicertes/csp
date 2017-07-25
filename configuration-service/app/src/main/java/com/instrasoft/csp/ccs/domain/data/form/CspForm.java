@@ -1,7 +1,8 @@
-package com.instrasoft.csp.ccs.domain.data;
+package com.instrasoft.csp.ccs.domain.data.form;
 
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.instrasoft.csp.ccs.domain.data.Contact;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -2,8 +2,6 @@ package com.instrasoft.csp.ccs.repository;
 
 import com.instrasoft.csp.ccs.domain.postgresql.CspManagement;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,7 +14,11 @@ public interface CspManagementRepository extends JpaRepository<CspManagement, Lo
 
     List<CspManagement> findByCspIdAndModuleId(String cspId, Long moduleId);
 
+    List<CspManagement> findByModuleId(Long moduleId);
+
     List<CspManagement> findByModuleIdAndModuleVersionId(Long moduleId, Long moduleVersionId);
+
+    public CspManagement findTop1ByCspIdOrderByDateChangedDesc(String cspId);
 
     @Transactional
     List<CspManagement> removeByCspId(String cspId);

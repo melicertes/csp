@@ -13,6 +13,8 @@ public interface CspInfoRepository extends JpaRepository<CspInfo, Long> {
 
     public List<CspInfo> findByCspId(String cspId);
 
+    public CspInfo findTop1ByOrderByRecordDateTimeDesc();
+
     @Transactional
     List<CspInfo> removeByCspId(String cspId);
 }

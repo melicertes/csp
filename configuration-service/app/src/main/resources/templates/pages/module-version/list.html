@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="fragments::head(title='Modules', description='modules description')"></head>
+<head th:replace="fragments::head(title='Module Versions', description='module versions description')"></head>
 
 <body>
 
@@ -19,17 +19,17 @@
 
     <div class="row">
         <div class="col-md-12">
-            <h2 class="page-header"><i class="fa fa-circle-o-notch"></i> Modules</h2>
+            <h2 class="page-header"><i class="fa fa-bars"></i> Module Versions of Module: <span th:utext="${moduleData.getName()}"></span></h2>
         </div>
     </div>
 
     <div class="row">
         <div class="col-md-12">
             <div id="toolbar" class="btn-group">
-                <a th:href="${addModuleUrl}" class="btn btn-primary"><i class="glyphicon glyphicon-plus"></i> Register Module</a>
+                <a th:href="${addModuleVersionsUrl}" class="btn btn-primary"><i class="glyphicon glyphicon-plus"></i> Register Module Version</a>
             </div>
-            <table id="module-table" data-toggle="table"
-                   th:attr="data-url=${dataModuleUrl}"
+            <table id="module-version-table" data-toggle="table"
+                   th:attr="data-url=${dataModuleVersionsUrl}"
                    data-cache="false"
                    data-query-params="queryParams"
                    data-pagination="true"
@@ -43,10 +43,11 @@
                 <thead>
                 <tr>
                     <th data-field="icon" data-align="center"></th>
-                    <th data-field="shortName" data-sortable="true">Short Name</th>
-                    <th data-field="startPriority" data-sortable="true" data-align="center">Start Priority</th>
-                    <th data-field="isDefault" data-sortable="true" data-align="center">Default</th>
-                    <th data-field="versionsCount" data-sortable="true" data-align="center">Versions Count</th>
+                    <th data-field="fullName" data-sortable="true">Full Name</th>
+                    <th data-field="version" data-sortable="true" data-align="center">Version</th>
+                    <th data-field="releasedOn" data-sortable="true" data-align="center">Released On</th>
+                    <th data-field="hash" data-sortable="true" data-visible="false">Hash</th>
+                    <th data-field="description" data-sortable="true" data-visible="false">Description</th>
                     <th data-field="btn" data-sortable="false" data-align="center">Actions</th>
                 </tr>
                 </thead>
@@ -63,11 +64,11 @@
 
 <script th:inline="javascript">
     /*<![CDATA[*/
-    var REMOVE_URL = [[${removeModuleUrl}]];
+    var REMOVE_URL = [[${removeModuleVersionsUrl}]];
     /*]]>*/
 </script>
 
-<script th:src="@{/assets/js/pages/module/list.js}"></script>
+<script th:src="@{/assets/js/pages/module-version/list.js}"></script>
 
 </body>
 

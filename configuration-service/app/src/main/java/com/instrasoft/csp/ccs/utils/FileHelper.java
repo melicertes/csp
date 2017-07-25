@@ -11,6 +11,12 @@ import java.security.NoSuchAlgorithmException;
 
 public class FileHelper {
 
+    public static void removeFile(String filePath, String fileName) throws IOException {
+        File f = new File(filePath + fileName);
+        Path path = Paths.get(f.getAbsolutePath());
+        Files.delete(path);
+    }
+
     public static String getFileFromHash(String filePath, String hash) throws FileNotFoundException {
         File folder = new File(filePath);
         File[] files = folder.listFiles();

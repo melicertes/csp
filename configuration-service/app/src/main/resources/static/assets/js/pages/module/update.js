@@ -1,7 +1,7 @@
-$(document).ready(function(){
+$(document).ready(function() {
 
     /*
-    UI handlers
+     UI handlers
      */
     $('.p').mask("###", {placeholder: "___"});
 
@@ -9,7 +9,7 @@ $(document).ready(function(){
 
 
     /*
-    Validation
+     Validation
      */
     $.validator.setDefaults({
         highlight: function(element) {
@@ -48,7 +48,7 @@ $(document).ready(function(){
             var formData = JSON.stringify($('#module-form').serializeObject());
             $.ajax({
                 type: 'POST',
-                url: POST_URL,
+                url: POST_URL + "/" + $("#module_id").val(),
                 data: formData,
                 processData: false,
                 contentType:"application/json; charset=utf-8",
@@ -60,7 +60,7 @@ $(document).ready(function(){
                         $('#result').html('<div class="alert alert-dismissable alert-success"><a class="close" data-dismiss="alert" href="#" aria-hidden="true">×</a>'+response.responseText+'</div>');
                         setTimeout(function () {
                             window.location = REDIRECT_URL;
-                        }, 100);
+                        }, 1000);
                     }
                     else {
                         $('#result').html('<div class="alert alert-dismissable alert-danger"><a class="close" data-dismiss="alert" href="#" aria-hidden="true">×</a><strong>Error!</strong><br>'+response.responseText+'</div>');
@@ -70,6 +70,4 @@ $(document).ready(function(){
         }
 
     });
-
-
 });

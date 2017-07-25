@@ -1,15 +1,12 @@
-package com.instrasoft.csp.ccs.domain.data;
+package com.instrasoft.csp.ccs.domain.data.table;
 
 
-public class ModuleRow {
+public class ModuleVersionRow {
 
     private String icon;
-    private String shortName;
     private String fullName;
     private String version;
-    private String released;
-    private String isDefault;
-    private Integer priority;
+    private String releasedOn;
     private String hash;
     private String description;
     private String btn;
@@ -21,14 +18,6 @@ public class ModuleRow {
 
     public void setIcon(String icon) {
         this.icon = icon;
-    }
-
-    public String getShortName() {
-        return shortName;
-    }
-
-    public void setShortName(String shortName) {
-        this.shortName = shortName;
     }
 
     public String getFullName() {
@@ -47,28 +36,12 @@ public class ModuleRow {
         this.version = version;
     }
 
-    public String getReleased() {
-        return released;
+    public String getReleasedOn() {
+        return releasedOn;
     }
 
-    public void setReleased(String released) {
-        this.released = released;
-    }
-
-    public String getIsDefault() {
-        return isDefault;
-    }
-
-    public void setIsDefault(String isDefault) {
-        this.isDefault = isDefault;
-    }
-
-    public Integer getPriority() {
-        return priority;
-    }
-
-    public void setPriority(Integer priority) {
-        this.priority = priority;
+    public void setReleasedOn(String releasedOn) {
+        this.releasedOn = releasedOn;
     }
 
     public String getHash() {
@@ -98,14 +71,11 @@ public class ModuleRow {
 
     @Override
     public String toString() {
-        return "ModuleRow{" +
+        return "ModuleVersionRow{" +
                 "icon='" + icon + '\'' +
-                ", shortName='" + shortName + '\'' +
                 ", fullName='" + fullName + '\'' +
-                ", version='" + version + '\'' +
-                ", released='" + released + '\'' +
-                ", isDefault='" + isDefault + '\'' +
-                ", priority=" + priority +
+                ", version=" + version +
+                ", releasedOn='" + releasedOn + '\'' +
                 ", hash='" + hash + '\'' +
                 ", description='" + description + '\'' +
                 ", btn='" + btn + '\'' +
