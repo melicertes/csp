@@ -1,9 +1,7 @@
-package com.intrasoft.csp.controller;
+package com.intrasoft.csp.anon.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.intrasoft.csp.model.Rules;
-import com.intrasoft.csp.model.Ruleset;
-import com.intrasoft.csp.repository.RulesetRepository;
+import com.intrasoft.csp.anon.model.Ruleset;
+import com.intrasoft.csp.anon.repository.RulesetRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +16,6 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -70,16 +67,12 @@ public class RulesetsController {
             LOG.info(file.getOriginalFilename());
             byte[] bytes = file.getBytes();
             Path path = Paths.get(file.getOriginalFilename());
-            Files.write(path, bytes);
-            ruleset.setFile(file.getBytes());
+            ruleset.setFile(bytes);
             ruleset.setFilename(file.getOriginalFilename());
         } catch (IOException e) {
             redirectAttributes.addFlashAttribute("message", "Something went wrong");
             return "pages/rulesets";
         }
-
-        Rules rules = new ObjectMapper().readerFor(Rules.class).readValue(new String(file.getBytes()));
-        LOG.info(rules.toString());
 
         rulesetRepository.save(ruleset);
         List<Ruleset> rulesets =rulesetRepository.findAll();

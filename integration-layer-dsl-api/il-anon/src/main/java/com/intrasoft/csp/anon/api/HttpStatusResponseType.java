@@ -1,4 +1,4 @@
-package com.intrasoft.csp.api;
+package com.intrasoft.csp.anon.api;
 
 public enum HttpStatusResponseType {
 

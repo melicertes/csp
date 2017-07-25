@@ -1,6 +1,6 @@
-package com.intrasoft.csp.repository;
+package com.intrasoft.csp.anon.repository;
 
-import com.intrasoft.csp.model.Ruleset;
+import com.intrasoft.csp.anon.model.Ruleset;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -9,4 +9,6 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface RulesetRepository extends JpaRepository<Ruleset, Long> {
+
+
 }

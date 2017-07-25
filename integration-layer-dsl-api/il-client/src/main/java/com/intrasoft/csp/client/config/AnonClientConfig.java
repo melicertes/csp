@@ -11,13 +11,13 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 public class AnonClientConfig {
-    @Value("${anon.protocol}")
+    @Value("${anon.protocol:http}")
     private String protocol;
 
-    @Value("${anon.host}")
+    @Value("${anon.host:loclahost}")
     private String host;
 
-    @Value("${anon.port}")
+    @Value("${anon.port:8089}")
     private String port;
 
     @Bean(name = "anonClient")

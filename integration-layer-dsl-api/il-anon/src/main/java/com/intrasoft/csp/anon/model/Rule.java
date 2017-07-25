@@ -1,4 +1,4 @@
-package com.intrasoft.csp.model;
+package com.intrasoft.csp.anon.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -58,9 +58,16 @@ public class Rule {
         PSEUDO
     }
 
+    /*
+     * numbers are hashes #
+     * chars are asterisks *
+     * IP pseudonymization ###.###.###.###
+     * EMAIL pseudonymization ****@********
+     */
     private enum FieldType {
-        DATE,
         IP,
-        EMAIL
+        EMAIL,
+        STRING,
+        NUMBER
     }
 }
