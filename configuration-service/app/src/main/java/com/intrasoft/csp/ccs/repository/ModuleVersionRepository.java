@@ -21,6 +21,6 @@ public interface ModuleVersionRepository extends JpaRepository<ModuleVersion, Lo
 
     Long countByModuleId(Long moduleId);
 
-    @Query("select MV.version from ModuleVersion MV where MV.moduleId = :moduleId")
+    @Query("select MV.version from ModuleVersion MV where MV.moduleId = :moduleId order by MV.version asc")
     List<Integer> findVersionsByModuleId(@Param("moduleId") Long moduleId);
 }
