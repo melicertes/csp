@@ -7,6 +7,9 @@ import com.intrasoft.csp.anon.service.ApiDataHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,17 +33,11 @@ public class AnonController {
     ApiDataHandler apiDataHandler;
 
     @RequestMapping(value = "/v"+REST_API_V1+"/"+DATA_ANONYMIZATION,
-            consumes = {"application/json"},
-            produces = {"application/json"},
+            consumes = {MediaType.APPLICATION_JSON_VALUE},
+            produces = {MediaType.APPLICATION_JSON_VALUE},
             method = RequestMethod.POST)
-    public ResponseEntity<String> anonNewIntData(@RequestBody String postData) throws InvalidKeyException, NoSuchAlgorithmException, IOException {
+    public ResponseEntity anonData(@RequestBody IntegrationAnonData integrationAnonData) throws InvalidKeyException, NoSuchAlgorithmException, IOException {
         LOG.info("Anon Endpoint: POST received");
-        ObjectMapper mapper = new ObjectMapper();
-        IntegrationAnonData integrationAnonData = mapper.readValue(postData, IntegrationAnonData.class);
-//        IntegrationAnonData integrationAnonData = new IntegrationAnonData();
-//        integrationAnonData.setIntegrationData(integrationData);
-//        integrationAnonData.setCspId(integrationData.getDataParams().getCspId());
-//        integrationAnonData.setDataType(integrationData.getDataType().toString());
         return apiDataHandler.handleAnonIntegrationData(integrationAnonData);
     }
 

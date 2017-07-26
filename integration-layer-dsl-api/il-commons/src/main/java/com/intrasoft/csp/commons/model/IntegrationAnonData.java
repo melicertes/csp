@@ -1,47 +1,58 @@
 package com.intrasoft.csp.commons.model;
 
-import com.fasterxml.jackson.annotation.JsonValue;
+import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.databind.JsonNode;
+import jdk.nashorn.internal.ir.ObjectNode;
+
+import java.io.Serializable;
 
 
 /**
  * Created by chris on 26/6/2017.
  */
-public class IntegrationAnonData {
+public class IntegrationAnonData implements Serializable{
 
+    @JsonProperty("cspId")
     String cspId;
 
+    @JsonProperty("dataType")
     IntegrationDataType dataType;
 
-    Object dataObject;
+    @JsonProperty("dataObject")
+    JsonNode dataObject;
 
 
-
+    @JsonProperty("cspId")
     public String getCspId() {
         return cspId;
     }
-
+    @JsonProperty("cspId")
     public void setCspId(String cspId) {
         this.cspId = cspId;
     }
 
-    @JsonValue
+    @JsonProperty("dataType")
     public IntegrationDataType getDataType() {
         return dataType;
     }
 
+    @JsonProperty("dataType")
     public void setDataType(IntegrationDataType dataType) {
         this.dataType = dataType;
     }
 
+    @JsonProperty("dataType")
     public void setDataType(String dataTypeStr) {
         this.dataType = IntegrationDataType.fromValue(dataTypeStr);
     }
 
-    public Object getDataObject() {
+    @JsonProperty("dataObject")
+    public JsonNode getDataObject() {
         return dataObject;
     }
 
-    public void setDataObject(Object dataObject) {
+    @JsonProperty("dataObject")
+    public void setDataObject(JsonNode dataObject) {
         this.dataObject = dataObject;
     }
 
