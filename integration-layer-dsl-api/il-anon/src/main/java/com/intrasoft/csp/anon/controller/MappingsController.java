@@ -10,12 +10,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import javax.validation.Valid;
 import java.io.IOException;
 import java.util.List;
 
@@ -49,20 +49,42 @@ public class MappingsController {
         return rulesetRepository.findAll();
     }
 
-    @GetMapping("/")
-    public ModelAndView showMappings(Mapping mapping, Model model) {
+    @GetMapping("/mappings")
+    public ModelAndView showMappings(Mapping mapping) {
+        return new ModelAndView("pages/mappings", "mappings", getMappings());
+    }
+
+    @GetMapping("/mappings/{id}")
+    public ModelAndView showMappings(@PathVariable Long id) {
         ModelAndView mav = new ModelAndView("pages/mappings");
-        mav.addObject(mapping);
+        mav.addObject("mappings", getMappings());
+        Mapping mapping = mappingRepository.findOne(id);
+        LOG.info(mapping.toString());
+        mav.addObject("mapping", mapping);
         return mav;
     }
 
-    @PostMapping("/")
-    public ModelAndView addMapping(RedirectAttributes redirectAttributes, @ModelAttribute Mapping mapping, Model model) throws IOException {
-        LOG.info("POST: " + mapping.toString());
-        mappingRepository.save(mapping);
-        ModelAndView mav = new ModelAndView("pages/mappings");
-        mav.addObject(mapping);
-        mav.addObject(getMappings());
+    @PostMapping("/mapping/save")
+    public ModelAndView addMapping(RedirectAttributes redirect, @Valid Mapping mapping, BindingResult bindingResult) throws IOException {
+        LOG.info("CREATE mapping: " + mapping.toString());
+        if (bindingResult.hasErrors()) {
+            return new ModelAndView("pages/mappings");
+        }
+        Mapping newMapping = mappingRepository.save(mapping);
+        ModelAndView mav = new ModelAndView("redirect:/mappings/" + mapping.getId());
+        mav.addObject("mappings", getMappings());
+        mav.addObject("mapping",newMapping);
+        redirect.addFlashAttribute("msg", "Mapping created");
+        return mav;
+    }
+
+    @GetMapping("/mapping/delete/{id}")
+    public ModelAndView deleteMapping(@PathVariable Long id, RedirectAttributes redirect) throws IOException {
+        LOG.info("DELETE mapping with id: " + id);
+        mappingRepository.delete(id);
+        ModelAndView mav = new ModelAndView("redirect:/mappings");
+        mav.addObject("mappings",getMappings());
+        redirect.addFlashAttribute("msg", "Mapping deleted");
         return mav;
     }
 

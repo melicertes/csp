@@ -5,8 +5,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.intrasoft.csp.anon.model.Rule;
 import com.intrasoft.csp.anon.model.Rules;
 import com.intrasoft.csp.anon.utils.HMAC;
+import com.intrasoft.csp.commons.exceptions.InvalidDataTypeException;
 import com.intrasoft.csp.commons.model.IntegrationAnonData;
 import com.intrasoft.csp.commons.model.IntegrationDataType;
+import com.intrasoft.csp.commons.validators.IntegrationDataValidator;
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.TypeRef;
@@ -19,6 +21,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.BindingResult;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -50,6 +54,9 @@ public class ApiDataHandler {
 
         String cspId = integrationAnonData.getCspId();
         IntegrationDataType dataType = integrationAnonData.getDataType();
+        if (dataType == null){
+            throw new InvalidDataTypeException("Unknown Datatype");
+        }
 
 //        String jsonString = mapper.writeValueAsString(integrationAnonData.getDataObject());
 //        JsonNode out = JsonPath.using(configuration).parse(jsonString).json();

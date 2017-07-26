@@ -9,8 +9,8 @@
     <link th:href="@{/webjars/font-awesome/4.7.0/css/font-awesome.min.css}" rel="stylesheet" media="screen" />
     <link th:href="@{/webjars/bootstrap-fileinput/4.2.0/css/fileinput.min.css}" rel="stylesheet"/>
 
-    <link rel="stylesheet" th:href="@{/theme/css/jumbotron.css}"/>
-    <link rel="stylesheet" th:href="@{/theme/css/custom.css}"/>
+    <link rel="stylesheet" th:href="@{/css/jumbotron.css}"/>
+    <link rel="stylesheet" th:href="@{/css/custom.css}"/>
 
 </head>
 <body>
@@ -30,7 +30,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
         </button>
-        <a class="navbar-brand-icon fa fa-user-secret fa-3x" href="pages/dashboard.html" th:href="@{/}">
+        <a class="navbar-brand-icon fa fa-user-secret fa-3x" href="pages/mappings" th:href="@{/mappings}">
             <!--<img src="../static/assets/logo.png" th:src="@{/assets/logo.png}" style="float: left; margin-top: -15px;"/>-->
         </a>
         <span class="navbar-brand" style="">CSP - Anonymization Service</span>
@@ -38,10 +38,10 @@
 
     </div>
     <ul class="nav navbar-nav">
-        <li class="" th:class="${navHomeClassActive}"><a href="/">
+        <li class="" th:class="${navHomeClassActive}"><a href="/mappings">
             <i class="fa fa-list"></i> Mappings</a>
         </li>
-        <li class="" th:class="${navCspClassActive}"><a href="/rulesets.html">
+        <li class="" th:class="${navCspClassActive}"><a href="/rulesets">
             <i class="fa  fa-gavel"></i> Rulesets</a>
         </li>
     </ul>
