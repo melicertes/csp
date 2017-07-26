@@ -98,6 +98,17 @@
 
     <script th:src="@{/webjars/bootstrap-table/1.9.1/bootstrap-table.js}"></script>
     <script th:src="@{/webjars/bootstrap-table/1.9.1/locale/bootstrap-table-en-US.js}"></script>
+
+    <script>
+        $(document).ready(function () {
+            $("a").tooltip({
+                'selector': '',
+                'placement': 'top',
+                'container':'body'
+            });
+        });
+    </script>
+
 </th:block>
 </body>
 </html>

@@ -19,15 +19,23 @@
 
     <div class="row">
         <div class="col-md-12">
-            <h2 class="page-header"><i class="fa fa-gavel"></i> Rulesets</h2>
+            <h2 class="page-header"><i class="fa fa-gavel"></i> Rulesets
+            <th:a th:href="${'#'}" th:class="pull-right" th:data-placement="bottom" th:rel="tooltip" th:title="${'help tooltip'}">
+                <i class="fa fa-question-circle-o" aria-hidden="true"></i>
+            </th:a></h2>
         </div>
     </div>
-
+    <div class = "alert alert-success" th:if="${msg}">
+        <span th:text="${msg}"></span>
+    </div>
+    <div class = "alert alert-danger" th:if="${error}">
+        <span th:text="${error}"></span>
+    </div>
     <div class="row">
         <div class="col-md-12 col-sm-12">
             <div class="row" data-duplicate="contact" data-duplicate-min="2" data-duplicate-max="10">
                 <div class="row">
-                    <form th:action="@{/rulesets}" th:object="${ruleset}" method="post" enctype="multipart/form-data">
+                    <form th:action="@{/rulesets/save}" th:object="${ruleset}" method="post" enctype="multipart/form-data">
                         <div class="col-md-12 col-xs-12">
                             <div class="form-group">
                                 <label for="file">File:</label>
@@ -42,7 +50,7 @@
                         </div>
                         <div class="col-md-2 col-xs-12 pull-down">
                             <div class="form-group">
-                                <button type="submit" value="Submit" class="save btn btn-success">Import file</button>
+                                <button th:href="'rulesets/save'" type="submit" value="Submit" class="save btn btn-success">Save</button>&nbsp;
                                 <button type="reset" value="Reset" class="save btn btn-default pull-right">Clear</button>
                             </div>
                         </div>
@@ -68,9 +76,27 @@
                                 <td th:text="${iterStat.count}"></td>
                                 <td th:text="${ruleset.filename}"></td>
                                 <td th:text="${ruleset.description}"></td>
-                                <td><i class="fa fa-trash-o" aria-hidden="true"></i>
-                                    <i class="fa fa-edit" aria-hidden="true"></i>
-                                </td>
+                                <td><a th:href="'#'+${ruleset.id}"  data-toggle="modal" ><i class="fa fa-trash" aria-hidden="true"></i></a>
+                                    <a th:href="'/rulesets/'+${ruleset.id}"><i class="fa fa-edit" aria-hidden="true"></i></a></td>
+                                <!-- Modal -->
+                                <div class="modal fade" th:id="${ruleset.id}" aria-labelledby="tiketLabel" tabindex="-1" role="dialog" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                                                <h4 class="modal-title" id="tiketLabel"><span th:text="Confirm"></span></h4>
+                                            </div>
+                                            <div class="modal-body">
+                                                <h4 class="modal-title" th:id="tiketLabel">Are you sure you want to delete this ruleset ?
+                                                </h4>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <a th:href="@{'/ruleset/delete/' + ${ruleset.id}}" class="btn btn-danger pull-left">Delete</a>
+                                                <button class="btn btn-default pull-right" data-dismiss="modal">No</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </tr>
                         </table>
                     </div>
