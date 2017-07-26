@@ -186,7 +186,7 @@ public class CspServerInternalBusinessTestFlow1dataTypes implements CamelRoutes 
         mockUtils.sendFlow1Data(mvc, serverName,false, true, IntegrationDataType.THREAT, HttpMethods.POST.name());
 
         // Expect 1-messages/teams from ESCP according to CERT-GR configuration for THREAT on csp2.dangerduck.gr
-        _flowImpl(IntegrationDataType.THREAT, 1);
+        _flowImpl(IntegrationDataType.THREAT, getEcspMessagesCount(IntegrationDataType.THREAT));
 
         //Thread.sleep(10*1000); //to avoid "Rejecting received message because of the listener container having been stopped in the meantime"
         //be careful when debugging, you might miss breakpoints if the time is not enough
@@ -374,11 +374,12 @@ public class CspServerInternalBusinessTestFlow1dataTypes implements CamelRoutes 
                         "Team: "+team.toString());
             }
 
+            //TODO: TC bug here, see SXCSP-255. We should use cspId and not shortName
             if (!team.getShortName().toLowerCase().trim().equals(serverName.toLowerCase().trim())){
                 teams.add(team);
             }
         }
-
+        LOG.info("Total teams to assert: "+teams.size());
         return teams.size();
     }
 
