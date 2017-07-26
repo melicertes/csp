@@ -13,14 +13,14 @@ $(document).ready(function(){
         e.preventDefault();
     });
 
-    $('body').on('click', 'a.module-version-delete', function(e) {
+    $('body').on('click', 'a.module-delete', function(e) {
         e.preventDefault();
-        var moduleVersionId = $(this).attr('data-module-version-id');
-        var moduleVersionName = $(this).attr('data-module-version-name');
+        var moduleId = $(this).attr('data-module-id');
+        var moduleName = $(this).attr('data-module-name');
         BootstrapDialog.confirm({
             title: 'Confirmation',
-            size: BootstrapDialog.SIZE_SMALL,
-            message: 'Are you sure to delete Module Version:<br><strong>' + moduleVersionName + '</strong><br> and its related information?',
+            size: BootstrapDialog.SIZE_NORMAL,
+            message: 'Are you sure to delete Module: <strong>' + moduleName + '</strong> and its related information?',
             type: BootstrapDialog.TYPE_WARNING,
             closable: false,
             draggable: true,
@@ -32,7 +32,7 @@ $(document).ready(function(){
                 if(result) {
                     $.ajax({
                         type: 'POST',
-                        url: REMOVE_URL + "/" + moduleVersionId,
+                        url: REMOVE_URL + "/" + moduleId,
                         processData: false,
                         contentType:"application/json; charset=utf-8",
                         dataType:"json",
@@ -48,7 +48,7 @@ $(document).ready(function(){
                                 BootstrapDialog.show({
                                     title: 'Error',
                                     type: BootstrapDialog.TYPE_DANGER,
-                                    size: BootstrapDialog.SIZE_SMALL,
+                                    size: BootstrapDialog.SIZE_NORMAL,
                                     message: response.responseText,
                                     closable: true,
                                     closeByBackdrop: false,

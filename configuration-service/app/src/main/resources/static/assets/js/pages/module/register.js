@@ -3,20 +3,9 @@ $(document).ready(function(){
     /*
     UI handlers
      */
-    $("#module_file").fileinput({
-        browseClass: "btn btn-default",
-        showCaption: true,
-        showRemove: true,
-        showUpload: false,
-        showPreview: false,
-        allowedFileExtensions: ['zip']
-    });
-
-    //099.099.099.099
-    $('.v').mask("0.0.000", {placeholder: "_._.___"});
     $('.p').mask("###", {placeholder: "___"});
 
-    $('#module_default').checkboxpicker({});
+    $('#module_is_default').checkboxpicker({});
 
 
     /*
@@ -47,20 +36,7 @@ $(document).ready(function(){
             module_short_name: {
                 required: true
             },
-            module_full_name: {
-                required: true
-            },
-            module_version: {
-                required: true
-            },
-            module_priority: {
-                required: true
-            },
-            module_file: {
-                required: true,
-                extension: "zip"
-            },
-            module_description: {
+            module_start_priority: {
                 required: true
             }
         }
@@ -69,28 +45,25 @@ $(document).ready(function(){
         e.preventDefault();
 
         if (form.valid()) {
-            var f = document.getElementById('module-form');
-            var formData = new FormData(f);
-
+            var formData = JSON.stringify($('#module-form').serializeObject());
             $.ajax({
                 type: 'POST',
                 url: POST_URL,
                 data: formData,
                 processData: false,
-                contentType: false,
+                contentType:"application/json; charset=utf-8",
+                dataType:"json",
                 success: function (response) {
-                    console.log(response);
-
                     if (response.responseCode === 0) {
                         $('#module-form').find('input, textarea, button, select').val('');
                         $('#module-form').find('input, textarea, button, select').attr('disabled', 'disabled');
                         $('#result').html('<div class="alert alert-dismissable alert-success"><a class="close" data-dismiss="alert" href="#" aria-hidden="true">×</a>'+response.responseText+'</div>');
                         setTimeout(function () {
                             window.location = REDIRECT_URL;
-                        }, 1000);
+                        }, 100);
                     }
                     else {
-                        $('#result').html('<div class="alert alert-dismissable alert-danger"><a class="close" data-dismiss="alert" href="#" aria-hidden="true">×</a><strong>'+response.responseText+'</strong><br>'+response.responseException+'</div>');
+                        $('#result').html('<div class="alert alert-dismissable alert-danger"><a class="close" data-dismiss="alert" href="#" aria-hidden="true">×</a><strong>Error!</strong><br>'+response.responseText+'</div>');
                     }
                 }
             });
