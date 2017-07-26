@@ -1,6 +1,7 @@
 package com.intrasoft.csp.integration.business.server.internal;
 
 
+import com.intrasoft.csp.commons.constants.AppProperties;
 import com.intrasoft.csp.commons.model.IntegrationData;
 import com.intrasoft.csp.commons.model.IntegrationDataType;
 import com.intrasoft.csp.commons.routes.CamelRoutes;
@@ -243,6 +244,7 @@ public class CspServerInternalBusinessTestFlow2 implements CamelRoutes {
         mockedDsl.expectedMessageCount(1);
         mockedDsl.assertIsSatisfied();
 
+        boolean isExternal = false;
 
         list = mockedDsl.getReceivedExchanges();
         for (Exchange exchange : list) {
@@ -251,6 +253,7 @@ public class CspServerInternalBusinessTestFlow2 implements CamelRoutes {
             assertThat(data.getDataType(), is(this.dataTypeToTest));
             assertThat(data.getSharingParams().getIsExternal(), is(true));
             assertThat(data.getSharingParams().getToShare(), is(true));
+            isExternal = data.getSharingParams().getIsExternal();
         }
 
         /*
@@ -259,7 +262,7 @@ public class CspServerInternalBusinessTestFlow2 implements CamelRoutes {
         // The data type to test is defined in class -> private IntegrationDataType dataTypeToTest = IntegrationDataType.VULNERABILITY;
         // The application id is "taranis"
         // Expect 1-messages according to application.properties (external.vulnerability.apps:taranis)
-        mockedApp.expectedMessageCount(1);
+        mockedApp.expectedMessageCount(env.getProperty((isExternal? AppProperties.EXTERNAL:AppProperties.INTERNAL)+"."+this.dataTypeToTest.name().toLowerCase()+".apps").split(",").length);
         mockedApp.assertIsSatisfied();
 
         list = mockedApp.getReceivedExchanges();
