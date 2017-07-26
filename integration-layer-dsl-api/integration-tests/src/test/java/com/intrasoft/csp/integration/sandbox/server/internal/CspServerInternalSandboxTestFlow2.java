@@ -32,6 +32,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.core.env.Environment;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.util.StringUtils;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.util.HashMap;
@@ -47,6 +48,7 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
 @RunWith(CamelSpringBootRunner.class)
 @SpringBootTest(classes = {CspApp.class, MockUtils.class},
         properties = {
+                "server.name:CERT-EU",
                 "csp.retry.backOffPeriod:10",
                 "csp.retry.maxAttempts:1",
                 "embedded.activemq.start:false",
@@ -92,11 +94,15 @@ public class CspServerInternalSandboxTestFlow2 {
     private Integer currentCspId = 0;
     private final IntegrationDataType dataTypeToTest = IntegrationDataType.VULNERABILITY;
     private final String applicationId = "taranis";
-    private final String cspId = "CERT-GR";
+    private String cspId = "CERT-GR";
 
 
     @Before
     public void init() throws Exception {
+        String cspIdArg = env.getProperty("extCspId");
+        if(!StringUtils.isEmpty(cspIdArg)){
+            cspId = cspIdArg;
+        }
         mvc = webAppContextSetup(webApplicationContext).build();
         MockitoAnnotations.initMocks(this);
         mockUtils.setSpringCamelContext(springCamelContext);

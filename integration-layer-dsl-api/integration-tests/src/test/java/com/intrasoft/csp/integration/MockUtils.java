@@ -168,11 +168,11 @@ public class MockUtils implements ContextUrl {
 
 
 
-    public void sendFlow1Data(MockMvc mvc, Boolean isExternal, Boolean toShare, IntegrationDataType dataType, String httpMethod) throws Exception {
-        sendFlow1Data(mvc,"taranis", isExternal,toShare,dataType,httpMethod);
+    public void sendFlow1Data(MockMvc mvc,String cspId, Boolean isExternal, Boolean toShare, IntegrationDataType dataType, String httpMethod) throws Exception {
+        sendFlow1Data(mvc,cspId,"taranis", isExternal,toShare,dataType,httpMethod);
     }
 
-    public void sendFlow1Data(MockMvc mvc, String applicationId, Boolean isExternal, Boolean toShare, IntegrationDataType dataType, String httpMethod) throws Exception {
+    public void sendFlow1Data(MockMvc mvc, String cspId, String applicationId, Boolean isExternal, Boolean toShare, IntegrationDataType dataType, String httpMethod) throws Exception {
         IntegrationData integrationData = new IntegrationData();
         integrationData.setDataType(dataType);
         SharingParams sharingParams = new SharingParams();
@@ -183,8 +183,8 @@ public class MockUtils implements ContextUrl {
         dataParams.setRecordId("222");
         dataParams.setDateTime(DateTime.now());
         dataParams.setApplicationId(applicationId);
-        dataParams.setCspId("CERT-GR");
-        dataParams.setOriginCspId("origin-CERT-GR");
+        dataParams.setCspId(cspId);
+        dataParams.setOriginCspId("origin-"+cspId);
         dataParams.setOriginApplicationId("origin-"+applicationId);
         dataParams.setOriginRecordId("origin-222");
         integrationData.setDataParams(dataParams);
