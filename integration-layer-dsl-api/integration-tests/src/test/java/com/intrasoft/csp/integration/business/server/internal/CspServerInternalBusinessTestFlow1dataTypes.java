@@ -183,7 +183,7 @@ public class CspServerInternalBusinessTestFlow1dataTypes implements CamelRoutes 
     @DirtiesContext
     @Test
     public void testDslFlow1PostDataTypeThreat() throws Exception {
-        mockUtils.sendFlow1Data(mvc, false, true, IntegrationDataType.THREAT, HttpMethods.POST.name());
+        mockUtils.sendFlow1Data(mvc, serverName,false, true, IntegrationDataType.THREAT, HttpMethods.POST.name());
 
         // Expect 1-messages/teams from ESCP according to CERT-GR configuration for THREAT on csp2.dangerduck.gr
         _flowImpl(IntegrationDataType.THREAT, 1);
@@ -195,7 +195,7 @@ public class CspServerInternalBusinessTestFlow1dataTypes implements CamelRoutes 
     @DirtiesContext
     @Test
     public void testDslFlow1PutDataTypeThreat() throws Exception {
-        mockUtils.sendFlow1Data(mvc, false, true, IntegrationDataType.THREAT, HttpMethods.PUT.name());
+        mockUtils.sendFlow1Data(mvc, serverName,false, true, IntegrationDataType.THREAT, HttpMethods.PUT.name());
 
         // Expect 1-messages/teams from ESCP according to CERT-GR configuration for THREAT on csp2.dangerduck.gr
         _flowImpl(IntegrationDataType.THREAT, getEcspMessagesCount(IntegrationDataType.THREAT));
@@ -207,7 +207,7 @@ public class CspServerInternalBusinessTestFlow1dataTypes implements CamelRoutes 
     @DirtiesContext
     @Test
     public void testDslFlow1PostDataTypeArtefact() throws Exception {
-        mockUtils.sendFlow1Data(mvc, false, true, IntegrationDataType.ARTEFACT, HttpMethods.POST.name());
+        mockUtils.sendFlow1Data(mvc, serverName, false, true, IntegrationDataType.ARTEFACT, HttpMethods.POST.name());
 
         // Expect 1-messages/teams from ESCP according to CERT-GR configuration for ARTEFACT on csp2.dangerduck.gr
         _flowImpl(IntegrationDataType.ARTEFACT, getEcspMessagesCount(IntegrationDataType.ARTEFACT));
@@ -219,7 +219,7 @@ public class CspServerInternalBusinessTestFlow1dataTypes implements CamelRoutes 
     @DirtiesContext
     @Test
     public void testDslFlow1PutDataTypeArtefact() throws Exception {
-        mockUtils.sendFlow1Data(mvc, false, true, IntegrationDataType.ARTEFACT, HttpMethods.PUT.name());
+        mockUtils.sendFlow1Data(mvc, serverName, false, true, IntegrationDataType.ARTEFACT, HttpMethods.PUT.name());
 
         // Expect 1-messages/teams from ESCP according to CERT-GR configuration for ARTEFACT on csp2.dangerduck.gr
         _flowImpl(IntegrationDataType.ARTEFACT, getEcspMessagesCount(IntegrationDataType.ARTEFACT));
@@ -231,7 +231,7 @@ public class CspServerInternalBusinessTestFlow1dataTypes implements CamelRoutes 
     @DirtiesContext
     @Test
     public void testDslFlow1PostDataTypeTrustcircle() throws Exception {
-        mockUtils.sendFlow1Data(mvc, false, true, IntegrationDataType.TRUSTCIRCLE, HttpMethods.POST.name());
+        mockUtils.sendFlow1Data(mvc, serverName, false, true, IntegrationDataType.TRUSTCIRCLE, HttpMethods.POST.name());
 
         // Expect 3-messages/teams from ESCP according to CERT-GR configuration for TRUSTCIRCLE on csp2.dangerduck.gr
         _flowImpl(IntegrationDataType.TRUSTCIRCLE, getEcspMessagesCount(IntegrationDataType.TRUSTCIRCLE));
@@ -243,7 +243,7 @@ public class CspServerInternalBusinessTestFlow1dataTypes implements CamelRoutes 
     @DirtiesContext
     @Test
     public void testDslFlow1PutDataTypeTrustcircle() throws Exception {
-        mockUtils.sendFlow1Data(mvc, false, true, IntegrationDataType.TRUSTCIRCLE, HttpMethods.PUT.name());
+        mockUtils.sendFlow1Data(mvc,serverName, false, true, IntegrationDataType.TRUSTCIRCLE, HttpMethods.PUT.name());
 
         // Expect 3-messages/teams from ESCP according to CERT-GR configuration for TRUSTCIRCLE on csp2.dangerduck.gr
         _flowImpl(IntegrationDataType.TRUSTCIRCLE, getEcspMessagesCount(IntegrationDataType.TRUSTCIRCLE));

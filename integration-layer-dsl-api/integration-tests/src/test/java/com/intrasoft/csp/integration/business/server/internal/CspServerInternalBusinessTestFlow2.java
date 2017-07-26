@@ -26,6 +26,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.env.Environment;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.util.StringUtils;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.util.List;
@@ -117,10 +118,16 @@ public class CspServerInternalBusinessTestFlow2 implements CamelRoutes {
     private Integer currentCspId = 0;
     private final IntegrationDataType dataTypeToTest = IntegrationDataType.VULNERABILITY;
     private final String applicationId = "taranis";
-    private final String cspId = "CERT-GR";
+    private String cspId = "CERT-GR";
 
     @Before
     public void init() throws Exception {
+        //check arguments if external cspId was provided
+        String cspIdArg = env.getProperty("extCspId");
+        if(!StringUtils.isEmpty(cspIdArg)){
+            cspId = cspIdArg;
+        }
+        //cspId = env.getProperty("server.name");
         mvc = webAppContextSetup(webApplicationContext).build();
         mockUtils.setSpringCamelContext(springCamelContext);
 
