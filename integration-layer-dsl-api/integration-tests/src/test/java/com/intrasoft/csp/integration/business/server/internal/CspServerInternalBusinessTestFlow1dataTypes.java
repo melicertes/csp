@@ -168,9 +168,9 @@ public class CspServerInternalBusinessTestFlow1dataTypes implements CamelRoutes 
         mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX, routes.apply(ELASTIC), mockedElastic.getEndpointUri());
 
         //Initialize internalApps Hashmap according application.properties (internal section)
-        internalApps.put(IntegrationDataType.THREAT, 1);
-        internalApps.put(IntegrationDataType.ARTEFACT, 2);
-        internalApps.put(IntegrationDataType.TRUSTCIRCLE, 1);
+        internalApps.put(IntegrationDataType.THREAT, env.getProperty("internal.threat.apps").split(",").length);
+        internalApps.put(IntegrationDataType.ARTEFACT, env.getProperty("internal.artefact.apps").split(",").length);
+        internalApps.put(IntegrationDataType.TRUSTCIRCLE, env.getProperty("internal.trustcircle.apps").split(",").length);
 
         serverName = env.getProperty("server.name");
         tcProtocol=env.getProperty("tc.protocol");
