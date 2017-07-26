@@ -34,6 +34,7 @@ import org.springframework.web.context.WebApplicationContext;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
@@ -153,7 +154,7 @@ public class CspServerInternalBusinessTestFlow1verbs implements CamelRoutes {
     public void testDslFlow1PostToShare() throws Exception {
         mockUtils.sendFlow1Data(mvc,serverName, applicationId, false, true, this.dataTypeToTest, HttpMethods.POST.name());
 
-        _toSharePostPutFlowImpl(tcProcessor.getEcspMessagesCount(this.dataTypeToTest));
+        _toSharePostPutFlowImpl(tcProcessor.getTcTeams(this.dataTypeToTest).size());
 
         //Thread.sleep(10*1000); //to avoid "Rejecting received message because of the listener container having been stopped in the meantime"
         //be careful when debugging, you might miss breakpoints if the time is not enough
@@ -164,7 +165,7 @@ public class CspServerInternalBusinessTestFlow1verbs implements CamelRoutes {
     public void testDslFlow1PutToShare() throws Exception {
         mockUtils.sendFlow1Data(mvc,serverName, applicationId, false, true, this.dataTypeToTest, HttpMethods.PUT.name());
 
-        _toSharePostPutFlowImpl(tcProcessor.getEcspMessagesCount(this.dataTypeToTest));
+        _toSharePostPutFlowImpl(tcProcessor.getTcTeams(this.dataTypeToTest).size());
 
         //Thread.sleep(10*1000); //to avoid "Rejecting received message because of the listener container having been stopped in the meantime"
         //be careful when debugging, you might miss breakpoints if the time is not enough
@@ -291,7 +292,8 @@ public class CspServerInternalBusinessTestFlow1verbs implements CamelRoutes {
         for (Exchange exchange : list) {
             Message in = exchange.getIn();
             EnhancedTeamDTO enhancedTeamDTO = in.getBody(EnhancedTeamDTO.class);
-            assertThat(enhancedTeamDTO.getTeam().getUrl(), is("http://csp2.dangerduck.gr:8081"));
+            assertThat(tcProcessor.getTcTeams(this.dataTypeToTest).stream()
+                    .anyMatch(t->t.getUrl().toLowerCase().equals(enhancedTeamDTO.getTeam().getUrl())),is(true));
         }
 
         //ELASTIC

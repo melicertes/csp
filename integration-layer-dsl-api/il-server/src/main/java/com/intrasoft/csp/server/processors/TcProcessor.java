@@ -133,7 +133,13 @@ public class TcProcessor implements Processor,CamelRoutes{
     }
 
 
-    public Integer getEcspMessagesCount(IntegrationDataType integrationDataType) throws IOException {
+    public List<Team> getTcTeams(IntegrationDataType integrationDataType) throws IOException {
+        String uri = getTcUri(integrationDataType);
+        List<Team> teams = getTcTeams(uri);
+        return teams;
+    }
+
+    public String getTcUri(IntegrationDataType integrationDataType) throws IOException {
         String uri = null;
         String getAllTcUri = this.getTcCirclesURI();
         List<TrustCircle> tcList = camelRestService.sendAndGetList(getAllTcUri, null,  HttpMethod.GET.name(), TrustCircle.class,null);
@@ -144,9 +150,7 @@ public class TcProcessor implements Processor,CamelRoutes{
         }else{
             throw new CspBusinessException("Integration Test error: Could not find trust circle id for this data. ");
         }
-
-        List<Team> teams = getTcTeams(uri);
-        return teams.size();
+        return uri;
     }
 
     private void sendByTeamId(String teamId, Exchange exchange) throws IOException {
