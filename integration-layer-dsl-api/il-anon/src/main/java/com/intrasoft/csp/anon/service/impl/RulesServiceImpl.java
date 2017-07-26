@@ -26,9 +26,11 @@ public class RulesServiceImpl implements RulesService {
 
     @Override
     public Rules getRule(IntegrationDataType integrationDataType, String cspId) throws IOException {
-        ObjectMapper mapper = new ObjectMapper();
-        Mapping mapping = mappingRepository.findDistinctByDataType(integrationDataType).get(0);
-        Rules rules = new ObjectMapper().readerFor(Rules.class).readValue(new String(mapping.getRuleset().getFile()));
+        Mapping mapping = mappingRepository.findTopByDataTypeAndCspId(integrationDataType, cspId);
+        Rules rules = null;
+        if (mapping != null){
+            rules = new ObjectMapper().readerFor(Rules.class).readValue(new String(mapping.getRuleset().getFile()));
+        }
         return rules;
     }
 }

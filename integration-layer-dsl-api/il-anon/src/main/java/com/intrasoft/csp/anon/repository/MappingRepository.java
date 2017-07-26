@@ -11,5 +11,5 @@ import java.util.List;
 @Repository
 public interface MappingRepository extends JpaRepository <Mapping, Long>{
 
-    public List<Mapping> findDistinctByDataType(IntegrationDataType integrationDataType);
+    public Mapping findTopByDataTypeAndCspId(IntegrationDataType integrationDataType, String cspId);
 }
