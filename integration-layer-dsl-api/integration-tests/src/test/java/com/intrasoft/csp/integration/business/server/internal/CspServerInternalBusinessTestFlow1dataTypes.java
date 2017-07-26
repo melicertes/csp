@@ -6,6 +6,7 @@ import com.intrasoft.csp.commons.model.*;
 import com.intrasoft.csp.commons.routes.CamelRoutes;
 import com.intrasoft.csp.integration.MockUtils;
 import com.intrasoft.csp.server.CspApp;
+import com.intrasoft.csp.server.processors.TcProcessor;
 import com.intrasoft.csp.server.routes.RouteUtils;
 import com.intrasoft.csp.server.service.CamelRestService;
 import com.intrasoft.csp.server.service.ErrorMessageHandler;
@@ -137,6 +138,9 @@ public class CspServerInternalBusinessTestFlow1dataTypes implements CamelRoutes 
     ErrorMessageHandler errorMessageHandler;
 
     @Autowired
+    TcProcessor tcProcessor;
+
+    @Autowired
     Environment env;
 
     private Integer numOfCspsToTest = 3;
@@ -186,7 +190,7 @@ public class CspServerInternalBusinessTestFlow1dataTypes implements CamelRoutes 
         mockUtils.sendFlow1Data(mvc, serverName,false, true, IntegrationDataType.THREAT, HttpMethods.POST.name());
 
         // Expect 1-messages/teams from ESCP according to CERT-GR configuration for THREAT on csp2.dangerduck.gr
-        _flowImpl(IntegrationDataType.THREAT, getEcspMessagesCount(IntegrationDataType.THREAT));
+        _flowImpl(IntegrationDataType.THREAT, tcProcessor.getEcspMessagesCount(IntegrationDataType.THREAT));
 
         //Thread.sleep(10*1000); //to avoid "Rejecting received message because of the listener container having been stopped in the meantime"
         //be careful when debugging, you might miss breakpoints if the time is not enough
@@ -198,7 +202,7 @@ public class CspServerInternalBusinessTestFlow1dataTypes implements CamelRoutes 
         mockUtils.sendFlow1Data(mvc, serverName,false, true, IntegrationDataType.THREAT, HttpMethods.PUT.name());
 
         // Expect 1-messages/teams from ESCP according to CERT-GR configuration for THREAT on csp2.dangerduck.gr
-        _flowImpl(IntegrationDataType.THREAT, getEcspMessagesCount(IntegrationDataType.THREAT));
+        _flowImpl(IntegrationDataType.THREAT, tcProcessor.getEcspMessagesCount(IntegrationDataType.THREAT));
 
         //Thread.sleep(10*1000); //to avoid "Rejecting received message because of the listener container having been stopped in the meantime"
         //be careful when debugging, you might miss breakpoints if the time is not enough
@@ -210,7 +214,7 @@ public class CspServerInternalBusinessTestFlow1dataTypes implements CamelRoutes 
         mockUtils.sendFlow1Data(mvc, serverName, false, true, IntegrationDataType.ARTEFACT, HttpMethods.POST.name());
 
         // Expect 1-messages/teams from ESCP according to CERT-GR configuration for ARTEFACT on csp2.dangerduck.gr
-        _flowImpl(IntegrationDataType.ARTEFACT, getEcspMessagesCount(IntegrationDataType.ARTEFACT));
+        _flowImpl(IntegrationDataType.ARTEFACT, tcProcessor.getEcspMessagesCount(IntegrationDataType.ARTEFACT));
 
         //Thread.sleep(10*1000); //to avoid "Rejecting received message because of the listener container having been stopped in the meantime"
         //be careful when debugging, you might miss breakpoints if the time is not enough
@@ -222,7 +226,7 @@ public class CspServerInternalBusinessTestFlow1dataTypes implements CamelRoutes 
         mockUtils.sendFlow1Data(mvc, serverName, false, true, IntegrationDataType.ARTEFACT, HttpMethods.PUT.name());
 
         // Expect 1-messages/teams from ESCP according to CERT-GR configuration for ARTEFACT on csp2.dangerduck.gr
-        _flowImpl(IntegrationDataType.ARTEFACT, getEcspMessagesCount(IntegrationDataType.ARTEFACT));
+        _flowImpl(IntegrationDataType.ARTEFACT, tcProcessor.getEcspMessagesCount(IntegrationDataType.ARTEFACT));
 
         //Thread.sleep(10*1000); //to avoid "Rejecting received message because of the listener container having been stopped in the meantime"
         //be careful when debugging, you might miss breakpoints if the time is not enough
@@ -234,7 +238,7 @@ public class CspServerInternalBusinessTestFlow1dataTypes implements CamelRoutes 
         mockUtils.sendFlow1Data(mvc, serverName, false, true, IntegrationDataType.TRUSTCIRCLE, HttpMethods.POST.name());
 
         // Expect 3-messages/teams from ESCP according to CERT-GR configuration for TRUSTCIRCLE on csp2.dangerduck.gr
-        _flowImpl(IntegrationDataType.TRUSTCIRCLE, getEcspMessagesCount(IntegrationDataType.TRUSTCIRCLE));
+        _flowImpl(IntegrationDataType.TRUSTCIRCLE, tcProcessor.getEcspMessagesCount(IntegrationDataType.TRUSTCIRCLE));
 
         //Thread.sleep(10*1000); //to avoid "Rejecting received message because of the listener container having been stopped in the meantime"
         //be careful when debugging, you might miss breakpoints if the time is not enough
@@ -246,7 +250,7 @@ public class CspServerInternalBusinessTestFlow1dataTypes implements CamelRoutes 
         mockUtils.sendFlow1Data(mvc,serverName, false, true, IntegrationDataType.TRUSTCIRCLE, HttpMethods.PUT.name());
 
         // Expect 3-messages/teams from ESCP according to CERT-GR configuration for TRUSTCIRCLE on csp2.dangerduck.gr
-        _flowImpl(IntegrationDataType.TRUSTCIRCLE, getEcspMessagesCount(IntegrationDataType.TRUSTCIRCLE));
+        _flowImpl(IntegrationDataType.TRUSTCIRCLE, tcProcessor.getEcspMessagesCount(IntegrationDataType.TRUSTCIRCLE));
 
         //Thread.sleep(10*1000); //to avoid "Rejecting received message because of the listener container having been stopped in the meantime"
         //be careful when debugging, you might miss breakpoints if the time is not enough
@@ -350,38 +354,7 @@ public class CspServerInternalBusinessTestFlow1dataTypes implements CamelRoutes 
     }
 
 
-    Integer getEcspMessagesCount(IntegrationDataType integrationDataType) throws IOException {
-        String uri = null;
-        String getAllTcUri = this.getTcCirclesURI();
-        List<TrustCircle> tcList = camelRestService.sendAndGetList(getAllTcUri, null,  HttpMethod.GET.name(), TrustCircle.class,null);
 
-        Optional<TrustCircle> optionalTc  = tcList.stream().filter(t->t.getShortName().toLowerCase().contains(IntegrationDataType.tcNamingConventionForShortName.get(integrationDataType).toString().toLowerCase())).findAny();
-        if(optionalTc.isPresent()){
-            uri = this.getTcCirclesURI() + "/" + optionalTc.get().getId();
-        }else{
-            throw new CspBusinessException("Integration Test error: Could not find trust circle id for this data. ");
-        }
-
-        TrustCircle tc = camelRestService.send(uri, null,  HttpMethod.GET.name(), TrustCircle.class);
-        List<Team> teams = new ArrayList<>();
-        //first make all calls to get the teams
-        for (String teamId : tc.getTeams()){
-            //make call to TC-team
-            Team team = camelRestService.send(this.getTcTeamsURI() + "/" + teamId, teamId, HttpMethod.GET.name(), Team.class);
-            if(team.getShortName()==null){
-                throw new CspBusinessException("Team short name received from TC API is null - cannot proceed. \n" +
-                        "TrustCircle: "+tc.toString()+"\n" +
-                        "Team: "+team.toString());
-            }
-
-            //TODO: TC bug here, see SXCSP-255. We should use cspId and not shortName
-            if (!team.getShortName().toLowerCase().trim().equals(serverName.toLowerCase().trim())){
-                teams.add(team);
-            }
-        }
-        LOG.info("Total teams to assert: "+teams.size());
-        return teams.size();
-    }
 
     private String getTcCirclesURI() {
 

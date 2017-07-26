@@ -7,6 +7,7 @@ import com.intrasoft.csp.commons.model.IntegrationDataType;
 import com.intrasoft.csp.commons.routes.CamelRoutes;
 import com.intrasoft.csp.integration.MockUtils;
 import com.intrasoft.csp.server.CspApp;
+import com.intrasoft.csp.server.processors.TcProcessor;
 import com.intrasoft.csp.server.routes.RouteUtils;
 import com.intrasoft.csp.server.service.ErrorMessageHandler;
 import org.apache.camel.EndpointInject;
@@ -119,6 +120,9 @@ public class CspServerInternalBusinessTestFlow1verbs implements CamelRoutes {
     @Autowired
     Environment env;
 
+    @Autowired
+    TcProcessor tcProcessor;
+
     String serverName;
 
     private final IntegrationDataType dataTypeToTest = IntegrationDataType.VULNERABILITY;
@@ -149,7 +153,7 @@ public class CspServerInternalBusinessTestFlow1verbs implements CamelRoutes {
     public void testDslFlow1PostToShare() throws Exception {
         mockUtils.sendFlow1Data(mvc,serverName, applicationId, false, true, this.dataTypeToTest, HttpMethods.POST.name());
 
-        _toSharePostPutFlowImpl();
+        _toSharePostPutFlowImpl(tcProcessor.getEcspMessagesCount(this.dataTypeToTest));
 
         //Thread.sleep(10*1000); //to avoid "Rejecting received message because of the listener container having been stopped in the meantime"
         //be careful when debugging, you might miss breakpoints if the time is not enough
@@ -160,7 +164,7 @@ public class CspServerInternalBusinessTestFlow1verbs implements CamelRoutes {
     public void testDslFlow1PutToShare() throws Exception {
         mockUtils.sendFlow1Data(mvc,serverName, applicationId, false, true, this.dataTypeToTest, HttpMethods.PUT.name());
 
-        _toSharePostPutFlowImpl();
+        _toSharePostPutFlowImpl(tcProcessor.getEcspMessagesCount(this.dataTypeToTest));
 
         //Thread.sleep(10*1000); //to avoid "Rejecting received message because of the listener container having been stopped in the meantime"
         //be careful when debugging, you might miss breakpoints if the time is not enough
@@ -212,7 +216,7 @@ public class CspServerInternalBusinessTestFlow1verbs implements CamelRoutes {
     }
 
 
-    private void _toSharePostPutFlowImpl() throws Exception {
+    private void _toSharePostPutFlowImpl(Integer expectedEscpMessages) throws Exception {
        /*
         DSL
          */
@@ -280,7 +284,7 @@ public class CspServerInternalBusinessTestFlow1verbs implements CamelRoutes {
         }
 
         //ESCP
-        mockedEcsp.expectedMessageCount(1);
+        mockedEcsp.expectedMessageCount(expectedEscpMessages);
         mockedEcsp.assertIsSatisfied();
 
         list = mockedEcsp.getReceivedExchanges();

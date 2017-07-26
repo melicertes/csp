@@ -104,29 +104,51 @@ public class TcProcessor implements Processor,CamelRoutes{
 
     private void sendByTcId(String tcId, Exchange exchange) throws IOException {
         String uri = this.getTcCirclesURI() + "/" + tcId;
-        TrustCircle tc = camelRestService.send(uri, null,  HttpMethod.GET.name(), TrustCircle.class);
-
-        List<Team> teams = new ArrayList<>();
-        //first make all calls to get the teams
-        for (String teamId : tc.getTeams()){
-            //make call to TC-team
-            Team team = camelRestService.send(this.getTcTeamsURI() + "/" + teamId, teamId, HttpMethod.GET.name(), Team.class);
-            if(team.getShortName()==null){
-                throw new CspBusinessException("Team short name received from TC API is null - cannot proceed. \n" +
-                        "TrustCircle: "+tc.toString()+"\n" +
-                        "Team: "+team.toString());
-            }
-
-            //TODO: TC bug here, see SXCSP-255. We should use cspId and not shortName
-            if (!team.getShortName().toLowerCase().trim().equals(serverName.toLowerCase().trim())){
-                teams.add(team);
-            }
-        }
+        List<Team> teams = getTcTeams(uri);
         //all TC calls have been made up to this point, TEAMS list has been populated
-
         // Decide the flow
         decideTheFlow(teams,exchange);
     }
+
+
+    List<Team> getTcTeams(String uri) throws IOException {
+        TrustCircle tc = camelRestService.send(uri, null,  HttpMethod.GET.name(), TrustCircle.class);
+        List<Team> teams = new ArrayList<>();
+        //first make all calls to get the teams
+        for (String teamId : tc.getTeams()) {
+            //make call to TC-team
+            Team team = camelRestService.send(this.getTcTeamsURI() + "/" + teamId, teamId, HttpMethod.GET.name(), Team.class);
+            if (team.getShortName() == null) {
+                throw new CspBusinessException("Team short name received from TC API is null - cannot proceed. \n" +
+                        "TrustCircle: " + tc.toString() + "\n" +
+                        "Team: " + team.toString());
+            }
+
+            //TODO: TC bug here, see SXCSP-255. We should use cspId and not shortName
+            if (!team.getShortName().toLowerCase().trim().equals(serverName.toLowerCase().trim())) {
+                teams.add(team);
+            }
+        }
+        return teams;
+    }
+
+
+    public Integer getEcspMessagesCount(IntegrationDataType integrationDataType) throws IOException {
+        String uri = null;
+        String getAllTcUri = this.getTcCirclesURI();
+        List<TrustCircle> tcList = camelRestService.sendAndGetList(getAllTcUri, null,  HttpMethod.GET.name(), TrustCircle.class,null);
+
+        Optional<TrustCircle> optionalTc  = tcList.stream().filter(t->t.getShortName().toLowerCase().contains(IntegrationDataType.tcNamingConventionForShortName.get(integrationDataType).toString().toLowerCase())).findAny();
+        if(optionalTc.isPresent()){
+            uri = this.getTcCirclesURI() + "/" + optionalTc.get().getId();
+        }else{
+            throw new CspBusinessException("Integration Test error: Could not find trust circle id for this data. ");
+        }
+
+        List<Team> teams = getTcTeams(uri);
+        return teams.size();
+    }
+
     private void sendByTeamId(String teamId, Exchange exchange) throws IOException {
         Team team = getTeamByRestCall(teamId);
         List<Team> teams = new ArrayList<>();
