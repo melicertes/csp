@@ -1,0 +1,134 @@
+--------------------------------------------
+-- How to run integration and smoke tests --
+--------------------------------------------
+
+1. Build the project or use an existing build to take the jar file
+******************************************************************
+
+
+1A. Build the project (ignore this step if you already have the jar file and go to 2.)
+--------------------------------------------------------------------------------------
+
+
+1Ai. Build the project
+--------------------------
+Go to the folder gia have cloned the git repository and run:
+
+$ mvn clean install -DskipTests
+
+
+1Aii. Navigate to target folder and locate the jar file
+----------------------------------------------------
+$ cd integration-tests/target
+
+the file will have a similar name to this format:
+integration-tests-0.2.0-SNAPSHOT.jar
+
+
+
+2. Upload the integration-tests jar file
+****************************************
+After starting your vpn connection use ssh to test login to a csp vm (usually you have setup your config file in .ssh folder).
+
+eg.
+$ ssh central-csp.intra
+
+Exit the terminal and locate the jar file in your local path. Use scp to copy the jar file to the host machine.
+
+eg.
+$ scp integration-tests-0.2.0-SNAPSHOT.jar central-csp.intra:/home/csp
+
+Login to the host like you did before and validate that the file has been uploaded successfully.
+
+
+3. Locate the docker container to copy the jar file
+***************************************************
+
+In the host machine find the running docker containers.
+
+$ docker ps
+
+Sample output:
+
+central-csp:~$ docker ps
+CONTAINER ID        IMAGE                                   COMMAND                  CREATED             STATUS              PORTS                          NAMES
+d1826a54d144        csp-apache:1.0p1                        "/docker-entrypoin..."   3 hours ago         Up 3 hours          80/tcp, 0.0.0.0:443->443/tcp   csp-apache
+e3d5fe85d77d        csp-openam:1.0-Alpha                    "/opt/ssoadm/run-o..."   3 hours ago         Up 3 hours          8080/tcp                       csp-oam
+f2f5a6f10698        csp-owncloud:1.0                        "docker-run"             2 days ago          Up 2 days           80/tcp                         csp-files
+2bc36fa02a4e        csp-postgres:1.0                        "docker-entrypoint..."   3 days ago          Up 3 days           127.0.0.1:5432->5432/tcp       csp-postgres
+fa7346ff00dc        csp-java8:1.0                           "docker-entrypoint..."   3 days ago          Up 3 days           8081/tcp                       csp-il
+760b3424f741        csp-python27:1.0                        "sh docker-entrypo..."   3 days ago          Up 3 days           8000/tcp                       csp-tc
+3c5999d70e68        csp-mocknode:1.0                        "node server.js"         3 days ago          Up 3 days           3000/tcp, 3002/tcp             csp-mock
+96d90b9ae3e1        docker.elastic.co/kibana/kibana:5.4.0   "/bin/sh -c /usr/l..."   3 days ago          Up 3 days           5601/tcp                       csp-kibana
+468712e8d41d        csp-elasticsearch:1.0                   "/bin/bash bin/es-..."   3 days ago          Up 3 days           9200/tcp, 9300/tcp             csp-es
+
+Find the CONTAINER ID of the image containing the text "csp-java". On the above output is fa7346ff00dc.
+
+Copy the jar file in the container:
+
+$ docker cp integration-tests-0.2.0-SNAPSHOT.jar fa7346ff00dc:/opt/csp
+
+4. Connect to the java docker container
+***************************************
+
+Using the CONTAINER ID from previous step, eg fa7346ff00dc, connect to the container:
+
+$ docker exec -i -t fa7346ff00dc  /bin/sh
+
+5. Run the tests
+****************
+
+In the home directory you will find the integration tests jar. You can use the following commands to run various tests
+
+5i. Smoke tests
+----------------
+
+The jar file contains the latest application server code, so you can run the smoke tests against him. These tests can be ran
+in any environment which has java 1.8 installed and will start an instance of the application server in sandbox test port,
+not affecting any other running instances.
+
+Test 1:
+$ java -jar integration-tests-0.2.0-SNAPSHOT.jar com.intrasoft.csp.integration.sandbox.server.internal.CspServerInternalSandboxTest
+
+Test 2:
+$ java -jar integration-tests-0.2.0-SNAPSHOT.jar com.intrasoft.csp.integration.sandbox.server.internal.CspServerInternalSandboxTestFlow1dataTypes
+
+Test 3:
+$ java -jar integration-tests-0.2.0-SNAPSHOT.jar com.intrasoft.csp.integration.sandbox.server.internal.CspServerInternalSandboxTestFlow1verbs
+
+Test 4:
+$ java -jar integration-tests-0.2.0-SNAPSHOT.jar com.intrasoft.csp.integration.sandbox.server.internal.CspServerInternalSandboxTestFlow2
+
+Test 5:
+$ java -jar integration-tests-0.2.0-SNAPSHOT.jar com.intrasoft.csp.integration.sandbox.server.internal.CspServerVariousIntegrationDataTest
+
+Test 6:
+$ java -jar integration-tests-0.2.0-SNAPSHOT.jar com.intrasoft.csp.integration.sandbox.server.internal.IntegrationDataValidatorTest
+
+5ii. Integration (Business) Tests
+----------------------------------
+
+iTest1:
+
+$ java -jar -Dspring.profiles.active=docker -Dapache.camel.use.activemq=false -Dembedded.activemq.start=false \
+  integration-tests-0.2.0-SNAPSHOT.jar \
+  com.intrasoft.csp.integration.business.server.internal.CspServerInternalBusinessTestFlow1dataTypes
+
+
+iTest2:
+
+$ java -jar -Dspring.profiles.active=docker -Dapache.camel.use.activemq=false -Dembedded.activemq.start=false \
+  integration-tests-0.2.0-SNAPSHOT.jar \
+  com.intrasoft.csp.integration.business.server.internal.CspServerInternalBusinessTestFlow1verbs
+
+
+iTest3:
+Use an extCspId argument having a value that exists in your TC db and is NOT the same with the cspId of the machine you
+are running these tests
+
+$ java -jar -Dspring.profiles.active=docker -Dapache.camel.use.activemq=false -Dembedded.activemq.start=false -DextCspId=demo1-csp \
+  integration-tests-0.2.0-SNAPSHOT.jar \
+  com.intrasoft.csp.integration.business.server.internal.CspServerInternalBusinessTestFlow2
+
+
+
