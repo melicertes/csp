@@ -4,6 +4,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.validation.constraints.NotNull;
 
 /**
  * Created by chris on 7/7/2017.
@@ -15,9 +16,13 @@ public class Ruleset {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    @NotNull
     String filename;
+
+    @NotNull
     byte[] file;
 
+    @NotNull
     String description;
 
     public long getId() {

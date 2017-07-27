@@ -48,10 +48,11 @@ public class RulesetsController {
                              BindingResult result,
                              Model model) throws IOException {
 
-        if (result.hasErrors()) {
+       /* if (result.hasErrors()) {
+            LOG.error(result.getFieldError().toString());
             redirectAttributes.addFlashAttribute("error", result.getFieldError().toString());
-            return "pages/rulesets";
-        }
+            return "redirect:";
+        }*/
 
         model.addAttribute("description", ruleset.getDescription());
         ruleset.setFilename(file.getOriginalFilename());
@@ -62,7 +63,7 @@ public class RulesetsController {
         LOG.info("Import File");
         if (file.isEmpty()) {
             redirectAttributes.addFlashAttribute("error", "Please select a file to upload");
-            return "pages/rulesets";
+            return "redirect:";
         }
         try {
 
@@ -72,15 +73,16 @@ public class RulesetsController {
             ruleset.setFile(bytes);
             ruleset.setFilename(file.getOriginalFilename());
         } catch (IOException e) {
+            LOG.error("File upload failed: " + e);
             redirectAttributes.addFlashAttribute("error", "Something went wrong");
-            return "pages/rulesets";
+            return "redirect:";
         }
 
         rulesetRepository.save(ruleset);
         List<Ruleset> rulesets =rulesetRepository.findAll();
         model.addAttribute("rulesets", rulesets);
         redirectAttributes.addFlashAttribute("msg", "Ruleset imported.");
-        return "pages/rulesets";
+        return "redirect:";
     }
 
     @GetMapping("/rulesets/{id}")
@@ -117,7 +119,7 @@ public class RulesetsController {
         return mav;
     }
 
-    @ExceptionHandler(IOException.class)
+/*    @ExceptionHandler(IOException.class)
     public ModelAndView IOException(HttpServletRequest request, Exception ex, RedirectAttributes redirect){
         LOG.error("Requested URL="+request.getRequestURL());
         LOG.error("Exception Raised");
@@ -128,5 +130,5 @@ public class RulesetsController {
         redirect.addFlashAttribute("error", "File could not be imported");
 
         return mav;
-    }
+    }*/
 }

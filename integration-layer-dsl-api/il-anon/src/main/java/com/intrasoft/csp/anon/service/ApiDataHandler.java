@@ -28,6 +28,8 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 public class ApiDataHandler {
@@ -40,6 +42,12 @@ public class ApiDataHandler {
     @Autowired
     HMAC hmac;
 
+    private static final String EMAIL_PATTERN =
+            "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@"
+                    + "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
+    private static final String IPADDRESS_PATTERN =
+            "(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)";
+
     private static ObjectMapper mapper = new ObjectMapper();
 
     private static final Configuration configuration = Configuration.builder()
@@ -47,6 +55,14 @@ public class ApiDataHandler {
             .mappingProvider(new JacksonMappingProvider())
             .build();
 
+    /**
+     *
+     * @param integrationAnonData
+     * @return
+     * @throws NoSuchAlgorithmException
+     * @throws InvalidKeyException
+     * @throws IOException
+     */
     public ResponseEntity<?> handleAnonIntegrationData(IntegrationAnonData integrationAnonData) throws NoSuchAlgorithmException, InvalidKeyException, IOException {
 
         String cspId = integrationAnonData.getCspId();
@@ -60,7 +76,6 @@ public class ApiDataHandler {
         }
 
         Rules rules = rulesService.getRule(dataType, cspId);
-
         if (rules == null){
             throw new AnonException("Mapping not found for given tuple.");
         }
@@ -87,10 +102,17 @@ public class ApiDataHandler {
         }
 
         integrationAnonData.setDataObject(out);
-        LOG.info(mapper.writeValueAsString(integrationAnonData));
         return new ResponseEntity<>(integrationAnonData, HttpStatus.OK);
     }
 
+    /**
+     *
+     * @param action
+     * @param fieldVal
+     * @return
+     * @throws InvalidKeyException
+     * @throws NoSuchAlgorithmException
+     */
     private String updateField(String action, String fieldVal) throws InvalidKeyException, NoSuchAlgorithmException {
         String newVal = fieldVal;
         if (action.toLowerCase().equals("pseudo")){
@@ -102,10 +124,39 @@ public class ApiDataHandler {
         return newVal;
     }
 
-    private String anonField(String val){
+    /**
+     *
+     * @param fieldVal
+     * @return
+     */
+    private String anonField(String fieldVal){
+        String fieldtype = "string";
+
+        Pattern rEmail = Pattern.compile(EMAIL_PATTERN);
+        Pattern rIp = Pattern.compile(IPADDRESS_PATTERN);
+        if (rEmail.matcher(fieldVal).matches()) fieldtype = "email";
+        else if (rIp.matcher(fieldVal).matches()) fieldtype = "ip";
+
+        switch (fieldtype) {
+            case "string":
+                return "*******";
+            case "ip":
+                return "***.***.***.***";
+            case "email":
+                return "***@******.**";
+            case "alphanumeric":
+                return "**********";
+        }
         return "*********";
     }
 
+    /**
+     *
+     * @param val
+     * @return
+     * @throws NoSuchAlgorithmException
+     * @throws InvalidKeyException
+     */
     private String pseudoField(String val) throws NoSuchAlgorithmException, InvalidKeyException {
 
         String secret = hmac.getKey().getKey();
