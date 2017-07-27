@@ -71,8 +71,6 @@ $(document).ready(function(){
                 processData: false,
                 contentType: false,
                 success: function (response) {
-                    console.log(response);
-
                     if (response.responseCode === 0) {
                         $('#module-version-form').find('input, textarea, button, select').val('');
                         $('#module-version-form').find('input, textarea, button, select').attr('disabled', 'disabled');
@@ -82,8 +80,11 @@ $(document).ready(function(){
                         }, 100);
                     }
                     else {
-                        $('#result').html('<div class="alert alert-dismissable alert-danger"><a class="close" data-dismiss="alert" href="#" aria-hidden="true">×</a><strong>'+response.responseText+'</strong></div>');
+                        $('#result').html('<div class="alert alert-dismissable alert-danger"><a class="close" data-dismiss="alert" href="#" aria-hidden="true">×</a><strong>Error: '+xhr.responseJSON.responseCode+'</strong><br>'+xhr.responseJSON.responseText+'<br>'+xhr.responseJSON.responseException+'</div>');
                     }
+                },
+                error:function (xhr, ajaxOptions, thrownError){
+                    $('#result').html('<div class="alert alert-dismissable alert-danger"><a class="close" data-dismiss="alert" href="#" aria-hidden="true">×</a><strong>Error: '+xhr.responseJSON.responseCode+'</strong><br>'+xhr.responseJSON.responseText+'<br>'+xhr.responseJSON.responseException+'</div>');
                 }
             });
         }

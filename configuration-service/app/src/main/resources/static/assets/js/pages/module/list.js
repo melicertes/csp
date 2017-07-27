@@ -37,30 +37,17 @@ $(document).ready(function(){
                         contentType:"application/json; charset=utf-8",
                         dataType:"json",
                         success: function (response) {
-                            console.log(response);
-
                             if (response.responseCode === 0) {
                                 setTimeout(function () {
                                     $('#module-table').bootstrapTable('refresh');
                                 }, 100);
                             }
                             else {
-                                BootstrapDialog.show({
-                                    title: 'Error',
-                                    type: BootstrapDialog.TYPE_DANGER,
-                                    size: BootstrapDialog.SIZE_NORMAL,
-                                    message: response.responseText,
-                                    closable: true,
-                                    closeByBackdrop: false,
-                                    closeByKeyboard: false,
-                                    buttons: [{
-                                        label: 'Close',
-                                        action: function(dialogRef){
-                                            dialogRef.close();
-                                        }
-                                    }]
-                                });
+                                $('#result').html('<div class="alert alert-dismissable alert-danger"><a class="close" data-dismiss="alert" href="#" aria-hidden="true">×</a><strong>Error: '+xhr.responseJSON.responseCode+'</strong><br>'+xhr.responseJSON.responseText+'<br>'+xhr.responseJSON.responseException+'</div>');
                             }
+                        },
+                        error:function (xhr, ajaxOptions, thrownError){
+                            $('#result').html('<div class="alert alert-dismissable alert-danger"><a class="close" data-dismiss="alert" href="#" aria-hidden="true">×</a><strong>Error: '+xhr.responseJSON.responseCode+'</strong><br>'+xhr.responseJSON.responseText+'<br>'+xhr.responseJSON.responseException+'</div>');
                         }
                     });
                 }else {
