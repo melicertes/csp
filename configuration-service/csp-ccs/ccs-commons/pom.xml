@@ -16,26 +16,24 @@
     <packaging>jar</packaging>
 
     <dependencies>
-        <!--<dependency>-->
-        <!--<groupId>com.intrasoft.csp</groupId>-->
-        <!--<artifactId>il-commons</artifactId>-->
-        <!--<version>${project.version}</version>-->
-        <!--</dependency>-->
-
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+            <scope>provided</scope>
         </dependency>
-
+        <dependency>
+            <groupId>org.springframework.retry</groupId>
+            <artifactId>spring-retry</artifactId>
+            <version>${spring.retry.version}</version>
+        </dependency>
     </dependencies>
 
 </project>

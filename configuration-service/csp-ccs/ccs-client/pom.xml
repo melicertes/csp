@@ -16,12 +16,11 @@
     <packaging>jar</packaging>
 
     <dependencies>
-        <!--<dependency>-->
-        <!--<groupId>com.intrasoft.csp</groupId>-->
-        <!--<artifactId>il-commons</artifactId>-->
-        <!--<version>${project.version}</version>-->
-        <!--</dependency>-->
-
+        <dependency>
+            <groupId>com.intrasoft.csp.ccs</groupId>
+            <artifactId>ccs-commons</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>

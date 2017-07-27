@@ -1,7 +1,7 @@
 package com.intrasoft.csp.ccs.server.controller;
 
 
-import com.intrasoft.csp.ccs.server.config.context.ApiContextUrl;
+import com.intrasoft.csp.ccs.commons.routes.ApiContextUrl;
 import com.intrasoft.csp.ccs.server.config.context.DataContextUrl;
 import com.intrasoft.csp.ccs.server.config.CspCcsException;
 import com.intrasoft.csp.ccs.server.config.types.HttpStatusResponseType;
