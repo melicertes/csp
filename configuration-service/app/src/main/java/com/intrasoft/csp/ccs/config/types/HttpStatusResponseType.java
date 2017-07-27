@@ -4,12 +4,16 @@ package com.intrasoft.csp.ccs.config.types;
 public enum HttpStatusResponseType {
 
     /*
+    COMMON ERROR CODES
+     */
+    OK(0, "Successful transaction"),
+    FAILURE(999, "Transaction failure; Systemic failure"),
+
+    /*
     API ERROR CODES
      */
 
     //API GENERIC
-    API_OK(0, "Successful transaction"),
-    API_FAILURE(99, "Transaction failure; Systemic failure"),
     API_INVALID_CSP_ENTRY(100, "Transaction failure; CSP ID not found; Failure to identify cspId presented"),
     API_INVALID_MODULE_NAME(101, "Transaction failure; Request contains invalid module name"),
     API_INVALID_MODULE_VERSION(102, "Transaction failure; Request contains invalid module version"),
@@ -34,8 +38,6 @@ public enum HttpStatusResponseType {
      */
 
     //DATA GENERIC
-    DATA_OK(0, "Successful transaction"),
-    DATA_FAILURE(9999, "Transaction failure; Systemic failure"),
     DATA_INVALID_CSP_ID(1000, "Transaction failure; CSP ID not found; Failure to identify cspId presented"),
     DATA_INVALID_MODULE_ID(1001, "Transaction failure; Module ID not found; Failure to identify moduleId presented"),
     DATA_INVALID_MODULE_VERSION_ID(1002, "Transaction failure; Module Version ID not found; Failure to identify moduleVersionId presented"),
