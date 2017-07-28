@@ -10,7 +10,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.util.FileCopyUtils;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.client.*;
 
 import java.io.IOException;
