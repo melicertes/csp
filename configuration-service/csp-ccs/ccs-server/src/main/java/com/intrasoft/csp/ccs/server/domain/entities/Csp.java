@@ -1,9 +1,8 @@
-package com.intrasoft.csp.ccs.server.domain.postgresql;
+package com.intrasoft.csp.ccs.server.domain.entities;
 
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-import java.util.Date;
 
 
 @Entity

@@ -3,7 +3,7 @@ package com.intrasoft.csp.ccs.server.controller;
 import com.intrasoft.csp.ccs.server.config.CspCcsException;
 import com.intrasoft.csp.ccs.commons.routes.ApiContextUrl;
 import com.intrasoft.csp.ccs.server.domain.api.*;
-import com.intrasoft.csp.ccs.server.domain.postgresql.*;
+import com.intrasoft.csp.ccs.server.domain.entities.*;
 import com.intrasoft.csp.ccs.server.repository.*;
 import com.intrasoft.csp.ccs.server.config.types.HttpStatusResponseType;
 import com.intrasoft.csp.ccs.server.utils.FileHelper;

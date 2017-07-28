@@ -4,7 +4,7 @@ package com.intrasoft.csp.ccs.server.controller;
 import com.intrasoft.csp.ccs.server.config.CspCcsException;
 import com.intrasoft.csp.ccs.server.config.context.PagesContextUrl;
 import com.intrasoft.csp.ccs.server.domain.api.Response;
-import com.intrasoft.csp.ccs.server.domain.postgresql.*;
+import com.intrasoft.csp.ccs.server.domain.entities.*;
 import com.intrasoft.csp.ccs.server.repository.*;
 import com.intrasoft.csp.ccs.server.config.types.ContactType;
 import com.intrasoft.csp.ccs.server.config.types.HttpStatusResponseType;

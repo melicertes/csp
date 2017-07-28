@@ -4,7 +4,7 @@ import com.intrasoft.csp.ccs.server.config.context.PagesContextUrl;
 import com.intrasoft.csp.ccs.server.config.types.ContactType;
 import com.intrasoft.csp.ccs.server.domain.data.table.ManagementRow;
 import com.intrasoft.csp.ccs.server.config.context.DataContextUrl;
-import com.intrasoft.csp.ccs.server.domain.postgresql.*;
+import com.intrasoft.csp.ccs.server.domain.entities.*;
 import com.intrasoft.csp.ccs.server.repository.*;
 import com.intrasoft.csp.ccs.server.utils.VersionParser;
 import org.slf4j.Logger;
