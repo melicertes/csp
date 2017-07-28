@@ -4,6 +4,7 @@ import com.intrasoft.csp.client.AnonClient;
 import com.intrasoft.csp.commons.client.ApiVersionClient;
 import com.intrasoft.csp.commons.client.RetryRestTemplate;
 import com.intrasoft.csp.commons.exceptions.InvalidDataTypeException;
+import com.intrasoft.csp.commons.model.IntegrationAnonData;
 import com.intrasoft.csp.commons.model.IntegrationData;
 import com.intrasoft.csp.commons.routes.ContextUrl;
 import org.slf4j.Logger;
@@ -29,10 +30,10 @@ public class AnonClientImpl implements AnonClient, ContextUrl {
     RetryRestTemplate retryRestTemplate;
 
     @Override
-    public ResponseEntity<String> postAnonData(IntegrationData integrationData, String context) throws InvalidDataTypeException {
+    public ResponseEntity<String> postAnonData(IntegrationAnonData integrationAnonData, String context) throws InvalidDataTypeException {
         final String url = apiVersionClient.getApiUrl() + context;
         LOG.debug("ANON call [post]: " + url);
-        ResponseEntity<String> response = retryRestTemplate.exchange(url, HttpMethod.POST, new HttpEntity<Object>(integrationData), String.class);
+        ResponseEntity<String> response = retryRestTemplate.exchange(url, HttpMethod.POST, new HttpEntity<Object>(integrationAnonData), String.class);
         return response;
     }
 

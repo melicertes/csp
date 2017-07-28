@@ -1,6 +1,7 @@
 package com.intrasoft.csp.client;
 
 import com.intrasoft.csp.commons.exceptions.InvalidDataTypeException;
+import com.intrasoft.csp.commons.model.IntegrationAnonData;
 import com.intrasoft.csp.commons.model.IntegrationData;
 import org.springframework.http.ResponseEntity;
 
@@ -9,5 +10,5 @@ import org.springframework.http.ResponseEntity;
  */
 public interface AnonClient {
 
-    ResponseEntity<String> postAnonData(IntegrationData integrationData, String context) throws InvalidDataTypeException;
+    ResponseEntity<String> postAnonData(IntegrationAnonData integrationAnonData, String context) throws InvalidDataTypeException;
 }
