@@ -30,7 +30,7 @@ public class CcsClientConfig implements ApiContextUrl {
     }
 
     @Autowired
-    @Qualifier("CcsRestTemplate")
+    @Qualifier("CspRestTemplate")
     RetryRestTemplate retryRestTemplate;
 
     @Bean(name = "CcsApiVersionClient")

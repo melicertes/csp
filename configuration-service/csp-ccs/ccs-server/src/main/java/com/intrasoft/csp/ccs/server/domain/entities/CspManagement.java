@@ -1,4 +1,4 @@
-package com.intrasoft.csp.ccs.server.domain.postgresql;
+package com.intrasoft.csp.ccs.server.domain.entities;
 
 
 import javax.persistence.*;

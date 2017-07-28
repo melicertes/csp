@@ -1,6 +1,6 @@
 package com.intrasoft.csp.ccs.server.repository;
 
-import com.intrasoft.csp.ccs.server.domain.postgresql.CspIp;
+import com.intrasoft.csp.ccs.server.domain.entities.CspIp;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

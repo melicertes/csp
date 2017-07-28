@@ -1,6 +1,6 @@
 package com.intrasoft.csp.ccs.server.repository;
 
-import com.intrasoft.csp.ccs.server.domain.postgresql.CspModuleInfo;
+import com.intrasoft.csp.ccs.server.domain.entities.CspModuleInfo;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
