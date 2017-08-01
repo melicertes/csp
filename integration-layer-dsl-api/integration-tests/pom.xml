@@ -30,11 +30,6 @@
         </dependency>
         <dependency>
             <groupId>com.intrasoft.csp</groupId>
-            <artifactId>il-anon</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.intrasoft.csp</groupId>
             <artifactId>il-client</artifactId>
             <version>${project.version}</version>
         </dependency>

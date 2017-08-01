@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="head (title, description)">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> </meta>
+    <!-- Bootstrap -->
+    <link th:href="@{/webjars/bootstrap/3.3.7/css/bootstrap.min.css}"  rel="stylesheet" media="screen"> </link>
+    <link th:href="@{/webjars/bootstrap-table/1.9.1/bootstrap-table.css}" rel="stylesheet"></link>
+    <link th:href="@{/webjars/font-awesome/4.7.0/css/font-awesome.min.css}" rel="stylesheet" media="screen" />
+    <link th:href="@{/webjars/bootstrap-fileinput/4.2.0/css/fileinput.min.css}" rel="stylesheet"/>
+
+    <link rel="stylesheet" th:href="@{/css/jumbotron.css}"/>
+    <link rel="stylesheet" th:href="@{/css/custom.css}"/>
+
+</head>
+<body>
+
+<div class="btn-group">
+    <button type="button" class="btn btn-success">This is a success button</button>
+    <button type="button" class="btn btn-warning">This is a warning button</button>
+    <button type="button" class="btn btn-danger">This is a danger button</button>
+</div>
+
+<div class="container" th:fragment="nav">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
+                aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand-icon fa fa-user-secret fa-3x" href="pages/mappings" th:href="@{/mappings}">
+            <!--<img src="../static/assets/logo.png" th:src="@{/assets/logo.png}" style="float: left; margin-top: -15px;"/>-->
+        </a>
+        <span class="navbar-brand" style="">CSP - Anonymization Service</span>
+
+
+    </div>
+    <ul class="nav navbar-nav">
+        <li class="" th:class="${navHomeClassActive}"><a href="/mappings">
+            <i class="fa fa-list"></i> Mappings</a>
+        </li>
+        <li class="" th:class="${navCspClassActive}"><a href="/rulesets">
+            <i class="fa  fa-gavel"></i> Rulesets</a>
+        </li>
+    </ul>
+    <div id="navbar" class="navbar-collapse collapse">
+
+        <ul class="nav navbar-nav navbar-right">
+            <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                    <span class="glyphicon glyphicon-user"></span>&nbsp;
+                    <strong>admin</strong>
+                    <span class="glyphicon glyphicon-chevron-down"></span>
+                </a>
+                <ul class="dropdown-menu">
+                    <li>
+                        <div class="navbar-login">
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <p class="text-center">
+                                        <span class="glyphicon glyphicon-user icon-size"></span>
+                                    </p>
+                                </div>
+                                <div class="col-lg-8">
+                                    <p class="text-left">admin</p>
+                                    <p class="text-left">
+                                        <strong> </strong>
+                                    </p>
+                                    <p class="text-left small"></p>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="divider"></li>
+                    <li>
+                        <div class="navbar-login navbar-login-session">
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <p>
+                                        <a href="#" class="btn btn-danger btn-block">Logout</a>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+
+    </div>
+</div>
+
+<th:block th:fragment="scripts">
+    <script th:src="@{/webjars/jquery/3.2.1/jquery.min.js}"></script>
+    <script th:src="@{/webjars/bootstrap/3.3.7/js/bootstrap.min.js}"></script>
+
+    <script th:src="@{/webjars/bootstrap-table/1.9.1/bootstrap-table.js}"></script>
+    <script th:src="@{/webjars/bootstrap-table/1.9.1/locale/bootstrap-table-en-US.js}"></script>
+
+    <script>
+        $(document).ready(function () {
+            $("a").tooltip({
+                'selector': '',
+                'placement': 'top',
+                'container':'body'
+            });
+        });
+    </script>
+
+</th:block>
+</body>
+</html>

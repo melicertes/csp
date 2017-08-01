@@ -8,8 +8,6 @@ public interface ContextUrl {
     String DCL_INTEGRATION_DATA= "/dcl/integrationData";
     String ADAPTER_INTEGRATION_DATA= "/adapter/integrationData";
 
-    String DATA_ANONYMIZATION = "/anon";
-
     String MANAGE_CONSUME_ERROR_Q= "/manage/consume/errorq";
 
     String GET_API_VERSION = "apiversion";

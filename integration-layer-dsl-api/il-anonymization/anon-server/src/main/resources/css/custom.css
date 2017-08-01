@@ -1,0 +1,153 @@
+.navbar-brand-icon{
+    padding: 08px 15px;
+    float: left;
+    height: 50px;
+    /*font-size: 18px;*/
+    /*line-height: 20px;*/
+    color: #9d9d9d;
+}
+
+.h1button {
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+
+#id_csp_installed {
+    width: 20px;
+    float: left;
+    padding: 0px;
+    margin: 0;
+    height: 20px;
+}
+
+.item {
+    white-space: nowrap;
+    display: inline
+}
+
+.delete-form {
+    display: inline;
+}
+
+.list-group-item .icon .glyphicon-pencil {
+    margin-right: 0.5em;
+}
+
+.modal-body label {
+    font-weight: normal;
+}
+
+.navbar-login {
+    width: 305px;
+    padding: 10px;
+    padding-bottom: 0px;
+}
+
+.navbar-login-session {
+    padding: 10px;
+    padding-bottom: 0px;
+    padding-top: 0px;
+}
+
+.icon-size {
+    font-size: 87px;
+}
+
+.form-group .errorlist {
+    float: right;
+    list-style: none;
+    color: red;
+}
+
+.huge {
+    font-size: 40px;
+}
+
+.panel-green {
+    border-color: #5cb85c;
+}
+
+.panel-green > .panel-heading {
+    border-color: #5cb85c;
+    color: white;
+    background-color: #5cb85c;
+}
+
+.panel-green > a {
+    color: #5cb85c;
+}
+
+.panel-green > a:hover {
+    color: #3d8b3d;
+}
+
+.panel-red {
+    border-color: #d9534f;
+}
+
+.panel-red > .panel-heading {
+    border-color: #d9534f;
+    color: white;
+    background-color: #d9534f;
+}
+
+.panel-red > a {
+    color: #d9534f;
+}
+
+.panel-red > a:hover {
+    color: #b52b27;
+}
+
+.panel-yellow {
+    border-color: #f0ad4e;
+}
+
+.panel-yellow > .panel-heading {
+    border-color: #f0ad4e;
+    color: white;
+    background-color: #f0ad4e;
+}
+
+.panel-yellow > a {
+    color: #f0ad4e;
+}
+
+.panel-yellow > a:hover {
+    color: #df8a13;
+}
+
+
+
+
+
+/*.wrapped {*/
+    /*max-width:200px;*/
+    /*word-wrap:break-word;*/
+    /**/
+/*}*/
+
+.navbar-header > span.navbar-brand:hover {
+    color: #9d9d9d;
+    text-decoration: none;
+}
+
+label.error{
+    color: #c9302c;
+    display: block;
+}
+input.error {
+    border-color: #c9302c;
+}
+
+.wrapped:before {
+    word-wrap:break-word;
+    /*content:"\,";*/
+    /*white-space:pre;*/
+    /*word-wrap:break-word;*/
+}
+
+/*Change the size here*/
+div.tooltip-inner {
+    max-width: 350px;
+}

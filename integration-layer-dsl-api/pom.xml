@@ -22,7 +22,8 @@
 		<module>il-server</module>
 		<module>il-client</module>
 		<module>integration-tests</module>
-		<module>il-anon</module>
+		<module>il-anonymization</module>
+		<module>libraries</module>
 	</modules>
 
 	<properties>
