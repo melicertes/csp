@@ -77,6 +77,9 @@ public class CspSSLTest implements ContextUrl {
                 .thenReturn(mockUtils.getMockedTeam(1,"http://external.csp%s.com"))
                 .thenReturn(mockUtils.getMockedTeam(2,"http://external.csp%s.com"))
                 .thenReturn(mockUtils.getMockedTeam(3,"http://external.csp%s.com"));
+        Mockito.when(camelRestService.sendAndGetList(anyString(), anyObject(), eq("GET"), eq(TrustCircle.class), anyObject()))
+                .thenReturn(mockUtils.getAllMockedTrustCircles(3, IntegrationDataType.tcNamingConventionForShortName.get(IntegrationDataType.INCIDENT)));
+
     }
 
     @Test
@@ -100,6 +103,7 @@ public class CspSSLTest implements ContextUrl {
         SharingParams sharingParams = new SharingParams();
         sharingParams.setIsExternal(false);
         sharingParams.setToShare(true);
+        integrationData.setDataObject("something");
         integrationData.setSharingParams(sharingParams);
         ResponseEntity<String> response = cspClient.postIntegrationData(integrationData, DSL_INTEGRATION_DATA);
         assertThat(response.getStatusCode(),is(HttpStatus.OK));
