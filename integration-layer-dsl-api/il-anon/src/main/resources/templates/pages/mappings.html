@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments::head(title='Dashboard', description='dashboard description')"></head>
+
+<body>
+
+<nav class="navbar navbar-inverse navbar-fixed-top">
+    <div th:replace="fragments::nav"></div>
+</nav>
+
+<div class="container">
+
+    <div class="row">
+        <div class="col-md-12">
+            <p>&nbsp;</p>
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="col-md-12">
+            <h2 class="page-header"><i class="fa fa-list"></i> CSP Mappings</h2>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12 col-sm-12">
+            <div class="row" data-duplicate="contact" data-duplicate-min="2" data-duplicate-max="10">
+                <form action="#" th:action="@{/}" th:object="${integrationAnonData}" method="post" enctype="multipart/form-data">
+                    <div class="col-md-3 col-xs-12">
+                        <div class="form-group">
+                            <label>CSP id:</label>
+                            <input class="form-control" th:field="*{cspId}" name="cspId" type="text"/>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-xs-12">
+                        <label>Data Type:</label>
+                        <div class="input-group" style="width: 100%;">
+                            <select th:field="*{dataType}" class="form-control" th:selected="null">
+                                <option th:each="dataType : ${integrationDataTypes}"
+                                        th:value="${dataType.name()}"
+                                        th:text="${dataType}">
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-xs-12">
+                        <label>Ruleset:</label>
+                        <div class="input-group" style="width: 100%;">
+                            <select th:field="*{ruleset}" class="form-control" th:selected="null">
+                                <option th:each="ruleset : ${rulesets}"
+                                        th:value="${ruleset.id}"
+                                        th:text="${ruleset.filename}">
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-2 col-xs-12" style="text-align: right">
+                        <div class="form-group">
+                            <p>&nbsp;</p>
+                            <button type="submit" value="Submit" class="save btn btn-success">Save</button>&nbsp;
+                            <button type="reset" value="Reset" class="save btn btn-default pull-right">Clear</button>
+                        </div>
+                    </div>
+                </form>
+                <div class="row">
+                    <div class="col-md-12">
+                        <table data-toggle="table" data-page-size="20" data-pagination="true">
+                            <thead>
+                            <tr>
+                                <th><i class="fa  fa-file-code-o"></i></th>
+                                <th data-sortable="true" data-sort-name="TCName_sort">CSP Id</th>
+                                <th data-sortable="true" data-sort-name="TCName_sort">Data Type</th>
+                                <th data-sortable="true" data-sort-name="TCName_sort">Ruleset</th>
+                                <th>Actions</th>
+                            </tr>
+                            </thead>
+                            <tr th:id="${integrationAnonData.id}" th:each="integrationAnonData,iterStat: ${integrationAnonDataAll}">
+                                <td th:text="${iterStat.count}"></td>
+                                <td th:text="${integrationAnonData.cspId}"></td>
+                                <td th:text="${integrationAnonData.dataType}"></td>
+                                <td th:text="${integrationAnonData.ruleset}"></td>
+                                <td><i class="fa fa-trash-o" aria-hidden="true"></i>
+                                    <i class="fa fa-edit" aria-hidden="true"></i></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<th:block th:replace="fragments::scripts"></th:block>
+
+
+</body>
+
+</html>

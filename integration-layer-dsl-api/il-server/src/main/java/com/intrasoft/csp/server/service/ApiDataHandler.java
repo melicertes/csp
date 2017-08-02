@@ -5,7 +5,6 @@ import com.intrasoft.csp.commons.exceptions.InvalidDataTypeException;
 import com.intrasoft.csp.commons.model.IntegrationData;
 import com.intrasoft.csp.commons.routes.CamelRoutes;
 import com.intrasoft.csp.commons.validators.IntegrationDataValidator;
-import com.intrasoft.csp.server.api.DclApiController;
 import com.intrasoft.csp.server.routes.RouteUtils;
 import org.apache.camel.Exchange;
 import org.apache.camel.Produce;
@@ -18,7 +17,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.beanvalidation.SpringValidatorAdapter;
 
 /**
  * Created by iskitsas on 6/10/17.

@@ -2,6 +2,7 @@ package eu.europa.csp.vcbadmin.controller;
 
 import java.io.IOException;
 import java.time.Duration;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
@@ -20,8 +21,7 @@ import javax.validation.constraints.Size;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import org.springframework.data.domain.Page;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.Authentication;
@@ -32,6 +32,7 @@ import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -42,17 +43,18 @@ import eu.europa.csp.vcbadmin.config.editors.DurationEditor;
 import eu.europa.csp.vcbadmin.config.editors.ZoneDateTimeEditor;
 import eu.europa.csp.vcbadmin.constants.MeetingScheduledTaskType;
 import eu.europa.csp.vcbadmin.constants.MeetingStatus;
+import eu.europa.csp.vcbadmin.model.CustomUserDetails;
 import eu.europa.csp.vcbadmin.model.Meeting;
 import eu.europa.csp.vcbadmin.model.MeetingForm;
 import eu.europa.csp.vcbadmin.model.MeetingScheduledTask;
-
 import eu.europa.csp.vcbadmin.model.PageWrapper;
-
+import eu.europa.csp.vcbadmin.model.ParticipantForm;
 import eu.europa.csp.vcbadmin.model.User;
 import eu.europa.csp.vcbadmin.repository.MeetingRepository;
 import eu.europa.csp.vcbadmin.repository.UserRepository;
 import eu.europa.csp.vcbadmin.service.MeetingService;
 import eu.europa.csp.vcbadmin.service.exception.MeetingNotFound;
+import jersey.repackaged.com.google.common.collect.Lists;
 
 @Controller
 public class MeetingController {
@@ -73,10 +75,8 @@ public class MeetingController {
 	@Autowired
 	VcbadminProperties vcbadminProperties;
 
-	@GetMapping("/createMeeting")
-	public String showForm(MeetingForm formMeeting) {
-		return "createMeeting";
-	}
+	@Value(value = "${event.show.timezone.default:Europe/Athens}")
+	String tz_default;
 
 	@Autowired
 	public MeetingController(OpenfireProperties properties) {
@@ -96,24 +96,45 @@ public class MeetingController {
 		// ZoneDateTimeFormatter(DateTimeFormatter.ISO_ZONED_DATE_TIME),"start");
 	}
 
+	@GetMapping("/createMeeting")
+	public String showForm(Model model, Authentication auth) {
+		CustomUserDetails principal = ((CustomUserDetails) auth.getPrincipal());
+		String user_tz = principal.getTimezone();
+		try {
+			ZoneId.of(user_tz);
+		} catch (Exception e) {
+			user_tz = tz_default;
+		}
+		MeetingForm formMeeting = new MeetingForm();
+		LinkedList<ParticipantForm> l = new LinkedList<>();
+		l.add(new ParticipantForm(principal.getFirstname(), principal.getLastname(), principal.getUsername()));
+		formMeeting.setEmails(l);
+		model.addAttribute("userTZ", user_tz);
+		model.addAttribute("meetingForm", formMeeting);
+		return "createMeeting";
+	}
+
 	@PostMapping("/createMeeting")
 	public String createMeeting(@Valid @ModelAttribute("meetingForm") MeetingForm meetingForm,
 			BindingResult bindingResult, Authentication auth) {
-		List<String> emails = meetingForm.getEmails().stream().filter(s -> Objects.nonNull(s) && !s.trim().isEmpty())
+		List<ParticipantForm> emails = meetingForm.getEmails().stream()
+				.filter(s -> Objects.nonNull(s) && s.getEmail() != null && (!s.getEmail().trim().isEmpty()))
 				.collect(Collectors.toList());
-		System.out.println(emails);
-		if (emails.isEmpty()) {
-			bindingResult.rejectValue("emails", "errors.emails.empty", "Please provide at least one participant");
-		} else {
-			for (String email : emails) {
-				System.out.println(email);
-				Pattern pattern = Pattern.compile(EMAIL_PATTERN);
-				Matcher matcher = pattern.matcher(email);
-				if (!matcher.matches()) {
-					bindingResult.rejectValue("emails", "errors.emails.malformed", "Some emails are not well-formed");
-				}
-			}
-		}
+		// log.debug(emails.toString());
+		// if (emails.isEmpty()) {
+		// bindingResult.rejectValue("emails", "errors.emails.empty", "Please
+		// provide at least one participant");
+		// } else {
+		// for (String email : emails) {
+		// System.out.println(email);
+		// Pattern pattern = Pattern.compile(EMAIL_PATTERN);
+		// Matcher matcher = pattern.matcher(email);
+		// if (!matcher.matches()) {
+		// bindingResult.rejectValue("emails", "errors.emails.malformed", "Some
+		// emails are not well-formed");
+		// }
+		// }
+		// }
 		if (meetingForm.getDuration() != null) {
 			if (meetingForm.getDuration().compareTo(Duration.ofMinutes(vcbadminProperties.getMaxMeetingDuration())) > 0
 					|| meetingForm.getDuration()
@@ -128,13 +149,14 @@ public class MeetingController {
 						"Start datetime cannot refer to past");
 			}
 		}
+		meetingForm.setEmails(new LinkedList<>(emails)); // important: update
+		// the correct email
+		// list
+
 		if (bindingResult.hasErrors()) {
+			log.info("{}", bindingResult.getAllErrors().toString());
 			return "createMeeting";
 		}
-
-		meetingForm.setEmails(new LinkedList<>(emails)); // important: update
-															// the correct email
-															// list
 
 		log.debug("Meeting validated ok: {}", meetingForm);
 		log.debug(meetingForm.toString());
@@ -164,39 +186,55 @@ public class MeetingController {
 				// m.getStart().minusMinutes(30))
 				new MeetingScheduledTask(MeetingScheduledTaskType.START_MEETING, invitationDate),
 				new MeetingScheduledTask(MeetingScheduledTaskType.END_MEETING, m.getExpectedEnd().plusMinutes(30))));
-		return "redirect:/listMeeting";
+		return "redirect:/listMeeting/scheduled";
 	}
 
 	@PostMapping("/cancelMeeting")
-	public String checkPersonInfo(
+	public String cancelMeeting(
 			@RequestParam(value = "id") @Size(min = 1, message = "Please select at least one meeting to cancel") Long[] ids,
 			Model model) throws IOException {
 		try {
 			meetingService.cancelMeetings(ids);
 		} catch (MeetingNotFound e) {
-			model.addAttribute("error", e.getMessage());
+			model.addAttribute("errors", e.getMessage());
 		}
-		return "redirect:/listMeeting";
+		return "redirect:/listMeeting/scheduled";
 	}
 
-	@GetMapping(value = { "/listMeeting", "/" })
+	@GetMapping(value = { "/listMeeting/{type}", "/" })
 
-	public String listMeeting(Model model, Authentication auth,@PageableDefault(value=2, page=0) Pageable pageable) {
-		PageWrapper<Meeting> meetings = new PageWrapper<>(meetingRepository.findByUserEmailAndStatusOrStatus(auth.getName(),
-				MeetingStatus.Pending, MeetingStatus.Running,pageable), "/listMeeting");
-		PageWrapper<Meeting> pastMeetings=new PageWrapper<>(meetingRepository.findByUserEmailAndStatusOrStatusOrStatus(auth.getName(),
-				MeetingStatus.Cancel, MeetingStatus.Completed, MeetingStatus.Expired, MeetingStatus.Error,pageable), "/listMeeting");
-		
+	public String listMeeting(Model model, @PathVariable(name = "type", required = false) String past,
+			Authentication auth, @PageableDefault(value = 10, page = 0) Pageable pageable) {
+		PageWrapper<Meeting> meetings;
+		Boolean isPast = "past".equals(past);
+		if (isPast) {
+			meetings = new PageWrapper<>(
+					meetingRepository.findByUserEmailAndStatusOrStatusOrStatus(auth.getName(), MeetingStatus.Cancel,
+							MeetingStatus.Completed, MeetingStatus.Expired, MeetingStatus.Error, pageable),
+					"/listMeeting/" + past);
+		} else {
+			past = "scheduled";
+			meetings = new PageWrapper<>(meetingRepository.findByUserEmailAndStatusOrStatus(auth.getName(),
+					MeetingStatus.Pending, MeetingStatus.Running, pageable), "/listMeeting/" + past);
+		}
+		model.addAttribute("past", isPast);
+		model.addAttribute("meetingType", isPast ? "Past Meetings" : "Scheduled Meetings");
 		model.addAttribute("meetings", meetings);
-		model.addAttribute("pastMeetings", pastMeetings);
+		String user_tz = ((CustomUserDetails) auth.getPrincipal()).getTimezone();
+		try {
+			ZoneId.of(user_tz);
+		} catch (Exception e) {
+			user_tz = tz_default;
+		}
+		model.addAttribute("userTZ", user_tz);
 		return "listMeeting";
 	}
 
 	@GetMapping(value = { "/retryMeeting" })
-	public String showMeeting(Long id, RedirectAttributes model, Authentication auth) {
+	public String retryMeeting(Long id, RedirectAttributes model, Authentication auth) {
 		if (!meetingService.retryMeeting(id)) {
 			model.addFlashAttribute("errors", Collections.singleton("Either too late to retry, or no such meeting"));
 		}
-		return "redirect:/listMeeting";
+		return "redirect:/listMeeting/scheduled";
 	}
 }

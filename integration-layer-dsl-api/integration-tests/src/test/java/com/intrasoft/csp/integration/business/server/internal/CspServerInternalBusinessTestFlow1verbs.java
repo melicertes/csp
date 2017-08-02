@@ -7,6 +7,7 @@ import com.intrasoft.csp.commons.model.IntegrationDataType;
 import com.intrasoft.csp.commons.routes.CamelRoutes;
 import com.intrasoft.csp.integration.MockUtils;
 import com.intrasoft.csp.server.CspApp;
+import com.intrasoft.csp.server.processors.TcProcessor;
 import com.intrasoft.csp.server.routes.RouteUtils;
 import com.intrasoft.csp.server.service.ErrorMessageHandler;
 import org.apache.camel.EndpointInject;
@@ -33,12 +34,15 @@ import org.springframework.web.context.WebApplicationContext;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
 @RunWith(CamelSpringBootRunner.class)
 @SpringBootTest(classes = {CspApp.class, MockUtils.class},
         properties = {
+        /*
+        //added in application-dangerduck.properties
                 "consume.errorq.on.interval:false",
                 "csp.retry.backOffPeriod:10",
                 "csp.retry.maxAttempts:1",
@@ -65,11 +69,11 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
                 "elastic.protocol: http",
                 "elastic.host: csp2.dangerduck.gr",
                 "elastic.port: 9200",
-                "elastic.path: /cspdata"
+                "elastic.path: /cspdata"*/
         })
 //@MockEndpointsAndSkip("^https4-in://localhost.*adapter.*|https4-in://csp.*|https4-ex://ex.*") // by removing this any http requests will be sent as expected.
 //@MockEndpointsAndSkip("http://external.csp*") // by removing this any http requests will be sent as expected.
-@MockEndpointsAndSkip("^http://csp2.dangerduck.gr:8081/v1/dcl/integrationData")
+@MockEndpointsAndSkip("^http.*://.*/v.*/dcl/integrationData")
 // In this test we mock all other http requests except for tc. TC dummy server is expected on 3001 port.
 // To start the TC dummy server:
 // $ APP_NAME=tc SSL=true PORT=8081 node server.js
@@ -117,11 +121,17 @@ public class CspServerInternalBusinessTestFlow1verbs implements CamelRoutes {
     @Autowired
     Environment env;
 
+    @Autowired
+    TcProcessor tcProcessor;
+
+    String serverName;
+
     private final IntegrationDataType dataTypeToTest = IntegrationDataType.VULNERABILITY;
     private final String applicationId = "taranis";
 
     @Before
     public void init() throws Exception {
+        serverName = env.getProperty("server.name");
         mvc = webAppContextSetup(webApplicationContext).build();
         mockUtils.setSpringCamelContext(springCamelContext);
 
@@ -142,9 +152,9 @@ public class CspServerInternalBusinessTestFlow1verbs implements CamelRoutes {
     @DirtiesContext
     @Test
     public void testDslFlow1PostToShare() throws Exception {
-        mockUtils.sendFlow1Data(mvc, applicationId, false, true, this.dataTypeToTest, HttpMethods.POST.name());
+        mockUtils.sendFlow1Data(mvc,serverName, applicationId, false, true, this.dataTypeToTest, HttpMethods.POST.name());
 
-        _toSharePostPutFlowImpl();
+        _toSharePostPutFlowImpl(tcProcessor.getTcTeams(this.dataTypeToTest).size());
 
         //Thread.sleep(10*1000); //to avoid "Rejecting received message because of the listener container having been stopped in the meantime"
         //be careful when debugging, you might miss breakpoints if the time is not enough
@@ -153,9 +163,9 @@ public class CspServerInternalBusinessTestFlow1verbs implements CamelRoutes {
     @DirtiesContext
     @Test
     public void testDslFlow1PutToShare() throws Exception {
-        mockUtils.sendFlow1Data(mvc, applicationId, false, true, this.dataTypeToTest, HttpMethods.PUT.name());
+        mockUtils.sendFlow1Data(mvc,serverName, applicationId, false, true, this.dataTypeToTest, HttpMethods.PUT.name());
 
-        _toSharePostPutFlowImpl();
+        _toSharePostPutFlowImpl(tcProcessor.getTcTeams(this.dataTypeToTest).size());
 
         //Thread.sleep(10*1000); //to avoid "Rejecting received message because of the listener container having been stopped in the meantime"
         //be careful when debugging, you might miss breakpoints if the time is not enough
@@ -164,7 +174,7 @@ public class CspServerInternalBusinessTestFlow1verbs implements CamelRoutes {
     @DirtiesContext
     @Test
     public void testDslFlow1DeleteToShare() throws Exception {
-        mockUtils.sendFlow1Data(mvc, applicationId, false, true, this.dataTypeToTest, HttpMethods.DELETE.name());
+        mockUtils.sendFlow1Data(mvc, serverName,applicationId, false, true, this.dataTypeToTest, HttpMethods.DELETE.name());
 
         _deleteFlowImpl();
 
@@ -176,7 +186,7 @@ public class CspServerInternalBusinessTestFlow1verbs implements CamelRoutes {
     @DirtiesContext
     @Test
     public void testDslFlow1PostNotToShare() throws Exception {
-        mockUtils.sendFlow1Data(mvc, applicationId,false, false, this.dataTypeToTest, HttpMethods.POST.name());
+        mockUtils.sendFlow1Data(mvc,serverName, applicationId,false, false, this.dataTypeToTest, HttpMethods.POST.name());
 
         _notToSharePostPutFlowImpl();
 
@@ -187,7 +197,7 @@ public class CspServerInternalBusinessTestFlow1verbs implements CamelRoutes {
     @DirtiesContext
     @Test
     public void testDslFlow1PutNotToShare() throws Exception {
-        mockUtils.sendFlow1Data(mvc, applicationId,false, false, this.dataTypeToTest, HttpMethods.PUT.name());
+        mockUtils.sendFlow1Data(mvc, serverName,applicationId,false, false, this.dataTypeToTest, HttpMethods.PUT.name());
 
         _notToSharePostPutFlowImpl();
 
@@ -198,7 +208,7 @@ public class CspServerInternalBusinessTestFlow1verbs implements CamelRoutes {
     @DirtiesContext
     @Test
     public void testDslFlow1DeleteNotToShare() throws Exception {
-        mockUtils.sendFlow1Data(mvc, applicationId,false, false, this.dataTypeToTest, HttpMethods.DELETE.name());
+        mockUtils.sendFlow1Data(mvc,serverName, applicationId,false, false, this.dataTypeToTest, HttpMethods.DELETE.name());
 
         _deleteFlowImpl();
 
@@ -207,7 +217,7 @@ public class CspServerInternalBusinessTestFlow1verbs implements CamelRoutes {
     }
 
 
-    private void _toSharePostPutFlowImpl() throws Exception {
+    private void _toSharePostPutFlowImpl(Integer expectedEscpMessages) throws Exception {
        /*
         DSL
          */
@@ -275,14 +285,15 @@ public class CspServerInternalBusinessTestFlow1verbs implements CamelRoutes {
         }
 
         //ESCP
-        mockedEcsp.expectedMessageCount(1);
+        mockedEcsp.expectedMessageCount(expectedEscpMessages);
         mockedEcsp.assertIsSatisfied();
 
         list = mockedEcsp.getReceivedExchanges();
         for (Exchange exchange : list) {
             Message in = exchange.getIn();
             EnhancedTeamDTO enhancedTeamDTO = in.getBody(EnhancedTeamDTO.class);
-            assertThat(enhancedTeamDTO.getTeam().getUrl(), is("http://csp2.dangerduck.gr:8081"));
+            assertThat(tcProcessor.getTcTeams(this.dataTypeToTest).stream()
+                    .anyMatch(t->t.getUrl().toLowerCase().equals(enhancedTeamDTO.getTeam().getUrl())),is(true));
         }
 
         //ELASTIC

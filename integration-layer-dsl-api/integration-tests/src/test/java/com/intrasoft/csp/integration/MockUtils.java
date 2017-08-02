@@ -146,7 +146,12 @@ public class MockUtils implements ContextUrl {
         dataParams.setApplicationId("test1");
         dataParams.setCspId("testCspId");
         dataParams.setRecordId("recordId");
+        dataParams.setOriginCspId("origin-testCspId");
+        dataParams.setOriginApplicationId("origin-test1");
+        dataParams.setOriginRecordId("origin-recordId");
         dataParams.setDateTime(DateTime.now());
+        dataParams.setUrl("http://rt.cert-gr.melecertes.eu/Ticket/Display.html?id=23453");
+        dataParams.setReference("<a href=\"http://rt.cert-gr.melecertes.eu/Ticket/Display.html?id=23453\" data-origin=\"cert-gr;rt;23453\">Incident title</a>");
         SharingParams sharingParams = new SharingParams();
         sharingParams.setIsExternal(isExternal);
         sharingParams.setToShare(true);
@@ -163,11 +168,11 @@ public class MockUtils implements ContextUrl {
 
 
 
-    public void sendFlow1Data(MockMvc mvc, Boolean isExternal, Boolean toShare, IntegrationDataType dataType, String httpMethod) throws Exception {
-        sendFlow1Data(mvc,"taranis", isExternal,toShare,dataType,httpMethod);
+    public void sendFlow1Data(MockMvc mvc,String cspId, Boolean isExternal, Boolean toShare, IntegrationDataType dataType, String httpMethod) throws Exception {
+        sendFlow1Data(mvc,cspId,"taranis", isExternal,toShare,dataType,httpMethod);
     }
 
-    public void sendFlow1Data(MockMvc mvc, String applicationId, Boolean isExternal, Boolean toShare, IntegrationDataType dataType, String httpMethod) throws Exception {
+    public void sendFlow1Data(MockMvc mvc, String cspId, String applicationId, Boolean isExternal, Boolean toShare, IntegrationDataType dataType, String httpMethod) throws Exception {
         IntegrationData integrationData = new IntegrationData();
         integrationData.setDataType(dataType);
         SharingParams sharingParams = new SharingParams();
@@ -178,7 +183,10 @@ public class MockUtils implements ContextUrl {
         dataParams.setRecordId("222");
         dataParams.setDateTime(DateTime.now());
         dataParams.setApplicationId(applicationId);
-        dataParams.setCspId("CERT-GR");
+        dataParams.setCspId(cspId);
+        dataParams.setOriginCspId("origin-"+cspId);
+        dataParams.setOriginApplicationId("origin-"+applicationId);
+        dataParams.setOriginRecordId("origin-222");
         integrationData.setDataParams(dataParams);
         integrationData.setDataObject(dataParams);
 
@@ -217,6 +225,9 @@ public class MockUtils implements ContextUrl {
         DataParams dataParams = new DataParams();
         dataParams.setRecordId("222");
         dataParams.setApplicationId(applicationId);
+        dataParams.setOriginCspId("origin-"+cspId);
+        dataParams.setOriginApplicationId("origin-"+applicationId);
+        dataParams.setOriginRecordId("origin-222");
         dataParams.setDateTime(DateTime.now());
         dataParams.setCspId(cspId);
         integrationData.setDataParams(dataParams);

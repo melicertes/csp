@@ -1,0 +1,96 @@
+swagger: '2.0'
+info:
+  description: >-
+    Anonymization service accepts data from the Integration Layer (cspId,
+    integrationDataType and dataObject), and returns the dataObject with
+    anonymized the appropriate fields of the dataObject json string.
+  version: 1.0.0
+  title: Anonymization API
+host: anon.csp.org
+basePath: /v1
+tags:
+  - name: anon
+    description: Anonymize data
+schemes:
+  - https
+paths:
+  /anon:
+    post:
+      tags:
+        - anon
+      summary: Post integration data to anonymize
+      description: >-
+        Integration Layer posts integration data to the anonymization service.
+        The anonymization service responds with the integration data anonymized
+        based on internal rules.
+      operationId: anonData
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: intAnonDataObj
+          description: Integration data to anonymize
+          required: true
+          schema:
+            $ref: '#/definitions/IndegrationAnonData'
+      responses:
+        '200':
+          description: Successful operation
+          schema:
+            $ref: '#/definitions/IndegrationAnonData'
+        '400':
+          description: Malformed Data Structure
+        '404':
+          description: >-
+            mapping not found; failure to identify (cspId, dataType,
+            ruleFilePath) tuple presented
+          schema:
+            $ref: '#/definitions/ResponseError'
+        '500':
+          description: Systemic failure
+          schema:
+            $ref: '#/definitions/ResponseError'
+definitions:
+  IndegrationAnonData:
+    type: object
+    properties:
+      cspId:
+        type: string
+      dataType:
+        $ref: '#/definitions/IntegrationDataType'
+      dataObject:
+        type: string
+  IntegrationDataType:
+    type: string
+    enum:
+      - event
+      - threat
+      - incident
+      - vulnerability
+      - artefact
+      - chat
+      - file
+      - contact
+      - trustCircle
+  ResponseError:
+    description: Failed Response object
+    properties:
+      responseCode:
+        type: integer
+        minimum: 1000
+        maximum: 9999
+        example: 1020
+        description: the response code; code > 0 = Error (see detailed response)
+      responseText:
+        type: string
+        example: Transaction failure
+        description: the response received in a textual format
+      responseException:
+        type: string
+        example: Exception as received from the backend
+    required:
+      - responseCode
+      - responseText
+      - responseException

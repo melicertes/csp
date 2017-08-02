@@ -7,7 +7,7 @@ info:
     represents the data and updates that record (deduplication) or creates a new
     one. The emmition of the creation or update is dependant on the "isExternal"
     flag.
-  version: 1.0.1
+  version: 1.0.4
   title: Application Adapter API
 host: app.csp.org
 schemes:
@@ -41,10 +41,6 @@ paths:
           description: Successful operation
         '400':
           description: Malformed Integration Data Structure
-        '500':
-          description: Internal server error
-        '503':
-          description: Service unavailable
     put:
       summary: Process integration data update from integration layer
       description: |
@@ -63,10 +59,6 @@ paths:
           description: Successful operation
         '400':
           description: Malformed Integration Data Structure
-        '500':
-          description: Internal server error
-        '503':
-          description: Service unavailable
     delete:
       summary: Process integration data deletion from integration layer
       description: >
@@ -91,10 +83,8 @@ paths:
       responses:
         '200':
           description: Successful operation
-        '500':
-          description: Internal server error
-        '503':
-          description: Service unavailable
+        '400':
+          description: Malformed Integration Data Structure
 definitions:
   IntegrationData:
     type: object
@@ -107,18 +97,55 @@ definitions:
         $ref: '#/definitions/IntegrationDataType'
       dataObject:
         type: string
+        format: json
   DataParams:
     type: object
+    description: >
+      origin[Csp/Application/Record]Id are only set by the application that
+      initiates flow #1 (see SAD).
+
+      In this case Origin[csp/application/record]Id and
+      [csp/application/record]Id are equal.
+
+      In the case where a principal application adapter gets data from external
+      CSP and re-emitts them for indexing,
+
+      [csp/application/record]Id are set to that of the principal application
+      while Origin[csp/application/record]Id
+
+      remain unchanged.
     properties:
+      originCspId:
+        type: string
+      originApplicationId:
+        type: string
+      originRecordId:
+        type: string
       cspId:
         type: string
       applicationId:
         type: string
       recordId:
         type: string
-      timestamp:
+      dateTime:
         type: string
         format: dateTime
+        description: |
+          timestamp of the record emission
+      url:
+        type: string
+        format: url
+        description: |
+          reference to the emmitted record based on [csp/application/record]Id
+          (see SAD)
+    required:
+      - originCspId
+      - originApplicationId
+      - originRecordId
+      - cspId
+      - applicationId
+      - recordId
+      - dateTime
   IntegrationDataType:
     type: string
     enum:
@@ -133,8 +160,19 @@ definitions:
       - trustCircle
   SharingParams:
     type: object
+    description: |
+      only one of the trustCircleId or teamId should exist.
+      If none exists, sharing is done based on data specific
+      trust circles
     properties:
       toShare:
         type: boolean
       isExternal:
         type: boolean
+      trustCircleId:
+        type: string
+      teamId:
+        type: string
+    required:
+      - toShare
+      - isExternal

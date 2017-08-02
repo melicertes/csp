@@ -1,6 +1,7 @@
 package com.intrasoft.csp.integration.business.server.internal;
 
 
+import com.intrasoft.csp.commons.constants.AppProperties;
 import com.intrasoft.csp.commons.model.IntegrationData;
 import com.intrasoft.csp.commons.model.IntegrationDataType;
 import com.intrasoft.csp.commons.routes.CamelRoutes;
@@ -26,6 +27,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.env.Environment;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.util.StringUtils;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.util.List;
@@ -37,6 +39,8 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
 @RunWith(CamelSpringBootRunner.class)
 @SpringBootTest(classes = {CspApp.class, MockUtils.class},
         properties = {
+        /*
+        //added in application-dangerduck.properties
                 "consume.errorq.on.interval:false",
                 "csp.retry.backOffPeriod:10",
                 "csp.retry.maxAttempts:1",
@@ -68,11 +72,11 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
                 "elastic.protocol: http",
                 "elastic.host: csp2.dangerduck.gr",
                 "elastic.port: 9200",
-                "elastic.path: /cspdata"
+                "elastic.path: /cspdata"*/
         })
 //@MockEndpointsAndSkip("^https4-in://localhost.*adapter.*|https4-in://csp.*|https4-ex://ex.*") // by removing this any http requests will be sent as expected.
 //@MockEndpointsAndSkip("http://external.csp*") // by removing this any http requests will be sent as expected.
-@MockEndpointsAndSkip("^http://csp2.dangerduck.gr:8081/v1/dcl/integrationData")
+@MockEndpointsAndSkip("^http.*://.*/v.*/dcl/integrationData")
 // In this test we mock all other http requests except for tc. TC dummy server is expected on 3001 port.
 // To start the TC dummy server:
 // $ APP_NAME=tc SSL=true PORT=8081 node server.js
@@ -115,10 +119,16 @@ public class CspServerInternalBusinessTestFlow2 implements CamelRoutes {
     private Integer currentCspId = 0;
     private final IntegrationDataType dataTypeToTest = IntegrationDataType.VULNERABILITY;
     private final String applicationId = "taranis";
-    private final String cspId = "CERT-GR";
+    private String cspId = "CERT-GR";
 
     @Before
     public void init() throws Exception {
+        //check arguments if external cspId was provided
+        String cspIdArg = env.getProperty("extCspId");
+        if(!StringUtils.isEmpty(cspIdArg)){
+            cspId = cspIdArg;
+        }
+        //cspId = env.getProperty("server.name");
         mvc = webAppContextSetup(webApplicationContext).build();
         mockUtils.setSpringCamelContext(springCamelContext);
 
@@ -234,6 +244,7 @@ public class CspServerInternalBusinessTestFlow2 implements CamelRoutes {
         mockedDsl.expectedMessageCount(1);
         mockedDsl.assertIsSatisfied();
 
+        boolean isExternal = false;
 
         list = mockedDsl.getReceivedExchanges();
         for (Exchange exchange : list) {
@@ -242,6 +253,7 @@ public class CspServerInternalBusinessTestFlow2 implements CamelRoutes {
             assertThat(data.getDataType(), is(this.dataTypeToTest));
             assertThat(data.getSharingParams().getIsExternal(), is(true));
             assertThat(data.getSharingParams().getToShare(), is(true));
+            isExternal = data.getSharingParams().getIsExternal();
         }
 
         /*
@@ -250,7 +262,7 @@ public class CspServerInternalBusinessTestFlow2 implements CamelRoutes {
         // The data type to test is defined in class -> private IntegrationDataType dataTypeToTest = IntegrationDataType.VULNERABILITY;
         // The application id is "taranis"
         // Expect 1-messages according to application.properties (external.vulnerability.apps:taranis)
-        mockedApp.expectedMessageCount(1);
+        mockedApp.expectedMessageCount(env.getProperty((isExternal? AppProperties.EXTERNAL:AppProperties.INTERNAL)+"."+this.dataTypeToTest.name().toLowerCase()+".apps").split(",").length);
         mockedApp.assertIsSatisfied();
 
         list = mockedApp.getReceivedExchanges();

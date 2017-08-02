@@ -21,6 +21,12 @@ public class SharingParams implements Serializable {
     @JsonProperty("isExternal")
     private Boolean isExternal;
 
+    @JsonProperty("tcId")
+    private String tcId;
+
+    @JsonProperty("teamId")
+    private String teamId;
+
     public SharingParams() {
     }
 
@@ -43,6 +49,22 @@ public class SharingParams implements Serializable {
 
     public void setIsExternal(Boolean isExternal) {
         this.isExternal = isExternal;
+    }
+
+    public String getTcId() {
+        return tcId;
+    }
+
+    public void setTcId(String tcId) {
+        this.tcId = tcId;
+    }
+
+    public String getTeamId() {
+        return teamId;
+    }
+
+    public void setTeamId(String teamId) {
+        this.teamId = teamId;
     }
 
     @Override
@@ -70,6 +92,8 @@ public class SharingParams implements Serializable {
 
         sb.append("    toShare: ").append(toIndentedString(toShare)).append("\n");
         sb.append("    isExternal: ").append(toIndentedString(isExternal)).append("\n");
+        sb.append("    tcId: ").append(toIndentedString(tcId)).append("\n");
+        sb.append("    teamId: ").append(toIndentedString(teamId)).append("\n");
         sb.append("}");
         return sb.toString();
     }

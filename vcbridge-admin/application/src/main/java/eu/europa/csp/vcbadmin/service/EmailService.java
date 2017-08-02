@@ -13,6 +13,9 @@ import java.util.Scanner;
 import javax.mail.internet.MimeMessage;
 import javax.mail.util.ByteArrayDataSource;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.safety.Whitelist;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -92,11 +95,13 @@ public class EmailService {
 	@Value(value = "classpath:templates/icalendar/meeting.ics")
 	private Resource meetingTemplate;
 
-	@Value(value = "classpath:templates/icalendar/invitation_description.txt")
-	private Resource meetingTemplateInvitation;
+	// @Value(value =
+	// "classpath:templates/icalendar/invitation_description.txt")
+	// private Resource meetingTemplateInvitation;
 
-	@Value(value = "classpath:templates/icalendar/cancellation_description.txt")
-	private Resource meetingTemplateCancellation;
+	// @Value(value =
+	// "classpath:templates/icalendar/cancellation_description.txt")
+	// private Resource meetingTemplateCancellation;
 
 	@Async
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -119,7 +124,8 @@ public class EmailService {
 				m.put("meeting_date", meeting.getStart().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
 				m.put("meeting_time", meeting.getStart().format(DateTimeFormatter.ofPattern("HH:mm ZZZ")));
 				m.put("meeting_duration", meeting.getDurationAsTime().format(DateTimeFormatter.ofPattern("HH:mm")));
-				m.put("meeting_duration_str", meeting.getDurationAsTime().format(DateTimeFormatter.ofPattern("H' hour(s) and 'mm' minutes'")));
+				m.put("meeting_duration_str", meeting.getDurationAsTime()
+						.format(DateTimeFormatter.ofPattern("H' hour(s) and 'mm' minutes'")));
 				m.put("meeting_username", p.getUsername());
 				m.put("meeting_password", p.getPassword());
 				m.put("meeting_url", meeting.getUrl());
@@ -132,6 +138,8 @@ public class EmailService {
 				String content = mailContentBuilder.build(et.getContent(), m);
 
 				messageHelper.setText(content, true);
+
+				String icalendar_descripion = br2nl(content).replaceAll("(\\r|\\n|\\r\\n)+", "\\\\n");// Jsoup.parse(content).text();
 
 				// icalendar stuff
 				BufferedReader br = new BufferedReader(new InputStreamReader(meetingTemplate.getInputStream()), 1024);
@@ -149,18 +157,29 @@ public class EmailService {
 						.format(ZonedDateTime.ofInstant(meeting.getStart().toInstant(), ZoneOffset.UTC)));
 				m.put("uid", meeting.getUid());
 				m.put("location", meeting.getUrl());
-				m.put("comment", content);
+				//m.put("comment", icalendar_descripion);
+				m.put("description", mailContentBuilder.build(icalendar_descripion, m));
+				StringBuilder attendee_string = new StringBuilder();
+				for (Participant part : meeting.getParticipants()) {
+					attendee_string
+							.append(String.format("ATTENDEE;ROLE=REQ-PARTICIPANT;PARTSTAT=TENTATIVE;CN=%s:MAILTO:%s",
+									part.getFullname(), part.getEmail()));
+					attendee_string.append("\n");
+				}
+				m.put("attendee", attendee_string.toString());
 				if (et.getType().equals(EmailTemplateType.INVITATION)) {
-					String ics_description_template = new Scanner(meetingTemplateInvitation.getInputStream(), "utf-8")
-							.useDelimiter("\\Z").next();
-					m.put("description", mailContentBuilder.build(ics_description_template, m));
+					// String ics_description_template = new
+					// Scanner(meetingTemplateInvitation.getInputStream(),
+					// "utf-8")
+					// .useDelimiter("\\Z").next();
 					m.put("seq", 0);
 					m.put("status", "CONFIRMED");
 
 				} else {
-					String ics_description_template = new Scanner(meetingTemplateCancellation.getInputStream(), "utf-8")
-							.useDelimiter("\\Z").next();
-					m.put("description", mailContentBuilder.build(ics_description_template, m));
+					// String ics_description_template = new
+					// Scanner(meetingTemplateCancellation.getInputStream(),
+					// "utf-8")
+					// .useDelimiter("\\Z").next();
 					m.put("seq", 1);
 					m.put("status", "CANCELLED");
 				}
@@ -182,5 +201,21 @@ public class EmailService {
 				// runtime exception; compiler will not force you to handle it
 			}
 		}
+	}
+
+	public static String br2nl(String html) {
+		if (html == null)
+			return html;
+		Document document = Jsoup.parse(html);
+		document.outputSettings(new Document.OutputSettings().prettyPrint(false));// makes
+																					// html()
+																					// preserve
+																					// linebreaks
+																					// and
+																					// spacing
+		document.select("br").append("\\n");
+		document.select("p").prepend("\\n\\n");
+		String s = document.html().replaceAll("\\\\n", "\n");
+		return Jsoup.clean(s, "", Whitelist.none(), new Document.OutputSettings().prettyPrint(false));
 	}
 }

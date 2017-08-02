@@ -82,8 +82,8 @@ public class Meeting {
 			for (String email : emails) {
 				String hashed_email = hba.marshal(md.digest((email + System.currentTimeMillis()).getBytes()));
 				md.reset();
-				participants
-						.add(new Participant(email, hashed_email.substring(0, 6), hashed_email.substring(6, 16), this));
+				participants.add(new Participant(email, hashed_email.substring(0, 6), null, null,
+						hashed_email.substring(6, 16), this));
 				sb.append(email);
 			}
 			sb.append(System.currentTimeMillis());
@@ -147,6 +147,21 @@ public class Meeting {
 
 	public void setParticipants(List<Participant> participants) {
 		this.participants = participants;
+		this.participants.forEach(p -> p.setMeeting(this));
+		if (room == null || room.isEmpty()) {
+			StringBuilder sb = new StringBuilder();
+			for (Participant p : this.participants) {
+				sb.append(p.getEmail());
+			}
+			sb.append(System.currentTimeMillis());
+			try {
+				MessageDigest md = MessageDigest.getInstance(
+						"MD5"); /* always create new instance not thread safe */
+				room = hba.marshal(md.digest(sb.toString().getBytes())).substring(0, 16);
+			} catch (NoSuchAlgorithmException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 	public MeetingStatus getStatus() {

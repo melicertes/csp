@@ -1,11 +1,6 @@
 package com.intrasoft.csp.integration.sandbox.server.internal;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.intrasoft.csp.commons.apiHttpStatusResponse.HttpStatusResponseType;
-import com.intrasoft.csp.commons.model.DataParams;
-import com.intrasoft.csp.commons.model.IntegrationData;
-import com.intrasoft.csp.commons.model.IntegrationDataType;
-import com.intrasoft.csp.commons.model.SharingParams;
 import com.intrasoft.csp.commons.routes.ContextUrl;
 import com.intrasoft.csp.commons.validators.IntegrationDataValidator;
 import com.intrasoft.csp.integration.TestUtil;
@@ -13,23 +8,17 @@ import com.intrasoft.csp.server.CspApp;
 import org.apache.camel.test.spring.CamelSpringBootRunner;
 import org.apache.camel.test.spring.MockEndpointsAndSkip;
 import org.apache.commons.io.FileUtils;
-import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.validation.BeanPropertyBindingResult;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.io.File;
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.Charset;
 
@@ -72,10 +61,11 @@ public class IntegrationDataValidatorTest implements ContextUrl {
     @Autowired
     private WebApplicationContext webApplicationContext;
 
-    URL null_datatype = getClass().getClassLoader().getResource("null_datatype.json");
-    URL missing_integration_data = getClass().getClassLoader().getResource("missing_integration_data.json");
-    URL integration_data_vulnerability = getClass().getClassLoader().getResource("integration_data_vulnerability.json");
-    URL invalid_integration_data_vulnerability = getClass().getClassLoader().getResource("invalid_integration_data_vulnerability.json");
+    URL incident_data_example1 = getClass().getClassLoader().getResource("json/incident_data_example1.json");
+    URL null_datatype = getClass().getClassLoader().getResource("json/null_datatype.json");
+    URL missing_integration_data = getClass().getClassLoader().getResource("json/missing_integration_data.json");
+    URL integration_data_vulnerability = getClass().getClassLoader().getResource("json/integration_data_vulnerability.json");
+    URL invalid_integration_data_vulnerability = getClass().getClassLoader().getResource("json/invalid_integration_data_vulnerability.json");
 
     @Before
     public void init() throws Exception {
@@ -86,6 +76,16 @@ public class IntegrationDataValidatorTest implements ContextUrl {
     @Test
     public void validIntegrationDataTest() throws Exception {
         String json = FileUtils.readFileToString(new File(integration_data_vulnerability.toURI()),Charset.forName("UTF-8"));
+        mvc.perform(post("/v"+REST_API_V1+"/"+DSL_INTEGRATION_DATA).accept(MediaType.TEXT_PLAIN)
+                .content(json)
+                .contentType(TestUtil.APPLICATION_JSON_UTF8))
+                .andExpect(status().isOk())
+                .andExpect(content().string(HttpStatusResponseType.SUCCESSFUL_OPERATION.getReasonPhrase()));
+    }
+
+    @Test
+    public void validIntegrationDataExample1Test() throws Exception {
+        String json = FileUtils.readFileToString(new File(incident_data_example1.toURI()),Charset.forName("UTF-8"));
         mvc.perform(post("/v"+REST_API_V1+"/"+DSL_INTEGRATION_DATA).accept(MediaType.TEXT_PLAIN)
                 .content(json)
                 .contentType(TestUtil.APPLICATION_JSON_UTF8))

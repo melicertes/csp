@@ -1,24 +1,48 @@
 package eu.europa.csp.vcbadmin.model;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZonedDateTime;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.UUID;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
 
 import org.hibernate.validator.constraints.NotEmpty;
 
 import eu.europa.csp.vcbadmin.constants.MeetingStatus;
 
 public class MeetingForm {
+	private static HexBinaryAdapter hba = new HexBinaryAdapter();
+
 	public static Meeting createMeetingFromForm(MeetingForm form_meeting, User user) {
 		Meeting m = new Meeting();
 		m.setDuration(form_meeting.getDuration());
 		m.setStart(form_meeting.getStart());
-		m.setParticipantEmails(form_meeting.getEmails());
+		List<Participant> participants = new LinkedList<>();
+		for (ParticipantForm p : form_meeting.getEmails()) {
+			MessageDigest md = null;
+			try {
+				md = MessageDigest.getInstance("MD5"); // always create new
+														// instance
+														// not thread safe
+			} catch (NoSuchAlgorithmException e) {
+				e.printStackTrace();
+			}
+			if (md != null) {
+				String hashed_email = hba.marshal(md.digest((p.getEmail() + System.currentTimeMillis()).getBytes()));
+				md.reset();
+				participants.add(new Participant(p.getEmail(), hashed_email.substring(0, 6), p.getName(),
+						p.getSurname(), hashed_email.substring(6, 16)));
+			}
+		}
+		m.setParticipants(participants);
 		m.setStatus(MeetingStatus.Pending);
 		m.setUser(user);
 		m.setUid(UUID.randomUUID().toString());
@@ -32,7 +56,7 @@ public class MeetingForm {
 
 	@NotNull
 	private String timeZone = "Europe/Athens";
-	
+
 	@NotEmpty
 	private String subject;
 
@@ -45,7 +69,8 @@ public class MeetingForm {
 	private Duration duration;
 
 	@NotNull
-	private LinkedList<String> emails = new LinkedList<>();
+	@Valid
+	private LinkedList<ParticipantForm> emails = new LinkedList<>();
 
 	public MeetingForm() {
 
@@ -55,7 +80,7 @@ public class MeetingForm {
 		return duration;
 	}
 
-	public LinkedList<String> getEmails() {
+	public LinkedList<ParticipantForm> getEmails() {
 		return emails;
 	}
 
@@ -82,7 +107,7 @@ public class MeetingForm {
 		this.duration = duration;
 	}
 
-	public void setEmails(LinkedList<String> emails) {
+	public void setEmails(LinkedList<ParticipantForm> emails) {
 		this.emails = emails;
 	}
 

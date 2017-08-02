@@ -1,0 +1,112 @@
+--------------------------------------------
+-- How to run integration and smoke tests --
+--------------------------------------------
+
+1. Build the project or use an existing build to take the jar file
+******************************************************************
+
+
+1A. Build the project (ignore this step if you already have the jar file and go to 2.)
+--------------------------------------------------------------------------------------
+
+
+1Ai. Build the project
+--------------------------
+Go to the folder you have cloned the git repository and run:
+
+$ mvn clean install -DskipTests
+
+
+1Aii. Navigate to target folder and locate the jar file
+----------------------------------------------------
+$ cd integration-tests/target
+
+the file will have a similar name to this format:
+integration-tests-0.2.0-SNAPSHOT.jar
+
+
+
+2. Upload the integration-tests jar file
+****************************************
+After starting your vpn connection use ssh to test login to a csp vm (usually you have setup your config file in .ssh folder).
+
+eg.
+$ ssh central-csp.intra
+
+Exit the terminal and locate the jar file in your local path. Use scp to copy the jar file to the host machine.
+
+eg.
+$ scp integration-tests-0.2.0-SNAPSHOT.jar central-csp.intra:/home/csp
+
+Login to the host like you did before and validate that the file has been uploaded successfully.
+
+
+3. Copy the jar file in the container
+*************************************
+
+$ docker cp integration-tests-0.2.0-SNAPSHOT.jar csp-il:/opt/csp
+
+
+4. Connect to the java docker container
+***************************************
+
+$ docker exec -ti csp-il /bin/sh
+
+
+5. Run the tests
+****************
+
+In the home directory you will find the integration tests jar. You can use the following commands to run various tests
+
+5i. Smoke tests
+----------------
+
+The jar file contains the latest application server code, so you can run the smoke tests against him. These tests can be ran
+in any environment which has java 1.8 installed and will start an instance of the application server in sandbox test port,
+not affecting any other running instances.
+
+Test 1:
+$ java -jar integration-tests-0.2.0-SNAPSHOT.jar com.intrasoft.csp.integration.sandbox.server.internal.CspServerInternalSandboxTest
+
+Test 2:
+$ java -jar integration-tests-0.2.0-SNAPSHOT.jar com.intrasoft.csp.integration.sandbox.server.internal.CspServerInternalSandboxTestFlow1dataTypes
+
+Test 3:
+$ java -jar integration-tests-0.2.0-SNAPSHOT.jar com.intrasoft.csp.integration.sandbox.server.internal.CspServerInternalSandboxTestFlow1verbs
+
+Test 4:
+$ java -jar integration-tests-0.2.0-SNAPSHOT.jar com.intrasoft.csp.integration.sandbox.server.internal.CspServerInternalSandboxTestFlow2
+
+Test 5:
+$ java -jar integration-tests-0.2.0-SNAPSHOT.jar com.intrasoft.csp.integration.sandbox.server.internal.CspServerVariousIntegrationDataTest
+
+Test 6:
+$ java -jar integration-tests-0.2.0-SNAPSHOT.jar com.intrasoft.csp.integration.sandbox.server.internal.IntegrationDataValidatorTest
+
+5ii. Integration (Business) Tests
+----------------------------------
+
+iTest1:
+
+$ java -jar -Dspring.profiles.active=docker -Dapache.camel.use.activemq=false -Dembedded.activemq.start=false \
+  integration-tests-0.2.0-SNAPSHOT.jar \
+  com.intrasoft.csp.integration.business.server.internal.CspServerInternalBusinessTestFlow1dataTypes
+
+
+iTest2:
+
+$ java -jar -Dspring.profiles.active=docker -Dapache.camel.use.activemq=false -Dembedded.activemq.start=false \
+  integration-tests-0.2.0-SNAPSHOT.jar \
+  com.intrasoft.csp.integration.business.server.internal.CspServerInternalBusinessTestFlow1verbs
+
+
+iTest3:
+Use an extCspId argument having a value that exists in your TC db and is NOT the same with the cspId of the machine you
+are running these tests
+
+$ java -jar -Dspring.profiles.active=docker -Dapache.camel.use.activemq=false -Dembedded.activemq.start=false -DextCspId=demo1-csp \
+  integration-tests-0.2.0-SNAPSHOT.jar \
+  com.intrasoft.csp.integration.business.server.internal.CspServerInternalBusinessTestFlow2
+
+
+

@@ -7,7 +7,7 @@ STATUS:[(${status})]
 UID:[(${uid})]
 SUMMARY:[(${summary})]
 ORGANIZER;CN=[(${organizer})]:MAILTO:[(${organizerEmail})]
-CATEGORIES:Meeting
+[(${attendee})]CATEGORIES:Meeting
 DTSTART:[(${start})]
 DURATION:[(${duration})]
 TRANSP:OPAQUE

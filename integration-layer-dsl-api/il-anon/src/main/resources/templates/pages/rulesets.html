@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments::head(title='Dashboard', description='dashboard description')"></head>
+
+<body>
+
+<nav class="navbar navbar-inverse navbar-fixed-top">
+    <div th:replace="fragments::nav"></div>
+</nav>
+
+<div class="container">
+
+    <div class="row">
+        <div class="col-md-12">
+            <p>&nbsp;</p>
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="col-md-12">
+            <h2 class="page-header"><i class="fa fa-gavel"></i> Rulesets</h2>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12 col-sm-12">
+            <div class="row" data-duplicate="contact" data-duplicate-min="2" data-duplicate-max="10">
+                <div class="row">
+                    <form th:action="@{/rulesets}" th:object="${ruleset}" method="post" enctype="multipart/form-data">
+                        <div class="col-md-12 col-xs-12">
+                            <div class="form-group">
+                                <label for="file">File:</label>
+                                <input id="file" th:field="*{file}" name="file" type="file" class="file"></input>
+                            </div>
+                        </div>
+                        <div class="col-md-12 col-xs-12">
+                            <div class="form-group">
+                                <label for="description">Description:</label>
+                                <textarea id="description" th:field="*{description}" name="description" type="text" class="form-control custom-control" rows="3" style="resize:none"></textarea>
+                            </div>
+                        </div>
+                        <div class="col-md-2 col-xs-12 pull-down">
+                            <div class="form-group">
+                                <button type="submit" value="Submit" class="save btn btn-success">Import file</button>
+                                <button type="reset" value="Reset" class="save btn btn-default pull-right">Clear</button>
+                            </div>
+                        </div>
+                        <div class="col-md-10 col-xs-12 pull-down pull-right" style="text-align: right">
+                            <div class="form-group">
+                                <button type="#" value="Create" class="save btn btn-primary pull-right">Create</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <table data-toggle="table" data-page-size="20" data-pagination="true">
+                            <thead>
+                            <tr>
+                                <th><i class="fa  fa-file-code-o"></i></th>
+                                <th data-sortable="true" data-sort-name="TCName_sort">Name</th>
+                                <th data-sortable="true" data-sort-name="TCName_sort">Description</th>
+                                <th>Actions</th>
+                            </tr>
+                            </thead>
+                            <tr th:id="${ruleset.id}" th:each="ruleset,iterStat: ${rulesets}">
+                                <td th:text="${iterStat.count}"></td>
+                                <td th:text="${ruleset.filename}"></td>
+                                <td th:text="${ruleset.description}"></td>
+                                <td><i class="fa fa-trash-o" aria-hidden="true"></i>
+                                    <i class="fa fa-edit" aria-hidden="true"></i>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<th:block th:replace="fragments::scripts"></th:block>
+<script th:src="@{/webjars/bootstrap-fileinput/4.2.0/js/fileinput.min.js}"></script>
+
+<script>
+
+    $("#file").fileinput({'showUpload':false, 'showPreview':false, 'hiddenThumbnailContent': true});
+
+</script>
+<!--
+<script th:src="@{/assets/js/vendor/jquery.validate.min.js}" src="../static/assets/js/vendor/jquery.validate.min.js"></script>
+<script th:src="@{/assets/js/vendor/jquery.validate.additional-methods.min.js}" src="../static/assets/js/vendor/jquery.validate.additional-methods.min.js"></script>
+<script th:src="@{/assets/js/vendor/jquery.mask.min.js}" src="../static/assets/js/vendor/jquery.mask.min.js"></script>
+<script th:src="@{/bootstrap-checkbox/bootstrap-checkbox.min.js}" src="../static/bootstrap-checkbox/bootstrap-checkbox.min.js"></script>
+-->
+
+
+
+</body>
+
+</html>
