@@ -1,7 +1,7 @@
 package com.intrasoft.csp.anon.service;
 
-import com.intrasoft.csp.anon.commons.model.IntegrationDataType;
 import com.intrasoft.csp.anon.model.Rules;
+import com.intrasoft.csp.commons.model.IntegrationDataType;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;

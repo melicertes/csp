@@ -1,12 +1,12 @@
 package com.intrasoft.csp.anon.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.intrasoft.csp.anon.commons.model.IntegrationDataType;
 import com.intrasoft.csp.anon.model.Mapping;
 import com.intrasoft.csp.anon.model.Rules;
 import com.intrasoft.csp.anon.repository.MappingRepository;
 import com.intrasoft.csp.anon.repository.RulesetRepository;
 import com.intrasoft.csp.anon.service.RulesService;
+import com.intrasoft.csp.commons.model.IntegrationDataType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

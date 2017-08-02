@@ -6,7 +6,7 @@ import com.intrasoft.csp.anon.client.config.AnonClientConfig;
 
 import com.intrasoft.csp.anon.commons.model.AnonContextUrl;
 import com.intrasoft.csp.anon.commons.model.IntegrationAnonData;
-import com.intrasoft.csp.anon.commons.model.IntegrationDataType;
+import com.intrasoft.csp.commons.model.IntegrationDataType;
 import com.intrasoft.csp.libraries.restclient.config.CspRestTemplateConfiguration;
 import com.intrasoft.csp.libraries.restclient.service.RetryRestTemplate;
 import org.junit.Test;
@@ -28,7 +28,7 @@ import static org.hamcrest.Matchers.is;
 
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = {AnonApp.class, AnonClientConfig.class, CspRestTemplateConfiguration.class},
+@SpringBootTest(classes = {AnonApp.class, AnonClientConfig.class},
         webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT,
         properties = {
                 "server.port: 8585",

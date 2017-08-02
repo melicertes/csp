@@ -2,6 +2,7 @@ package com.intrasoft.csp.anon.commons.model;
 
 import com.fasterxml.jackson.annotation.*;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.intrasoft.csp.commons.model.IntegrationDataType;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;

@@ -1,7 +1,7 @@
 package com.intrasoft.csp.anon.repository;
 
-import com.intrasoft.csp.anon.commons.model.IntegrationDataType;
 import com.intrasoft.csp.anon.model.Mapping;
+import com.intrasoft.csp.commons.model.IntegrationDataType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

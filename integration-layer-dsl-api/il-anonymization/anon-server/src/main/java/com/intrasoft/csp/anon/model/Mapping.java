@@ -1,6 +1,6 @@
 package com.intrasoft.csp.anon.model;
 
-import com.intrasoft.csp.anon.commons.model.IntegrationDataType;
+import com.intrasoft.csp.commons.model.IntegrationDataType;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.persistence.*;
