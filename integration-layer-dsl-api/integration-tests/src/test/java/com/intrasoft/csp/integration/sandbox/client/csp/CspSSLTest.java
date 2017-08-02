@@ -1,10 +1,11 @@
 package com.intrasoft.csp.integration.sandbox.client.csp;
 
 import com.intrasoft.csp.client.CspClient;
-import com.intrasoft.csp.commons.client.ApiVersionClient;
 import com.intrasoft.csp.commons.model.*;
 import com.intrasoft.csp.commons.routes.ContextUrl;
 import com.intrasoft.csp.integration.MockUtils;
+import com.intrasoft.csp.libraries.versioning.client.ApiVersionClient;
+import com.intrasoft.csp.libraries.versioning.model.VersionDTO;
 import com.intrasoft.csp.server.CspApp;
 import com.intrasoft.csp.server.service.CamelRestService;
 import org.apache.camel.test.spring.CamelSpringBootRunner;

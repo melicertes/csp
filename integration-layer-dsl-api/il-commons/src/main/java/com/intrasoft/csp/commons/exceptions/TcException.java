@@ -1,5 +1,7 @@
 package com.intrasoft.csp.commons.exceptions;
 
+import com.intrasoft.csp.libraries.restclient.exceptions.CspBusinessException;
+
 /**
  * Created by iskitsas on 5/6/17.
  */

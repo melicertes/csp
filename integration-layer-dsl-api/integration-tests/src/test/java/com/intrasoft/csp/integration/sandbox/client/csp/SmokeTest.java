@@ -1,6 +1,6 @@
 package com.intrasoft.csp.integration.sandbox.client.csp;
 
-import com.intrasoft.csp.commons.api.ApiVersionController;
+import com.intrasoft.csp.libraries.versioning.controller.ApiVersionController;
 import com.intrasoft.csp.server.CspApp;
 import org.junit.Test;
 import org.junit.runner.RunWith;

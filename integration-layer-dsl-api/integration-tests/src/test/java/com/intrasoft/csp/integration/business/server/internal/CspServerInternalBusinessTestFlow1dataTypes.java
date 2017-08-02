@@ -1,7 +1,6 @@
 package com.intrasoft.csp.integration.business.server.internal;
 
 
-import com.intrasoft.csp.commons.exceptions.CspBusinessException;
 import com.intrasoft.csp.commons.model.*;
 import com.intrasoft.csp.commons.routes.CamelRoutes;
 import com.intrasoft.csp.integration.MockUtils;

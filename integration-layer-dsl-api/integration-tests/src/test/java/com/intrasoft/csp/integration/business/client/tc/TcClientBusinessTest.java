@@ -1,9 +1,10 @@
 package com.intrasoft.csp.integration.business.client.tc;
 
 import com.intrasoft.csp.client.TrustCirclesClient;
-import com.intrasoft.csp.client.config.CspRestTemplateConfiguration;
+import com.intrasoft.csp.client.config.CspClientConfig;
 import com.intrasoft.csp.client.config.TrustCirclesClientConfig;
 import com.intrasoft.csp.commons.model.TrustCircle;
+import com.intrasoft.csp.libraries.restclient.config.RestTemplateConfiguration;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -25,7 +26,7 @@ import static org.junit.Assert.fail;
  * Created by iskitsas on 4/10/17.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringBootTest(classes = {TrustCirclesClient.class, CspRestTemplateConfiguration.class, TrustCirclesClientConfig.class},
+@SpringBootTest(classes = {TrustCirclesClient.class, TrustCirclesClientConfig.class, CspClientConfig.class},
         properties = {
                 "csp.retry.backOffPeriod:10",//ms
                 "csp.retry.maxAttempts:1",

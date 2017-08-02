@@ -1,4 +1,4 @@
-package com.intrasoft.csp.commons.exceptions;
+package com.intrasoft.csp.libraries.restclient.exceptions;
 
 /**
  * Created by iskitsas on 4/4/17.

@@ -17,6 +17,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>com.intrasoft.csp</groupId>
+            <artifactId>libraries-versioning</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.apache.camel</groupId>
             <artifactId>camel-jackson</artifactId>
             <version>${camel.version}</version>

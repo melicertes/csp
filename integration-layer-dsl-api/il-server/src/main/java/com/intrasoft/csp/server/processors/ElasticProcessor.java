@@ -1,7 +1,6 @@
 package com.intrasoft.csp.server.processors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.intrasoft.csp.commons.exceptions.CspBusinessException;
 import com.intrasoft.csp.commons.model.IntegrationData;
 import com.intrasoft.csp.commons.model.IntegrationDataType;
 import com.intrasoft.csp.commons.model.elastic.ElasticData;
@@ -12,6 +11,7 @@ import com.intrasoft.csp.commons.model.elastic.query.Must;
 import com.intrasoft.csp.commons.model.elastic.query.Query;
 import com.intrasoft.csp.commons.model.elastic.query.Match;
 import com.intrasoft.csp.commons.model.elastic.search.Hit;
+import com.intrasoft.csp.libraries.restclient.exceptions.CspBusinessException;
 import com.intrasoft.csp.server.service.CamelRestService;
 import com.intrasoft.csp.server.service.CspUtils;
 import org.apache.camel.*;

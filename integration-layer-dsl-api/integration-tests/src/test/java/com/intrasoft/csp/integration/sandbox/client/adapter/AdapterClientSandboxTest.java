@@ -2,13 +2,13 @@ package com.intrasoft.csp.integration.sandbox.client.adapter;
 
 import com.intrasoft.csp.client.AdapterClient;
 import com.intrasoft.csp.client.config.AdapterClientConfig;
-import com.intrasoft.csp.client.config.CspRestTemplateConfiguration;
-import com.intrasoft.csp.commons.client.RetryRestTemplate;
+import com.intrasoft.csp.client.config.CspClientConfig;
 import com.intrasoft.csp.commons.model.IntegrationData;
 import com.intrasoft.csp.commons.model.IntegrationDataType;
 import com.intrasoft.csp.commons.model.SharingParams;
 import com.intrasoft.csp.commons.routes.ContextUrl;
 import com.intrasoft.csp.integration.TestUtil;
+import com.intrasoft.csp.libraries.restclient.service.RetryRestTemplate;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -36,7 +36,7 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
  * Created by iskitsas on 4/4/17.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringBootTest(classes = {AdapterClient.class, CspRestTemplateConfiguration.class, AdapterClientConfig.class}) //SB 1.5
+@SpringBootTest(classes = {AdapterClient.class, AdapterClientConfig.class, CspClientConfig.class}) //SB 1.5
 public class AdapterClientSandboxTest {
     @Mock
     AdapterClient adapterMockClient;

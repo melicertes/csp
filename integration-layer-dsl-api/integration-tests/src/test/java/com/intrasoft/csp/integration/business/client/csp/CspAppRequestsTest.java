@@ -4,13 +4,13 @@ package com.intrasoft.csp.integration.business.client.csp;
  * Created by iskitsas on 4/28/17.
  */
 
-import com.intrasoft.csp.client.config.CspRestTemplateConfiguration;
-import com.intrasoft.csp.commons.client.RetryRestTemplate;
+import com.intrasoft.csp.client.config.CspClientConfig;
 import com.intrasoft.csp.commons.constants.AppProperties;
 import com.intrasoft.csp.commons.model.IntegrationData;
 import com.intrasoft.csp.commons.model.IntegrationDataType;
 import com.intrasoft.csp.commons.model.SharingParams;
 import com.intrasoft.csp.commons.routes.ContextUrl;
+import com.intrasoft.csp.libraries.restclient.service.RetryRestTemplate;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -31,7 +31,7 @@ import static org.hamcrest.Matchers.is;
  * This test suit is expecting to have a CspApp server up and running with activemq enabled
  * */
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringBootTest(classes = {CspRestTemplateConfiguration.class},
+@SpringBootTest(classes = {CspClientConfig.class},
         properties = {
                 "csp.retry.backOffPeriod:10",//ms
                 "csp.retry.maxAttempts:1",

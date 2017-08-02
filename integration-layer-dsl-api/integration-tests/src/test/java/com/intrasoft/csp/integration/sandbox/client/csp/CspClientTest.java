@@ -1,13 +1,13 @@
 package com.intrasoft.csp.integration.sandbox.client.csp;
 
 import com.intrasoft.csp.client.CspClient;
-import com.intrasoft.csp.commons.client.ApiVersionClient;
-import com.intrasoft.csp.commons.client.RetryRestTemplate;
 import com.intrasoft.csp.commons.model.IntegrationData;
 import com.intrasoft.csp.commons.model.IntegrationDataType;
 import com.intrasoft.csp.commons.model.SharingParams;
 import com.intrasoft.csp.commons.routes.ContextUrl;
 import com.intrasoft.csp.integration.TestUtil;
+import com.intrasoft.csp.libraries.restclient.service.RetryRestTemplate;
+import com.intrasoft.csp.libraries.versioning.client.ApiVersionClient;
 import com.intrasoft.csp.server.CspApp;
 import org.apache.camel.test.spring.CamelSpringBootRunner;
 import org.apache.camel.test.spring.MockEndpointsAndSkip;

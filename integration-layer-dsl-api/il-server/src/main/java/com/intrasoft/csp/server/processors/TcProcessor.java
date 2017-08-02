@@ -1,10 +1,10 @@
 package com.intrasoft.csp.server.processors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.intrasoft.csp.commons.exceptions.CspBusinessException;
 import com.intrasoft.csp.commons.exceptions.InvalidSharingParamsException;
 import com.intrasoft.csp.commons.model.*;
 import com.intrasoft.csp.commons.routes.CamelRoutes;
+import com.intrasoft.csp.libraries.restclient.exceptions.CspBusinessException;
 import com.intrasoft.csp.server.service.CamelRestService;
 import com.intrasoft.csp.server.routes.RouteUtils;
 import org.apache.camel.*;

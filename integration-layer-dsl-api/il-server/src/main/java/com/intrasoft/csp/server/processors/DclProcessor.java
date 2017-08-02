@@ -28,9 +28,6 @@ public class DclProcessor implements Processor,CamelRoutes {
     ObjectMapper objectMapper;
 
     @Autowired
-    TrustCirclesClient tcClient;
-
-    @Autowired
     CamelRestService camelRestService;
 
     @Autowired

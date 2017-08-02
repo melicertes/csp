@@ -93,6 +93,11 @@
         </dependency>
         <dependency>
             <groupId>com.intrasoft.csp</groupId>
+            <artifactId>libraries-versioning</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.intrasoft.csp</groupId>
             <artifactId>il-client</artifactId>
             <version>${project.version}</version>
         </dependency>

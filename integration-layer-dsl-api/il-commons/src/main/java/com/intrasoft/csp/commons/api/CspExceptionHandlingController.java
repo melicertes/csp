@@ -1,7 +1,6 @@
 package com.intrasoft.csp.commons.api;
 
 import com.intrasoft.csp.commons.apiHttpStatusResponse.HttpStatusResponseType;
-import com.intrasoft.csp.commons.exceptions.CspCommonException;
 import com.intrasoft.csp.commons.exceptions.InvalidDataTypeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,17 +20,6 @@ public class CspExceptionHandlingController {
      * Static LOGGER.
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(CspExceptionHandlingController.class);
-
-    @ExceptionHandler({CspCommonException.class})
-    public void handleBadRequests(HttpServletRequest request, HttpServletResponse response, Exception e) throws IOException {
-        LOGGER.error("Bad request: {} from {}, Exception: {} {}",
-                request.getRequestURI(),
-                request.getRemoteHost(),
-                e.getStackTrace()[0].toString(),
-                e.getLocalizedMessage());
-
-        response.sendError(HttpStatus.BAD_REQUEST.value(), e.getLocalizedMessage());
-    }
 
     @ExceptionHandler({HttpMessageNotReadableException.class})
     public void handleInvalidMessages(HttpServletRequest request, HttpServletResponse response, Exception e) throws IOException {

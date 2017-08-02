@@ -2,7 +2,6 @@ package com.intrasoft.csp.integration.business.client.adapter;
 
 import com.intrasoft.csp.client.AdapterClient;
 import com.intrasoft.csp.client.config.AdapterClientConfig;
-import com.intrasoft.csp.client.config.CspRestTemplateConfiguration;
 import com.intrasoft.csp.commons.model.IntegrationData;
 import com.intrasoft.csp.commons.model.IntegrationDataType;
 import org.junit.Rule;
@@ -26,7 +25,7 @@ import static org.junit.Assert.fail;
  * Created by iskitsas on 4/6/17.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringBootTest(classes = {AdapterClient.class, CspRestTemplateConfiguration.class, AdapterClientConfig.class},
+@SpringBootTest(classes = {AdapterClient.class, AdapterClientConfig.class},
         properties = {
                 "csp.retry.backOffPeriod:10",//ms
                 "csp.retry.maxAttempts:1",

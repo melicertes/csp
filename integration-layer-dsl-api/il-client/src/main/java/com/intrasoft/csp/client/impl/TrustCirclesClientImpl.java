@@ -1,8 +1,8 @@
 package com.intrasoft.csp.client.impl;
 
 import com.intrasoft.csp.client.TrustCirclesClient;
-import com.intrasoft.csp.commons.client.RetryRestTemplate;
 import com.intrasoft.csp.commons.model.TrustCircle;
+import com.intrasoft.csp.libraries.restclient.service.RetryRestTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

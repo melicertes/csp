@@ -1,7 +1,7 @@
 package com.intrasoft.csp.integration.sandbox.client.csp;
 
-import com.intrasoft.csp.commons.client.ApiVersionClient;
-import com.intrasoft.csp.commons.model.VersionDTO;
+import com.intrasoft.csp.libraries.versioning.client.ApiVersionClient;
+import com.intrasoft.csp.libraries.versioning.model.VersionDTO;
 import com.intrasoft.csp.server.CspApp;
 import org.apache.camel.test.spring.CamelSpringBootRunner;
 import org.junit.Test;

@@ -1,10 +1,8 @@
 package com.intrasoft.csp.server.service;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.intrasoft.csp.commons.exceptions.CspBusinessException;
+import com.intrasoft.csp.libraries.restclient.exceptions.CspBusinessException;
 import org.apache.camel.*;
 import org.apache.camel.http.common.HttpOperationFailedException;
 import org.slf4j.Logger;
