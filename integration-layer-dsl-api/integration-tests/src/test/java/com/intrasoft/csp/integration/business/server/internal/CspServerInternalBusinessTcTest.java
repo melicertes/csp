@@ -13,16 +13,24 @@ import org.apache.camel.spring.SpringCamelContext;
 import org.apache.camel.test.spring.CamelSpringBootRunner;
 import org.apache.camel.test.spring.MockEndpointsAndSkip;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.env.Environment;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.io.File;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -35,6 +43,8 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
 @RunWith(CamelSpringBootRunner.class)
 @SpringBootTest(classes = {CspApp.class, MockUtils.class},
         properties = {
+                /*
+                //added in application-demo.properties
                 "csp.retry.backOffPeriod:10",
                 "csp.retry.maxAttempts:1",
                 "embedded.activemq.start:true",
@@ -50,7 +60,7 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
                 "tc.host: localhost",
                 "tc.port: 8081",
                 "tc.path.circles:/tc",
-                "tc.path.teams:/tct"
+                "tc.path.teams:/tct"*/
         })
 @MockEndpointsAndSkip("^https4-in://localhost.*adapter.*|https4-in://csp.*|https4-ex://ex.*") // by removing this any http requests will be sent as expected.
 // In this test we mock all other http requests except for tc. TC dummy server is expected on 3001 port.
@@ -87,6 +97,9 @@ public class CspServerInternalBusinessTcTest implements CamelRoutes {
     @Autowired
     ErrorMessageHandler errorMessageHandler;
 
+    @Autowired
+    Environment env;
+
     @Before
     public void init() throws Exception {
         mvc = webAppContextSetup(webApplicationContext).build();
@@ -95,6 +108,11 @@ public class CspServerInternalBusinessTcTest implements CamelRoutes {
         mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX,routes.apply(DCL),mockedDcl.getEndpointUri());
         mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX,routes.apply(DDL),mockedDdl.getEndpointUri());
         mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX,routes.apply(TC),mockedTC.getEndpointUri());
+
+        String tcPort = env.getProperty("tc.port");
+        String serverSslKeyStore = env.getProperty("server.ssl.key-store");
+        LOG.info("\n---------\n tc.port="+tcPort+" \n---------\n");
+        LOG.info("\n---------\n server.ssl.key-store="+serverSslKeyStore+" \n---------\n");
     }
 
     // Use @DirtiesContext on each test method to force Spring Testing to automatically reload the CamelContext after
