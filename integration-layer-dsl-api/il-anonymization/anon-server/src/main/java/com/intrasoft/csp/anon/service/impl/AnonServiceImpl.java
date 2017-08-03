@@ -4,6 +4,7 @@ import com.intrasoft.csp.anon.commons.exceptions.InvalidDataTypeException;
 import com.intrasoft.csp.anon.commons.model.IntegrationAnonData;
 import com.intrasoft.csp.anon.commons.model.MappingDTO;
 import com.intrasoft.csp.anon.commons.model.RuleSetDTO;
+import com.intrasoft.csp.anon.commons.model.SaveMappingDTO;
 import com.intrasoft.csp.anon.model.Mapping;
 import com.intrasoft.csp.anon.model.RuleSet;
 import com.intrasoft.csp.anon.repository.MappingRepository;
@@ -100,6 +101,29 @@ public class AnonServiceImpl implements AnonService,Conversions {
     }
 
     @Override
+    public MappingDTO saveMapping(SaveMappingDTO saveMappingDTO) {
+        Mapping mapping = null;
+        if(saveMappingDTO.getId() == null){//insert
+            mapping = new Mapping();
+        }else{//update
+            mapping = mappingRepository.findOne(saveMappingDTO.getId());
+        }
+
+        if(!StringUtils.isEmpty(saveMappingDTO.getCspId())) {
+            mapping.setCspId(saveMappingDTO.getCspId());
+        }
+        if(saveMappingDTO.getRuleSetId()!=null) {
+            mapping.setRuleset(rulesetRepository.findOne(saveMappingDTO.getRuleSetId()));
+        }
+        if(saveMappingDTO.getDataType()!=null) {
+            mapping.setDataType(saveMappingDTO.getDataType());
+        }
+
+        Mapping saved = mappingRepository.save(mapping);
+        return convertMappingToDTO.apply(saved);
+    }
+
+    @Override
     public void deleteMapping(Long id) {
         mappingRepository.delete(id);
     }
@@ -107,5 +131,13 @@ public class AnonServiceImpl implements AnonService,Conversions {
     @Override
     public MappingDTO getMappingById(Long id) {
         return convertMappingToDTO.apply(mappingRepository.findOne(id));
+    }
+
+    @Override
+    public List<MappingDTO> getAllMappings() {
+        return mappingRepository.findAll().stream().map(m->{
+            MappingDTO mappingDTO = convertMappingToDTO.apply(m);
+            return mappingDTO;
+        }).collect(Collectors.toList());
     }
 }

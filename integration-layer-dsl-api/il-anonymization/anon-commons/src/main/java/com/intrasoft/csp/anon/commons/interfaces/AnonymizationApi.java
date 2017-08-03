@@ -4,6 +4,7 @@ import com.intrasoft.csp.anon.commons.exceptions.InvalidDataTypeException;
 import com.intrasoft.csp.anon.commons.model.IntegrationAnonData;
 import com.intrasoft.csp.anon.commons.model.MappingDTO;
 import com.intrasoft.csp.anon.commons.model.RuleSetDTO;
+import com.intrasoft.csp.anon.commons.model.SaveMappingDTO;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
@@ -41,5 +42,6 @@ public interface AnonymizationApi {
      * */
     MappingDTO saveMapping(MappingDTO mappingDTO);
     void deleteMapping(Long id);
+    List<MappingDTO> getAllMappings();
     MappingDTO getMappingById(Long id);
 }

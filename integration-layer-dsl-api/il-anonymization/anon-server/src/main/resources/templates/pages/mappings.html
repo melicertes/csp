@@ -33,7 +33,7 @@
                     <div class="col-md-3 col-xs-12">
                         <div class="form-group">
                             <label>CSP id:</label>
-                            <input class="form-control" th:field="*{id}" name="cspId" type="hidden"/>
+                            <input class="form-control" th:field="*{id}" name="id" type="hidden"/>
                             <input class="form-control" th:field="*{cspId}" name="cspId" type="text"/>
                             <span th:if="${#fields.hasErrors('cspId')}" th:errors="*{cspId}">cspId Error</span>
                         </div>
@@ -52,23 +52,23 @@
                         </div>
                     </div>
                     <div class="col-md-4 col-xs-12">
-                        <label>Ruleset:</label>
+                        <label>RuleSet:</label>
                         <div class="input-group" style="width: 100%;">
-                            <select th:field="*{ruleset}" class="form-control" th:selected="null">
+                            <select th:field="*{ruleSetId}" class="form-control" th:selected="null">
                                 <option th:value="${null}" th:text="${'select ruleset'}" th:selected="selected"></option>
                                 <option th:each="ruleset : ${rulesets}"
                                         th:value="${ruleset.id}"
                                         th:text="${ruleset.filename}">
                                 </option>
                             </select>
-                            <span th:if="${#fields.hasErrors('ruleset')}" th:errors="*{ruleset}">ruleset Error</span>
+                            <span th:if="${#fields.hasErrors('ruleSetId')}" th:errors="*{ruleSetId}">ruleset Error</span>
                         </div>
                     </div>
                     <div class="col-md-2 col-xs-12" style="text-align: right">
                         <div class="form-group">
                             <p>&nbsp;</p>
-                            <button th:href="'mapping/save'" type="submit" value="Submit" class="save btn btn-success"><i class="glyphicon glyphicon-plus"></i>&nbsp;Save</button>&nbsp;
-                            <button type="reset" value="Reset" class="save btn btn-default pull-right">Clear</button>
+                            <button type="submit" value="Submit" class="save btn btn-success"><i class="glyphicon glyphicon-plus"></i>&nbsp;Save</button>&nbsp;
+                            <button type="reset" value="Reset" class="save btn btn-default pull-right" onclick="window.location='/mappings'">Clear</button>
                         </div>
                     </div>
                 </form>
@@ -88,7 +88,7 @@
                                     <td th:text="${iterStat.count}"></td>
                                     <td th:text="${mapping.cspId}"></td>
                                     <td th:text="${mapping.dataType}"></td>
-                                    <td th:text="${mapping.ruleset}"></td>
+                                    <td th:text="${mapping.ruleSetDTO.filename}"></td>
                                     <td><a th:href="'#'+${mapping.id}"  data-toggle="modal" ><i class="fa fa-trash" aria-hidden="true"></i></a>
                                         <a th:href="'/mappings/'+${mapping.id}"><i class="fa fa-edit" aria-hidden="true"></i></a></td>
                                     <!-- Modal -->

@@ -66,4 +66,9 @@ public class AnonController implements AnonContextUrl {
         return anonService.getMappingById(id);
     }
 
+    @RequestMapping(value = "/v"+REST_API_V1+"/"+GET_ALL_MAPPINGS, method = RequestMethod.GET)
+    public List<MappingDTO> getAllMappings(){
+        return anonService.getAllMappings();
+    }
+
 }

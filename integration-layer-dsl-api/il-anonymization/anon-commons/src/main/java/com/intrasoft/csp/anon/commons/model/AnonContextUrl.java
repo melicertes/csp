@@ -11,6 +11,7 @@ public interface AnonContextUrl {
     String SAVE_MAPPING = "/mapping/save";
     String DELETE_MAPPING = "/mapping/delete";
     String GET_MAPPING = "/mapping/get";
+    String GET_ALL_MAPPINGS = "/mapping/getAll";
 
     String REST_API_V1 = "1";
 }

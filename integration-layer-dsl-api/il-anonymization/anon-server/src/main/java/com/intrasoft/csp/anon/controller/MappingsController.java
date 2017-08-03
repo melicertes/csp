@@ -1,14 +1,19 @@
 package com.intrasoft.csp.anon.controller;
 
+import com.intrasoft.csp.anon.commons.model.MappingDTO;
+import com.intrasoft.csp.anon.commons.model.RuleSetDTO;
+import com.intrasoft.csp.anon.commons.model.SaveMappingDTO;
 import com.intrasoft.csp.anon.model.Mapping;
 import com.intrasoft.csp.anon.model.RuleSet;
 import com.intrasoft.csp.anon.repository.MappingRepository;
 import com.intrasoft.csp.anon.repository.RuleSetRepository;
+import com.intrasoft.csp.anon.service.AnonService;
 import com.intrasoft.csp.commons.model.IntegrationDataType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
@@ -28,10 +33,7 @@ public class MappingsController {
     private static final Logger LOG = LoggerFactory.getLogger(MappingsController.class);
 
     @Autowired
-    MappingRepository mappingRepository;
-
-    @Autowired
-    RuleSetRepository rulesetRepository ;
+    AnonService anonService;
 
     @ModelAttribute("integrationDataTypes")
     public IntegrationDataType[] integrationDataTypes() {
@@ -39,17 +41,17 @@ public class MappingsController {
     }
 
     @ModelAttribute("mappings")
-    public List<Mapping> getMappings() {
-        return mappingRepository.findAll();
+    public List<MappingDTO> getMappings() {
+        return anonService.getAllMappings();
     }
 
     @ModelAttribute("rulesets")
-    public List<RuleSet> rulesets() {
-        return rulesetRepository.findAll();
+    public List<RuleSetDTO> rulesets() {
+        return anonService.getAllRuleSet();
     }
 
     @GetMapping("/mappings")
-    public ModelAndView showMappings(Mapping mapping) {
+    public ModelAndView showMappings(@ModelAttribute("mapping") SaveMappingDTO mapping) {
         return new ModelAndView("pages/mappings", "mappings", getMappings());
     }
 
@@ -57,32 +59,29 @@ public class MappingsController {
     public ModelAndView showMappings(@PathVariable Long id) {
         ModelAndView mav = new ModelAndView("pages/mappings");
         mav.addObject("mappings", getMappings());
-        Mapping mapping = mappingRepository.findOne(id);
+        MappingDTO mapping = anonService.getMappingById(id);
         LOG.info(mapping.toString());
-        mav.addObject("mapping", mapping);
+        mav.addObject("mapping", new SaveMappingDTO(mapping.getId(),mapping.getCspId(),mapping.getRuleSetDTO().getId(),mapping.getDataType()));
         return mav;
     }
 
     @PostMapping("/mapping/save")
-    public ModelAndView addMapping(RedirectAttributes redirect, @Valid Mapping mapping, BindingResult bindingResult) throws IOException {
+    public ModelAndView addMapping(RedirectAttributes redirect, @ModelAttribute("mapping") SaveMappingDTO mapping, BindingResult bindingResult) throws IOException {
         LOG.info("CREATE mapping: " + mapping.toString());
         if (bindingResult.hasErrors()) {
             return new ModelAndView("pages/mappings");
         }
-        Mapping newMapping = mappingRepository.save(mapping);
-        ModelAndView mav = new ModelAndView("redirect:/mappings/" + mapping.getId());
-        mav.addObject("mappings", getMappings());
-        mav.addObject("mapping",newMapping);
-        redirect.addFlashAttribute("msg", "Mapping created");
+        MappingDTO newMapping = anonService.saveMapping(mapping);
+        ModelAndView mav = new ModelAndView("redirect:/mappings");
+        redirect.addFlashAttribute("msg", "Mapping saved");
         return mav;
     }
 
     @GetMapping("/mapping/delete/{id}")
     public ModelAndView deleteMapping(@PathVariable Long id, RedirectAttributes redirect) throws IOException {
         LOG.info("DELETE mapping with id: " + id);
-        mappingRepository.delete(id);
+        anonService.deleteMapping(id);
         ModelAndView mav = new ModelAndView("redirect:/mappings");
-        mav.addObject("mappings",getMappings());
         redirect.addFlashAttribute("msg", "Mapping deleted");
         return mav;
     }

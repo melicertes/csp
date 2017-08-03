@@ -96,4 +96,12 @@ public class AnonClientImpl implements AnonClient, AnonContextUrl {
         MappingDTO response = retryRestTemplate.getForObject(url, MappingDTO.class,id);
         return response;
     }
+
+    @Override
+    public List<MappingDTO> getAllMappings() {
+        final String url = apiVersionClient.getApiUrl() + "/"+GET_ALL_MAPPINGS;
+        LOG.info("Get all ruleSet call [post]: " + url);
+        List<MappingDTO> response = Arrays.asList(retryRestTemplate.getForObject(url, MappingDTO[].class));
+        return response;
+    }
 }
