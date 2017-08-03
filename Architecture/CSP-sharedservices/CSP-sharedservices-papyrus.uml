@@ -412,26 +412,13 @@
       <importedPackage xmi:type="uml:Profile" href="pathmap://UML_PROFILES/Ecore.profile.uml#_0"/>
     </packageImport>
     <packagedElement xmi:type="uml:Package" xmi:id="_r-D2QvVVEea4b69uN8N4dw" name="IntegrationDataEnvelop">
-      <packagedElement xmi:type="uml:DataType" xmi:id="_r-D2Q_VVEea4b69uN8N4dw" name="IntegrationDataEnvelop">
-        <ownedAttribute xmi:type="uml:Property" xmi:id="_pQnYwAQgEeeWNbzuB-wxVw" name="cspId">
-          <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#EString"/>
-        </ownedAttribute>
-        <ownedAttribute xmi:type="uml:Property" xmi:id="_r-D2RPVVEea4b69uN8N4dw" name="applicationId">
-          <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#EString"/>
-        </ownedAttribute>
-        <ownedAttribute xmi:type="uml:Property" xmi:id="_r-D2RfVVEea4b69uN8N4dw" name="toShare">
-          <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#EBoolean"/>
-        </ownedAttribute>
-        <ownedAttribute xmi:type="uml:Property" xmi:id="_r-D2RvVVEea4b69uN8N4dw" name="isExternal">
-          <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#EBoolean"/>
-        </ownedAttribute>
-        <ownedAttribute xmi:type="uml:Property" xmi:id="_r-D2R_VVEea4b69uN8N4dw" name="recordId">
-          <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#EString"/>
-        </ownedAttribute>
+      <packagedElement xmi:type="uml:DataType" xmi:id="_r-D2Q_VVEea4b69uN8N4dw" name="IntegrationData">
         <ownedAttribute xmi:type="uml:Property" xmi:id="_r-D2SfVVEea4b69uN8N4dw" name="integrationDataType" type="_r-D2S_VVEea4b69uN8N4dw"/>
-        <ownedAttribute xmi:type="uml:Property" xmi:id="_r-D2SvVVEea4b69uN8N4dw" name="integrationData">
+        <ownedAttribute xmi:type="uml:Property" xmi:id="_r-D2SvVVEea4b69uN8N4dw" name="dataObject" visibility="public">
           <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#EString"/>
         </ownedAttribute>
+        <ownedAttribute xmi:type="uml:Property" xmi:id="_WJhAkHiWEeeTxr5UtET5tQ" name="dataParams" visibility="public" type="_W47gwHiVEeeTxr5UtET5tQ"/>
+        <ownedAttribute xmi:type="uml:Property" xmi:id="_dvrgsHiWEeeTxr5UtET5tQ" name="sharingParams" visibility="public" type="_X4zpYHiVEeeTxr5UtET5tQ"/>
       </packagedElement>
       <packagedElement xmi:type="uml:Enumeration" xmi:id="_r-D2S_VVEea4b69uN8N4dw" name="IntegrationDataType">
         <ownedLiteral xmi:type="uml:EnumerationLiteral" xmi:id="_r-D2TPVVEea4b69uN8N4dw" name="Event"/>
@@ -445,6 +432,48 @@
         <ownedLiteral xmi:type="uml:EnumerationLiteral" xmi:id="_GKNaQAQhEeeWNbzuB-wxVw" name="Threat"/>
       </packagedElement>
       <packagedElement xmi:type="uml:Usage" xmi:id="_r-D2U_VVEea4b69uN8N4dw" client="_r-D2QPVVEea4b69uN8N4dw" supplier="_r-D2S_VVEea4b69uN8N4dw"/>
+      <packagedElement xmi:type="uml:Usage" xmi:id="_mERNEHiWEeeTxr5UtET5tQ" client="_r-D2Q_VVEea4b69uN8N4dw" supplier="_W47gwHiVEeeTxr5UtET5tQ"/>
+      <packagedElement xmi:type="uml:Usage" xmi:id="_nrrPwHiWEeeTxr5UtET5tQ" client="_r-D2Q_VVEea4b69uN8N4dw" supplier="_X4zpYHiVEeeTxr5UtET5tQ"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:DataType" xmi:id="_W47gwHiVEeeTxr5UtET5tQ" name="DataParams">
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_pQnYwAQgEeeWNbzuB-wxVw" name="cspId">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#EString"/>
+      </ownedAttribute>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_r-D2RPVVEea4b69uN8N4dw" name="applicationId">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#EString"/>
+      </ownedAttribute>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_r-D2R_VVEea4b69uN8N4dw" name="recordId">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#EString"/>
+      </ownedAttribute>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_wy8ywHiVEeeTxr5UtET5tQ" name="originCspId" visibility="public">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#EString"/>
+      </ownedAttribute>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_4N3sMHiVEeeTxr5UtET5tQ" name="originApplicationId" visibility="public">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#EString"/>
+      </ownedAttribute>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_8u_uAHiVEeeTxr5UtET5tQ" name="originRecordId" visibility="public">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#EString"/>
+      </ownedAttribute>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_BQ_SgHiWEeeTxr5UtET5tQ" name="dateTime" visibility="public">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#EDate"/>
+      </ownedAttribute>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_Fiye4HiWEeeTxr5UtET5tQ" name="url" visibility="public">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#EString"/>
+      </ownedAttribute>
+    </packagedElement>
+    <packagedElement xmi:type="uml:DataType" xmi:id="_X4zpYHiVEeeTxr5UtET5tQ" name="SharingParams">
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_r-D2RfVVEea4b69uN8N4dw" name="toShare">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#EBoolean"/>
+      </ownedAttribute>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_r-D2RvVVEea4b69uN8N4dw" name="isExternal">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#EBoolean"/>
+      </ownedAttribute>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_OjGo0HiWEeeTxr5UtET5tQ" name="trustCircleId" visibility="public">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#EString"/>
+      </ownedAttribute>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_RM5VkHiWEeeTxr5UtET5tQ" name="teamId" visibility="public">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#EString"/>
+      </ownedAttribute>
     </packagedElement>
   </packagedElement>
 </uml:Model>
