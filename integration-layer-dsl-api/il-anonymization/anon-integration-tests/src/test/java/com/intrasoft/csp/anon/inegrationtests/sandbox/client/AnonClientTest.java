@@ -57,7 +57,7 @@ public class AnonClientTest implements AnonContextUrl {
         IntegrationAnonData data = new IntegrationAnonData();
         data.setDataType(IntegrationDataType.TRUSTCIRCLE);
         data.setCspId("9");
-        ResponseEntity<String> response = anonClient.postAnonData(data, DATA_ANONYMIZATION);
+        ResponseEntity<String> response = anonClient.postAnonData(data);
         //TODO: on an empty DB AnonException is expected
         assertThat(response.getStatusCode(),is(HttpStatus.OK));
     }

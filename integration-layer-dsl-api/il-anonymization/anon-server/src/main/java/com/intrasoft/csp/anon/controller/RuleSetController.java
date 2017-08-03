@@ -25,9 +25,9 @@ import java.util.List;
  */
 
 @Controller
-public class RulesetsController {
+public class RuleSetController {
 
-    private static final Logger LOG = LoggerFactory.getLogger(RulesetsController.class);
+    private static final Logger LOG = LoggerFactory.getLogger(RuleSetController.class);
 
     @Autowired
     RulesetRepository rulesetRepository ;

@@ -1,0 +1,29 @@
+{
+  "rules": [
+    {
+      "field": "$.trustcircle.short_name",
+      "action": "anon",
+      "fieldtype": "string"
+    },
+    {
+      "field": "$.trustcircle.created",
+      "action": "pseudo",
+      "fieldtype": "string"
+    },
+     {
+      "field": "$.trustcircle.teams[*].description",
+      "action": "anon",
+      "fieldtype": "string"
+    },
+    {
+      "field": "$.trustcircle.teams[*].theip",
+      "action": "anon",
+      "fieldtype": "ip"
+    },
+    {
+      "field": "$.trustcircle.teams[*].theemail",
+      "action": "anon",
+      "fieldtype": "email"
+    }
+  ]
+}
