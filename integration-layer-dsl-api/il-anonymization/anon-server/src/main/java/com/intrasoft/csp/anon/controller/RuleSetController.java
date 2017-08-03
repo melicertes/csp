@@ -1,7 +1,9 @@
 package com.intrasoft.csp.anon.controller;
 
-import com.intrasoft.csp.anon.model.Ruleset;
-import com.intrasoft.csp.anon.repository.RulesetRepository;
+import com.intrasoft.csp.anon.commons.model.RuleSetDTO;
+import com.intrasoft.csp.anon.model.RuleSet;
+import com.intrasoft.csp.anon.repository.RuleSetRepository;
+import com.intrasoft.csp.anon.service.AnonService;
 import org.hibernate.exception.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,11 +32,11 @@ public class RuleSetController {
     private static final Logger LOG = LoggerFactory.getLogger(RuleSetController.class);
 
     @Autowired
-    RulesetRepository rulesetRepository ;
+    AnonService anonService;
 
     @GetMapping("/rulesets")
-    public String showRulesets(Ruleset ruleset, Model model) {
-        List<Ruleset> rulesets =rulesetRepository.findAll();
+    public String showRulesets(RuleSet ruleset, Model model) {
+        List<RuleSetDTO> rulesets =anonService.getAllRuleSet();
         model.addAttribute("rulesets", rulesets);
         model.addAttribute("ruleset", ruleset);
         return "pages/rulesets";
@@ -43,7 +45,7 @@ public class RuleSetController {
     @PostMapping("/rulesets/save")
     public String addRuleset(@RequestPart(value = "file", required = false) MultipartFile file,
                              RedirectAttributes redirectAttributes,
-                             @ModelAttribute Ruleset ruleset,
+                             @ModelAttribute RuleSetDTO ruleset,
                              BindingResult result,
                              Model model) throws IOException {
 
@@ -77,8 +79,9 @@ public class RuleSetController {
             return "redirect:";
         }
 
-        rulesetRepository.save(ruleset);
-        List<Ruleset> rulesets =rulesetRepository.findAll();
+        anonService.saveRuleSet(ruleset);
+        List<RuleSetDTO> rulesets =anonService.getAllRuleSet();
+
         model.addAttribute("rulesets", rulesets);
         redirectAttributes.addFlashAttribute("msg", "Ruleset imported.");
         return "redirect:";
@@ -87,8 +90,8 @@ public class RuleSetController {
     @GetMapping("/rulesets/{id}")
     public ModelAndView showRuleset(@PathVariable Long id) {
         ModelAndView mav = new ModelAndView("pages/rulesets");
-        mav.addObject("rulesets", rulesetRepository.findAll());
-        Ruleset ruleset = rulesetRepository.findOne(id);
+        mav.addObject("rulesets", anonService.getAllRuleSet());
+        RuleSetDTO ruleset = anonService.getRuleSetById(id);
         LOG.info(ruleset.toString());
         mav.addObject("ruleset", ruleset);
         return mav;
@@ -97,9 +100,9 @@ public class RuleSetController {
     @GetMapping("/ruleset/delete/{id}")
     public ModelAndView deleteMapping(@PathVariable Long id, RedirectAttributes redirect) throws ConstraintViolationException {
         LOG.info("DELETE ruleset with id: " + id);
-        rulesetRepository.delete(id);
+        anonService.deleteRuleSet(id);
         ModelAndView mav = new ModelAndView("redirect:/rulesets");
-        mav.addObject("mappings",rulesetRepository.findAll());
+        mav.addObject("mappings",anonService.getAllRuleSet());
         redirect.addFlashAttribute("msg", "Ruleset deleted");
         return mav;
     }
@@ -111,23 +114,11 @@ public class RuleSetController {
         ModelAndView mav = new ModelAndView("redirect:/rulesets");
         mav.addObject("exception", ex);
         mav.addObject("url", request.getRequestURL());
-        mav.addObject("mappings",rulesetRepository.findAll());
+        mav.addObject("mappings",anonService.getAllRuleSet());
         redirect.addFlashAttribute("error", "Ruleset could not be deleted");
 
 //        mav.setViewName("error");
         return mav;
     }
 
-/*    @ExceptionHandler(IOException.class)
-    public ModelAndView IOException(HttpServletRequest request, Exception ex, RedirectAttributes redirect){
-        LOG.error("Requested URL="+request.getRequestURL());
-        LOG.error("Exception Raised");
-        ModelAndView mav = new ModelAndView("redirect:/rulesets");
-        mav.addObject("exception", ex);
-        mav.addObject("url", request.getRequestURL());
-        mav.addObject("mappings",rulesetRepository.findAll());
-        redirect.addFlashAttribute("error", "File could not be imported");
-
-        return mav;
-    }*/
 }

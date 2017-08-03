@@ -67,6 +67,14 @@ public class AnonClientImpl implements AnonClient, AnonContextUrl {
     }
 
     @Override
+    public RuleSetDTO getRuleSetById(Long id) {
+        final String url = apiVersionClient.getApiUrl() + "/"+GET_RULESET+"/{id}";
+        LOG.info("Get all ruleSet call [post]: " + url);
+        RuleSetDTO response = retryRestTemplate.getForObject(url, RuleSetDTO.class,id);
+        return response;
+    }
+
+    @Override
     public MappingDTO saveMapping(MappingDTO mappingDTO) {
         final String url = apiVersionClient.getApiUrl() + "/"+SAVE_MAPPING;
         LOG.info("Save mapping call [post]: " + url);

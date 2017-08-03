@@ -1,15 +1,14 @@
 package com.intrasoft.csp.anon.controller;
 
 import com.intrasoft.csp.anon.model.Mapping;
-import com.intrasoft.csp.anon.model.Ruleset;
+import com.intrasoft.csp.anon.model.RuleSet;
 import com.intrasoft.csp.anon.repository.MappingRepository;
-import com.intrasoft.csp.anon.repository.RulesetRepository;
+import com.intrasoft.csp.anon.repository.RuleSetRepository;
 import com.intrasoft.csp.commons.model.IntegrationDataType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
@@ -32,7 +31,7 @@ public class MappingsController {
     MappingRepository mappingRepository;
 
     @Autowired
-    RulesetRepository rulesetRepository ;
+    RuleSetRepository rulesetRepository ;
 
     @ModelAttribute("integrationDataTypes")
     public IntegrationDataType[] integrationDataTypes() {
@@ -45,7 +44,7 @@ public class MappingsController {
     }
 
     @ModelAttribute("rulesets")
-    public List<Ruleset> rulesets() {
+    public List<RuleSet> rulesets() {
         return rulesetRepository.findAll();
     }
 

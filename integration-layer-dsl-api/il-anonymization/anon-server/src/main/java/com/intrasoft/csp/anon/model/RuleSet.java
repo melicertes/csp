@@ -7,7 +7,7 @@ import javax.validation.constraints.NotNull;
  * Created by chris on 7/7/2017.
  */
 @Entity
-public class Ruleset {
+public class RuleSet {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

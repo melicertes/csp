@@ -5,7 +5,6 @@ import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
 
 @Entity
 public class Mapping {
@@ -21,7 +20,7 @@ public class Mapping {
 
     @NotNull
     @OneToOne
-    Ruleset ruleset;
+    RuleSet ruleset;
 
     @NotNull
     IntegrationDataType dataType;
@@ -42,11 +41,11 @@ public class Mapping {
         this.cspId = cspId;
     }
 
-    public Ruleset getRuleset() {
+    public RuleSet getRuleset() {
         return ruleset;
     }
 
-    public void setRuleset(Ruleset ruleset) {
+    public void setRuleset(RuleSet ruleset) {
         this.ruleset = ruleset;
     }
 

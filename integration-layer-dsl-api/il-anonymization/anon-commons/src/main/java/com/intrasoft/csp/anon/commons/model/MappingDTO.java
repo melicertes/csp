@@ -9,7 +9,7 @@ import java.io.Serializable;
 public class MappingDTO implements Serializable{
     private static final long serialVersionUID = -3938233520434048789L;
 
-    private long id;
+    private Long id;
 
     String cspId;
 
@@ -23,7 +23,7 @@ public class MappingDTO implements Serializable{
     /**
      * Constructor to update a new RuleSet
      * */
-    public MappingDTO(long id, String cspId, RuleSetDTO ruleSetDTO, IntegrationDataType dataType) {
+    public MappingDTO(Long id, String cspId, RuleSetDTO ruleSetDTO, IntegrationDataType dataType) {
         this.id = id;
         this.cspId = cspId;
         this.ruleSetDTO = ruleSetDTO;
@@ -39,11 +39,11 @@ public class MappingDTO implements Serializable{
         this.dataType = dataType;
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

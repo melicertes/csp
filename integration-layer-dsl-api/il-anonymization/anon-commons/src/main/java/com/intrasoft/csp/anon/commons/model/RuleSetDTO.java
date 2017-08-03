@@ -8,7 +8,7 @@ public class RuleSetDTO implements Serializable{
 
     private static final long serialVersionUID = -7745951309682259628L;
 
-    private long id;
+    private Long id;
 
     String filename;
 
@@ -22,7 +22,7 @@ public class RuleSetDTO implements Serializable{
     /**
      * Constructor to update a new Mapping
      * */
-    public RuleSetDTO(long id, String filename, byte[] file, String description) {
+    public RuleSetDTO(Long id, String filename, byte[] file, String description) {
         this.id = id;
         this.filename = filename;
         this.file = file;
@@ -38,11 +38,11 @@ public class RuleSetDTO implements Serializable{
         this.description = description;
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

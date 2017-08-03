@@ -27,6 +27,7 @@ public interface AnonymizationApi {
     RuleSetDTO saveRuleSet(RuleSetDTO ruleSetDTO);
     void deleteRuleSet(Long id);
     List<RuleSetDTO> getAllRuleSet();
+    RuleSetDTO getRuleSetById(Long id);
 
     /**
      * CRUD management for mappings

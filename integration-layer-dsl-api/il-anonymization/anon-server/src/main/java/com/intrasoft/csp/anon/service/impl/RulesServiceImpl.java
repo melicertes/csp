@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.intrasoft.csp.anon.model.Mapping;
 import com.intrasoft.csp.anon.model.Rules;
 import com.intrasoft.csp.anon.repository.MappingRepository;
-import com.intrasoft.csp.anon.repository.RulesetRepository;
+import com.intrasoft.csp.anon.repository.RuleSetRepository;
 import com.intrasoft.csp.anon.service.RulesService;
 import com.intrasoft.csp.commons.model.IntegrationDataType;
 import org.slf4j.Logger;
@@ -19,7 +19,7 @@ public class RulesServiceImpl implements RulesService {
     private static final Logger LOG = LoggerFactory.getLogger(RulesService.class);
 
     @Autowired
-    RulesetRepository rulesetRepository;
+    RuleSetRepository rulesetRepository;
 
     @Autowired
     MappingRepository mappingRepository;
