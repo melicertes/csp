@@ -5,7 +5,7 @@ info:
       This document describes the REST API of the CSP system. The API is protected 
       using Basic Authentication.
 
-  version: "1.0.1"
+  version: "0.0.2"
 
 host: localhost:8000
 schemes:
@@ -57,7 +57,8 @@ paths:
       parameters:
         - name: id
           in: path
-          type: integer
+          type: string
+          format: uuid or short_name
           description: The trust circle ID to return
           required: true
       responses:
@@ -74,7 +75,8 @@ paths:
       parameters:
         - name: id
           in: path
-          type: integer
+          type: string
+          format: uuid or short_name
           description: The ID of the trust circle to update
           required: true
         - in: body
@@ -101,7 +103,8 @@ paths:
       parameters:
         - name: id
           in: path
-          type: integer
+          type: string
+          format: uuid or short_name
           description: The ID of the trust circle to update
           required: true
       responses:
@@ -152,7 +155,8 @@ paths:
       parameters:
         - name: id
           in: path
-          type: integer
+          type: string
+          format: uuid
           description: The team ID to return
           required: true
       responses:
@@ -169,7 +173,8 @@ paths:
       parameters:
         - name: id
           in: path
-          type: integer
+          type: string
+          format: uuid
           description: The ID of the team to update
           required: true
         - in: body
@@ -196,7 +201,8 @@ paths:
       parameters:
         - name: id
           in: path
-          type: integer
+          type: string
+          format: uuid
           description: The ID of the team to delete
           required: true
       responses:
@@ -224,7 +230,8 @@ definitions:
       - auth_source
     properties:
       id:
-        type: integer
+        type: string
+        format: uuid
         description: The unique identifier of this trust circle
         readOnly: true
       created:
@@ -259,7 +266,8 @@ definitions:
       teams:
         type: array
         items:
-          type: integer
+          type: string
+          format: uuid
           description: Team ID
   Team:
     type: object
@@ -273,7 +281,8 @@ definitions:
       - status
     properties:
       id:
-        type: integer
+        type: string
+        format: uuid
         description: The unique identifier of this team
         readOnly: true
       created:
@@ -329,7 +338,7 @@ definitions:
       csp_domain:
         type: string
         maxLength: 255
-        description: The domain of the CSP installation. Required if csp_installed is true.
+        description: The domain of the CSP installation.
       status:
         type: string
         description: Status of the team (see /config endpoint)
