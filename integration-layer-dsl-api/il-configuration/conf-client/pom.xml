@@ -5,36 +5,22 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.intrasoft.csp</groupId>
-        <artifactId>il-anonymization</artifactId>
+        <artifactId>il-configuration</artifactId>
         <version>0.2.0-SNAPSHOT</version>
     </parent>
 
-
-    <name>Anonymization Integration Tests</name>
+    <name>Configuration Client</name>
     <groupId>com.intrasoft.csp</groupId>
-    <artifactId>anon-integration-tests</artifactId>
+    <artifactId>conf-client</artifactId>
     <version>0.2.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-
     <dependencies>
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>com.intrasoft.csp</groupId>
-            <artifactId>anon-server</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.intrasoft.csp</groupId>
-            <artifactId>anon-client</artifactId>
+            <artifactId>conf-commons</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>
-
 
 </project>

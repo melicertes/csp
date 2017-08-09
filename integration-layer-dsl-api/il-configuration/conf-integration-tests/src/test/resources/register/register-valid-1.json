@@ -1,0 +1,41 @@
+{
+  "name": "DFN-Cert CSIRT Installation1",
+  "domainName": "dfncertmain.dfn.cert.org",
+  "registrationDate": "2017-03-30T23:59:50Z",
+  "externalIPs": [
+    "150.140.187.1",
+    "150.140.187.2"
+  ],
+  "internalIPs": [
+    "192.168.1.1",
+    "192.168.1.2"
+  ],
+  "registrationIsUpdate": true,
+  "contacts": [
+    {
+      "personName": "string1",
+      "personEmail": "user@example.com1",
+      "contactType": "tech-admin"
+    },
+    {
+      "personName": "string2",
+      "personEmail": "user@example.com2",
+      "contactType": "tech-admin"
+    }
+  ],
+  "moduleInfo": {
+    "modules": [
+      {
+        "name": "module1",
+        "additionalProperties": {
+          "fullName": "module1:1.1",
+          "version": 11000,
+          "installedOn": "2017-04-24T11:59:35Z",
+          "active": true,
+          "hash": "fd61127757973c982cec9d15b61da61a173c8ea86c3122655b92abacec5c7edacff933f896a895d50ecfa3c8f9fc34eb76258bbc228fdf35a5b767a9b1a4c9"
+        }
+
+      }
+    ]
+  }
+}
