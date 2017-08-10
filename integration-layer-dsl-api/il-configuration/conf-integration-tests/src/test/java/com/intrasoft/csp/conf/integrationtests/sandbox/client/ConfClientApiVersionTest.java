@@ -1,10 +1,7 @@
-package com.intrasoft.csp.anon.integrationtests.sandbox.client;
+package com.intrasoft.csp.conf.integrationtests.sandbox.client;
 
-
-import com.intrasoft.csp.anon.client.config.AnonClientConfig;
-
-
-import com.intrasoft.csp.anon.server.AnonApp;
+import com.intrasoft.csp.conf.client.config.ConfClientConfig;
+import com.intrasoft.csp.conf.server.ConfApp;
 import com.intrasoft.csp.libraries.restclient.config.CspRestTemplateConfiguration;
 import com.intrasoft.csp.libraries.versioning.client.ApiVersionClient;
 import com.intrasoft.csp.libraries.versioning.model.VersionDTO;
@@ -22,24 +19,24 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = {AnonApp.class, AnonClientConfig.class, CspRestTemplateConfiguration.class},
+@SpringBootTest(classes = {ConfApp.class, ConfClientConfig.class, CspRestTemplateConfiguration.class},
         webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT,
         properties = {
                 "server.port: 8585",
-                "anon.server.protocol: http",
-                "anon.server.host: localhost",
-                "anon.server.port: 8585",
+                "conf.server.protocol: http",
+                "conf.server.host: localhost",
+                "conf.server.port: 8585",
                 "api.version: 1",
                 "csp.retry.backOffPeriod:10",
                 "csp.retry.maxAttempts:1",
                 "key.update=10000"
         })
 @ActiveProfiles("h2mem")
-public class AnonClientApiVersionTest {
-    private static final Logger LOG = LoggerFactory.getLogger(AnonClientApiVersionTest.class);
+public class ConfClientApiVersionTest {
+    private static final Logger LOG = LoggerFactory.getLogger(ConfClientApiVersionTest.class);
 
     @Autowired
-    @Qualifier("AnonApiVersionClient")
+    @Qualifier("ConfApiVersionClient")
     ApiVersionClient apiVersionClient;
 
     @Test

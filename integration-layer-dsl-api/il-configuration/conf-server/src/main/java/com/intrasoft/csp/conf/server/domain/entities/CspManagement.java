@@ -9,9 +9,7 @@ import javax.validation.constraints.NotNull;
 public class CspManagement {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator="csp_management_id_seq")
-    @SequenceGenerator(name="csp_management_id_seq", sequenceName="csp_management_id_seq", allocationSize=1)
-    @Column(name="id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name="csp_id")

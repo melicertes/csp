@@ -23,6 +23,7 @@
 		<module>il-client</module>
 		<module>integration-tests</module>
 		<module>il-anonymization</module>
+		<module>il-configuration</module>
 		<module>libraries</module>
 	</modules>
 

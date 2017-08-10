@@ -8,9 +8,7 @@ import javax.validation.constraints.NotNull;
 public class ModuleVersion {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator="module_version_id_seq")
-    @SequenceGenerator(name="module_version_id_seq", sequenceName="module_version_id_seq", allocationSize=1)
-    @Column(name="id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name="module_id")

@@ -9,9 +9,7 @@ public class CspModuleInfo {
 
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator="csp_module_info_seq")
-    @SequenceGenerator(name="csp_module_info_seq", sequenceName="csp_module_info_seq", allocationSize=1)
-    @Column(name="id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name="csp_info_id")
