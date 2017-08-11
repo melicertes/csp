@@ -8,5 +8,12 @@ public interface ApiContextUrl {
     String API_REGISTER = "/register";
     String API_UPDATE = "/update";
 
+    String ERROR = "/errorex";
     String REST_API_V1 = "1";
+
+    //URLs
+    String HOME_PAGE = "/";
+
+    //TH VIEWS
+    String ERROR_EXCEPTION_TH_VIEW = "error_exception";
 }

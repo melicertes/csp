@@ -5,12 +5,17 @@ import com.intrasoft.csp.libraries.restclient.exceptions.CspBusinessException;
 
 public class ConfException extends CspBusinessException {
 
+    private static final long serialVersionUID = 2580556814256005621L;
     private Integer code;
 
 
 //    public ConfException(Integer code) {
 //        this.code = code;
 //    }
+
+    public ConfException(String message) {
+        super(message);
+    }
 
     public ConfException(String message, Integer code) {
         super(message);

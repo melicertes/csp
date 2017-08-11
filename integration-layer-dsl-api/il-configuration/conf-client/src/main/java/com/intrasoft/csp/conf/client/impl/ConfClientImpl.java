@@ -7,6 +7,7 @@ import com.intrasoft.csp.conf.commons.context.ApiContextUrl;
 import com.intrasoft.csp.conf.commons.model.AppInfoDTO;
 import com.intrasoft.csp.conf.commons.model.RegistrationDTO;
 import com.intrasoft.csp.conf.commons.model.ResponseDTO;
+import com.intrasoft.csp.conf.commons.model.UpdateInformationDTO;
 import com.intrasoft.csp.libraries.restclient.service.RetryRestTemplate;
 import com.intrasoft.csp.libraries.versioning.client.ApiVersionClient;
 import org.slf4j.Logger;
@@ -35,30 +36,28 @@ public class ConfClientImpl implements ConfClient, ApiContextUrl {
 
 
     @Override
-    public ResponseEntity updates(String cspId) {
-        final String url = apiVersionClient.getApiUrl() + API_BASEURL + API_UPDATES + "/" + cspId;
+    public UpdateInformationDTO updates(String cspId) {
+        final String url = apiVersionClient.getApiUrl() + API_UPDATES + "/" + cspId;
         LOG.debug("Configuration call [GET]: " + url);
-
-        ResponseEntity response = retryRestTemplate.exchange(url, HttpMethod.GET, null, String.class);
+        UpdateInformationDTO response = retryRestTemplate.getForObject(url, UpdateInformationDTO.class);
         return response;
     }
 
     @Override
-    public ResponseEntity register(String cspId, RegistrationDTO cspRegistration) {
-        final String url = apiVersionClient.getApiUrl() + API_BASEURL + API_REGISTER + "/" + cspId;
+    public void register(String cspId, RegistrationDTO cspRegistration) {
+        final String url = apiVersionClient.getApiUrl() + API_REGISTER + "/" + cspId;
         LOG.debug("Configuration call [POST]: " + url);
 
         /**
          * @TODO
          * At test fails to persist, but api service logs success
          */
-        ResponseEntity response = retryRestTemplate.exchange(url, HttpMethod.POST, new HttpEntity<Object>(cspRegistration), ResponseDTO.class);
-        return response;
+        retryRestTemplate.exchange(url, HttpMethod.POST, new HttpEntity<Object>(cspRegistration), ResponseDTO.class);
     }
 
     @Override
     public ResponseEntity update(String cspId, String updateHash) {
-        final String url = apiVersionClient.getApiUrl() + API_BASEURL + API_UPDATE + "/" + cspId + "/" + updateHash;
+        final String url = apiVersionClient.getApiUrl() + API_UPDATE + "/" + cspId + "/" + updateHash;
         LOG.debug("Configuration call [GET]: " + url);
 
         /**
@@ -70,11 +69,10 @@ public class ConfClientImpl implements ConfClient, ApiContextUrl {
     }
 
     @Override
-    public ResponseEntity appInfo(String cspId, AppInfoDTO appInfo) {
-        final String url = apiVersionClient.getApiUrl() + API_BASEURL + API_APPINFO + "/" + cspId;
+    public void appInfo(String cspId, AppInfoDTO appInfo) {
+        final String url = apiVersionClient.getApiUrl() + API_APPINFO + "/" + cspId;
         LOG.debug("Configuration call [POST]: " + url);
 
         ResponseEntity response = retryRestTemplate.exchange(url, HttpMethod.POST, new HttpEntity<Object>(appInfo), String.class);
-        return response;
     }
 }

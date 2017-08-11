@@ -3,10 +3,12 @@ package com.intrasoft.csp.anon.server.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.intrasoft.csp.anon.commons.exceptions.AnonException;
+import com.intrasoft.csp.anon.commons.exceptions.MappingNotFoundForGivenTupleException;
 import com.intrasoft.csp.anon.commons.model.IntegrationAnonData;
 import com.intrasoft.csp.anon.server.model.Rule;
 import com.intrasoft.csp.anon.server.model.Rules;
 import com.intrasoft.csp.anon.server.utils.HMAC;
+import com.intrasoft.csp.commons.apiHttpStatusResponse.HttpStatusResponseType;
 import com.intrasoft.csp.commons.model.IntegrationDataType;
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.JsonPath;
@@ -76,7 +78,7 @@ public class ApiDataHandler {
 
         Rules rules = rulesService.getRule(dataType, cspId);
         if (rules == null){
-            throw new AnonException("Mapping not found for given tuple.");
+            throw new MappingNotFoundForGivenTupleException(HttpStatusResponseType.MAPPING_NOT_FOUND_FOR_GIVEN_TUPLE.getReasonPhrase());
         }
 
         JsonNode out = integrationAnonData.getDataObject();
