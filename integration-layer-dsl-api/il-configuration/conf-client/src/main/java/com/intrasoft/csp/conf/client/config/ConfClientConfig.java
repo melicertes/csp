@@ -6,6 +6,7 @@ import com.intrasoft.csp.conf.client.ConfClient;
 import com.intrasoft.csp.conf.client.impl.ConfClientImpl;
 import com.intrasoft.csp.conf.commons.context.ApiContextUrl;
 
+import com.intrasoft.csp.conf.commons.exceptions.*;
 import com.intrasoft.csp.libraries.restclient.config.RestTemplateConfiguration;
 import com.intrasoft.csp.libraries.restclient.exceptions.CspBusinessException;
 import com.intrasoft.csp.libraries.restclient.handlers.ExceptionHandler;
@@ -62,6 +63,14 @@ public class ConfClientConfig implements ApiContextUrl {
     static {
         SUPPORTED_EXCEPTIONS.put(CspBusinessException.class.getName(), CspBusinessException::new);
         SUPPORTED_EXCEPTIONS.put(InvalidDataTypeException.class.getName(), InvalidDataTypeException::new);
+        SUPPORTED_EXCEPTIONS.put(ConfException.class.getName(), ConfException::new);
+        SUPPORTED_EXCEPTIONS.put(InvalidCspEntryException.class.getName(), InvalidCspEntryException::new);
+        SUPPORTED_EXCEPTIONS.put(InvalidModuleNameException.class.getName(), InvalidModuleNameException::new);
+        SUPPORTED_EXCEPTIONS.put(InvalidModuleVersionException.class.getName(), InvalidModuleVersionException::new);
+        SUPPORTED_EXCEPTIONS.put(InvalidModuleHashException.class.getName(), InvalidModuleHashException::new);
+        SUPPORTED_EXCEPTIONS.put(RegisterNotUpdatable.class.getName(), RegisterNotUpdatable::new);
+        SUPPORTED_EXCEPTIONS.put(UpdateInvalidHashEntryException.class.getName(), UpdateInvalidHashEntryException::new);
+        SUPPORTED_EXCEPTIONS.put(UpdateNotFoundException.class.getName(), UpdateNotFoundException::new);
     }
 
     @Bean(name = "confClient")

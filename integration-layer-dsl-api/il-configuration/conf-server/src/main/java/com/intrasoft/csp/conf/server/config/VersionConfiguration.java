@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Configuration;
  * Version Configuration.
  */
 @Configuration
-@ComponentScan({"com.intrasoft.csp.commons","com.intrasoft.csp.libraries.versioning"})
+@ComponentScan({"com.intrasoft.csp.commons","com.intrasoft.csp.libraries"})
 public class VersionConfiguration implements ApiContextUrl {
 
     public static VersionDTO CCS_SERVER_VERSION = new VersionDTO()

@@ -5,7 +5,7 @@ import com.intrasoft.csp.conf.commons.exceptions.ConfException;
 import com.intrasoft.csp.conf.server.context.DataContextUrl;
 import com.intrasoft.csp.conf.server.context.PagesContextUrl;
 import com.intrasoft.csp.conf.commons.types.ContactType;
-import com.intrasoft.csp.conf.commons.types.HttpStatusResponseType;
+import com.intrasoft.csp.conf.commons.types.StatusResponseType;
 import com.intrasoft.csp.conf.commons.model.ResponseDTO;
 import com.intrasoft.csp.conf.server.domain.data.Contact;
 import com.intrasoft.csp.conf.server.domain.data.form.CspForm;
@@ -145,7 +145,7 @@ public class DataController implements DataContextUrl, PagesContextUrl {
             rows.add(row);
         }
 
-        LOG_AUDIT.info(logInfo + HttpStatusResponseType.OK.text());
+        LOG_AUDIT.info(logInfo + StatusResponseType.OK.text());
         return new ResponseEntity<>(rows, HttpStatus.OK);
     }
 
@@ -186,8 +186,8 @@ public class DataController implements DataContextUrl, PagesContextUrl {
             }
         }
 
-        LOG_AUDIT.info(logInfo + HttpStatusResponseType.DATA_DASHBOARD_MANAGE_OK.text());
-        ResponseDTO response = new ResponseDTO(HttpStatusResponseType.DATA_DASHBOARD_MANAGE_OK.code(), HttpStatusResponseType.DATA_DASHBOARD_MANAGE_OK.text());
+        LOG_AUDIT.info(logInfo + StatusResponseType.DATA_DASHBOARD_MANAGE_OK.text());
+        ResponseDTO response = new ResponseDTO(StatusResponseType.DATA_DASHBOARD_MANAGE_OK.code(), StatusResponseType.DATA_DASHBOARD_MANAGE_OK.text());
         return new ResponseEntity<>(response, HttpStatus.OK);
 
     }
@@ -242,7 +242,7 @@ public class DataController implements DataContextUrl, PagesContextUrl {
             rows.add(row);
         }
 
-        LOG_AUDIT.info(logInfo + HttpStatusResponseType.OK.text());
+        LOG_AUDIT.info(logInfo + StatusResponseType.OK.text());
         return new ResponseEntity<>(rows, HttpStatus.OK);
     }
 
@@ -263,12 +263,12 @@ public class DataController implements DataContextUrl, PagesContextUrl {
 
         //Check if csp_id exists
         if (cspRepository.exists(cspForm.getCspId())) {
-            throw new ConfException(HttpStatusResponseType.DATA_CSP_SAVE_RECORD_EXISTS.text(), HttpStatusResponseType.DATA_CSP_SAVE_RECORD_EXISTS.code());
+            throw new ConfException(StatusResponseType.DATA_CSP_SAVE_RECORD_EXISTS.text(), StatusResponseType.DATA_CSP_SAVE_RECORD_EXISTS.code());
         }
 
         //Check if contact name, email, type are of equal size
         if ((cspForm.getContactNames().size() + cspForm.getContactEmails().size() + cspForm.getContactTypes().size()) % 3 != 0) {
-            throw new ConfException(HttpStatusResponseType.DATA_CSP_SAVE_INVALID_CONTACT.text(), HttpStatusResponseType.DATA_CSP_SAVE_INVALID_CONTACT.code());
+            throw new ConfException(StatusResponseType.DATA_CSP_SAVE_INVALID_CONTACT.text(), StatusResponseType.DATA_CSP_SAVE_INVALID_CONTACT.code());
         }
 
         //save csp
@@ -276,8 +276,8 @@ public class DataController implements DataContextUrl, PagesContextUrl {
         csp.setId(cspForm.getCspId());
         csp = this.persistCsp(csp, cspForm);
 
-        LOG_AUDIT.info(logInfo + HttpStatusResponseType.DATA_CSP_SAVE_OK.text());
-        ResponseDTO response = new ResponseDTO(HttpStatusResponseType.DATA_CSP_SAVE_OK.code(), HttpStatusResponseType.DATA_CSP_SAVE_OK.text());
+        LOG_AUDIT.info(logInfo + StatusResponseType.DATA_CSP_SAVE_OK.text());
+        ResponseDTO response = new ResponseDTO(StatusResponseType.DATA_CSP_SAVE_OK.code(), StatusResponseType.DATA_CSP_SAVE_OK.text());
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -298,7 +298,7 @@ public class DataController implements DataContextUrl, PagesContextUrl {
 
         //Check if csp_id exists
         if (!cspRepository.exists(cspForm.getCspId())) {
-            throw new ConfException(HttpStatusResponseType.DATA_INVALID_CSP_ID.text(), HttpStatusResponseType.DATA_INVALID_CSP_ID.code());
+            throw new ConfException(StatusResponseType.DATA_INVALID_CSP_ID.text(), StatusResponseType.DATA_INVALID_CSP_ID.code());
         }
 
         //remove secondary records
@@ -309,8 +309,8 @@ public class DataController implements DataContextUrl, PagesContextUrl {
         Csp csp = cspRepository.findOne(cspId);
         csp = this.persistCsp(csp, cspForm);
 
-        LOG_AUDIT.info(logInfo + HttpStatusResponseType.DATA_CSP_UPDATE_OK.text());
-        ResponseDTO response = new ResponseDTO(HttpStatusResponseType.DATA_CSP_UPDATE_OK.code(), HttpStatusResponseType.DATA_CSP_UPDATE_OK.text());
+        LOG_AUDIT.info(logInfo + StatusResponseType.DATA_CSP_UPDATE_OK.text());
+        ResponseDTO response = new ResponseDTO(StatusResponseType.DATA_CSP_UPDATE_OK.code(), StatusResponseType.DATA_CSP_UPDATE_OK.text());
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -330,7 +330,7 @@ public class DataController implements DataContextUrl, PagesContextUrl {
 
         //Check if csp_id exists
         if (!cspRepository.exists(cspId)) {
-            throw new ConfException(HttpStatusResponseType.DATA_INVALID_CSP_ID.text(), HttpStatusResponseType.DATA_INVALID_CSP_ID.code());
+            throw new ConfException(StatusResponseType.DATA_INVALID_CSP_ID.text(), StatusResponseType.DATA_INVALID_CSP_ID.code());
         }
 
         //remove in the opposite order foreign records
@@ -346,8 +346,8 @@ public class DataController implements DataContextUrl, PagesContextUrl {
         //remove main record
         cspRepository.delete(cspId);
 
-        LOG_AUDIT.info(logInfo + HttpStatusResponseType.DATA_CSP_DELETE_OK.text());
-        ResponseDTO response = new ResponseDTO(HttpStatusResponseType.DATA_CSP_DELETE_OK.code(), HttpStatusResponseType.DATA_CSP_DELETE_OK.text());
+        LOG_AUDIT.info(logInfo + StatusResponseType.DATA_CSP_DELETE_OK.text());
+        ResponseDTO response = new ResponseDTO(StatusResponseType.DATA_CSP_DELETE_OK.code(), StatusResponseType.DATA_CSP_DELETE_OK.text());
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -398,7 +398,7 @@ public class DataController implements DataContextUrl, PagesContextUrl {
             rows.add(row);
         }
 
-        LOG_AUDIT.info(logInfo + HttpStatusResponseType.OK.text());
+        LOG_AUDIT.info(logInfo + StatusResponseType.OK.text());
         return new ResponseEntity<>(rows, HttpStatus.OK);
     }
 
@@ -419,14 +419,14 @@ public class DataController implements DataContextUrl, PagesContextUrl {
 
         //check if Module Name exists
         if (moduleRepository.findByName(moduleForm.getShortName()) != null) {
-            throw new ConfException(HttpStatusResponseType.DATA_MODULE_SAVE_NAME_EXISTS.text(), HttpStatusResponseType.DATA_MODULE_SAVE_NAME_EXISTS.code());
+            throw new ConfException(StatusResponseType.DATA_MODULE_SAVE_NAME_EXISTS.text(), StatusResponseType.DATA_MODULE_SAVE_NAME_EXISTS.code());
         }
 
         Module module = new Module();
         module = this.persistModule(module, moduleForm);
 
-        LOG_AUDIT.info(logInfo + HttpStatusResponseType.DATA_MODULE_SAVE_OK.text());
-        ResponseDTO response = new ResponseDTO(HttpStatusResponseType.DATA_MODULE_SAVE_OK.code(), HttpStatusResponseType.DATA_MODULE_SAVE_OK.text());
+        LOG_AUDIT.info(logInfo + StatusResponseType.DATA_MODULE_SAVE_OK.text());
+        ResponseDTO response = new ResponseDTO(StatusResponseType.DATA_MODULE_SAVE_OK.code(), StatusResponseType.DATA_MODULE_SAVE_OK.text());
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -449,19 +449,19 @@ public class DataController implements DataContextUrl, PagesContextUrl {
         //search if module exists
         Module module = moduleRepository.findOne(moduleId);
         if (module == null) {
-            throw new ConfException(HttpStatusResponseType.DATA_INVALID_MODULE_ID.text(), HttpStatusResponseType.DATA_INVALID_MODULE_ID.code());
+            throw new ConfException(StatusResponseType.DATA_INVALID_MODULE_ID.text(), StatusResponseType.DATA_INVALID_MODULE_ID.code());
         }
 
         //check if new Module Name exists, when different from original
         if (!module.getName().equals(moduleForm.getShortName()) && moduleRepository.findByName(moduleForm.getShortName()) != null) {
-            throw new ConfException(HttpStatusResponseType.DATA_MODULE_SAVE_NAME_EXISTS.text(), HttpStatusResponseType.DATA_MODULE_SAVE_NAME_EXISTS.code());
+            throw new ConfException(StatusResponseType.DATA_MODULE_SAVE_NAME_EXISTS.text(), StatusResponseType.DATA_MODULE_SAVE_NAME_EXISTS.code());
         }
 
         //proceed with persisting
         module = this.persistModule(module, moduleForm);
 
-        LOG_AUDIT.info(logInfo + HttpStatusResponseType.DATA_MODULE_UPDATE_OK.text());
-        ResponseDTO response = new ResponseDTO(HttpStatusResponseType.DATA_MODULE_UPDATE_OK.code(), HttpStatusResponseType.DATA_MODULE_UPDATE_OK.text());
+        LOG_AUDIT.info(logInfo + StatusResponseType.DATA_MODULE_UPDATE_OK.text());
+        ResponseDTO response = new ResponseDTO(StatusResponseType.DATA_MODULE_UPDATE_OK.code(), StatusResponseType.DATA_MODULE_UPDATE_OK.text());
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -481,19 +481,19 @@ public class DataController implements DataContextUrl, PagesContextUrl {
 
         //check if Module exists
         if (moduleRepository.exists(moduleId)) {
-            throw new ConfException(HttpStatusResponseType.DATA_INVALID_MODULE_ID.text(), HttpStatusResponseType.DATA_INVALID_MODULE_ID.code());
+            throw new ConfException(StatusResponseType.DATA_INVALID_MODULE_ID.text(), StatusResponseType.DATA_INVALID_MODULE_ID.code());
         }
 
         //check if removal can be performed, according to management table, on top of UI disabled buttons
         if (cspManagementRepository.findByModuleId(moduleId).size() > 0) {
-            throw new ConfException(HttpStatusResponseType.DATA_MODULE_DELETE_ERROR.text(), HttpStatusResponseType.DATA_MODULE_DELETE_ERROR.code());
+            throw new ConfException(StatusResponseType.DATA_MODULE_DELETE_ERROR.text(), StatusResponseType.DATA_MODULE_DELETE_ERROR.code());
         }
 
         //delete module version
         moduleRepository.delete(moduleId);
 
-        LOG_AUDIT.info(logInfo + HttpStatusResponseType.DATA_MODULE_DELETE_OK.text());
-        ResponseDTO response = new ResponseDTO(HttpStatusResponseType.DATA_MODULE_DELETE_OK.code(), HttpStatusResponseType.DATA_MODULE_DELETE_OK.text());
+        LOG_AUDIT.info(logInfo + StatusResponseType.DATA_MODULE_DELETE_OK.text());
+        ResponseDTO response = new ResponseDTO(StatusResponseType.DATA_MODULE_DELETE_OK.code(), StatusResponseType.DATA_MODULE_DELETE_OK.text());
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -518,7 +518,7 @@ public class DataController implements DataContextUrl, PagesContextUrl {
 
         //check if Module exists
         if (!moduleRepository.exists(moduleId)) {
-            throw new ConfException(HttpStatusResponseType.DATA_INVALID_MODULE_ID.text(), HttpStatusResponseType.DATA_INVALID_MODULE_ID.code());
+            throw new ConfException(StatusResponseType.DATA_INVALID_MODULE_ID.text(), StatusResponseType.DATA_INVALID_MODULE_ID.code());
         }
 
         List<ModuleVersionRow> rows = new ArrayList<>();
@@ -545,7 +545,7 @@ public class DataController implements DataContextUrl, PagesContextUrl {
             rows.add(row);
         }
 
-        LOG_AUDIT.info(logInfo + HttpStatusResponseType.OK.text());
+        LOG_AUDIT.info(logInfo + StatusResponseType.OK.text());
         return new ResponseEntity<>(rows, HttpStatus.OK);
     }
 
@@ -574,17 +574,17 @@ public class DataController implements DataContextUrl, PagesContextUrl {
 
         //check if Module exists
         if (!moduleRepository.exists(moduleId)) {
-            throw new ConfException(HttpStatusResponseType.DATA_INVALID_MODULE_ID.text(), HttpStatusResponseType.DATA_INVALID_MODULE_ID.code());
+            throw new ConfException(StatusResponseType.DATA_INVALID_MODULE_ID.text(), StatusResponseType.DATA_INVALID_MODULE_ID.code());
         }
 
         //check for empty file
         if (uploadFile.isEmpty()) {
-            throw new ConfException(HttpStatusResponseType.DATA_MODULE_VERSION_EMPTY_FILE.text(), HttpStatusResponseType.DATA_MODULE_VERSION_EMPTY_FILE.code());
+            throw new ConfException(StatusResponseType.DATA_MODULE_VERSION_EMPTY_FILE.text(), StatusResponseType.DATA_MODULE_VERSION_EMPTY_FILE.code());
         }
 
         //check if module version exists
         if (moduleVersionRepository.findByModuleIdAndVersion(moduleId, VersionParser.fromString(version)) != null) {
-            throw new ConfException(HttpStatusResponseType.DATA_MODULE_VERSION_EXISTS.text(), HttpStatusResponseType.DATA_MODULE_VERSION_EXISTS.code());
+            throw new ConfException(StatusResponseType.DATA_MODULE_VERSION_EXISTS.text(), StatusResponseType.DATA_MODULE_VERSION_EXISTS.code());
             }
 
         //save file and get hash
@@ -601,14 +601,14 @@ public class DataController implements DataContextUrl, PagesContextUrl {
             moduleVersion.setDescription(description);
             moduleVersionRepository.save(moduleVersion);
 
-            LOG_AUDIT.info(logInfo + HttpStatusResponseType.DATA_MODULE_VERSION_SAVE_OK.text());
-            ResponseDTO response = new ResponseDTO(HttpStatusResponseType.DATA_MODULE_VERSION_SAVE_OK.code(), HttpStatusResponseType.DATA_MODULE_VERSION_SAVE_OK.text());
+            LOG_AUDIT.info(logInfo + StatusResponseType.DATA_MODULE_VERSION_SAVE_OK.text());
+            ResponseDTO response = new ResponseDTO(StatusResponseType.DATA_MODULE_VERSION_SAVE_OK.code(), StatusResponseType.DATA_MODULE_VERSION_SAVE_OK.text());
             return new ResponseEntity<>(response, HttpStatus.OK);
 
         } catch (IOException e) {
-            throw new ConfException(HttpStatusResponseType.DATA_MODULE_VERSION_SAVE_FILE.text(), HttpStatusResponseType.DATA_MODULE_VERSION_SAVE_FILE.code());
+            throw new ConfException(StatusResponseType.DATA_MODULE_VERSION_SAVE_FILE.text(), StatusResponseType.DATA_MODULE_VERSION_SAVE_FILE.code());
         } catch (NoSuchAlgorithmException e) {
-            throw new ConfException(HttpStatusResponseType.DATA_MODULE_VERSION_HASH_FILE.text(), HttpStatusResponseType.DATA_MODULE_VERSION_HASH_FILE.code());
+            throw new ConfException(StatusResponseType.DATA_MODULE_VERSION_HASH_FILE.text(), StatusResponseType.DATA_MODULE_VERSION_HASH_FILE.code());
         }
     }
 
@@ -639,17 +639,17 @@ public class DataController implements DataContextUrl, PagesContextUrl {
 
         //check if module version exists
         if (!moduleVersionRepository.exists(moduleVersionId)) {
-            throw new ConfException(HttpStatusResponseType.DATA_INVALID_MODULE_VERSION_ID.text(), HttpStatusResponseType.DATA_INVALID_MODULE_VERSION_ID.code());
+            throw new ConfException(StatusResponseType.DATA_INVALID_MODULE_VERSION_ID.text(), StatusResponseType.DATA_INVALID_MODULE_VERSION_ID.code());
         }
 
         //check if module exists
         if (!moduleRepository.exists(moduleId)) {
-            throw new ConfException(HttpStatusResponseType.DATA_INVALID_MODULE_ID.text(), HttpStatusResponseType.DATA_INVALID_MODULE_ID.code());
+            throw new ConfException(StatusResponseType.DATA_INVALID_MODULE_ID.text(), StatusResponseType.DATA_INVALID_MODULE_ID.code());
         }
 
         //check if module full name exists, if different than original
         if (!fullName.equals(moduleVersionRepository.findOne(moduleVersionId).getFullName()) && moduleVersionRepository.findByFullName(fullName) != null) {
-            throw new ConfException(HttpStatusResponseType.DATA_MODULE_VERSION_NAME_EXISTS.text(), HttpStatusResponseType.DATA_MODULE_VERSION_NAME_EXISTS.code());
+            throw new ConfException(StatusResponseType.DATA_MODULE_VERSION_NAME_EXISTS.text(), StatusResponseType.DATA_MODULE_VERSION_NAME_EXISTS.code());
         }
 
         try {
@@ -659,7 +659,7 @@ public class DataController implements DataContextUrl, PagesContextUrl {
                 String oldHash = moduleVersionRepository.findOne(moduleVersionId).getHash();
                 newHash = FileHelper.saveUploadedFile(fileTemp, fileRepository, uploadFile, digestAlgorithm);
                 if (moduleVersionRepository.findByHash(newHash) != null) {
-                    throw new ConfException(HttpStatusResponseType.DATA_MODULE_VERSION_HASH_EXISTS.text(), HttpStatusResponseType.DATA_MODULE_VERSION_HASH_EXISTS.code());
+                    throw new ConfException(StatusResponseType.DATA_MODULE_VERSION_HASH_EXISTS.text(), StatusResponseType.DATA_MODULE_VERSION_HASH_EXISTS.code());
                 }
                 //find filename from hash and remove old file from file repository
                 String fileName = FileHelper.getFileFromHash(fileRepository, oldHash);
@@ -677,16 +677,16 @@ public class DataController implements DataContextUrl, PagesContextUrl {
             moduleVersion.setDescription(description);
             moduleVersionRepository.save(moduleVersion);
 
-            LOG_AUDIT.info(logInfo + HttpStatusResponseType.DATA_MODULE_VERSION_UPDATE_OK.text());
-            ResponseDTO response = new ResponseDTO(HttpStatusResponseType.DATA_MODULE_VERSION_UPDATE_OK.code(), HttpStatusResponseType.DATA_MODULE_VERSION_UPDATE_OK.text());
+            LOG_AUDIT.info(logInfo + StatusResponseType.DATA_MODULE_VERSION_UPDATE_OK.text());
+            ResponseDTO response = new ResponseDTO(StatusResponseType.DATA_MODULE_VERSION_UPDATE_OK.code(), StatusResponseType.DATA_MODULE_VERSION_UPDATE_OK.text());
             return new ResponseEntity<>(response, HttpStatus.OK);
 
         } catch (NoSuchAlgorithmException e) {
-            throw new ConfException(HttpStatusResponseType.DATA_MODULE_VERSION_HASH_FILE.text(), HttpStatusResponseType.DATA_MODULE_VERSION_HASH_FILE.code());
+            throw new ConfException(StatusResponseType.DATA_MODULE_VERSION_HASH_FILE.text(), StatusResponseType.DATA_MODULE_VERSION_HASH_FILE.code());
         } catch (NoSuchFileException e) {
-            throw new ConfException(HttpStatusResponseType.DATA_MODULE_VERSION_INVALID_FILE.text(), HttpStatusResponseType.DATA_MODULE_VERSION_INVALID_FILE.code());
+            throw new ConfException(StatusResponseType.DATA_MODULE_VERSION_INVALID_FILE.text(), StatusResponseType.DATA_MODULE_VERSION_INVALID_FILE.code());
         } catch (IOException e) {
-            throw new ConfException(HttpStatusResponseType.DATA_MODULE_VERSION_SAVE_FILE.text(), HttpStatusResponseType.DATA_MODULE_VERSION_SAVE_FILE.code());
+            throw new ConfException(StatusResponseType.DATA_MODULE_VERSION_SAVE_FILE.text(), StatusResponseType.DATA_MODULE_VERSION_SAVE_FILE.code());
         }
     }
 
@@ -706,13 +706,13 @@ public class DataController implements DataContextUrl, PagesContextUrl {
 
         //check if module version exists
         if (!moduleVersionRepository.exists(moduleVersionId)) {
-            throw new ConfException(HttpStatusResponseType.DATA_INVALID_MODULE_VERSION_ID.text(), HttpStatusResponseType.DATA_INVALID_MODULE_VERSION_ID.code());
+            throw new ConfException(StatusResponseType.DATA_INVALID_MODULE_VERSION_ID.text(), StatusResponseType.DATA_INVALID_MODULE_VERSION_ID.code());
         }
 
         Module module = moduleRepository.findOne(moduleVersionRepository.findOne(moduleVersionId).getModuleId());
         //check if removal can be done by management table
         if (cspManagementRepository.findByModuleIdAndModuleVersionId(module.getId(), moduleVersionId).size() > 0) {
-            throw new ConfException(HttpStatusResponseType.DATA_MODULE_VERSION_DELETE_ERROR.text(), HttpStatusResponseType.DATA_MODULE_VERSION_DELETE_ERROR.code());
+            throw new ConfException(StatusResponseType.DATA_MODULE_VERSION_DELETE_ERROR.text(), StatusResponseType.DATA_MODULE_VERSION_DELETE_ERROR.code());
         }
 
         try {
@@ -724,12 +724,12 @@ public class DataController implements DataContextUrl, PagesContextUrl {
             //delete module version
             moduleVersionRepository.delete(moduleVersionId);
 
-            LOG_AUDIT.info(logInfo + HttpStatusResponseType.DATA_MODULE_VERSION_DELETE_OK.text());
-            ResponseDTO response = new ResponseDTO(HttpStatusResponseType.DATA_MODULE_VERSION_DELETE_OK.code(), HttpStatusResponseType.DATA_MODULE_VERSION_DELETE_OK.text());
+            LOG_AUDIT.info(logInfo + StatusResponseType.DATA_MODULE_VERSION_DELETE_OK.text());
+            ResponseDTO response = new ResponseDTO(StatusResponseType.DATA_MODULE_VERSION_DELETE_OK.code(), StatusResponseType.DATA_MODULE_VERSION_DELETE_OK.text());
             return new ResponseEntity<>(response, HttpStatus.OK);
 
         } catch (IOException e) {
-            throw new ConfException(HttpStatusResponseType.DATA_MODULE_VERSION_INVALID_FILE.text(), HttpStatusResponseType.DATA_MODULE_VERSION_INVALID_FILE.code());
+            throw new ConfException(StatusResponseType.DATA_MODULE_VERSION_INVALID_FILE.text(), StatusResponseType.DATA_MODULE_VERSION_INVALID_FILE.code());
         }
     }
 

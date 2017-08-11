@@ -6,13 +6,15 @@ import com.intrasoft.csp.commons.exceptions.InvalidDataTypeException;
 import com.intrasoft.csp.conf.client.ConfClient;
 import com.intrasoft.csp.conf.client.config.ConfClientConfig;
 import com.intrasoft.csp.conf.commons.context.ApiContextUrl;
+import com.intrasoft.csp.conf.commons.exceptions.InvalidCspEntryException;
 import com.intrasoft.csp.conf.commons.model.AppInfoDTO;
 import com.intrasoft.csp.conf.commons.model.RegistrationDTO;
-import com.intrasoft.csp.conf.commons.model.ResponseDTO;
 import com.intrasoft.csp.conf.commons.model.UpdateInformationDTO;
+import com.intrasoft.csp.conf.commons.types.StatusResponseType;
 import com.intrasoft.csp.conf.server.ConfApp;
 import com.intrasoft.csp.libraries.restclient.service.RetryRestTemplate;
 import org.apache.commons.io.IOUtils;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -24,13 +26,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.fail;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {ConfApp.class, ConfClientConfig.class},
@@ -44,11 +46,6 @@ import static org.hamcrest.Matchers.*;
 
                 "conf.retry.backOffPeriod:5000",
                 "conf.retry.maxAttempts:0"
-
-//                "api.version: 1",
-//                "csp.retry.backOffPeriod:10",
-//                "csp.retry.maxAttempts:1",
-//                "key.update=10000"
         })
 @Rollback(value = false)
 public class ConfClientTest implements ApiContextUrl {
@@ -65,28 +62,20 @@ public class ConfClientTest implements ApiContextUrl {
 
 
     @Test
-    public void updatesTest() throws InvalidDataTypeException, IOException {
+    public void updatesInvalidCspTest() throws InvalidDataTypeException, IOException {
         String cspId;
-        ResponseEntity response;
 
         /**
-         * Test an existing CSP
+         * Test a CSP does not exists
          */
         cspId = "12345678-9123-4564-2665-5440000";
-        response = confClient.updates(cspId);
-        assertThat(response.getStatusCode(), is(HttpStatus.OK));
 
-        ObjectMapper mapper = new ObjectMapper();
-        UpdateInformationDTO updateInformation = new ObjectMapper().readValue(response.getBody().toString(), UpdateInformationDTO.class);
-        assertThat(updateInformation.getDateChanged(), is(notNullValue()));
-        assertThat(updateInformation.getAvailable().size(), greaterThanOrEqualTo(1));
-
-        /**
-         * Test invalid CSP
-         */
-//        cspId = "1234";
-//        response = confClient.updates(cspId);
-//        assertThat(response.getStatusCode(), is(HttpStatus.NOT_FOUND));
+        try {
+            UpdateInformationDTO updateInformationDTO = confClient.updates(cspId);
+            fail("Expected CategoryCannotBeDeletedException");
+        }catch (InvalidCspEntryException e){
+            Assert.assertThat(e.getMessage(), containsString(StatusResponseType.API_INVALID_CSP_ENTRY.text()));
+        }
     }
 
     @Test
@@ -104,8 +93,7 @@ public class ConfClientTest implements ApiContextUrl {
         json = IOUtils.toString(this.getClass().getResourceAsStream("/register/register-valid-1.json"), "UTF-8");
         ObjectMapper mapper = new ObjectMapper();
         registration = new ObjectMapper().readValue(json, RegistrationDTO.class);
-        response = confClient.register(cspId, registration);
-        assertThat(response.getStatusCode(), is(HttpStatus.OK));
+        confClient.register(cspId, registration);
 
     }
 
@@ -138,7 +126,6 @@ public class ConfClientTest implements ApiContextUrl {
         json = IOUtils.toString(this.getClass().getResourceAsStream("/appInfo/appInfo-valid-1.json"), "UTF-8");
         ObjectMapper mapper = new ObjectMapper();
         appInfo = new ObjectMapper().readValue(json, AppInfoDTO.class);
-        response = confClient.appInfo(cspId, appInfo);
-        assertThat(response.getStatusCode(), is(HttpStatus.OK));
+        confClient.appInfo(cspId, appInfo);
     }
 }
