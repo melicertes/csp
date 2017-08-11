@@ -47,7 +47,7 @@ import static org.junit.Assert.fail;
                 "csp.retry.maxAttempts:1",
                 "key.update=10000"
         })
-@ActiveProfiles("mysql") //TODO: to be changed to use H2 DB profile
+@ActiveProfiles("h2mem") //TODO: to be changed to use H2 DB profile
 public class AnonClientTest implements AnonContextUrl {
     private static final Logger LOG = LoggerFactory.getLogger(AnonClientTest.class);
 
