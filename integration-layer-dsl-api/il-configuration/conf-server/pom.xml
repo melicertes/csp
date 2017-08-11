@@ -94,11 +94,11 @@
             <version>4.7.0</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.webjars.bower/bootstrap-fileinput -->
-        <dependency>
-            <groupId>org.webjars.bower</groupId>
-            <artifactId>bootstrap-fileinput</artifactId>
-            <version>4.4.0</version>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>org.webjars.bower</groupId>-->
+            <!--<artifactId>bootstrap-fileinput</artifactId>-->
+            <!--<version>4.4.0</version>-->
+        <!--</dependency>-->
         <!-- https://mvnrepository.com/artifact/org.webjars/html5shiv -->
         <dependency>
             <groupId>org.webjars</groupId>
@@ -136,11 +136,11 @@
             <version>1.16.0</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.webjars.bower/bootstrap3-dialog -->
-        <dependency>
-            <groupId>org.webjars.bower</groupId>
-            <artifactId>bootstrap3-dialog</artifactId>
-            <version>1.35.3</version>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>org.webjars.bower</groupId>-->
+            <!--<artifactId>bootstrap3-dialog</artifactId>-->
+            <!--<version>1.35.3</version>-->
+        <!--</dependency>-->
 
         <dependency>
             <groupId>org.springframework.security</groupId>
