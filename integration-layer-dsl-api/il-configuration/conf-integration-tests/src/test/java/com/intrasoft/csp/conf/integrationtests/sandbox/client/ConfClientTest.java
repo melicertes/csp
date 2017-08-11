@@ -23,6 +23,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.annotation.Rollback;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,7 +51,7 @@ import static org.hamcrest.Matchers.*;
 //                "csp.retry.maxAttempts:1",
 //                "key.update=10000"
         })
-@Rollback(value = false)
+@ActiveProfiles("postgres")
 public class ConfClientTest implements ApiContextUrl {
 
     private static final Logger LOG = LoggerFactory.getLogger(ConfClientTest.class);

@@ -22,16 +22,16 @@ import static org.hamcrest.Matchers.is;
 @SpringBootTest(classes = {ConfApp.class, ConfClientConfig.class, CspRestTemplateConfiguration.class},
         webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT,
         properties = {
-                "server.port: 8585",
+                "server.port: 8090",
                 "conf.server.protocol: http",
                 "conf.server.host: localhost",
-                "conf.server.port: 8585",
+                "conf.server.port: 8090",
                 "api.version: 1",
                 "csp.retry.backOffPeriod:10",
                 "csp.retry.maxAttempts:1",
                 "key.update=10000"
         })
-@ActiveProfiles("h2mem")
+@ActiveProfiles("postgres")
 public class ConfClientApiVersionTest {
     private static final Logger LOG = LoggerFactory.getLogger(ConfClientApiVersionTest.class);
 
@@ -45,7 +45,7 @@ public class ConfClientApiVersionTest {
         String apiUrl = apiVersionClient.getApiUrl();
         String anonContext = apiVersionClient.getContext();
         assertThat(versionDTO.getMaxVersion(),is(1.0));
-        assertThat(apiUrl,is("http://localhost:8585/v1"));
+        assertThat(apiUrl,is("http://localhost:8090/v1"));
         assertThat(anonContext,is("/v1"));
     }
 }
