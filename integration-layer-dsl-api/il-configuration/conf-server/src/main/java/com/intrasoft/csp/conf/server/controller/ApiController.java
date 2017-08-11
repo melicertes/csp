@@ -32,6 +32,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 @RestController
+@RequestMapping(ApiContextUrl.API_BASEURL)
 public class ApiController implements ApiContextUrl, ConfigurationApi {
 
     private static Logger LOG_AUDIT = LoggerFactory.getLogger("audit-log");
@@ -73,12 +74,12 @@ public class ApiController implements ApiContextUrl, ConfigurationApi {
      *              formatted as text, for 36 characters total, arranged as 8-4-4-4-12.
      * @return ResponseEntity
      */
-    @RequestMapping(value = "/v" + REST_API_V1 + API_BASEURL + API_UPDATES + "/{cspId}",
+    @RequestMapping(value = "/v" + REST_API_V1 + API_UPDATES + "/{cspId}",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity updates(@PathVariable String cspId) {
         String user = "system";
-        String logInfo = user + ", " + "/v" + REST_API_V1 + API_BASEURL + API_UPDATES + "/" + cspId + ": ";
+        String logInfo = user + ", " + "/v" + REST_API_V1 + API_UPDATES + "/" + cspId + ": ";
         LOG_AUDIT.info(logInfo + "GET Request received");
 
         //search for CSP
@@ -134,13 +135,13 @@ public class ApiController implements ApiContextUrl, ConfigurationApi {
      * @param cspRegistration A block of information to register the CSP being installed
      * @return ResponseEntity
      */
-    @RequestMapping(value = "/v" + REST_API_V1 + API_BASEURL + API_REGISTER + "/{cspId}",
+    @RequestMapping(value = "/v" + REST_API_V1 +  API_REGISTER + "/{cspId}",
             method = RequestMethod.POST,
             consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity register(@PathVariable String cspId, @RequestBody RegistrationDTO cspRegistration) {
         String user = "system";
-        String logInfo = user + ", " +  "/v" + REST_API_V1 + API_BASEURL + API_REGISTER + "/" + cspId + ": ";
+        String logInfo = user + ", " +  "/v" + REST_API_V1 +  API_REGISTER + "/" + cspId + ": ";
         LOG_AUDIT.info(logInfo + "POST Request received");
 
         if (cspRepository.exists(cspId) && cspRegistration.getRegistrationIsUpdate()) {
@@ -189,12 +190,12 @@ public class ApiController implements ApiContextUrl, ConfigurationApi {
      *                   available for this cspId to download; then it provides the byte stream for this update object.
      * @return ResponseEntity
      */
-    @RequestMapping(value = "/v" + REST_API_V1 + API_BASEURL + API_UPDATE + "/{cspId}" + "/{updateHash}",
+    @RequestMapping(value = "/v" + REST_API_V1 + API_UPDATE + "/{cspId}" + "/{updateHash}",
             method = RequestMethod.GET,
             consumes = MediaType.ALL_VALUE)
     public ResponseEntity update(@PathVariable String cspId, @PathVariable String updateHash) {
         String user = "system";
-        String logInfo = user + ", " + "/v" + REST_API_V1 + API_BASEURL + API_UPDATE + "/" + cspId + "/" + updateHash + ": ";
+        String logInfo = user + ", " + "/v" + REST_API_V1 + API_UPDATE + "/" + cspId + "/" + updateHash + ": ";
         LOG_AUDIT.info(logInfo + "GET Request received");
 
         //search for CSP
@@ -246,13 +247,13 @@ public class ApiController implements ApiContextUrl, ConfigurationApi {
      *              formatted as text, for 36 characters total, arranged as 8-4-4-4-12.
      * @return ResponseEntity
      */
-    @RequestMapping(value = "/v" + REST_API_V1 + API_BASEURL + API_APPINFO + "/{cspId}",
+    @RequestMapping(value = "/v" + REST_API_V1 +  API_APPINFO + "/{cspId}",
             method = RequestMethod.POST,
             consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity appInfo(@PathVariable String cspId, @RequestBody AppInfoDTO appInfo) {
         String user = "system";
-        String logInfo = user + ", " + "/v" + REST_API_V1 + API_BASEURL + API_APPINFO + "/" + cspId + ": ";
+        String logInfo = user + ", " + "/v" + REST_API_V1 +  API_APPINFO + "/" + cspId + ": ";
         LOG_AUDIT.info(logInfo + "POST Request received");
 
         //search for CSP

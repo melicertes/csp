@@ -18,7 +18,7 @@ public class VersionConfiguration implements ApiContextUrl {
     public static VersionDTO CCS_SERVER_VERSION = new VersionDTO()
             .withMinVersion(Double.valueOf(REST_API_V1))
             .withMaxVersion(Double.valueOf(REST_API_V1))
-            .withVersionContext(Double.valueOf(REST_API_V1),  "/v" + REST_API_V1);
+            .withVersionContext(Double.valueOf(REST_API_V1),  API_BASEURL+"/v" + REST_API_V1);
 
     @Bean
     public ApiVersionService apiVersionService() {

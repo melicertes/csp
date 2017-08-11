@@ -10,11 +10,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 public interface ConfigurationApi {
 
-    public ResponseEntity updates(String cspId);
+    ResponseEntity updates(String cspId);
 
-    public ResponseEntity register(String cspId, RegistrationDTO cspRegistration);
+    ResponseEntity register(String cspId, RegistrationDTO cspRegistration);
 
-    public ResponseEntity update(String cspId, String updateHash);
+    ResponseEntity update(String cspId, String updateHash);
 
-    public ResponseEntity appInfo(String cspId, AppInfoDTO appInfo);
+    ResponseEntity appInfo(String cspId, AppInfoDTO appInfo);
 }
