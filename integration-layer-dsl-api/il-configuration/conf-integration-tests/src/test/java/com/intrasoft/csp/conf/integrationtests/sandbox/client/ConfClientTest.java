@@ -9,6 +9,7 @@ import com.intrasoft.csp.conf.commons.context.ApiContextUrl;
 import com.intrasoft.csp.conf.commons.exceptions.InvalidCspEntryException;
 import com.intrasoft.csp.conf.commons.model.AppInfoDTO;
 import com.intrasoft.csp.conf.commons.model.RegistrationDTO;
+import com.intrasoft.csp.conf.commons.model.ResponseDTO;
 import com.intrasoft.csp.conf.commons.model.UpdateInformationDTO;
 import com.intrasoft.csp.conf.commons.types.StatusResponseType;
 import com.intrasoft.csp.conf.server.ConfApp;
@@ -48,7 +49,7 @@ import static org.junit.Assert.fail;
                 "conf.retry.backOffPeriod:5000",
                 "conf.retry.maxAttempts:0"
         })
-@ActiveProfiles("postgres")
+@ActiveProfiles("h2mem")
 public class ConfClientTest implements ApiContextUrl {
 
     private static final Logger LOG = LoggerFactory.getLogger(ConfClientTest.class);
@@ -94,7 +95,7 @@ public class ConfClientTest implements ApiContextUrl {
         json = IOUtils.toString(this.getClass().getResourceAsStream("/register/register-valid-1.json"), "UTF-8");
         ObjectMapper mapper = new ObjectMapper();
         registration = new ObjectMapper().readValue(json, RegistrationDTO.class);
-        confClient.register(cspId, registration);
+        ResponseDTO responseDTO = confClient.register(cspId, registration);
 
     }
 

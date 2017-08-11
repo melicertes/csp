@@ -25,8 +25,8 @@ public class ApiController implements ApiContextUrl {
     }
 
     @RequestMapping(value = "/v" + REST_API_V1 +  API_REGISTER + "/{cspId}", method = RequestMethod.POST)
-    public void register(@PathVariable String cspId, @RequestBody RegistrationDTO cspRegistration) {
-        confService.register(cspId,cspRegistration);
+    public ResponseDTO register(@PathVariable String cspId, @RequestBody RegistrationDTO cspRegistration) {
+        return confService.register(cspId,cspRegistration);
     }
 
     @RequestMapping(value = "/v" + REST_API_V1 + API_UPDATE + "/{cspId}" + "/{updateHash}", method = RequestMethod.GET)

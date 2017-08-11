@@ -44,7 +44,7 @@ public class ConfClientImpl implements ConfClient, ApiContextUrl {
     }
 
     @Override
-    public void register(String cspId, RegistrationDTO cspRegistration) {
+    public ResponseDTO register(String cspId, RegistrationDTO cspRegistration) {
         final String url = apiVersionClient.getApiUrl() + API_REGISTER + "/" + cspId;
         LOG.debug("Configuration call [POST]: " + url);
 
@@ -52,7 +52,8 @@ public class ConfClientImpl implements ConfClient, ApiContextUrl {
          * @TODO
          * At test fails to persist, but api service logs success
          */
-        retryRestTemplate.exchange(url, HttpMethod.POST, new HttpEntity<Object>(cspRegistration), ResponseDTO.class);
+        ResponseDTO responseDTO = retryRestTemplate.postForObject(url, cspRegistration, ResponseDTO.class);
+        return responseDTO;
     }
 
     @Override

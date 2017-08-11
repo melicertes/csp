@@ -4,6 +4,7 @@ package com.intrasoft.csp.conf.commons.interfaces;
 import com.intrasoft.csp.conf.commons.exceptions.InvalidCspEntryException;
 import com.intrasoft.csp.conf.commons.model.AppInfoDTO;
 import com.intrasoft.csp.conf.commons.model.RegistrationDTO;
+import com.intrasoft.csp.conf.commons.model.ResponseDTO;
 import com.intrasoft.csp.conf.commons.model.UpdateInformationDTO;
 import org.springframework.http.ResponseEntity;
 
@@ -24,7 +25,7 @@ public interface ConfigurationApi {
      *              formatted as text, for 36 characters total, arranged as 8-4-4-4-12.
      * @param cspRegistration A block of information to register the CSP being installed
      */
-    void register(String cspId, RegistrationDTO cspRegistration);
+    ResponseDTO register(String cspId, RegistrationDTO cspRegistration);
 
     /**
      * Retrieves a list of available updates, for registered modules of the CSP.

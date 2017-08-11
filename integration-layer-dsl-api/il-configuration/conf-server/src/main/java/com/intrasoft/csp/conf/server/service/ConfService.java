@@ -114,7 +114,7 @@ public class ConfService implements ApiContextUrl,ConfigurationApi{
     }
 
     @Override
-    public void register(String cspId, RegistrationDTO cspRegistration) {
+    public ResponseDTO register(String cspId, RegistrationDTO cspRegistration) {
         String user = "system";
         String logInfo = user + ", " +  "/v" + REST_API_V1 +  API_REGISTER + "/" + cspId + ": ";
         LOG_AUDIT.info(logInfo + "POST Request received");
@@ -153,7 +153,7 @@ public class ConfService implements ApiContextUrl,ConfigurationApi{
 
         LOG_AUDIT.info(logInfo + StatusResponseType.OK.text());
         ResponseDTO response = new ResponseDTO(StatusResponseType.OK.code(), StatusResponseType.OK.text());
-        //return new ResponseEntity<>(response, HttpStatus.OK);
+        return response;
     }
 
     @Override
