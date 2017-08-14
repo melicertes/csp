@@ -15,9 +15,15 @@ import java.util.Map;
 /**
  * Created by chris on 30/6/2017.
  */
-@RestController
-public class CustomErrorController implements ErrorController {
+/**
+Not needed
 
+ @RestController
+
+ */
+@Deprecated
+public class CustomErrorController /* implements ErrorController*/ {
+/*
     private static final String PATH = "/error";
     private final ErrorAttributes errorAttributes;
 
@@ -54,5 +60,5 @@ public class CustomErrorController implements ErrorController {
             return false;
         }
         return !"false".equals(parameter.toLowerCase());
-    }
+    }*/
 }

@@ -26,10 +26,23 @@ public class AnonExceptionHandlingController extends RestExceptionHandlingContro
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AnonExceptionHandlingController.class);
 
+    /**
+     * Example to override default internal exception handling
     @ExceptionHandler(value = {MappingNotFoundForGivenTupleException.class})
     public ResponseEntity<Object>  invalidCspEntryException(WebRequest request, HttpServletRequest req, HttpServletResponse response, Exception e) throws IOException {
-        return handleExceptionInternal(e,
-                super.getRestErrorDTO(e, HttpStatusResponseType.MAPPING_NOT_FOUND_FOR_GIVEN_TUPLE.value(),req.getRequestURI()),
-                new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
+        return handleException(e,HttpStatusResponseType.MAPPING_NOT_FOUND_FOR_GIVEN_TUPLE.value(),HttpStatus.BAD_REQUEST, request);
+    }*/
+
+    @ExceptionHandler({MappingNotFoundForGivenTupleException.class})
+    public void handleBadRequests(HttpServletRequest request, HttpServletResponse response, Exception e) throws IOException {
+        LOGGER.error("Bad request: {} from {}, Exception: {} {}",
+                request.getRequestURI(),
+                request.getRemoteHost(),
+                e.getStackTrace()[0].toString(),
+                e.getLocalizedMessage());
+
+        // if sending an http code other than 4xx the internal handling exception will not be triggered
+        // 401-unauthorized will also NOT trigger the internal handling exception mechanism
+        response.sendError(HttpStatusResponseType.MAPPING_NOT_FOUND_FOR_GIVEN_TUPLE.value(), e.getLocalizedMessage());
     }
 }
