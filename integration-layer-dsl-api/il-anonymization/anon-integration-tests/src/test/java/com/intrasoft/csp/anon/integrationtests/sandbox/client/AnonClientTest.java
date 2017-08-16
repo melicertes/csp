@@ -77,7 +77,7 @@ public class AnonClientTest implements AnonContextUrl {
 
         try {
             ResponseEntity<String> response = anonClient.postAnonData(data);
-            fail("Expected CategoryCannotBeDeletedException");
+            fail("Expected MappingNotFoundForGivenTupleException");
         } catch (MappingNotFoundForGivenTupleException e) {
             Assert.assertThat(e.getMessage(), containsString(HttpStatusResponseType.MAPPING_NOT_FOUND_FOR_GIVEN_TUPLE.getReasonPhrase()));
         }

@@ -9,7 +9,6 @@ import org.springframework.boot.autoconfigure.web.ErrorMvcAutoConfiguration;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @SpringBootApplication
-//@EnableAutoConfiguration(exclude = {ErrorMvcAutoConfiguration.class})
 public class ConfApp {
 
     private static final Logger LOG = (Logger) LoggerFactory.getLogger(ConfApp.class);

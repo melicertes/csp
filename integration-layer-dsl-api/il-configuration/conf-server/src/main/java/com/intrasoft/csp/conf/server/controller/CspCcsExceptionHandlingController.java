@@ -32,51 +32,37 @@ public class CspCcsExceptionHandlingController extends RestExceptionHandlingCont
     private static Logger LOG_EXCEPTION = LoggerFactory.getLogger("exc-log");
 
     @ExceptionHandler(value = {InvalidCspEntryException.class})
-    public ResponseEntity<Object>  invalidCspEntryException(WebRequest request,HttpServletRequest req, HttpServletResponse response, Exception e) throws IOException {
-        return handleExceptionInternal(e,
-                super.getRestErrorDTO(e,StatusResponseType.API_INVALID_CSP_ENTRY.code(),req.getRequestURI()),
-                new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
+    public ResponseEntity<Object>  invalidCspEntryException(WebRequest request,Exception e) throws IOException {
+        return handleException(e,StatusResponseType.API_INVALID_CSP_ENTRY.code(),HttpStatus.BAD_REQUEST, request);
     }
 
     @ExceptionHandler(value = {InvalidModuleHashException.class})
-    public ResponseEntity<Object>  invalidModuleHashException(WebRequest request,HttpServletRequest req, HttpServletResponse response, Exception e) throws IOException {
-        return handleExceptionInternal(e,
-                super.getRestErrorDTO(e,StatusResponseType.API_INVALID_MODULE_HASH.code(),req.getRequestURI()),
-                new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
+    public ResponseEntity<Object>  invalidModuleHashException(WebRequest request, Exception e) throws IOException {
+        return handleException(e,StatusResponseType.API_INVALID_MODULE_HASH.code(),HttpStatus.BAD_REQUEST, request);
     }
 
     @ExceptionHandler(value = {InvalidModuleNameException.class})
-    public ResponseEntity<Object>  invalidModuleNameException(WebRequest request,HttpServletRequest req, HttpServletResponse response, Exception e) throws IOException {
-        return handleExceptionInternal(e,
-                super.getRestErrorDTO(e,StatusResponseType.API_INVALID_MODULE_NAME.code(),req.getRequestURI()),
-                new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
+    public ResponseEntity<Object>  invalidModuleNameException(WebRequest request, Exception e) throws IOException {
+        return handleException(e,StatusResponseType.API_INVALID_MODULE_NAME.code(),HttpStatus.BAD_REQUEST, request);
     }
 
     @ExceptionHandler(value = {InvalidModuleVersionException.class})
-    public ResponseEntity<Object>  invalidModuleVersionException(WebRequest request,HttpServletRequest req, HttpServletResponse response, Exception e) throws IOException {
-        return handleExceptionInternal(e,
-                super.getRestErrorDTO(e,StatusResponseType.API_INVALID_MODULE_VERSION.code(),req.getRequestURI()),
-                new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
+    public ResponseEntity<Object>  invalidModuleVersionException(WebRequest request, Exception e) throws IOException {
+        return handleException(e,StatusResponseType.API_INVALID_MODULE_VERSION.code(),HttpStatus.BAD_REQUEST, request);
     }
 
     @ExceptionHandler(value = {RegisterNotUpdatable.class})
-    public ResponseEntity<Object>  registerNotUpdatable(WebRequest request,HttpServletRequest req, HttpServletResponse response, Exception e) throws IOException {
-        return handleExceptionInternal(e,
-                super.getRestErrorDTO(e,StatusResponseType.API_REGISTER_NOT_UPDATABLE.code(),req.getRequestURI()),
-                new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
+    public ResponseEntity<Object>  registerNotUpdatable(WebRequest request, Exception e) throws IOException {
+        return handleException(e,StatusResponseType.API_REGISTER_NOT_UPDATABLE.code(),HttpStatus.BAD_REQUEST, request);
     }
 
     @ExceptionHandler(value = {UpdateInvalidHashEntryException.class})
-    public ResponseEntity<Object>  updateInvalidHashEntryException(WebRequest request,HttpServletRequest req, HttpServletResponse response, Exception e) throws IOException {
-        return handleExceptionInternal(e,
-                super.getRestErrorDTO(e,StatusResponseType.API_UPDATE_INVALID_HASH_ENTRY.code(),req.getRequestURI()),
-                new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
+    public ResponseEntity<Object>  updateInvalidHashEntryException(WebRequest request, Exception e) throws IOException {
+        return handleException(e,StatusResponseType.API_UPDATE_INVALID_HASH_ENTRY.code(),HttpStatus.BAD_REQUEST, request);
     }
 
     @ExceptionHandler(value = {UpdateNotFoundException.class})
-    public ResponseEntity<Object>  updateNotFoundException(WebRequest request,HttpServletRequest req, HttpServletResponse response, Exception e) throws IOException {
-        return handleExceptionInternal(e,
-                super.getRestErrorDTO(e,StatusResponseType.API_UPDATE_NOT_FOUND.code(),req.getRequestURI()),
-                new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
+    public ResponseEntity<Object>  updateNotFoundException(WebRequest request, Exception e) throws IOException {
+        return handleException(e,StatusResponseType.API_UPDATE_NOT_FOUND.code(),HttpStatus.BAD_REQUEST, request);
     }
 }
