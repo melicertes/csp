@@ -1,10 +1,9 @@
 package com.intrasoft.csp.anon.commons.interfaces;
 
-import com.intrasoft.csp.anon.commons.exceptions.InvalidDataTypeException;
+import com.intrasoft.csp.anon.commons.exceptions.UnsupportedDataTypeException;
 import com.intrasoft.csp.anon.commons.model.IntegrationAnonData;
 import com.intrasoft.csp.anon.commons.model.MappingDTO;
 import com.intrasoft.csp.anon.commons.model.RuleSetDTO;
-import com.intrasoft.csp.anon.commons.model.SaveMappingDTO;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
@@ -13,7 +12,7 @@ public interface AnonymizationApi {
     /**
      * Anonymize data
      * */
-    ResponseEntity<String> postAnonData(IntegrationAnonData integrationAnonData) throws InvalidDataTypeException;
+    ResponseEntity<String> postAnonData(IntegrationAnonData integrationAnonData) throws UnsupportedDataTypeException;
 
     /**
      * CRUD management for ruleSet

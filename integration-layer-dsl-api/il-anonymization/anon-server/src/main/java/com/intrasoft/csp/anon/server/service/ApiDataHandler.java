@@ -2,8 +2,9 @@ package com.intrasoft.csp.anon.server.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.intrasoft.csp.anon.commons.exceptions.AnonException;
+import com.intrasoft.csp.anon.commons.exceptions.MalformedIntegrationDataStructureException;
 import com.intrasoft.csp.anon.commons.exceptions.MappingNotFoundForGivenTupleException;
+import com.intrasoft.csp.anon.commons.exceptions.UnsupportedDataTypeException;
 import com.intrasoft.csp.anon.commons.model.IntegrationAnonData;
 import com.intrasoft.csp.anon.server.model.Rule;
 import com.intrasoft.csp.anon.server.model.Rules;
@@ -69,11 +70,11 @@ public class ApiDataHandler {
         String cspId = integrationAnonData.getCspId();
         IntegrationDataType dataType = integrationAnonData.getDataType();
         if (dataType == null){
-            throw new AnonException("Invalid dataType");
+            throw new UnsupportedDataTypeException(HttpStatusResponseType.UNSUPPORTED_DATA_TYPE.getReasonPhrase());
         }
 
         if (cspId == null || cspId.equals("")){
-            throw new AnonException("cspId cannot be empty.");
+            throw new MalformedIntegrationDataStructureException(HttpStatusResponseType.MALFORMED_INTEGRATION_DATA_STRUCTURE.getReasonPhrase());
         }
 
         Rules rules = rulesService.getRule(dataType, cspId);

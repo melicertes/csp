@@ -4,7 +4,7 @@ package com.intrasoft.csp.anon.client.config;
 import com.intrasoft.csp.anon.client.AnonClient;
 import com.intrasoft.csp.anon.client.impl.AnonClientImpl;
 import com.intrasoft.csp.anon.commons.exceptions.AnonException;
-import com.intrasoft.csp.anon.commons.exceptions.InvalidDataTypeException;
+import com.intrasoft.csp.anon.commons.exceptions.UnsupportedDataTypeException;
 import com.intrasoft.csp.anon.commons.exceptions.MappingNotFoundForGivenTupleException;
 import com.intrasoft.csp.anon.commons.model.AnonContextUrl;
 import com.intrasoft.csp.libraries.restclient.config.RestTemplateConfiguration;
@@ -64,7 +64,7 @@ public class AnonClientConfig implements AnonContextUrl {
 
     static {
         SUPPORTED_EXCEPTIONS.put(CspBusinessException.class.getName(), CspBusinessException::new);
-        SUPPORTED_EXCEPTIONS.put(InvalidDataTypeException.class.getName(), InvalidDataTypeException::new);
+        SUPPORTED_EXCEPTIONS.put(UnsupportedDataTypeException.class.getName(), UnsupportedDataTypeException::new);
         SUPPORTED_EXCEPTIONS.put(AnonException.class.getName(), AnonException::new);
         SUPPORTED_EXCEPTIONS.put(MappingNotFoundForGivenTupleException.class.getName(), MappingNotFoundForGivenTupleException::new);
     }

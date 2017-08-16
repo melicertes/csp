@@ -1,7 +1,7 @@
 package com.intrasoft.csp.anon.client.impl;
 
 import com.intrasoft.csp.anon.client.AnonClient;
-import com.intrasoft.csp.anon.commons.exceptions.InvalidDataTypeException;
+import com.intrasoft.csp.anon.commons.exceptions.UnsupportedDataTypeException;
 import com.intrasoft.csp.anon.commons.model.AnonContextUrl;
 
 import com.intrasoft.csp.anon.commons.model.IntegrationAnonData;
@@ -36,7 +36,7 @@ public class AnonClientImpl implements AnonClient, AnonContextUrl {
     RetryRestTemplate retryRestTemplate;
 
     @Override
-    public ResponseEntity<String> postAnonData(IntegrationAnonData integrationAnonData) throws InvalidDataTypeException {
+    public ResponseEntity<String> postAnonData(IntegrationAnonData integrationAnonData) throws UnsupportedDataTypeException {
         final String url = apiVersionClient.getApiUrl() + "/"+ANONYMIZE;
         LOG.info("ANON call [post]: " + url);
         ResponseEntity<String> response = retryRestTemplate.exchange(url, HttpMethod.POST, new HttpEntity<Object>(integrationAnonData), String.class);

@@ -1,6 +1,6 @@
 package com.intrasoft.csp.anon.server.service.impl;
 
-import com.intrasoft.csp.anon.commons.exceptions.InvalidDataTypeException;
+import com.intrasoft.csp.anon.commons.exceptions.UnsupportedDataTypeException;
 import com.intrasoft.csp.anon.commons.model.IntegrationAnonData;
 import com.intrasoft.csp.anon.commons.model.MappingDTO;
 import com.intrasoft.csp.anon.commons.model.RuleSetDTO;
@@ -32,7 +32,7 @@ public class AnonServiceImpl implements AnonService,Conversions {
     MappingRepository mappingRepository;
 
     @Override
-    public ResponseEntity<String> postAnonData(IntegrationAnonData integrationAnonData) throws InvalidDataTypeException {
+    public ResponseEntity<String> postAnonData(IntegrationAnonData integrationAnonData) throws UnsupportedDataTypeException {
         return null;
     }
 

@@ -1,0 +1,51 @@
+{"cspId": "CERT-BUND",
+  "dataType": "trustCircle",
+  "dataObject": {
+    "trustcircle": {
+      "id":  5468468,
+      "created":  "1487827718",
+      "short_name":  "myTrustCircle",
+      "name":  "This is my Trust Circle",
+      "description":  "This is a sample trust circle for data structure",
+      "auth_source":  "ENISA",
+      "info_url":  "https://www.enisa.europa.eu/",
+      "membership_url":  "https://www.enisa.europa.eu/",
+      "teams":  [
+        {
+          "id":  555,
+          "created": "1487827718",
+          "short_name":  "myTeam",
+          "name":  "This is my Team",
+          "host_organisation":  "ENISA",
+          "description":  "This is a sample team for data structure",
+          "country":  "European Union",
+          "additional_countries":  [ "Greece", "Italy"],
+          "established": "This team was established in 2016",
+          "nis_team_types":  ["type1","type2"],
+          "nis_sectors":  ["sector1", "sector2"],
+          "csp_installed":  true,
+          "csp_id":  "thisismycspid",
+          "status":  "active"
+        },
+
+        {
+          "id":  7777,
+          "created": "1487823418",
+          "short_name":  "secondTeam",
+          "name":  "This is my second Team",
+          "host_organisation":  "EU CERT",
+          "description":  "This is another sample team for data structure",
+          "country":  "Belgium",
+          "additional_countries":  [ "Spain", "Netherlands"],
+          "established": "This team was established in 2015",
+          "nis_team_types":  ["type5","type6"],
+          "nis_sectors":  ["sector7", "sector8"],
+          "csp_installed":  true,
+          "csp_id":  "thisismyothercspid",
+          "status":  "inactive"
+        }
+
+      ]
+    }
+  }
+}
