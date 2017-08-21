@@ -22,7 +22,7 @@
 		<module>il-server</module>
 		<module>il-client</module>
 		<module>integration-tests</module>
-		<module>il-anonymization</module>
+		<module>anonymization</module>
 		<module>il-configuration</module>
 		<module>libraries</module>
 	</modules>
