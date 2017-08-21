@@ -10,6 +10,7 @@
         <version>0.2.0-SNAPSHOT</version>
     </parent>
 
+    <name>Integration Layer Client</name>
     <groupId>com.intrasoft.csp</groupId>
     <artifactId>il-client</artifactId>
     <version>0.2.0-SNAPSHOT</version>

@@ -3,41 +3,31 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
     <parent>
         <groupId>com.intrasoft.csp</groupId>
-        <artifactId>parent-pom</artifactId>
+        <artifactId>configuration</artifactId>
         <version>0.2.0-SNAPSHOT</version>
     </parent>
 
+    <name>Configuration Commons</name>
     <groupId>com.intrasoft.csp</groupId>
-    <artifactId>il-commons</artifactId>
+    <artifactId>conf-commons</artifactId>
     <version>0.2.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
+
     <dependencies>
-        <dependency>
-            <groupId>com.intrasoft.csp</groupId>
-            <artifactId>libraries-versioning</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.camel</groupId>
-            <artifactId>camel-jackson</artifactId>
-            <version>${camel.version}</version>
-        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-jpa -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter</artifactId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+            <version>1.5.3.RELEASE</version>
         </dependency>
+        <!-- Configuration -->
         <dependency>
-            <groupId>org.springframework.retry</groupId>
-            <artifactId>spring-retry</artifactId>
-            <version>${spring.retry.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-web</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>joda-time</groupId>
@@ -52,17 +42,15 @@
             <artifactId>hibernate-validator</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-            <scope>provided</scope>
+            <groupId>com.intrasoft.csp</groupId>
+            <artifactId>libraries-versioning</artifactId>
+            <version>${project.version}</version>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/org.json/json -->
         <dependency>
-            <groupId>org.json</groupId>
-            <artifactId>json</artifactId>
+            <groupId>com.intrasoft.csp</groupId>
+            <artifactId>il-commons</artifactId>
+            <version>${project.version}</version>
         </dependency>
-
-
     </dependencies>
 
 </project>

@@ -5,25 +5,22 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.intrasoft.csp</groupId>
-        <artifactId>anonymization</artifactId>
+        <artifactId>parent-pom</artifactId>
         <version>0.2.0-SNAPSHOT</version>
     </parent>
 
 
-    <name>Anonymization Client</name>
+    <name>Anonymization Service</name>
     <groupId>com.intrasoft.csp</groupId>
-    <artifactId>anon-client</artifactId>
+    <artifactId>integration-layer</artifactId>
     <version>0.2.0-SNAPSHOT</version>
-    <packaging>jar</packaging>
+    <packaging>pom</packaging>
 
-
-    <dependencies>
-        <dependency>
-            <groupId>com.intrasoft.csp</groupId>
-            <artifactId>anon-commons</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-    </dependencies>
-
+    <modules>
+        <module>il-client</module>
+        <module>il-commons</module>
+        <module>il-server</module>
+        <module>il-integration-tests</module>
+    </modules>
 
 </project>

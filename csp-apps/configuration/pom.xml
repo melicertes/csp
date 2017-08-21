@@ -12,7 +12,7 @@
 
     <name>Configuration Service</name>
     <groupId>com.intrasoft.csp</groupId>
-    <artifactId>il-configuration</artifactId>
+    <artifactId>configuration</artifactId>
     <version>0.2.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 

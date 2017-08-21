@@ -9,7 +9,7 @@ $ mvn clean install -DskipTests
 
 2. Navigate to target folder and locate the jar file
 ----------------------------------------------------
-$ cd integration-layer-dsl-api/integration-tests/target
+$ cd csp-apps/integration-tests/target
 
 
 3. Run one or more test-classes by providing the package+classnames as arguments

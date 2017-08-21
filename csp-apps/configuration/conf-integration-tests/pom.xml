@@ -5,20 +5,31 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.intrasoft.csp</groupId>
-        <artifactId>il-configuration</artifactId>
+        <artifactId>configuration</artifactId>
         <version>0.2.0-SNAPSHOT</version>
     </parent>
 
-    <name>Configuration Client</name>
+
+    <name>Configuration Integration Tests</name>
     <groupId>com.intrasoft.csp</groupId>
-    <artifactId>conf-client</artifactId>
+    <artifactId>conf-integration-tests</artifactId>
     <version>0.2.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <dependencies>
         <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>com.intrasoft.csp</groupId>
-            <artifactId>conf-commons</artifactId>
+            <artifactId>conf-server</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.intrasoft.csp</groupId>
+            <artifactId>conf-client</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>
