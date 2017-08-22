@@ -34,7 +34,6 @@ import org.springframework.web.context.WebApplicationContext;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
@@ -128,6 +127,8 @@ public class CspServerInternalBusinessTestFlow1verbs implements CamelRoutes {
 
     private final IntegrationDataType dataTypeToTest = IntegrationDataType.VULNERABILITY;
     private final String applicationId = "taranis";
+    static final String tcId = "tcId";
+    static final String teamId = "teamId";
 
     @Before
     public void init() throws Exception {
@@ -151,73 +152,76 @@ public class CspServerInternalBusinessTestFlow1verbs implements CamelRoutes {
     // endpoint that is then reused in another test method.
     @DirtiesContext
     @Test
-    public void testDslFlow1PostToShare() throws Exception {
+    public void dslFlow1DataTypePostToShareTest() throws Exception {
         mockUtils.sendFlow1Data(mvc,serverName, applicationId, false, true, this.dataTypeToTest, HttpMethods.POST.name());
-
-        _toSharePostPutFlowImpl(tcProcessor.getTcTeams(this.dataTypeToTest).size());
-
-        //Thread.sleep(10*1000); //to avoid "Rejecting received message because of the listener container having been stopped in the meantime"
-        //be careful when debugging, you might miss breakpoints if the time is not enough
+        assertPostPutFlow(tcProcessor.getTcTeams(this.dataTypeToTest).size());
     }
 
     @DirtiesContext
     @Test
-    public void testDslFlow1PutToShare() throws Exception {
+    public void dslFlow1TcIdPostToShareTest() throws Exception {
+        mockUtils.sendFlow1Data(mvc,serverName, applicationId,tcId,null, false, true, this.dataTypeToTest, HttpMethods.POST.name());
+        assertPostPutFlow(tcProcessor.getTcTeams(this.dataTypeToTest).size());
+    }
+
+    @DirtiesContext
+    @Test
+    public void dslFlow1TeamIdPostToShareTest() throws Exception {
+        mockUtils.sendFlow1Data(mvc,serverName, applicationId,null,teamId, false, true, this.dataTypeToTest, HttpMethods.POST.name());
+        assertPostPutFlow(tcProcessor.getTcTeams(this.dataTypeToTest).size());
+    }
+
+    @DirtiesContext
+    @Test
+    public void dslFlow1DataTypePutToShareTest() throws Exception {
         mockUtils.sendFlow1Data(mvc,serverName, applicationId, false, true, this.dataTypeToTest, HttpMethods.PUT.name());
-
-        _toSharePostPutFlowImpl(tcProcessor.getTcTeams(this.dataTypeToTest).size());
-
-        //Thread.sleep(10*1000); //to avoid "Rejecting received message because of the listener container having been stopped in the meantime"
-        //be careful when debugging, you might miss breakpoints if the time is not enough
+        assertPostPutFlow(tcProcessor.getTcTeams(this.dataTypeToTest).size());
     }
 
     @DirtiesContext
     @Test
-    public void testDslFlow1DeleteToShare() throws Exception {
+    public void dslFlow1TcIdPutToShareTest() throws Exception {
+        mockUtils.sendFlow1Data(mvc,serverName, applicationId,tcId,null, false, true, this.dataTypeToTest, HttpMethods.PUT.name());
+        assertPostPutFlow(tcProcessor.getTcTeams(this.dataTypeToTest).size());
+    }
+
+    @DirtiesContext
+    @Test
+    public void dslFlow1TeamIdPutToShareTest() throws Exception {
+        mockUtils.sendFlow1Data(mvc,serverName, applicationId,null,teamId, false, true, this.dataTypeToTest, HttpMethods.PUT.name());
+        assertPostPutFlow(tcProcessor.getTcTeams(this.dataTypeToTest).size());
+    }
+
+    @DirtiesContext
+    @Test
+    public void dslFlow1DeleteToShareTest() throws Exception {
         mockUtils.sendFlow1Data(mvc, serverName,applicationId, false, true, this.dataTypeToTest, HttpMethods.DELETE.name());
-
-        _deleteFlowImpl();
-
-        //Thread.sleep(10*1000); //to avoid "Rejecting received message because of the listener container having been stopped in the meantime"
-        //be careful when debugging, you might miss breakpoints if the time is not enough
+        assertDeleteFlow();
     }
-
 
     @DirtiesContext
     @Test
-    public void testDslFlow1PostNotToShare() throws Exception {
+    public void dslFlow1PostNotToShareTest() throws Exception {
         mockUtils.sendFlow1Data(mvc,serverName, applicationId,false, false, this.dataTypeToTest, HttpMethods.POST.name());
-
-        _notToSharePostPutFlowImpl();
-
-        //Thread.sleep(10*1000); //to avoid "Rejecting received message because of the listener container having been stopped in the meantime"
-        //be careful when debugging, you might miss breakpoints if the time is not enough
+        assertNotToSharePostPutFlow();
     }
 
     @DirtiesContext
     @Test
-    public void testDslFlow1PutNotToShare() throws Exception {
+    public void dslFlow1PutNotToShareTest() throws Exception {
         mockUtils.sendFlow1Data(mvc, serverName,applicationId,false, false, this.dataTypeToTest, HttpMethods.PUT.name());
-
-        _notToSharePostPutFlowImpl();
-
-        //Thread.sleep(10*1000); //to avoid "Rejecting received message because of the listener container having been stopped in the meantime"
-        //be careful when debugging, you might miss breakpoints if the time is not enough
+        assertNotToSharePostPutFlow();
     }
 
     @DirtiesContext
     @Test
-    public void testDslFlow1DeleteNotToShare() throws Exception {
+    public void dslFlow1DeleteNotToShareTest() throws Exception {
         mockUtils.sendFlow1Data(mvc,serverName, applicationId,false, false, this.dataTypeToTest, HttpMethods.DELETE.name());
-
-        _deleteFlowImpl();
-
-        //Thread.sleep(10*1000); //to avoid "Rejecting received message because of the listener container having been stopped in the meantime"
-        //be careful when debugging, you might miss breakpoints if the time is not enough
+        assertDeleteFlow();
     }
 
 
-    private void _toSharePostPutFlowImpl(Integer expectedEscpMessages) throws Exception {
+    private void assertPostPutFlow(Integer expectedEscpMessages) throws Exception {
        /*
         DSL
          */
@@ -310,7 +314,7 @@ public class CspServerInternalBusinessTestFlow1verbs implements CamelRoutes {
     }
 
 
-    private void _deleteFlowImpl() throws Exception {
+    private void assertDeleteFlow() throws Exception {
        /*
         DSL
          */
@@ -370,9 +374,13 @@ public class CspServerInternalBusinessTestFlow1verbs implements CamelRoutes {
             IntegrationData data = in.getBody(IntegrationData.class);
             assertThat(data.getDataType(), is(this.dataTypeToTest));
         }
+
+        //ESCP
+        mockedEcsp.expectedMessageCount(0);
+        mockedEcsp.assertIsSatisfied();
     }
 
-    private void _notToSharePostPutFlowImpl() throws Exception {
+    private void assertNotToSharePostPutFlow() throws Exception {
        /*
         DSL
          */

@@ -148,42 +148,42 @@ public class CspServerInternalSandboxTestFlow1verbs implements CamelRoutes {
     @Test
     public void dslFlow1DataTypePostToShareTest() throws Exception {
         mockUtils.sendFlow1Data(mvc,serverName, applicationId,false, true, this.dataTypeToTest, HttpMethods.POST.name());
-        assertPostPutFlowImpl(3);
+        assertPostPutFlow(3);
     }
 
     @DirtiesContext
     @Test
     public void dslFlow1TcIdPostToShareTest() throws Exception {
         mockUtils.sendFlow1Data(mvc,serverName, applicationId,tcId,null,false, true, this.dataTypeToTest, HttpMethods.POST.name());
-        assertPostPutFlowImpl(3);
+        assertPostPutFlow(3);
     }
 
     @DirtiesContext
     @Test
     public void dslFlow1TeamIdPostToShareTest() throws Exception {
         mockUtils.sendFlow1Data(mvc,serverName, applicationId,null,teamId,false, true, this.dataTypeToTest, HttpMethods.POST.name());
-        assertPostPutFlowImpl(1);
+        assertPostPutFlow(1);
     }
 
     @DirtiesContext
     @Test
     public void dslFlow1DataTypePutToShareTest() throws Exception {
         mockUtils.sendFlow1Data(mvc, serverName,applicationId,false, true, this.dataTypeToTest, HttpMethods.PUT.name());
-        assertPostPutFlowImpl(3);
+        assertPostPutFlow(3);
     }
 
     @DirtiesContext
     @Test
     public void dslFlow1TcIdPutToShareTest() throws Exception {
         mockUtils.sendFlow1Data(mvc, serverName,applicationId,tcId, null,false, true, this.dataTypeToTest, HttpMethods.PUT.name());
-        assertPostPutFlowImpl(3);
+        assertPostPutFlow(3);
     }
 
     @DirtiesContext
     @Test
     public void dslFlow1TeamIdPutToShareTest() throws Exception {
         mockUtils.sendFlow1Data(mvc, serverName,applicationId,null,teamId,false, true, this.dataTypeToTest, HttpMethods.PUT.name());
-        assertPostPutFlowImpl(1);
+        assertPostPutFlow(1);
     }
 
     @DirtiesContext
@@ -215,7 +215,7 @@ public class CspServerInternalSandboxTestFlow1verbs implements CamelRoutes {
     }
 
 
-    private void assertPostPutFlowImpl(Integer expectedEcspMessages) throws Exception {
+    private void assertPostPutFlow(Integer expectedEcspMessages) throws Exception {
        /*
         DSL
          */

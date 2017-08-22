@@ -26,16 +26,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.env.Environment;
-import org.springframework.http.HttpMethod;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
 
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -154,6 +150,8 @@ public class CspServerInternalBusinessTestFlow1dataTypes implements CamelRoutes 
     String tcPathTeams;
 
     String applicationId = "taranis";
+    static final String tcId = "tcId";
+    static final String teamId = "teamId";
     @Before
     public void init() throws Exception {
         mvc = webAppContextSetup(webApplicationContext).build();
@@ -186,79 +184,131 @@ public class CspServerInternalBusinessTestFlow1dataTypes implements CamelRoutes 
     // endpoint that is then reused in another test method.
     @DirtiesContext
     @Test
-    public void testDslFlow1PostDataTypeThreat() throws Exception {
+    public void dslFlow1PostDataTypeThreatTest() throws Exception {
         mockUtils.sendFlow1Data(mvc, serverName,applicationId,false, true, IntegrationDataType.THREAT, HttpMethods.POST.name());
-
-        // Expect 1-messages/teams from ESCP according to CERT-GR configuration for THREAT on csp2.dangerduck.gr
-        _flowImpl(IntegrationDataType.THREAT, tcProcessor.getTcTeams(IntegrationDataType.THREAT).size());
-
-        //Thread.sleep(10*1000); //to avoid "Rejecting received message because of the listener container having been stopped in the meantime"
-        //be careful when debugging, you might miss breakpoints if the time is not enough
+        assertFlows(IntegrationDataType.THREAT, tcProcessor.getTcTeams(IntegrationDataType.THREAT).size());
     }
 
     @DirtiesContext
     @Test
-    public void testDslFlow1PutDataTypeThreat() throws Exception {
+    public void dslFlow1PostTcIdThreatTest() throws Exception {
+        mockUtils.sendFlow1Data(mvc, serverName,applicationId,tcId,null,false, true, IntegrationDataType.THREAT, HttpMethods.POST.name());
+        assertFlows(IntegrationDataType.THREAT, tcProcessor.getTcTeams(IntegrationDataType.THREAT).size());
+    }
+
+    @DirtiesContext
+    @Test
+    public void dslFlow1PostTeamIdThreatTest() throws Exception {
+        mockUtils.sendFlow1Data(mvc, serverName,applicationId,null,teamId,false, true, IntegrationDataType.THREAT, HttpMethods.POST.name());
+        assertFlows(IntegrationDataType.THREAT, tcProcessor.getTcTeams(IntegrationDataType.THREAT).size());
+    }
+
+    @DirtiesContext
+    @Test
+    public void dslFlow1PutDataTypeThreatTest() throws Exception {
         mockUtils.sendFlow1Data(mvc, serverName,applicationId,false, true, IntegrationDataType.THREAT, HttpMethods.PUT.name());
-
-        // Expect 1-messages/teams from ESCP according to CERT-GR configuration for THREAT on csp2.dangerduck.gr
-        _flowImpl(IntegrationDataType.THREAT, tcProcessor.getTcTeams(IntegrationDataType.THREAT).size());
-
-        //Thread.sleep(10*1000); //to avoid "Rejecting received message because of the listener container having been stopped in the meantime"
-        //be careful when debugging, you might miss breakpoints if the time is not enough
+        assertFlows(IntegrationDataType.THREAT, tcProcessor.getTcTeams(IntegrationDataType.THREAT).size());
     }
 
     @DirtiesContext
     @Test
-    public void testDslFlow1PostDataTypeArtefact() throws Exception {
+    public void dslFlow1PutTcIdThreatTest() throws Exception {
+        mockUtils.sendFlow1Data(mvc, serverName,applicationId,tcId,null,false, true, IntegrationDataType.THREAT, HttpMethods.PUT.name());
+        assertFlows(IntegrationDataType.THREAT, tcProcessor.getTcTeams(IntegrationDataType.THREAT).size());
+    }
+
+    @DirtiesContext
+    @Test
+    public void dslFlow1PutTeamIdThreatTest() throws Exception {
+        mockUtils.sendFlow1Data(mvc, serverName,applicationId,null,teamId,false, true, IntegrationDataType.THREAT, HttpMethods.PUT.name());
+        assertFlows(IntegrationDataType.THREAT, tcProcessor.getTcTeams(IntegrationDataType.THREAT).size());
+    }
+
+    @DirtiesContext
+    @Test
+    public void dslFlow1PostDataTypeArtefactTest() throws Exception {
         mockUtils.sendFlow1Data(mvc, serverName, applicationId,false, true, IntegrationDataType.ARTEFACT, HttpMethods.POST.name());
-
-        // Expect 1-messages/teams from ESCP according to CERT-GR configuration for ARTEFACT on csp2.dangerduck.gr
-        _flowImpl(IntegrationDataType.ARTEFACT, tcProcessor.getTcTeams(IntegrationDataType.ARTEFACT).size());
-
-        //Thread.sleep(10*1000); //to avoid "Rejecting received message because of the listener container having been stopped in the meantime"
-        //be careful when debugging, you might miss breakpoints if the time is not enough
+        assertFlows(IntegrationDataType.ARTEFACT, tcProcessor.getTcTeams(IntegrationDataType.ARTEFACT).size());
     }
 
     @DirtiesContext
     @Test
-    public void testDslFlow1PutDataTypeArtefact() throws Exception {
+    public void dslFlow1PosTcIdArtefactTest() throws Exception {
+        mockUtils.sendFlow1Data(mvc, serverName, applicationId,tcId,null,false, true, IntegrationDataType.ARTEFACT, HttpMethods.POST.name());
+        assertFlows(IntegrationDataType.ARTEFACT, tcProcessor.getTcTeams(IntegrationDataType.ARTEFACT).size());
+    }
+
+    @DirtiesContext
+    @Test
+    public void dslFlow1PostTeamIdArtefactTest() throws Exception {
+        mockUtils.sendFlow1Data(mvc, serverName, applicationId,null,teamId,false, true, IntegrationDataType.ARTEFACT, HttpMethods.POST.name());
+        assertFlows(IntegrationDataType.ARTEFACT, tcProcessor.getTcTeams(IntegrationDataType.ARTEFACT).size());
+    }
+
+    @DirtiesContext
+    @Test
+    public void dslFlow1PutDataTypeArtefactTest() throws Exception {
         mockUtils.sendFlow1Data(mvc, serverName, applicationId,false, true, IntegrationDataType.ARTEFACT, HttpMethods.PUT.name());
-
-        // Expect 1-messages/teams from ESCP according to CERT-GR configuration for ARTEFACT on csp2.dangerduck.gr
-        _flowImpl(IntegrationDataType.ARTEFACT, tcProcessor.getTcTeams(IntegrationDataType.ARTEFACT).size());
-
-        //Thread.sleep(10*1000); //to avoid "Rejecting received message because of the listener container having been stopped in the meantime"
-        //be careful when debugging, you might miss breakpoints if the time is not enough
+        assertFlows(IntegrationDataType.ARTEFACT, tcProcessor.getTcTeams(IntegrationDataType.ARTEFACT).size());
     }
 
     @DirtiesContext
     @Test
-    public void testDslFlow1PostDataTypeTrustcircle() throws Exception {
+    public void dslFlow1PutTcIdArtefactTest() throws Exception {
+        mockUtils.sendFlow1Data(mvc, serverName, applicationId,tcId,null,false, true, IntegrationDataType.ARTEFACT, HttpMethods.PUT.name());
+        assertFlows(IntegrationDataType.ARTEFACT, tcProcessor.getTcTeams(IntegrationDataType.ARTEFACT).size());
+    }
+
+    @DirtiesContext
+    @Test
+    public void dslFlow1PutTeamIdArtefactTest() throws Exception {
+        mockUtils.sendFlow1Data(mvc, serverName, applicationId,null,teamId,false, true, IntegrationDataType.ARTEFACT, HttpMethods.PUT.name());
+        assertFlows(IntegrationDataType.ARTEFACT, tcProcessor.getTcTeams(IntegrationDataType.ARTEFACT).size());
+    }
+
+    @DirtiesContext
+    @Test
+    public void dslFlow1PostDataTypeTrustcircleTest() throws Exception {
         mockUtils.sendFlow1Data(mvc, serverName, applicationId,false, true, IntegrationDataType.TRUSTCIRCLE, HttpMethods.POST.name());
-
-        // Expect 3-messages/teams from ESCP according to CERT-GR configuration for TRUSTCIRCLE on csp2.dangerduck.gr
-        _flowImpl(IntegrationDataType.TRUSTCIRCLE, tcProcessor.getTcTeams(IntegrationDataType.TRUSTCIRCLE).size());
-
-        //Thread.sleep(10*1000); //to avoid "Rejecting received message because of the listener container having been stopped in the meantime"
-        //be careful when debugging, you might miss breakpoints if the time is not enough
+        assertFlows(IntegrationDataType.TRUSTCIRCLE, tcProcessor.getTcTeams(IntegrationDataType.TRUSTCIRCLE).size());
     }
 
     @DirtiesContext
     @Test
-    public void testDslFlow1PutDataTypeTrustcircle() throws Exception {
-        mockUtils.sendFlow1Data(mvc,serverName, applicationId,false, true, IntegrationDataType.TRUSTCIRCLE, HttpMethods.PUT.name());
-
-        // Expect 3-messages/teams from ESCP according to CERT-GR configuration for TRUSTCIRCLE on csp2.dangerduck.gr
-        _flowImpl(IntegrationDataType.TRUSTCIRCLE, tcProcessor.getTcTeams(IntegrationDataType.TRUSTCIRCLE).size());
-
-        //Thread.sleep(10*1000); //to avoid "Rejecting received message because of the listener container having been stopped in the meantime"
-        //be careful when debugging, you might miss breakpoints if the time is not enough
+    public void dslFlow1PosTcIdTrustcircleTest() throws Exception {
+        mockUtils.sendFlow1Data(mvc, serverName, applicationId,tcId,null,false, true, IntegrationDataType.TRUSTCIRCLE, HttpMethods.POST.name());
+        assertFlows(IntegrationDataType.TRUSTCIRCLE, tcProcessor.getTcTeams(IntegrationDataType.TRUSTCIRCLE).size());
     }
 
+    @DirtiesContext
+    @Test
+    public void dslFlow1PostTeamIdTrustcircleTest() throws Exception {
+        mockUtils.sendFlow1Data(mvc, serverName, applicationId,null,teamId,false, true, IntegrationDataType.TRUSTCIRCLE, HttpMethods.POST.name());
+        assertFlows(IntegrationDataType.TRUSTCIRCLE, tcProcessor.getTcTeams(IntegrationDataType.TRUSTCIRCLE).size());
+    }
 
+    @DirtiesContext
+    @Test
+    public void dslFlow1PutDataTypeTrustcircleTest() throws Exception {
+        mockUtils.sendFlow1Data(mvc,serverName, applicationId,false, true, IntegrationDataType.TRUSTCIRCLE, HttpMethods.PUT.name());
+        assertFlows(IntegrationDataType.TRUSTCIRCLE, tcProcessor.getTcTeams(IntegrationDataType.TRUSTCIRCLE).size());
+    }
 
-    private void _flowImpl(IntegrationDataType dataType, Integer expectedEscpMessages) throws Exception {
+    @DirtiesContext
+    @Test
+    public void dslFlow1PutTcIdTrustcircleTest() throws Exception {
+        mockUtils.sendFlow1Data(mvc,serverName, applicationId,tcId,null,false, true, IntegrationDataType.TRUSTCIRCLE, HttpMethods.PUT.name());
+        assertFlows(IntegrationDataType.TRUSTCIRCLE, tcProcessor.getTcTeams(IntegrationDataType.TRUSTCIRCLE).size());
+    }
+
+    @DirtiesContext
+    @Test
+    public void dslFlow1PutTeamIdTrustcircleTest() throws Exception {
+        mockUtils.sendFlow1Data(mvc,serverName, applicationId,null,teamId,false, true, IntegrationDataType.TRUSTCIRCLE, HttpMethods.PUT.name());
+        assertFlows(IntegrationDataType.TRUSTCIRCLE, tcProcessor.getTcTeams(IntegrationDataType.TRUSTCIRCLE).size());
+    }
+
+    private void assertFlows(IntegrationDataType dataType, Integer expectedEscpMessages) throws Exception {
        /*
         DSL
          */
