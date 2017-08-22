@@ -22,10 +22,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.core.env.Environment;
+import org.springframework.http.HttpMethod;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 
@@ -101,6 +103,9 @@ public class CspServerInternalSandboxTestFlow1dataTypes implements CamelRoutes {
 
     String elasticUri;
     String serverName;
+    String applicationId = "taranis";
+    static final String tcId = "tcId";
+    static final String teamId = "teamId";
 
     @Before
     public void init() throws Exception {
@@ -143,109 +148,157 @@ public class CspServerInternalSandboxTestFlow1dataTypes implements CamelRoutes {
 
     @DirtiesContext
     @Test
-    public void testDslFlow1PostDataTypeThreat() throws Exception {
-        Mockito.when(camelRestService.sendAndGetList(anyString(), anyObject(), eq("GET"), eq(TrustCircle.class), anyObject()))
-                .thenReturn(mockUtils.getAllMockedTrustCircles(this.numOfCspsToTest, IntegrationDataType.tcNamingConventionForShortName.get(IntegrationDataType.THREAT)));
-
-        Mockito.when(camelRestService.send(anyString(), anyObject(), eq("GET"), eq(TrustCircle.class)))
-                .thenReturn(mockUtils.getMockedTrustCircle(this.numOfCspsToTest, IntegrationDataType.tcNamingConventionForShortName.get(IntegrationDataType.THREAT)));
-
-        mockUtils.sendFlow1Data(mvc, serverName,false, true, IntegrationDataType.THREAT, HttpMethods.POST.name());
-
-        _flowImpl(IntegrationDataType.THREAT);
-
-        //Thread.sleep(10*1000); //to avoid "Rejecting received message because of the listener container having been stopped in the meantime"
-        //be careful when debugging, you might miss breakpoints if the time is not enough
+    public void dslFlow1PostDataTypeThreatTest() throws Exception {
+        mockitoWhen(HttpMethod.GET.name(),TrustCircle.class,IntegrationDataType.THREAT);
+        mockUtils.sendFlow1Data(mvc, serverName,applicationId,false, true, IntegrationDataType.THREAT, HttpMethods.POST.name());
+        assertFlows(IntegrationDataType.THREAT, 3);
     }
 
     @DirtiesContext
     @Test
-    public void testDslFlow1PutDataTypeThreat() throws Exception {
-        Mockito.when(camelRestService.sendAndGetList(anyString(), anyObject(), eq("GET"), eq(TrustCircle.class), anyObject()))
-                .thenReturn(mockUtils.getAllMockedTrustCircles(this.numOfCspsToTest, IntegrationDataType.tcNamingConventionForShortName.get(IntegrationDataType.THREAT)));
-
-        Mockito.when(camelRestService.send(anyString(), anyObject(), eq("GET"), eq(TrustCircle.class)))
-                .thenReturn(mockUtils.getMockedTrustCircle(this.numOfCspsToTest, IntegrationDataType.tcNamingConventionForShortName.get(IntegrationDataType.THREAT)));
-
-        mockUtils.sendFlow1Data(mvc, serverName,false, true, IntegrationDataType.THREAT, HttpMethods.PUT.name());
-
-        _flowImpl(IntegrationDataType.THREAT);
-
-        //Thread.sleep(10*1000); //to avoid "Rejecting received message because of the listener container having been stopped in the meantime"
-        //be careful when debugging, you might miss breakpoints if the time is not enough
+    public void dslFlow1PostTcIdThreatTest() throws Exception {
+        mockitoWhen(HttpMethod.GET.name(),TrustCircle.class,IntegrationDataType.THREAT);
+        mockUtils.sendFlow1Data(mvc, serverName,applicationId,tcId,null,false, true, IntegrationDataType.THREAT, HttpMethods.POST.name());
+        assertFlows(IntegrationDataType.THREAT, 3);
     }
 
     @DirtiesContext
     @Test
-    public void testDslFlow1PostDataTypeArtefact() throws Exception {
-        Mockito.when(camelRestService.sendAndGetList(anyString(), anyObject(), eq("GET"), eq(TrustCircle.class), anyObject()))
-                .thenReturn(mockUtils.getAllMockedTrustCircles(this.numOfCspsToTest, IntegrationDataType.tcNamingConventionForShortName.get(IntegrationDataType.ARTEFACT)));
-
-        Mockito.when(camelRestService.send(anyString(), anyObject(), eq("GET"), eq(TrustCircle.class)))
-                .thenReturn(mockUtils.getMockedTrustCircle(this.numOfCspsToTest, IntegrationDataType.tcNamingConventionForShortName.get(IntegrationDataType.ARTEFACT)));
-
-        mockUtils.sendFlow1Data(mvc,serverName, false, true, IntegrationDataType.ARTEFACT, HttpMethods.POST.name());
-
-        _flowImpl(IntegrationDataType.ARTEFACT);
-
-        //Thread.sleep(10*1000); //to avoid "Rejecting received message because of the listener container having been stopped in the meantime"
-        //be careful when debugging, you might miss breakpoints if the time is not enough
+    public void dslFlow1PostTeamIdThreatTest() throws Exception {
+        mockitoWhen(HttpMethod.GET.name(),TrustCircle.class,IntegrationDataType.THREAT);
+        mockUtils.sendFlow1Data(mvc, serverName,applicationId,null,teamId,false, true, IntegrationDataType.THREAT, HttpMethods.POST.name());
+        assertFlows(IntegrationDataType.THREAT, 1);
     }
 
     @DirtiesContext
     @Test
-    public void testDslFlow1PutDataTypeArtefact() throws Exception {
-        Mockito.when(camelRestService.sendAndGetList(anyString(), anyObject(), eq("GET"), eq(TrustCircle.class), anyObject()))
-                .thenReturn(mockUtils.getAllMockedTrustCircles(this.numOfCspsToTest, IntegrationDataType.tcNamingConventionForShortName.get(IntegrationDataType.ARTEFACT)));
-
-        Mockito.when(camelRestService.send(anyString(), anyObject(), eq("GET"), eq(TrustCircle.class)))
-                .thenReturn(mockUtils.getMockedTrustCircle(this.numOfCspsToTest, IntegrationDataType.tcNamingConventionForShortName.get(IntegrationDataType.ARTEFACT)));
-
-        mockUtils.sendFlow1Data(mvc, serverName,false, true, IntegrationDataType.ARTEFACT, "PUT");
-
-        _flowImpl(IntegrationDataType.ARTEFACT);
-
-        //Thread.sleep(10*1000); //to avoid "Rejecting received message because of the listener container having been stopped in the meantime"
-        //be careful when debugging, you might miss breakpoints if the time is not enough
+    public void dslFlow1PutDataTypeThreatTest() throws Exception {
+        mockitoWhen(HttpMethod.GET.name(),TrustCircle.class,IntegrationDataType.THREAT);
+        mockUtils.sendFlow1Data(mvc, serverName,applicationId,false, true, IntegrationDataType.THREAT, HttpMethods.PUT.name());
+        assertFlows(IntegrationDataType.THREAT, 3);
     }
 
     @DirtiesContext
     @Test
-    public void testDslFlow1PostDataTypeTrustcircle() throws Exception {
-        Mockito.when(camelRestService.sendAndGetList(anyString(), anyObject(), eq("GET"), eq(TrustCircle.class), anyObject()))
-                .thenReturn(mockUtils.getAllMockedTrustCircles(this.numOfCspsToTest, IntegrationDataType.tcNamingConventionForShortName.get(IntegrationDataType.TRUSTCIRCLE)));
-
-        Mockito.when(camelRestService.send(anyString(), anyObject(), eq("GET"), eq(TrustCircle.class)))
-                .thenReturn(mockUtils.getMockedTrustCircle(this.numOfCspsToTest, IntegrationDataType.tcNamingConventionForShortName.get(IntegrationDataType.TRUSTCIRCLE)));
-
-        mockUtils.sendFlow1Data(mvc, serverName,false, true, IntegrationDataType.TRUSTCIRCLE, HttpMethods.POST.name());
-
-        _flowImpl(IntegrationDataType.TRUSTCIRCLE);
-
-        //Thread.sleep(10*1000); //to avoid "Rejecting received message because of the listener container having been stopped in the meantime"
-        //be careful when debugging, you might miss breakpoints if the time is not enough
+    public void dslFlow1PutTcIdThreatTest() throws Exception {
+        mockitoWhen(HttpMethod.GET.name(),TrustCircle.class,IntegrationDataType.THREAT);
+        mockUtils.sendFlow1Data(mvc, serverName,applicationId, tcId, null, false, true, IntegrationDataType.THREAT, HttpMethods.PUT.name());
+        assertFlows(IntegrationDataType.THREAT, 3);
     }
 
     @DirtiesContext
     @Test
-    public void testDslFlow1PutDataTypeTrustcircle() throws Exception {
-        Mockito.when(camelRestService.sendAndGetList(anyString(), anyObject(), eq("GET"), eq(TrustCircle.class), anyObject()))
-                .thenReturn(mockUtils.getAllMockedTrustCircles(this.numOfCspsToTest, IntegrationDataType.tcNamingConventionForShortName.get(IntegrationDataType.TRUSTCIRCLE)));
-
-        Mockito.when(camelRestService.send(anyString(), anyObject(), eq("GET"), eq(TrustCircle.class)))
-                .thenReturn(mockUtils.getMockedTrustCircle(this.numOfCspsToTest, IntegrationDataType.tcNamingConventionForShortName.get(IntegrationDataType.TRUSTCIRCLE)));
-
-        mockUtils.sendFlow1Data(mvc, serverName,false, true, IntegrationDataType.TRUSTCIRCLE, HttpMethods.PUT.name());
-
-        _flowImpl(IntegrationDataType.TRUSTCIRCLE);
-
-        //Thread.sleep(10*1000); //to avoid "Rejecting received message because of the listener container having been stopped in the meantime"
-        //be careful when debugging, you might miss breakpoints if the time is not enough
+    public void dslFlow1PutTeamIdThreatTest() throws Exception {
+        mockitoWhen(HttpMethod.GET.name(),TrustCircle.class,IntegrationDataType.THREAT);
+        mockUtils.sendFlow1Data(mvc, serverName,applicationId, null, teamId, false, true, IntegrationDataType.THREAT, HttpMethods.PUT.name());
+        assertFlows(IntegrationDataType.THREAT, 1);
     }
 
+    @DirtiesContext
+    @Test
+    public void dslFlow1PostDataTypeArtefactTest() throws Exception {
+        mockitoWhen(HttpMethod.GET.name(),TrustCircle.class,IntegrationDataType.ARTEFACT);
+        mockUtils.sendFlow1Data(mvc,serverName, applicationId,false, true, IntegrationDataType.ARTEFACT, HttpMethods.POST.name());
+        assertFlows(IntegrationDataType.ARTEFACT, 3);
+    }
 
+    @DirtiesContext
+    @Test
+    public void dslFlow1PostTcIdArtefactTest() throws Exception {
+        mockitoWhen(HttpMethod.GET.name(),TrustCircle.class,IntegrationDataType.ARTEFACT);
+        mockUtils.sendFlow1Data(mvc,serverName, applicationId,tcId,null,false, true, IntegrationDataType.ARTEFACT, HttpMethods.POST.name());
+        assertFlows(IntegrationDataType.ARTEFACT, 3);
+    }
 
-    private void _flowImpl(IntegrationDataType dataType) throws Exception {
+    @DirtiesContext
+    @Test
+    public void dslFlow1PostTeamIdArtefactTest() throws Exception {
+        mockitoWhen(HttpMethod.GET.name(),TrustCircle.class,IntegrationDataType.ARTEFACT);
+        mockUtils.sendFlow1Data(mvc,serverName, applicationId,null,teamId,false, true, IntegrationDataType.ARTEFACT, HttpMethods.POST.name());
+        assertFlows(IntegrationDataType.ARTEFACT, 1);
+    }
+
+    @DirtiesContext
+    @Test
+    public void dslFlow1PutDataTypeArtefactTest() throws Exception {
+        mockitoWhen(HttpMethod.GET.name(),TrustCircle.class,IntegrationDataType.ARTEFACT);
+        mockUtils.sendFlow1Data(mvc, serverName,applicationId,false, true, IntegrationDataType.ARTEFACT, "PUT");
+        assertFlows(IntegrationDataType.ARTEFACT, 3);
+    }
+
+    @DirtiesContext
+    @Test
+    public void dslFlow1PutTcIdArtefactTest() throws Exception {
+        mockitoWhen(HttpMethod.GET.name(),TrustCircle.class,IntegrationDataType.ARTEFACT);
+        mockUtils.sendFlow1Data(mvc, serverName,applicationId,tcId,null,false, true, IntegrationDataType.ARTEFACT, "PUT");
+        assertFlows(IntegrationDataType.ARTEFACT, 3);
+    }
+
+    @DirtiesContext
+    @Test
+    public void dslFlow1PutTeamIdArtefactTest() throws Exception {
+        mockitoWhen(HttpMethod.GET.name(),TrustCircle.class,IntegrationDataType.ARTEFACT);
+        mockUtils.sendFlow1Data(mvc, serverName,applicationId,null,teamId,false, true, IntegrationDataType.ARTEFACT, "PUT");
+        assertFlows(IntegrationDataType.ARTEFACT, 1);
+    }
+
+    @DirtiesContext
+    @Test
+    public void dslFlow1PostDataTypeTrustcircleTest() throws Exception {
+        mockitoWhen(HttpMethod.GET.name(),TrustCircle.class,IntegrationDataType.TRUSTCIRCLE);
+        mockUtils.sendFlow1Data(mvc, serverName,applicationId,false, true, IntegrationDataType.TRUSTCIRCLE, HttpMethods.POST.name());
+        assertFlows(IntegrationDataType.TRUSTCIRCLE, 3);
+    }
+
+    @DirtiesContext
+    @Test
+    public void dslFlow1TcIdTypeTrustcircleTest() throws Exception {
+        mockitoWhen(HttpMethod.GET.name(),TrustCircle.class,IntegrationDataType.TRUSTCIRCLE);
+        mockUtils.sendFlow1Data(mvc, serverName,applicationId,tcId,null,false, true, IntegrationDataType.TRUSTCIRCLE, HttpMethods.POST.name());
+        assertFlows(IntegrationDataType.TRUSTCIRCLE, 3);
+    }
+
+    @DirtiesContext
+    @Test
+    public void dslFlow1PostTeamIdTrustcircleTest() throws Exception {
+        mockitoWhen(HttpMethod.GET.name(),TrustCircle.class,IntegrationDataType.TRUSTCIRCLE);
+        mockUtils.sendFlow1Data(mvc, serverName,applicationId,null,teamId,false, true, IntegrationDataType.TRUSTCIRCLE, HttpMethods.POST.name());
+        assertFlows(IntegrationDataType.TRUSTCIRCLE, 1);
+    }
+
+    @DirtiesContext
+    @Test
+    public void dslFlow1PutDataTypeTrustcircleTest() throws Exception {
+        mockitoWhen(HttpMethod.GET.name(),TrustCircle.class,IntegrationDataType.TRUSTCIRCLE);
+        mockUtils.sendFlow1Data(mvc, serverName,applicationId,false, true, IntegrationDataType.TRUSTCIRCLE, HttpMethods.PUT.name());
+        assertFlows(IntegrationDataType.TRUSTCIRCLE, 3);
+    }
+
+    @DirtiesContext
+    @Test
+    public void dslFlow1PutTcIdTrustcircleTest() throws Exception {
+        mockitoWhen(HttpMethod.GET.name(),TrustCircle.class,IntegrationDataType.TRUSTCIRCLE);
+        mockUtils.sendFlow1Data(mvc, serverName,applicationId,tcId,null,false, true, IntegrationDataType.TRUSTCIRCLE, HttpMethods.PUT.name());
+        assertFlows(IntegrationDataType.TRUSTCIRCLE, 3);
+    }
+
+    @DirtiesContext
+    @Test
+    public void dslFlow1PutTeamIdTrustcircleTest() throws Exception {
+        mockitoWhen(HttpMethod.GET.name(),TrustCircle.class,IntegrationDataType.TRUSTCIRCLE);
+        mockUtils.sendFlow1Data(mvc, serverName,applicationId,null,teamId,false, true, IntegrationDataType.TRUSTCIRCLE, HttpMethods.PUT.name());
+        assertFlows(IntegrationDataType.TRUSTCIRCLE, 1);
+    }
+
+    void mockitoWhen(String httpMethod, Class aClass, IntegrationDataType integrationDataType) throws IOException {
+        Mockito.when(camelRestService.sendAndGetList(anyString(), anyObject(), eq(httpMethod), eq(aClass), anyObject()))
+                .thenReturn(mockUtils.getAllMockedTrustCircles(this.numOfCspsToTest, IntegrationDataType.tcNamingConventionForShortName.get(integrationDataType)));
+
+        Mockito.when(camelRestService.send(anyString(), anyObject(), eq(httpMethod), eq(aClass)))
+                .thenReturn(mockUtils.getMockedTrustCircle(this.numOfCspsToTest, IntegrationDataType.tcNamingConventionForShortName.get(integrationDataType)));
+    }
+
+    private void assertFlows(IntegrationDataType dataType, Integer expectedEcspMessages) throws Exception {
        /*
         DSL
          */
@@ -309,7 +362,7 @@ public class CspServerInternalSandboxTestFlow1dataTypes implements CamelRoutes {
         }
 
         //ESCP
-        mockedEcsp.expectedMessageCount(3);
+        mockedEcsp.expectedMessageCount(expectedEcspMessages);
         mockedEcsp.assertIsSatisfied();
 
         list = mockedEcsp.getReceivedExchanges();

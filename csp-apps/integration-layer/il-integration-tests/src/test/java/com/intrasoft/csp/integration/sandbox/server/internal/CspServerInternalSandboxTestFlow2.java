@@ -21,7 +21,6 @@ import org.apache.camel.test.spring.MockEndpointsAndSkip;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Matchers;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.slf4j.Logger;
@@ -35,7 +34,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.util.StringUtils;
 import org.springframework.web.context.WebApplicationContext;
 
-import java.util.HashMap;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -95,6 +93,8 @@ public class CspServerInternalSandboxTestFlow2 {
     private final IntegrationDataType dataTypeToTest = IntegrationDataType.VULNERABILITY;
     private final String applicationId = "taranis";
     private String cspId = "CERT-GR";
+    static final String tcId = "tcId";
+    static final String teamId = "teamId";
 
 
     @Before
@@ -124,71 +124,108 @@ public class CspServerInternalSandboxTestFlow2 {
                 .thenReturn(mockUtils.getMockedTeam(3, "http://external.csp%s.com", "CERT-FR"));
     }
 
+    /**
+     * isExternal will be false in Flow 2, and TcProcessor will set it to true
+     * toShare will be true in Flow 2
+     */
+
     @DirtiesContext
     @Test
-    public void testDslFlow2PostAuthorized() throws Exception {
-        /*
-        isExternal will be false in Flow 2, and TcProcessor will set it to true
-        toShare will be true in Flow 2
-         */
+    public void dslFlow2DataTypePostAuthorizedTest() throws Exception {
         //For authorized flow, set cspId to have a value from the initialized in Mockito (CERT-GR, CERT-DE or CERT-FR)
         mockUtils.sendFlow2Data(mvc, applicationId, false, true, this.cspId, this.dataTypeToTest, HttpMethods.POST.name());
-
-        _authorizedFlowImpl();
-
-        //Thread.sleep(10*1000); //to avoid "Rejecting received message because of the listener container having been stopped in the meantime"
-        //be careful when debugging, you might miss breakpoints if the time is not enough
+        assertAuthorizedFlow();
     }
 
     @DirtiesContext
     @Test
-    public void testDslFlow2PutAuthorized() throws Exception {
-        /*
-        isExternal will be false in Flow 2, and TcProcessor will set it to true
-        toShare will be true in Flow 2
-         */
+    public void dslFlow2TcIdPostAuthorizedTest() throws Exception {
+        //For authorized flow, set cspId to have a value from the initialized in Mockito (CERT-GR, CERT-DE or CERT-FR)
+        mockUtils.sendFlow2Data(mvc, applicationId,tcId,null, false, true, this.cspId, this.dataTypeToTest, HttpMethods.POST.name());
+        assertAuthorizedFlow();
+    }
+
+    @DirtiesContext
+    @Test
+    public void dslFlow2TeamIdPostAuthorizedTest() throws Exception {
+        //For authorized flow, set cspId to have a value from the initialized in Mockito (CERT-GR, CERT-DE or CERT-FR)
+        mockUtils.sendFlow2Data(mvc, applicationId,null,teamId, false, true, this.cspId, this.dataTypeToTest, HttpMethods.POST.name());
+        assertAuthorizedFlow();
+    }
+
+    @DirtiesContext
+    @Test
+    public void dslFlow2DataTypePutAuthorizedTest() throws Exception {
         //For authorized flow, set cspId to have a value from the initialized in Mockito (CERT-GR, CERT-DE or CERT-FR)
         mockUtils.sendFlow2Data(mvc, applicationId, false, true, this.cspId, this.dataTypeToTest, HttpMethods.PUT.name());
-
-        _authorizedFlowImpl();
-
-        //Thread.sleep(10*1000); //to avoid "Rejecting received message because of the listener container having been stopped in the meantime"
-        //be careful when debugging, you might miss breakpoints if the time is not enough
+        assertAuthorizedFlow();
     }
 
     @DirtiesContext
     @Test
-    public void testDslFlow2PostNotAuthorized() throws Exception {
-        /*
-        isExternal will be false in Flow 2, and TcProcessor will set it to true
-        toShare will be true in Flow 2
-         */
+    public void dslFlow2TcIdPutAuthorizedTest() throws Exception {
+        //For authorized flow, set cspId to have a value from the initialized in Mockito (CERT-GR, CERT-DE or CERT-FR)
+        mockUtils.sendFlow2Data(mvc, applicationId,tcId,null, false, true, this.cspId, this.dataTypeToTest, HttpMethods.PUT.name());
+        assertAuthorizedFlow();
+    }
+
+    @DirtiesContext
+    @Test
+    public void dslFlow2TeamIdPutAuthorizedTest() throws Exception {
+        //For authorized flow, set cspId to have a value from the initialized in Mockito (CERT-GR, CERT-DE or CERT-FR)
+        mockUtils.sendFlow2Data(mvc, applicationId,null,teamId, false, true, this.cspId, this.dataTypeToTest, HttpMethods.PUT.name());
+        assertAuthorizedFlow();
+    }
+
+    @DirtiesContext
+    @Test
+    public void dslFlow2DataTypePostNotAuthorizedTest() throws Exception {
         //For NOT authorized flow, set cspId to have a value different than the ones initialized in Mockito (CERT-GR, CERT-DE or CERT-FR)
         mockUtils.sendFlow2Data(mvc, applicationId, false, true, "CERT-DUMMY-GR", this.dataTypeToTest, HttpMethods.POST.name());
-
-        _notAuthorizedFlowImpl();
-
-        //Thread.sleep(10*1000); //to avoid "Rejecting received message because of the listener container having been stopped in the meantime"
-        //be careful when debugging, you might miss breakpoints if the time is not enough
+        assertNotAuthorizedFlow();
     }
 
     @DirtiesContext
     @Test
-    public void testDslFlow2PutNotAuthorized() throws Exception {
-        /*
-        isExternal will be false in Flow 2, and TcProcessor will set it to true
-        toShare will be true in Flow 2
-         */
+    public void dslFlow2TcIdPostNotAuthorizedTest() throws Exception {
         //For NOT authorized flow, set cspId to have a value different than the ones initialized in Mockito (CERT-GR, CERT-DE or CERT-FR)
-        mockUtils.sendFlow2Data(mvc, applicationId, false, true, "CERT-DUMMY-GR", this.dataTypeToTest, HttpMethods.PUT.name());
-
-        _notAuthorizedFlowImpl();
-
-        //Thread.sleep(10*1000); //to avoid "Rejecting received message because of the listener container having been stopped in the meantime"
-        //be careful when debugging, you might miss breakpoints if the time is not enough
+        mockUtils.sendFlow2Data(mvc, applicationId, tcId, null,false, true, "CERT-DUMMY-GR", this.dataTypeToTest, HttpMethods.POST.name());
+        assertNotAuthorizedFlow();
     }
 
-    private void _authorizedFlowImpl() throws Exception {
+    @DirtiesContext
+    @Test
+    public void dslFlow2TeamIdPostNotAuthorizedTest() throws Exception {
+        //For NOT authorized flow, set cspId to have a value different than the ones initialized in Mockito (CERT-GR, CERT-DE or CERT-FR)
+        mockUtils.sendFlow2Data(mvc, applicationId,null,teamId, false, true, "CERT-DUMMY-GR", this.dataTypeToTest, HttpMethods.POST.name());
+        assertNotAuthorizedFlow();
+    }
+
+    @DirtiesContext
+    @Test
+    public void dslFlow2DataTypePutNotAuthorizedTest() throws Exception {
+        //For NOT authorized flow, set cspId to have a value different than the ones initialized in Mockito (CERT-GR, CERT-DE or CERT-FR)
+        mockUtils.sendFlow2Data(mvc, applicationId, false, true, "CERT-DUMMY-GR", this.dataTypeToTest, HttpMethods.PUT.name());
+        assertNotAuthorizedFlow();
+    }
+
+    @DirtiesContext
+    @Test
+    public void dslFlow2TcIdPutNotAuthorizedTest() throws Exception {
+        //For NOT authorized flow, set cspId to have a value different than the ones initialized in Mockito (CERT-GR, CERT-DE or CERT-FR)
+        mockUtils.sendFlow2Data(mvc, applicationId,tcId,null, false, true, "CERT-DUMMY-GR", this.dataTypeToTest, HttpMethods.PUT.name());
+        assertNotAuthorizedFlow();
+    }
+
+    @DirtiesContext
+    @Test
+    public void dslFlow2TeamIdPutNotAuthorizedTest() throws Exception {
+        //For NOT authorized flow, set cspId to have a value different than the ones initialized in Mockito (CERT-GR, CERT-DE or CERT-FR)
+        mockUtils.sendFlow2Data(mvc, applicationId,null,teamId, false, true, "CERT-DUMMY-GR", this.dataTypeToTest, HttpMethods.PUT.name());
+        assertNotAuthorizedFlow();
+    }
+
+    private void assertAuthorizedFlow() throws Exception {
                 /*
         External DCL: expect 1-message
          */
@@ -257,7 +294,7 @@ public class CspServerInternalSandboxTestFlow2 {
         }
     }
 
-    private void _notAuthorizedFlowImpl() throws Exception {
+    private void assertNotAuthorizedFlow() throws Exception {
         /*
         External DCL: expect 1-message
          */

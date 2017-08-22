@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -139,6 +140,10 @@ public class MockUtils implements ContextUrl {
     }*/
 
     public void sendFlow1IntegrationData(MockMvc mvc, Boolean isExternal) throws Exception {
+        sendFlow1IntegrationData(mvc,isExternal, null, null);
+    }
+
+    public void sendFlow1IntegrationData(MockMvc mvc, Boolean isExternal, String tcId, String teamId) throws Exception {
         IntegrationData integrationData = new IntegrationData();
         integrationData.setDataType(IntegrationDataType.INCIDENT);
 
@@ -155,6 +160,12 @@ public class MockUtils implements ContextUrl {
         SharingParams sharingParams = new SharingParams();
         sharingParams.setIsExternal(isExternal);
         sharingParams.setToShare(true);
+        if(!StringUtils.isEmpty(tcId)){
+            sharingParams.setTcId(tcId);
+        }
+        if(!StringUtils.isEmpty(teamId)){
+            sharingParams.setTeamId(teamId);
+        }
         integrationData.setDataParams(dataParams);
         integrationData.setDataObject(dataParams);
         integrationData.setSharingParams(sharingParams);
@@ -167,17 +178,31 @@ public class MockUtils implements ContextUrl {
 
 
 
-
+    /**
+     * Will be deleted in the future. Use the one in which you pass the applicationId argument
+     * */
+    @Deprecated
     public void sendFlow1Data(MockMvc mvc,String cspId, Boolean isExternal, Boolean toShare, IntegrationDataType dataType, String httpMethod) throws Exception {
         sendFlow1Data(mvc,cspId,"taranis", isExternal,toShare,dataType,httpMethod);
     }
 
     public void sendFlow1Data(MockMvc mvc, String cspId, String applicationId, Boolean isExternal, Boolean toShare, IntegrationDataType dataType, String httpMethod) throws Exception {
+        sendFlow1Data(mvc,cspId,applicationId,null,null,isExternal,toShare,dataType,httpMethod);
+    }
+
+    public void sendFlow1Data(MockMvc mvc, String cspId, String applicationId, String tcId, String teamId,
+                              Boolean isExternal, Boolean toShare, IntegrationDataType dataType, String httpMethod) throws Exception {
         IntegrationData integrationData = new IntegrationData();
         integrationData.setDataType(dataType);
         SharingParams sharingParams = new SharingParams();
         sharingParams.setIsExternal(isExternal);
         sharingParams.setToShare(toShare);
+        if(!StringUtils.isEmpty(tcId)){
+            sharingParams.setTcId(tcId);
+        }
+        if(!StringUtils.isEmpty(teamId)){
+            sharingParams.setTeamId(teamId);
+        }
         integrationData.setSharingParams(sharingParams);
         DataParams dataParams = new DataParams();
         dataParams.setRecordId("222");
@@ -215,12 +240,23 @@ public class MockUtils implements ContextUrl {
     }
 
 
-    public void sendFlow2Data(MockMvc mvc, String applicationId, Boolean isExternal, Boolean toShare, String cspId, IntegrationDataType dataType, String httpMethod) throws Exception {
+    public void sendFlow2Data(MockMvc mvc, String applicationId, Boolean isExternal, Boolean toShare, String cspId,
+                              IntegrationDataType dataType, String httpMethod) throws Exception {
+        sendFlow2Data(mvc,applicationId,null,null,isExternal,toShare,cspId,dataType,httpMethod);
+    }
+
+    public void sendFlow2Data(MockMvc mvc, String applicationId,String tcId,String teamId, Boolean isExternal, Boolean toShare, String cspId, IntegrationDataType dataType, String httpMethod) throws Exception {
         IntegrationData integrationData = new IntegrationData();
         integrationData.setDataType(dataType);
         SharingParams sharingParams = new SharingParams();
         sharingParams.setIsExternal(isExternal);
         sharingParams.setToShare(toShare);
+        if(!StringUtils.isEmpty(tcId)){
+            sharingParams.setTcId(tcId);
+        }
+        if(!StringUtils.isEmpty(teamId)){
+            sharingParams.setTeamId(teamId);
+        }
         integrationData.setSharingParams(sharingParams);
         DataParams dataParams = new DataParams();
         dataParams.setRecordId("222");

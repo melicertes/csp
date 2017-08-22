@@ -153,4 +153,79 @@ public class CspServerInternalBusinessTcTest implements CamelRoutes {
         //be careful when debugging, you might miss breakpoints if the time is not enough
         errorMessageHandler.consumeErrorMessages(1, 1000L,"<br/>");
     }
+
+    @DirtiesContext
+    @Test
+    public void dslFlow1TcIdTest() throws Exception {
+        String tcId = "tcId";
+        mockUtils.sendFlow1IntegrationData(mvc,false,tcId,null);
+
+        mockedDsl.expectedMessageCount(1);
+        mockedDsl.assertIsSatisfied();
+
+        List<Exchange> list = mockedDsl.getReceivedExchanges();
+        for (Exchange exchange : list) {
+            Message in = exchange.getIn();
+            IntegrationData data = in.getBody(IntegrationData.class);
+            assertThat(data.getSharingParams().getTcId(), is(tcId));
+            assertThat(data.getDataType(), is(IntegrationDataType.INCIDENT));
+        }
+
+        mockedTC.expectedMessageCount(1);
+        mockedTC.assertIsSatisfied();
+        list = mockedTC.getReceivedExchanges();
+        for (Exchange exchange : list) {
+            Message in = exchange.getIn();
+            IntegrationData dataIn = in.getBody(IntegrationData.class);
+            assertThat(dataIn.getDataType(), is(IntegrationDataType.INCIDENT));
+            assertThat(exchange.getIn().getHeader(CamelRoutes.ORIGIN_ENDPOINT),is(routes.apply(CamelRoutes.DCL)));
+        }
+
+        mockedDcl.expectedMessageCount(1);
+
+        mockedDdl.expectedMessageCount(1);
+        mockedDdl.assertIsSatisfied();
+
+        Thread.sleep(10*1000); //to avoid "Rejecting received message because of the listener container having been stopped in the meantime"
+        //be careful when debugging, you might miss breakpoints if the time is not enough
+        //errorMessageHandler.consumeErrorMessages(1, 1000L,"<br/>");
+    }
+
+
+    @DirtiesContext
+    @Test
+    public void dslFlow1TeamIdTest() throws Exception {
+        String teamId = "teamId";
+        mockUtils.sendFlow1IntegrationData(mvc,false,null,teamId);
+
+        mockedDsl.expectedMessageCount(1);
+        mockedDsl.assertIsSatisfied();
+
+        List<Exchange> list = mockedDsl.getReceivedExchanges();
+        for (Exchange exchange : list) {
+            Message in = exchange.getIn();
+            IntegrationData data = in.getBody(IntegrationData.class);
+            assertThat(data.getSharingParams().getTeamId(), is(teamId));
+            assertThat(data.getDataType(), is(IntegrationDataType.INCIDENT));
+        }
+
+        mockedTC.expectedMessageCount(1);
+        mockedTC.assertIsSatisfied();
+        list = mockedTC.getReceivedExchanges();
+        for (Exchange exchange : list) {
+            Message in = exchange.getIn();
+            IntegrationData dataIn = in.getBody(IntegrationData.class);
+            assertThat(dataIn.getDataType(), is(IntegrationDataType.INCIDENT));
+            assertThat(exchange.getIn().getHeader(CamelRoutes.ORIGIN_ENDPOINT),is(routes.apply(CamelRoutes.DCL)));
+        }
+
+        mockedDcl.expectedMessageCount(1);
+
+        mockedDdl.expectedMessageCount(1);
+        mockedDdl.assertIsSatisfied();
+
+        Thread.sleep(10*1000); //to avoid "Rejecting received message because of the listener container having been stopped in the meantime"
+        //be careful when debugging, you might miss breakpoints if the time is not enough
+        //errorMessageHandler.consumeErrorMessages(1, 1000L,"<br/>");
+    }
 }
