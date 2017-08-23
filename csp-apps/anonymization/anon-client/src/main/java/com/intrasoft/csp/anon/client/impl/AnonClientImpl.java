@@ -28,6 +28,7 @@ public class AnonClientImpl implements AnonClient, AnonContextUrl {
     private Logger LOG = (Logger) LoggerFactory.getLogger(AnonClientImpl.class);
 
     @Autowired
+    @Qualifier("AnonApiVersionClient")
     ApiVersionClient apiVersionClient;
 
 

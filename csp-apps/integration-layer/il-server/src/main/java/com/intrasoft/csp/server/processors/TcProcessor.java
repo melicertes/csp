@@ -1,10 +1,14 @@
 package com.intrasoft.csp.server.processors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.intrasoft.csp.anon.client.AnonClient;
+import com.intrasoft.csp.anon.commons.model.IntegrationAnonData;
 import com.intrasoft.csp.commons.exceptions.InvalidSharingParamsException;
 import com.intrasoft.csp.commons.model.*;
 import com.intrasoft.csp.commons.routes.CamelRoutes;
 import com.intrasoft.csp.libraries.restclient.exceptions.CspBusinessException;
+import com.intrasoft.csp.server.policy.domain.model.SharingPolicyAction;
+import com.intrasoft.csp.server.policy.service.SharingPolicyService;
 import com.intrasoft.csp.server.service.CamelRestService;
 import com.intrasoft.csp.server.routes.RouteUtils;
 import org.apache.camel.*;
@@ -49,6 +53,11 @@ public class TcProcessor implements Processor,CamelRoutes{
     @Autowired
     ProducerTemplate producer;
 
+    @Autowired
+    SharingPolicyService sharingPolicyService;
+
+    @Autowired
+    AnonClient anonClient;
 
     @Autowired
     RouteUtils routes;
@@ -194,6 +203,31 @@ public class TcProcessor implements Processor,CamelRoutes{
 
     private void handleDclFlowAndSendToECSP(String httpMethod, Team team, IntegrationData integrationData){
         //TODO: SXCSP-85 Sharing Policy to be integrated only when sending to ECSP
+        /**
+         * 3 actions:
+         * -share as is
+         * -share anonymized
+         * -dont share
+         */
+        SharingPolicyAction sharingPolicyAction = sharingPolicyService.evaluate(integrationData.getDataType());
+        switch (sharingPolicyAction){
+            case SHARE_AS_IS:
+                break;
+            case SHARE_ANONYMIZED:
+                IntegrationAnonData integrationAnonData = new IntegrationAnonData();
+                integrationAnonData.setCspId(integrationData.getDataParams().getCspId());
+                integrationAnonData.setDataType(integrationData.getDataType());
+                //integrationAnonData.setDataObject(integrationData.getDataObject());
+                //IntegrationAnonData anonData = anonClient.postAnonData(integrationAnonData);
+                Object obj = anonClient.postAnonData(integrationAnonData);//TODO: to be removed after merge
+                //integrationData.setDataObject(anonData.getDataObject());
+                integrationData.setDataObject(obj);
+                break;
+            case DO_NOT_SHARE:
+                return;
+            case NO_ACTION_FOUND:
+                break;
+        }
         EnhancedTeamDTO enhancedTeamDTO = new EnhancedTeamDTO(team, integrationData);
         Map<String, Object> headers = new HashMap<>();
 

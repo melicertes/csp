@@ -22,6 +22,7 @@ public class CspClientImpl implements CspClient, ContextUrl {
     private Logger LOG = (Logger) LoggerFactory.getLogger(CspClientImpl.class);
 
     @Autowired
+    @Qualifier("CspApiVersionClient")
     ApiVersionClient apiVersionClient;
 
 

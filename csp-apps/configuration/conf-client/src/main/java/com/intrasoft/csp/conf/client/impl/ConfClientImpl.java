@@ -28,6 +28,7 @@ public class ConfClientImpl implements ConfClient, ApiContextUrl {
     private Logger LOG = (Logger) LoggerFactory.getLogger(ConfClientImpl.class);
 
     @Autowired
+    @Qualifier("ConfApiVersionClient")
     ApiVersionClient apiVersionClient;
 
     @Autowired

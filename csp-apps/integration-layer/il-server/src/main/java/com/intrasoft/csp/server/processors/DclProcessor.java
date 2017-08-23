@@ -2,7 +2,6 @@ package com.intrasoft.csp.server.processors;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.intrasoft.csp.client.TrustCirclesClient;
 import com.intrasoft.csp.commons.model.IntegrationData;
 import com.intrasoft.csp.commons.routes.CamelRoutes;
 import com.intrasoft.csp.server.service.CamelRestService;
@@ -44,10 +43,6 @@ public class DclProcessor implements Processor,CamelRoutes {
         IntegrationData integrationData = cspUtils.getExchangeData(exchange,IntegrationData.class);
         LOG.info("DCL - received integrationData with datatype: " + integrationData.getDataType());
         String httpMethod = (String) exchange.getIn().getHeader(Exchange.HTTP_METHOD);
-
-        /**
-         * @TODO Anonymize data
-         */
 
         //pass message for TC processing
         exchange.getIn().setBody(integrationData);

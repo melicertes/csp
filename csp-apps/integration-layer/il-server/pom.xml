@@ -98,8 +98,18 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-test-spring</artifactId>
+            <version>${camel.version}</version>
+        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>com.intrasoft.csp</groupId>-->
+            <!--<artifactId>il-client</artifactId>-->
+            <!--<version>${project.version}</version>-->
+        <!--</dependency>-->
+        <dependency>
             <groupId>com.intrasoft.csp</groupId>
-            <artifactId>il-client</artifactId>
+            <artifactId>anon-client</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>
