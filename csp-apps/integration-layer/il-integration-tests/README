@@ -1,0 +1,24 @@
+---------------------------------------------------
+-- Running an integration test from command line --
+---------------------------------------------------
+
+1. First build the project
+--------------------------
+$ mvn clean install -DskipTests
+
+
+2. Navigate to target folder and locate the jar file
+----------------------------------------------------
+$ cd csp-apps/integration-tests/target
+
+
+3. Run one or more test-classes by providing the package+classnames as arguments
+--------------------------------------------------------------------------------
+$ java -jar integration-tests-0.2.0-SNAPSHOT.jar com.intrasoft.csp.integration.sandbox.server.internal.CspServerInternalSandboxTest
+
+APPENDIX
+--------
+
+Sample with docker profile and env vars
+
+java -jar -Dspring.profiles.active=docker -DES_PATH_BASE=/pathbse -DES_PORT=9000 -DES_LOCAL_DOMAIN=es.local -DIL_SSL_KEYSTORE_PASS=123456 -DIL_SSL_KEY_PASS=12345 -DIL_CSP_SUBDOMAIN_PREFIX=pref -DTC_PATH_TEAMS=/teams  -DTC_PATH_CIRCLES=/circles -DCSP_NAME -DTC_LOCAL_DOMAIN=tc.local  integration-tests-0.2.0-SNAPSHOT.jar com.intrasoft.csp.integration.business.server.internal.CspServerInternalBusinessTcTest
