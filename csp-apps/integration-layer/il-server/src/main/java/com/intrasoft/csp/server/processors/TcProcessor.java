@@ -22,6 +22,8 @@ import org.springframework.util.StringUtils;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
 /**
@@ -98,7 +100,7 @@ public class TcProcessor implements Processor,CamelRoutes{
 
     }
 
-    private void sendByDataType(IntegrationData integrationData, Exchange exchange, String originEndpoint, String httpMethod) throws IOException {
+    private void sendByDataType(IntegrationData integrationData, Exchange exchange, String originEndpoint, String httpMethod) throws IOException, NoSuchAlgorithmException, InvalidKeyException {
         //make all-TCs call
         String getAllTcUri = this.getTcCirclesURI();
         List<TrustCircle> tcList = camelRestService.sendAndGetList(getAllTcUri, null,  HttpMethod.GET.name(), TrustCircle.class,null);
@@ -111,7 +113,7 @@ public class TcProcessor implements Processor,CamelRoutes{
         }
     }
 
-    private void sendByTcId(String tcId, Exchange exchange) throws IOException {
+    private void sendByTcId(String tcId, Exchange exchange) throws IOException, InvalidKeyException, NoSuchAlgorithmException {
         String uri = this.getTcCirclesURI() + "/" + tcId;
         List<Team> teams = getTcTeams(uri);
         //all TC calls have been made up to this point, TEAMS list has been populated
@@ -162,7 +164,7 @@ public class TcProcessor implements Processor,CamelRoutes{
         return uri;
     }
 
-    private void sendByTeamId(String teamId, Exchange exchange) throws IOException {
+    private void sendByTeamId(String teamId, Exchange exchange) throws IOException, InvalidKeyException, NoSuchAlgorithmException {
         Team team = getTeamByRestCall(teamId);
         List<Team> teams = new ArrayList<>();
         //TODO: TC bug here, see SXCSP-255. We should use cspId and not shortName
@@ -175,7 +177,7 @@ public class TcProcessor implements Processor,CamelRoutes{
         }
     }
 
-    private void decideTheFlow(List<Team> teams, Exchange exchange){
+    private void decideTheFlow(List<Team> teams, Exchange exchange) throws NoSuchAlgorithmException, InvalidKeyException, IOException {
         String originEndpoint = (String) exchange.getIn().getHeader(CamelRoutes.ORIGIN_ENDPOINT);
         IntegrationData integrationData = exchange.getIn().getBody(IntegrationData.class);
         String httpMethod = (String) exchange.getIn().getHeader(Exchange.HTTP_METHOD);
@@ -201,7 +203,7 @@ public class TcProcessor implements Processor,CamelRoutes{
         return team;
     }
 
-    private void handleDclFlowAndSendToECSP(String httpMethod, Team team, IntegrationData integrationData){
+    private void handleDclFlowAndSendToECSP(String httpMethod, Team team, IntegrationData integrationData) throws NoSuchAlgorithmException, InvalidKeyException, IOException {
         //TODO: SXCSP-85 Sharing Policy to be integrated only when sending to ECSP
         /**
          * 3 actions:
@@ -214,14 +216,12 @@ public class TcProcessor implements Processor,CamelRoutes{
             case SHARE_AS_IS:
                 break;
             case SHARE_ANONYMIZED:
+                //TODO: in case of exception we have to decide if the Guaranteed Delivery will kick in to handle it
                 IntegrationAnonData integrationAnonData = new IntegrationAnonData();
                 integrationAnonData.setCspId(integrationData.getDataParams().getCspId());
                 integrationAnonData.setDataType(integrationData.getDataType());
-                //integrationAnonData.setDataObject(integrationData.getDataObject());
-                //IntegrationAnonData anonData = anonClient.postAnonData(integrationAnonData);
-                Object obj = anonClient.postAnonData(integrationAnonData);//TODO: to be removed after merge
-                //integrationData.setDataObject(anonData.getDataObject());
-                integrationData.setDataObject(obj);
+                IntegrationAnonData anonData = anonClient.postAnonData(integrationAnonData);
+                integrationData.setDataObject(anonData.getDataObject());
                 break;
             case DO_NOT_SHARE:
                 return;

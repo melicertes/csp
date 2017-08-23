@@ -1,10 +1,9 @@
 package com.intrasoft.csp.server.policy.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.intrasoft.csp.anon.client.AnonClient;
-import com.intrasoft.csp.commons.model.EnhancedTeamDTO;
-import com.intrasoft.csp.commons.model.IntegrationDataType;
-import com.intrasoft.csp.commons.model.Team;
-import com.intrasoft.csp.commons.model.TrustCircle;
+import com.intrasoft.csp.anon.commons.model.IntegrationAnonData;
+import com.intrasoft.csp.commons.model.*;
 import com.intrasoft.csp.commons.routes.CamelRoutes;
 import com.intrasoft.csp.server.CspApp;
 import com.intrasoft.csp.server.policy.domain.model.SharingPolicyAction;
@@ -90,6 +89,10 @@ public class SharingPolicyServiceTest implements CamelRoutes {
     @Autowired
     SpringCamelContext springCamelContext;
 
+    @Autowired
+    ObjectMapper objectMapper;
+
+    DataParams anonObject;
     @Before
     public void init() throws Exception {
         mvc = webAppContextSetup(webApplicationContext).build();
@@ -106,8 +109,14 @@ public class SharingPolicyServiceTest implements CamelRoutes {
                 .thenReturn(mockUtils.getMockedTeam(1,"http://external.csp%s.com"))
                 .thenReturn(mockUtils.getMockedTeam(2,"http://external.csp%s.com"))
                 .thenReturn(mockUtils.getMockedTeam(3,"http://external.csp%s.com"));
-        ResponseEntity<String> ret = new ResponseEntity<>("mocked and anonymized!", HttpStatus.OK);
-        Mockito.when(anonClient.postAnonData(anyObject())).thenReturn(ret);
+        IntegrationAnonData integrationAnonData = new IntegrationAnonData();
+
+        anonObject = new DataParams();
+        anonObject.setCspId("AnonymizedCspId");
+        anonObject.setApplicationId("AnonymizedApplicationId");
+
+        integrationAnonData.setDataObject(anonObject);
+        Mockito.when(anonClient.postAnonData(anyObject())).thenReturn(integrationAnonData);
     }
 
     @Test
@@ -131,7 +140,9 @@ public class SharingPolicyServiceTest implements CamelRoutes {
             Message in = exchange.getIn();
             EnhancedTeamDTO enhancedTeamDTO = in.getBody(EnhancedTeamDTO.class);
             assertThat(enhancedTeamDTO.getTeam().getUrl(), is("http://external.csp"+i+".com"));
-            assertThat(enhancedTeamDTO.getIntegrationData().getDataObject().toString(),is("<200 OK,mocked and anonymized!,{}>"));
+            String anonObjectJsonStrExpected = objectMapper.writeValueAsString(anonObject);
+            String anonObjectJsonStrToCompare = objectMapper.writeValueAsString(enhancedTeamDTO.getIntegrationData().getDataObject());
+            assertThat(anonObjectJsonStrToCompare,is(anonObjectJsonStrExpected));
         }
     }
 }

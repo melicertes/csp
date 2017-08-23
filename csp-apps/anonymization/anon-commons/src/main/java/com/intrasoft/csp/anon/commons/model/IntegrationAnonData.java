@@ -54,7 +54,7 @@ public class IntegrationAnonData implements Serializable{
         return dataObject;
     }
 
-    public void setDataObject(JsonNode dataObject) {
+    public void setDataObject(Object dataObject) {
         this.dataObject = dataObject;
     }
 
