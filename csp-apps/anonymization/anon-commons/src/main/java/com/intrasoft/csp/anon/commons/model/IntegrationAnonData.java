@@ -29,7 +29,7 @@ public class IntegrationAnonData implements Serializable{
     @NotNull
     @Valid
     @JsonProperty("dataObject")
-    JsonNode dataObject;
+    Object dataObject;
 
     public IntegrationAnonData() {
     }
@@ -50,7 +50,7 @@ public class IntegrationAnonData implements Serializable{
         this.dataType = dataType;
     }
 
-    public JsonNode getDataObject() {
+    public Object getDataObject() {
         return dataObject;
     }
 

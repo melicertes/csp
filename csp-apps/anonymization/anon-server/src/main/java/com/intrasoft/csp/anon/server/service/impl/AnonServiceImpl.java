@@ -1,23 +1,39 @@
 package com.intrasoft.csp.anon.server.service.impl;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.intrasoft.csp.anon.commons.exceptions.AnonException;
 import com.intrasoft.csp.anon.commons.exceptions.InvalidDataTypeException;
+import com.intrasoft.csp.anon.commons.exceptions.MappingNotFoundForGivenTupleException;
 import com.intrasoft.csp.anon.commons.model.IntegrationAnonData;
 import com.intrasoft.csp.anon.commons.model.MappingDTO;
 import com.intrasoft.csp.anon.commons.model.RuleSetDTO;
 import com.intrasoft.csp.anon.commons.model.SaveMappingDTO;
 import com.intrasoft.csp.anon.server.model.Mapping;
+import com.intrasoft.csp.anon.server.model.Rule;
 import com.intrasoft.csp.anon.server.model.RuleSet;
+import com.intrasoft.csp.anon.server.model.Rules;
 import com.intrasoft.csp.anon.server.repository.MappingRepository;
 import com.intrasoft.csp.anon.server.repository.RuleSetRepository;
 import com.intrasoft.csp.anon.server.service.AnonService;
+import com.intrasoft.csp.anon.server.service.ApiDataHandler;
 import com.intrasoft.csp.anon.server.utils.Conversions;
+import com.intrasoft.csp.commons.apiHttpStatusResponse.HttpStatusResponseType;
+import com.intrasoft.csp.commons.model.IntegrationDataType;
+import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.TypeRef;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,9 +47,12 @@ public class AnonServiceImpl implements AnonService,Conversions {
     @Autowired
     MappingRepository mappingRepository;
 
+    @Autowired
+    ApiDataHandler apiDataHandler;
+
     @Override
-    public ResponseEntity<String> postAnonData(IntegrationAnonData integrationAnonData) throws InvalidDataTypeException {
-        return null;
+    public IntegrationAnonData postAnonData(IntegrationAnonData integrationAnonData) throws InvalidDataTypeException, NoSuchAlgorithmException, InvalidKeyException, IOException {
+        return apiDataHandler.handleAnonIntegrationData(integrationAnonData);
     }
 
     @Override

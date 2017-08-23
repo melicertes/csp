@@ -36,10 +36,10 @@ public class AnonClientImpl implements AnonClient, AnonContextUrl {
     RetryRestTemplate retryRestTemplate;
 
     @Override
-    public ResponseEntity<String> postAnonData(IntegrationAnonData integrationAnonData) throws InvalidDataTypeException {
+    public IntegrationAnonData postAnonData(IntegrationAnonData integrationAnonData) throws InvalidDataTypeException {
         final String url = apiVersionClient.getApiUrl() + "/"+ANONYMIZE;
         LOG.info("ANON call [post]: " + url);
-        ResponseEntity<String> response = retryRestTemplate.exchange(url, HttpMethod.POST, new HttpEntity<Object>(integrationAnonData), String.class);
+        IntegrationAnonData response = retryRestTemplate.postForObject(url, integrationAnonData, IntegrationAnonData.class);
         return response;
     }
 

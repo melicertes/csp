@@ -23,6 +23,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 
 import static org.hamcrest.Matchers.containsString;
 
@@ -39,7 +41,7 @@ import static org.hamcrest.Matchers.containsString;
                 "csp.retry.maxAttempts:1",
                 "key.update=10000"
         })
-@ActiveProfiles("h2mem") //TODO: to be changed to use H2 DB profile
+@ActiveProfiles("h2mem")
 public class AnonApiTest implements AnonContextUrl {
 
     private static final Logger LOG = LoggerFactory.getLogger(AnonApiTest.class);
@@ -52,15 +54,19 @@ public class AnonApiTest implements AnonContextUrl {
     @Qualifier("anonClient")
     AnonClient anonClient;
 
+    @Autowired
+    ObjectMapper objectMapper;
+
     @Test
-    public void anonymizeTrustCircleTest() throws IOException {
+    public void anonymizeTrustCircleTest() throws IOException, InvalidKeyException, NoSuchAlgorithmException {
         ObjectMapper mapper = new ObjectMapper();
         String json = IOUtils.toString(this.getClass().getResourceAsStream("/trustcircle.json"), "UTF-8");
         IntegrationAnonData integrationAnonData = mapper.readValue(json, IntegrationAnonData.class);
         try {
-            ResponseEntity<String> response = anonClient.postAnonData(integrationAnonData);
-            Assert.assertThat(response.getBody(), containsString("\"short_name\":\"*******\""));
-            Assert.assertThat(response.getBody(), containsString("\"description\":\"*******\""));
+            IntegrationAnonData anonData = anonClient.postAnonData(integrationAnonData);
+            String response = objectMapper.writeValueAsString(anonData.getDataObject());
+            Assert.assertThat(response, containsString("\"short_name\":\"*******\""));
+            Assert.assertThat(response, containsString("\"description\":\"*******\""));
         } catch (MappingNotFoundForGivenTupleException e) {
             Assert.fail(HttpStatusResponseType.MAPPING_NOT_FOUND_FOR_GIVEN_TUPLE.getReasonPhrase());
         }
@@ -72,7 +78,7 @@ public class AnonApiTest implements AnonContextUrl {
         String json = IOUtils.toString(this.getClass().getResourceAsStream("/threat.json"), "UTF-8");
         IntegrationAnonData integrationAnonData = mapper.readValue(json, IntegrationAnonData.class);
         try {
-            ResponseEntity<String> response = anonClient.postAnonData(integrationAnonData);
+            anonClient.postAnonData(integrationAnonData);
         } catch (Exception e) {
             Assert.assertThat(e.getMessage(), containsString(HttpStatusResponseType.MAPPING_NOT_FOUND_FOR_GIVEN_TUPLE.getReasonPhrase()));
         }
@@ -84,7 +90,7 @@ public class AnonApiTest implements AnonContextUrl {
         String json = IOUtils.toString(this.getClass().getResourceAsStream("/invalidDataType.json"), "UTF-8");
         IntegrationAnonData integrationAnonData = mapper.readValue(json, IntegrationAnonData.class);
         try {
-            ResponseEntity<String> response = anonClient.postAnonData(integrationAnonData);
+            anonClient.postAnonData(integrationAnonData);
         } catch (Exception e) {
             Assert.assertThat(e.getMessage(), containsString(HttpStatusResponseType.UNSUPPORTED_DATA_TYPE.getReasonPhrase()));
         }
@@ -96,7 +102,7 @@ public class AnonApiTest implements AnonContextUrl {
         String json = IOUtils.toString(this.getClass().getResourceAsStream("/malformed.json"), "UTF-8");
         IntegrationAnonData integrationAnonData = mapper.readValue(json, IntegrationAnonData.class);
         try {
-            ResponseEntity<String> response = anonClient.postAnonData(integrationAnonData);
+            anonClient.postAnonData(integrationAnonData);
         } catch (Exception e) {
             Assert.assertThat(e.getMessage(), containsString(HttpStatusResponseType.MALFORMED_INTEGRATION_DATA_STRUCTURE.getReasonPhrase()));
         }

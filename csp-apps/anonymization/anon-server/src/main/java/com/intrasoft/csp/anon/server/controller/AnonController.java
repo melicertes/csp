@@ -29,9 +29,9 @@ public class AnonController implements AnonContextUrl {
     AnonService anonService;
 
     @RequestMapping(value = "/v"+REST_API_V1+"/"+ANONYMIZE, method = RequestMethod.POST)
-    public ResponseEntity anonData(@RequestBody IntegrationAnonData integrationAnonData) throws InvalidKeyException, NoSuchAlgorithmException, IOException {
+    public IntegrationAnonData anonData(@RequestBody IntegrationAnonData integrationAnonData) throws InvalidKeyException, NoSuchAlgorithmException, IOException {
         LOG.info("Anon Endpoint: POST received");
-        return apiDataHandler.handleAnonIntegrationData(integrationAnonData);
+        return anonService.postAnonData(integrationAnonData);
     }
 
     @RequestMapping(value = "/v"+REST_API_V1+"/"+SAVE_RULESET, method = RequestMethod.POST)

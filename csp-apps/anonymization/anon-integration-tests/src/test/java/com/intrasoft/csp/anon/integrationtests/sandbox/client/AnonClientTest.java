@@ -37,6 +37,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -70,13 +72,13 @@ public class AnonClientTest implements AnonContextUrl {
     AnonClient anonClient;
 
     @Test
-    public void sendPostIntegrationDataTest() throws IOException {
+    public void sendPostIntegrationDataTest() throws IOException, InvalidKeyException, NoSuchAlgorithmException {
         IntegrationAnonData data = new IntegrationAnonData();
         data.setDataType(IntegrationDataType.TRUSTCIRCLE);
         data.setCspId("9");
 
         try {
-            ResponseEntity<String> response = anonClient.postAnonData(data);
+            anonClient.postAnonData(data);
             fail("Expected MappingNotFoundForGivenTupleException");
         } catch (MappingNotFoundForGivenTupleException e) {
             Assert.assertThat(e.getMessage(), containsString(HttpStatusResponseType.MAPPING_NOT_FOUND_FOR_GIVEN_TUPLE.getReasonPhrase()));
