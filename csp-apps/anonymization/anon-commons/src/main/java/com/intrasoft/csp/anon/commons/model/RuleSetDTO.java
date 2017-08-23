@@ -75,7 +75,6 @@ public class RuleSetDTO implements Serializable{
         return "RuleSetDTO{" +
                 "id=" + id +
                 ", filename='" + filename + '\'' +
-                ", file=" + Arrays.toString(file) +
                 ", description='" + description + '\'' +
                 '}';
     }

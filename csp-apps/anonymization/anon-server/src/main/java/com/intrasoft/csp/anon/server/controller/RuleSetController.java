@@ -28,7 +28,8 @@ import java.util.List;
 @Controller
 public class RuleSetController {
 
-    private static final Logger LOG = LoggerFactory.getLogger(RuleSetController.class);
+    private static Logger LOG_AUDIT = LoggerFactory.getLogger("audit-log");
+    private static Logger LOG_EXCEPTION = LoggerFactory.getLogger("exc-log");
 
     @Autowired
     AnonService anonService;
@@ -48,41 +49,29 @@ public class RuleSetController {
                              BindingResult result,
                              Model model) throws IOException {
 
-       /* if (result.hasErrors()) {
-            LOG.error(result.getFieldError().toString());
-            redirectAttributes.addFlashAttribute("error", result.getFieldError().toString());
-            return "redirect:";
-        }*/
-
         model.addAttribute("description", ruleset.getDescription());
         ruleset.setFilename(file.getOriginalFilename());
         ruleset.setFile(file.getBytes());
-        String str = new String(ruleset.getFile());
-        LOG.info(str);
-
-        LOG.info("Import File");
         if (file.isEmpty()) {
             redirectAttributes.addFlashAttribute("error", "Please select a file to upload");
             return "redirect:";
         }
         try {
-
-            LOG.info(file.getOriginalFilename());
             byte[] bytes = file.getBytes();
             Path path = Paths.get(file.getOriginalFilename());
             ruleset.setFile(bytes);
             ruleset.setFilename(file.getOriginalFilename());
         } catch (IOException e) {
-            LOG.error("File upload failed: " + e);
+            LOG_EXCEPTION.error("File upload failed: " + e);
             redirectAttributes.addFlashAttribute("error", "Something went wrong");
             return "redirect:";
         }
 
-        anonService.saveRuleSet(ruleset);
+        ruleset = anonService.saveRuleSet(ruleset);
         List<RuleSetDTO> rulesets =anonService.getAllRuleSet();
-
         model.addAttribute("rulesets", rulesets);
         redirectAttributes.addFlashAttribute("msg", "Ruleset imported.");
+        LOG_AUDIT.info("UI: CREATE ruleset " + ruleset.toString());
         return "redirect:";
     }
 
@@ -91,32 +80,30 @@ public class RuleSetController {
         ModelAndView mav = new ModelAndView("pages/rulesets");
         mav.addObject("rulesets", anonService.getAllRuleSet());
         RuleSetDTO ruleset = anonService.getRuleSetById(id);
-        LOG.info(ruleset.toString());
         mav.addObject("ruleset", ruleset);
+        LOG_AUDIT.info("UI: GET ruleset " + ruleset.toString());
         return mav;
     }
 
     @GetMapping("/ruleset/delete/{id}")
     public ModelAndView deleteMapping(@PathVariable Long id, RedirectAttributes redirect) throws ConstraintViolationException {
-        LOG.info("DELETE ruleset with id: " + id);
         anonService.deleteRuleSet(id);
         ModelAndView mav = new ModelAndView("redirect:/rulesets");
         mav.addObject("mappings",anonService.getAllRuleSet());
         redirect.addFlashAttribute("msg", "Ruleset deleted");
+        LOG_AUDIT.info("UI: DELETE ruleset with id: " + id);
         return mav;
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
     public ModelAndView handleSqlException(HttpServletRequest request, Exception ex, RedirectAttributes redirect){
-        LOG.error("Requested URL="+request.getRequestURL());
-        LOG.error("Exception Raised");
+        LOG_EXCEPTION.error("Requested URL="+request.getRequestURL());
+        LOG_EXCEPTION.error("Exception Raised");
         ModelAndView mav = new ModelAndView("redirect:/rulesets");
         mav.addObject("exception", ex);
         mav.addObject("url", request.getRequestURL());
         mav.addObject("mappings",anonService.getAllRuleSet());
         redirect.addFlashAttribute("error", "Ruleset could not be deleted");
-
-//        mav.setViewName("error");
         return mav;
     }
 

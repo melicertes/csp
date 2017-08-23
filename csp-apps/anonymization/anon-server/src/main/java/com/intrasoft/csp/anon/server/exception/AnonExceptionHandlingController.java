@@ -22,7 +22,7 @@ import java.io.IOException;
 @ControllerAdvice
 public class AnonExceptionHandlingController extends RestExceptionHandlingController {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AnonExceptionHandlingController.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AnonExceptionHandlingController.class);
 
     /**
      * Example to override default internal exception handling
@@ -33,7 +33,7 @@ public class AnonExceptionHandlingController extends RestExceptionHandlingContro
 
     @ExceptionHandler({MappingNotFoundForGivenTupleException.class})
     public void handleBadRequests(HttpServletRequest request, HttpServletResponse response, Exception e) throws IOException {
-        LOGGER.error("Bad request: {} from {}, Exception: {} {}",
+        LOG.error("Bad request: {} from {}, Exception: {} {}",
                 request.getRequestURI(),
                 request.getRemoteHost(),
                 e.getStackTrace()[0].toString(),
