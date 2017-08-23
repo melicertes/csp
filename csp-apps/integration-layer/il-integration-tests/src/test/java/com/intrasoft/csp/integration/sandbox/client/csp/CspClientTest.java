@@ -1,14 +1,15 @@
 package com.intrasoft.csp.integration.sandbox.client.csp;
 
 import com.intrasoft.csp.client.CspClient;
+import com.intrasoft.csp.client.config.CspClientConfig;
 import com.intrasoft.csp.commons.model.IntegrationData;
 import com.intrasoft.csp.commons.model.IntegrationDataType;
 import com.intrasoft.csp.commons.model.SharingParams;
 import com.intrasoft.csp.commons.routes.ContextUrl;
-import com.intrasoft.csp.integration.TestUtil;
 import com.intrasoft.csp.libraries.restclient.service.RetryRestTemplate;
 import com.intrasoft.csp.libraries.versioning.client.ApiVersionClient;
 import com.intrasoft.csp.server.CspApp;
+import com.intrasoft.csp.server.utils.TestUtil;
 import org.apache.camel.test.spring.CamelSpringBootRunner;
 import org.apache.camel.test.spring.MockEndpointsAndSkip;
 import org.junit.Test;
@@ -16,6 +17,7 @@ import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,7 +35,7 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
  * Created by iskitsas on 5/3/17.
  */
 @RunWith(CamelSpringBootRunner.class)
-@SpringBootTest(classes = {CspApp.class},
+@SpringBootTest(classes = {CspApp.class, CspClientConfig.class},
         webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT,
         properties = {
                 "server.port: 8082",
@@ -51,9 +53,11 @@ public class CspClientTest implements ContextUrl {
     private static final Logger LOG = LoggerFactory.getLogger(CspClientTest.class);
 
     @Autowired
+    @Qualifier("CspApiVersionClient")
     ApiVersionClient apiVersionClient;
 
     @Autowired
+    @Qualifier("CspRestTemplate")
     RetryRestTemplate retryRestTemplate;
 
     @Autowired

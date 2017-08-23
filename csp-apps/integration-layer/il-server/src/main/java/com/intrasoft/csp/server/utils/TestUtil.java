@@ -1,4 +1,4 @@
-package com.intrasoft.csp.server.test.utils;
+package com.intrasoft.csp.server.utils;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;

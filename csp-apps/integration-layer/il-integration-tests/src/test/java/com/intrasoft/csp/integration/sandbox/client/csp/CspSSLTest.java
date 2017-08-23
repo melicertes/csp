@@ -1,13 +1,14 @@
 package com.intrasoft.csp.integration.sandbox.client.csp;
 
 import com.intrasoft.csp.client.CspClient;
+import com.intrasoft.csp.client.config.CspClientConfig;
 import com.intrasoft.csp.commons.model.*;
 import com.intrasoft.csp.commons.routes.ContextUrl;
-import com.intrasoft.csp.integration.MockUtils;
 import com.intrasoft.csp.libraries.versioning.client.ApiVersionClient;
 import com.intrasoft.csp.libraries.versioning.model.VersionDTO;
 import com.intrasoft.csp.server.CspApp;
 import com.intrasoft.csp.server.service.CamelRestService;
+import com.intrasoft.csp.server.utils.MockUtils;
 import org.apache.camel.test.spring.CamelSpringBootRunner;
 import org.apache.camel.test.spring.MockEndpointsAndSkip;
 import org.joda.time.DateTime;
@@ -17,6 +18,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
@@ -34,7 +36,7 @@ import static org.mockito.Matchers.eq;
  * Created by iskitsas on 5/22/17.
  */
 @RunWith(CamelSpringBootRunner.class)
-@SpringBootTest(classes = {CspApp.class,MockUtils.class},
+@SpringBootTest(classes = {CspApp.class, CspClientConfig.class,MockUtils.class},
         webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT,
         properties = {
                 "server.port: 8082",
@@ -59,6 +61,7 @@ import static org.mockito.Matchers.eq;
 @MockEndpointsAndSkip("http:*")
 public class CspSSLTest implements ContextUrl {
     @Autowired
+    @Qualifier("CspApiVersionClient")
     ApiVersionClient apiVersionClient;
 
     @Autowired

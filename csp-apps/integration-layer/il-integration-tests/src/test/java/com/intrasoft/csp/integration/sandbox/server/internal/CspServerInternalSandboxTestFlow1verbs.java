@@ -2,10 +2,10 @@ package com.intrasoft.csp.integration.sandbox.server.internal;
 
 import com.intrasoft.csp.commons.model.*;
 import com.intrasoft.csp.commons.routes.CamelRoutes;
-import com.intrasoft.csp.integration.MockUtils;
 import com.intrasoft.csp.server.CspApp;
 import com.intrasoft.csp.server.routes.RouteUtils;
 import com.intrasoft.csp.server.service.CamelRestService;
+import com.intrasoft.csp.server.utils.MockUtils;
 import org.apache.camel.*;
 import org.apache.camel.component.http.HttpMethods;
 import org.apache.camel.component.mock.MockEndpoint;

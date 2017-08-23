@@ -7,6 +7,7 @@ import com.intrasoft.csp.commons.model.SharingParams;
 import com.intrasoft.csp.commons.routes.ContextUrl;
 import com.intrasoft.csp.server.CspApp;
 import com.intrasoft.csp.server.processors.DslProcessor;
+import com.intrasoft.csp.server.utils.TestUtil;
 import org.apache.camel.*;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.impl.DefaultExchange;

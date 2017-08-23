@@ -1,5 +1,6 @@
 package com.intrasoft.csp.integration.sandbox.client.csp;
 
+import com.intrasoft.csp.client.config.CspClientConfig;
 import com.intrasoft.csp.libraries.versioning.client.ApiVersionClient;
 import com.intrasoft.csp.libraries.versioning.model.VersionDTO;
 import com.intrasoft.csp.server.CspApp;
@@ -9,6 +10,7 @@ import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -18,7 +20,7 @@ import static org.hamcrest.Matchers.is;
  * Created by iskitsas on 5/5/17.
  */
 @RunWith(CamelSpringBootRunner.class)
-@SpringBootTest(classes = {CspApp.class},
+@SpringBootTest(classes = {CspApp.class, CspClientConfig.class},
         webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT,
         properties = {
                 "server.port: 8082",
@@ -35,6 +37,7 @@ public class CspClientApiVersionTest {
     private static final Logger LOG = LoggerFactory.getLogger(CspClientTest.class);
 
     @Autowired
+    @Qualifier("CspApiVersionClient")
     ApiVersionClient apiVersionClient;
 
     @Test

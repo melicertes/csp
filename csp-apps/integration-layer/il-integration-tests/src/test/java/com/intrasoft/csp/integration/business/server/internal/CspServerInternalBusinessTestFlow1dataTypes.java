@@ -3,12 +3,12 @@ package com.intrasoft.csp.integration.business.server.internal;
 
 import com.intrasoft.csp.commons.model.*;
 import com.intrasoft.csp.commons.routes.CamelRoutes;
-import com.intrasoft.csp.integration.MockUtils;
 import com.intrasoft.csp.server.CspApp;
 import com.intrasoft.csp.server.processors.TcProcessor;
 import com.intrasoft.csp.server.routes.RouteUtils;
 import com.intrasoft.csp.server.service.CamelRestService;
 import com.intrasoft.csp.server.service.ErrorMessageHandler;
+import com.intrasoft.csp.server.utils.MockUtils;
 import org.apache.camel.EndpointInject;
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;

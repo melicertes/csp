@@ -1,13 +1,11 @@
 package com.intrasoft.csp.integration.sandbox.client.tc;
 
 import com.intrasoft.csp.client.TrustCirclesClient;
-import com.intrasoft.csp.client.config.CspClientConfig;
-import com.intrasoft.csp.client.config.TrustCirclesClientConfig;
 import com.intrasoft.csp.commons.model.TrustCircle;
-import com.intrasoft.csp.integration.MockUtils;
-import com.intrasoft.csp.integration.TestUtil;
 import com.intrasoft.csp.libraries.restclient.service.RetryRestTemplate;
 import com.intrasoft.csp.server.CspApp;
+import com.intrasoft.csp.server.utils.MockUtils;
+import com.intrasoft.csp.server.utils.TestUtil;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
