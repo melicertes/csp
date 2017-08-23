@@ -6,6 +6,7 @@ import com.intrasoft.csp.anon.commons.model.IntegrationAnonData;
 import com.intrasoft.csp.commons.model.*;
 import com.intrasoft.csp.commons.routes.CamelRoutes;
 import com.intrasoft.csp.server.CspApp;
+import com.intrasoft.csp.server.policy.domain.model.PolicyDTO;
 import com.intrasoft.csp.server.policy.domain.model.SharingPolicyAction;
 import com.intrasoft.csp.server.routes.RouteUtils;
 import com.intrasoft.csp.server.service.CamelRestService;
@@ -30,11 +31,17 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
-
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -141,5 +148,27 @@ public class SharingPolicyServiceTest implements CamelRoutes {
             String anonObjectJsonStrToCompare = objectMapper.writeValueAsString(enhancedTeamDTO.getIntegrationData().getDataObject());
             assertThat(anonObjectJsonStrToCompare,is(anonObjectJsonStrExpected));
         }
+    }
+
+    @Test
+    public void evaluateConditionTest() throws ScriptException {
+        String condition = "function(i,t) i.getDataObject() == t.getCspId()";
+
+        PolicyDTO policyDTO = new PolicyDTO();
+        policyDTO.setCondition(condition);
+
+        Team team = new Team();
+        team.setCspId("testCspId");
+
+        IntegrationData integrationData = new IntegrationData();
+        integrationData.setDataObject("testCspId");
+
+
+        ScriptEngine engine = new ScriptEngineManager().getEngineByName("nashorn");
+        @SuppressWarnings("unchecked")
+        BiFunction<Object, Object, Object> biF = ( BiFunction<Object, Object, Object>)engine.eval(
+                String.format("new java.util.function.BiFunction(%s)", condition));
+
+        assertThat(biF.apply(integrationData,team), is(true));
     }
 }
