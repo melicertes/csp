@@ -4,16 +4,19 @@ import com.intrasoft.csp.anon.commons.exceptions.InvalidDataTypeException;
 import com.intrasoft.csp.anon.commons.model.IntegrationAnonData;
 import com.intrasoft.csp.anon.commons.model.MappingDTO;
 import com.intrasoft.csp.anon.commons.model.RuleSetDTO;
-import com.intrasoft.csp.anon.commons.model.SaveMappingDTO;
 import org.springframework.http.ResponseEntity;
 
+import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 public interface AnonymizationApi {
     /**
      * Anonymize data
+     * @return IntegrationAnonDAta with anonymized dataObject
      * */
-    ResponseEntity<String> postAnonData(IntegrationAnonData integrationAnonData) throws InvalidDataTypeException;
+    IntegrationAnonData postAnonData(IntegrationAnonData integrationAnonData) throws InvalidDataTypeException, NoSuchAlgorithmException, InvalidKeyException, IOException;
 
     /**
      * CRUD management for ruleSet

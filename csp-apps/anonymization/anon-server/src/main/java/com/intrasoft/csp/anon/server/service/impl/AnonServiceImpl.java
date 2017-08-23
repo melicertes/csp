@@ -10,14 +10,17 @@ import com.intrasoft.csp.anon.server.model.RuleSet;
 import com.intrasoft.csp.anon.server.repository.MappingRepository;
 import com.intrasoft.csp.anon.server.repository.RuleSetRepository;
 import com.intrasoft.csp.anon.server.service.AnonService;
+import com.intrasoft.csp.anon.server.service.ApiDataHandler;
 import com.intrasoft.csp.anon.server.utils.Conversions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,9 +34,12 @@ public class AnonServiceImpl implements AnonService,Conversions {
     @Autowired
     MappingRepository mappingRepository;
 
+    @Autowired
+    ApiDataHandler apiDataHandler;
+
     @Override
-    public ResponseEntity<String> postAnonData(IntegrationAnonData integrationAnonData) throws InvalidDataTypeException {
-        return null;
+    public IntegrationAnonData postAnonData(IntegrationAnonData integrationAnonData) throws InvalidDataTypeException, NoSuchAlgorithmException, InvalidKeyException, IOException {
+        return apiDataHandler.handleAnonIntegrationData(integrationAnonData);
     }
 
     @Override

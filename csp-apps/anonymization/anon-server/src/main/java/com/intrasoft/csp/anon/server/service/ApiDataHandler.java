@@ -3,6 +3,7 @@ package com.intrasoft.csp.anon.server.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.intrasoft.csp.anon.commons.exceptions.AnonException;
+import com.intrasoft.csp.anon.commons.exceptions.InvalidDataTypeException;
 import com.intrasoft.csp.anon.commons.exceptions.MappingNotFoundForGivenTupleException;
 import com.intrasoft.csp.anon.commons.model.IntegrationAnonData;
 import com.intrasoft.csp.anon.server.model.Rule;
@@ -64,16 +65,17 @@ public class ApiDataHandler {
      * @throws InvalidKeyException
      * @throws IOException
      */
-    public ResponseEntity<?> handleAnonIntegrationData(IntegrationAnonData integrationAnonData) throws NoSuchAlgorithmException, InvalidKeyException, IOException {
+
+    public IntegrationAnonData handleAnonIntegrationData(IntegrationAnonData integrationAnonData) throws NoSuchAlgorithmException, InvalidKeyException, IOException {
 
         String cspId = integrationAnonData.getCspId();
         IntegrationDataType dataType = integrationAnonData.getDataType();
         if (dataType == null){
-            throw new AnonException("Invalid dataType");
+            throw new InvalidDataTypeException(HttpStatusResponseType.UNSUPPORTED_DATA_TYPE.getReasonPhrase());
         }
 
         if (cspId == null || cspId.equals("")){
-            throw new AnonException("cspId cannot be empty.");
+            throw new AnonException(HttpStatusResponseType.MALFORMED_INTEGRATION_DATA_STRUCTURE.getReasonPhrase());
         }
 
         Rules rules = rulesService.getRule(dataType, cspId);
@@ -81,9 +83,8 @@ public class ApiDataHandler {
             throw new MappingNotFoundForGivenTupleException(HttpStatusResponseType.MAPPING_NOT_FOUND_FOR_GIVEN_TUPLE.getReasonPhrase());
         }
 
-        JsonNode out = integrationAnonData.getDataObject();
-        ObjectMapper mapper = new ObjectMapper();
-        HashMap<String, String> jpointers = new HashMap<>();
+        JsonNode out = mapper.valueToTree(integrationAnonData.getDataObject());
+
         for (Rule rule : rules.getRules()){
             if (rule.getField().contains("[*]")){
                 List<String> vals = JsonPath.using(configuration).parse(out).read(rule.getField(), new TypeRef<List<String>>(){});
@@ -103,7 +104,7 @@ public class ApiDataHandler {
         }
 
         integrationAnonData.setDataObject(out);
-        return new ResponseEntity<>(integrationAnonData, HttpStatus.OK);
+        return integrationAnonData;
     }
 
     /**

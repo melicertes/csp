@@ -5,6 +5,7 @@ import com.intrasoft.csp.anon.commons.model.RuleSetDTO;
 import com.intrasoft.csp.anon.commons.model.SaveMappingDTO;
 import com.intrasoft.csp.anon.server.service.AnonService;
 import com.intrasoft.csp.commons.model.IntegrationDataType;
+import org.hibernate.exception.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.List;
 
@@ -24,7 +26,9 @@ import java.util.List;
 @Controller
 public class MappingsController {
 
-    private static final Logger LOG = LoggerFactory.getLogger(MappingsController.class);
+//    private static final Logger LOG = LoggerFactory.getLogger(MappingsController.class);
+    private static Logger LOG_AUDIT = LoggerFactory.getLogger("audit-log");
+    private static Logger LOG_EXCEPTION = LoggerFactory.getLogger("exc-log");
 
     @Autowired
     AnonService anonService;
@@ -54,14 +58,14 @@ public class MappingsController {
         ModelAndView mav = new ModelAndView("pages/mappings");
         mav.addObject("mappings", getMappings());
         MappingDTO mapping = anonService.getMappingById(id);
-        LOG.info(mapping.toString());
+        LOG_AUDIT.info("UI: GET mapping " + mapping.toString());
         mav.addObject("mapping", new SaveMappingDTO(mapping.getId(),mapping.getCspId(),mapping.getRuleSetDTO().getId(),mapping.getDataType()));
         return mav;
     }
 
     @PostMapping("/mapping/save")
     public ModelAndView addMapping(RedirectAttributes redirect, @ModelAttribute("mapping") SaveMappingDTO mapping, BindingResult bindingResult) throws IOException {
-        LOG.info("CREATE mapping: " + mapping.toString());
+        LOG_AUDIT.info("UI: CREATE mapping: " + mapping.toString());
         if (bindingResult.hasErrors()) {
             return new ModelAndView("pages/mappings");
         }
@@ -73,11 +77,10 @@ public class MappingsController {
 
     @GetMapping("/mapping/delete/{id}")
     public ModelAndView deleteMapping(@PathVariable Long id, RedirectAttributes redirect) throws IOException {
-        LOG.info("DELETE mapping with id: " + id);
+        LOG_AUDIT.info("UI: DELETE mapping with id: " + id);
         anonService.deleteMapping(id);
         ModelAndView mav = new ModelAndView("redirect:/mappings");
         redirect.addFlashAttribute("msg", "Mapping deleted");
         return mav;
     }
-
 }
