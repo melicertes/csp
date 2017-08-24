@@ -7,6 +7,7 @@ import com.intrasoft.csp.commons.exceptions.InvalidSharingParamsException;
 import com.intrasoft.csp.commons.model.*;
 import com.intrasoft.csp.commons.routes.CamelRoutes;
 import com.intrasoft.csp.libraries.restclient.exceptions.CspBusinessException;
+import com.intrasoft.csp.server.policy.domain.model.EvaluatedPolicyDTO;
 import com.intrasoft.csp.server.policy.domain.model.SharingPolicyAction;
 import com.intrasoft.csp.server.policy.service.SharingPolicyService;
 import com.intrasoft.csp.server.service.CamelRestService;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.PostConstruct;
+import javax.script.ScriptException;
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -211,7 +213,20 @@ public class TcProcessor implements Processor,CamelRoutes{
          * -share anonymized
          * -dont share
          */
-        SharingPolicyAction sharingPolicyAction = sharingPolicyService.evaluate(integrationData.getDataType());
+        EvaluatedPolicyDTO evaluatedPolicyDTO = sharingPolicyService.evaluate(integrationData.getDataType());
+        SharingPolicyAction sharingPolicyAction = evaluatedPolicyDTO.getSharingPolicyAction();
+        try {
+            if(evaluatedPolicyDTO.getPolicyDTO()!=null){
+                Boolean evaluatedPolicyCondition = sharingPolicyService.checkCondition(evaluatedPolicyDTO.getPolicyDTO().getCondition(),integrationData,team);
+                LOG.info(String.format("evaluatedPolicyCondition(%s) = %b",evaluatedPolicyDTO.getPolicyDTO().getCondition(),evaluatedPolicyCondition));
+            }else{
+                LOG.warn("Could not find a condition in the EvaluatedPolicyDTO.");
+                //TODO: How to handle this?
+            }
+        } catch (ScriptException e) {
+            //TODO: how to handle this?
+            LOG.error("Error while evaluating policy condition",e);
+        }
         switch (sharingPolicyAction){
             case SHARE_AS_IS:
                 break;

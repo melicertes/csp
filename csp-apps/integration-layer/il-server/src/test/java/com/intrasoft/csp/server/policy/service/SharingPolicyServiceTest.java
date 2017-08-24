@@ -9,6 +9,7 @@ import com.intrasoft.csp.server.CspApp;
 import com.intrasoft.csp.server.policy.domain.exception.CouldNotDeleteException;
 import com.intrasoft.csp.server.policy.domain.exception.PolicyNotFoundException;
 import com.intrasoft.csp.server.policy.domain.exception.PolicySaveException;
+import com.intrasoft.csp.server.policy.domain.model.EvaluatedPolicyDTO;
 import com.intrasoft.csp.server.policy.domain.model.PolicyDTO;
 import com.intrasoft.csp.server.policy.domain.model.SharingPolicyAction;
 import com.intrasoft.csp.server.routes.RouteUtils;
@@ -137,14 +138,17 @@ public class SharingPolicyServiceTest implements CamelRoutes {
     @DirtiesContext
     @Test
     public void evaluateTest(){
-        SharingPolicyAction action = sharingPolicyService.evaluate(IntegrationDataType.ARTEFACT);
+        EvaluatedPolicyDTO evaluatedPolicyDTO = sharingPolicyService.evaluate(IntegrationDataType.ARTEFACT);
+        SharingPolicyAction action = evaluatedPolicyDTO.getSharingPolicyAction();
         assertThat(action, is(SharingPolicyAction.NO_ACTION_FOUND));
     }
 
     @DirtiesContext
     @Test
     public void dslFlow1TestUsingCamelEndpoint() throws Exception {
-        Mockito.when(sharingPolicyService.evaluate(eq(IntegrationDataType.INCIDENT))).thenReturn(SharingPolicyAction.SHARE_ANONYMIZED);
+        EvaluatedPolicyDTO evaluatedPolicyDTO = new EvaluatedPolicyDTO();
+        evaluatedPolicyDTO.setSharingPolicyAction(SharingPolicyAction.SHARE_ANONYMIZED);
+        Mockito.when(sharingPolicyService.evaluate(eq(IntegrationDataType.INCIDENT))).thenReturn(evaluatedPolicyDTO);
         mockUtils.sendFlow1IntegrationData(mvc,false);
 
         mockedEcsp.expectedMessageCount(3);
@@ -217,7 +221,7 @@ public class SharingPolicyServiceTest implements CamelRoutes {
 
     @DirtiesContext
     @Test
-    public void evaluateConditionTest() throws ScriptException {
+    public void checkConditionTest() throws ScriptException {
         String condition = "function(i,t) i.getDataObject() == t.getCspId()";
 
         PolicyDTO policyDTO = new PolicyDTO();
@@ -229,13 +233,7 @@ public class SharingPolicyServiceTest implements CamelRoutes {
         IntegrationData integrationData = new IntegrationData();
         integrationData.setDataObject("testCspId");
 
-
-        ScriptEngine engine = new ScriptEngineManager().getEngineByName("nashorn");
-        @SuppressWarnings("unchecked")
-        BiFunction<Object, Object, Object> biF = ( BiFunction<Object, Object, Object>)engine.eval(
-                String.format("new java.util.function.BiFunction(%s)", condition));
-
-        assertThat(biF.apply(integrationData,team), is(true));
+        assertThat(sharingPolicyService.checkCondition(condition,integrationData,team), is(true));
     }
 
     @DirtiesContext

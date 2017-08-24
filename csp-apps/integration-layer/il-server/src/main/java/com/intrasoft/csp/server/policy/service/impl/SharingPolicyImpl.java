@@ -1,10 +1,13 @@
 package com.intrasoft.csp.server.policy.service.impl;
 
+import com.intrasoft.csp.commons.model.IntegrationData;
 import com.intrasoft.csp.commons.model.IntegrationDataType;
+import com.intrasoft.csp.commons.model.Team;
 import com.intrasoft.csp.server.policy.domain.entity.Policy;
 import com.intrasoft.csp.server.policy.domain.exception.CouldNotDeleteException;
 import com.intrasoft.csp.server.policy.domain.exception.PolicyNotFoundException;
 import com.intrasoft.csp.server.policy.domain.exception.PolicySaveException;
+import com.intrasoft.csp.server.policy.domain.model.EvaluatedPolicyDTO;
 import com.intrasoft.csp.server.policy.domain.model.PolicyDTO;
 import com.intrasoft.csp.server.policy.domain.model.SharingPolicyAction;
 import com.intrasoft.csp.server.policy.domain.repository.PolicyRepository;
@@ -16,9 +19,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.util.StringUtils;
 
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
 public class SharingPolicyImpl implements SharingPolicyService, Conversions{
@@ -46,15 +53,15 @@ public class SharingPolicyImpl implements SharingPolicyService, Conversions{
     }
 
     @Override
-    public SharingPolicyAction evaluate(IntegrationDataType integrationDataType) {
+    public EvaluatedPolicyDTO evaluate(IntegrationDataType integrationDataType) {
         List<Policy> list = policyRepository.findByIntegrationDataType(integrationDataType);
         Optional<Policy> appliedPolicy = list.stream()
                 .filter(p->p.getActive()!=null && p.getActive())
                 .max(Comparator.comparing(p->p.getSharingPolicyAction().priority()));//get the action with the highest priority
         if(!appliedPolicy.isPresent()) {
-            return SharingPolicyAction.NO_ACTION_FOUND;
+            return new EvaluatedPolicyDTO(SharingPolicyAction.NO_ACTION_FOUND, null);
         }else{
-            return appliedPolicy.get().getSharingPolicyAction();
+            return new EvaluatedPolicyDTO(appliedPolicy.get().getSharingPolicyAction(),convertPolicyToDTO.apply(appliedPolicy.get()));
         }
     }
 
@@ -113,5 +120,15 @@ public class SharingPolicyImpl implements SharingPolicyService, Conversions{
             throw new PolicyNotFoundException("Could not find a policy with this id: "+id);
         }
         return convertPolicyToDTO.apply(policy);
+    }
+
+    @Override
+    public Boolean checkCondition(String condition, IntegrationData integrationData, Team team) throws ScriptException {
+        ScriptEngine engine = new ScriptEngineManager().getEngineByName("nashorn");
+        @SuppressWarnings("unchecked")
+        BiFunction<Object, Object, Object> biF = ( BiFunction<Object, Object, Object>)engine.eval(
+                String.format("new java.util.function.BiFunction(%s)", condition));
+        Boolean ret = (Boolean) biF.apply(integrationData,team);
+        return ret;
     }
 }
