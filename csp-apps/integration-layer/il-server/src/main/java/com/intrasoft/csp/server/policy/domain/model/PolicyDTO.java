@@ -4,11 +4,27 @@ import com.intrasoft.csp.commons.model.IntegrationDataType;
 
 public class PolicyDTO {
     Integer id;
+    Boolean active;
     IntegrationDataType integrationDataType;
     String condition;
     SharingPolicyAction sharingPolicyAction;
 
     public PolicyDTO() {
+    }
+
+    public PolicyDTO(Integer id, Boolean active, IntegrationDataType integrationDataType, String condition, SharingPolicyAction sharingPolicyAction) {
+        this.id = id;
+        this.active = active;
+        this.integrationDataType = integrationDataType;
+        this.condition = condition;
+        this.sharingPolicyAction = sharingPolicyAction;
+    }
+
+    public PolicyDTO(Boolean active, IntegrationDataType integrationDataType, String condition, SharingPolicyAction sharingPolicyAction) {
+        this.active = active;
+        this.integrationDataType = integrationDataType;
+        this.condition = condition;
+        this.sharingPolicyAction = sharingPolicyAction;
     }
 
     public Integer getId() {
@@ -25,6 +41,14 @@ public class PolicyDTO {
 
     public void setIntegrationDataType(IntegrationDataType integrationDataType) {
         this.integrationDataType = integrationDataType;
+    }
+
+    public Boolean getActive() {
+        return active;
+    }
+
+    public void setActive(Boolean active) {
+        this.active = active;
     }
 
     public String getCondition() {
