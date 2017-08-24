@@ -48,7 +48,9 @@ public class SharingPolicyImpl implements SharingPolicyService, Conversions{
     @Override
     public SharingPolicyAction evaluate(IntegrationDataType integrationDataType) {
         List<Policy> list = policyRepository.findByIntegrationDataType(integrationDataType);
-        Optional<Policy> appliedPolicy = list.stream().max(Comparator.comparing(p->p.getSharingPolicyAction().priority()));
+        Optional<Policy> appliedPolicy = list.stream()
+                .filter(p->p.getActive()!=null && p.getActive())
+                .max(Comparator.comparing(p->p.getSharingPolicyAction().priority()));//get the action with the highest priority
         if(!appliedPolicy.isPresent()) {
             return SharingPolicyAction.NO_ACTION_FOUND;
         }else{
@@ -97,6 +99,11 @@ public class SharingPolicyImpl implements SharingPolicyService, Conversions{
         }catch (EmptyResultDataAccessException e){
             throw new CouldNotDeleteException(String.format("Could not delete policy with this id: %d. Does it exist?",id));
         }
+    }
+
+    @Override
+    public void deleteAllPolicies() {
+        policyRepository.deleteAll();
     }
 
     @Override

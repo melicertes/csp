@@ -15,5 +15,6 @@ public interface SharingPolicyService {
     SharingPolicyAction evaluate(IntegrationDataType integrationDataType);
     PolicyDTO savePolicy(PolicyDTO policyDTO) throws PolicySaveException;
     void deletePolicy(Integer id);
+    void deleteAllPolicies();
     PolicyDTO getPolicyById(Integer id) throws PolicyNotFoundException;
 }

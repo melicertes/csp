@@ -6,7 +6,6 @@ import com.intrasoft.csp.anon.commons.model.IntegrationAnonData;
 import com.intrasoft.csp.commons.model.*;
 import com.intrasoft.csp.commons.routes.CamelRoutes;
 import com.intrasoft.csp.server.CspApp;
-import com.intrasoft.csp.server.policy.domain.entity.Policy;
 import com.intrasoft.csp.server.policy.domain.exception.CouldNotDeleteException;
 import com.intrasoft.csp.server.policy.domain.exception.PolicyNotFoundException;
 import com.intrasoft.csp.server.policy.domain.exception.PolicySaveException;
@@ -35,24 +34,20 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.core.env.Environment;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
-import java.math.BigDecimal;
 import java.util.Comparator;
 import java.util.List;
 import java.util.function.BiFunction;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.*;
@@ -112,6 +107,7 @@ public class SharingPolicyServiceTest implements CamelRoutes {
     Environment environment;
 
     DataParams anonObject;
+
     @Before
     public void init() throws Exception {
         mvc = webAppContextSetup(webApplicationContext).build();
@@ -138,6 +134,7 @@ public class SharingPolicyServiceTest implements CamelRoutes {
         Mockito.when(anonClient.postAnonData(anyObject())).thenReturn(integrationAnonData);
     }
 
+    @DirtiesContext
     @Test
     public void evaluateTest(){
         SharingPolicyAction action = sharingPolicyService.evaluate(IntegrationDataType.ARTEFACT);
@@ -165,12 +162,21 @@ public class SharingPolicyServiceTest implements CamelRoutes {
         }
     }
 
+    @DirtiesContext
     @Test
     public void evaluatePolicyTest() throws Exception {
         String condition = "function(i,t) i.getDataObject() == t.getCspId()";
         PolicyDTO newPolicyDTO = new PolicyDTO();
         newPolicyDTO.setActive(true);
         newPolicyDTO.setSharingPolicyAction(SharingPolicyAction.SHARE_ANONYMIZED);
+        newPolicyDTO.setIntegrationDataType(IntegrationDataType.INCIDENT);
+        newPolicyDTO.setCondition(condition);
+        sharingPolicyService.savePolicy(newPolicyDTO);
+
+        //ADD A NOT ACTIVE POLICY WITH HIGHEST PRIORITY to test it will not trigger
+        newPolicyDTO = new PolicyDTO();
+        newPolicyDTO.setActive(false);
+        newPolicyDTO.setSharingPolicyAction(SharingPolicyAction.SHARE_AS_IS);
         newPolicyDTO.setIntegrationDataType(IntegrationDataType.INCIDENT);
         newPolicyDTO.setCondition(condition);
         sharingPolicyService.savePolicy(newPolicyDTO);
@@ -192,6 +198,7 @@ public class SharingPolicyServiceTest implements CamelRoutes {
         }
     }
 
+    @DirtiesContext
     @Test
     public void evaluatePolicyDoNotShareTest() throws Exception {
         String condition = "function(i,t) i.getDataObject() == t.getCspId()";
@@ -208,6 +215,7 @@ public class SharingPolicyServiceTest implements CamelRoutes {
         mockedEcsp.assertIsSatisfied();
     }
 
+    @DirtiesContext
     @Test
     public void evaluateConditionTest() throws ScriptException {
         String condition = "function(i,t) i.getDataObject() == t.getCspId()";
@@ -230,6 +238,7 @@ public class SharingPolicyServiceTest implements CamelRoutes {
         assertThat(biF.apply(integrationData,team), is(true));
     }
 
+    @DirtiesContext
     @Test
     public void policyNotFoundExceptionTest(){
         Integer id = 123456;
@@ -241,6 +250,7 @@ public class SharingPolicyServiceTest implements CamelRoutes {
         }
     }
 
+    @DirtiesContext
     @Test
     public void policySaveExceptionTest(){
         try {
@@ -253,6 +263,7 @@ public class SharingPolicyServiceTest implements CamelRoutes {
         }
     }
 
+    @DirtiesContext
     @Test
     public void policyCouldNotDeleteExceptionTest(){
         Integer id = 12345678;
@@ -264,6 +275,7 @@ public class SharingPolicyServiceTest implements CamelRoutes {
         }
     }
 
+    @DirtiesContext
     @Test
     public void savePolicyAndGetByIdTest(){
         String condition = "test condition";
@@ -300,6 +312,7 @@ public class SharingPolicyServiceTest implements CamelRoutes {
         assertThat(dto.getId(),is(savedDto.getId()));
     }
 
+    @DirtiesContext
     @Test
     public void deletePolicyTest(){
         PolicyDTO newPolicyDTO = new PolicyDTO();
@@ -320,6 +333,7 @@ public class SharingPolicyServiceTest implements CamelRoutes {
         }
     }
 
+    @DirtiesContext
     @Test
     public void getAllPoliciesTest(){
         List<PolicyDTO> list = sharingPolicyService.getPolicies();
@@ -362,6 +376,7 @@ public class SharingPolicyServiceTest implements CamelRoutes {
 
     }
 
+    @DirtiesContext
     @Test
     public void getPolicyByActionTest(){
         PolicyDTO newPolicyDTO = new PolicyDTO();
@@ -388,6 +403,7 @@ public class SharingPolicyServiceTest implements CamelRoutes {
         assertThat(list.get(0).getId(),is(1));
     }
 
+    @DirtiesContext
     @Test
     public void getPolicyByDataTypeTest(){
         PolicyDTO newPolicyDTO = new PolicyDTO();
@@ -412,5 +428,30 @@ public class SharingPolicyServiceTest implements CamelRoutes {
         assertThat(list.get(0).getIntegrationDataType(),is(IntegrationDataType.ARTEFACT));
         assertThat(list.get(0).getCondition(),is("condition2"));
         assertThat(list.get(0).getId(),is(2));
+    }
+
+    @DirtiesContext
+    @Test
+    public void deleteAllPoliciesTest(){
+        PolicyDTO newPolicyDTO = new PolicyDTO();
+        newPolicyDTO.setActive(true);
+        newPolicyDTO.setSharingPolicyAction(SharingPolicyAction.SHARE_ANONYMIZED);
+        newPolicyDTO.setIntegrationDataType(IntegrationDataType.CONTACT);
+        newPolicyDTO.setCondition("condition");
+        sharingPolicyService.savePolicy(newPolicyDTO);
+
+        newPolicyDTO = new PolicyDTO();
+        newPolicyDTO.setActive(false);
+        newPolicyDTO.setSharingPolicyAction(SharingPolicyAction.SHARE_AS_IS);
+        newPolicyDTO.setIntegrationDataType(IntegrationDataType.ARTEFACT);
+        newPolicyDTO.setCondition("condition2");
+        sharingPolicyService.savePolicy(newPolicyDTO);
+
+        List<PolicyDTO> list = sharingPolicyService.getPolicies();
+        assertThat(list.size(),is(2));
+        sharingPolicyService.deleteAllPolicies();
+        list = sharingPolicyService.getPolicies();
+        assertThat(list.size(),is(0));
+
     }
 }
