@@ -1,0 +1,29 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="layout/main">
+<head>
+    <title th:text="#{home.title}"></title>
+</head>
+
+<th:block layout:fragment="main-content">
+
+    <div class="row">
+        <div class="col-md-12">
+            <p>&nbsp;</p>
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="col-md-12">
+            <h2 class="page-header"><i class="fa fa-list"></i>
+                <span th:text="#{welcome.message}"></span>
+            </h2>
+        </div>
+    </div>
+
+
+
+</th:block>
+</html>
