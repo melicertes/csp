@@ -23,7 +23,115 @@
         </div>
     </div>
 
-
-
+    <div class = "alert alert-success" th:if="${msg}">
+        <span th:text="${msg}"></span>
+    </div>
+    <div class="row">
+        <div class="col-md-12 col-sm-12">
+            <div class="row" data-duplicate="contact" data-duplicate-min="2" data-duplicate-max="10">
+                <form th:action="@{/policies/save}" th:object="${policy}" enctype="multipart/form-data" method="post">
+                    <input class="form-control" th:field="*{id}" name="id" type="hidden"/>
+                    <div class="col-md-2 col-xs-12">
+                        <label>Data Type:</label>
+                        <div class="input-group" style="width: 100%;">
+                            <select th:field="*{integrationDataType}" class="form-control">
+                                <option th:value="${null}" th:text="${'- select datatype -'}" th:selected="selected"></option>
+                                <option th:each="integrationDataType : ${integrationDataTypes}"
+                                        th:value="${integrationDataType.name()}"
+                                        th:text="${integrationDataType}">
+                                </option>
+                            </select>
+                            <span th:if="${#fields.hasErrors('integrationDataType')}" th:errors="*{integrationDataType}">integrationDataType Error</span>
+                        </div>
+                    </div>
+                    <div class="col-md-2 col-xs-12">
+                        <div class="form-group">
+                            <label>Active:</label>
+                            <select th:field="*{active}" class="form-control">
+                                <option th:value="${null}" th:text="${'-'}" th:selected="selected"></option>
+                                <option value="true">true</option>
+                                <option value="false">false</option>
+                            </select>
+                            <span th:if="${#fields.hasErrors('active')}" th:errors="*{active}">Active Error</span>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-xs-12">
+                        <div class="form-group">
+                            <label>Condition:</label>
+                            <input class="form-control" th:field="*{condition}" name="condition" type="text"/>
+                            <span th:if="${#fields.hasErrors('condition')}" th:errors="*{condition}">condition Error</span>
+                        </div>
+                    </div>
+                    <div class="col-md-2 col-xs-12">
+                        <label>Sharing Policy Action:</label>
+                        <div class="input-group" style="width: 100%;">
+                            <select th:field="*{sharingPolicyAction}" class="form-control" th:selected="null">
+                                <option th:value="${null}" th:text="${' - select action - '}" th:selected="selected"></option>
+                                <option th:each="sharingPolicyAction : ${sharingPolicyActions}"
+                                        th:value="${sharingPolicyAction.name()}"
+                                        th:text="${sharingPolicyAction.text()}" th:if="${sharingPolicyAction.name() != 'NO_ACTION_FOUND'}">
+                                </option>
+                            </select>
+                            <span th:if="${#fields.hasErrors('sharingPolicyAction')}" th:errors="*{sharingPolicyAction}">sharingPolicyAction Error</span>
+                        </div>
+                    </div>
+                    <div class="col-md-2 col-xs-12" style="text-align: right">
+                        <div class="form-group">
+                            <p>&nbsp;</p>
+                            <button type="submit" value="Submit" class="save btn btn-success"><i class="glyphicon glyphicon-plus"></i>&nbsp;Save</button>&nbsp;
+                            <button type="reset" value="Reset" class="save btn btn-default pull-right" onclick="window.location='/policies'">Clear</button>
+                        </div>
+                    </div>
+                </form>
+                <div class="row">
+                    <div class="col-md-12">
+                        <table data-toggle="table" data-page-size="20" data-pagination="true">
+                            <thead>
+                            <tr>
+                                <!--<th><i class="fa  fa-file-code-o"></i></th>-->
+                                <th data-sortable="true"><i class="fa  fa-file-code-o"></i> Id</th>
+                                <th data-sortable="true">DataType</th>
+                                <th data-sortable="true">Active</th>
+                                <th data-sortable="true">Condition</th>
+                                <th data-sortable="true">Sharing Policy Action</th>
+                                <th>Actions</th>
+                            </tr>
+                            </thead>
+                            <tr th:id="${policy.id}" th:each="policy,iterStat: ${policies}">
+                                <!--/*<td th:text="${iterStat.count}"></td>*/-->
+                                <td th:text="${policy.id}"></td>
+                                <td th:text="${policy.integrationDataType}"></td>
+                                <td th:text="${policy.active}"></td>
+                                <td th:text="${policy.condition}"></td>
+                                <td th:text="${policy.sharingPolicyAction.text()}"></td>
+                                <td><a th:href="'#'+${policy.id}"  data-toggle="modal" ><i class="fa fa-trash" aria-hidden="true"></i></a>
+                                    <a th:href="'/policies/'+${policy.id}"><i class="fa fa-edit" aria-hidden="true"></i></a></td>
+                                <!-- Modal -->
+                                <div class="modal fade" th:id="${policy.id}" aria-labelledby="tiketLabel" tabindex="-1" role="dialog" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                                                <h4 class="modal-title" id="tiketLabel"><span th:text="Confirm"></span></h4>
+                                            </div>
+                                            <div class="modal-body">
+                                                <h4 class="modal-title" th:id="tiketLabel">Are you sure you want to delete policy for id
+                                                    <span th:text="${policy.id}"></span> and datatype <span th:text="${policy.integrationDataType}"></span> ?
+                                                </h4>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <a th:href="@{'/policies/delete/' + ${policy.id}}" class="btn btn-danger pull-left">Delete</a>
+                                                <button class="btn btn-default pull-right" data-dismiss="modal">No</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </th:block>
 </html>

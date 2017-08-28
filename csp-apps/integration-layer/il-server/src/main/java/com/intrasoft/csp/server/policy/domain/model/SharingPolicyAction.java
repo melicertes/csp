@@ -1,18 +1,21 @@
 package com.intrasoft.csp.server.policy.domain.model;
 
 public enum SharingPolicyAction {
-    SHARE_AS_IS(3), //highest priority
-    SHARE_ANONYMIZED(2),
-    DO_NOT_SHARE(1), //lowest priority
-    NO_ACTION_FOUND(0);
+    SHARE_AS_IS(3,"Share as is"), //highest priority
+    SHARE_ANONYMIZED(2 ,"Share anonymized"),
+    DO_NOT_SHARE(1, "Do not share"), //lowest priority
+    NO_ACTION_FOUND(0, "No action found");
 
     Integer priority;
+    String text;
 
-    SharingPolicyAction(Integer priority) {
+    SharingPolicyAction(Integer priority, String text) {
         this.priority = priority;
+        this.text = text;
     }
 
     public int priority() {
         return this.priority;
     }
+    public String text() { return this.text; }
 }
