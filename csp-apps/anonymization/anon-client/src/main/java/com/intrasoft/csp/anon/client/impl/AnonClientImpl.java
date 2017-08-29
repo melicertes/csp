@@ -14,9 +14,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
 
 import java.util.Arrays;
 import java.util.List;
@@ -62,16 +59,16 @@ public class AnonClientImpl implements AnonClient, AnonContextUrl {
     @Override
     public List<RuleSetDTO> getAllRuleSet() {
         final String url = apiVersionClient.getApiUrl() + "/"+GET_ALL_RULESET;
-        LOG.info("Get all ruleSet call [post]: " + url);
+        LOG.info("Get all ruleSet call [get]: " + url);
         List<RuleSetDTO> response = Arrays.asList(retryRestTemplate.getForObject(url, RuleSetDTO[].class));
         return response;
     }
 
     @Override
     public RuleSetDTO getRuleSetById(Long id) {
-        final String url = apiVersionClient.getApiUrl() + "/"+GET_RULESET+"/{id}";
-        LOG.info("Get all ruleSet call [post]: " + url);
-        RuleSetDTO response = retryRestTemplate.getForObject(url, RuleSetDTO.class,id);
+        final String url = apiVersionClient.getApiUrl() + "/"+GET_RULESET+"/" + id;
+        LOG.info("Get ruleSet call [get]: " + url);
+        RuleSetDTO response = retryRestTemplate.getForObject(url, RuleSetDTO.class);
         return response;
     }
 
