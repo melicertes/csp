@@ -83,7 +83,7 @@ public class AnonApiTest implements AnonContextUrl {
             IntegrationAnonData anonData = anonClient.postAnonData(integrationAnonData);
             String response = objectMapper.writeValueAsString(anonData.getDataObject());
             Assert.assertThat(response, containsString("\"short_name\":\"*******\""));
-            Assert.assertThat(response, containsString("\"description\":\"*******\""));
+            Assert.assertThat(response, containsString("\"created\":\"##########\""));
         } catch (MappingNotFoundForGivenTupleException e) {
             Assert.fail(HttpStatusResponseType.MAPPING_NOT_FOUND_FOR_GIVEN_TUPLE.getReasonPhrase());
         }

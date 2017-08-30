@@ -20,8 +20,8 @@ public class Helper {
         Rules rules = new Rules();
         List<Rule> ruleList = new ArrayList<>();
         ruleList.add(new Rule("$.trustcircle.short_name", "anon", "string"));
-        ruleList.add(new Rule("$.trustcircle.created", "pseudo", "string"));
-        ruleList.add(new Rule("$.trustcircle.teams[*].description", "anon", "string"));
+        ruleList.add(new Rule("$.trustcircle.created", "anon", "numeric"));
+        ruleList.add(new Rule("$.trustcircle.teams[*].description", "pseudo", "string"));
         ruleList.add(new Rule("$.trustcircle.teams[*].theip", "anon", "ip"));
         ruleList.add(new Rule("$.trustcircle.teams[*].theemail", "anon", "email"));
         rules.setRules(ruleList);
