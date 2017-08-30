@@ -90,7 +90,7 @@ public class AnonClientImpl implements AnonClient, AnonContextUrl {
     @Override
     public MappingDTO getMappingById(Long id) {
         final String url = apiVersionClient.getApiUrl() + "/"+GET_MAPPING+"/{id}";
-        LOG.info("Get all ruleSet call [post]: " + url);
+        LOG.info("Get ruleSet by id call [post]: " + url);
         MappingDTO response = retryRestTemplate.getForObject(url, MappingDTO.class,id);
         return response;
     }

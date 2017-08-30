@@ -20,6 +20,14 @@ public class Rules {
     @JsonProperty("rules")
     public List<Rule> rules = new ArrayList<>();
 
+    public Rules() {
+        super();
+    }
+
+    public Rules(List<Rule> rules) {
+        this.rules = rules;
+    }
+
     public List<Rule> getRules() {
         return rules;
     }

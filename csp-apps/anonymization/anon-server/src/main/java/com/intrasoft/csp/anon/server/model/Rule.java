@@ -19,6 +19,10 @@ public class Rule {
     @JsonProperty("fieldtype")
     private String fieldType;
 
+    public Rule() {
+        super();
+    }
+
     public Rule(String field, String action, String fieldType) {
         this.field = field;
         this.action = action;

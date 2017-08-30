@@ -1,4 +1,4 @@
-package com.intrasoft.csp.anon.integrationtests.sandbox.client;
+package com.intrasoft.csp.anon.integrationtests.business;
 
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -25,6 +25,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.intrasoft.csp.anon.integrationtests.business.utils.Helper.createRuleset;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertThat;
 
@@ -55,9 +56,6 @@ public class RulesetsApiTest implements AnonContextUrl {
     @Qualifier("anonClient")
     AnonClient anonClient;
 
-    @Autowired
-    ObjectMapper objectMapper;
-
     @Test
     @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
     public void saveRuleset() throws JsonProcessingException {
@@ -80,14 +78,12 @@ public class RulesetsApiTest implements AnonContextUrl {
         // Given
         RuleSetDTO ruleSetDTO = createRuleset();
         ruleSetDTO = anonClient.saveRuleSet(ruleSetDTO);
-        LOG.info(ruleSetDTO.toString());
 
         // When
         RuleSetDTO fetchedRuleSetDTO = anonClient.getRuleSetById(ruleSetDTO.getId());
 
         //Then
         assertThat(fetchedRuleSetDTO.getFilename(), equalTo("TrustCircleRulesFile"));
-        LOG.info(fetchedRuleSetDTO.toString());
     }
 
     @Test
@@ -103,22 +99,6 @@ public class RulesetsApiTest implements AnonContextUrl {
 
         //Then
         assertThat(anonClient.getAllRuleSet().size(), equalTo(0));
-    }
-
-    public RuleSetDTO createRuleset() throws JsonProcessingException {
-        Rules rules = new Rules();
-        List<Rule> ruleList = new ArrayList<>();
-        ruleList.add(new Rule("$.trustcircle.short_name", "anon", "string"));
-        ruleList.add(new Rule("$.trustcircle.created", "pseudo", "string"));
-        ruleList.add(new Rule("$.trustcircle.teams[*].description", "anon", "string"));
-        ruleList.add(new Rule("$.trustcircle.teams[*].theip", "anon", "ip"));
-        ruleList.add(new Rule("$.trustcircle.teams[*].theemail", "anon", "email"));
-        rules.setRules(ruleList);
-        RuleSetDTO ruleSetDTO = new RuleSetDTO();
-        ruleSetDTO.setFilename("TrustCircleRulesFile");
-        ruleSetDTO.setDescription("Rules to anonymize a trustcircle data object");
-        ruleSetDTO.setFile(objectMapper.writeValueAsBytes(ruleList));
-        return ruleSetDTO;
     }
 
 }
