@@ -3,10 +3,15 @@ package com.intrasoft.csp.anon.server.controller;
 import com.intrasoft.csp.anon.commons.model.RuleSetDTO;
 import com.intrasoft.csp.anon.server.model.RuleSet;
 import com.intrasoft.csp.anon.server.service.AnonService;
+import org.apache.catalina.webresources.FileResource;
+import org.apache.commons.io.FileUtils;
 import org.hibernate.exception.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.data.repository.query.Param;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -16,6 +21,8 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -92,6 +99,17 @@ public class RuleSetController {
         mav.addObject("mappings",anonService.getAllRuleSet());
         redirect.addFlashAttribute("msg", "Ruleset deleted");
         return mav;
+    }
+
+    @GetMapping(value="/rulesets/download", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    @ResponseBody
+    public FileSystemResource downloadFile(@Param(value="id") Long id, HttpServletResponse response) throws IOException {
+        RuleSetDTO ruleset = anonService.getRuleSetById(id);
+        File rulesetFile = new File(ruleset.getFilename());
+        FileUtils.writeByteArrayToFile(rulesetFile, ruleset.getFile());
+        response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
+        response.setHeader("Content-Disposition", "attachment; filename="+ ruleset.getFilename());
+        return new FileSystemResource(rulesetFile);
     }
 
     @ExceptionHandler(ConstraintViolationException.class)

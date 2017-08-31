@@ -77,7 +77,9 @@
                                 <td th:text="${ruleset.filename}"></td>
                                 <td th:text="${ruleset.description}"></td>
                                 <td><a th:href="'#'+${ruleset.id}"  data-toggle="modal" ><i class="fa fa-trash" aria-hidden="true"></i></a>
-                                    <a th:href="'/rulesets/'+${ruleset.id}"><i class="fa fa-edit" aria-hidden="true"></i></a></td>
+                                    <a th:href="'/rulesets/'+${ruleset.id}"><i class="fa fa-edit" aria-hidden="true"></i></a>
+                                    <a th:href="@{|/rulesets/download?id=${ruleset.id}|}"><i class="fa fa-download" aria-hidden="true"></i></a>
+                                </td>
                                 <!-- Modal -->
                                 <div class="modal fade" th:id="${ruleset.id}" aria-labelledby="tiketLabel" tabindex="-1" role="dialog" aria-hidden="true">
                                     <div class="modal-dialog">
