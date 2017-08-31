@@ -20,7 +20,7 @@ import java.util.List;
 @RestController
 public class AnonController implements AnonContextUrl {
 
-    private static Logger LOG_AUDIT = LoggerFactory.getLogger("audit-log");
+    private static Logger LOG = LoggerFactory.getLogger("audit-log");
     private static Logger LOG_EXCEPTION = LoggerFactory.getLogger("exc-log");
 
 
@@ -32,7 +32,6 @@ public class AnonController implements AnonContextUrl {
 
     @RequestMapping(value = "/v"+REST_API_V1+"/"+ANONYMIZE, method = RequestMethod.POST)
     public IntegrationAnonData anonData(@RequestBody IntegrationAnonData integrationAnonData) throws InvalidKeyException, NoSuchAlgorithmException, IOException {
-        LOG_AUDIT.info("Anon Endpoint: POST received");
         return anonService.postAnonData(integrationAnonData);
     }
 

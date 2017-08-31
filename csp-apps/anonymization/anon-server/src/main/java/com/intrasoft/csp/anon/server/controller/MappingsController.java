@@ -26,9 +26,7 @@ import java.util.List;
 @Controller
 public class MappingsController {
 
-//    private static final Logger LOG = LoggerFactory.getLogger(MappingsController.class);
-    private static Logger LOG_AUDIT = LoggerFactory.getLogger("audit-log");
-    private static Logger LOG_EXCEPTION = LoggerFactory.getLogger("exc-log");
+    private static final Logger LOG = LoggerFactory.getLogger(MappingsController.class);
 
     @Autowired
     AnonService anonService;
@@ -58,14 +56,14 @@ public class MappingsController {
         ModelAndView mav = new ModelAndView("pages/mappings");
         mav.addObject("mappings", getMappings());
         MappingDTO mapping = anonService.getMappingById(id);
-        LOG_AUDIT.info("UI: GET mapping " + mapping.toString());
+        LOG.info("UI: GET mapping " + mapping.toString());
         mav.addObject("mapping", new SaveMappingDTO(mapping.getId(),mapping.getCspId(),mapping.getRuleSetDTO().getId(),mapping.getDataType()));
         return mav;
     }
 
     @PostMapping("/mapping/save")
     public ModelAndView addMapping(RedirectAttributes redirect, @ModelAttribute("mapping") SaveMappingDTO mapping, BindingResult bindingResult) throws IOException {
-        LOG_AUDIT.info("UI: CREATE mapping: " + mapping.toString());
+        LOG.info("UI: CREATE mapping: " + mapping.toString());
         if (bindingResult.hasErrors()) {
             return new ModelAndView("pages/mappings");
         }
@@ -77,7 +75,7 @@ public class MappingsController {
 
     @GetMapping("/mapping/delete/{id}")
     public ModelAndView deleteMapping(@PathVariable Long id, RedirectAttributes redirect) throws IOException {
-        LOG_AUDIT.info("UI: DELETE mapping with id: " + id);
+        LOG.info("UI: DELETE mapping with id: " + id);
         anonService.deleteMapping(id);
         ModelAndView mav = new ModelAndView("redirect:/mappings");
         redirect.addFlashAttribute("msg", "Mapping deleted");

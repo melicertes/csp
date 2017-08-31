@@ -68,6 +68,7 @@ public class ApiDataHandler {
 
     public IntegrationAnonData handleAnonIntegrationData(IntegrationAnonData integrationAnonData) throws NoSuchAlgorithmException, InvalidKeyException, IOException {
 
+        LOG.info("Handle integrationData for cspId: " + integrationAnonData.getCspId() + " and " + " dataType " + integrationAnonData.getDataType());
         String cspId = integrationAnonData.getCspId();
         IntegrationDataType dataType = integrationAnonData.getDataType();
         if (dataType == null){
