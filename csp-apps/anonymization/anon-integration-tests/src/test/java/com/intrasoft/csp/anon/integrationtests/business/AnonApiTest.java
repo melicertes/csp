@@ -1,16 +1,24 @@
-package com.intrasoft.csp.anon.integrationtests.sandbox.client;
+package com.intrasoft.csp.anon.integrationtests.business;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.intrasoft.csp.anon.client.AnonClient;
 import com.intrasoft.csp.anon.client.config.AnonClientConfig;
 import com.intrasoft.csp.anon.commons.exceptions.MappingNotFoundForGivenTupleException;
 import com.intrasoft.csp.anon.commons.model.AnonContextUrl;
 import com.intrasoft.csp.anon.commons.model.IntegrationAnonData;
+import com.intrasoft.csp.anon.commons.model.MappingDTO;
+import com.intrasoft.csp.anon.commons.model.RuleSetDTO;
+import com.intrasoft.csp.anon.integrationtests.business.utils.Helper;
 import com.intrasoft.csp.anon.server.AnonApp;
+import com.intrasoft.csp.anon.server.model.Mapping;
+import com.intrasoft.csp.anon.server.model.RuleSet;
 import com.intrasoft.csp.commons.apiHttpStatusResponse.HttpStatusResponseType;
+import com.intrasoft.csp.commons.model.IntegrationDataType;
 import com.intrasoft.csp.libraries.restclient.service.RetryRestTemplate;
 import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -56,6 +64,16 @@ public class AnonApiTest implements AnonContextUrl {
     @Autowired
     ObjectMapper objectMapper;
 
+    @Before
+    public void populateH2Db() throws JsonProcessingException {
+        RuleSetDTO ruleSetDTO = Helper.createRuleset();
+        anonClient.saveRuleSet(ruleSetDTO);
+
+        ruleSetDTO.setId(new Long(1));
+        MappingDTO mappingDTO = Helper.createMapping(ruleSetDTO);
+        anonClient.saveMapping(mappingDTO);
+    }
+
     @Test
     public void anonymizeTrustCircleTest() throws IOException, InvalidKeyException, NoSuchAlgorithmException {
         ObjectMapper mapper = new ObjectMapper();
@@ -65,7 +83,7 @@ public class AnonApiTest implements AnonContextUrl {
             IntegrationAnonData anonData = anonClient.postAnonData(integrationAnonData);
             String response = objectMapper.writeValueAsString(anonData.getDataObject());
             Assert.assertThat(response, containsString("\"short_name\":\"*******\""));
-            Assert.assertThat(response, containsString("\"description\":\"*******\""));
+            Assert.assertThat(response, containsString("\"created\":\"##########\""));
         } catch (MappingNotFoundForGivenTupleException e) {
             Assert.fail(HttpStatusResponseType.MAPPING_NOT_FOUND_FOR_GIVEN_TUPLE.getReasonPhrase());
         }

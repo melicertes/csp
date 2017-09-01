@@ -68,6 +68,7 @@ public class ApiDataHandler {
 
     public IntegrationAnonData handleAnonIntegrationData(IntegrationAnonData integrationAnonData) throws NoSuchAlgorithmException, InvalidKeyException, IOException {
 
+        LOG.info("Handle integrationData for cspId: " + integrationAnonData.getCspId() + " and " + " dataType " + integrationAnonData.getDataType());
         String cspId = integrationAnonData.getCspId();
         IntegrationDataType dataType = integrationAnonData.getDataType();
         if (dataType == null){
@@ -91,15 +92,17 @@ public class ApiDataHandler {
                 for (int i = 0; i < vals.size() ; i++){
                     String jpointer = rule.getField().replace("*",String.valueOf(i));
                     String action = rule.getAction();
-                    String value = JsonPath.using(configuration).parse(out).read(jpointer, String.class);
-                    out = JsonPath.using(configuration).parse(out).set(jpointer, updateField(action, value)).json();
+                    String fieldType = rule.getFieldType();
+                    String fieldValue = JsonPath.using(configuration).parse(out).read(jpointer, String.class);
+                    out = JsonPath.using(configuration).parse(out).set(jpointer, updateField(action, fieldType, fieldValue)).json();
                 }
             }
             else {
                 String jpointer = rule.getField();
                 String action = rule.getAction();
-                String value = JsonPath.using(configuration).parse(out).read(jpointer, String.class);
-                out = JsonPath.using(configuration).parse(out).set(jpointer, updateField(action, value)).json();
+                String fieldType = rule.getFieldType();
+                String fieldValue = JsonPath.using(configuration).parse(out).read(jpointer, String.class);
+                out = JsonPath.using(configuration).parse(out).set(jpointer, updateField(action, fieldType, fieldValue)).json();
             }
         }
 
@@ -110,18 +113,18 @@ public class ApiDataHandler {
     /**
      *
      * @param action
-     * @param fieldVal
+     * @param fieldValue
      * @return
      * @throws InvalidKeyException
      * @throws NoSuchAlgorithmException
      */
-    private String updateField(String action, String fieldVal) throws InvalidKeyException, NoSuchAlgorithmException {
-        String newVal = fieldVal;
+    private String updateField(String action, String fieldType, String fieldValue) throws InvalidKeyException, NoSuchAlgorithmException {
+        String newVal = fieldValue;
         if (action.toLowerCase().equals("pseudo")){
-            newVal = pseudoField(fieldVal);
+            newVal = pseudoField(fieldValue);
         }
         else if (action.toLowerCase().equals("anon")){
-            newVal = anonField(fieldVal);
+            newVal = anonField(fieldType, fieldValue);
         }
         return newVal;
     }
@@ -131,8 +134,7 @@ public class ApiDataHandler {
      * @param fieldVal
      * @return
      */
-    private String anonField(String fieldVal){
-        String fieldtype = "string";
+    private String anonField(String fieldtype, String fieldVal){
 
         Pattern rEmail = Pattern.compile(EMAIL_PATTERN);
         Pattern rIp = Pattern.compile(IPADDRESS_PATTERN);
@@ -147,9 +149,13 @@ public class ApiDataHandler {
             case "email":
                 return "***@******.**";
             case "alphanumeric":
-                return "**********";
+                return "##########";
+            case "numeric":
+                return "##########";
+            default:
+                return "$$$$$$$$$";
         }
-        return "*********";
+//        return "*********";
     }
 
     /**
