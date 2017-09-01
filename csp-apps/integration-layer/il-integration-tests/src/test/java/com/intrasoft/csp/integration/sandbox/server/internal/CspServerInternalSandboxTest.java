@@ -1,5 +1,7 @@
 package com.intrasoft.csp.integration.sandbox.server.internal;
 
+import com.intrasoft.csp.anon.client.AnonClient;
+import com.intrasoft.csp.anon.commons.model.IntegrationAnonData;
 import com.intrasoft.csp.commons.model.*;
 import com.intrasoft.csp.commons.routes.CamelRoutes;
 import com.intrasoft.csp.server.CspApp;
@@ -74,6 +76,9 @@ public class CspServerInternalSandboxTest implements CamelRoutes{
     @MockBean
     CamelRestService camelRestService;
 
+    @MockBean
+    AnonClient anonClient;
+
     @Autowired
     MockUtils mockUtils;
 
@@ -82,6 +87,8 @@ public class CspServerInternalSandboxTest implements CamelRoutes{
 
     @Autowired
     SpringCamelContext springCamelContext;
+
+    DataParams anonObject;
 
     private Integer numOfCsps = 3;
     private Integer currentCspId = 0;
@@ -104,6 +111,15 @@ public class CspServerInternalSandboxTest implements CamelRoutes{
                 .thenReturn(mockUtils.getMockedTeam(3,"http://external.csp%s.com"));
         ///*deprecated*/ mockUtils.mockRouteSkipSendToOriginalEndpoint(CamelRoutes.MOCK_PREFIX, routes.apply(TC),mockedTC.getEndpointUri());
         ///*deprecated*/ mockUtils.mockRouteSkipSendToOriginalEndpoint(CamelRoutes.MOCK_PREFIX,routes.apply(TCT),mockedTCT.getEndpointUri());
+
+        IntegrationAnonData integrationAnonData = new IntegrationAnonData();
+
+        anonObject = new DataParams();
+        anonObject.setCspId("AnonymizedCspId");
+        anonObject.setApplicationId("AnonymizedApplicationId");
+
+        integrationAnonData.setDataObject(anonObject);
+        Mockito.when(anonClient.postAnonData(anyObject())).thenReturn(integrationAnonData);
     }
 
     // Use @DirtiesContext on each test method to force Spring Testing to automatically reload the CamelContext after
