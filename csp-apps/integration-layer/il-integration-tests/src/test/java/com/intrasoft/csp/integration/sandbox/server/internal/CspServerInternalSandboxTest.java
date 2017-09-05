@@ -5,6 +5,10 @@ import com.intrasoft.csp.anon.commons.model.IntegrationAnonData;
 import com.intrasoft.csp.commons.model.*;
 import com.intrasoft.csp.commons.routes.CamelRoutes;
 import com.intrasoft.csp.server.CspApp;
+import com.intrasoft.csp.server.policy.domain.model.EvaluatedPolicyDTO;
+import com.intrasoft.csp.server.policy.domain.model.PolicyDTO;
+import com.intrasoft.csp.server.policy.domain.model.SharingPolicyAction;
+import com.intrasoft.csp.server.policy.service.SharingPolicyService;
 import com.intrasoft.csp.server.routes.RouteUtils;
 import com.intrasoft.csp.server.service.CamelRestService;
 import com.intrasoft.csp.server.utils.MockUtils;
@@ -22,7 +26,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
 
@@ -44,6 +50,7 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
 @RunWith(CamelSpringBootRunner.class)
 @SpringBootTest(classes = {CspApp.class, MockUtils.class},
         properties = {
+                "spring.datasource.url:jdbc:h2:mem:csp_policy",
                 "csp.retry.backOffPeriod:10",
                 "csp.retry.maxAttempts:1",
                 "embedded.activemq.start:false",
@@ -88,6 +95,9 @@ public class CspServerInternalSandboxTest implements CamelRoutes{
     @Autowired
     SpringCamelContext springCamelContext;
 
+    @MockBean
+    SharingPolicyService sharingPolicyService;
+
     DataParams anonObject;
 
     private Integer numOfCsps = 3;
@@ -120,6 +130,13 @@ public class CspServerInternalSandboxTest implements CamelRoutes{
 
         integrationAnonData.setDataObject(anonObject);
         Mockito.when(anonClient.postAnonData(anyObject())).thenReturn(integrationAnonData);
+
+        EvaluatedPolicyDTO evaluatedPolicyDTO = new EvaluatedPolicyDTO();
+        evaluatedPolicyDTO.setSharingPolicyAction(SharingPolicyAction.NO_ACTION_FOUND);
+        PolicyDTO mockedPolicyDTO = new PolicyDTO();
+        evaluatedPolicyDTO.setPolicyDTO(mockedPolicyDTO);
+        Mockito.when(sharingPolicyService.evaluate(eq(IntegrationDataType.INCIDENT))).thenReturn(evaluatedPolicyDTO);
+        Mockito.when(sharingPolicyService.checkCondition(anyObject(),anyObject(),anyObject())).thenReturn(true); //ignore any condition for this test and always return true
     }
 
     // Use @DirtiesContext on each test method to force Spring Testing to automatically reload the CamelContext after

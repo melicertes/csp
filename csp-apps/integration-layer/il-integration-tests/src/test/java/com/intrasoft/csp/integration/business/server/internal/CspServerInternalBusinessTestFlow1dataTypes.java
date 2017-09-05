@@ -4,6 +4,10 @@ package com.intrasoft.csp.integration.business.server.internal;
 import com.intrasoft.csp.commons.model.*;
 import com.intrasoft.csp.commons.routes.CamelRoutes;
 import com.intrasoft.csp.server.CspApp;
+import com.intrasoft.csp.server.policy.domain.model.EvaluatedPolicyDTO;
+import com.intrasoft.csp.server.policy.domain.model.PolicyDTO;
+import com.intrasoft.csp.server.policy.domain.model.SharingPolicyAction;
+import com.intrasoft.csp.server.policy.service.SharingPolicyService;
 import com.intrasoft.csp.server.processors.TcProcessor;
 import com.intrasoft.csp.server.routes.RouteUtils;
 import com.intrasoft.csp.server.service.CamelRestService;
@@ -21,12 +25,15 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.core.env.Environment;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
 
@@ -35,11 +42,14 @@ import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.Matchers.anyObject;
+import static org.mockito.Matchers.eq;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
 @RunWith(CamelSpringBootRunner.class)
 @SpringBootTest(classes = {CspApp.class, MockUtils.class},
         properties = {
+                "spring.datasource.url:jdbc:h2:mem:csp_policy",
         /*
         //added in application-dangerduck.properties
                 "consume.errorq.on.interval:false",
@@ -135,6 +145,9 @@ public class CspServerInternalBusinessTestFlow1dataTypes implements CamelRoutes 
     @Autowired
     TcProcessor tcProcessor;
 
+    @MockBean
+    SharingPolicyService sharingPolicyService;
+
     @Autowired
     Environment env;
 
@@ -176,6 +189,16 @@ public class CspServerInternalBusinessTestFlow1dataTypes implements CamelRoutes 
         tcPort=env.getProperty("tc.port");
         tcPathCircles=env.getProperty("tc.path.circles");
         tcPathTeams=env.getProperty("tc.path.teams");
+
+        EvaluatedPolicyDTO evaluatedPolicyDTO = new EvaluatedPolicyDTO();
+        evaluatedPolicyDTO.setSharingPolicyAction(SharingPolicyAction.NO_ACTION_FOUND);
+        PolicyDTO mockedPolicyDTO = new PolicyDTO();
+        evaluatedPolicyDTO.setPolicyDTO(mockedPolicyDTO);
+        Mockito.when(sharingPolicyService.evaluate(eq(IntegrationDataType.INCIDENT))).thenReturn(evaluatedPolicyDTO);
+        Mockito.when(sharingPolicyService.evaluate(eq(IntegrationDataType.THREAT))).thenReturn(evaluatedPolicyDTO);
+        Mockito.when(sharingPolicyService.evaluate(eq(IntegrationDataType.ARTEFACT))).thenReturn(evaluatedPolicyDTO);
+        Mockito.when(sharingPolicyService.evaluate(eq(IntegrationDataType.TRUSTCIRCLE))).thenReturn(evaluatedPolicyDTO);
+        Mockito.when(sharingPolicyService.checkCondition(anyObject(),anyObject(),anyObject())).thenReturn(true); //ignore any condition for this test and always return true
     }
 
 

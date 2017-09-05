@@ -151,7 +151,7 @@ public class SharingPolicyServiceTest implements CamelRoutes {
         Mockito.when(sharingPolicyService.evaluate(eq(IntegrationDataType.INCIDENT))).thenReturn(evaluatedPolicyDTO);
         mockUtils.sendFlow1IntegrationData(mvc,false);
 
-        mockedEcsp.expectedMessageCount(3);
+        mockedEcsp.expectedMessageCount(0); //The will be no condition to the aboved mocked call, so it will fallback to default action
         mockedEcsp.assertIsSatisfied();
         List<Exchange> list = mockedEcsp.getReceivedExchanges();
         int i=0;
@@ -169,7 +169,7 @@ public class SharingPolicyServiceTest implements CamelRoutes {
     @DirtiesContext
     @Test
     public void evaluatePolicyTest() throws Exception {
-        String condition = "function(i,t) i.getDataObject() == t.getCspId()";
+        String condition = "function(i,t) i.getDataParams().getCspId() != null && t.getShortName() != null";
         PolicyDTO newPolicyDTO = new PolicyDTO();
         newPolicyDTO.setActive(true);
         newPolicyDTO.setSharingPolicyAction(SharingPolicyAction.SHARE_ANONYMIZED);
@@ -188,6 +188,42 @@ public class SharingPolicyServiceTest implements CamelRoutes {
         mockUtils.sendFlow1IntegrationData(mvc,false);
 
         mockedEcsp.expectedMessageCount(3);
+        mockedEcsp.assertIsSatisfied();
+        List<Exchange> list = mockedEcsp.getReceivedExchanges();
+        int i=0;
+        for (Exchange exchange : list) {
+            i++;
+            Message in = exchange.getIn();
+            EnhancedTeamDTO enhancedTeamDTO = in.getBody(EnhancedTeamDTO.class);
+            assertThat(enhancedTeamDTO.getTeam().getUrl(), is("http://external.csp"+i+".com"));
+            String anonObjectJsonStrExpected = objectMapper.writeValueAsString(anonObject);
+            String anonObjectJsonStrToCompare = objectMapper.writeValueAsString(enhancedTeamDTO.getIntegrationData().getDataObject());
+            assertThat(anonObjectJsonStrToCompare,is(anonObjectJsonStrExpected));
+        }
+    }
+
+    @DirtiesContext
+    @Test
+    public void evaluateDefaultPolicyWithEmptyConditionTest() throws Exception {
+        String condition = "a condition that fails with exception and should fallback to default";
+        PolicyDTO newPolicyDTO = new PolicyDTO();
+        newPolicyDTO.setActive(true);
+        newPolicyDTO.setSharingPolicyAction(SharingPolicyAction.SHARE_ANONYMIZED);
+        newPolicyDTO.setIntegrationDataType(IntegrationDataType.INCIDENT);
+        newPolicyDTO.setCondition(condition);
+        sharingPolicyService.savePolicy(newPolicyDTO);
+
+        //ADD A NOT ACTIVE POLICY WITH HIGHEST PRIORITY to test it will not trigger
+        newPolicyDTO = new PolicyDTO();
+        newPolicyDTO.setActive(false);
+        newPolicyDTO.setSharingPolicyAction(SharingPolicyAction.SHARE_AS_IS);
+        newPolicyDTO.setIntegrationDataType(IntegrationDataType.INCIDENT);
+        newPolicyDTO.setCondition(condition);
+        sharingPolicyService.savePolicy(newPolicyDTO);
+
+        mockUtils.sendFlow1IntegrationData(mvc,false);
+
+        mockedEcsp.expectedMessageCount(0);
         mockedEcsp.assertIsSatisfied();
         List<Exchange> list = mockedEcsp.getReceivedExchanges();
         int i=0;

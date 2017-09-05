@@ -39,6 +39,7 @@ import static org.mockito.Matchers.eq;
 @SpringBootTest(classes = {CspApp.class, CspClientConfig.class,MockUtils.class},
         webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT,
         properties = {
+                "spring.datasource.url:jdbc:h2:mem:csp_policy",
                 "server.port: 8082",
                 "server.ssl.enabled:true",
                 "server.ssl.key-store=classpath:sslcert/csp-internal.jks",
