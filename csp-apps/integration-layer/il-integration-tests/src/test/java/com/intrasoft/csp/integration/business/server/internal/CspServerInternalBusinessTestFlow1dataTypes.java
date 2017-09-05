@@ -194,11 +194,7 @@ public class CspServerInternalBusinessTestFlow1dataTypes implements CamelRoutes 
         evaluatedPolicyDTO.setSharingPolicyAction(SharingPolicyAction.NO_ACTION_FOUND);
         PolicyDTO mockedPolicyDTO = new PolicyDTO();
         evaluatedPolicyDTO.setPolicyDTO(mockedPolicyDTO);
-        Mockito.when(sharingPolicyService.evaluate(eq(IntegrationDataType.INCIDENT))).thenReturn(evaluatedPolicyDTO);
-        Mockito.when(sharingPolicyService.evaluate(eq(IntegrationDataType.THREAT))).thenReturn(evaluatedPolicyDTO);
-        Mockito.when(sharingPolicyService.evaluate(eq(IntegrationDataType.ARTEFACT))).thenReturn(evaluatedPolicyDTO);
-        Mockito.when(sharingPolicyService.evaluate(eq(IntegrationDataType.TRUSTCIRCLE))).thenReturn(evaluatedPolicyDTO);
-        Mockito.when(sharingPolicyService.checkCondition(anyObject(),anyObject(),anyObject())).thenReturn(true); //ignore any condition for this test and always return true
+        Mockito.when(sharingPolicyService.evaluate(anyObject(),anyObject())).thenReturn(evaluatedPolicyDTO);
     }
 
 

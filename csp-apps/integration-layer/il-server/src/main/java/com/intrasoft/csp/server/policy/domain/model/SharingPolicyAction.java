@@ -23,20 +23,4 @@ public enum SharingPolicyAction {
         return this.priority;
     }
     public String text() { return this.text; }
-
-    public static final Map<IntegrationDataType,SharingPolicyAction> defaultActionMap;
-
-    static{
-        defaultActionMap = new ConcurrentHashMap<>();
-        defaultActionMap.put(IntegrationDataType.DUMMY,DO_NOT_SHARE);
-        defaultActionMap.put(IntegrationDataType.THREAT,DO_NOT_SHARE);
-        defaultActionMap.put(IntegrationDataType.EVENT,DO_NOT_SHARE);
-        defaultActionMap.put(IntegrationDataType.ARTEFACT,SHARE_ANONYMIZED);
-        defaultActionMap.put(IntegrationDataType.INCIDENT,DO_NOT_SHARE);
-        defaultActionMap.put(IntegrationDataType.CONTACT,DO_NOT_SHARE);
-        defaultActionMap.put(IntegrationDataType.FILE,DO_NOT_SHARE);
-        defaultActionMap.put(IntegrationDataType.CHAT,DO_NOT_SHARE);
-        defaultActionMap.put(IntegrationDataType.VULNERABILITY,SHARE_AS_IS);
-        defaultActionMap.put(IntegrationDataType.TRUSTCIRCLE,DO_NOT_SHARE);
-    }
 }

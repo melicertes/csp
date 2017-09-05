@@ -3,6 +3,10 @@ package com.intrasoft.csp.integration.sandbox.server.internal;
 import com.intrasoft.csp.commons.model.*;
 import com.intrasoft.csp.commons.routes.CamelRoutes;
 import com.intrasoft.csp.server.CspApp;
+import com.intrasoft.csp.server.policy.domain.model.EvaluatedPolicyDTO;
+import com.intrasoft.csp.server.policy.domain.model.PolicyDTO;
+import com.intrasoft.csp.server.policy.domain.model.SharingPolicyAction;
+import com.intrasoft.csp.server.policy.service.SharingPolicyService;
 import com.intrasoft.csp.server.routes.RouteUtils;
 import com.intrasoft.csp.server.service.CamelRestService;
 import com.intrasoft.csp.server.utils.MockUtils;
@@ -96,6 +100,9 @@ public class CspServerInternalSandboxTestFlow1verbs implements CamelRoutes {
     @Autowired
     SpringCamelContext springCamelContext;
 
+    @MockBean
+    SharingPolicyService sharingPolicyService;
+
     @Autowired
     Environment env;
 
@@ -144,6 +151,12 @@ public class CspServerInternalSandboxTestFlow1verbs implements CamelRoutes {
 
         Mockito.when(camelRestService.send(Matchers.contains(elasticUri),anyObject(),anyString()))
                 .thenReturn(mockUtils.getMockedElasticSearchResponse(2));
+
+        EvaluatedPolicyDTO evaluatedPolicyDTO = new EvaluatedPolicyDTO();
+        evaluatedPolicyDTO.setSharingPolicyAction(SharingPolicyAction.NO_ACTION_FOUND);
+        PolicyDTO mockedPolicyDTO = new PolicyDTO();
+        evaluatedPolicyDTO.setPolicyDTO(mockedPolicyDTO);
+        Mockito.when(sharingPolicyService.evaluate(anyObject(),anyObject())).thenReturn(evaluatedPolicyDTO);
     }
 
     @DirtiesContext

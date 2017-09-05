@@ -213,25 +213,23 @@ public class TcProcessor implements Processor,CamelRoutes{
          * -share anonymized
          * -dont share
          */
-        EvaluatedPolicyDTO evaluatedPolicyDTO = sharingPolicyService.evaluate(integrationData.getDataType());
+        EvaluatedPolicyDTO evaluatedPolicyDTO = sharingPolicyService.evaluate(integrationData,team);
         SharingPolicyAction sharingPolicyAction = evaluatedPolicyDTO.getSharingPolicyAction();
-        Boolean evaluatedPolicyCondition = false;
-        try {
-            if(evaluatedPolicyDTO.getPolicyDTO()!=null){
-                evaluatedPolicyCondition = sharingPolicyService.checkCondition(evaluatedPolicyDTO.getPolicyDTO().getCondition(),integrationData,team);
-                LOG.info(String.format("evaluatedPolicyCondition(%s) = %b",evaluatedPolicyDTO.getPolicyDTO().getCondition(),evaluatedPolicyCondition));
-            }else{
-                LOG.warn("Could not find a condition in the EvaluatedPolicyDTO.");
-                //TODO: How to handle this?
-            }
-        } catch (ScriptException e) {
-            //TODO: how to handle this?
-            LOG.error("Error while evaluating policy condition",e);
-        }
+//        Boolean evaluatedPolicyCondition = false;
+//        try {
+//            if(evaluatedPolicyDTO.getPolicyDTO()!=null){
+//                evaluatedPolicyCondition = sharingPolicyService.checkCondition(evaluatedPolicyDTO.getPolicyDTO().getCondition(),integrationData,team);
+//                LOG.info(String.format("evaluatedPolicyCondition(%s) = %b",evaluatedPolicyDTO.getPolicyDTO().getCondition(),evaluatedPolicyCondition));
+//            }else{
+//                LOG.warn("Could not find a condition in the EvaluatedPolicyDTO.");
+//                //TODO: How to handle this?
+//            }
+//        } catch (ScriptException e) {
+//            //TODO: how to handle this?
+//            LOG.error("Error while evaluating policy condition",e);
+//        }
+//
 
-        if(!evaluatedPolicyCondition){
-            sharingPolicyAction=SharingPolicyAction.defaultActionMap.get(integrationData.getDataType()); //get the default for this dataType;
-        }
 
         switch (sharingPolicyAction){
             case SHARE_AS_IS:

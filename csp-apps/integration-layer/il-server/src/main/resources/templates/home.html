@@ -27,9 +27,10 @@
         <span th:text="${msg}"></span>
     </div>
     <div class="row">
+        <h2 th:text="#{save.policy}">Save Policy</h2>
         <div class="col-md-12 col-sm-12">
             <div class="row" data-duplicate="contact" data-duplicate-min="2" data-duplicate-max="10">
-                <form th:action="@{/policies/save}" th:object="${policy}" enctype="multipart/form-data" method="post">
+                <form th:action="@{/policies/save}" th:object="${policy}" enctype="multipart/form-data" method="post" onsubmit="return ilPolicies.validateSaveOperation()" >
                     <input class="form-control" th:field="*{id}" name="id" type="hidden"/>
                     <div class="col-md-2 col-xs-12">
                         <label>Data Type:</label>
@@ -46,11 +47,11 @@
                     </div>
                     <div class="col-md-2 col-xs-12">
                         <div class="form-group">
-                            <label>Active:</label>
+                            <label>Status:</label>
                             <select th:field="*{active}" class="form-control">
-                                <option th:value="${null}" th:text="${'-'}" th:selected="selected"></option>
-                                <option value="true">true</option>
-                                <option value="false">false</option>
+                                <option value="true">Active</option>
+                                <option th:value="${null}" th:text="${'Default'}"></option>
+                                <option value="false">Inactive</option>
                             </select>
                             <span th:if="${#fields.hasErrors('active')}" th:errors="*{active}">Active Error</span>
                         </div>
@@ -85,14 +86,14 @@
                 </form>
                 <div class="row">
                     <div class="col-md-12">
-                        <h2 th:text="#{saved.policies}">Saved policies</h2>
+                        <h2 th:text="#{stored.policies}">Saved policies</h2>
                         <table data-toggle="table" data-page-size="20" data-pagination="true">
                             <thead>
                             <tr>
                                 <!--<th><i class="fa  fa-file-code-o"></i></th>-->
                                 <th data-sortable="true"><i class="fa  fa-file-code-o"></i> Id</th>
                                 <th data-sortable="true">DataType</th>
-                                <th data-sortable="true">Active</th>
+                                <th data-sortable="true">Status</th>
                                 <th data-sortable="true">Condition</th>
                                 <th data-sortable="true">Sharing Policy Action</th>
                                 <th>Actions</th>
@@ -102,7 +103,7 @@
                                 <!--/*<td th:text="${iterStat.count}"></td>*/-->
                                 <td th:text="${policy.id}"></td>
                                 <td th:text="${policy.integrationDataType}"></td>
-                                <td th:text="${policy.active}"></td>
+                                <td th:text="${policy.active == null?'Default': (policy.active == true?'Active':'Inactive')}"></td>
                                 <td th:text="${policy.condition}"></td>
                                 <td th:text="${policy.sharingPolicyAction.text()}"></td>
                                 <td><a th:href="'#'+${policy.id}"  data-toggle="modal" ><i class="fa fa-trash" aria-hidden="true"></i></a>
@@ -131,34 +132,13 @@
                         </table>
                     </div>
                 </div>
-
-                <div class="row">
-                    <div class="col-md-12">
-                        <h2 th:text="#{default.policies}">Default policies</h2>
-                        <table data-toggle="table" data-page-size="20" data-pagination="true">
-                            <thead>
-                            <tr>
-                                <!--<th><i class="fa  fa-file-code-o"></i></th>-->
-                                <!--<th data-sortable="true"><i class="fa  fa-file-code-o"></i> Id</th>-->
-                                <th data-sortable="true">DataType</th>
-                                <th data-sortable="true">Active</th>
-                                <th data-sortable="true">Condition</th>
-                                <th data-sortable="true">Sharing Policy Action</th>
-                            </tr>
-                            </thead>
-                            <tr th:each="integrationDataType,iterStat : ${integrationDataTypes}">
-                                <!--<td th:text="${iterStat.count}"></td>-->
-                                <td th:text="${integrationDataType}"></td>
-                                <td th:text="${'always'}"></td>
-                                <td th:text="${'none'}"></td>
-                                <td th:text="${T(com.intrasoft.csp.server.policy.domain.model.SharingPolicyAction).defaultActionMap.get(integrationDataType).text()}"></td>
-
-                            </tr>
-                        </table>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
+    <script>
+        $(document).ready(function(){
+            ilPolicies.init();
+        });
+    </script>
 </th:block>
 </html>
