@@ -85,6 +85,7 @@
                 </form>
                 <div class="row">
                     <div class="col-md-12">
+                        <h2 th:text="#{saved.policies}">Saved policies</h2>
                         <table data-toggle="table" data-page-size="20" data-pagination="true">
                             <thead>
                             <tr>
@@ -126,6 +127,32 @@
                                         </div>
                                     </div>
                                 </div>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <h2 th:text="#{default.policies}">Default policies</h2>
+                        <table data-toggle="table" data-page-size="20" data-pagination="true">
+                            <thead>
+                            <tr>
+                                <!--<th><i class="fa  fa-file-code-o"></i></th>-->
+                                <!--<th data-sortable="true"><i class="fa  fa-file-code-o"></i> Id</th>-->
+                                <th data-sortable="true">DataType</th>
+                                <th data-sortable="true">Active</th>
+                                <th data-sortable="true">Condition</th>
+                                <th data-sortable="true">Sharing Policy Action</th>
+                            </tr>
+                            </thead>
+                            <tr th:each="integrationDataType,iterStat : ${integrationDataTypes}">
+                                <!--<td th:text="${iterStat.count}"></td>-->
+                                <td th:text="${integrationDataType}"></td>
+                                <td th:text="${'always'}"></td>
+                                <td th:text="${'none'}"></td>
+                                <td th:text="${T(com.intrasoft.csp.server.policy.domain.model.SharingPolicyAction).defaultActionMap.get(integrationDataType).text()}"></td>
+
                             </tr>
                         </table>
                     </div>
