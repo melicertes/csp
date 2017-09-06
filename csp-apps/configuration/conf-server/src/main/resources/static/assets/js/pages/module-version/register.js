@@ -60,9 +60,13 @@ $(document).ready(function(){
     form.submit(function (e) {
         e.preventDefault();
 
+
         if (form.valid()) {
             var f = document.getElementById('module-version-form');
             var formData = new FormData(f);
+
+            // save us from double-saving
+            $('button.save.btn-success').prop("disabled", true);
 
             $.ajax({
                 type: 'POST',
@@ -85,6 +89,7 @@ $(document).ready(function(){
                 },
                 error:function (xhr, ajaxOptions, thrownError){
                     $('#result').html('<div class="alert alert-dismissable alert-danger"><a class="close" data-dismiss="alert" href="#" aria-hidden="true">×</a><strong>Error: '+xhr.responseJSON.responseCode+'</strong><br>'+xhr.responseJSON.responseText+'<br>'+xhr.responseJSON.responseException+'</div>');
+                    $('button.save.btn-success').prop("disabled", false);
                 }
             });
         }
