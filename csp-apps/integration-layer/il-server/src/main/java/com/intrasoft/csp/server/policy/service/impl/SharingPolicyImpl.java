@@ -53,15 +53,40 @@ public class SharingPolicyImpl implements SharingPolicyService, Conversions{
     }
 
     @Override
-    public EvaluatedPolicyDTO evaluate(IntegrationDataType integrationDataType) {
+    public EvaluatedPolicyDTO evaluate(IntegrationData integrationData, Team team) {
+        IntegrationDataType integrationDataType = integrationData.getDataType();
+        Policy defaultPolicy = policyRepository.findByIntegrationDataTypeAndActive(integrationDataType,null).stream().findAny().orElse(null);
+        if(defaultPolicy == null){
+            LOG.warn("Default policy was not found. Will check any other existing policies.");
+        }
+
         List<Policy> list = policyRepository.findByIntegrationDataType(integrationDataType);
-        Optional<Policy> appliedPolicy = list.stream()
-                .filter(p->p.getActive()!=null && p.getActive())
-                .max(Comparator.comparing(p->p.getSharingPolicyAction().priority()));//get the action with the highest priority
-        if(!appliedPolicy.isPresent()) {
-            return new EvaluatedPolicyDTO(SharingPolicyAction.NO_ACTION_FOUND, null);
+        Comparator<Policy> comparator = Comparator.comparing(p->p.getSharingPolicyAction().priority());
+        list.sort(comparator.reversed());
+
+        for(Policy policy: list){
+            if(policy.getActive()!=null && policy.getActive()){
+                try{
+                boolean isTrue = checkCondition(policy.getPolicyCondition(),integrationData,team);
+                if(isTrue){
+                    return new EvaluatedPolicyDTO(policy.getSharingPolicyAction(),convertPolicyToDTO.apply(policy));
+                }else{
+                    //continue to next
+                }
+                }catch(Exception e){
+                    LOG.error(String.format("Error while evaluating condition for policy with id: %s and action: %s ." +
+                            "Will continue to next active policy.",policy.getId(),policy.getSharingPolicyAction()),e);
+                }
+            }
+        }
+
+        //reaching here means no condition was evaluated. Fallback to default
+        if(defaultPolicy != null){
+            LOG.info("Using default policy with id: "+defaultPolicy.getId()+" with action: "+defaultPolicy.getSharingPolicyAction());
+            return new EvaluatedPolicyDTO(defaultPolicy.getSharingPolicyAction(),convertPolicyToDTO.apply(defaultPolicy));
         }else{
-            return new EvaluatedPolicyDTO(appliedPolicy.get().getSharingPolicyAction(),convertPolicyToDTO.apply(appliedPolicy.get()));
+            LOG.error("Could evaluate any policy. Fallback to DO_NOT_SHARE");
+            return new EvaluatedPolicyDTO(SharingPolicyAction.DO_NOT_SHARE, null);
         }
     }
 

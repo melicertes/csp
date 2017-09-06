@@ -16,7 +16,9 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {CspApp.class},
-        webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+        webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT,properties = {
+        "spring.datasource.url:jdbc:h2:mem:csp_policy",
+})
 public class SmokeTest {
     @Autowired
     private ApiVersionController controller;

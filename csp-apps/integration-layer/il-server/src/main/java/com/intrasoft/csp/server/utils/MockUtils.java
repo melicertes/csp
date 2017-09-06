@@ -210,6 +210,8 @@ public class MockUtils implements ContextUrl {
         dataParams.setOriginCspId("origin-"+cspId);
         dataParams.setOriginApplicationId("origin-"+applicationId);
         dataParams.setOriginRecordId("origin-222");
+        dataParams.setUrl("https://rt.cert-gr.melecertes.eu/Ticket/Display.html?id=23453");
+        dataParams.setReference("<a href=\"https://rt.cert-gr.melecertes.eu/Ticket/Display.html?id=23453\" data-origin=\"cert-gr;rt;23453\">Incident title</a>");
         integrationData.setDataParams(dataParams);
         integrationData.setDataObject(dataParams);
 
@@ -262,6 +264,8 @@ public class MockUtils implements ContextUrl {
         dataParams.setOriginCspId("origin-"+cspId);
         dataParams.setOriginApplicationId("origin-"+applicationId);
         dataParams.setOriginRecordId("origin-222");
+        dataParams.setUrl("http://rt.cert-gr.melecertes.eu/Ticket/Display.html?id=23453");
+        dataParams.setReference("<a href=\"http://rt.cert-gr.melecertes.eu/Ticket/Display.html?id=23453\" data-origin=\"cert-gr;rt;23453\">Incident title</a>");
         dataParams.setDateTime(DateTime.now());
         dataParams.setCspId(cspId);
         integrationData.setDataParams(dataParams);

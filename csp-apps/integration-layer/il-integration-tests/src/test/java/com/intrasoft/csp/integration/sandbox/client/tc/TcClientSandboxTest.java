@@ -1,6 +1,8 @@
 package com.intrasoft.csp.integration.sandbox.client.tc;
 
 import com.intrasoft.csp.client.TrustCirclesClient;
+import com.intrasoft.csp.client.config.CspClientConfig;
+import com.intrasoft.csp.client.config.TrustCirclesClientConfig;
 import com.intrasoft.csp.commons.model.TrustCircle;
 import com.intrasoft.csp.libraries.restclient.service.RetryRestTemplate;
 import com.intrasoft.csp.server.CspApp;
@@ -27,8 +29,9 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
  * Created by iskitsas on 4/10/17.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringBootTest(classes = {CspApp.class,MockUtils.class},
+@SpringBootTest(classes = {CspApp.class, TrustCirclesClientConfig.class, CspClientConfig.class,MockUtils.class},
         properties = {
+                "spring.datasource.url:jdbc:h2:mem:csp_policy",
                 "csp.retry.backOffPeriod:10",
                 "csp.retry.maxAttempts:1"
         })

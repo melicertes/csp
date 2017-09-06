@@ -16,7 +16,7 @@ public interface SharingPolicyService {
     List<PolicyDTO> getPolicies();
     List<PolicyDTO> getPoliciesByAction(SharingPolicyAction sharingPolicyAction);
     List<PolicyDTO> getPoliciesByDataType(IntegrationDataType integrationDataType);
-    EvaluatedPolicyDTO evaluate(IntegrationDataType integrationDataType);
+    EvaluatedPolicyDTO evaluate(IntegrationData integrationData, Team team);
     PolicyDTO savePolicy(PolicyDTO policyDTO) throws PolicySaveException;
     void deletePolicy(Integer id);
     void deleteAllPolicies();

@@ -35,6 +35,7 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
 @RunWith(CamelSpringBootRunner.class)
 @SpringBootTest(classes = {CspApp.class, MockUtils.class},
         properties = {
+                "spring.datasource.url:jdbc:h2:mem:csp_policy",
                 "csp.retry.backOffPeriod:10",
                 "csp.retry.maxAttempts:1",
                 "embedded.activemq.start:true",

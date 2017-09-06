@@ -82,7 +82,7 @@ public class TcProcessor implements Processor,CamelRoutes{
         String httpMethod = (String) exchange.getIn().getHeader(Exchange.HTTP_METHOD);
 
 
-        //TODO: SXCSP-185. tcId and teamId logic to be implemented - if both throw exception - Malformed 4xx
+        // SXCSP-185. tcId and teamId logic to be implemented - if both throw exception - Malformed 4xx
         if (!StringUtils.isEmpty(integrationData.getSharingParams().getTcId())
                 && !StringUtils.isEmpty(integrationData.getSharingParams().getTeamId())) {
             throw new InvalidSharingParamsException("Invalid sharing params provided: tcId and team were both provided. " +
@@ -206,27 +206,16 @@ public class TcProcessor implements Processor,CamelRoutes{
     }
 
     private void handleDclFlowAndSendToECSP(String httpMethod, Team team, IntegrationData integrationData) throws NoSuchAlgorithmException, InvalidKeyException, IOException {
-        //TODO: SXCSP-85 Sharing Policy to be integrated only when sending to ECSP
+        // SXCSP-85 Sharing Policy to be integrated only when sending to ECSP
         /**
          * 3 actions:
          * -share as is
          * -share anonymized
          * -dont share
          */
-        EvaluatedPolicyDTO evaluatedPolicyDTO = sharingPolicyService.evaluate(integrationData.getDataType());
+        EvaluatedPolicyDTO evaluatedPolicyDTO = sharingPolicyService.evaluate(integrationData,team);
         SharingPolicyAction sharingPolicyAction = evaluatedPolicyDTO.getSharingPolicyAction();
-        try {
-            if(evaluatedPolicyDTO.getPolicyDTO()!=null){
-                Boolean evaluatedPolicyCondition = sharingPolicyService.checkCondition(evaluatedPolicyDTO.getPolicyDTO().getCondition(),integrationData,team);
-                LOG.info(String.format("evaluatedPolicyCondition(%s) = %b",evaluatedPolicyDTO.getPolicyDTO().getCondition(),evaluatedPolicyCondition));
-            }else{
-                LOG.warn("Could not find a condition in the EvaluatedPolicyDTO.");
-                //TODO: How to handle this?
-            }
-        } catch (ScriptException e) {
-            //TODO: how to handle this?
-            LOG.error("Error while evaluating policy condition",e);
-        }
+
         switch (sharingPolicyAction){
             case SHARE_AS_IS:
                 break;

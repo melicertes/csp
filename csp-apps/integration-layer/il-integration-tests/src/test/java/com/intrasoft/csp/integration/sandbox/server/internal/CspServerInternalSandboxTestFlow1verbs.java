@@ -3,6 +3,10 @@ package com.intrasoft.csp.integration.sandbox.server.internal;
 import com.intrasoft.csp.commons.model.*;
 import com.intrasoft.csp.commons.routes.CamelRoutes;
 import com.intrasoft.csp.server.CspApp;
+import com.intrasoft.csp.server.policy.domain.model.EvaluatedPolicyDTO;
+import com.intrasoft.csp.server.policy.domain.model.PolicyDTO;
+import com.intrasoft.csp.server.policy.domain.model.SharingPolicyAction;
+import com.intrasoft.csp.server.policy.service.SharingPolicyService;
 import com.intrasoft.csp.server.routes.RouteUtils;
 import com.intrasoft.csp.server.service.CamelRestService;
 import com.intrasoft.csp.server.utils.MockUtils;
@@ -23,7 +27,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.core.env.Environment;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.util.StringUtils;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.util.List;
@@ -42,6 +48,7 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
 @RunWith(CamelSpringBootRunner.class)
 @SpringBootTest(classes = {CspApp.class, MockUtils.class},
         properties = {
+                "spring.datasource.url:jdbc:h2:mem:csp_policy",
                 "server.name:CERT-GR",
                 "csp.retry.backOffPeriod:10",
                 "csp.retry.maxAttempts:1",
@@ -94,6 +101,9 @@ public class CspServerInternalSandboxTestFlow1verbs implements CamelRoutes {
     @Autowired
     SpringCamelContext springCamelContext;
 
+    @MockBean
+    SharingPolicyService sharingPolicyService;
+
     @Autowired
     Environment env;
 
@@ -105,11 +115,21 @@ public class CspServerInternalSandboxTestFlow1verbs implements CamelRoutes {
     private final String applicationId = "taranis";
     String serverName;
 
-    static final String tcId = "tcId";
-    static final String teamId = "teamId";
+    protected String tcId = "tcId";
+    protected String teamId = "teamId";
 
     @Before
     public void init() throws Exception {
+        String tcIdArg = env.getProperty("extTcId");
+        if(!StringUtils.isEmpty(tcIdArg)){
+            tcId = tcIdArg;
+        }
+
+        String teamIdArg = env.getProperty("extTeamId");
+        if(!StringUtils.isEmpty(teamIdArg)){
+            teamId = teamIdArg;
+        }
+
         serverName = env.getProperty("server.name");
         mvc = webAppContextSetup(webApplicationContext).build();
         MockitoAnnotations.initMocks(this);
@@ -142,6 +162,12 @@ public class CspServerInternalSandboxTestFlow1verbs implements CamelRoutes {
 
         Mockito.when(camelRestService.send(Matchers.contains(elasticUri),anyObject(),anyString()))
                 .thenReturn(mockUtils.getMockedElasticSearchResponse(2));
+
+        EvaluatedPolicyDTO evaluatedPolicyDTO = new EvaluatedPolicyDTO();
+        evaluatedPolicyDTO.setSharingPolicyAction(SharingPolicyAction.NO_ACTION_FOUND);
+        PolicyDTO mockedPolicyDTO = new PolicyDTO();
+        evaluatedPolicyDTO.setPolicyDTO(mockedPolicyDTO);
+        Mockito.when(sharingPolicyService.evaluate(anyObject(),anyObject())).thenReturn(evaluatedPolicyDTO);
     }
 
     @DirtiesContext

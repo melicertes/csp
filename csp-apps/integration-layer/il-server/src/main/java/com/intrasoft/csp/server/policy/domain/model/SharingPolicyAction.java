@@ -1,5 +1,10 @@
 package com.intrasoft.csp.server.policy.domain.model;
 
+import com.intrasoft.csp.commons.model.IntegrationDataType;
+
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 public enum SharingPolicyAction {
     SHARE_AS_IS(3,"Share as is"), //highest priority
     SHARE_ANONYMIZED(2 ,"Share anonymized"),

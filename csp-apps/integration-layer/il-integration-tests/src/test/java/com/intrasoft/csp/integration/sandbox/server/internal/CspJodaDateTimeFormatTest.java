@@ -23,7 +23,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
  * Created by iskitsas on 5/23/17.
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = {CspApp.class})
+@SpringBootTest(classes = {CspApp.class},properties = {
+        "spring.datasource.url:jdbc:h2:mem:csp_policy",
+})
 public class CspJodaDateTimeFormatTest {
     @Autowired
     ObjectMapper objectMapper;

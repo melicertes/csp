@@ -9,5 +9,6 @@ import java.util.List;
 
 public interface PolicyRepository extends JpaRepository<Policy,Integer>{
     List<Policy> findByIntegrationDataType(IntegrationDataType integrationDataType);
+    List<Policy> findByIntegrationDataTypeAndActive(IntegrationDataType integrationDataType, Boolean active);
     List<Policy> findBySharingPolicyAction(SharingPolicyAction sharingPolicyAction);
 }

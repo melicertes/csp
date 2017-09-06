@@ -23,6 +23,7 @@ import static org.hamcrest.Matchers.is;
 @SpringBootTest(classes = {CspApp.class, CspClientConfig.class},
         webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT,
         properties = {
+                "spring.datasource.url:jdbc:h2:mem:csp_policy",
                 "server.port: 8082",
                 "csp.server.protocol: http",
                 "csp.server.host: localhost",

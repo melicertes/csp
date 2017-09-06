@@ -86,6 +86,11 @@ $ java -jar integration-tests-0.2.0-SNAPSHOT.jar com.intrasoft.csp.integration.s
 5ii. Integration (Business) Tests
 ----------------------------------
 
+For teamId and tcId tests you must provide a team or tc that exists in TC db, where you run the tests, otherwise dummy
+hardoced values will be used ("teamId","tcId"). In order to pass the values you can use the following arguments:
+-DextTcId=<yourValue>
+-DextTeamId=<yourValue>
+
 iTest1:
 
 $ java -jar -Dspring.profiles.active=docker -Dapache.camel.use.activemq=false -Dembedded.activemq.start=false \

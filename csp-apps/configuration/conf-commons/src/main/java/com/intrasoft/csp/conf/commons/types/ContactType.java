@@ -2,6 +2,7 @@ package com.intrasoft.csp.conf.commons.types;
 
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public enum ContactType {
     TECH_ADMIN("tech-admin"),
@@ -14,18 +15,21 @@ public enum ContactType {
         this.value = value;
     }
 
+    @JsonProperty("contactType")
     public String getValue() {
         return this.value;
     }
 
     @JsonCreator
-    public static ContactType fromValue(String text) {
+    public static ContactType fromValue(@JsonProperty("contactType") String text) {
         for (ContactType b : ContactType.values()) {
-            if (String.valueOf(b.value).equals(text)) {
+            if (String.valueOf(b.getValue()).compareToIgnoreCase(text) == 0) {
                 return b;
             }
         }
-        return null;
+
+        // fallback in the case the text presented is the actual enum
+        return ContactType.valueOf(text);
     }
 
 }
