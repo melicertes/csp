@@ -45,6 +45,7 @@ $(document).ready(function(){
         e.preventDefault();
 
         if (form.valid()) {
+            $('button.save.btn-success').attr('disabled', 'disabled');
             var formData = JSON.stringify($('#module-form').serializeObject());
             $.ajax({
                 type: 'POST',
