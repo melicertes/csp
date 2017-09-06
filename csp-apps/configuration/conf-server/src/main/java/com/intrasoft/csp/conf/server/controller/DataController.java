@@ -606,9 +606,9 @@ public class DataController implements DataContextUrl, PagesContextUrl {
             return new ResponseEntity<>(response, HttpStatus.OK);
 
         } catch (IOException e) {
-            throw new ConfException(StatusResponseType.DATA_MODULE_VERSION_SAVE_FILE.text(), StatusResponseType.DATA_MODULE_VERSION_SAVE_FILE.code());
+            throw new ConfException(StatusResponseType.DATA_MODULE_VERSION_SAVE_FILE.text(), e, StatusResponseType.DATA_MODULE_VERSION_SAVE_FILE.code());
         } catch (NoSuchAlgorithmException e) {
-            throw new ConfException(StatusResponseType.DATA_MODULE_VERSION_HASH_FILE.text(), StatusResponseType.DATA_MODULE_VERSION_HASH_FILE.code());
+            throw new ConfException(StatusResponseType.DATA_MODULE_VERSION_HASH_FILE.text(), e, StatusResponseType.DATA_MODULE_VERSION_HASH_FILE.code());
         }
     }
 

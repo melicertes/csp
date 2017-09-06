@@ -1,14 +1,14 @@
 package com.intrasoft.csp.conf.server.utils;
 
 
+import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.*;
+import java.security.DigestOutputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -40,17 +40,24 @@ public class FileHelper {
 
     public static String saveUploadedFile(String fileTemp, String fileRepository, MultipartFile file, String digestAlgorithm) throws IOException, NoSuchAlgorithmException {
         /*
-        Save file to temp
+        Save file from Multipart to temp **using streams for >600mb files**
          */
-        byte[] bytes = file.getBytes();
-        File f = new File(fileTemp + file.getOriginalFilename());
-        Path path = Paths.get(f.getAbsolutePath());
-        Files.write(path, bytes);
+        final File f = new File(fileTemp + file.getOriginalFilename());
+        final String hash; // to be initialized further down
 
+        try (InputStream inputStream = file.getInputStream();
+             DigestOutputStream outputStream = new DigestOutputStream(
+                        new FileOutputStream(f.getAbsoluteFile()),
+                        MessageDigest.getInstance(digestAlgorithm)) ) {
+            IOUtils.copy(inputStream, outputStream );
+            // copy is done, digest is ready.
+            hash = Hex.encodeHexString(
+                    outputStream.getMessageDigest().digest() );
+        }
         /*
         Calculate hash
          */
-        String hash = hashFile(digestAlgorithm, f.getAbsolutePath());
+        //String hash = hashFile(digestAlgorithm, f.getAbsolutePath());
 
         /*
         Clean up files
@@ -69,25 +76,25 @@ public class FileHelper {
         return hash;
     }
 
-    private static String hashFile(String digestAlgorithm, String filePath) throws NoSuchAlgorithmException, IOException {
-        MessageDigest md = MessageDigest.getInstance(digestAlgorithm);
-        FileInputStream fis = new FileInputStream(filePath);
-
-        byte[] dataBytes = new byte[1024];
-
-        int nread = 0;
-        while ((nread = fis.read(dataBytes)) != -1) {
-            md.update(dataBytes, 0, nread);
-        };
-        byte[] mdbytes = md.digest();
-        fis.close();
-
-        //convert the byte to hex format
-        StringBuffer hexString = new StringBuffer();
-        for (int i=0;i<mdbytes.length;i++) {
-            hexString.append(Integer.toHexString(0xFF & mdbytes[i]));
-        }
-
-        return hexString.toString();
-    }
+//    private static String hashFile(String digestAlgorithm, String filePath) throws NoSuchAlgorithmException, IOException {
+//        MessageDigest md = MessageDigest.getInstance(digestAlgorithm);
+//        FileInputStream fis = new FileInputStream(filePath);
+//
+//        byte[] dataBytes = new byte[1024];
+//
+//        int nread = 0;
+//        while ((nread = fis.read(dataBytes)) != -1) {
+//            md.update(dataBytes, 0, nread);
+//        };
+//        byte[] mdbytes = md.digest();
+//        fis.close();
+//
+//        //convert the byte to hex format
+//        StringBuffer hexString = new StringBuffer();
+//        for (int i=0;i<mdbytes.length;i++) {
+//            hexString.append(Integer.toHexString(0xFF & mdbytes[i]));
+//        }
+//
+//        return hexString.toString();
+//    }
 }
