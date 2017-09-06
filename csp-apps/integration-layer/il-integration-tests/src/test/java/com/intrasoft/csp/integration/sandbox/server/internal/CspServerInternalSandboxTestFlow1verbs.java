@@ -29,6 +29,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.util.StringUtils;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.util.List;
@@ -114,11 +115,21 @@ public class CspServerInternalSandboxTestFlow1verbs implements CamelRoutes {
     private final String applicationId = "taranis";
     String serverName;
 
-    static final String tcId = "tcId";
-    static final String teamId = "teamId";
+    protected String tcId = "tcId";
+    protected String teamId = "teamId";
 
     @Before
     public void init() throws Exception {
+        String tcIdArg = env.getProperty("extTcId");
+        if(!StringUtils.isEmpty(tcIdArg)){
+            tcId = tcIdArg;
+        }
+
+        String teamIdArg = env.getProperty("extTeamId");
+        if(!StringUtils.isEmpty(teamIdArg)){
+            teamId = teamIdArg;
+        }
+
         serverName = env.getProperty("server.name");
         mvc = webAppContextSetup(webApplicationContext).build();
         MockitoAnnotations.initMocks(this);

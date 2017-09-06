@@ -35,6 +35,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.util.StringUtils;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.util.HashMap;
@@ -163,10 +164,19 @@ public class CspServerInternalBusinessTestFlow1dataTypes implements CamelRoutes 
     String tcPathTeams;
 
     String applicationId = "taranis";
-    static final String tcId = "tcId";
-    static final String teamId = "teamId";
+    String tcId = "tcId";
+    String teamId = "teamId";
     @Before
     public void init() throws Exception {
+        String tcIdArg = env.getProperty("extTcId");
+        if(!StringUtils.isEmpty(tcIdArg)){
+            tcId = tcIdArg;
+        }
+
+        String teamIdArg = env.getProperty("extTeamId");
+        if(!StringUtils.isEmpty(teamIdArg)){
+            teamId = teamIdArg;
+        }
         mvc = webAppContextSetup(webApplicationContext).build();
         mockUtils.setSpringCamelContext(springCamelContext);
 

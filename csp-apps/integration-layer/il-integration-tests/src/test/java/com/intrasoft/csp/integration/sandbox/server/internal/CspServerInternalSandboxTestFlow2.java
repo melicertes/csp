@@ -95,8 +95,8 @@ public class CspServerInternalSandboxTestFlow2 {
     private final IntegrationDataType dataTypeToTest = IntegrationDataType.VULNERABILITY;
     private final String applicationId = "taranis";
     private String cspId = "CERT-GR";
-    static final String tcId = "tcId";
-    static final String teamId = "teamId";
+    private String tcId = "tcId";
+    private String teamId = "teamId";
 
 
     @Before
@@ -104,6 +104,16 @@ public class CspServerInternalSandboxTestFlow2 {
         String cspIdArg = env.getProperty("extCspId");
         if(!StringUtils.isEmpty(cspIdArg)){
             cspId = cspIdArg;
+        }
+
+        String tcIdArg = env.getProperty("extTcId");
+        if(!StringUtils.isEmpty(tcIdArg)){
+            tcId = tcIdArg;
+        }
+
+        String teamIdArg = env.getProperty("extTeamId");
+        if(!StringUtils.isEmpty(teamIdArg)){
+            teamId = teamIdArg;
         }
         mvc = webAppContextSetup(webApplicationContext).build();
         MockitoAnnotations.initMocks(this);
