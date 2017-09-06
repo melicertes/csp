@@ -2,7 +2,7 @@ package com.intrasoft.csp.conf.server.service;
 
 import com.intrasoft.csp.conf.commons.context.ApiContextUrl;
 import com.intrasoft.csp.conf.commons.exceptions.*;
-import com.intrasoft.csp.conf.commons.interfaces.ConfigurationApi;
+import com.intrasoft.csp.conf.commons.interfaces.Configuration;
 import com.intrasoft.csp.conf.commons.model.*;
 import com.intrasoft.csp.conf.commons.types.StatusResponseType;
 import com.intrasoft.csp.conf.server.domain.entities.*;
@@ -29,7 +29,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 @Service
-public class ConfService implements ApiContextUrl,ConfigurationApi{
+public class ConfService implements ApiContextUrl, Configuration {
     private static Logger LOG_AUDIT = LoggerFactory.getLogger("audit-log");
     private static Logger LOG_EXCEPTION = LoggerFactory.getLogger("exc-log");
 
@@ -91,9 +91,22 @@ public class ConfService implements ApiContextUrl,ConfigurationApi{
                     //send only if reported version is different than managed version
                     ModuleVersion versionManaged = moduleVersionRepository.findOne(cspManagement.getModuleVersionId());
                     CspInfo cspInfo = cspInfoRepository.findTop1ByCspIdOrderByRecordDateTimeDesc(cspId);
-                    CspModuleInfo cspModuleInfo = cspModuleInfoRepository.findTop1ByCspInfoIdOrderByCspInfoIdDesc(cspInfo.getId());
-                    ModuleVersion versionReported = moduleVersionRepository.findOne(cspModuleInfo.getModuleVersionId());
-                    if (versionManaged.getVersion() != versionReported.getVersion()) {
+                    //if csp has already reported updates
+                    if (cspInfo != null) {
+                        CspModuleInfo cspModuleInfo = cspModuleInfoRepository.findTop1ByCspInfoIdOrderByCspInfoIdDesc(cspInfo.getId());
+                        ModuleVersion versionReported = moduleVersionRepository.findOne(cspModuleInfo.getModuleVersionId());
+                        if (versionManaged.getVersion() != versionReported.getVersion()) {
+                            ModuleUpdateInfoDTO moduleUpdateInfo = new ModuleUpdateInfoDTO();
+                            moduleUpdateInfo.setName(moduleVersionRepository.findOne(cspManagement.getModuleVersionId()).getFullName());
+                            moduleUpdateInfo.setDescription(moduleVersionRepository.findOne(cspManagement.getModuleVersionId()).getDescription());
+                            moduleUpdateInfo.setVersion(VersionParser.toString(moduleVersionRepository.findOne(cspManagement.getModuleVersionId()).getVersion()));
+                            moduleUpdateInfo.setReleased(moduleVersionRepository.findOne(cspManagement.getModuleVersionId()).getReleasedOn());
+                            moduleUpdateInfo.setHash(moduleVersionRepository.findOne(cspManagement.getModuleVersionId()).getHash());
+
+                            updates.add(moduleUpdateInfo);
+                        }
+                    }
+                    else {
                         ModuleUpdateInfoDTO moduleUpdateInfo = new ModuleUpdateInfoDTO();
                         moduleUpdateInfo.setName(moduleVersionRepository.findOne(cspManagement.getModuleVersionId()).getFullName());
                         moduleUpdateInfo.setDescription(moduleVersionRepository.findOne(cspManagement.getModuleVersionId()).getDescription());
@@ -103,6 +116,7 @@ public class ConfService implements ApiContextUrl,ConfigurationApi{
 
                         updates.add(moduleUpdateInfo);
                     }
+
                 }
                 available.put(module.getName(), updates);
             }

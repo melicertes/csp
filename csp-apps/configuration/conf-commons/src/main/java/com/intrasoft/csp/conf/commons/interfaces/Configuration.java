@@ -9,7 +9,7 @@ import com.intrasoft.csp.conf.commons.model.UpdateInformationDTO;
 import org.springframework.http.ResponseEntity;
 
 
-public interface ConfigurationApi {
+public interface Configuration {
 
     /**
      * Retrieves a list of available updates, for registered modules of the CSP.

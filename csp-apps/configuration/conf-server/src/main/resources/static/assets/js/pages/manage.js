@@ -43,6 +43,7 @@ $(document).ready(function(){
         });
 
         if (form.valid() && !hasError) {
+            $('button.save.btn-success').attr('disabled', 'disabled');
             var formData = new Object();
             formData.cspId = $("#cspId").val();
             var modules = [];
