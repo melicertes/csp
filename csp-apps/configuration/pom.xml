@@ -21,6 +21,7 @@
         <module>conf-commons</module>
         <module>conf-server</module>
         <module>conf-integration-tests</module>
+	<module>conf-client-cspapp</module>
     </modules>
 
 
