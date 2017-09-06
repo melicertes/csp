@@ -195,7 +195,7 @@ public class CspServerInternalBusinessTestFlow1verbs implements CamelRoutes {
     @Test
     public void dslFlow1TeamIdPostToShareTest() throws Exception {
         mockUtils.sendFlow1Data(mvc,serverName, applicationId,null,teamId, false, true, this.dataTypeToTest, HttpMethods.POST.name());
-        assertPostPutFlow(tcProcessor.getTcTeams(this.dataTypeToTest).size());
+        assertPostPutFlow(1);
     }
 
     @DirtiesContext
@@ -216,7 +216,7 @@ public class CspServerInternalBusinessTestFlow1verbs implements CamelRoutes {
     @Test
     public void dslFlow1TeamIdPutToShareTest() throws Exception {
         mockUtils.sendFlow1Data(mvc,serverName, applicationId,null,teamId, false, true, this.dataTypeToTest, HttpMethods.PUT.name());
-        assertPostPutFlow(tcProcessor.getTcTeams(this.dataTypeToTest).size());
+        assertPostPutFlow(1);
     }
 
     @DirtiesContext
