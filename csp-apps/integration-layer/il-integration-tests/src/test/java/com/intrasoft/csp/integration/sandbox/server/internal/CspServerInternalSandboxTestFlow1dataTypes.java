@@ -50,6 +50,7 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
 @SpringBootTest(classes = {CspApp.class, MockUtils.class},
         properties = {
                 "spring.datasource.url:jdbc:h2:mem:csp_policy",
+                "flyway.enabled:false",
                 "server.name:CERT-GR",
                 "csp.retry.backOffPeriod:10",
                 "csp.retry.maxAttempts:1",

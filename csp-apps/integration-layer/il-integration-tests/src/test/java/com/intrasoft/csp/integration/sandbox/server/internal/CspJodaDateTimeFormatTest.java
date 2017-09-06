@@ -25,6 +25,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {CspApp.class},properties = {
         "spring.datasource.url:jdbc:h2:mem:csp_policy",
+        "flyway.enabled:false"
 })
 public class CspJodaDateTimeFormatTest {
     @Autowired
