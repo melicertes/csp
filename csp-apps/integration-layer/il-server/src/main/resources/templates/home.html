@@ -39,7 +39,7 @@
                                 <option th:value="${null}" th:text="${'- select datatype -'}" th:selected="selected"></option>
                                 <option th:each="integrationDataType : ${integrationDataTypes}"
                                         th:value="${integrationDataType.name()}"
-                                        th:text="${integrationDataType}">
+                                        th:text="${integrationDataType}" th:if="${integrationDataType.name() != 'DUMMY' and integrationDataType.name() != 'TRUSTCIRCLE'}">
                                 </option>
                             </select>
                             <span th:if="${#fields.hasErrors('integrationDataType')}" th:errors="*{integrationDataType}">integrationDataType Error</span>
@@ -49,9 +49,16 @@
                         <div class="form-group">
                             <label>Status:</label>
                             <select th:field="*{active}" class="form-control">
-                                <option value="true">Active</option>
-                                <option th:value="${null}" th:text="${'Default'}"></option>
-                                <option value="false">Inactive</option>
+                                <div th:if="${active == null and id!=null}">
+                                    <option value="true">Active</option>
+                                    <option th:value="${null}" th:text="${'Default'}" th:selected="selected"></option>
+                                    <option value="false">Inactive</option>
+                                </div>
+                                <th:block th:unless="${active == null and id!=null}">
+                                    <option value="true">Active</option>
+                                    <option th:value="${null}" th:text="${'Default'}"></option>
+                                    <option value="false">Inactive</option>
+                                </th:block>
                             </select>
                             <span th:if="${#fields.hasErrors('active')}" th:errors="*{active}">Active Error</span>
                         </div>

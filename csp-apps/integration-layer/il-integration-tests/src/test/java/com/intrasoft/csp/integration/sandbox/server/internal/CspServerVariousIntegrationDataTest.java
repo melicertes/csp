@@ -47,6 +47,7 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
         webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT,
         properties = {
                 "spring.datasource.url:jdbc:h2:mem:csp_policy",
+                "flyway.enabled:false",
                 "server.port: 8089",
                 "csp.server.protocol: http",
                 "csp.server.host: localhost",

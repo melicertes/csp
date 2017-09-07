@@ -1,7 +1,10 @@
 package com.intrasoft.csp.conf.server.controller;
 
 import com.intrasoft.csp.conf.commons.context.ApiContextUrl;
-import com.intrasoft.csp.conf.commons.model.*;
+import com.intrasoft.csp.conf.commons.model.AppInfoDTO;
+import com.intrasoft.csp.conf.commons.model.RegistrationDTO;
+import com.intrasoft.csp.conf.commons.model.ResponseDTO;
+import com.intrasoft.csp.conf.commons.model.UpdateInformationDTO;
 import com.intrasoft.csp.conf.server.service.ConfService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,8 +38,8 @@ public class ApiController implements ApiContextUrl {
     }
 
     @RequestMapping(value = "/v" + REST_API_V1 +  API_APPINFO + "/{cspId}", method = RequestMethod.POST)
-    public void appInfo(@PathVariable String cspId, @RequestBody AppInfoDTO appInfo) {
-        confService.appInfo(cspId,appInfo);
+    public ResponseDTO appInfo(@PathVariable String cspId, @RequestBody AppInfoDTO appInfo) {
+        return confService.appInfo(cspId,appInfo);
     }
 
 }

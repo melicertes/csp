@@ -25,7 +25,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,6 +35,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.fail;
 
+@Deprecated
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {ConfApp.class, ConfClientConfig.class},
         webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT,
@@ -91,8 +91,8 @@ public class ConfClientTest implements ApiContextUrl {
         /**
          * Test existing CSP with registrationIsUpdate=true
          */
-        cspId = "12345678-9123-4564-2665-5440000";
-        json = IOUtils.toString(this.getClass().getResourceAsStream("/register/register-valid-1.json"), "UTF-8");
+        cspId = "11111111-1111-1111-1111-111111111111";
+        json = IOUtils.toString(this.getClass().getResourceAsStream("/register.json"), "UTF-8");
         ObjectMapper mapper = new ObjectMapper();
         registration = new ObjectMapper().readValue(json, RegistrationDTO.class);
         ResponseDTO responseDTO = confClient.register(cspId, registration);
@@ -125,7 +125,7 @@ public class ConfClientTest implements ApiContextUrl {
          * Test existing CSP with registrationIsUpdate=true
          */
         cspId = "12345678-9123-4564-2665-5440000";
-        json = IOUtils.toString(this.getClass().getResourceAsStream("/appInfo/appInfo-valid-1.json"), "UTF-8");
+        json = IOUtils.toString(this.getClass().getResourceAsStream("/appInfo.json"), "UTF-8");
         ObjectMapper mapper = new ObjectMapper();
         appInfo = new ObjectMapper().readValue(json, AppInfoDTO.class);
         confClient.appInfo(cspId, appInfo);

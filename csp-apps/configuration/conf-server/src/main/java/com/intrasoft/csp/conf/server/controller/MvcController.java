@@ -20,6 +20,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Controller
 public class MvcController implements PagesContextUrl, DataContextUrl {
@@ -166,6 +167,7 @@ public class MvcController implements PagesContextUrl, DataContextUrl {
         model = this.init(model);
         model.addAttribute("cspSaveUrl", DATA_BASEURL + DATA_CSP_SAVE);
         model.addAttribute("cspListUrl", PAGES_CSP_LIST);
+        model.addAttribute("cspId", UUID.randomUUID().toString());
         model.addAttribute("navCspClassActive", "active");
         return new ModelAndView("pages/csp/register", "register", model);
     }

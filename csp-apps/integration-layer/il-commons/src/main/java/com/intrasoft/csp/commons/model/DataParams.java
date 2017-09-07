@@ -42,9 +42,6 @@ public class DataParams implements Serializable {
     @JsonProperty("originRecordId")
     private String originRecordId;
 
-    @JsonProperty("reference")
-    private String reference;
-
     @JsonProperty("url")
     private String url;
 
@@ -121,14 +118,6 @@ public class DataParams implements Serializable {
 
     public void setOriginRecordId(String originRecordId) {
         this.originRecordId = originRecordId;
-    }
-
-    public String getReference() {
-        return reference;
-    }
-
-    public void setReference(String reference) {
-        this.reference = reference;
     }
 
     public String getUrl() {

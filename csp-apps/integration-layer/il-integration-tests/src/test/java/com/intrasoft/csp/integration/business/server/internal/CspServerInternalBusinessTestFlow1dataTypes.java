@@ -51,6 +51,7 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
 @SpringBootTest(classes = {CspApp.class, MockUtils.class},
         properties = {
                 "spring.datasource.url:jdbc:h2:mem:csp_policy",
+                "flyway.enabled:false",
         /*
         //added in application-dangerduck.properties
                 "consume.errorq.on.interval:false",
@@ -229,7 +230,7 @@ public class CspServerInternalBusinessTestFlow1dataTypes implements CamelRoutes 
     @Test
     public void dslFlow1PostTeamIdThreatTest() throws Exception {
         mockUtils.sendFlow1Data(mvc, serverName,applicationId,null,teamId,false, true, IntegrationDataType.THREAT, HttpMethods.POST.name());
-        assertFlows(IntegrationDataType.THREAT, tcProcessor.getTcTeams(IntegrationDataType.THREAT).size());
+        assertFlows(IntegrationDataType.THREAT, 1);
     }
 
     @DirtiesContext
@@ -250,7 +251,7 @@ public class CspServerInternalBusinessTestFlow1dataTypes implements CamelRoutes 
     @Test
     public void dslFlow1PutTeamIdThreatTest() throws Exception {
         mockUtils.sendFlow1Data(mvc, serverName,applicationId,null,teamId,false, true, IntegrationDataType.THREAT, HttpMethods.PUT.name());
-        assertFlows(IntegrationDataType.THREAT, tcProcessor.getTcTeams(IntegrationDataType.THREAT).size());
+        assertFlows(IntegrationDataType.THREAT, 1);
     }
 
     @DirtiesContext
@@ -271,7 +272,7 @@ public class CspServerInternalBusinessTestFlow1dataTypes implements CamelRoutes 
     @Test
     public void dslFlow1PostTeamIdArtefactTest() throws Exception {
         mockUtils.sendFlow1Data(mvc, serverName, applicationId,null,teamId,false, true, IntegrationDataType.ARTEFACT, HttpMethods.POST.name());
-        assertFlows(IntegrationDataType.ARTEFACT, tcProcessor.getTcTeams(IntegrationDataType.ARTEFACT).size());
+        assertFlows(IntegrationDataType.ARTEFACT, 1);
     }
 
     @DirtiesContext
@@ -292,7 +293,7 @@ public class CspServerInternalBusinessTestFlow1dataTypes implements CamelRoutes 
     @Test
     public void dslFlow1PutTeamIdArtefactTest() throws Exception {
         mockUtils.sendFlow1Data(mvc, serverName, applicationId,null,teamId,false, true, IntegrationDataType.ARTEFACT, HttpMethods.PUT.name());
-        assertFlows(IntegrationDataType.ARTEFACT, tcProcessor.getTcTeams(IntegrationDataType.ARTEFACT).size());
+        assertFlows(IntegrationDataType.ARTEFACT, 1);
     }
 
     @DirtiesContext
@@ -313,7 +314,7 @@ public class CspServerInternalBusinessTestFlow1dataTypes implements CamelRoutes 
     @Test
     public void dslFlow1PostTeamIdTrustcircleTest() throws Exception {
         mockUtils.sendFlow1Data(mvc, serverName, applicationId,null,teamId,false, true, IntegrationDataType.TRUSTCIRCLE, HttpMethods.POST.name());
-        assertFlows(IntegrationDataType.TRUSTCIRCLE, tcProcessor.getTcTeams(IntegrationDataType.TRUSTCIRCLE).size());
+        assertFlows(IntegrationDataType.TRUSTCIRCLE, 1);
     }
 
     @DirtiesContext
@@ -334,7 +335,7 @@ public class CspServerInternalBusinessTestFlow1dataTypes implements CamelRoutes 
     @Test
     public void dslFlow1PutTeamIdTrustcircleTest() throws Exception {
         mockUtils.sendFlow1Data(mvc,serverName, applicationId,null,teamId,false, true, IntegrationDataType.TRUSTCIRCLE, HttpMethods.PUT.name());
-        assertFlows(IntegrationDataType.TRUSTCIRCLE, tcProcessor.getTcTeams(IntegrationDataType.TRUSTCIRCLE).size());
+        assertFlows(IntegrationDataType.TRUSTCIRCLE, 1);
     }
 
     private void assertFlows(IntegrationDataType dataType, Integer expectedEscpMessages) throws Exception {

@@ -60,6 +60,7 @@ $(document).ready(function(){
         e.preventDefault();
 
         if (form.valid()) {
+            $('button.save.btn-success').attr('disabled', 'disabled');
             var f = document.getElementById('module-version-form');
             var formData = new FormData(f);
 

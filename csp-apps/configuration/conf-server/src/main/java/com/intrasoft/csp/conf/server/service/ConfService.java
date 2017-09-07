@@ -2,7 +2,7 @@ package com.intrasoft.csp.conf.server.service;
 
 import com.intrasoft.csp.conf.commons.context.ApiContextUrl;
 import com.intrasoft.csp.conf.commons.exceptions.*;
-import com.intrasoft.csp.conf.commons.interfaces.ConfigurationApi;
+import com.intrasoft.csp.conf.commons.interfaces.Configuration;
 import com.intrasoft.csp.conf.commons.model.*;
 import com.intrasoft.csp.conf.commons.types.StatusResponseType;
 import com.intrasoft.csp.conf.server.domain.entities.*;
@@ -19,6 +19,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.method.P;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -29,7 +30,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 @Service
-public class ConfService implements ApiContextUrl,ConfigurationApi{
+public class ConfService implements ApiContextUrl, Configuration {
     private static Logger LOG_AUDIT = LoggerFactory.getLogger("audit-log");
     private static Logger LOG_EXCEPTION = LoggerFactory.getLogger("exc-log");
 
@@ -78,7 +79,11 @@ public class ConfService implements ApiContextUrl,ConfigurationApi{
         LinkedHashMap<String, List<ModuleUpdateInfoDTO>> available = new LinkedHashMap<>();
 
         UpdateInformationDTO updateInformation = new UpdateInformationDTO();
-        updateInformation.setDateChanged(cspManagementRepository.findTop1ByCspIdOrderByDateChangedDesc(cspId).getDateChanged());
+        CspManagement cspMgt = cspManagementRepository.findTop1ByCspIdOrderByDateChangedDesc(cspId);
+        if (cspMgt == null) {
+            throw new InvalidCspEntryException(StatusResponseType.API_CSP_NOT_CONFIGURED_YET.text());
+        }
+        updateInformation.setDateChanged(cspMgt.getDateChanged());
 
         //get modules by priority
         List<Module> moduleList = moduleRepository.findAll(new Sort(Sort.Direction.ASC, "StartPriority"));
@@ -91,9 +96,23 @@ public class ConfService implements ApiContextUrl,ConfigurationApi{
                     //send only if reported version is different than managed version
                     ModuleVersion versionManaged = moduleVersionRepository.findOne(cspManagement.getModuleVersionId());
                     CspInfo cspInfo = cspInfoRepository.findTop1ByCspIdOrderByRecordDateTimeDesc(cspId);
-                    CspModuleInfo cspModuleInfo = cspModuleInfoRepository.findTop1ByCspInfoIdOrderByCspInfoIdDesc(cspInfo.getId());
-                    ModuleVersion versionReported = moduleVersionRepository.findOne(cspModuleInfo.getModuleVersionId());
-                    if (versionManaged.getVersion() != versionReported.getVersion()) {
+
+                    //if csp has already reported updates, search for updates not existed in the last report
+                    if (cspInfo != null) {
+                        CspModuleInfo cspModuleInfo = cspModuleInfoRepository.findTop1ByCspInfoIdOrderByCspInfoIdDesc(cspInfo.getId());
+                        ModuleVersion versionReported = moduleVersionRepository.findOne(cspModuleInfo.getModuleVersionId());
+                        if (versionManaged.getVersion() != versionReported.getVersion()) {
+                            ModuleUpdateInfoDTO moduleUpdateInfo = new ModuleUpdateInfoDTO();
+                            moduleUpdateInfo.setName(moduleVersionRepository.findOne(cspManagement.getModuleVersionId()).getFullName());
+                            moduleUpdateInfo.setDescription(moduleVersionRepository.findOne(cspManagement.getModuleVersionId()).getDescription());
+                            moduleUpdateInfo.setVersion(VersionParser.toString(moduleVersionRepository.findOne(cspManagement.getModuleVersionId()).getVersion()));
+                            moduleUpdateInfo.setReleased(moduleVersionRepository.findOne(cspManagement.getModuleVersionId()).getReleasedOn());
+                            moduleUpdateInfo.setHash(moduleVersionRepository.findOne(cspManagement.getModuleVersionId()).getHash());
+
+                            updates.add(moduleUpdateInfo);
+                        }
+                    }
+                    else {
                         ModuleUpdateInfoDTO moduleUpdateInfo = new ModuleUpdateInfoDTO();
                         moduleUpdateInfo.setName(moduleVersionRepository.findOne(cspManagement.getModuleVersionId()).getFullName());
                         moduleUpdateInfo.setDescription(moduleVersionRepository.findOne(cspManagement.getModuleVersionId()).getDescription());
@@ -103,6 +122,7 @@ public class ConfService implements ApiContextUrl,ConfigurationApi{
 
                         updates.add(moduleUpdateInfo);
                     }
+
                 }
                 available.put(module.getName(), updates);
             }
@@ -205,7 +225,7 @@ public class ConfService implements ApiContextUrl,ConfigurationApi{
     }
 
     @Override
-    public void appInfo(String cspId, AppInfoDTO appInfo) {
+    public ResponseDTO appInfo(String cspId, AppInfoDTO appInfo) {
         String user = "system";
         String logInfo = user + ", " + "/v" + REST_API_V1 +  API_APPINFO + "/" + cspId + ": ";
         LOG_AUDIT.info(logInfo + "POST Request received");
@@ -222,7 +242,7 @@ public class ConfService implements ApiContextUrl,ConfigurationApi{
 
         LOG_AUDIT.info(logInfo + StatusResponseType.OK.text());
         ResponseDTO response = new ResponseDTO(StatusResponseType.OK.code(), StatusResponseType.OK.text());
-        //return new ResponseEntity<>(response, HttpStatus.OK);
+        return response;
     }
 
     private Csp getCspFromRegistration(RegistrationDTO cspRegistration) {
@@ -310,7 +330,11 @@ public class ConfService implements ApiContextUrl,ConfigurationApi{
             cspModuleInfo.setCspInfoId(cspInfo.getId());
             cspModuleInfo.setModuleVersionId(moduleVersion.getId());
             cspModuleInfo.setModuleInstalledOn(moduleInfo.getAdditionalProperties().getInstalledOn());
-            int val = moduleInfo.getAdditionalProperties().getActive() ? 1 : 0;
+            int val = 0;
+            if (moduleInfo.getAdditionalProperties().getActive() != null && moduleInfo.getAdditionalProperties().getActive() == true) {
+                val = 1;
+            }
+            //int val = moduleInfo.getAdditionalProperties().getActive() ? 1 : 0;
             cspModuleInfo.setModuleIsActive(val);
             cspModuleInfo = cspModuleInfoRepository.save(cspModuleInfo);
 
