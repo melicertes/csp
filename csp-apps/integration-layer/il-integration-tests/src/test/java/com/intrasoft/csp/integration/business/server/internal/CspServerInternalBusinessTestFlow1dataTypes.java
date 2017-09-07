@@ -178,6 +178,12 @@ public class CspServerInternalBusinessTestFlow1dataTypes implements CamelRoutes 
         if(!StringUtils.isEmpty(teamIdArg)){
             teamId = teamIdArg;
         }
+
+        String dataObjectArg = env.getProperty("dataObject");
+        if(!StringUtils.isEmpty(dataObjectArg)){
+            mockUtils.setDataObjectToTest(dataObjectArg);
+        }
+
         mvc = webAppContextSetup(webApplicationContext).build();
         mockUtils.setSpringCamelContext(springCamelContext);
 

@@ -154,6 +154,12 @@ public class CspServerInternalBusinessTestFlow1verbs implements CamelRoutes {
         if(!StringUtils.isEmpty(teamIdArg)){
             teamId = teamIdArg;
         }
+
+        String dataObjectArg = env.getProperty("dataObject");
+        if(!StringUtils.isEmpty(dataObjectArg)){
+            mockUtils.setDataObjectToTest(dataObjectArg);
+        }
+
         serverName = env.getProperty("server.name");
         mvc = webAppContextSetup(webApplicationContext).build();
         mockUtils.setSpringCamelContext(springCamelContext);

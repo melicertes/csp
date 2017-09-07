@@ -131,6 +131,11 @@ public class CspServerInternalSandboxTestFlow1verbs implements CamelRoutes {
             teamId = teamIdArg;
         }
 
+        String dataObjectArg = env.getProperty("dataObject");
+        if(!StringUtils.isEmpty(dataObjectArg)){
+            mockUtils.setDataObjectToTest(dataObjectArg);
+        }
+
         serverName = env.getProperty("server.name");
         mvc = webAppContextSetup(webApplicationContext).build();
         MockitoAnnotations.initMocks(this);

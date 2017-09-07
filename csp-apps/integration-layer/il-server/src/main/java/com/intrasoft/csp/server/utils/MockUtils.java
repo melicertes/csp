@@ -425,4 +425,12 @@ public class MockUtils implements ContextUrl {
     public void setSpringCamelContext(SpringCamelContext springCamelContext) {
         this.springCamelContext = springCamelContext;
     }
+
+    public String getDataObjectToTest() {
+        return dataObjectToTest;
+    }
+
+    public void setDataObjectToTest(String dataObjectToTest) {
+        this.dataObjectToTest = dataObjectToTest;
+    }
 }
