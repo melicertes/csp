@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -45,11 +46,6 @@ public class ConfClientImpl implements ConfClient, ApiContextUrl {
     public ResponseDTO register(String cspId, RegistrationDTO cspRegistration) {
         final String url = apiVersionClient.getApiUrl() + API_REGISTER + "/" + cspId;
         LOG.debug("Configuration call [POST]: " + url);
-
-        /**
-         * @TODO
-         * At test fails to persist, but api service logs success
-         */
         ResponseDTO responseDTO = retryRestTemplate.postForObject(url, cspRegistration, ResponseDTO.class);
         return responseDTO;
     }
@@ -58,20 +54,15 @@ public class ConfClientImpl implements ConfClient, ApiContextUrl {
     public ResponseEntity update(String cspId, String updateHash) {
         final String url = apiVersionClient.getApiUrl() + API_UPDATE + "/" + cspId + "/" + updateHash;
         LOG.debug("Configuration call [GET]: " + url);
-
-        /**
-         * @TODO
-         * Service returns either file stream or ResponseDTO. How to implement?
-         */
-        ResponseEntity response = retryRestTemplate.exchange(url, HttpMethod.GET, null, Stream.class);
+        ResponseEntity response = retryRestTemplate.exchange(url, HttpMethod.GET, null, Resource.class);
         return response;
     }
 
     @Override
-    public void appInfo(String cspId, AppInfoDTO appInfo) {
+    public ResponseDTO appInfo(String cspId, AppInfoDTO appInfo) {
         final String url = apiVersionClient.getApiUrl() + API_APPINFO + "/" + cspId;
         LOG.debug("Configuration call [POST]: " + url);
-
-        ResponseEntity response = retryRestTemplate.exchange(url, HttpMethod.POST, new HttpEntity<Object>(appInfo), String.class);
+        ResponseDTO response = retryRestTemplate.postForObject(url, appInfo, ResponseDTO.class);//retryRestTemplate.exchange(url, HttpMethod.POST, new HttpEntity<Object>(appInfo), ResponseDTO.class);
+        return response;
     }
 }

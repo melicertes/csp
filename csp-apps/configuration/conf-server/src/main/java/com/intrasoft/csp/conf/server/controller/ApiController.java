@@ -38,8 +38,8 @@ public class ApiController implements ApiContextUrl {
     }
 
     @RequestMapping(value = "/v" + REST_API_V1 +  API_APPINFO + "/{cspId}", method = RequestMethod.POST)
-    public void appInfo(@PathVariable String cspId, @RequestBody AppInfoDTO appInfo) {
-        confService.appInfo(cspId,appInfo);
+    public ResponseDTO appInfo(@PathVariable String cspId, @RequestBody AppInfoDTO appInfo) {
+        return confService.appInfo(cspId,appInfo);
     }
 
 }
