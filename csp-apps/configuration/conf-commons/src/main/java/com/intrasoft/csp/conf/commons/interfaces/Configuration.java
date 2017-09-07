@@ -23,7 +23,7 @@ public interface Configuration {
      * Register a NEW csp or register for an existing CSP the modules that are being installed
      * @param cspId A unique identifier that defines a Registered and Known CSP. The csp identifier follows the UUID
      *              formatted as text, for 36 characters total, arranged as 8-4-4-4-12.
-     * @param cspRegistration A block of information to register the CSP being installed
+     * @param cspRegistration A block of information to register the CSP being installed.
      */
     ResponseDTO register(String cspId, RegistrationDTO cspRegistration);
 
@@ -42,5 +42,5 @@ public interface Configuration {
      * @param cspId A unique identifier that defines a Registered and Known CSP. The csp identifier follows the UUID
      *              formatted as text, for 36 characters total, arranged as 8-4-4-4-12.
      */
-    void appInfo(String cspId, AppInfoDTO appInfo);
+    ResponseDTO appInfo(String cspId, AppInfoDTO appInfo);
 }

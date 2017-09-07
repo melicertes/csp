@@ -585,7 +585,7 @@ public class DataController implements DataContextUrl, PagesContextUrl {
         //check if module version exists
         if (moduleVersionRepository.findByModuleIdAndVersion(moduleId, VersionParser.fromString(version)) != null) {
             throw new ConfException(StatusResponseType.DATA_MODULE_VERSION_EXISTS.text(), StatusResponseType.DATA_MODULE_VERSION_EXISTS.code());
-            }
+        }
 
         //save file and get hash
         try {
@@ -682,11 +682,11 @@ public class DataController implements DataContextUrl, PagesContextUrl {
             return new ResponseEntity<>(response, HttpStatus.OK);
 
         } catch (NoSuchAlgorithmException e) {
-            throw new ConfException(StatusResponseType.DATA_MODULE_VERSION_HASH_FILE.text(), StatusResponseType.DATA_MODULE_VERSION_HASH_FILE.code());
+            throw new ConfException(StatusResponseType.DATA_MODULE_VERSION_HASH_FILE.text(), e.getCause(), StatusResponseType.DATA_MODULE_VERSION_HASH_FILE.code());
         } catch (NoSuchFileException e) {
-            throw new ConfException(StatusResponseType.DATA_MODULE_VERSION_INVALID_FILE.text(), StatusResponseType.DATA_MODULE_VERSION_INVALID_FILE.code());
+            throw new ConfException(StatusResponseType.DATA_MODULE_VERSION_INVALID_FILE.text(), e.getCause(), StatusResponseType.DATA_MODULE_VERSION_INVALID_FILE.code());
         } catch (IOException e) {
-            throw new ConfException(StatusResponseType.DATA_MODULE_VERSION_SAVE_FILE.text(), StatusResponseType.DATA_MODULE_VERSION_SAVE_FILE.code());
+            throw new ConfException(StatusResponseType.DATA_MODULE_VERSION_SAVE_FILE.text(), e.getCause(), StatusResponseType.DATA_MODULE_VERSION_SAVE_FILE.code());
         }
     }
 
@@ -729,7 +729,7 @@ public class DataController implements DataContextUrl, PagesContextUrl {
             return new ResponseEntity<>(response, HttpStatus.OK);
 
         } catch (IOException e) {
-            throw new ConfException(StatusResponseType.DATA_MODULE_VERSION_INVALID_FILE.text(), StatusResponseType.DATA_MODULE_VERSION_INVALID_FILE.code());
+            throw new ConfException(StatusResponseType.DATA_MODULE_VERSION_INVALID_FILE.text(), e.getCause(), StatusResponseType.DATA_MODULE_VERSION_INVALID_FILE.code());
         }
     }
 

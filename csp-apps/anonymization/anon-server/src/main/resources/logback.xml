@@ -6,7 +6,7 @@
 
     <!--Basic configuration-->
     <property name="APP_NAME" value="CSP.ANONYMIZATION"/>
-    <property name="LOGS_HOME" value="/var/log/csp/"/>
+    <property name="LOGS_HOME" value="/opt/csplogs/"/>
     <property name="TYPE_EXC" value="exc"/>
     <property name="TYPE_AUD" value="aud"/>
     <property name="HISTORY_EXC" value="1"/>

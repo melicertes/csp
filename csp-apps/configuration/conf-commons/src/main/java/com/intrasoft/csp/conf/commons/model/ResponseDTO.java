@@ -23,6 +23,9 @@ public class ResponseDTO {
         this.responseText = responseText;
     }
 
+    public ResponseDTO() {
+        super();
+    }
 
     public ResponseDTO(Integer responseCode, String responseText) {
         this.responseCode = responseCode;

@@ -39,6 +39,77 @@ public class MockUtils implements ContextUrl {
     @Autowired
     ObjectMapper objectMapper;
 
+    String dataObjectToTest = "{\n" +
+            "\"xml_advisory\": {\n" +
+            "    \"meta_info\": {\n" +
+            "      \"system_information\": {\n" +
+            "        \"systemdetail\": {\n" +
+            "          \"affected_products_text\": \"Apple iTunes\",\n" +
+            "          \"affected_platform\": {\n" +
+            "            \"platform\": {\n" +
+            "              \"producer\": \"Microsoft\",\n" +
+            "              \"name\": \"Windows\",\n" +
+            "              \"version\": \"10\"\n" +
+            "            }\n" +
+            "          },\n" +
+            "          \"affected_products_versions_text\": \"11\",\n" +
+            "          \"affected_platforms_text\": \"Microsoft Windows 10\",\n" +
+            "          \"affected_product\": {\n" +
+            "            \"product\": {\n" +
+            "              \"producer\": \"Apple\",\n" +
+            "              \"name\": \"iTunes\",\n" +
+            "              \"version\": \"11\"\n" +
+            "            }\n" +
+            "          }\n" +
+            "        }\n" +
+            "      },\n" +
+            "      \"probability\": \"high\",\n" +
+            "      \"version_history\": {\n" +
+            "        \"version_instance\": { \"version\": \"1.00\" }\n" +
+            "      },\n" +
+            "      \"title\": \"Advisory regarding recent Taranis 3.3.3 vulnerability\",\n" +
+            "      \"taranis_version\": \"3.0\",\n" +
+            "      \"vulnerability_effect\": {\n" +
+            "         \n" +
+            "      },\n" +
+            "      \"damage\": \"high\",\n" +
+            "      \"issuer\": \"Taranis\",\n" +
+            "      \"availability\": \"https://kennisbank.ncsc.nl/\",\n" +
+            "      \"reference_number\": \"Taranis-2017-XXXX\",\n" +
+            "      \"vulnerability_identifiers\": {\n" +
+            "        \"cve\": { \"id\": \"CVE-2017-7578\" }\n" +
+            "      }\n" +
+            "    },\n" +
+            "    \"rating\": {\n" +
+            "      \"publisher_analysis\": {\n" +
+            "        \"ques_pro_expect\": \"3\",\n" +
+            "        \"ques_pro_exploit\": \"6\",\n" +
+            "        \"ques_pro_complexity\": \"3\",\n" +
+            "        \"ques_pro_access\": \"6\",\n" +
+            "        \"ques_pro_details\": \"2\",\n" +
+            "        \"ques_pro_solution\": \"3\",\n" +
+            "        \"ques_dmg_privesc\": \"1\",\n" +
+            "        \"ques_pro_standard\": \"3\",\n" +
+            "        \"ques_dmg_infoleak\": \"2\",\n" +
+            "        \"ques_pro_credent\": \"2\",\n" +
+            "        \"ques_pro_userint\": \"3\",\n" +
+            "        \"ques_dmg_remrights\": \"1\",\n" +
+            "        \"ques_pro_exploited\": \"3\",\n" +
+            "        \"ques_dmg_dos\": \"1\",\n" +
+            "        \"ques_dmg_codeexec\": \"2\"\n" +
+            "      }\n" +
+            "    },\n" +
+            "    \"content\": {\n" +
+            "      \"additional_resources\": { \"resource\": \"http://cve.mitre.org/cve/\" },\n" +
+            "      \"solution\": \"Uninstall iTunes, Taranis and MacOS.\",\n" +
+            "      \"disclaimer\": \"Door gebruik van deze security advisory gaat u akkoord met de navolgende voorwaarden.\",\n" +
+            "      \"abstract\": \"Taranis 3.3.3 when combined with Itunes 11 under Windows 10 cause the Safari browser to crush.\",\n" +
+            "      \"consequences\": \"The computer may freeze.\",\n" +
+            "      \"description\": \"Taranis 3.3.3 when combined with Itunes 11 under Windows 10 cause the Safari browser to crush.\"\n" +
+            "    }\n" +
+            "  }\n" +
+            "}";
+
     /**
      * examples: getMockedTrustCircle(3, "http://external.csp%s.com")
      * */
@@ -154,7 +225,6 @@ public class MockUtils implements ContextUrl {
         dataParams.setOriginRecordId("origin-recordId");
         dataParams.setDateTime(DateTime.now());
         dataParams.setUrl("http://rt.cert-gr.melecertes.eu/Ticket/Display.html?id=23453");
-        dataParams.setReference("<a href=\"http://rt.cert-gr.melecertes.eu/Ticket/Display.html?id=23453\" data-origin=\"cert-gr;rt;23453\">Incident title</a>");
         SharingParams sharingParams = new SharingParams();
         sharingParams.setIsExternal(isExternal);
         sharingParams.setToShare(true);
@@ -165,7 +235,7 @@ public class MockUtils implements ContextUrl {
             sharingParams.setTeamId(teamId);
         }
         integrationData.setDataParams(dataParams);
-        integrationData.setDataObject(dataParams);
+        integrationData.setDataObject(dataObjectToTest);
         integrationData.setSharingParams(sharingParams);
         mvc.perform(post("/v"+REST_API_V1+"/"+DSL_INTEGRATION_DATA).accept(MediaType.TEXT_PLAIN)
                 .content(TestUtil.convertObjectToJsonBytes(integrationData))
@@ -210,8 +280,9 @@ public class MockUtils implements ContextUrl {
         dataParams.setOriginCspId("origin-"+cspId);
         dataParams.setOriginApplicationId("origin-"+applicationId);
         dataParams.setOriginRecordId("origin-222");
+        dataParams.setUrl("https://rt.cert-gr.melecertes.eu/Ticket/Display.html?id=23453");
         integrationData.setDataParams(dataParams);
-        integrationData.setDataObject(dataParams);
+        integrationData.setDataObject(dataObjectToTest);
 
 
         if (httpMethod.toLowerCase().equals("post")) {
@@ -262,10 +333,11 @@ public class MockUtils implements ContextUrl {
         dataParams.setOriginCspId("origin-"+cspId);
         dataParams.setOriginApplicationId("origin-"+applicationId);
         dataParams.setOriginRecordId("origin-222");
+        dataParams.setUrl("http://rt.cert-gr.melecertes.eu/Ticket/Display.html?id=23453");
         dataParams.setDateTime(DateTime.now());
         dataParams.setCspId(cspId);
         integrationData.setDataParams(dataParams);
-        integrationData.setDataObject(dataParams);
+        integrationData.setDataObject(dataObjectToTest);
 
 
         if (httpMethod.toLowerCase().equals("post")) {

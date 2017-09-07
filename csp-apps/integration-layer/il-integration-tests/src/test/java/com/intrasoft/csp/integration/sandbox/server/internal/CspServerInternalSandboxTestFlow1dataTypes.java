@@ -30,6 +30,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.util.StringUtils;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.io.IOException;
@@ -49,6 +50,7 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
 @SpringBootTest(classes = {CspApp.class, MockUtils.class},
         properties = {
                 "spring.datasource.url:jdbc:h2:mem:csp_policy",
+                "flyway.enabled:false",
                 "server.name:CERT-GR",
                 "csp.retry.backOffPeriod:10",
                 "csp.retry.maxAttempts:1",
@@ -113,11 +115,20 @@ public class CspServerInternalSandboxTestFlow1dataTypes implements CamelRoutes {
     String elasticUri;
     String serverName;
     String applicationId = "taranis";
-    static final String tcId = "tcId";
-    static final String teamId = "teamId";
+    String tcId = "tcId";
+    String teamId = "teamId";
 
     @Before
     public void init() throws Exception {
+        String tcIdArg = env.getProperty("extTcId");
+        if(!StringUtils.isEmpty(tcIdArg)){
+            tcId = tcIdArg;
+        }
+
+        String teamIdArg = env.getProperty("extTeamId");
+        if(!StringUtils.isEmpty(teamIdArg)){
+            teamId = teamIdArg;
+        }
         serverName = env.getProperty("server.name");
         mvc = webAppContextSetup(webApplicationContext).build();
         MockitoAnnotations.initMocks(this);

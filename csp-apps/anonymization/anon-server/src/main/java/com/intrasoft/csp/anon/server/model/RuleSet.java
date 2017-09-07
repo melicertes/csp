@@ -20,7 +20,6 @@ public class RuleSet {
     @Column(length = 1024*1024*2)//2MB maximum
     byte[] file;
 
-    @NotNull
     String description;
 
     public long getId() {

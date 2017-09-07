@@ -206,31 +206,19 @@ public class TcProcessor implements Processor,CamelRoutes{
     }
 
     private void handleDclFlowAndSendToECSP(String httpMethod, Team team, IntegrationData integrationData) throws NoSuchAlgorithmException, InvalidKeyException, IOException {
-        // SXCSP-85 Sharing Policy to be integrated only when sending to ECSP
+        // SXCSP-85 Sharing Policy to be integrated only when sending to ECSP; TrustCircle should be excluded
+        SharingPolicyAction sharingPolicyAction = SharingPolicyAction.SHARE_AS_IS;
         /**
          * 3 actions:
          * -share as is
          * -share anonymized
          * -dont share
          */
-        EvaluatedPolicyDTO evaluatedPolicyDTO = sharingPolicyService.evaluate(integrationData,team);
-        SharingPolicyAction sharingPolicyAction = evaluatedPolicyDTO.getSharingPolicyAction();
-//        Boolean evaluatedPolicyCondition = false;
-//        try {
-//            if(evaluatedPolicyDTO.getPolicyDTO()!=null){
-//                evaluatedPolicyCondition = sharingPolicyService.checkCondition(evaluatedPolicyDTO.getPolicyDTO().getCondition(),integrationData,team);
-//                LOG.info(String.format("evaluatedPolicyCondition(%s) = %b",evaluatedPolicyDTO.getPolicyDTO().getCondition(),evaluatedPolicyCondition));
-//            }else{
-//                LOG.warn("Could not find a condition in the EvaluatedPolicyDTO.");
-//                //TODO: How to handle this?
-//            }
-//        } catch (ScriptException e) {
-//            //TODO: how to handle this?
-//            LOG.error("Error while evaluating policy condition",e);
-//        }
-//
-
-
+        if(!integrationData.getDataType().equals(IntegrationDataType.TRUSTCIRCLE)) {
+            // EVALUATE ONLY IF DATA_TYPE IS NOT TRUSTCIRCLE
+            EvaluatedPolicyDTO evaluatedPolicyDTO = sharingPolicyService.evaluate(integrationData, team);
+            sharingPolicyAction = evaluatedPolicyDTO.getSharingPolicyAction();
+        }
         switch (sharingPolicyAction){
             case SHARE_AS_IS:
                 break;

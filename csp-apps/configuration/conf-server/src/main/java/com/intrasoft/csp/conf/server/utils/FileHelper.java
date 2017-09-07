@@ -41,6 +41,17 @@ public class FileHelper {
     public static String saveUploadedFile(String fileTemp, String fileRepository, MultipartFile file, String digestAlgorithm) throws IOException, NoSuchAlgorithmException {
         /*
         Save file from Multipart to temp **using streams for >600mb files**
+        Create temp directory if does not exist
+         */
+        createDirectory(fileTemp);
+
+        /*
+        Create data directory of does not exist
+         */
+        createDirectory(fileRepository);
+
+        /*
+        Save file to temp
          */
         final File f = new File(fileTemp + file.getOriginalFilename());
         final String hash; // to be initialized further down
@@ -69,6 +80,7 @@ public class FileHelper {
         };
         File target = new File(fileRepository + hash + "." + FilenameUtils.getExtension(f.getAbsolutePath()));
         Path FROM = Paths.get(f.getAbsolutePath());
+
         Path TO = Paths.get(target.getAbsolutePath());
         Files.copy(FROM, TO, options);
         Files.delete(FROM);
@@ -97,4 +109,16 @@ public class FileHelper {
 //
 //        return hexString.toString();
 //    }
+
+    private static void createDirectory(String directory) throws IOException {
+        File tempDir = new File(directory);
+        if (!tempDir.exists()) {
+            try{
+                tempDir.mkdirs();
+            }
+            catch(SecurityException se){
+                throw new IOException();
+            }
+        }
+    }
 }

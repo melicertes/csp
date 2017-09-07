@@ -20,7 +20,7 @@ public enum StatusResponseType {
     API_INVALID_MODULE_HASH(103, "Transaction failure; Request contains invalid module hash"),
 
     //API UPDATES SPECIFIC
-
+    API_CSP_NOT_CONFIGURED_YET(200, "Transaction failure; CSP is not configured for updates yet"),
 
     //API REGISTER SPECIFIC
     API_REGISTER_NOT_UPDATABLE(300, "Transaction failure; CSP requests update with registrationIsUpdate = false"),

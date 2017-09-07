@@ -40,6 +40,7 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
 @SpringBootTest(classes = {CspApp.class, MockUtils.class},
         properties = {
                 "spring.datasource.url:jdbc:h2:mem:csp_policy",
+                "flyway.enabled:false",
         /*
         //added in application-dangerduck.properties
                 "consume.errorq.on.interval:false",
@@ -121,8 +122,8 @@ public class CspServerInternalBusinessTestFlow2 implements CamelRoutes {
     private final IntegrationDataType dataTypeToTest = IntegrationDataType.VULNERABILITY;
     private final String applicationId = "taranis";
     private String cspId = "CERT-GR";
-    static final String tcId = "tcId";
-    static final String teamId = "teamId";
+    String tcId = "tcId";
+    String teamId = "teamId";
 
     @Before
     public void init() throws Exception {
@@ -130,6 +131,15 @@ public class CspServerInternalBusinessTestFlow2 implements CamelRoutes {
         String cspIdArg = env.getProperty("extCspId");
         if(!StringUtils.isEmpty(cspIdArg)){
             cspId = cspIdArg;
+        }
+        String tcIdArg = env.getProperty("extTcId");
+        if(!StringUtils.isEmpty(tcIdArg)){
+            tcId = tcIdArg;
+        }
+
+        String teamIdArg = env.getProperty("extTeamId");
+        if(!StringUtils.isEmpty(teamIdArg)){
+            teamId = teamIdArg;
         }
         //cspId = env.getProperty("server.name");
         mvc = webAppContextSetup(webApplicationContext).build();

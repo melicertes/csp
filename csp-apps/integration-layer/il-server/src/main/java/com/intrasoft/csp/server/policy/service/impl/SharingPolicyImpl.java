@@ -88,24 +88,6 @@ public class SharingPolicyImpl implements SharingPolicyService, Conversions{
             LOG.error("Could evaluate any policy. Fallback to DO_NOT_SHARE");
             return new EvaluatedPolicyDTO(SharingPolicyAction.DO_NOT_SHARE, null);
         }
-
-
-//        try{
-//            return new EvaluatedPolicyDTO(SharingPolicyAction.DO_NOT_SHARE, null);
-//        }catch(Exception e){
-//            LOG.error("Exception caught on policy condition evaluation: "+);
-//        }
-//
-//
-//
-//        Optional<Policy> appliedPolicy = list.stream()
-//                .filter(p->p.getActive()!=null && p.getActive())
-//                .max(Comparator.comparing(p->p.getSharingPolicyAction().priority()));//get the action with the highest priority
-//        if(!appliedPolicy.isPresent()) {
-//            return new EvaluatedPolicyDTO(SharingPolicyAction.NO_ACTION_FOUND, null);
-//        }else{
-//            return new EvaluatedPolicyDTO(appliedPolicy.get().getSharingPolicyAction(),convertPolicyToDTO.apply(appliedPolicy.get()));
-//        }
     }
 
     @Override
