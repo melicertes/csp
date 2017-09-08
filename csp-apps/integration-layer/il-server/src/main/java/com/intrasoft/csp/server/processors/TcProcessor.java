@@ -78,6 +78,9 @@ public class TcProcessor implements Processor,CamelRoutes{
                 originEndpoint.equals(routes.apply(CamelRoutes.EDCL))? " handle from external CSP":"";
         LOG.info("DCL - Get Trust Circles from TC API and "+msg+" [ORIGIN_ENDPOINT:"+originEndpoint+"]");
 
+        boolean isFlow1 = originEndpoint.equals(routes.apply(CamelRoutes.DCL))?true:false;
+        boolean isFlow2 = originEndpoint.equals(routes.apply(CamelRoutes.EDCL))?true:false;
+
         IntegrationData integrationData = exchange.getIn().getBody(IntegrationData.class);
         String httpMethod = (String) exchange.getIn().getHeader(Exchange.HTTP_METHOD);
 
@@ -89,15 +92,20 @@ public class TcProcessor implements Processor,CamelRoutes{
                     "Only one or none should be provided. "+integrationData.getSharingParams().toString());
         }
 
-        if (!StringUtils.isEmpty(integrationData.getSharingParams().getTcId())) {
-            //send by tcId provided
-            sendByTcId(integrationData.getSharingParams().getTcId(),exchange);
-        }else if(!StringUtils.isEmpty(integrationData.getSharingParams().getTeamId())){
-            //send by teamId provided
-            sendByTeamId(integrationData.getSharingParams().getTeamId(),exchange);
-        }else{
+        if(isFlow1) {
+            if (!StringUtils.isEmpty(integrationData.getSharingParams().getTcId())) {
+                //send by tcId provided - only in flow1
+                sendByTcId(integrationData.getSharingParams().getTcId(), exchange);
+            } else if (!StringUtils.isEmpty(integrationData.getSharingParams().getTeamId())) {
+                //send by teamId provided - only in flow1
+                sendByTeamId(integrationData.getSharingParams().getTeamId(), exchange);
+            } else {
+                //send by dataType
+                sendByDataType(integrationData, exchange, originEndpoint, httpMethod);
+            }
+        } else if(isFlow2){
             //send by dataType
-            sendByDataType(integrationData,exchange,originEndpoint,httpMethod);
+            sendByDataType(integrationData, exchange, originEndpoint, httpMethod);
         }
 
     }
@@ -117,14 +125,20 @@ public class TcProcessor implements Processor,CamelRoutes{
 
     private void sendByTcId(String tcId, Exchange exchange) throws IOException, InvalidKeyException, NoSuchAlgorithmException {
         String uri = this.getTcCirclesURI() + "/" + tcId;
-        List<Team> teams = getTcTeams(uri);
+        List<Team> teams = getTcTeams(uri,exchange);
         //all TC calls have been made up to this point, TEAMS list has been populated
         // Decide the flow
         decideTheFlow(teams,exchange);
     }
 
 
-    List<Team> getTcTeams(String uri) throws IOException {
+    List<Team> getTcTeams(String uri, Exchange exchange) throws IOException {
+        String originEndpoint = (String) exchange.getIn().getHeader(CamelRoutes.ORIGIN_ENDPOINT);
+        boolean isFlow1 = originEndpoint.equals(routes.apply(CamelRoutes.DCL))?true:false;
+        return  getTcTeamsByArg(uri,isFlow1);
+    }
+
+    List<Team> getTcTeamsByArg(String uri, boolean isFlow1) throws IOException {
         TrustCircle tc = camelRestService.send(uri, null,  HttpMethod.GET.name(), TrustCircle.class);
         List<Team> teams = new ArrayList<>();
         //first make all calls to get the teams
@@ -137,18 +151,30 @@ public class TcProcessor implements Processor,CamelRoutes{
                         "Team: " + team.toString());
             }
 
-            //TODO: TC bug here, see SXCSP-255. We should use cspId and not shortName
-            if (!team.getShortName().toLowerCase().trim().equals(serverName.toLowerCase().trim())) {
+            if(isFlow1){
+                //the following is only valid for flow1
+                //TODO: TC bug here, see SXCSP-255. We should use cspId and not shortName
+                if (!team.getShortName().toLowerCase().trim().equals(serverName.toLowerCase().trim())) {
+                    teams.add(team);
+                }
+            }else{
                 teams.add(team);
             }
         }
+        LOG.info("-- Teams: "+teams.toString());
         return teams;
     }
 
 
-    public List<Team> getTcTeams(IntegrationDataType integrationDataType) throws IOException {
+    public List<Team> getTcTeamsFlow1(IntegrationDataType integrationDataType) throws IOException {
         String uri = getTcUri(integrationDataType);
-        List<Team> teams = getTcTeams(uri);
+        List<Team> teams = getTcTeamsByArg(uri,true);
+        return teams;
+    }
+
+    public List<Team> getAllTcTeams(IntegrationDataType integrationDataType) throws IOException {
+        String uri = getTcUri(integrationDataType);
+        List<Team> teams = getTcTeamsByArg(uri,false);
         return teams;
     }
 
@@ -184,14 +210,14 @@ public class TcProcessor implements Processor,CamelRoutes{
         IntegrationData integrationData = exchange.getIn().getBody(IntegrationData.class);
         String httpMethod = (String) exchange.getIn().getHeader(Exchange.HTTP_METHOD);
         // Decide the flow
-        if(originEndpoint.equals(routes.apply(CamelRoutes.DCL))) {
+        if(originEndpoint.equals(routes.apply(CamelRoutes.DCL))) {//flow1
             for(Team t:teams) {
                 //send to ECSP
                 LOG.info(t.toString());
                 LOG.info(integrationData.toString());
                 handleDclFlowAndSendToECSP(httpMethod, t, integrationData);
             }
-        }else if(originEndpoint.equals(routes.apply(CamelRoutes.EDCL))){
+        }else if(originEndpoint.equals(routes.apply(CamelRoutes.EDCL))){//flow2
             handleExternalDclFlowAndSendToDSL(exchange,httpMethod, teams, integrationData);
         }
     }
@@ -205,6 +231,7 @@ public class TcProcessor implements Processor,CamelRoutes{
         return team;
     }
 
+    //flow1
     private void handleDclFlowAndSendToECSP(String httpMethod, Team team, IntegrationData integrationData) throws NoSuchAlgorithmException, InvalidKeyException, IOException {
         // SXCSP-85 Sharing Policy to be integrated only when sending to ECSP; TrustCircle should be excluded
         SharingPolicyAction sharingPolicyAction = SharingPolicyAction.SHARE_AS_IS;
@@ -227,6 +254,7 @@ public class TcProcessor implements Processor,CamelRoutes{
                 IntegrationAnonData integrationAnonData = new IntegrationAnonData();
                 integrationAnonData.setCspId(integrationData.getDataParams().getCspId());
                 integrationAnonData.setDataType(integrationData.getDataType());
+                integrationAnonData.setDataObject(integrationData.getDataObject());
                 IntegrationAnonData anonData = anonClient.postAnonData(integrationAnonData);
                 integrationData.setDataObject(anonData.getDataObject());
                 break;
@@ -242,9 +270,11 @@ public class TcProcessor implements Processor,CamelRoutes{
         producer.sendBodyAndHeaders(routes.apply(ECSP), ExchangePattern.InOut, enhancedTeamDTO, headers);
     }
 
+    // flow2
     private void handleExternalDclFlowAndSendToDSL(Exchange exchange,String httpMethod,List<Team> teams, IntegrationData integrationData){
 
         //TODO: TC bug here, see SXCSP-255. We should use cspId and not shortName
+        //should have all teams regardless of any teamId provided in sharingParams
         boolean authorized = teams.stream().anyMatch(t->t.getShortName().toLowerCase().equals(integrationData.getDataParams().getCspId().toLowerCase()));
         LOG.info("Authorized (cspId or shortName="+integrationData.getDataParams().getCspId().toLowerCase()+"): "+authorized);
         if (authorized){

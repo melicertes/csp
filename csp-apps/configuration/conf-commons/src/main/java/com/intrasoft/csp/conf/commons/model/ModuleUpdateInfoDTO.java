@@ -8,6 +8,7 @@ public class ModuleUpdateInfoDTO {
     private String version;
     private String released;
     private String hash;
+    private Integer startPriority;
 
 
     public String getName() {
@@ -50,15 +51,23 @@ public class ModuleUpdateInfoDTO {
         this.hash = hash;
     }
 
+    public Integer getStartPriority() {
+        return startPriority;
+    }
+
+    public void setStartPriority(Integer startPriority) {
+        this.startPriority = startPriority;
+    }
 
     @Override
     public String toString() {
-        return "ModuleUpdateInfo{" +
+        return "ModuleUpdateInfoDTO{" +
                 "name='" + name + '\'' +
                 ", description='" + description + '\'' +
-                ", version=" + version +
+                ", version='" + version + '\'' +
                 ", released='" + released + '\'' +
                 ", hash='" + hash + '\'' +
+                ", startPriority=" + startPriority +
                 '}';
     }
 }
