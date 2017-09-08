@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.intrasoft.csp.anon.client.AnonClient;
 import com.intrasoft.csp.anon.client.config.AnonClientConfig;
+import com.intrasoft.csp.anon.commons.exceptions.AnonException;
 import com.intrasoft.csp.anon.commons.exceptions.MappingNotFoundForGivenTupleException;
 import com.intrasoft.csp.anon.commons.model.AnonContextUrl;
 import com.intrasoft.csp.anon.commons.model.IntegrationAnonData;
@@ -102,6 +103,22 @@ public class AnonApiTest implements AnonContextUrl {
             IntegrationAnonData anonData = anonClient.postAnonData(integrationAnonData);
             String response = objectMapper.writeValueAsString(anonData.getDataObject());
             Assert.assertThat(response, containsString("\"affected_products_text\":\"*******\""));
+    }
+
+    @Test
+    public void nullDataObjectTest() throws IOException, InvalidKeyException, NoSuchAlgorithmException {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            IntegrationAnonData integrationAnonData = new IntegrationAnonData();
+            integrationAnonData.setCspId("demo1-csp");
+            integrationAnonData.setDataType(IntegrationDataType.VULNERABILITY);
+            integrationAnonData.setDataObject(null);
+            IntegrationAnonData anonData = anonClient.postAnonData(integrationAnonData);
+            String response = objectMapper.writeValueAsString(anonData.getDataObject());
+        }
+        catch (AnonException e){
+            Assert.assertThat(e.getMessage(), containsString(HttpStatusResponseType.MALFORMED_INTEGRATION_DATA_STRUCTURE.getReasonPhrase()));
+        }
     }
 
     @Test
