@@ -254,6 +254,7 @@ public class TcProcessor implements Processor,CamelRoutes{
                 IntegrationAnonData integrationAnonData = new IntegrationAnonData();
                 integrationAnonData.setCspId(integrationData.getDataParams().getCspId());
                 integrationAnonData.setDataType(integrationData.getDataType());
+                integrationAnonData.setDataObject(integrationData.getDataObject());
                 IntegrationAnonData anonData = anonClient.postAnonData(integrationAnonData);
                 integrationData.setDataObject(anonData.getDataObject());
                 break;

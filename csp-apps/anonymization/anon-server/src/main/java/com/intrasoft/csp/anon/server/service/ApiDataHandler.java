@@ -84,6 +84,10 @@ public class ApiDataHandler {
             throw new MappingNotFoundForGivenTupleException(HttpStatusResponseType.MAPPING_NOT_FOUND_FOR_GIVEN_TUPLE.getReasonPhrase());
         }
 
+        if (integrationAnonData.getDataObject() == null){
+            throw new AnonException(HttpStatusResponseType.MALFORMED_INTEGRATION_DATA_STRUCTURE.getReasonPhrase());
+        }
+
         JsonNode out = mapper.valueToTree(integrationAnonData.getDataObject());
 
         for (Rule rule : rules.getRules()){
