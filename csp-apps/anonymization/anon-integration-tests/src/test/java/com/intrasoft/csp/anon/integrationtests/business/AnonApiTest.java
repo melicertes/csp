@@ -67,11 +67,16 @@ public class AnonApiTest implements AnonContextUrl {
     @Before
     public void populateH2Db() throws JsonProcessingException {
         RuleSetDTO ruleSetDTO = Helper.createRuleset();
+        RuleSetDTO ruleSetDTO2 = Helper.createRuleset2();
         anonClient.saveRuleSet(ruleSetDTO);
+        anonClient.saveRuleSet(ruleSetDTO2);
 
         ruleSetDTO.setId(new Long(1));
+        ruleSetDTO2.setId(new Long(2));
         MappingDTO mappingDTO = Helper.createMapping(ruleSetDTO);
+        MappingDTO mappingDTO2 = Helper.createMapping2(ruleSetDTO2);
         anonClient.saveMapping(mappingDTO);
+        anonClient.saveMapping(mappingDTO2);
     }
 
     @Test
@@ -87,6 +92,16 @@ public class AnonApiTest implements AnonContextUrl {
         } catch (MappingNotFoundForGivenTupleException e) {
             Assert.fail(HttpStatusResponseType.MAPPING_NOT_FOUND_FOR_GIVEN_TUPLE.getReasonPhrase());
         }
+    }
+
+    @Test
+    public void anonymizeVulnerabilityest() throws IOException, InvalidKeyException, NoSuchAlgorithmException {
+        ObjectMapper mapper = new ObjectMapper();
+        String json = IOUtils.toString(this.getClass().getResourceAsStream("/vulnerability.json"), "UTF-8");
+        IntegrationAnonData integrationAnonData = mapper.readValue(json, IntegrationAnonData.class);
+            IntegrationAnonData anonData = anonClient.postAnonData(integrationAnonData);
+            String response = objectMapper.writeValueAsString(anonData.getDataObject());
+            Assert.assertThat(response, containsString("\"affected_products_text\":\"*******\""));
     }
 
     @Test
