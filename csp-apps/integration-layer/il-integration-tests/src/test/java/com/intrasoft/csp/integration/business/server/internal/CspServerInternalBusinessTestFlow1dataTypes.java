@@ -222,14 +222,14 @@ public class CspServerInternalBusinessTestFlow1dataTypes implements CamelRoutes 
     @Test
     public void dslFlow1PostDataTypeThreatTest() throws Exception {
         mockUtils.sendFlow1Data(mvc, serverName,applicationId,false, true, IntegrationDataType.THREAT, HttpMethods.POST.name());
-        assertFlows(IntegrationDataType.THREAT, tcProcessor.getTcTeams(IntegrationDataType.THREAT).size());
+        assertFlows(IntegrationDataType.THREAT, tcProcessor.getTcTeamsFlow1(IntegrationDataType.THREAT).size());
     }
 
     @DirtiesContext
     @Test
     public void dslFlow1PostTcIdThreatTest() throws Exception {
         mockUtils.sendFlow1Data(mvc, serverName,applicationId,tcId,null,false, true, IntegrationDataType.THREAT, HttpMethods.POST.name());
-        assertFlows(IntegrationDataType.THREAT, tcProcessor.getTcTeams(IntegrationDataType.THREAT).size());
+        assertFlows(IntegrationDataType.THREAT, tcProcessor.getTcTeamsFlow1(IntegrationDataType.THREAT).size());
     }
 
     @DirtiesContext
@@ -243,14 +243,14 @@ public class CspServerInternalBusinessTestFlow1dataTypes implements CamelRoutes 
     @Test
     public void dslFlow1PutDataTypeThreatTest() throws Exception {
         mockUtils.sendFlow1Data(mvc, serverName,applicationId,false, true, IntegrationDataType.THREAT, HttpMethods.PUT.name());
-        assertFlows(IntegrationDataType.THREAT, tcProcessor.getTcTeams(IntegrationDataType.THREAT).size());
+        assertFlows(IntegrationDataType.THREAT, tcProcessor.getTcTeamsFlow1(IntegrationDataType.THREAT).size());
     }
 
     @DirtiesContext
     @Test
     public void dslFlow1PutTcIdThreatTest() throws Exception {
         mockUtils.sendFlow1Data(mvc, serverName,applicationId,tcId,null,false, true, IntegrationDataType.THREAT, HttpMethods.PUT.name());
-        assertFlows(IntegrationDataType.THREAT, tcProcessor.getTcTeams(IntegrationDataType.THREAT).size());
+        assertFlows(IntegrationDataType.THREAT, tcProcessor.getTcTeamsFlow1(IntegrationDataType.THREAT).size());
     }
 
     @DirtiesContext
@@ -264,14 +264,14 @@ public class CspServerInternalBusinessTestFlow1dataTypes implements CamelRoutes 
     @Test
     public void dslFlow1PostDataTypeArtefactTest() throws Exception {
         mockUtils.sendFlow1Data(mvc, serverName, applicationId,false, true, IntegrationDataType.ARTEFACT, HttpMethods.POST.name());
-        assertFlows(IntegrationDataType.ARTEFACT, tcProcessor.getTcTeams(IntegrationDataType.ARTEFACT).size());
+        assertFlows(IntegrationDataType.ARTEFACT, tcProcessor.getTcTeamsFlow1(IntegrationDataType.ARTEFACT).size());
     }
 
     @DirtiesContext
     @Test
     public void dslFlow1PosTcIdArtefactTest() throws Exception {
         mockUtils.sendFlow1Data(mvc, serverName, applicationId,tcId,null,false, true, IntegrationDataType.ARTEFACT, HttpMethods.POST.name());
-        assertFlows(IntegrationDataType.ARTEFACT, tcProcessor.getTcTeams(IntegrationDataType.ARTEFACT).size());
+        assertFlows(IntegrationDataType.ARTEFACT, tcProcessor.getTcTeamsFlow1(IntegrationDataType.ARTEFACT).size());
     }
 
     @DirtiesContext
@@ -285,14 +285,14 @@ public class CspServerInternalBusinessTestFlow1dataTypes implements CamelRoutes 
     @Test
     public void dslFlow1PutDataTypeArtefactTest() throws Exception {
         mockUtils.sendFlow1Data(mvc, serverName, applicationId,false, true, IntegrationDataType.ARTEFACT, HttpMethods.PUT.name());
-        assertFlows(IntegrationDataType.ARTEFACT, tcProcessor.getTcTeams(IntegrationDataType.ARTEFACT).size());
+        assertFlows(IntegrationDataType.ARTEFACT, tcProcessor.getTcTeamsFlow1(IntegrationDataType.ARTEFACT).size());
     }
 
     @DirtiesContext
     @Test
     public void dslFlow1PutTcIdArtefactTest() throws Exception {
         mockUtils.sendFlow1Data(mvc, serverName, applicationId,tcId,null,false, true, IntegrationDataType.ARTEFACT, HttpMethods.PUT.name());
-        assertFlows(IntegrationDataType.ARTEFACT, tcProcessor.getTcTeams(IntegrationDataType.ARTEFACT).size());
+        assertFlows(IntegrationDataType.ARTEFACT, tcProcessor.getTcTeamsFlow1(IntegrationDataType.ARTEFACT).size());
     }
 
     @DirtiesContext
@@ -306,14 +306,14 @@ public class CspServerInternalBusinessTestFlow1dataTypes implements CamelRoutes 
     @Test
     public void dslFlow1PostDataTypeTrustcircleTest() throws Exception {
         mockUtils.sendFlow1Data(mvc, serverName, applicationId,false, true, IntegrationDataType.TRUSTCIRCLE, HttpMethods.POST.name());
-        assertFlows(IntegrationDataType.TRUSTCIRCLE, tcProcessor.getTcTeams(IntegrationDataType.TRUSTCIRCLE).size());
+        assertFlows(IntegrationDataType.TRUSTCIRCLE, tcProcessor.getTcTeamsFlow1(IntegrationDataType.TRUSTCIRCLE).size());
     }
 
     @DirtiesContext
     @Test
     public void dslFlow1PosTcIdTrustcircleTest() throws Exception {
         mockUtils.sendFlow1Data(mvc, serverName, applicationId,tcId,null,false, true, IntegrationDataType.TRUSTCIRCLE, HttpMethods.POST.name());
-        assertFlows(IntegrationDataType.TRUSTCIRCLE, tcProcessor.getTcTeams(IntegrationDataType.TRUSTCIRCLE).size());
+        assertFlows(IntegrationDataType.TRUSTCIRCLE, tcProcessor.getTcTeamsFlow1(IntegrationDataType.TRUSTCIRCLE).size());
     }
 
     @DirtiesContext
@@ -327,14 +327,14 @@ public class CspServerInternalBusinessTestFlow1dataTypes implements CamelRoutes 
     @Test
     public void dslFlow1PutDataTypeTrustcircleTest() throws Exception {
         mockUtils.sendFlow1Data(mvc,serverName, applicationId,false, true, IntegrationDataType.TRUSTCIRCLE, HttpMethods.PUT.name());
-        assertFlows(IntegrationDataType.TRUSTCIRCLE, tcProcessor.getTcTeams(IntegrationDataType.TRUSTCIRCLE).size());
+        assertFlows(IntegrationDataType.TRUSTCIRCLE, tcProcessor.getTcTeamsFlow1(IntegrationDataType.TRUSTCIRCLE).size());
     }
 
     @DirtiesContext
     @Test
     public void dslFlow1PutTcIdTrustcircleTest() throws Exception {
         mockUtils.sendFlow1Data(mvc,serverName, applicationId,tcId,null,false, true, IntegrationDataType.TRUSTCIRCLE, HttpMethods.PUT.name());
-        assertFlows(IntegrationDataType.TRUSTCIRCLE, tcProcessor.getTcTeams(IntegrationDataType.TRUSTCIRCLE).size());
+        assertFlows(IntegrationDataType.TRUSTCIRCLE, tcProcessor.getTcTeamsFlow1(IntegrationDataType.TRUSTCIRCLE).size());
     }
 
     @DirtiesContext
