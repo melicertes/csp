@@ -32,10 +32,31 @@ public class Helper {
         return ruleSetDTO;
     }
 
+    public static RuleSetDTO createRuleset2() throws JsonProcessingException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        Rules rules = new Rules();
+        List<Rule> ruleList = new ArrayList<>();
+        ruleList.add(new Rule("xml_advisory.meta_info.system_information.systemdetail.affected_products_text", "anon", "string"));
+        rules.setRules(ruleList);
+        RuleSetDTO ruleSetDTO = new RuleSetDTO();
+        ruleSetDTO.setFilename("VulnerabilityRulesFile");
+        ruleSetDTO.setDescription("Rules to anonymize a vulnerability data object");
+        ruleSetDTO.setFile(objectMapper.writeValueAsBytes(rules));
+        return ruleSetDTO;
+    }
+
     public static MappingDTO createMapping(RuleSetDTO ruleSetDTO){
         MappingDTO mappingDTO = new MappingDTO();
         mappingDTO.setCspId("CERT-BUND");
         mappingDTO.setDataType(IntegrationDataType.TRUSTCIRCLE);
+        mappingDTO.setRuleSetDTO(ruleSetDTO);
+        return mappingDTO;
+    }
+
+    public static MappingDTO createMapping2(RuleSetDTO ruleSetDTO){
+        MappingDTO mappingDTO = new MappingDTO();
+        mappingDTO.setCspId("demo1-csp");
+        mappingDTO.setDataType(IntegrationDataType.VULNERABILITY);
         mappingDTO.setRuleSetDTO(ruleSetDTO);
         return mappingDTO;
     }

@@ -132,9 +132,15 @@ public class CspServerInternalBusinessTestFlow2 implements CamelRoutes {
         if(!StringUtils.isEmpty(cspIdArg)){
             cspId = cspIdArg;
         }
+
         String tcIdArg = env.getProperty("extTcId");
         if(!StringUtils.isEmpty(tcIdArg)){
             tcId = tcIdArg;
+        }
+
+        String dataObjectArg = env.getProperty("dataObject");
+        if(!StringUtils.isEmpty(dataObjectArg)){
+            mockUtils.setDataObjectToTest(dataObjectArg);
         }
 
         String teamIdArg = env.getProperty("extTeamId");

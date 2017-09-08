@@ -154,6 +154,12 @@ public class CspServerInternalBusinessTestFlow1verbs implements CamelRoutes {
         if(!StringUtils.isEmpty(teamIdArg)){
             teamId = teamIdArg;
         }
+
+        String dataObjectArg = env.getProperty("dataObject");
+        if(!StringUtils.isEmpty(dataObjectArg)){
+            mockUtils.setDataObjectToTest(dataObjectArg);
+        }
+
         serverName = env.getProperty("server.name");
         mvc = webAppContextSetup(webApplicationContext).build();
         mockUtils.setSpringCamelContext(springCamelContext);
@@ -182,14 +188,14 @@ public class CspServerInternalBusinessTestFlow1verbs implements CamelRoutes {
     @Test
     public void dslFlow1DataTypePostToShareTest() throws Exception {
         mockUtils.sendFlow1Data(mvc,serverName, applicationId, false, true, this.dataTypeToTest, HttpMethods.POST.name());
-        assertPostPutFlow(tcProcessor.getTcTeams(this.dataTypeToTest).size());
+        assertPostPutFlow(tcProcessor.getTcTeamsFlow1(this.dataTypeToTest).size());
     }
 
     @DirtiesContext
     @Test
     public void dslFlow1TcIdPostToShareTest() throws Exception {
         mockUtils.sendFlow1Data(mvc,serverName, applicationId,tcId,null, false, true, this.dataTypeToTest, HttpMethods.POST.name());
-        assertPostPutFlow(tcProcessor.getTcTeams(this.dataTypeToTest).size());
+        assertPostPutFlow(tcProcessor.getTcTeamsFlow1(this.dataTypeToTest).size());
     }
 
     @DirtiesContext
@@ -203,14 +209,14 @@ public class CspServerInternalBusinessTestFlow1verbs implements CamelRoutes {
     @Test
     public void dslFlow1DataTypePutToShareTest() throws Exception {
         mockUtils.sendFlow1Data(mvc,serverName, applicationId, false, true, this.dataTypeToTest, HttpMethods.PUT.name());
-        assertPostPutFlow(tcProcessor.getTcTeams(this.dataTypeToTest).size());
+        assertPostPutFlow(tcProcessor.getTcTeamsFlow1(this.dataTypeToTest).size());
     }
 
     @DirtiesContext
     @Test
     public void dslFlow1TcIdPutToShareTest() throws Exception {
         mockUtils.sendFlow1Data(mvc,serverName, applicationId,tcId,null, false, true, this.dataTypeToTest, HttpMethods.PUT.name());
-        assertPostPutFlow(tcProcessor.getTcTeams(this.dataTypeToTest).size());
+        assertPostPutFlow(tcProcessor.getTcTeamsFlow1(this.dataTypeToTest).size());
     }
 
     @DirtiesContext
@@ -324,7 +330,7 @@ public class CspServerInternalBusinessTestFlow1verbs implements CamelRoutes {
         for (Exchange exchange : list) {
             Message in = exchange.getIn();
             EnhancedTeamDTO enhancedTeamDTO = in.getBody(EnhancedTeamDTO.class);
-            assertThat(tcProcessor.getTcTeams(this.dataTypeToTest).stream()
+            assertThat(tcProcessor.getTcTeamsFlow1(this.dataTypeToTest).stream()
                     .anyMatch(t->t.getUrl().toLowerCase().equals(enhancedTeamDTO.getTeam().getUrl())),is(true));
         }
 

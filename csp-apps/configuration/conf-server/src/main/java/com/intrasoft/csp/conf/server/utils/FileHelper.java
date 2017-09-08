@@ -12,6 +12,7 @@ import java.security.DigestOutputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+
 public class FileHelper {
 
     public static void removeFile(String filePath, String fileName) throws IOException {
@@ -40,7 +41,6 @@ public class FileHelper {
 
     public static String saveUploadedFile(String fileTemp, String fileRepository, MultipartFile file, String digestAlgorithm) throws IOException, NoSuchAlgorithmException {
         /*
-        Save file from Multipart to temp **using streams for >600mb files**
         Create temp directory if does not exist
          */
         createDirectory(fileTemp);
@@ -58,17 +58,29 @@ public class FileHelper {
 
         try (InputStream inputStream = file.getInputStream();
              DigestOutputStream outputStream = new DigestOutputStream(
-                        new FileOutputStream(f.getAbsoluteFile()),
-                        MessageDigest.getInstance(digestAlgorithm)) ) {
+                     new FileOutputStream(f.getAbsoluteFile()),
+                     MessageDigest.getInstance(digestAlgorithm)) ) {
             IOUtils.copy(inputStream, outputStream );
             // copy is done, digest is ready.
-            hash = Hex.encodeHexString(
-                    outputStream.getMessageDigest().digest() );
+            hash = Hex.encodeHexString(outputStream.getMessageDigest().digest());
         }
-        /*
-        Calculate hash
-         */
-        //String hash = hashFile(digestAlgorithm, f.getAbsolutePath());
+
+        //rename file within temp
+        CopyOption[] options = new CopyOption[]{
+                StandardCopyOption.REPLACE_EXISTING,
+                StandardCopyOption.COPY_ATTRIBUTES
+        };
+        File target = new File(fileTemp + hash + "." + FilenameUtils.getExtension(f.getAbsolutePath()));
+        Path FROM = Paths.get(f.getAbsolutePath());
+        Path TO = Paths.get(target.getAbsolutePath());
+        Files.copy(FROM, TO, options);
+        Files.delete(FROM);
+
+        return hash;
+    }
+
+    public static void copyFromTempToRepo(String fileTemp, String fileRepository, String hash) throws IOException {
+        String fileName = FileHelper.getFileFromHash(fileTemp, hash);
 
         /*
         Clean up files
@@ -78,37 +90,11 @@ public class FileHelper {
                 StandardCopyOption.REPLACE_EXISTING,
                 StandardCopyOption.COPY_ATTRIBUTES
         };
-        File target = new File(fileRepository + hash + "." + FilenameUtils.getExtension(f.getAbsolutePath()));
-        Path FROM = Paths.get(f.getAbsolutePath());
-
-        Path TO = Paths.get(target.getAbsolutePath());
+        Path FROM = Paths.get(fileTemp + fileName);
+        Path TO = Paths.get(fileRepository + fileName);
         Files.copy(FROM, TO, options);
         Files.delete(FROM);
-
-        return hash;
     }
-
-//    private static String hashFile(String digestAlgorithm, String filePath) throws NoSuchAlgorithmException, IOException {
-//        MessageDigest md = MessageDigest.getInstance(digestAlgorithm);
-//        FileInputStream fis = new FileInputStream(filePath);
-//
-//        byte[] dataBytes = new byte[1024];
-//
-//        int nread = 0;
-//        while ((nread = fis.read(dataBytes)) != -1) {
-//            md.update(dataBytes, 0, nread);
-//        };
-//        byte[] mdbytes = md.digest();
-//        fis.close();
-//
-//        //convert the byte to hex format
-//        StringBuffer hexString = new StringBuffer();
-//        for (int i=0;i<mdbytes.length;i++) {
-//            hexString.append(Integer.toHexString(0xFF & mdbytes[i]));
-//        }
-//
-//        return hexString.toString();
-//    }
 
     private static void createDirectory(String directory) throws IOException {
         File tempDir = new File(directory);

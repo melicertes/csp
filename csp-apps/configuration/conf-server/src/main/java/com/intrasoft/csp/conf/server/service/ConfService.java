@@ -107,6 +107,7 @@ public class ConfService implements ApiContextUrl, Configuration {
                             moduleUpdateInfo.setVersion(VersionParser.toString(moduleVersionRepository.findOne(cspManagement.getModuleVersionId()).getVersion()));
                             moduleUpdateInfo.setReleased(moduleVersionRepository.findOne(cspManagement.getModuleVersionId()).getReleasedOn());
                             moduleUpdateInfo.setHash(moduleVersionRepository.findOne(cspManagement.getModuleVersionId()).getHash());
+                            moduleUpdateInfo.setStartPriority(module.getStartPriority());
 
                             updates.add(moduleUpdateInfo);
                         }
@@ -118,7 +119,8 @@ public class ConfService implements ApiContextUrl, Configuration {
                         moduleUpdateInfo.setVersion(VersionParser.toString(moduleVersionRepository.findOne(cspManagement.getModuleVersionId()).getVersion()));
                         moduleUpdateInfo.setReleased(moduleVersionRepository.findOne(cspManagement.getModuleVersionId()).getReleasedOn());
                         moduleUpdateInfo.setHash(moduleVersionRepository.findOne(cspManagement.getModuleVersionId()).getHash());
-
+                        moduleUpdateInfo.setStartPriority(module.getStartPriority());
+                        
                         updates.add(moduleUpdateInfo);
                     }
 

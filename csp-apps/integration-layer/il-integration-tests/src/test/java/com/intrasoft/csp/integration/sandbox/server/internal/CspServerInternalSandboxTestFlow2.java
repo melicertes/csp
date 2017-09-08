@@ -112,6 +112,11 @@ public class CspServerInternalSandboxTestFlow2 {
             tcId = tcIdArg;
         }
 
+        String dataObjectArg = env.getProperty("dataObject");
+        if(!StringUtils.isEmpty(dataObjectArg)){
+            mockUtils.setDataObjectToTest(dataObjectArg);
+        }
+
         String teamIdArg = env.getProperty("extTeamId");
         if(!StringUtils.isEmpty(teamIdArg)){
             teamId = teamIdArg;
