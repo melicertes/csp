@@ -11,6 +11,7 @@ import com.intrasoft.csp.conf.commons.model.api.ModulesInfoDTO;
 import com.intrasoft.csp.conf.commons.model.api.RegistrationDTO;
 import com.intrasoft.csp.conf.commons.model.api.ResponseDTO;
 import com.intrasoft.csp.conf.commons.model.forms.CspForm;
+import com.intrasoft.csp.conf.commons.types.StatusResponseType;
 import com.intrasoft.csp.conf.commons.utils.JodaConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -30,9 +31,6 @@ import java.util.List;
 public class RestApiController implements ContextUrl, ApiContextUrl {
 
     @Autowired
-    ConfClient client;
-
-    @Autowired
     InstallationService installService;
 
     @RequestMapping(value = REST_REGISTER + "/{cspId}",
@@ -40,8 +38,6 @@ public class RestApiController implements ContextUrl, ApiContextUrl {
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE,
             method = RequestMethod.POST)
     public ResponseDTO register(@PathVariable String cspId, @RequestBody CspForm cspForm) {
-
-
         RegistrationDTO cspRegistration = new RegistrationDTO();
         cspRegistration.setName(cspForm.getName());
         cspRegistration.setDomainName(cspForm.getDomainName());
@@ -54,9 +50,7 @@ public class RestApiController implements ContextUrl, ApiContextUrl {
         ModulesInfoDTO modulesInfo = new ModulesInfoDTO();
         cspRegistration.setModuleInfo(modulesInfo);
 
-        //TODO verify and persist
-        final ResponseDTO dto = client.register(cspId, cspRegistration);
-        return dto;
+        return installService.registerCsp(cspId,cspRegistration);
     }
 
     @RequestMapping(value = REST_LOG,

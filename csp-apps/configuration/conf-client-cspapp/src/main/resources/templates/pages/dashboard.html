@@ -19,10 +19,12 @@
 
     <div class="row">
         <div class="col-md-12">
-            <h2 class="page-header"><i class="fa fa-dashboard fa-2x"></i> CSP Installation Status</h2>
+            <h2 class="page-header"><i class="fa fa-dashboard fa-2x"></i> CSP Installation</h2>
+        </div>
+        <div class="col-md-12">
+            <p class="pull-right" th:if="${cspId != null}">CSP Id: <span th:text="${cspId}"></span> </p>
         </div>
     </div>
-
     <div class="row">
         <div class="col-md-3 col-xs-12">
             <div class="pie-chart2 pie-chart pie-number" data-percent="26">
@@ -35,7 +37,8 @@
                     Welcome to the CSP Installation Control Application - Dashboard.
                 </p>
                 <p th:unless="${links != null}">
-                    To proceed with installation, please go to the <a href="#" th:href="${installUrl}">installation</a> page.
+                    To proceed with installation, please go to the <a href="#" th:href="${installUrl}">installation</a> page to configure the CSP or the
+                    <a href="#" th:href="${updatesUrl}">Updates page</a> to see updates and installation status.
                 </p>
             </div>
             <div class="container" id="linksStatus"></div>

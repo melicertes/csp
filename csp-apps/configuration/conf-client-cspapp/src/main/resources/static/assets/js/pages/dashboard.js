@@ -29,6 +29,7 @@ function ajaxd_status() {
         success: function(data){
             console.log(data);
             chart.update(data);
+
         }
     });
 

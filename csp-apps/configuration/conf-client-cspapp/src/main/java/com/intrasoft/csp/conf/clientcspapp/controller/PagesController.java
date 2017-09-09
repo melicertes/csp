@@ -46,6 +46,9 @@ public class PagesController implements ContextUrl {
     public ModelAndView dashboard(Model model) {
         model = this.init(model);
 
+        if (installService.isInstallationOngoing()) {
+            model.addAttribute("cspId",installService.getState().getCspId());
+        }
         model.addAttribute("navHomeClassActive", "active");
         model.addAttribute("asyncInterval", statusInterval);
 
@@ -58,7 +61,7 @@ public class PagesController implements ContextUrl {
 
         model.addAttribute("navInstallClassActive", "active");
 
-        if (installService.isInstallationComplete()) {
+        if (installService.isInstallationComplete() || installService.isInstallationOngoing()) {
             return new ModelAndView("pages/install-complete", "install-complete", model);
         } else {
             model.addAttribute("cspId", UUID.randomUUID().toString());

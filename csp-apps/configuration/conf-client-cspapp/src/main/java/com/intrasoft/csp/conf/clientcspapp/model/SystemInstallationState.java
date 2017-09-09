@@ -23,10 +23,10 @@ public class SystemInstallationState implements Serializable {
 
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "VARCHAR(12)")
-    private InstallationState installationState;
+    private InstallationState installationState = InstallationState.NOT_STARTED;
 
     @Column(columnDefinition = "TEXT")
-    @Convert(converter = JpaConverterJson.class)
+    @Convert(converter = JpaConverterRegistrationDTOJson.class)
     private RegistrationDTO cspRegistration;
 
     public SystemInstallationState(String cspId, InstallationState installationState, RegistrationDTO cspRegistration) {
