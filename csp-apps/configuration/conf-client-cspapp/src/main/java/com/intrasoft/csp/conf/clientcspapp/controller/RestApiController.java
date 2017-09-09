@@ -132,15 +132,15 @@ public class RestApiController implements ContextUrl, ApiContextUrl {
                                 break;
                             case DOWNLOADED:
                                 actions.append(
-                                        "&nbsp;<a class=\"btn btn-xs btn-primary\" title=\"Install " + module.getName() + "\" href=\"" + PAGE_INSTALLMODULE + "/" + module.getHash() + "\"><i class=\"fa fa-cogs\"></i></a>"
+                                        "&nbsp;<a class=\"btn btn-xs btn-success\" title=\"Install " + module.getName() + "\" href=\"" + PAGE_INSTALLMODULE + "/" + module.getHash() + "\"><i class=\"fa fa-cogs\"></i></a>"
                                 );
                                 actions.append(
-                                        "&nbsp;<a class=\"btn btn-xs btn-primary\" title=\"Delete " + module.getName() + "\" href=\"" + PAGE_DELETEMODULE + "/" + module.getHash() + "\"><i class=\"fa fa-trash\"></i></a>"
+                                        "&nbsp;<a class=\"btn btn-xs btn-danger\" title=\"Delete " + module.getName() + "\" href=\"" + PAGE_DELETEMODULE + "/" + module.getHash() + "\"><i class=\"fa fa-trash\"></i></a>"
                                 );
                                 break;
                             case INSTALLED:
                                 actions.append(
-                                        "&nbsp;<a class=\"btn btn-xs btn-primary\" title=\"Re-Install " + module.getName() + "\" href=\"" + PAGE_REINSTALLMODULE + "/" + module.getHash() + "\"><i class=\"fa fa-refresh\"></i></a>"
+                                        "&nbsp;<a class=\"btn btn-xs btn-warning\" title=\"Re-Install " + module.getName() + "\" href=\"" + PAGE_REINSTALLMODULE + "/" + module.getHash() + "\"><i class=\"fa fa-refresh\"></i></a>"
                                 );
                                 break;
                             case OBSOLETE:
