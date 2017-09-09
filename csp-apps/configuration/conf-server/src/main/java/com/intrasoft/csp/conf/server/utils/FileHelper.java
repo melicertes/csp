@@ -79,14 +79,14 @@ public class FileHelper {
         move(fileTemp, fileName, fileRepository, fileName);
     }
 
-    private static void move(String fromDir, String toDir, String fromName, String toName) throws IOException {
+    private static void move(String fromDir, String fromName, String toDir, String toName) throws IOException {
         //overwrite existing file, if exists
         CopyOption[] options = new CopyOption[]{
                 StandardCopyOption.REPLACE_EXISTING,
 //                StandardCopyOption.COPY_ATTRIBUTES
         };
-        Path FROM = Paths.get(fromDir + fromName);
-        Path TO = Paths.get(toDir + toName);
+        Path FROM = Paths.get(fromDir, fromName);
+        Path TO = Paths.get(toDir, toName);
         Files.move(FROM, TO, options);
     }
 
