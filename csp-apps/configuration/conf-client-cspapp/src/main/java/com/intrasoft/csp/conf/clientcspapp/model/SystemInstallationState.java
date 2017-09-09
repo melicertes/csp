@@ -1,6 +1,6 @@
 package com.intrasoft.csp.conf.clientcspapp.model;
 
-import com.intrasoft.csp.conf.commons.model.RegistrationDTO;
+import com.intrasoft.csp.conf.commons.model.api.RegistrationDTO;
 import lombok.*;
 
 import javax.persistence.*;

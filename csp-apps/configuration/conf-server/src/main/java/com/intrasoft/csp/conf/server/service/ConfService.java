@@ -3,12 +3,12 @@ package com.intrasoft.csp.conf.server.service;
 import com.intrasoft.csp.conf.commons.context.ApiContextUrl;
 import com.intrasoft.csp.conf.commons.exceptions.*;
 import com.intrasoft.csp.conf.commons.interfaces.Configuration;
-import com.intrasoft.csp.conf.commons.model.*;
+import com.intrasoft.csp.conf.commons.model.api.*;
 import com.intrasoft.csp.conf.commons.types.StatusResponseType;
 import com.intrasoft.csp.conf.server.domain.entities.*;
 import com.intrasoft.csp.conf.server.repository.*;
 import com.intrasoft.csp.conf.server.utils.FileHelper;
-import com.intrasoft.csp.conf.server.utils.JodaConverter;
+import com.intrasoft.csp.conf.commons.utils.JodaConverter;
 import com.intrasoft.csp.conf.server.utils.VersionParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +19,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.method.P;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -169,8 +168,11 @@ public class ConfService implements ApiContextUrl, Configuration {
         this.updateCspContactsFromRegistration(cspId, cspRegistration);
 
         //ModuleInfo
-        List<ModuleInfoDTO> moduleInfoList = cspRegistration.getModuleInfo().getModules();
-        this.updateModulesInfo(cspId, moduleInfoList);
+        ModulesInfoDTO modulesInfo = cspRegistration.getModuleInfo();
+        if (modulesInfo.getModules() != null) {
+            this.updateModulesInfo(cspId, modulesInfo.getModules());
+        }
+
 
         LOG_AUDIT.info(logInfo + StatusResponseType.OK.text());
         ResponseDTO response = new ResponseDTO(StatusResponseType.OK.code(), StatusResponseType.OK.text());

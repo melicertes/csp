@@ -8,7 +8,7 @@ import com.intrasoft.csp.conf.commons.exceptions.InvalidCspEntryException;
 import com.intrasoft.csp.conf.commons.exceptions.InvalidModuleHashException;
 import com.intrasoft.csp.conf.commons.exceptions.InvalidModuleNameException;
 import com.intrasoft.csp.conf.commons.exceptions.InvalidModuleVersionException;
-import com.intrasoft.csp.conf.commons.model.*;
+import com.intrasoft.csp.conf.commons.model.api.*;
 import com.intrasoft.csp.conf.commons.types.StatusResponseType;
 import com.intrasoft.csp.conf.server.ConfApp;
 import com.intrasoft.csp.libraries.restclient.service.RetryRestTemplate;

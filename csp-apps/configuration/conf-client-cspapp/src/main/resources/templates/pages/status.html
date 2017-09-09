@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments::head(title='Update status', description='dashboard description')"></head>
+
+<body>
+
+<nav class="navbar navbar-inverse navbar-fixed-top">
+    <div th:replace="fragments::nav"></div>
+</nav>
+
+<div class="container">
+
+    <div class="row">
+        <div class="col-md-12">
+            <p>&nbsp;</p>
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="col-md-12">
+            <h2 class="page-header"><i class="fa fa-history fa-2x"></i> Update status</h2>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12" style="text-align: right">
+            <!--<a th:href="${updatesUrl}" class="save btn btn-default">Return to updates list</a>-->
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div style="padding-top: 5px;">
+                Currently updating "<span th:text="${moduleName}"></span>" from version <span th:text="${moduleVersionFrom}"></span> to version <span th:text="${moduleVersionTo}"></span>
+            </div>
+        </div>
+        <div class="col-md-6">
+            refresh automatically every <span th:text="${refreshInterval/1000}"></span>s
+            <input type="checkbox" id="refresh-control" checked="checked" data-off-cls="btn-danger" data-on-cls="btn-success" data-on-active-cls="btn-default" data-off-active-cls="btn-default"></input>
+            <a href="#" id="refresh" class="btn btn-primary pull-right"><i class="fa fa-refresh"></i> Refresh now</a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <p>&nbsp;</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12" style="text-align: right">
+            <a href="#" id="to-bottom" class="pull-right"><i class="fa fa-sort-desc"></i> Scroll to bottom</a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="error-log">
+                <img th:src="@{/assets/img/ajax-loader.gif}"/>
+                <div id="scroll">
+                    <!-- Use class bootstrap labels -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <a href="#" id="to-top" class="pull-right"><i class="fa fa-sort-asc"></i> Scroll to top</a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <p>&nbsp;</p>
+        </div>
+    </div>
+</div>
+
+
+<th:block th:replace="fragments::scripts"></th:block>
+
+<script th:src="@{/webjars/bootstrap-checkbox/1.2.5/dist/js/bootstrap-checkbox.min.js}"></script>
+
+<script th:src="@{/assets/js/pages/status.js}"></script>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    var REFRESH_INTERVAL = [[${refreshInterval}]];
+    var LOG_URL = [[${logUrl}]];
+    /*]]>*/
+</script>
+
+</body>
+
+</html>

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments::head(title='Installation', description='dashboard description')"></head>
+
+<body>
+
+<nav class="navbar navbar-inverse navbar-fixed-top">
+    <div th:replace="fragments::nav"></div>
+</nav>
+
+<div class="container">
+
+    <div class="row">
+        <div class="col-md-12">
+            <p>&nbsp;</p>
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="col-md-12">
+            <h2 class="page-header"><i class="fa fa-cube fa-2x"></i> Installation</h2>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <p>&nbsp;</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <i class="fa fa-thumbs-up"></i> Installation is complete! <a th:href="${dashboardUrl}">Please click here to navigate to the dashboard</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+<th:block th:replace="fragments::scripts"></th:block>
+
+
+</body>
+
+</html>

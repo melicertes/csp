@@ -5,7 +5,7 @@ import com.intrasoft.csp.conf.clientcspapp.ConfClientCspApplication;
 import com.intrasoft.csp.conf.clientcspapp.model.InstallationState;
 import com.intrasoft.csp.conf.clientcspapp.model.SystemInstallationState;
 import com.intrasoft.csp.conf.clientcspapp.repo.SystemInstallationStateRepository;
-import com.intrasoft.csp.conf.commons.model.RegistrationDTO;
+import com.intrasoft.csp.conf.commons.model.api.RegistrationDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
