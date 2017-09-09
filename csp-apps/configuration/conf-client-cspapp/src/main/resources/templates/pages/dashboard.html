@@ -30,21 +30,15 @@
             </div>
         </div>
         <div class="col-md-9 col-xs-12">
-            <!--SAMPLE CONTENT-->
             <div class="message-text">
                 <p>
-                    Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Phasellus hendrerit. Pellentesque aliquet nibh nec urna. In nisi neque, aliquet vel, dapibus id, mattis vel, nisi. Sed pretium, ligula sollicitudin laoreet viverra, tortor libero sodales leo, eget blandit nunc tortor eu nibh. Nullam mollis. Ut justo. Suspendisse potenti.
+                    Welcome to the CSP Installation Control Application - Dashboard.
                 </p>
-                <p>
-                    Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Phasellus hendrerit. Pellentesque aliquet nibh nec urna. In nisi neque, aliquet vel, dapibus id, mattis vel, nisi. Sed pretium, ligula sollicitudin laoreet viverra, tortor libero sodales leo, eget blandit nunc tortor eu nibh. Nullam mollis. Ut justo. Suspendisse potenti.
-                </p>
-                <p>
-                    Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Phasellus hendrerit. Pellentesque aliquet nibh nec urna. In nisi neque, aliquet vel, dapibus id, mattis vel, nisi. Sed pretium, ligula sollicitudin laoreet viverra, tortor libero sodales leo, eget blandit nunc tortor eu nibh. Nullam mollis. Ut justo. Suspendisse potenti.
-                </p>
-                <p>
-                    Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Phasellus hendrerit. Pellentesque aliquet nibh nec urna. In nisi neque, aliquet vel, dapibus id, mattis vel, nisi. Sed pretium, ligula sollicitudin laoreet viverra, tortor libero sodales leo, eget blandit nunc tortor eu nibh. Nullam mollis. Ut justo. Suspendisse potenti.
+                <p th:unless="${links != null}">
+                    To proceed with installation, please go to the <a href="#" th:href="${installUrl}">installation</a> page.
                 </p>
             </div>
+            <div class="container" id="linksStatus"></div>
         </div>
     </div>
 
@@ -59,6 +53,9 @@
 <script th:inline="javascript">
     /*<![CDATA[*/
     var ASYNC_INTERVAL = [[${asyncInterval}]];
+    var dashboardStatusUrl = [[${dashboardStatusUrl}]];
+
+    $("#linksStatus").load([[${dashboardLinks}]])
     /*]]>*/
 </script>
 

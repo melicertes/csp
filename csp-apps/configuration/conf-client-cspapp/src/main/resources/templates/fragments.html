@@ -90,5 +90,28 @@
 
     <script th:src="@{/assets/js/custom.js}"></script>
 </th:block>
+
+
+<th:block th:fragment="urls">
+    <div class="message-text">
+        <p>
+            If the installation is complete, the following URLs shall be available:
+        </p>
+    </div>
+    <div th:if="${links != null}" class="container" th:each="index,link : links">
+
+        <div class="row">
+            <div class="col-md-2">
+                <span th:text="${index}">1</span>
+            </div>
+            <div class="col-md-8">
+                <span th:text="${link.name}">MISP application</span>
+            </div>
+            <div class="col-md-2">
+                <a href="#" th:href="${link.url}">Link</a>
+            </div>
+        </div>
+    </div>
+</th:block>
 </body>
 </html>

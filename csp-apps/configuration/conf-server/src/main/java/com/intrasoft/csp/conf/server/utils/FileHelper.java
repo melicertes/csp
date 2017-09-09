@@ -65,16 +65,7 @@ public class FileHelper {
             hash = Hex.encodeHexString(outputStream.getMessageDigest().digest());
         }
 
-        //rename file within temp
-        CopyOption[] options = new CopyOption[]{
-                StandardCopyOption.REPLACE_EXISTING,
-                StandardCopyOption.COPY_ATTRIBUTES
-        };
-        File target = new File(fileTemp + hash + "." + FilenameUtils.getExtension(f.getAbsolutePath()));
-        Path FROM = Paths.get(f.getAbsolutePath());
-        Path TO = Paths.get(target.getAbsolutePath());
-        Files.copy(FROM, TO, options);
-        Files.delete(FROM);
+        move(f.getParent(), f.getName(), fileTemp, hash + "." + FilenameUtils.getExtension(f.getAbsolutePath()));
 
         return hash;
     }
@@ -85,15 +76,18 @@ public class FileHelper {
         /*
         Clean up files
          */
+        move(fileTemp, fileName, fileRepository, fileName);
+    }
+
+    private static void move(String fromDir, String toDir, String fromName, String toName) throws IOException {
         //overwrite existing file, if exists
         CopyOption[] options = new CopyOption[]{
                 StandardCopyOption.REPLACE_EXISTING,
                 StandardCopyOption.COPY_ATTRIBUTES
         };
-        Path FROM = Paths.get(fileTemp + fileName);
-        Path TO = Paths.get(fileRepository + fileName);
-        Files.copy(FROM, TO, options);
-        Files.delete(FROM);
+        Path FROM = Paths.get(fromDir + fromName);
+        Path TO = Paths.get(toDir + toName);
+        Files.move(FROM, TO, options);
     }
 
     private static void createDirectory(String directory) throws IOException {

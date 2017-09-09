@@ -596,15 +596,14 @@ public class DataController implements DataContextUrl, PagesContextUrl {
 
             //check for manifest.json within archive
             String moduleZipFile = FileHelper.getFileFromHash(fileTemp, hash);
-            ZipFile zf = new ZipFile(fileTemp + moduleZipFile);
-            if (zf.getEntry(manifestName) == null) {
-                zf.close();
-                //delete  module zip
-                FileHelper.removeFile(fileTemp, moduleZipFile);
-                throw new ConfException(StatusResponseType.DATA_MODULE_VERSION_INVALID_ARCHIVE.text(), StatusResponseType.DATA_MODULE_VERSION_INVALID_ARCHIVE.code());
+            try (ZipFile zf = new ZipFile(fileTemp + moduleZipFile)) {
+                if (zf.getEntry(manifestName) == null) {
+                    zf.close();
+                    //delete  module zip
+                    FileHelper.removeFile(fileTemp, moduleZipFile);
+                    throw new ConfException(StatusResponseType.DATA_MODULE_VERSION_INVALID_ARCHIVE.text(), StatusResponseType.DATA_MODULE_VERSION_INVALID_ARCHIVE.code());
+                }
             }
-            zf.close();
-
             //copy final file to repository
             FileHelper.copyFromTempToRepo(fileTemp, fileRepository, hash);
 
