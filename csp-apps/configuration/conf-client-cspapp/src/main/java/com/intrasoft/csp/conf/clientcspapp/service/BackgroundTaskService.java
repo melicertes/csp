@@ -103,7 +103,7 @@ public class BackgroundTaskService {
     public void scheduleDownload(String hash) {
 
         addTask(() -> {
-            if (installationService.canDownload()) {
+            if (installationService.canDownload() && internetAvailable) {
                 SystemModule module = installationService.findModuleByHash(hash);
                 module.setModuleState(ModuleState.DOWNLOADING);
                 module = installationService.updateSystemModuleState(module.getId(), ModuleState.DOWNLOADING);
