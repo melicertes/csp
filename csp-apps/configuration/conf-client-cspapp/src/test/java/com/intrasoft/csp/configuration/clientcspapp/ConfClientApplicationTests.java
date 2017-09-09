@@ -3,11 +3,16 @@ package com.intrasoft.csp.configuration.clientcspapp;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.intrasoft.csp.conf.clientcspapp.ConfClientCspApplication;
 import com.intrasoft.csp.conf.clientcspapp.model.InstallationState;
+import com.intrasoft.csp.conf.clientcspapp.model.ModuleState;
 import com.intrasoft.csp.conf.clientcspapp.model.SystemInstallationState;
+import com.intrasoft.csp.conf.clientcspapp.model.SystemModule;
 import com.intrasoft.csp.conf.clientcspapp.repo.SystemInstallationStateRepository;
+import com.intrasoft.csp.conf.clientcspapp.repo.SystemModuleRepository;
+import com.intrasoft.csp.conf.clientcspapp.service.InstallationService;
 import com.intrasoft.csp.conf.commons.model.api.RegistrationDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
+import org.joda.time.LocalDateTime;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,12 +24,18 @@ import org.springframework.transaction.annotation.Transactional;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes={ConfClientCspApplication.class}, properties = {"spring.datasource.url=jdbc:h2:mem:testdata;DB_CLOSE_ON_EXIT=FALSE"})
 @Slf4j
-public class ConfClientCspappApplicationTests {
+public class ConfClientApplicationTests {
 
 	private final String testUUID = "2513b89e-e073-4dc7-a43e-29a1ecce5a41";
 
 	@Autowired
 	SystemInstallationStateRepository repo;
+
+	@Autowired
+	SystemModuleRepository moduleRepository;
+
+	@Autowired
+	InstallationService installationService;
 
 	@Test
 	public void contextLoads() {
@@ -44,7 +55,7 @@ public class ConfClientCspappApplicationTests {
 
 	@Test
 	@Transactional
-	public void testMarshalling() throws Exception {
+	public void testMarshallingRegistration() throws Exception {
 
 		String json = IOUtils.toString(this.getClass().getResourceAsStream("/register/register-valid-1.json"), "UTF-8");
 		ObjectMapper mapper = new ObjectMapper();
@@ -66,4 +77,30 @@ public class ConfClientCspappApplicationTests {
 
 	}
 
+
+	@Test
+	@Transactional
+	public void testPersistingModules() throws Exception {
+
+		SystemModule mod = new SystemModule(null, "base", "DESC", new LocalDateTime(), true, "1.0.000","arcPath","modPath", ModuleState.UNKNOWN, "hash");
+
+		SystemModule saved = moduleRepository.save(mod);
+
+		Assert.assertNotNull("Id should be allocated", saved.getId());
+
+		log.info("Saved: {}", saved);
+		final SystemModule found = moduleRepository.findOne(saved.getId());
+		log.info("ById : {}", found);
+
+		Assert.assertEquals("should be same", saved, found);
+		Assert.assertEquals("date should be same", saved.getInstallDate(), found.getInstallDate());
+		Assert.assertEquals("hash should be same", found.getHash(), "hash");
+
+
+		Assert.assertEquals("version should be the same", installationService.findModuleInstalledActiveVersion(mod.getName()), mod.getVersion());
+
+		Assert.assertNull("should not be installed", installationService.findModuleInstalledActiveVersion("dummymodule"));
+
+
+	}
 }

@@ -8,4 +8,10 @@ function queryParams() {
     };
 }
 
+$(document).ready(function() {
 
+    $("#checkAgain").click( function() {
+        location.reload();
+    } )
+
+});

@@ -2,14 +2,19 @@ package com.intrasoft.csp.conf.clientcspapp.service;
 
 import com.intrasoft.csp.conf.client.ConfClient;
 import com.intrasoft.csp.conf.clientcspapp.model.InstallationState;
+import com.intrasoft.csp.conf.clientcspapp.model.ModuleState;
 import com.intrasoft.csp.conf.clientcspapp.model.SystemInstallationState;
+import com.intrasoft.csp.conf.clientcspapp.model.SystemModule;
 import com.intrasoft.csp.conf.clientcspapp.repo.SystemInstallationStateRepository;
+import com.intrasoft.csp.conf.clientcspapp.repo.SystemModuleRepository;
 import com.intrasoft.csp.conf.commons.model.api.RegistrationDTO;
 import com.intrasoft.csp.conf.commons.model.api.ResponseDTO;
+import com.intrasoft.csp.conf.commons.model.api.UpdateInformationDTO;
 import com.intrasoft.csp.conf.commons.types.StatusResponseType;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -22,10 +27,82 @@ public class InstallationService {
     @Autowired
     ConfClient client;
 
-
     @Autowired
     SystemInstallationStateRepository repo;
 
+    @Autowired
+    SystemModuleRepository moduleRepository;
+
+    @Transactional
+    public ResponseDTO registerCsp(String cspId, RegistrationDTO cspRegistration) {
+        final ResponseDTO dto = client.register(cspId, cspRegistration);
+        if (dto.getResponseCode() == StatusResponseType.OK.code()) {
+            log.info("CSP Registration OK, API returned {}",dto.getResponseText());
+            //CSP is now registered
+            SystemInstallationState state = getState();
+            state.setCspId(cspId);
+            state.setCspRegistration(cspRegistration);
+            state.setInstallationState(InstallationState.IN_PROGRESS);
+
+            state = repo.save(state);
+            log.info("CSP Registration success! CSP Id: {} [internal:{}]",cspId,state.getId());
+        } else {
+            log.error("CSP Registration has failed. Error Code {}, Error Text {}", dto.getResponseCode(),dto.getResponseText());
+        }
+        return dto;
+    }
+
+    public UpdateInformationDTO queryCspUpdates(String cspId) {
+        SystemInstallationState state = getState();
+        if (state.getInstallationState() == InstallationState.NOT_STARTED) {
+            log.error("CSP Id not available yet! Install first!");
+            return null;
+        } else if (!state.getCspId().contentEquals(cspId)) {
+            log.error("CSP Id requested {} is not ours ({})", cspId, state.getCspId());
+            //TODO return null here;
+        }
+
+        final UpdateInformationDTO updates = client.updates(cspId);
+        log.info("Updates retrieved at {} from central {}", updates.getDateChanged(), updates.getAvailable());
+        return updates;
+    }
+
+    public String findModuleInstalledActiveVersion(String moduleName) {
+        final List<SystemModule> list = moduleRepository.findByNameAndActiveOrderByIdDesc(moduleName, true);
+
+        if (list.size() == 0) {
+            return null;
+        } else {
+            // only one can be active anyway
+            return list.get(0).getVersion();
+        }
+    }
+
+
+    @Transactional
+    public SystemModule saveSystemModule(SystemModule module) {
+        module = moduleRepository.save(module);
+        log.info("Module {} saved!", module);
+        return module;
+    }
+
+    @Transactional
+    public SystemModule updateSystemModuleState(Long id, ModuleState state) {
+        SystemModule module = moduleRepository.findOne(id);
+        module.setModuleState(state);
+
+        return moduleRepository.save(module);
+    }
+    public SystemModule findModuleByHash(String hash) {
+        SystemModule module = moduleRepository.findOneByHash(hash);
+        if (module != null) {
+            log.info("Module {} retrieved!", module);
+        }
+        return module;
+    }
+
+
+    ///// helpers
 
     public SystemInstallationState getState() {
         final List<SystemInstallationState> list = repo.findAll();
@@ -63,24 +140,8 @@ public class InstallationService {
         return 95;
     }
 
-    public ResponseDTO registerCsp(String cspId, RegistrationDTO cspRegistration) {
-        final ResponseDTO dto = client.register(cspId, cspRegistration);
-        if (dto.getResponseCode() == StatusResponseType.OK.code()) {
-            log.info("CSP Registration OK, API returned {}",dto.getResponseText());
-            //CSP is now registered
-
-
-            SystemInstallationState state = getState();
-            state.setCspId(cspId);
-            state.setCspRegistration(cspRegistration);
-            state.setInstallationState(InstallationState.IN_PROGRESS);
-
-            state = repo.save(state);
-            log.info("CSP Registration success! CSP Id: {} [internal:{}]",cspId,state.getId());
-        } else {
-            log.error("CSP Registration has failed. Error Code {}, Error Text {}", dto.getResponseCode(),dto.getResponseText());
-        }
-        return dto;
+    public boolean canDownload() {
+        return isInstallationComplete() || isInstallationOngoing();
     }
 
 }

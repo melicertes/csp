@@ -13,7 +13,12 @@ public interface ContextUrl {
     String REST_REGISTER = "/register";
     String REST_LOG = "/log";
     String REST_DASHSTATUS = "/dstat";
+    String REST_UPDATESFOUND = "/updates";
 
+    String PAGE_DOWNLOADMODULE = "/downloadModule";
+    String PAGE_INSTALLMODULE = "/installModule";
+    String PAGE_REINSTALLMODULE = "/reinstallModule";
+    String PAGE_DELETEMODULE = "/deleteModule";
 
     String PAGES_ERROR = "/error";
 

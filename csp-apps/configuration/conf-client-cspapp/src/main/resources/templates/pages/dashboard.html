@@ -25,6 +25,11 @@
             <p class="pull-right" th:if="${cspId != null}">CSP Id: <span th:text="${cspId}"></span> </p>
         </div>
     </div>
+    <div class="row" th:if="${ internetAvailable == null || internetAvailable == false  }">
+        <div class="alert alert-dismissable alert-danger">
+            <a class="close" data-dismiss="alert" href="#" aria-hidden="true">×</a>
+            <strong>Error: Internet connectivity test failure.</strong><br/>Please check connectivity with internet and DNS</div>
+    </div>
     <div class="row">
         <div class="col-md-3 col-xs-12">
             <div class="pie-chart2 pie-chart pie-number" data-percent="26">
