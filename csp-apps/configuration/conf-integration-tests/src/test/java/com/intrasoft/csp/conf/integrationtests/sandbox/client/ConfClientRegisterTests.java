@@ -1,12 +1,11 @@
 package com.intrasoft.csp.conf.integrationtests.sandbox.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.intrasoft.csp.commons.exceptions.InvalidDataTypeException;
 import com.intrasoft.csp.conf.client.ConfClient;
 import com.intrasoft.csp.conf.client.config.ConfClientConfig;
 import com.intrasoft.csp.conf.commons.context.ApiContextUrl;
 import com.intrasoft.csp.conf.commons.exceptions.*;
-import com.intrasoft.csp.conf.commons.model.*;
+import com.intrasoft.csp.conf.commons.model.api.*;
 import com.intrasoft.csp.conf.commons.types.StatusResponseType;
 import com.intrasoft.csp.conf.server.ConfApp;
 import com.intrasoft.csp.libraries.restclient.service.RetryRestTemplate;
@@ -20,15 +19,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.core.io.InputStreamResource;
-import org.springframework.core.io.Resource;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.SerializationUtils;
 
 import java.io.*;
 import java.net.URISyntaxException;

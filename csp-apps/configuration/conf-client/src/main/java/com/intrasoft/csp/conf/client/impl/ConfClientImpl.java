@@ -3,10 +3,10 @@ package com.intrasoft.csp.conf.client.impl;
 
 import com.intrasoft.csp.conf.client.ConfClient;
 import com.intrasoft.csp.conf.commons.context.ApiContextUrl;
-import com.intrasoft.csp.conf.commons.model.AppInfoDTO;
-import com.intrasoft.csp.conf.commons.model.RegistrationDTO;
-import com.intrasoft.csp.conf.commons.model.ResponseDTO;
-import com.intrasoft.csp.conf.commons.model.UpdateInformationDTO;
+import com.intrasoft.csp.conf.commons.model.api.AppInfoDTO;
+import com.intrasoft.csp.conf.commons.model.api.RegistrationDTO;
+import com.intrasoft.csp.conf.commons.model.api.ResponseDTO;
+import com.intrasoft.csp.conf.commons.model.api.UpdateInformationDTO;
 import com.intrasoft.csp.libraries.restclient.service.RetryRestTemplate;
 import com.intrasoft.csp.libraries.versioning.client.ApiVersionClient;
 import org.slf4j.Logger;
@@ -14,11 +14,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.Resource;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-
-import java.util.stream.Stream;
 
 
 public class ConfClientImpl implements ConfClient, ApiContextUrl {
@@ -62,7 +59,7 @@ public class ConfClientImpl implements ConfClient, ApiContextUrl {
     public ResponseDTO appInfo(String cspId, AppInfoDTO appInfo) {
         final String url = apiVersionClient.getApiUrl() + API_APPINFO + "/" + cspId;
         LOG.debug("Configuration call [POST]: " + url);
-        ResponseDTO response = retryRestTemplate.postForObject(url, appInfo, ResponseDTO.class);//retryRestTemplate.exchange(url, HttpMethod.POST, new HttpEntity<Object>(appInfo), ResponseDTO.class);
+        ResponseDTO response = retryRestTemplate.postForObject(url, appInfo, ResponseDTO.class);
         return response;
     }
 }

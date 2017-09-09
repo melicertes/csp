@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments::head(title='Installation', description='dashboard description')"></head>
+
+<body>
+
+<nav class="navbar navbar-inverse navbar-fixed-top">
+    <div th:replace="fragments::nav"></div>
+</nav>
+
+<div class="container">
+
+    <div class="row">
+        <div class="col-md-12">
+            <p>&nbsp;</p>
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="col-md-12">
+            <h2 class="page-header"><i class="fa fa-cube fa-2x"></i> Installation</h2>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <form method="POST" action="#" id="csp-form">
+
+                <div class="row">
+                    <div class="col-md-12" style="text-align: right">
+                        <a th:href="${dashboardUrl}" class="save btn btn-default">Cancel</a>
+                        <button type="submit" class="save btn btn-success">Save</button>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 col-sm-12">
+                        <p class="lead pull-left">CSP Information</p>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-4 col-xs-12">
+                        <div class="form-group">
+                            <label for="csp_id">CSP ID:</label>
+                            <input class="form-control uuid" id="csp_id" maxlength="36" name="csp_id" type="text" th:value="${cspId}" readonly="readonly"></input>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-xs-12">
+                        <div class="form-group">
+                            <label for="csp_name">Name:</label>
+                            <input class="form-control" id="csp_name" name="csp_name" type="text"></input>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-xs-12">
+                        <div class="form-group">
+                            <label for="csp_domain_name">Domain Name:</label>
+                            <input class="form-control" id="csp_domain_name" name="csp_domain_name" type="text"></input>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12 col-sm-12">
+                        <p>&nbsp;</p>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12 col-sm-12">
+                        <p class="lead pull-left">Responsible Contacts</p>
+                        <button data-duplicate-remove="contact" class="btn btn-sm btn-danger btn-action pull-right"><i class="fa fa-minus"></i></button>
+                        <button data-duplicate-add="contact" class="btn btn-sm btn-success btn-action btn-add pull-right"><i class="fa fa-plus"></i></button>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12 col-sm-12">
+                        <div class="row" data-duplicate="contact" data-duplicate-min="2" data-duplicate-max="10">
+                            <div class="col-md-4 col-xs-12">
+                                <div class="form-group">
+                                    <label>Name:</label>
+                                    <input class="form-control csp_contact_name" name="csp_contact_name[]" type="text"></input>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-xs-12">
+                                <div class="form-group">
+                                    <label>Email:</label>
+                                    <input class="form-control csp_contact_email" name="csp_contact_email[]" type="text"></input>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-xs-12">
+                                <label>Type:</label>
+                                <div class="form-group input-group">
+                                    <select class="form-control csp_contact_type" name="csp_contact_type[]">
+                                        <option selected="selected"></option>
+                                        <option th:each="contactType : ${csp_contact_types}"
+                                                th:value="${contactType.getValue()}"
+                                                th:text="${contactType}">
+                                        </option>
+                                    </select>
+                                    <span class="input-group-btn">
+                                        <button data-duplicate-remove="contact" class="btn btn-success" type="button"><i class="fa fa-minus"></i></button>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12 col-sm-12">
+                        <p>&nbsp;</p>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 col-sm-12">
+                        <p class="lead pull-left">Internal IPs</p>
+                        <button data-duplicate-remove="int-ip" class="btn btn-sm btn-danger btn-action pull-right"><i class="fa fa-minus"></i></button>
+                        <button data-duplicate-add="int-ip" class="btn btn-sm btn-success btn-action pull-right"><i class="fa fa-plus"></i></button>
+                        <div class="clearfix"></div>
+                        <div data-duplicate="int-ip" class="input-group" data-duplicate-min="1" data-duplicate-max="10">
+                            <input type="text" class="form-control ip" name="csp_internal_ip[]"></input>
+                            <span class="input-group-btn">
+                                <button data-duplicate-remove="int-ip" class="btn btn-success" type="button"><i class="fa fa-minus"></i></button>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 col-sm-12">
+                        <p class="lead pull-left">External IPs</p>
+                        <button data-duplicate-remove="ext-ip" class="btn btn-sm btn-danger btn-action pull-right"><i class="fa fa-minus"></i></button>
+                        <button data-duplicate-add="ext-ip" class="btn btn-sm btn-success btn-action pull-right"><i class="fa fa-plus"></i></button>
+                        <div class="clearfix"></div>
+                        <div data-duplicate="ext-ip" class="input-group" data-duplicate-min="1" data-duplicate-max="10">
+                            <input type="text" class="form-control ip" name="csp_external_ip[]"></input>
+                            <span class="input-group-btn">
+                                <button data-duplicate-remove="ext-ip" class="btn btn-success" type="button"><i class="fa fa-minus"></i></button>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12 col-sm-12">
+                        <p>&nbsp;</p>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12" style="text-align: right">
+                        <a th:href="${dashboardUrl}" class="save btn btn-default">Cancel</a>
+                        <button type="submit" class="save btn btn-success">Save</button>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12 col-sm-12">
+                        <p>&nbsp;</p>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12" id="result"></div>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+
+</div>
+
+
+<th:block th:replace="fragments::scripts"></th:block>
+
+<script th:src="@{/webjars/jquery-validation/1.16.0/jquery.validate.min.js}"></script>
+<script th:src="@{/webjars/jquery-validation/1.16.0/additional-methods.min.js}"></script>
+<script th:src="@{/webjars/jquery-mask-plugin/1.14.10/dist/jquery.mask.min.js}"></script>
+<script th:src="@{/webjars/bootstrap-checkbox/1.2.5/dist/js/bootstrap-checkbox.min.js}"></script>
+
+<script th:src="@{/assets/js/vendor/jquery.duplicate.min.js}"></script>
+<script th:src="@{/assets/js/vendor/jquery.serializeObject.js}"></script>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    var POST_URL = [[${cspRegisterApi}]];
+    var REDIRECT_URL = [[${dashboardUrl}]];
+    /*]]>*/
+</script>
+<script th:src="@{/assets/js/pages/install.js}"></script>
+
+</body>
+
+</html>

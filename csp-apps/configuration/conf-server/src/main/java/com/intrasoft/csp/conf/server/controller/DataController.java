@@ -6,22 +6,21 @@ import com.intrasoft.csp.conf.server.context.DataContextUrl;
 import com.intrasoft.csp.conf.server.context.PagesContextUrl;
 import com.intrasoft.csp.conf.commons.types.ContactType;
 import com.intrasoft.csp.conf.commons.types.StatusResponseType;
-import com.intrasoft.csp.conf.commons.model.ResponseDTO;
-import com.intrasoft.csp.conf.server.domain.data.Contact;
-import com.intrasoft.csp.conf.server.domain.data.form.CspForm;
-import com.intrasoft.csp.conf.server.domain.data.form.ManagementForm;
-import com.intrasoft.csp.conf.server.domain.data.form.ManagementFormModule;
-import com.intrasoft.csp.conf.server.domain.data.form.ModuleForm;
-import com.intrasoft.csp.conf.server.domain.data.table.CspRow;
-import com.intrasoft.csp.conf.server.domain.data.table.DashboardRow;
-import com.intrasoft.csp.conf.server.domain.data.table.ModuleRow;
-import com.intrasoft.csp.conf.server.domain.data.table.ModuleVersionRow;
+import com.intrasoft.csp.conf.commons.model.api.ResponseDTO;
+import com.intrasoft.csp.conf.commons.model.ContactDTO;
+import com.intrasoft.csp.conf.commons.model.forms.CspForm;
+import com.intrasoft.csp.conf.commons.model.forms.ManagementForm;
+import com.intrasoft.csp.conf.commons.model.forms.ManagementFormModule;
+import com.intrasoft.csp.conf.commons.model.forms.ModuleForm;
+import com.intrasoft.csp.conf.server.domain.data.CspRow;
+import com.intrasoft.csp.conf.server.domain.data.DashboardRow;
+import com.intrasoft.csp.conf.server.domain.data.ModuleRow;
+import com.intrasoft.csp.conf.server.domain.data.ModuleVersionRow;
 import com.intrasoft.csp.conf.server.domain.entities.*;
 import com.intrasoft.csp.conf.server.repository.*;
 import com.intrasoft.csp.conf.server.utils.FileHelper;
-import com.intrasoft.csp.conf.server.utils.JodaConverter;
+import com.intrasoft.csp.conf.commons.utils.JodaConverter;
 import com.intrasoft.csp.conf.server.utils.VersionParser;
-import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,9 +31,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.NoSuchFileException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -782,7 +779,7 @@ public class DataController implements DataContextUrl, PagesContextUrl {
 
         //save csp contacts
         cspContactRepository.removeByCspId(csp.getId());
-        for (Contact contact : cspForm.getContacts()) {
+        for (ContactDTO contact : cspForm.getContacts()) {
             CspContact cspContact = new CspContact();
             cspContact.setCspId(csp.getId());
             cspContact.setPersonName(contact.getPersonName());
