@@ -149,15 +149,16 @@ public class DataParams implements Serializable {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("class DataParams {\n");
-
-        sb.append("    cspId: ").append(toIndentedString(cspId)).append("\n");
-        sb.append("    applicationId: ").append(toIndentedString(applicationId)).append("\n");
-        sb.append("    recordId: ").append(toIndentedString(recordId)).append("\n");
-        sb.append("    dateTime: ").append(toIndentedString(dateTime)).append("\n");
-        sb.append("}");
-        return sb.toString();
+        return "DataParams{" +
+                "cspId='" + cspId + '\'' +
+                ", applicationId='" + applicationId + '\'' +
+                ", recordId='" + recordId + '\'' +
+                ", dateTime=" + dateTime +
+                ", originCspId='" + originCspId + '\'' +
+                ", originApplicationId='" + originApplicationId + '\'' +
+                ", originRecordId='" + originRecordId + '\'' +
+                ", url='" + url + '\'' +
+                '}';
     }
 
     /**

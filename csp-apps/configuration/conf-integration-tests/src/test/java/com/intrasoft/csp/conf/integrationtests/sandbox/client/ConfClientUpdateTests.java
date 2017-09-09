@@ -108,23 +108,21 @@ public class ConfClientUpdateTests implements ApiContextUrl {
      * Test for a valid CSP, with valid hash, and existing update file
      */
     @Test
-    public void validUpdateTest() {
+    public void validUpdateTest() throws IOException {
         String cspId = "11111111-1111-1111-1111-111111111111";
         String hash = "fd61127757973c982cec9d15b61da61a173c8ea86c3122655b92abacec5c7edacff933f896a895d50ecfa3c8f9fc34eb76258bbc228fdf35a5b767a9b1a4c9";
 
         ResponseEntity<Resource> responseEntity = confClient.update(cspId, hash);
         InputStream responseInputStream;
 
-        try {
-            responseInputStream = responseEntity.getBody().getInputStream();
-            //response size is more than 100-bytes
-            Assert.assertThat(responseInputStream.available(), greaterThan(100));
-            //status code is OK
-            Assert.assertThat(responseEntity.getStatusCode(), equalTo(HttpStatus.OK));
-            //header contains original update file name
-            Assert.assertThat(responseEntity.getHeaders().get("Content-Disposition").get(0).toString(), containsString(hash));
-        } catch (IOException e) {
-            fail("Unexpected response");
-        }
+
+        responseInputStream = responseEntity.getBody().getInputStream();
+        //response size is more than 100-bytes
+        Assert.assertThat(responseInputStream.available(), greaterThan(100));
+        //status code is OK
+        Assert.assertThat(responseEntity.getStatusCode(), equalTo(HttpStatus.OK));
+        //header contains original update file name
+        Assert.assertThat(responseEntity.getHeaders().get("Content-Disposition").get(0).toString(), containsString(hash));
+
     }
 }

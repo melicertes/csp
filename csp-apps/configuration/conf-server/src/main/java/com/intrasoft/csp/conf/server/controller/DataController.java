@@ -21,6 +21,7 @@ import com.intrasoft.csp.conf.server.repository.*;
 import com.intrasoft.csp.conf.server.utils.FileHelper;
 import com.intrasoft.csp.conf.server.utils.JodaConverter;
 import com.intrasoft.csp.conf.server.utils.VersionParser;
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,11 +32,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.NoSuchFileException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.zip.ZipFile;
 
 @RestController
 public class DataController implements DataContextUrl, PagesContextUrl {
@@ -50,6 +54,8 @@ public class DataController implements DataContextUrl, PagesContextUrl {
     String fileTemp;
     @Value("${server.digest.algorithm}")
     String digestAlgorithm;
+    @Value("${server.manifest}")
+    String manifestName;
 
     @Autowired
     CspRepository cspRepository;
@@ -591,6 +597,20 @@ public class DataController implements DataContextUrl, PagesContextUrl {
         try {
             String hash = FileHelper.saveUploadedFile(fileTemp, fileRepository, uploadFile, digestAlgorithm);
 
+            //check for manifest.json within archive
+            String moduleZipFile = FileHelper.getFileFromHash(fileTemp, hash);
+            ZipFile zf = new ZipFile(fileTemp + moduleZipFile);
+            if (zf.getEntry(manifestName) == null) {
+                zf.close();
+                //delete  module zip
+                FileHelper.removeFile(fileTemp, moduleZipFile);
+                throw new ConfException(StatusResponseType.DATA_MODULE_VERSION_INVALID_ARCHIVE.text(), StatusResponseType.DATA_MODULE_VERSION_INVALID_ARCHIVE.code());
+            }
+            zf.close();
+
+            //copy final file to repository
+            FileHelper.copyFromTempToRepo(fileTemp, fileRepository, hash);
+
             //save after all exceptions
             ModuleVersion moduleVersion = new ModuleVersion();
             moduleVersion.setModuleId(moduleId);
@@ -655,16 +675,33 @@ public class DataController implements DataContextUrl, PagesContextUrl {
         try {
             //do NOT check for empty file, but check for unique hash, upon file uploading
             String newHash = "";
+            String fileName = "";
             if (!uploadFile.isEmpty()) {
                 String oldHash = moduleVersionRepository.findOne(moduleVersionId).getHash();
                 newHash = FileHelper.saveUploadedFile(fileTemp, fileRepository, uploadFile, digestAlgorithm);
                 if (moduleVersionRepository.findByHash(newHash) != null) {
                     throw new ConfException(StatusResponseType.DATA_MODULE_VERSION_HASH_EXISTS.text(), StatusResponseType.DATA_MODULE_VERSION_HASH_EXISTS.code());
                 }
+
+                //check for manifest.json within archive
+                String moduleZipFile = FileHelper.getFileFromHash(fileTemp, newHash);
+                ZipFile zf = new ZipFile(fileTemp + moduleZipFile);
+                if (zf.getEntry(manifestName) == null) {
+                    zf.close();
+                    //delete  module zip
+                    FileHelper.removeFile(fileTemp, moduleZipFile);
+                    throw new ConfException(StatusResponseType.DATA_MODULE_VERSION_INVALID_ARCHIVE.text(), StatusResponseType.DATA_MODULE_VERSION_INVALID_ARCHIVE.code());
+                }
+                zf.close();
+
+                //copy final file to repository
+                FileHelper.copyFromTempToRepo(fileTemp, fileRepository, newHash);
                 //find filename from hash and remove old file from file repository
-                String fileName = FileHelper.getFileFromHash(fileRepository, oldHash);
+                fileName = FileHelper.getFileFromHash(fileRepository, oldHash);
                 FileHelper.removeFile(fileRepository, fileName);
             }
+
+
 
             //proceed with persisting
             ModuleVersion moduleVersion = moduleVersionRepository.findOne(moduleVersionId);

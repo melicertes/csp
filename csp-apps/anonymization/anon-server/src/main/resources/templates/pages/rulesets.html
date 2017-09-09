@@ -20,9 +20,75 @@
     <div class="row">
         <div class="col-md-12">
             <h2 class="page-header"><i class="fa fa-gavel"></i> Rulesets
-            <th:a th:href="${'#'}" th:class="pull-right" th:data-placement="bottom" th:rel="tooltip" th:title="${'help tooltip'}">
+            <a th:href="'#rulesetHelpModal/'" data-target="#rulesetHelpModal" th:class="pull-right" data-toggle="modal">
                 <i class="fa fa-question-circle-o" aria-hidden="true"></i>
-            </th:a></h2>
+            </a>
+
+                <!-- Help Modal -->
+                <div class="modal fade" th:id="'rulesetHelpModal'" aria-labelledby="tiketLabel" tabindex="-1" role="dialog" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                                <h4 class="modal-title" id="tiketLabel"><span>Ruleset Configuration File Guide</span></h4>
+                            </div>
+                            <div class="modal-body">
+                                <h4 class="modal-title" th:id="tiketLabel">
+                                </h4>
+                                <small>
+                                <ul><b>field:</b> The field of the dataObject json that should be anonymized.</ul>
+                                <ul><b>action:</b> Two options 1) Anon (******), Pseudo (key based hashing)</ul>
+                                <ul><b>fieldtype:</b> The type of the field to anonymize: available options are
+                                    <ul><b>string</b> anonymized as **********</ul>
+                                    <ul><b>numeric</b> anonymized as ########</ul>
+                                    <ul><b>ip</b> anonymized as ***.***.***.***</ul>
+                                    <ul><b>email</b> anonymized as ****@******.**</ul>
+                                </ul>
+                                <b>NOTE:</b> node arrays are denoted as node[*] <br />
+                                    Sample file:
+                                <code>
+<pre>
+    {
+        "rules": [
+            {
+                "field": "$.trustcircle.short_name",
+                "action": "anon",
+                "fieldtype": "string"
+            },
+            {
+                "field": "$.trustcircle.created",
+                "action": "pseudo",
+                "fieldtype": "string"
+            },
+            {
+                "field": "$.trustcircle.teams[*].description",
+                "action": "anon",
+                "fieldtype": "string"
+            },
+            {
+                "field": "$.trustcircle.teams[*].theip",
+                "action": "anon",
+                "fieldtype": "ip"
+            },
+            {
+                "field": "$.trustcircle.teams[*].theemail",
+                "action": "anon",
+                "fieldtype": "email"
+            }
+        ]
+    }
+</pre>
+                                </code>
+                                </small>
+                            </div>
+                            <div class="modal-footer">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </h2>
         </div>
     </div>
     <div class = "alert alert-success" th:if="${msg}">
@@ -54,11 +120,11 @@
                                 <button type="reset" value="Reset" class="save btn btn-default pull-right">Clear</button>
                             </div>
                         </div>
-                        <div class="col-md-10 col-xs-12 pull-down pull-right" style="text-align: right">
+                        <!--<div class="col-md-10 col-xs-12 pull-down pull-right" style="text-align: right">
                             <div class="form-group">
                                 <button type="#" value="Create" class="save btn btn-primary"><i class="glyphicon glyphicon-plus"></i>&nbsp;Create</button>&nbsp;
                             </div>
-                        </div>
+                        </div>-->
                     </form>
                 </div>
                 <div class="row">
@@ -80,6 +146,7 @@
                                     <a th:href="'/rulesets/'+${ruleset.id}"><i class="fa fa-edit" aria-hidden="true"></i></a>
                                     <a th:href="@{|/rulesets/download?id=${ruleset.id}|}"><i class="fa fa-download" aria-hidden="true"></i></a>
                                 </td>
+
                                 <!-- Modal -->
                                 <div class="modal fade" th:id="${ruleset.id}" aria-labelledby="tiketLabel" tabindex="-1" role="dialog" aria-hidden="true">
                                     <div class="modal-dialog">

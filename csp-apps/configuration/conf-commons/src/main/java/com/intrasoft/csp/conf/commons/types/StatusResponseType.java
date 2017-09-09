@@ -70,7 +70,8 @@ public enum StatusResponseType {
     DATA_MODULE_VERSION_SAVE_FILE(1304, "Transaction failure; File could not be saved"),
     DATA_MODULE_VERSION_HASH_FILE(1305, "Transaction failure; Message digest of file could not be generated"),
     DATA_MODULE_VERSION_DELETE_ERROR(1306, "Transaction failure; Module Version cannot be removed; Module Version already assigned to CSPs"),
-    DATA_MODULE_VERSION_INVALID_FILE(1307, "Transaction failure; Module Version file does not exists and cannot be removed");
+    DATA_MODULE_VERSION_INVALID_FILE(1307, "Transaction failure; Module Version file does not exists and cannot be removed"),
+    DATA_MODULE_VERSION_INVALID_ARCHIVE(1308, "Transaction failure; No MANIFEST file found within Module Version archive");
 
 
 
