@@ -108,7 +108,7 @@ public class PagesController implements ContextUrl {
         model = this.init(model);
 
         model.addAttribute("navUpdatesClassActive", "active");
-    //todo find the inprogress task
+    //TODO find the inprogress task
         model.addAttribute("moduleName", "MISP");
         model.addAttribute("moduleVersionFrom", "12.00");
         model.addAttribute("moduleVersionTo", "12.21");
@@ -121,8 +121,6 @@ public class PagesController implements ContextUrl {
 
     @RequestMapping(value = PAGE_DOWNLOADMODULE + "/{hash}", method = RequestMethod.GET)
     public String downloadModule(@PathVariable String hash) {
-
-
         backgroundTaskService.scheduleDownload(installService.findModuleByHash(hash));
         return "redirect:"+PAGE_STATUS;
     }
@@ -130,22 +128,36 @@ public class PagesController implements ContextUrl {
 
     @RequestMapping(value = PAGE_INSTALLMODULE + "/{hash}", method = RequestMethod.GET)
     public String installModule(@PathVariable String hash) {
-        //TODO impl
-        return "";
+        backgroundTaskService.scheduleInstall(installService.findModuleByHash(hash));
+        return "redirect:"+PAGE_STATUS;
     }
 
 
     @RequestMapping(value = PAGE_REINSTALLMODULE + "/{hash}", method = RequestMethod.GET)
     public String reInstallModule(@PathVariable String hash) {
-        //TODO impl
-        return "";
+        backgroundTaskService.scheduleReInstall(installService.findModuleByHash(hash));
+        return "redirect:"+PAGE_STATUS;
     }
 
     @RequestMapping(value = PAGE_DELETEMODULE + "/{hash}", method = RequestMethod.GET)
     public String deleteModule(@PathVariable String hash) {
-        //TODO impl
-        return "";
+        backgroundTaskService.scheduleDelete(installService.findModuleByHash(hash));
+        return "redirect:"+PAGE_STATUS;
     }
+
+
+    @RequestMapping(value = PAGE_STARTMODULES + "/{cspId}", method = RequestMethod.GET)
+    public String startActiveModules(@PathVariable String cspId) {
+        backgroundTaskService.scheduleStartActiveModules();
+        return "redirect:"+PAGE_STATUS;
+    }
+
+    @RequestMapping(value = PAGE_STOPMODULES + "/{cspId}", method = RequestMethod.GET)
+    public String stopActiveModules(@PathVariable String cspId) {
+        backgroundTaskService.scheduleStopActiveModules();
+        return "redirect:"+PAGE_STATUS;
+    }
+
 
 
     /*

@@ -1,13 +1,15 @@
 package com.intrasoft.csp.conf.clientcspapp.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.intrasoft.csp.conf.clientcspapp.context.ContextUrl;
 import com.intrasoft.csp.conf.clientcspapp.model.ModuleState;
+import com.intrasoft.csp.conf.clientcspapp.model.SmtpDetails;
 import com.intrasoft.csp.conf.clientcspapp.model.SystemModule;
 import com.intrasoft.csp.conf.clientcspapp.model.UpdateVersion;
 import com.intrasoft.csp.conf.clientcspapp.model.forms.RegistrationForm;
+import com.intrasoft.csp.conf.clientcspapp.service.BackgroundTaskService;
+import com.intrasoft.csp.conf.clientcspapp.service.ExternalProcessService;
 import com.intrasoft.csp.conf.clientcspapp.service.InstallationService;
 import com.intrasoft.csp.conf.clientcspapp.service.SimpleStorageService;
 import com.intrasoft.csp.conf.commons.context.ApiContextUrl;
@@ -19,17 +21,14 @@ import com.intrasoft.csp.conf.commons.types.StatusResponseType;
 import com.intrasoft.csp.conf.commons.utils.JodaConverter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -39,8 +38,17 @@ import java.util.stream.Collectors;
 @Slf4j
 public class RestApiController implements ContextUrl, ApiContextUrl {
 
+    @Value("${client.ui.logentries.max:500}")
+    private Integer maxLines;
+
+    @Autowired
+    ExternalProcessService externalProcessService;
+
     @Autowired
     InstallationService installService;
+
+    @Autowired
+    BackgroundTaskService backgroundTaskService;
 
     @Autowired
     SimpleStorageService storageService;
@@ -57,8 +65,8 @@ public class RestApiController implements ContextUrl, ApiContextUrl {
             ) {
         try {
             String caBundleLocation = storageService.storeFileTemporarily(bundle.getInputStream(), "ca-bundle.crt");
-            String sslPrivateKey = storageService.storeFileTemporarily(bundle.getInputStream(), "sslprivate.key");
-            String sslPublicKey = storageService.storeFileTemporarily(bundle.getInputStream(), "sslpublic.crt");
+            String sslPrivateKey = storageService.storeFileTemporarily(privateKey.getInputStream(), "sslprivate.key");
+            String sslPublicKey = storageService.storeFileTemporarily(publicKey.getInputStream(), "sslpublic.crt");
 
             ObjectMapper mapper = new ObjectMapper();
 
@@ -90,32 +98,30 @@ public class RestApiController implements ContextUrl, ApiContextUrl {
         ModulesInfoDTO modulesInfo = new ModulesInfoDTO();
         cspRegistration.setModuleInfo(modulesInfo);
 
-        // todo add smtp
+        SmtpDetails smtp = new SmtpDetails();
+        smtp.setHost(cspForm.getSmtp_host());
+        smtp.setPort(cspForm.getSmtp_port());
+        smtp.setUserName(cspForm.getSmtp_user());
+        smtp.setPassword(cspForm.getSmtp_pass());
 
-
-        return installService.registerCsp(cspId,cspRegistration);
+        final ResponseDTO dto = installService.registerCsp(cspId, cspRegistration, smtp);
+        if (dto.getResponseCode() == 0) {
+            backgroundTaskService.scheduleInternalCertsGeneration();
+            backgroundTaskService.scheduleExternalCertsGeneration();
+            backgroundTaskService.scheduleEnvironmentCreation();
+        } else {
+            log.error("Not successful ; certificates creation has not been scheduled!");
+        }
+        return dto;
     }
 
     @RequestMapping(value = REST_LOG,
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE,
             method = RequestMethod.GET)
     public ResponseEntity log() {
-        ObjectMapper mapper = new ObjectMapper();
-        TypeReference<List<Object>> mapType = new TypeReference<List<Object>>() {};
+        final List<String> lines = externalProcessService.getLastEntries(maxLines);
 
-        File initialFile = new File("e://0//generated.json");
-
-
-        //InputStream is = TypeReference.class.getResourceAsStream("/generated.json");
-        List<Object> exampleList = new ArrayList<>();
-        try {
-            InputStream is = new FileInputStream(initialFile);
-            exampleList = mapper.readValue(is, mapType);
-        } catch (IOException e) {
-           // System.out.println(e.getMessage());
-        }
-
-        return new ResponseEntity<>(exampleList, HttpStatus.OK);
+        return new ResponseEntity<>(lines, HttpStatus.OK);
     }
 
     @RequestMapping(value = REST_DASHSTATUS, produces = MediaType.APPLICATION_JSON_UTF8_VALUE,

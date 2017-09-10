@@ -1,10 +1,7 @@
 package com.intrasoft.csp.conf.clientcspapp.service;
 
 import com.intrasoft.csp.conf.client.ConfClient;
-import com.intrasoft.csp.conf.clientcspapp.model.InstallationState;
-import com.intrasoft.csp.conf.clientcspapp.model.ModuleState;
-import com.intrasoft.csp.conf.clientcspapp.model.SystemInstallationState;
-import com.intrasoft.csp.conf.clientcspapp.model.SystemModule;
+import com.intrasoft.csp.conf.clientcspapp.model.*;
 import com.intrasoft.csp.conf.clientcspapp.repo.SystemInstallationStateRepository;
 import com.intrasoft.csp.conf.clientcspapp.repo.SystemModuleRepository;
 import com.intrasoft.csp.conf.commons.model.api.RegistrationDTO;
@@ -34,7 +31,7 @@ public class InstallationService {
     SystemModuleRepository moduleRepository;
 
     @Transactional
-    public ResponseDTO registerCsp(String cspId, RegistrationDTO cspRegistration) {
+    public ResponseDTO registerCsp(String cspId, RegistrationDTO cspRegistration, SmtpDetails smtp) {
         final ResponseDTO dto = client.register(cspId, cspRegistration);
         if (dto.getResponseCode() == StatusResponseType.OK.code()) {
             log.info("CSP Registration OK, API returned {}",dto.getResponseText());
@@ -43,7 +40,7 @@ public class InstallationService {
             state.setCspId(cspId);
             state.setCspRegistration(cspRegistration);
             state.setInstallationState(InstallationState.IN_PROGRESS);
-
+            state.setSmtpDetails(smtp);
             state = repo.save(state);
             log.info("CSP Registration success! CSP Id: {} [internal:{}]",cspId,state.getId());
         } else {
@@ -59,7 +56,7 @@ public class InstallationService {
             return null;
         } else if (!state.getCspId().contentEquals(cspId)) {
             log.error("CSP Id requested {} is not ours ({})", cspId, state.getCspId());
-            //TODO return null here;
+            return null;
         }
 
         final UpdateInformationDTO updates = client.updates(cspId);

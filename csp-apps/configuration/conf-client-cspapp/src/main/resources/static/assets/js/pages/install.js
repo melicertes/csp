@@ -105,7 +105,6 @@ $(document).ready(function() {
                     console.log('set files array correctly.');
                     $('#reginfo').show();
                     $('#certinfo').hide();
-
                 }
             }
         });

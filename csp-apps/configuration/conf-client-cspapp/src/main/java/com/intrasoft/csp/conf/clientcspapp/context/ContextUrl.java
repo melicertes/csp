@@ -20,6 +20,8 @@ public interface ContextUrl {
     String PAGE_INSTALLMODULE = "/installModule";
     String PAGE_REINSTALLMODULE = "/reinstallModule";
     String PAGE_DELETEMODULE = "/deleteModule";
+    String PAGE_STARTMODULES = "/startModules";
+    String PAGE_STOPMODULES = "/stopModules";
 
     String PAGES_ERROR = "/error";
 

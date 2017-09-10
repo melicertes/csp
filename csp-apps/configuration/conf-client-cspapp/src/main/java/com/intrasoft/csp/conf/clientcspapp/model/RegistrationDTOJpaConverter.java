@@ -12,7 +12,7 @@ import java.io.IOException;
  * Created by tangelatos on 06/09/2017.
  */
 @Converter
-public class JpaConverterRegistrationDTOJson implements AttributeConverter<RegistrationDTO, String> {
+public class RegistrationDTOJpaConverter implements AttributeConverter<RegistrationDTO, String> {
 
     private final static ObjectMapper objectMapper = new ObjectMapper();
 

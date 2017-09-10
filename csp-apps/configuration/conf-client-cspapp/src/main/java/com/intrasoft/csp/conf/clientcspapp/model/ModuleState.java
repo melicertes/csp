@@ -7,6 +7,7 @@ public enum ModuleState {
     UNKNOWN,
     DOWNLOADING,
     DOWNLOADED,
+    INSTALLING,
     INSTALLED,
     OBSOLETE,
     REMOVED

@@ -10,7 +10,7 @@ import java.io.Serializable;
  * Created by tangelatos on 06/09/2017.
  */
 @Entity
-@Getter @Setter @NoArgsConstructor
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor
 @EqualsAndHashCode @ToString
 public class SystemInstallationState implements Serializable {
 
@@ -26,12 +26,12 @@ public class SystemInstallationState implements Serializable {
     private InstallationState installationState = InstallationState.NOT_STARTED;
 
     @Column(columnDefinition = "TEXT")
-    @Convert(converter = JpaConverterRegistrationDTOJson.class)
+    @Convert(converter = RegistrationDTOJpaConverter.class)
     private RegistrationDTO cspRegistration;
 
-    public SystemInstallationState(String cspId, InstallationState installationState, RegistrationDTO cspRegistration) {
-        this.cspId = cspId;
-        this.installationState = installationState;
-        this.cspRegistration = cspRegistration;
-    }
+    @Column(columnDefinition = "TEXT")
+    @Convert(converter = SmtpDetailsJpaConverter.class)
+    private SmtpDetails smtpDetails;
+
+
 }

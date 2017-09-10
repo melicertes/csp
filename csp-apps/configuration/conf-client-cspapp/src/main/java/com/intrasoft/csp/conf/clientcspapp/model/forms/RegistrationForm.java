@@ -18,7 +18,7 @@ public class RegistrationForm extends CspForm {
     private String smtp_host;
 
     @JsonProperty("smtp_port")
-    private String smtp_port;
+    private Integer smtp_port;
 
     @JsonProperty("smtp_user")
     private String smtp_user;
