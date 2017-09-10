@@ -12,12 +12,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -44,16 +42,14 @@ public class BackgroundTaskService {
     @Value("${conf.server.port}")
     Integer port;
 
-    @Value("${installation.temp.directory}")
-    String tempDirectory;
-
     @Autowired
     ConfClient client;
 
     @Autowired
     InstallationService installationService;
 
-
+    @Autowired
+    SimpleStorageService storageService;
 
     @SneakyThrows
     public <S, R> void addTask(BackgroundTask<S, R> task) {
@@ -100,43 +96,47 @@ public class BackgroundTaskService {
         return internetAvailable;
     }
 
-    public void scheduleDownload(String hash) {
+    public void scheduleDownload(final SystemModule module) {
 
         addTask(() -> {
             if (installationService.canDownload() && internetAvailable) {
-                SystemModule module = installationService.findModuleByHash(hash);
                 module.setModuleState(ModuleState.DOWNLOADING);
-                module = installationService.updateSystemModuleState(module.getId(), ModuleState.DOWNLOADING);
-                log.info("Attempting to download {}",hash);
+                installationService.updateSystemModuleState(module.getId(), ModuleState.DOWNLOADING);
+                log.info("Attempting to download {}",module.getHash());
                 final SystemInstallationState state = installationService.getState();
-                final ResponseEntity entity = client.update(state.getCspId(), hash);
-                log.info("Entity for {} received, code {}",hash, entity.getStatusCodeValue());
+                final ResponseEntity entity = client.update(state.getCspId(), module.getHash());
+                log.info("Entity for {} received, code {}",module.getHash(), entity.getStatusCodeValue());
                 try {
                     if (entity.getStatusCodeValue() == HttpStatus.OK.value()) { // we are downloading!
                         Resource resource = (Resource) entity.getBody();
-                        // lets copy this directly to a modules location
-                        File target = new File(tempDirectory, hash + ".zip");
-                        Files.copy(resource.getInputStream(), target.toPath());
+                        // lets copy this directly to a temp location
+                        String location = storageService.storeFileTemporarily(resource.getInputStream(), module.getHash() + ".zip");
                         // update module information
                         module.setModuleState(ModuleState.DOWNLOADED);
-                        module.setArchivePath(target.getAbsolutePath());
-
-                        module = installationService.saveSystemModule(module);
-                        log.info("File has been received (size: {}) in temporary location for {}",target.length(), hash);
-                        return new BackgroundTaskResult<String, Boolean>(hash, true);
+                        module.setArchivePath(location);
+                        installationService.saveSystemModule(module);
+                        log.info("File has been received in temporary location for {}", module.getHash());
+                        return new BackgroundTaskResult<SystemModule, Boolean>(module, true);
                     } else {
-                        return new BackgroundTaskResult<String, Boolean>(entity.getStatusCode().toString(),false);
+                        return new BackgroundTaskResult<SystemModule, Boolean>(module,false);
                     }
                 } catch (IOException ioe) {
+                    resetModule(module);
                     log.error("IO exception in download: {}",ioe.getMessage(),ioe);
-                    return new BackgroundTaskResult<String, Boolean>(ioe.getMessage(),false);
+                    return new BackgroundTaskResult<SystemModule, Boolean>(module,false);
                 }
             } else {
-                log.error("Installation is not ready. Module cannot be downloaded {}", hash);
-                return new BackgroundTaskResult<String, Boolean>(hash, false);
+                log.error("Installation is not ready. Module cannot be downloaded {}", module.getHash());
+                return new BackgroundTaskResult<SystemModule, Boolean>(module, false);
             }
         });
 
+    }
+
+    private void resetModule(SystemModule module) {
+        module.setModuleState(ModuleState.UNKNOWN);
+        module.setArchivePath(null);
+        installationService.saveSystemModule(module);
     }
 }
 

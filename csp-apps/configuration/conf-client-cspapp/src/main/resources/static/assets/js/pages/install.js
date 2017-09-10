@@ -1,8 +1,53 @@
 $(document).ready(function() {
 
     /*
+     UI hiding
+     */
+
+    $('#reginfo').hide();
+    $('#certinfo').show();
+
+    /*
      UI handlers
      */
+    $("#ca_bundle").fileinput({
+        browseClass: "btn btn-default",
+        showCaption: true,
+        showRemove: true,
+        showUpload: false,
+        showPreview: false,
+        allowedFileExtensions: ['crt']
+    });
+
+    /*
+     UI handlers
+     */
+    $("#ssl_priv_key").fileinput({
+        browseClass: "btn btn-default",
+        showCaption: true,
+        showRemove: true,
+        showUpload: false,
+        showPreview: false,
+        allowedFileExtensions: ['key']
+    });
+
+    /*
+     UI handlers
+     */
+    $("#ssl_pub_key").fileinput({
+        browseClass: "btn btn-default",
+        showCaption: true,
+        showRemove: true,
+        showUpload: false,
+        showPreview: false,
+        allowedFileExtensions: ['crt']
+    });
+
+
+
+
+
+
     $('body').on('click', '.btn-action', function(e) {
         e.preventDefault();
     });
@@ -38,6 +83,36 @@ $(document).ready(function() {
             }
         }
     });
+
+    var filesForm = $("#csp-certs");
+    filesForm.submit(function (e) {
+        e.preventDefault();
+        var formData = new FormData(this);
+
+        $.ajax({
+            url: POSTFILES_URL + "/" + $('#csp_id').val(),
+            data: formData,
+            cache: false,
+            processData: false,
+            contentType: false,
+            type: 'POST',
+            success: function(response){
+                console.log(response);
+                var files = response.responseText;
+
+                if (response.responseCode === 0) {
+                    $('#csp-form').find('#files').val(response.responseText);
+                    console.log('set files array correctly.');
+                    $('#reginfo').show();
+                    $('#certinfo').hide();
+
+                }
+            }
+        });
+
+    });
+
+
     var form = $("#csp-form");
     form.validate({
         rules: {
@@ -67,6 +142,15 @@ $(document).ready(function() {
                 required: true
             },
             "csp_external_ip[]": {
+                required: true
+            },
+            ca_bundle: {
+                required: true
+            },
+            ssl_priv_key: {
+                required: true
+            },
+            ssl_pub_key: {
                 required: true
             }
         }

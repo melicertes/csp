@@ -23,10 +23,54 @@
         </div>
     </div>
 
-    <div class="row">
+
+
+    <div id="certinfo" class="row">
+        <div class="col-md-12">
+            <form enctype="multipart/form-data" method="POST" action="#" id="csp-certs" >
+
+                <div class="row">
+                    <div class="col-md-12" style="text-align: right">
+                        <a th:href="${dashboardUrl}" class="save btn btn-default">Cancel</a>
+                        <button type="submit" class="save btn btn-success">Save</button>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12 col-sm-12">
+                        <p class="lead pull-left">SSL Certificates</p>
+                        <p class="pull-right help-block">(Certificates must be uploaded first!)</p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4 col-xs-12">
+                        <div class="form-group">
+                            <label for="ca_bundle">CA Bundle (.crt):</label>
+                            <input id="ca_bundle" name="ca_bundle" type="file" class="file-loading"></input>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-xs-12">
+                        <div class="form-group">
+                            <label for="ssl_priv_key">Private SSL Key (.key):</label>
+                            <input id="ssl_priv_key" name="ssl_priv_key" type="file" class="file-loading"></input>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-xs-12">
+                        <div class="form-group">
+                            <label for="ssl_pub_key">Signed SSL Certificate (.crt):</label>
+                            <input id="ssl_pub_key" name="ssl_pub_key" type="file" class="file-loading"></input>
+                        </div>
+                    </div>
+                </div>
+            </form>
+
+        </div>
+    </div>
+
+    <div id="reginfo" class="row">
         <div class="col-md-12">
             <form method="POST" action="#" id="csp-form">
-
+                <input type="hidden" id="files" name="files"></input>
                 <div class="row">
                     <div class="col-md-12" style="text-align: right">
                         <a th:href="${dashboardUrl}" class="save btn btn-default">Cancel</a>
@@ -145,7 +189,47 @@
                 </div>
                 <div class="row">
                     <div class="col-md-12 col-sm-12">
-                        <p class="help-block">If host directly exposed, add external IP also here</p>
+                        <p class="help-block">If host directly exposed, add external IP here also</p>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12 col-sm-12">
+                        <p>&nbsp;</p>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12 col-sm-12">
+                        <p class="lead pull-left">Outgoing Emails</p>
+                        <p class="pull-right help-block">(Optional - videobridge support)</p>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-3 col-xs-6">
+                        <div class="form-group">
+                            <label for="smtp_host">SMPT Host:</label>
+                            <input id="smtp_host" name="smtp_host" type="text" class="form-control"></input>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-xs-6">
+                        <div class="form-group">
+                            <label for="smtp_port">SMPT Port:</label>
+                            <input id="smtp_port" name="smtp_port" type="text" class="form-control"></input>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-xs-6">
+                        <div class="form-group">
+                            <label for="smtp_user">SMPT Username:</label>
+                            <input id="smtp_user" name="smtp_user" type="text" class="form-control"></input>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-xs-6">
+                        <div class="form-group">
+                            <label for="smtp_pass">SMPT Password:</label>
+                            <input id="smtp_pass" name="smtp_pass" type="password" class="form-control"></input>
+                        </div>
                     </div>
                 </div>
 
@@ -186,6 +270,7 @@
 <script th:src="@{/webjars/jquery-validation/1.16.0/additional-methods.min.js}"></script>
 <script th:src="@{/webjars/jquery-mask-plugin/1.14.10/dist/jquery.mask.min.js}"></script>
 <script th:src="@{/webjars/bootstrap-checkbox/1.2.5/dist/js/bootstrap-checkbox.min.js}"></script>
+<script th:src="@{/webjars/bootstrap-fileinput/4.4.0/js/fileinput.min.js}"></script>
 
 <script th:src="@{/assets/js/vendor/jquery.duplicate.min.js}"></script>
 <script th:src="@{/assets/js/vendor/jquery.serializeObject.js}"></script>
@@ -193,6 +278,7 @@
 <script th:inline="javascript">
     /*<![CDATA[*/
     var POST_URL = [[${cspRegisterApi}]];
+    var POSTFILES_URL = [[${cspRegisterFilesApi}]];
     var REDIRECT_URL = [[${dashboardUrl}]];
     /*]]>*/
 </script>

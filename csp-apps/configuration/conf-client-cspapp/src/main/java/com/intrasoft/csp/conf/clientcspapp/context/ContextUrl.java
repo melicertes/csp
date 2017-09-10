@@ -10,6 +10,7 @@ public interface ContextUrl {
 
     String PAGE_LINKS = "/links.html";
 
+    String REST_REGISTER_FILES = "/registerFiles";
     String REST_REGISTER = "/register";
     String REST_LOG = "/log";
     String REST_DASHSTATUS = "/dstat";

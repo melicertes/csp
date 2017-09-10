@@ -76,6 +76,8 @@ public class PagesController implements ContextUrl {
         } else {
             model.addAttribute("cspId", UUID.randomUUID().toString());
             model.addAttribute("cspRegisterApi", REST_REGISTER);
+            model.addAttribute("cspRegisterFilesApi", REST_REGISTER_FILES);
+
             return new ModelAndView("pages/install-register", "install-register", model);
         }
     }
@@ -120,7 +122,8 @@ public class PagesController implements ContextUrl {
     @RequestMapping(value = PAGE_DOWNLOADMODULE + "/{hash}", method = RequestMethod.GET)
     public String downloadModule(@PathVariable String hash) {
 
-        backgroundTaskService.scheduleDownload(hash);
+
+        backgroundTaskService.scheduleDownload(installService.findModuleByHash(hash));
         return "redirect:"+PAGE_STATUS;
     }
 
@@ -154,7 +157,6 @@ public class PagesController implements ContextUrl {
         m.addAttribute("updatesUrl", PAGE_UPDATES);
         m.addAttribute("statusUrl", PAGE_STATUS);
         m.addAttribute("contactUrl", jiraLink);
-
         m.addAttribute("dashboardLinks", PAGE_LINKS);
         m.addAttribute("dashboardStatusUrl", REST_DASHSTATUS);
 

@@ -7,40 +7,77 @@ import com.intrasoft.csp.conf.clientcspapp.context.ContextUrl;
 import com.intrasoft.csp.conf.clientcspapp.model.ModuleState;
 import com.intrasoft.csp.conf.clientcspapp.model.SystemModule;
 import com.intrasoft.csp.conf.clientcspapp.model.UpdateVersion;
+import com.intrasoft.csp.conf.clientcspapp.model.forms.RegistrationForm;
 import com.intrasoft.csp.conf.clientcspapp.service.InstallationService;
+import com.intrasoft.csp.conf.clientcspapp.service.SimpleStorageService;
 import com.intrasoft.csp.conf.commons.context.ApiContextUrl;
 import com.intrasoft.csp.conf.commons.model.api.ModulesInfoDTO;
 import com.intrasoft.csp.conf.commons.model.api.RegistrationDTO;
 import com.intrasoft.csp.conf.commons.model.api.ResponseDTO;
 import com.intrasoft.csp.conf.commons.model.api.UpdateInformationDTO;
-import com.intrasoft.csp.conf.commons.model.forms.CspForm;
+import com.intrasoft.csp.conf.commons.types.StatusResponseType;
 import com.intrasoft.csp.conf.commons.utils.JodaConverter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
 
 @RestController
+@Slf4j
 public class RestApiController implements ContextUrl, ApiContextUrl {
 
     @Autowired
     InstallationService installService;
 
+    @Autowired
+    SimpleStorageService storageService;
+
+    @RequestMapping(value = REST_REGISTER_FILES + "/{cspId}",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
+            produces = MediaType.APPLICATION_JSON_UTF8_VALUE,
+            method = RequestMethod.POST)
+    public ResponseDTO registerFiles(
+            @PathVariable String cspId,
+            @RequestParam("ca_bundle") MultipartFile bundle,
+            @RequestParam("ssl_priv_key") MultipartFile privateKey,
+            @RequestParam("ssl_pub_key") MultipartFile publicKey
+            ) {
+        try {
+            String caBundleLocation = storageService.storeFileTemporarily(bundle.getInputStream(), "ca-bundle.crt");
+            String sslPrivateKey = storageService.storeFileTemporarily(bundle.getInputStream(), "sslprivate.key");
+            String sslPublicKey = storageService.storeFileTemporarily(bundle.getInputStream(), "sslpublic.crt");
+
+            ObjectMapper mapper = new ObjectMapper();
+
+            ResponseDTO resp = new ResponseDTO(StatusResponseType.OK.code(), mapper.writeValueAsString(
+                    Arrays.asList(caBundleLocation,sslPrivateKey,sslPublicKey)
+            ));
+            return resp;
+        } catch (IOException e) {
+            log.error("IOException {}",e.getMessage(),e);
+            return new ResponseDTO(StatusResponseType.FAILURE.code(), "IO Exception: "+e.getMessage());
+        }
+
+    }
+
     @RequestMapping(value = REST_REGISTER + "/{cspId}",
             consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE,
             method = RequestMethod.POST)
-    public ResponseDTO register(@PathVariable String cspId, @RequestBody CspForm cspForm) {
+    public ResponseDTO register(@PathVariable String cspId, @RequestBody RegistrationForm cspForm) {
         RegistrationDTO cspRegistration = new RegistrationDTO();
         cspRegistration.setName(cspForm.getName());
         cspRegistration.setDomainName(cspForm.getDomainName());
@@ -52,6 +89,9 @@ public class RestApiController implements ContextUrl, ApiContextUrl {
         // on registration modules are empty.
         ModulesInfoDTO modulesInfo = new ModulesInfoDTO();
         cspRegistration.setModuleInfo(modulesInfo);
+
+        // todo add smtp
+
 
         return installService.registerCsp(cspId,cspRegistration);
     }
@@ -72,7 +112,7 @@ public class RestApiController implements ContextUrl, ApiContextUrl {
             InputStream is = new FileInputStream(initialFile);
             exampleList = mapper.readValue(is, mapType);
         } catch (IOException e) {
-            System.out.println(e.getMessage());
+           // System.out.println(e.getMessage());
         }
 
         return new ResponseEntity<>(exampleList, HttpStatus.OK);
