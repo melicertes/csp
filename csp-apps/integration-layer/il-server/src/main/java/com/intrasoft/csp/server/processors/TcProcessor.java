@@ -257,6 +257,7 @@ public class TcProcessor implements Processor,CamelRoutes{
                 integrationAnonData.setDataObject(integrationData.getDataObject());
                 IntegrationAnonData anonData = anonClient.postAnonData(integrationAnonData);
                 integrationData.setDataObject(anonData.getDataObject());
+                LOG.info("-- Anonymized dataObject: "+anonData.getDataObject().toString());
                 break;
             case DO_NOT_SHARE:
                 return;
