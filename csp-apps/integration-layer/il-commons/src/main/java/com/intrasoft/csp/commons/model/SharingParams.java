@@ -21,7 +21,7 @@ public class SharingParams implements Serializable {
     @JsonProperty("isExternal")
     private Boolean isExternal;
 
-    @JsonProperty("tcId")
+    @JsonProperty("trustCircleId")
     private String tcId;
 
     @JsonProperty("teamId")
