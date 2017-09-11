@@ -2,6 +2,7 @@ package com.intrasoft.csp.server.processors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.intrasoft.csp.anon.client.AnonClient;
+import com.intrasoft.csp.anon.commons.exceptions.InvalidDataTypeException;
 import com.intrasoft.csp.anon.commons.model.IntegrationAnonData;
 import com.intrasoft.csp.commons.exceptions.InvalidSharingParamsException;
 import com.intrasoft.csp.commons.model.*;
@@ -250,12 +251,17 @@ public class TcProcessor implements Processor,CamelRoutes{
             case SHARE_AS_IS:
                 break;
             case SHARE_ANONYMIZED:
-                //TODO: in case of exception we have to decide if the Guaranteed Delivery will kick in to handle it
                 IntegrationAnonData integrationAnonData = new IntegrationAnonData();
                 integrationAnonData.setCspId(integrationData.getDataParams().getCspId());
                 integrationAnonData.setDataType(integrationData.getDataType());
                 integrationAnonData.setDataObject(integrationData.getDataObject());
-                IntegrationAnonData anonData = anonClient.postAnonData(integrationAnonData);
+                IntegrationAnonData anonData = null;
+                try {
+                    anonData = anonClient.postAnonData(integrationAnonData);
+                } catch (InvalidDataTypeException|NoSuchAlgorithmException|InvalidKeyException|IOException e) {
+                    LOG.error("Could not anonymize, falling back to 'DO_NOT_SHARE'. "+integrationAnonData.toString(),e);
+                    return;
+                }
                 integrationData.setDataObject(anonData.getDataObject());
                 LOG.info("-- Anonymized dataObject: "+anonData.getDataObject().toString());
                 break;
