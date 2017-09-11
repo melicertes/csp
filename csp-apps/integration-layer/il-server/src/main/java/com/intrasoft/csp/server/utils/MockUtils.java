@@ -114,6 +114,7 @@ public class MockUtils implements ContextUrl {
             Team t= new Team();
             t.setUrl(String.format(strWithCountArg,""+(i+1)));
             t.setShortName("sname"+i);
+            t.setCspId("sname"+i);
             ret.add(t);
         }
         return ret;
@@ -123,6 +124,7 @@ public class MockUtils implements ContextUrl {
         Team team = new Team();
         team.setUrl(String.format(strWithCountArg, "" + id));
         team.setShortName("sname"+id);
+        team.setCspId("sname"+id);
 
         return team;
     }
@@ -131,6 +133,7 @@ public class MockUtils implements ContextUrl {
         Team team = new Team();
         team.setUrl(String.format(strWithCountArg, "" + id));
         team.setShortName(shortName);
+        team.setCspId(shortName);
 
         return team;
     }

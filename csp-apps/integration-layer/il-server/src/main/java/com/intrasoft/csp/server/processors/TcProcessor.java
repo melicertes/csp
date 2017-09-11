@@ -153,10 +153,16 @@ public class TcProcessor implements Processor,CamelRoutes{
                         "Team: " + team.toString());
             }
 
+            if (team.getCspId() == null) {
+                throw new CspBusinessException("CspId received from TC API is null - cannot proceed. \n" +
+                        "TrustCircle: " + tc.toString() + "\n" +
+                        "Team: " + team.toString());
+            }
+
             if(isFlow1){
                 //the following is only valid for flow1
-                //TODO: TC bug here, see SXCSP-255. We should use cspId and not shortName
-                if (!team.getShortName().toLowerCase().trim().equals(serverName.toLowerCase().trim())) {
+                //SXCSP-255. Using cspId and not shortName
+                if (!team.getCspId().toLowerCase().trim().equals(serverName.toLowerCase().trim())) {
                     teams.add(team);
                 }
             }else{
@@ -197,8 +203,8 @@ public class TcProcessor implements Processor,CamelRoutes{
     private void sendByTeamId(String teamId, Exchange exchange) throws IOException, InvalidKeyException, NoSuchAlgorithmException {
         Team team = getTeamByRestCall(teamId);
         List<Team> teams = new ArrayList<>();
-        //TODO: TC bug here, see SXCSP-255. We should use cspId and not shortName
-        if (!team.getShortName().toLowerCase().trim().equals(serverName.toLowerCase().trim())){
+        //SXCSP-255. Using cspId and not shortName
+        if (!team.getCspId().toLowerCase().trim().equals(serverName.toLowerCase().trim())){
             teams.add(team);
             decideTheFlow(teams,exchange);
         }else{
@@ -228,6 +234,10 @@ public class TcProcessor implements Processor,CamelRoutes{
         Team team = camelRestService.send(this.getTcTeamsURI() + "/" + teamId, teamId, HttpMethod.GET.name(), Team.class);
         if(team.getShortName()==null){
             throw new CspBusinessException("Team short name received from TC API is null - cannot proceed. \n" +
+                    "Team: "+team.toString());
+        }
+        if(team.getCspId()==null){
+            throw new CspBusinessException("CspId received from TC API is null - cannot proceed. \n" +
                     "Team: "+team.toString());
         }
         return team;
@@ -281,9 +291,9 @@ public class TcProcessor implements Processor,CamelRoutes{
     // flow2
     private void handleExternalDclFlowAndSendToDSL(Exchange exchange,String httpMethod,List<Team> teams, IntegrationData integrationData){
 
-        //TODO: TC bug here, see SXCSP-255. We should use cspId and not shortName
+        //SXCSP-255. Using cspId and not shortName
         //should have all teams regardless of any teamId provided in sharingParams
-        boolean authorized = teams.stream().anyMatch(t->t.getShortName().toLowerCase().equals(integrationData.getDataParams().getCspId().toLowerCase()));
+        boolean authorized = teams.stream().anyMatch(t->t.getCspId().toLowerCase().equals(integrationData.getDataParams().getCspId().toLowerCase()));
         LOG.info("Authorized (cspId or shortName="+integrationData.getDataParams().getCspId().toLowerCase()+"): "+authorized);
         if (authorized){
             integrationData.getSharingParams().setIsExternal(true);
