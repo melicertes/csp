@@ -94,6 +94,15 @@ public class PagesController implements ContextUrl {
         return new ModelAndView("pages/updates", "updates", model);
     }
 
+    @RequestMapping(value = PAGE_SYSTEM, method = RequestMethod.GET)
+    public ModelAndView system(Model model) {
+        model = this.init(model);
+
+        model.addAttribute("navSystemClassActive", "active");
+
+        return new ModelAndView("pages/system", "system", model);
+    }
+
     @RequestMapping(value = PAGE_LINKS, method = RequestMethod.GET)
     public ModelAndView getPageLinks(Model model) {
         model = this.init(model);
@@ -167,6 +176,7 @@ public class PagesController implements ContextUrl {
         m.addAttribute("dashboardUrl", PAGE_DASHBOARD);
         m.addAttribute("installUrl", PAGE_INSTALL);
         m.addAttribute("updatesUrl", PAGE_UPDATES);
+        m.addAttribute("systemUrl", PAGE_SYSTEM);
         m.addAttribute("statusUrl", PAGE_STATUS);
         m.addAttribute("contactUrl", jiraLink);
         m.addAttribute("dashboardLinks", PAGE_LINKS);
@@ -175,6 +185,7 @@ public class PagesController implements ContextUrl {
         m.addAttribute("navHomeClassActive", "");
         m.addAttribute("navInstallClassActive", "");
         m.addAttribute("navUpdatesClassActive", "");
+        m.addAttribute("navSystemClassActive", "");
 
         return m;
     }
