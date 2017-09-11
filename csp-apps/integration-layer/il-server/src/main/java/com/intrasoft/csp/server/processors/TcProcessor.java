@@ -2,6 +2,7 @@ package com.intrasoft.csp.server.processors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.intrasoft.csp.anon.client.AnonClient;
+import com.intrasoft.csp.anon.commons.exceptions.AnonException;
 import com.intrasoft.csp.anon.commons.exceptions.InvalidDataTypeException;
 import com.intrasoft.csp.anon.commons.model.IntegrationAnonData;
 import com.intrasoft.csp.commons.exceptions.InvalidSharingParamsException;
@@ -258,7 +259,7 @@ public class TcProcessor implements Processor,CamelRoutes{
                 IntegrationAnonData anonData = null;
                 try {
                     anonData = anonClient.postAnonData(integrationAnonData);
-                } catch (InvalidDataTypeException|NoSuchAlgorithmException|InvalidKeyException|IOException e) {
+                } catch (InvalidDataTypeException|NoSuchAlgorithmException|InvalidKeyException|IOException|AnonException e) {
                     LOG.error("Could not anonymize, falling back to 'DO_NOT_SHARE'. "+integrationAnonData.toString(),e);
                     return;
                 }
