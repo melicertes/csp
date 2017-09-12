@@ -9,7 +9,7 @@ public class ModuleDataDTO {
     private String installedOn;
     private Boolean active;
     private String hash;
-    private Float startPriority;
+    private Integer startPriority;
 
 
     public String getFullName() {
@@ -52,11 +52,11 @@ public class ModuleDataDTO {
         this.hash = hash;
     }
 
-    public Float getStartPriority() {
+    public Integer getStartPriority() {
         return startPriority;
     }
 
-    public void setStartPriority(Float startPriority) {
+    public void setStartPriority(Integer startPriority) {
         this.startPriority = startPriority;
     }
 

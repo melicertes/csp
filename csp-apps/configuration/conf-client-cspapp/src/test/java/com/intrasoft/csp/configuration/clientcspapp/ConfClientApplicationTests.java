@@ -58,9 +58,8 @@ public class ConfClientApplicationTests {
 
 		TimeHelper.sleepFor(2000);
 
-		final List<String> list = externalProcessService.getLastEntries(20);
-		log.info("Data in list: {}", list.size());
-		list.forEach(log::info);
+		final List<LoggingEvent> list = externalProcessService.getLastEntries(20);
+		list.stream().map(le -> le.toString()).forEach(log::info);
 	}
 
 
@@ -108,7 +107,7 @@ public class ConfClientApplicationTests {
 	@Transactional
 	public void testPersistingModules() throws Exception {
 
-		SystemModule mod = new SystemModule(null, "base", "DESC", new LocalDateTime(), true, "1.0.000","arcPath","modPath", ModuleState.UNKNOWN, "hash");
+		SystemModule mod = new SystemModule(null, "base", "DESC", new LocalDateTime(), true, "1.0.000","arcPath","modPath", ModuleState.UNKNOWN, "hash",1);
 
 		SystemModule saved = moduleRepository.save(mod);
 

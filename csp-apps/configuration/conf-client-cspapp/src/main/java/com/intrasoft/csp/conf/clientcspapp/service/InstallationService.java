@@ -106,6 +106,7 @@ public class InstallationService {
 
         return moduleRepository.save(module);
     }
+
     public SystemModule findModuleByHash(String hash) {
         SystemModule module = moduleRepository.findOneByHash(hash);
         if (module != null) {
@@ -115,12 +116,23 @@ public class InstallationService {
     }
 
     @Transactional
-    public SystemService saveSystemModuleService(SystemModule module, SystemService service) {
+    public SystemService saveSystemModuleService(SystemModule module) {
 
         SystemModule savedModule = moduleRepository.save(module);
-        service.setModule(savedModule);
 
-        return serviceRepository.save(service);
+        SystemService systemService = serviceRepository.findByName(module.getName());
+        if (systemService == null) {
+            systemService = SystemService.builder()
+                    .module(savedModule)
+                    .serviceState(ServiceState.NOT_RUNNING)
+                    .name(module.getName())
+                    .startable(moduleContains(module,"docker-compose.yml"))
+                    .build();
+        } else {
+            systemService.setModule(savedModule);
+            systemService.setStartable(moduleContains(module,"docker-compose.yml"));
+        }
+        return serviceRepository.save(systemService);
 
     }
 
@@ -212,6 +224,10 @@ public class InstallationService {
      */
     public Boolean moduleContains(SystemModule module, String filename) {
         return simpleStorage.filesInArchive(module.getArchivePath()).anyMatch( f -> f.contentEquals(filename));
+    }
+
+    public List<SystemModule> findAllModulesInstalled() {
+        return moduleRepository.findByModuleStateOrderByStartPriority(ModuleState.INSTALLED);
     }
 }
 
