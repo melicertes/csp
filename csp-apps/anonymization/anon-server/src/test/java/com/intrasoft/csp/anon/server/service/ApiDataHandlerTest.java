@@ -45,6 +45,7 @@ public class ApiDataHandlerTest {
 
     URL data_incident = getClass().getClassLoader().getResource("data_incident.json");
     URL incident_rules_email_ip_string = getClass().getClassLoader().getResource("incident_rules_email_ip_string.json");
+//    URL incident_rules_email_ip_string = getClass().getClassLoader().getResource("incident_rules_string.json");
 
     @Autowired
     ObjectMapper objectMapper;
