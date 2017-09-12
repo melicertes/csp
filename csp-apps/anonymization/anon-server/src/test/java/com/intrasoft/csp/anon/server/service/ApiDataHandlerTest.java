@@ -7,6 +7,7 @@ import com.intrasoft.csp.anon.commons.model.MappingDTO;
 import com.intrasoft.csp.anon.commons.model.RuleSetDTO;
 import com.intrasoft.csp.anon.commons.model.SaveMappingDTO;
 import com.intrasoft.csp.anon.server.AnonApp;
+import com.intrasoft.csp.anon.server.model.Rules;
 import com.intrasoft.csp.commons.model.IntegrationData;
 import com.intrasoft.csp.commons.model.IntegrationDataType;
 import org.apache.commons.io.FileUtils;
@@ -24,6 +25,9 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.greaterThan;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {AnonApp.class},
@@ -44,8 +48,8 @@ public class ApiDataHandlerTest {
     ApiDataHandler apiDataHandler;
 
     URL data_incident = getClass().getClassLoader().getResource("data_incident.json");
+    URL data_incident2 = getClass().getClassLoader().getResource("data_incident2.json");
     URL incident_rules_email_ip_string = getClass().getClassLoader().getResource("incident_rules_email_ip_string.json");
-//    URL incident_rules_email_ip_string = getClass().getClassLoader().getResource("incident_rules_string.json");
 
     @Autowired
     ObjectMapper objectMapper;
@@ -79,5 +83,32 @@ public class ApiDataHandlerTest {
         integrationAnonData.setDataObject(integrationData.getDataObject());
 
         apiDataHandler.handleAnonIntegrationData(integrationAnonData);
+    }
+
+    @DirtiesContext
+    @Test
+    public void rulesServiceTest() throws IOException, URISyntaxException {
+        String json = FileUtils.readFileToString(new File(data_incident.toURI()), Charset.forName("UTF-8"));
+        String json2 = FileUtils.readFileToString(new File(data_incident2.toURI()), Charset.forName("UTF-8"));
+        IntegrationData integrationData = objectMapper.readValue(json,IntegrationData.class);
+        IntegrationData integrationData2 = objectMapper.readValue(json2,IntegrationData.class);
+
+        String cspId = integrationData.getDataParams().getCspId();
+        //insert mapping and ruleset
+        RuleSetDTO ruleSetDTO = new RuleSetDTO();
+        ruleSetDTO.setFilename(new File(incident_rules_email_ip_string.getFile()).getName());
+        ruleSetDTO.setFile(FileUtils.readFileToByteArray(new File(incident_rules_email_ip_string.toURI())));
+        ruleSetDTO.setDescription("incident ruleset");
+        RuleSetDTO savedRuleSet = anonService.saveRuleSet(ruleSetDTO);
+
+        MappingDTO mappingDTO = new MappingDTO(cspId,savedRuleSet,integrationData.getDataType());
+        MappingDTO savedMapping = anonService.saveMapping(mappingDTO);
+
+        mappingDTO = new MappingDTO(cspId,savedRuleSet,integrationData2.getDataType());
+        MappingDTO savedMapping2 = anonService.saveMapping(mappingDTO);
+
+        Rules rules = rulesService.getRule(IntegrationDataType.INCIDENT,"demo1-csp ");//test if the value is trimmed
+
+        assertThat(rules.getRules().size(),greaterThan(0));
     }
 }

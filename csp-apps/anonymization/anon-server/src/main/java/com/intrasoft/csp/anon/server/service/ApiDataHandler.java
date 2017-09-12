@@ -79,7 +79,7 @@ public class ApiDataHandler {
         Rules rules = rulesService.getRule(dataType, cspId);
         if (rules == null){
             throw new MappingNotFoundForGivenTupleException(HttpStatusResponseType.MAPPING_NOT_FOUND_FOR_GIVEN_TUPLE.getReasonPhrase()
-                    +"[dataType: "+dataType+",cspId:"+cspId+"]");
+                    +"[dataType: "+dataType+",cspId: "+cspId+"]");
         }
 
         if (integrationAnonData.getDataObject() == null){

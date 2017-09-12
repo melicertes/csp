@@ -26,7 +26,7 @@ public class RulesServiceImpl implements RulesService {
 
     @Override
     public Rules getRule(IntegrationDataType integrationDataType, String cspId) throws IOException {
-        Mapping mapping = mappingRepository.findTopByDataTypeAndCspId(integrationDataType, cspId);
+        Mapping mapping = mappingRepository.findTopByDataTypeAndCspId(integrationDataType, cspId.trim());
         Rules rules = null;
         if (mapping != null){
             rules = new ObjectMapper().readerFor(Rules.class).readValue(new String(mapping.getRuleset().getFile()));
