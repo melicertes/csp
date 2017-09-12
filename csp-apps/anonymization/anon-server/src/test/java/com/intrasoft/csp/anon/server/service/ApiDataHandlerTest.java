@@ -27,6 +27,7 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.greaterThan;
 
 @RunWith(SpringRunner.class)
@@ -82,7 +83,15 @@ public class ApiDataHandlerTest {
         integrationAnonData.setDataType(integrationData.getDataType());
         integrationAnonData.setDataObject(integrationData.getDataObject());
 
-        apiDataHandler.handleAnonIntegrationData(integrationAnonData);
+        IntegrationAnonData anonData = apiDataHandler.handleAnonIntegrationData(integrationAnonData);
+
+        String jsonOut = objectMapper.writeValueAsString(anonData.getDataObject());
+        assertThat(jsonOut, containsString("\"classification.taxonomy\":\""));//cannot really test the randomness of anon here
+        assertThat(jsonOut, containsString("\"classification.identifier\":\""));//cannot really test the randomness of anon here
+        assertThat(jsonOut, containsString("\"destination.local_hostname\":\"hostname\""));
+        assertThat(jsonOut, containsString("\"destination.local_ip\":\"***.***.***.***\""));
+        assertThat(jsonOut, containsString("\"destination.account\":\"***@******.**\""));
+        assertThat(jsonOut, containsString("\"destination.asn\":\"##########\""));
     }
 
     @DirtiesContext
