@@ -74,7 +74,7 @@ public class ApiDataHandlerTest {
 
         IntegrationAnonData integrationAnonData = new IntegrationAnonData();
         integrationAnonData.setCspId(cspId);
-        integrationAnonData.setDataType(IntegrationDataType.INCIDENT);
+        integrationAnonData.setDataType(integrationData.getDataType());
         integrationAnonData.setDataObject(integrationData.getDataObject());
 
         apiDataHandler.handleAnonIntegrationData(integrationAnonData);
