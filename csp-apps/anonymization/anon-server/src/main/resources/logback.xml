@@ -60,6 +60,12 @@
             <onMismatch>DENY</onMismatch>
         </filter>
 
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>WARN</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <fileNamePattern>${FILE_AUD_ROLL_PATTERN}</fileNamePattern>
             <maxHistory>${HISTORY_AUD}</maxHistory>

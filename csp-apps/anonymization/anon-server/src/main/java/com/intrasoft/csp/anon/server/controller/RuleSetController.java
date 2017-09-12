@@ -43,9 +43,11 @@ public class RuleSetController {
     @GetMapping("/rulesets")
     public String showRulesets(RuleSet ruleset, Model model) {
         LOG.info("UI: GET rulesets ");
+        LOG.warn("UI: GET rulesets ");
         List<RuleSetDTO> rulesets =anonService.getAllRuleSet();
         model.addAttribute("rulesets", rulesets);
         model.addAttribute("ruleset", ruleset);
+        model.addAttribute("id", null);
         return "pages/rulesets";
     }
 
@@ -57,6 +59,7 @@ public class RuleSetController {
                              Model model) throws IOException {
         LOG.info("UI: SAVE ruleset " + ruleset.toString());
         model.addAttribute("description", ruleset.getDescription());
+        model.addAttribute("id", ruleset.getId());
         ruleset.setFilename(file.getOriginalFilename());
         ruleset.setFile(file.getBytes());
         if (file.isEmpty()) {
@@ -77,13 +80,13 @@ public class RuleSetController {
         ruleset = anonService.saveRuleSet(ruleset);
         List<RuleSetDTO> rulesets =anonService.getAllRuleSet();
         model.addAttribute("rulesets", rulesets);
-        redirectAttributes.addFlashAttribute("msg", "Ruleset imported.");
+        redirectAttributes.addFlashAttribute("msg", "Ruleset saved.");
         return "redirect:";
     }
 
     @GetMapping("/rulesets/{id}")
     public ModelAndView showRuleset(@PathVariable Long id) {
-        LOG.info("UI: GET ruleset with id" + id);
+        LOG.info("UI: GET ruleset with id: " + id);
         ModelAndView mav = new ModelAndView("pages/rulesets");
         mav.addObject("rulesets", anonService.getAllRuleSet());
         RuleSetDTO ruleset = anonService.getRuleSetById(id);
@@ -92,11 +95,11 @@ public class RuleSetController {
     }
 
     @GetMapping("/ruleset/delete/{id}")
-    public ModelAndView deleteMapping(@PathVariable Long id, RedirectAttributes redirect) throws ConstraintViolationException {
+    public ModelAndView deleteRuleset(@PathVariable Long id, RedirectAttributes redirect) throws ConstraintViolationException {
         LOG.info("UI: DELETE ruleset with id: " + id);
         anonService.deleteRuleSet(id);
         ModelAndView mav = new ModelAndView("redirect:/rulesets");
-        mav.addObject("mappings",anonService.getAllRuleSet());
+        mav.addObject("rulesets",anonService.getAllRuleSet());
         redirect.addFlashAttribute("msg", "Ruleset deleted");
         return mav;
     }
@@ -119,7 +122,7 @@ public class RuleSetController {
         ModelAndView mav = new ModelAndView("redirect:/rulesets");
         mav.addObject("exception", ex);
         mav.addObject("url", request.getRequestURL());
-        mav.addObject("mappings",anonService.getAllRuleSet());
+        mav.addObject("rulesets",anonService.getAllRuleSet());
         redirect.addFlashAttribute("error", "Ruleset could not be deleted");
         return mav;
     }
