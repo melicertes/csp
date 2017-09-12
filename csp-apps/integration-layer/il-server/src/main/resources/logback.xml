@@ -57,7 +57,6 @@
         <filter class="ch.qos.logback.classic.filter.LevelFilter">
             <level>INFO</level>
             <onMatch>ACCEPT</onMatch>
-            <onMismatch>DENY</onMismatch>
         </filter>
 
         <filter class="ch.qos.logback.classic.filter.LevelFilter">
@@ -72,7 +71,7 @@
         </rollingPolicy>
     </appender>
 
-    <logger name="com.intrasoft.csp.server" level="info" additivity="false">
+    <logger name="root" level="info" additivity="false">
         <appender-ref ref="FILE-AUDIT"/>
         <appender-ref ref="FILE-EXCEPTION"/>
         <appender-ref ref="STDOUT"/>
