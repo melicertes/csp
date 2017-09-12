@@ -24,6 +24,11 @@ Sample with docker profile and env vars
 java -jar -Dspring.profiles.active=docker -DES_PATH_BASE=/pathbse -DES_PORT=9000 -DES_LOCAL_DOMAIN=es.local -DIL_SSL_KEYSTORE_PASS=123456 -DIL_SSL_KEY_PASS=12345 -DIL_CSP_SUBDOMAIN_PREFIX=pref -DTC_PATH_TEAMS=/teams  -DTC_PATH_CIRCLES=/circles -DCSP_NAME -DTC_LOCAL_DOMAIN=tc.local  integration-tests-0.2.0-SNAPSHOT.jar com.intrasoft.csp.integration.business.server.internal.CspServerInternalBusinessTcTest
 
 
+USEFUL Docker commands
+----------------------
+
+$ docker exec -i -t csp-il  /bin/sh
+
 USEFUL CURLs
 ------------
 

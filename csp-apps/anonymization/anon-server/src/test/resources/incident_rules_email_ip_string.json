@@ -1,0 +1,24 @@
+{
+  "rules": [
+    {
+      "field": "incident.event.classification.identifier",
+      "action": "pseudo",
+      "fieldtype": "string"
+    },
+    {
+      "field": "incident.event.classification.taxonomy",
+      "action": "pseudo",
+      "fieldtype": "string"
+    },
+    {
+      "field": "incident.event.destination.account",
+      "action": "anon",
+      "fieldtype": "email"
+    },
+    {
+      "field": "incident.event.destination.local_ip",
+      "action": "anon",
+      "fieldtype": "ip"
+    }
+  ]
+}
