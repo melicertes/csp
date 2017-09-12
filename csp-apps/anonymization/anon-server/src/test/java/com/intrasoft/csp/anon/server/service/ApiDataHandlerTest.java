@@ -49,8 +49,16 @@ public class ApiDataHandlerTest {
     ApiDataHandler apiDataHandler;
 
     URL data_incident = getClass().getClassLoader().getResource("data_incident.json");
-    URL data_incident2 = getClass().getClassLoader().getResource("data_incident2.json");
-    URL incident_rules_email_ip_string = getClass().getClassLoader().getResource("incident_rules_email_ip_string.json");
+    URL rules_incident = getClass().getClassLoader().getResource("rules_incident.json");
+
+    URL data_artefact = getClass().getClassLoader().getResource("data_artefact.json");
+    URL rules_artefact = getClass().getClassLoader().getResource("rules_artefact.json");
+
+    URL data_threat = getClass().getClassLoader().getResource("data_threat.json");
+    URL rules_threat = getClass().getClassLoader().getResource("rules_threat.json");
+
+    URL data_vulnerability = getClass().getClassLoader().getResource("data_vulnerability.json");
+    URL rules_vulnerability = getClass().getClassLoader().getResource("rules_vulnerability.json");
 
     @Autowired
     ObjectMapper objectMapper;
@@ -63,15 +71,15 @@ public class ApiDataHandlerTest {
 
     @DirtiesContext
     @Test
-    public void handleAnonIntegrationDataTest() throws URISyntaxException, IOException, InvalidKeyException, NoSuchAlgorithmException {
+    public void handleAnonIncidentTest() throws URISyntaxException, IOException, InvalidKeyException, NoSuchAlgorithmException {
         String json = FileUtils.readFileToString(new File(data_incident.toURI()), Charset.forName("UTF-8"));
         IntegrationData integrationData = objectMapper.readValue(json,IntegrationData.class);
 
         String cspId = integrationData.getDataParams().getCspId();
         //insert mapping and ruleset
         RuleSetDTO ruleSetDTO = new RuleSetDTO();
-        ruleSetDTO.setFilename(new File(incident_rules_email_ip_string.getFile()).getName());
-        ruleSetDTO.setFile(FileUtils.readFileToByteArray(new File(incident_rules_email_ip_string.toURI())));
+        ruleSetDTO.setFilename(new File(rules_incident.getFile()).getName());
+        ruleSetDTO.setFile(FileUtils.readFileToByteArray(new File(rules_incident.toURI())));
         ruleSetDTO.setDescription("incident ruleset");
         RuleSetDTO savedRuleSet = anonService.saveRuleSet(ruleSetDTO);
 
@@ -96,17 +104,111 @@ public class ApiDataHandlerTest {
 
     @DirtiesContext
     @Test
+    public void handleAnonThreatTest() throws URISyntaxException, IOException, InvalidKeyException, NoSuchAlgorithmException {
+        String json = FileUtils.readFileToString(new File(data_threat.toURI()), Charset.forName("UTF-8"));
+        IntegrationData integrationData = objectMapper.readValue(json,IntegrationData.class);
+
+        String cspId = integrationData.getDataParams().getCspId();
+        //insert mapping and ruleset
+        RuleSetDTO ruleSetDTO = new RuleSetDTO();
+        ruleSetDTO.setFilename(new File(rules_threat.getFile()).getName());
+        ruleSetDTO.setFile(FileUtils.readFileToByteArray(new File(rules_threat.toURI())));
+        ruleSetDTO.setDescription("threat ruleset");
+        RuleSetDTO savedRuleSet = anonService.saveRuleSet(ruleSetDTO);
+
+        MappingDTO mappingDTO = new MappingDTO(cspId,savedRuleSet,integrationData.getDataType());
+        MappingDTO savedMapping = anonService.saveMapping(mappingDTO);
+
+        IntegrationAnonData integrationAnonData = new IntegrationAnonData();
+        integrationAnonData.setCspId(cspId);
+        integrationAnonData.setDataType(integrationData.getDataType());
+        integrationAnonData.setDataObject(integrationData.getDataObject());
+
+        IntegrationAnonData anonData = apiDataHandler.handleAnonIntegrationData(integrationAnonData);
+
+        String jsonOut = objectMapper.writeValueAsString(anonData.getDataObject());
+//        assertThat(jsonOut, containsString("\"classification.taxonomy\":\""));//cannot really test the randomness of anon here
+        assertThat(jsonOut, containsString("\"id\":\"##########\""));
+        assertThat(jsonOut, containsString("\"info\":\"*******\""));
+        assertThat(jsonOut, containsString("\"uuid\":\"*******\""));
+        assertThat(jsonOut, containsString("\"disable_correlation\":\"*******\""));
+    }
+
+    @DirtiesContext
+    @Test
+    public void handleAnonArtefactTest() throws URISyntaxException, IOException, InvalidKeyException, NoSuchAlgorithmException {
+        String json = FileUtils.readFileToString(new File(data_artefact.toURI()), Charset.forName("UTF-8"));
+        IntegrationData integrationData = objectMapper.readValue(json,IntegrationData.class);
+
+        String cspId = integrationData.getDataParams().getCspId();
+        //insert mapping and ruleset
+        RuleSetDTO ruleSetDTO = new RuleSetDTO();
+        ruleSetDTO.setFilename(new File(rules_artefact.getFile()).getName());
+        ruleSetDTO.setFile(FileUtils.readFileToByteArray(new File(rules_artefact.toURI())));
+        ruleSetDTO.setDescription("artefact ruleset");
+        RuleSetDTO savedRuleSet = anonService.saveRuleSet(ruleSetDTO);
+
+        MappingDTO mappingDTO = new MappingDTO(cspId,savedRuleSet,integrationData.getDataType());
+        MappingDTO savedMapping = anonService.saveMapping(mappingDTO);
+
+        IntegrationAnonData integrationAnonData = new IntegrationAnonData();
+        integrationAnonData.setCspId(cspId);
+        integrationAnonData.setDataType(integrationData.getDataType());
+        integrationAnonData.setDataObject(integrationData.getDataObject());
+
+        IntegrationAnonData anonData = apiDataHandler.handleAnonIntegrationData(integrationAnonData);
+
+        String jsonOut = objectMapper.writeValueAsString(anonData.getDataObject());
+        assertThat(jsonOut, containsString("\"type\":\""));//cannot really test the randomness of anon here
+        assertThat(jsonOut, containsString("\"id\":\"##########\""));
+        assertThat(jsonOut, containsString("\"size\":\"##########\""));
+        assertThat(jsonOut, containsString("\"name\":\"*******\""));
+    }
+
+    @DirtiesContext
+    @Test
+    public void handleAnonVulnerabilityTest() throws URISyntaxException, IOException, InvalidKeyException, NoSuchAlgorithmException {
+        String json = FileUtils.readFileToString(new File(data_vulnerability.toURI()), Charset.forName("UTF-8"));
+        IntegrationData integrationData = objectMapper.readValue(json,IntegrationData.class);
+
+        String cspId = integrationData.getDataParams().getCspId();
+        //insert mapping and ruleset
+        RuleSetDTO ruleSetDTO = new RuleSetDTO();
+        ruleSetDTO.setFilename(new File(rules_vulnerability.getFile()).getName());
+        ruleSetDTO.setFile(FileUtils.readFileToByteArray(new File(rules_vulnerability.toURI())));
+        ruleSetDTO.setDescription("vulnerability ruleset");
+        RuleSetDTO savedRuleSet = anonService.saveRuleSet(ruleSetDTO);
+
+        MappingDTO mappingDTO = new MappingDTO(cspId,savedRuleSet,integrationData.getDataType());
+        MappingDTO savedMapping = anonService.saveMapping(mappingDTO);
+
+        IntegrationAnonData integrationAnonData = new IntegrationAnonData();
+        integrationAnonData.setCspId(cspId);
+        integrationAnonData.setDataType(integrationData.getDataType());
+        integrationAnonData.setDataObject(integrationData.getDataObject());
+
+        IntegrationAnonData anonData = apiDataHandler.handleAnonIntegrationData(integrationAnonData);
+
+        String jsonOut = objectMapper.writeValueAsString(anonData.getDataObject());
+//        assertThat(jsonOut, containsString("\"classification.taxonomy\":\""));//cannot really test the randomness of anon here
+        assertThat(jsonOut, containsString("\"affected_products_text\":\""));//cannot really test the randomness of anon here
+        assertThat(jsonOut, containsString("\"version\":\"##########\""));
+        assertThat(jsonOut, containsString("\"producer\":\"*******\""));
+    }
+
+    @DirtiesContext
+    @Test
     public void rulesServiceTest() throws IOException, URISyntaxException {
         String json = FileUtils.readFileToString(new File(data_incident.toURI()), Charset.forName("UTF-8"));
-        String json2 = FileUtils.readFileToString(new File(data_incident2.toURI()), Charset.forName("UTF-8"));
+        String json2 = FileUtils.readFileToString(new File(data_incident.toURI()), Charset.forName("UTF-8"));
         IntegrationData integrationData = objectMapper.readValue(json,IntegrationData.class);
         IntegrationData integrationData2 = objectMapper.readValue(json2,IntegrationData.class);
 
         String cspId = integrationData.getDataParams().getCspId();
         //insert mapping and ruleset
         RuleSetDTO ruleSetDTO = new RuleSetDTO();
-        ruleSetDTO.setFilename(new File(incident_rules_email_ip_string.getFile()).getName());
-        ruleSetDTO.setFile(FileUtils.readFileToByteArray(new File(incident_rules_email_ip_string.toURI())));
+        ruleSetDTO.setFilename(new File(rules_incident.getFile()).getName());
+        ruleSetDTO.setFile(FileUtils.readFileToByteArray(new File(rules_incident.toURI())));
         ruleSetDTO.setDescription("incident ruleset");
         RuleSetDTO savedRuleSet = anonService.saveRuleSet(ruleSetDTO);
 

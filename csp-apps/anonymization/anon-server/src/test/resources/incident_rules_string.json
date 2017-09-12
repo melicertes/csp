@@ -1,9 +1,0 @@
-{
-  "rules": [
-    {
-      "field": "incident.event.comment",
-      "action": "pseudo",
-      "fieldtype": "string"
-    }
-  ]
-}
