@@ -28,6 +28,10 @@ CSP_NAME=demo1-csp
  IL_PORT=8081
  IL_HOST_PORT=443
 
+ ## ANON
+ ANON_CLIENT_SSL_KEYSTORE_PASS=12345
+ ANON_SERVER_HOST=anon.local.demo1-csp.athens.intrasoft-intl.private
+
 
  IL_IN_VULNERABILITY_APPS="taranis,misp"
  IL_IN_ARTEFACT_APPS="misp,viper"
