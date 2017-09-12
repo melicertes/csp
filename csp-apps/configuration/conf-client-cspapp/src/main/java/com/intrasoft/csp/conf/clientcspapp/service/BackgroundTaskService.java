@@ -2,8 +2,10 @@ package com.intrasoft.csp.conf.clientcspapp.service;
 
 import com.intrasoft.csp.conf.client.ConfClient;
 import com.intrasoft.csp.conf.clientcspapp.model.*;
+import com.intrasoft.csp.conf.clientcspapp.util.FileHelper;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.joda.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
@@ -18,7 +20,7 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -226,18 +228,68 @@ public class BackgroundTaskService {
 
     public void scheduleInstall(SystemModule module) {
         addTask(() -> {
-            // TODO implement install
             //extract module to destination location
+            final File moduleDir = new File(modulesDirectory, module.getName());
 
-            // set module to INSTALLING
+            try {
+                if (module.getActive() == false && moduleDir.exists()) {
+                    storageService.deleteDirectoryAndContents(moduleDir.getAbsolutePath());
+                }
+                String moduleInstallDirectory = storageService.extractArchive(module.getArchivePath(),
+                        moduleDir.getAbsolutePath());
 
-            //perform all operations:
-            // a. load any docker.tar found
-            // b. copy .env from homedir to the module dir
-            // c. execute any first-time.sh found
-            // d. set module to INSTALLED + ACTIVE = TRUE
-            return new BackgroundTaskResult<>(false, -1);
+                // set module to INSTALLING
+                module.setModuleState(ModuleState.INSTALLING);
+                module.setModulePath(moduleInstallDirectory);
+                installationService.saveSystemModule(module);
+
+
+                //perform all operations:
+                // a. load any docker.tar found
+                installationService.installDockerImages(module);
+
+                // b. copy .env from homedir to the module dir
+                copyEnvironment(moduleInstallDirectory);
+                // c. execute any first-time.sh found
+
+                // d. set module to INSTALLED + ACTIVE = TRUE
+                module.setActive(true);
+                module.setModuleState(ModuleState.INSTALLED);
+                module.setInstallDate(new LocalDateTime());
+                module.setModulePath(moduleDir.getPath());
+                installationService.saveSystemModuleService(
+                        module, SystemService.builder()
+                                .module(module)
+                                .name(module.getName())
+                                .serviceState(ServiceState.NOT_RUNNING)
+                                .startable(installationService.moduleContains(module, "docker-compose.yml"))
+                                .build()
+                );
+                // TODO: update API call /api/appInfo here!
+                return new BackgroundTaskResult<>(true, 0);
+
+
+
+            } catch (IOException e) {
+                log.error("Failed to extract and install module",e);
+                module.setModuleState(ModuleState.DOWNLOADED);
+                module.setModulePath(null);
+                installationService.saveSystemModule(module);
+                return new BackgroundTaskResult<>(false, -1);
+            }
         });
+    }
+
+    private void copyEnvironment(String targetDirectory) throws IOException{
+        //by now we expect environment to be prepared.
+        File rootEnv = new File(System.getProperty("user.home"), "env");
+
+        if (rootEnv.exists()) {
+            FileHelper.copy(rootEnv.toPath(), new File(targetDirectory, ".env").toPath());
+        } else {
+            log.error("Root environment (env) not detected, cause of installation problems!");
+        }
+
     }
 
     public void scheduleReInstall(SystemModule module) {
@@ -288,16 +340,19 @@ public class BackgroundTaskService {
     }
 
 
-    private BackgroundTaskResult<Boolean, Integer> executeScriptSimple(String scriptName, Map<String,String> env) throws IOException {
+    public BackgroundTaskResult<Boolean, Integer> executeScriptSimple(String scriptName, Map<String,String> env) throws IOException {
         //generate script
-        extractResource("shellscripts/"+scriptName, modulesDirectory);
+        File script = new File(extractResource("shellscripts/" + scriptName, modulesDirectory));
+        script.setExecutable(true, true); //make it executable!
 
         // vars
         final SystemInstallationState state = installationService.getState();
         Map<String, String> envVars = new HashMap<String, String>();
         envVars.put("CSPNAME", state.getCspRegistration().getName());
         envVars.put("CSPDOMAIN", state.getCspRegistration().getDomainName());
-        envVars.putAll(env);
+        if (env != null) {
+            envVars.putAll(env);
+        }
 
         //execute script
         int exitCode = externalProcessService.executeExternalProcess(modulesDirectory, Optional.of(envVars),
@@ -317,8 +372,11 @@ public class BackgroundTaskService {
      */
     private String extractResource(String scriptName, String targetDirectory) throws IOException {
         final Resource script = resourceLoader.getResource("classpath:"+scriptName);
-        final File targetFile = new File(targetDirectory, scriptName);
-        Files.copy(script.getInputStream(), targetFile.toPath());
+        //scriptname is full path, we only need the name
+        String target = new File(scriptName).getName();
+        final File targetFile = new File(targetDirectory, target);
+        log.info("Extracting {} to {}",scriptName, targetFile.getAbsolutePath());
+        long total = FileHelper.copy(script.getInputStream(), targetFile.toPath(), null, StandardCopyOption.REPLACE_EXISTING);
         return targetFile.getAbsolutePath();
     }
 }

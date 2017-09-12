@@ -117,7 +117,7 @@ public class PagesController implements ContextUrl {
         model = this.init(model);
 
         model.addAttribute("navUpdatesClassActive", "active");
-    //TODO find the inprogress task
+    //TODO find the inprogress task or remove these attributes
         model.addAttribute("moduleName", "MISP");
         model.addAttribute("moduleVersionFrom", "12.00");
         model.addAttribute("moduleVersionTo", "12.21");

@@ -1,6 +1,6 @@
 package com.intrasoft.csp.conf.clientcspapp.model;
 
-import com.intrasoft.csp.conf.clientcspapp.service.TimeHelper;
+import com.intrasoft.csp.conf.clientcspapp.util.TimeHelper;
 import org.joda.time.LocalDateTime;
 import org.joda.time.format.DateTimeFormatter;
 

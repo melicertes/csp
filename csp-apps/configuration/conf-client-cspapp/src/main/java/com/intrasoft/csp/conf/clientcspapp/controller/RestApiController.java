@@ -115,6 +115,14 @@ public class RestApiController implements ContextUrl, ApiContextUrl {
         return dto;
     }
 
+
+    @GetMapping(value = "/regenerateEnv")
+    public void regenerateEnv() {
+        backgroundTaskService.scheduleInternalCertsGeneration();
+        backgroundTaskService.scheduleExternalCertsGeneration();
+        backgroundTaskService.scheduleEnvironmentCreation();
+    }
+
     @RequestMapping(value = REST_LOG,
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE,
             method = RequestMethod.GET)

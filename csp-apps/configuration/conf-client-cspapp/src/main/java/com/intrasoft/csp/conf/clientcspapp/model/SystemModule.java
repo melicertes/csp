@@ -10,13 +10,8 @@ import java.io.Serializable;
  * Created by tangelatos on 09/09/2017.
  */
 
-@Entity
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@EqualsAndHashCode
-@ToString
+@Entity @Getter @Setter @NoArgsConstructor @AllArgsConstructor
+@EqualsAndHashCode @ToString
 @Builder
 public class SystemModule implements Serializable {
 

@@ -7,7 +7,7 @@ import com.intrasoft.csp.conf.clientcspapp.repo.SystemInstallationStateRepositor
 import com.intrasoft.csp.conf.clientcspapp.repo.SystemModuleRepository;
 import com.intrasoft.csp.conf.clientcspapp.service.ExternalProcessService;
 import com.intrasoft.csp.conf.clientcspapp.service.InstallationService;
-import com.intrasoft.csp.conf.clientcspapp.service.TimeHelper;
+import com.intrasoft.csp.conf.clientcspapp.util.TimeHelper;
 import com.intrasoft.csp.conf.commons.model.api.RegistrationDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
@@ -86,6 +86,8 @@ public class ConfClientApplicationTests {
 
 		SystemInstallationState state = new SystemInstallationState(null, testUUID, InstallationState.NOT_STARTED, registration, new SmtpDetails());
 
+		state.getSmtpDetails().setPassword("blah");
+		state.getSmtpDetails().setUserName("blah");
 		SystemInstallationState saved = repo.save(state);
 
 		saved = repo.findOne(saved.getId());
@@ -97,8 +99,8 @@ public class ConfClientApplicationTests {
 
 		Assert.assertEquals("installation state should be NOT_STARTED", InstallationState.NOT_STARTED, saved.getInstallationState());
 		log.info("Retrieved registration as {}",saved.getCspRegistration());
-		//todo test marshalling smtpdetails
 
+		Assert.assertEquals("username should be saved", saved.getSmtpDetails().getUserName(),"blah");
 	}
 
 

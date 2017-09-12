@@ -2,7 +2,7 @@
 
 function createEnvironment() {
 
-    	echo "$(fgrep XXXDOMAINXXX $ENVJSON)"
+    echo "$(fgrep XXXDOMAINXXX $ENVJSON)"
 	echo "environment found: $ENVJSON $J2ENV $SITESC"
 	echo "About to replace $CSPNAME $CSPDOMAIN $INT_IP inside the configuration..."
 	sed -i.bak "s/XXXDOMAINXXX/$CSPDOMAIN/" $ENVJSON
@@ -26,9 +26,10 @@ function createEnvironment() {
 	    return 2
 	fi
 
-        ### generate env file
+    ### generate env file
 	$J2 $J2ENV $ENVJSON > ~/.env
-        ## generate sites conf
+	cp ~/.env ~/env
+    ## generate sites conf
 	$J2 $SITESC $ENVJSON  > ~/csp-sites.conf
 
         ### create docker network
@@ -40,13 +41,13 @@ function createEnvironment() {
 	echo "Docker network (internal) should be local.$CSPNAME.$CSPDOMAIN"
 	docker network ls
 
-        # are we sure the directory exists?
+	# are we sure the directory exists?
 	rm -fr /opt/csp/apache2/csp-sites
-        mkdir -p /opt/csp/apache2/csp-sites
+    mkdir -p /opt/csp/apache2/csp-sites
 
-        cp ~/csp-sites.conf /opt/csp/apache2/csp-sites
-        echo "Site configuration copied"
-        ls -l /opt/csp/apache2/csp-sites
+    cp ~/csp-sites.conf /opt/csp/apache2/csp-sites
+    echo "Site configuration copied"
+    ls -l /opt/csp/apache2/csp-sites
 
 	return 0
 }

@@ -4,6 +4,7 @@ import com.intrasoft.csp.conf.client.ConfClient;
 import com.intrasoft.csp.conf.clientcspapp.model.*;
 import com.intrasoft.csp.conf.clientcspapp.repo.SystemInstallationStateRepository;
 import com.intrasoft.csp.conf.clientcspapp.repo.SystemModuleRepository;
+import com.intrasoft.csp.conf.clientcspapp.repo.SystemServiceRepository;
 import com.intrasoft.csp.conf.commons.model.api.RegistrationDTO;
 import com.intrasoft.csp.conf.commons.model.api.ResponseDTO;
 import com.intrasoft.csp.conf.commons.model.api.UpdateInformationDTO;
@@ -13,7 +14,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Created by tangelatos on 09/09/2017.
@@ -29,6 +36,15 @@ public class InstallationService {
 
     @Autowired
     SystemModuleRepository moduleRepository;
+
+    @Autowired
+    SystemServiceRepository serviceRepository;
+
+    @Autowired
+    BackgroundTaskService backgroundTaskService;
+
+    @Autowired
+    SimpleStorageService simpleStorage;
 
     @Transactional
     public ResponseDTO registerCsp(String cspId, RegistrationDTO cspRegistration, SmtpDetails smtp) {
@@ -98,6 +114,16 @@ public class InstallationService {
         return module;
     }
 
+    @Transactional
+    public SystemService saveSystemModuleService(SystemModule module, SystemService service) {
+
+        SystemModule savedModule = moduleRepository.save(module);
+        service.setModule(savedModule);
+
+        return serviceRepository.save(service);
+
+    }
+
 
     ///// helpers
 
@@ -141,4 +167,51 @@ public class InstallationService {
         return isInstallationComplete() || isInstallationOngoing();
     }
 
+    /**
+     * find all tar files from this module and upload them in docker.
+     * @param module module has the module install path
+     *
+     * @return true if all was well
+     */
+    public boolean installDockerImages(SystemModule module) {
+        File moduleDir = new File(module.getModulePath());
+
+        final List<BackgroundTaskResult<Boolean, Integer>> list = Stream.of(moduleDir.list((File dir, String name) -> {
+            if (name.endsWith("tar")) {
+                return true;
+            } else
+                return false;
+        })).map(fName -> {
+            Map<String, String> env = new HashMap<>();
+            env.put("TAR_FILE", fName);
+            env.put("WORK_DIR", moduleDir.getAbsolutePath());
+
+            try {
+                final BackgroundTaskResult<Boolean, Integer> result =
+                        backgroundTaskService.executeScriptSimple("dockerLoad.sh", env);
+                return result;
+            } catch (IOException e) {
+                log.error("Exception in load execution: {}", e.getMessage(), e);
+                return new BackgroundTaskResult<>(false, -1);
+            }
+        }).distinct().collect(Collectors.toList());
+
+        for (BackgroundTaskResult<Boolean, Integer> r : list) {
+            if (r.getSource() == false) {
+                return false;
+            }
+        }
+        return true; //not a very nice way to handle errors in returns
+    }
+
+    /**
+     * return if module contains a specific file
+     * @param module
+     * @param filename
+     * @return
+     */
+    public Boolean moduleContains(SystemModule module, String filename) {
+        return simpleStorage.filesInArchive(module.getArchivePath()).anyMatch( f -> f.contentEquals(filename));
+    }
 }
+

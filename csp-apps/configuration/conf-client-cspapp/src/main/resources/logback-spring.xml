@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <property resource="application.properties"/>
+    <include resource="org/springframework/boot/logging/logback/defaults.xml" />
+    <property name="LOG_FILE" value="${LOG_FILE:-${LOG_PATH:-${LOG_TEMP:-${java.io.tmpdir:-/tmp}}/}spring.log}"/>
+    <include resource="org/springframework/boot/logging/logback/file-appender.xml" />
+    <include resource="org/springframework/boot/logging/logback/console-appender.xml" />
+
+    <appender name="DB" class="ch.qos.logback.classic.db.DBAppender">
+        <connectionSource class="ch.qos.logback.core.db.DriverManagerConnectionSource">
+            <driverClass>${spring.datasource.driver-class-name}</driverClass>
+            <url>${spring.datasource.url}</url>
+            <user>${spring.datasource.username}</user>
+            <password>${spring.datasource.password}</password>
+        </connectionSource>
+    </appender>
+
+
+    <root level="INFO">
+        <appender-ref ref="FILE" />
+        <appender-ref ref="CONSOLE" />
+        <appender-ref ref="DB" />
+    </root>
+</configuration>
