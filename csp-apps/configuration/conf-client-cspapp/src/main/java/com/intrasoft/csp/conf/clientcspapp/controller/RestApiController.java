@@ -3,15 +3,13 @@ package com.intrasoft.csp.conf.clientcspapp.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.intrasoft.csp.conf.clientcspapp.context.ContextUrl;
-import com.intrasoft.csp.conf.clientcspapp.model.ModuleState;
-import com.intrasoft.csp.conf.clientcspapp.model.SmtpDetails;
-import com.intrasoft.csp.conf.clientcspapp.model.SystemModule;
-import com.intrasoft.csp.conf.clientcspapp.model.UpdateVersion;
+import com.intrasoft.csp.conf.clientcspapp.model.*;
 import com.intrasoft.csp.conf.clientcspapp.model.forms.RegistrationForm;
 import com.intrasoft.csp.conf.clientcspapp.service.BackgroundTaskService;
 import com.intrasoft.csp.conf.clientcspapp.service.ExternalProcessService;
 import com.intrasoft.csp.conf.clientcspapp.service.InstallationService;
 import com.intrasoft.csp.conf.clientcspapp.service.SimpleStorageService;
+import com.intrasoft.csp.conf.clientcspapp.util.TimeHelper;
 import com.intrasoft.csp.conf.commons.context.ApiContextUrl;
 import com.intrasoft.csp.conf.commons.model.api.ModulesInfoDTO;
 import com.intrasoft.csp.conf.commons.model.api.RegistrationDTO;
@@ -20,6 +18,7 @@ import com.intrasoft.csp.conf.commons.model.api.UpdateInformationDTO;
 import com.intrasoft.csp.conf.commons.types.StatusResponseType;
 import com.intrasoft.csp.conf.commons.utils.JodaConverter;
 import lombok.extern.slf4j.Slf4j;
+import org.joda.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -126,10 +125,10 @@ public class RestApiController implements ContextUrl, ApiContextUrl {
     @RequestMapping(value = REST_LOG,
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE,
             method = RequestMethod.GET)
-    public ResponseEntity log() {
-        final List<String> lines = externalProcessService.getLastEntries(maxLines);
-
-        return new ResponseEntity<>(lines, HttpStatus.OK);
+    public @ResponseBody List<LogEntry> log() {
+        final List<LogEntry> lines = externalProcessService.getLastEntries(maxLines).stream()
+                .map(le -> new LogEntry(TimeHelper.isoFormat(new LocalDateTime(le.getTimestamp())), le.getLevel(), le.getFormattedMessage())).collect(Collectors.toList());
+        return lines;
     }
 
     @RequestMapping(value = REST_DASHSTATUS, produces = MediaType.APPLICATION_JSON_UTF8_VALUE,

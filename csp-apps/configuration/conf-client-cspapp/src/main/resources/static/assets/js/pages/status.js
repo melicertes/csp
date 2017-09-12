@@ -45,15 +45,23 @@ function ajaxd_status() {
             $('div.error-log > img').hide();
             var i = 0;
             $.each(data, function(id, item){
-                var type = item.gender;
-                var timestamp = '<span class="label label-default">'+item.registered+'</span>&nbsp;';
-                var message = item.greeting;
+                var type = item.lt;
+                var timestamp = '<span class="label label-default">'+item.ts+'</span>&nbsp;';
+                var message = item.m;
                 i++;
-                var h = '<p>' +
+
+                if (type === 'WARN') {
+                    label = 'warning'
+                } else if (type === 'ERROR') {
+                    label = 'danger'
+                } else {
+                    label = 'info';
+                }
+                var h = '<div>' +
                     timestamp +
-                    '<span id="row'+i+'" class="label label-info">'+type+'</span>&nbsp;'
+                    '<span id="row'+i+'" class="label label-'+label+'">'+type+'</span>&nbsp;'
                     + message +
-                    '</p>';
+                    '</div>';
                 $('div.error-log > div').append(h);
             });
         }

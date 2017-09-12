@@ -1,12 +1,12 @@
 package com.intrasoft.csp.conf.server.controller;
 
+import com.intrasoft.csp.conf.commons.types.ContactType;
+import com.intrasoft.csp.conf.commons.utils.VersionParser;
 import com.intrasoft.csp.conf.server.context.DataContextUrl;
 import com.intrasoft.csp.conf.server.context.PagesContextUrl;
-import com.intrasoft.csp.conf.commons.types.ContactType;
 import com.intrasoft.csp.conf.server.domain.data.ManagementRow;
 import com.intrasoft.csp.conf.server.domain.entities.*;
 import com.intrasoft.csp.conf.server.repository.*;
-import com.intrasoft.csp.conf.server.utils.VersionParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

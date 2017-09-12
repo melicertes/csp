@@ -47,5 +47,8 @@ public class SystemModule implements Serializable {
     @Column(columnDefinition = "TEXT")
     String hash;
 
+    @Column(columnDefinition = "INTEGER")
+    Integer startPriority;
+
 
 }

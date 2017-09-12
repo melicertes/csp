@@ -3,6 +3,9 @@ package com.intrasoft.csp.conf.clientcspapp.service;
 import com.intrasoft.csp.conf.client.ConfClient;
 import com.intrasoft.csp.conf.clientcspapp.model.*;
 import com.intrasoft.csp.conf.clientcspapp.util.FileHelper;
+import com.intrasoft.csp.conf.clientcspapp.util.TimeHelper;
+import com.intrasoft.csp.conf.commons.model.api.*;
+import com.intrasoft.csp.conf.commons.utils.VersionParser;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.LocalDateTime;
@@ -24,6 +27,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 /**
  * Created by tangelatos on 06/09/2017.
@@ -73,6 +77,47 @@ public class BackgroundTaskService {
 
     @Autowired
     ExternalProcessService externalProcessService;
+
+
+    @Scheduled(initialDelay = 10000, fixedRate = 600000)
+    public void registerCspHeartbeat() {
+        final SystemInstallationState state = installationService.getState();
+
+        if (state.getInstallationState() != InstallationState.NOT_STARTED &&
+                internetAvailable) {
+            try {
+                log.info("HEARTBEAT enabled and internet connectivity verified. Will try to connect");
+                AppInfoDTO appInfo = new AppInfoDTO();
+                appInfo.setName(state.getCspRegistration().getName());
+                appInfo.setRecordDateTime(TimeHelper.isoNow());
+
+                ModulesInfoDTO modsInfo = new ModulesInfoDTO();
+                modsInfo.setModules(
+                        installationService.findAllModulesInstalled().stream().map(m -> {
+                            ModuleInfoDTO info = new ModuleInfoDTO();
+                            info.setName(m.getName());
+
+                            ModuleDataDTO data = new ModuleDataDTO();
+                            data.setActive(m.getActive());
+                            data.setFullName(m.getName());
+                            data.setHash(m.getHash());
+                            data.setInstalledOn(TimeHelper.isoFormat(m.getInstallDate()));
+                            data.setStartPriority(m.getStartPriority());
+                            data.setVersion(VersionParser.fromString(m.getVersion()));
+                            info.setAdditionalProperties(data);
+                            return info;
+                        }).collect(Collectors.toList())
+                );
+                appInfo.setModuleInfo(modsInfo);
+                final ResponseDTO resp = client.appInfo(state.getCspId(), appInfo);
+                log.info("HEARTBEAT sent to CENTRAL, response was {} - {}", resp.getResponseText(), resp.getResponseCode());
+            } catch (Exception e) {
+                log.error("HEARTBEAT was not sent to CENTRAL, issue was {}",e.getMessage(),e);
+            }
+        }
+
+    }
+
 
     @SneakyThrows
     public <S, R> void addTask(BackgroundTask<S, R> task) {
@@ -257,15 +302,8 @@ public class BackgroundTaskService {
                 module.setModuleState(ModuleState.INSTALLED);
                 module.setInstallDate(new LocalDateTime());
                 module.setModulePath(moduleDir.getPath());
-                installationService.saveSystemModuleService(
-                        module, SystemService.builder()
-                                .module(module)
-                                .name(module.getName())
-                                .serviceState(ServiceState.NOT_RUNNING)
-                                .startable(installationService.moduleContains(module, "docker-compose.yml"))
-                                .build()
-                );
-                // TODO: update API call /api/appInfo here!
+                installationService.saveSystemModuleService(module);
+
                 return new BackgroundTaskResult<>(true, 0);
 
 

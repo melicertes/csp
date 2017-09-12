@@ -1,9 +1,13 @@
 package com.intrasoft.csp.conf.clientcspapp.service;
 
-import com.intrasoft.csp.conf.clientcspapp.util.TimeHelper;
+import com.intrasoft.csp.conf.clientcspapp.model.LoggingEvent;
+import com.intrasoft.csp.conf.clientcspapp.repo.LoggingEventRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.*;
 import java.util.*;
@@ -11,7 +15,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 import java.util.stream.Collector;
-import java.util.stream.Stream;
 
 /**
  * Created by tangelatos on 10/09/2017.
@@ -21,32 +24,17 @@ import java.util.stream.Stream;
 @Slf4j
 public class ExternalProcessService {
 
-    @Value("${client.ui.maxLinesInMemory:500000}")
-    Integer maxLinesInMemory;
-
     public static final int EXEC_ERROR = Integer.MIN_VALUE;
     private ExecutorService threadPool = Executors.newCachedThreadPool();
 
-    /**
-     * implement a size-limited list of entries
-     */
-    private List<String> logEntries = new LinkedList<String>() {
-        @Override
-        public boolean add(String o) {
-            boolean added = super.add(o);
-            while (added && size() > maxLinesInMemory) {
-                super.remove();
-            }
-            return added;
-        }
-    };
 
-    public Stream<String> getAllLogEntries() {
-        return logEntries.stream();
-    }
+    @Autowired
+    LoggingEventRepository logRepository;
 
-    public List<String> getLastEntries(int lastEntries) {
-        return getAllLogEntries().collect(lastN(lastEntries));
+
+    @Transactional
+    public List<LoggingEvent> getLastEntries(int lastEntries) {
+        return logRepository.findAll(new PageRequest(0, lastEntries, new Sort(Sort.Direction.DESC, "timestamp"))).getContent();
     }
 
 
@@ -76,25 +64,25 @@ public class ExternalProcessService {
             final Map<String, String> env = builder.environment();
             env.putAll(environment.get());
         }
-        logLine("EXEC: Additional environment variables defined: "+environment.orElse(new HashMap<>()));
+        log.info("EXEC: Additional environment variables defined: "+environment.orElse(new HashMap<>()));
 
         final Process proc;
         try {
             proc = builder.start();
-            logLine("EXEC: "+Arrays.toString(processAndArguments)+" START");
+            log.info("EXEC: "+Arrays.toString(processAndArguments)+" START");
         } catch (IOException e) {
             log.error("Process {} failed to start!", processAndArguments);
             return EXEC_ERROR;
         }
         // we should be ready.
         try  {
-            final StreamGobbler inputGobbler = new StreamGobbler(proc.getInputStream(), this::logLine );
-            final StreamGobbler errorGobbler = new StreamGobbler(proc.getErrorStream(), this::logLine );
+            final StreamGobbler inputGobbler = new StreamGobbler(proc.getInputStream(), log::info );
+            final StreamGobbler errorGobbler = new StreamGobbler(proc.getErrorStream(), log::error );
             threadPool.submit(inputGobbler);
             threadPool.submit(errorGobbler);
 
             int exitCode = proc.waitFor();
-            logLine("EXEC: "+Arrays.toString(processAndArguments)+" END | CODE: "+exitCode);
+            log.info("EXEC: "+Arrays.toString(processAndArguments)+" END | CODE: "+exitCode);
             return exitCode;
         } catch (InterruptedException e) {
             log.error("Process {} failed in execution: {}", processAndArguments, e.getMessage());
@@ -104,11 +92,6 @@ public class ExternalProcessService {
     }
 
 
-
-    private void logLine(String line) {
-        logEntries.add(TimeHelper.localNow() + " " + line);
-        log.info(line);
-    }
 
     private static class StreamGobbler implements Runnable {
         private InputStream inputStream;

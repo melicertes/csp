@@ -1,4 +1,4 @@
-package com.intrasoft.csp.conf.server.utils;
+package com.intrasoft.csp.conf.commons.utils;
 
 
 public class VersionParser {
