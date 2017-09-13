@@ -14,12 +14,7 @@ public class AuthorizationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
-
-        String tmp = "";
-        if (request.getHeaderNames().hasMoreElements()){
-            tmp = request.getHeaderNames().nextElement();
-            System.out.println(tmp);
-        }
+        response.setHeader("injectedHeader", "injectedValue");
 
         filterChain.doFilter(request, response);
     }

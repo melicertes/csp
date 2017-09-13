@@ -6,6 +6,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity(debug = true)
@@ -19,13 +20,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure( HttpSecurity httpSecurity ) throws Exception {
 
 if (enableOAM){
+//    httpSecurity.csrf().disable();
     httpSecurity
             .authorizeRequests()
             .antMatchers( "/" ).permitAll()
             .antMatchers( "/js/**", "/css/**", "/webjars/****" ).permitAll()
-            .anyRequest().authenticated()
+//            .anyRequest().authenticated()
             .and()
-            .addFilterBefore(new AuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
+            .addFilterBefore(new AuthorizationFilter(), BasicAuthenticationFilter.class);
 }
 
     }
