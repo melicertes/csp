@@ -104,6 +104,11 @@
                     <form th:action="@{/rulesets/save}" th:object="${ruleset}" method="post" enctype="multipart/form-data">
                         <div class="col-md-12 col-xs-12">
                             <div class="form-group">
+                                <input id="id" type="hidden" th:field="*{id}" name="id" class="form-control custom-control" />
+                            </div>
+                        </div>
+                        <div class="col-md-12 col-xs-12">
+                            <div class="form-group">
                                 <label for="file">File:</label>
                                 <input id="file" th:field="*{file}" name="file" type="file" class="file"></input>
                             </div>

@@ -20,8 +20,6 @@ import org.apache.tomcat.util.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.Mac;
@@ -29,7 +27,6 @@ import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -72,16 +69,17 @@ public class ApiDataHandler {
         String cspId = integrationAnonData.getCspId();
         IntegrationDataType dataType = integrationAnonData.getDataType();
         if (dataType == null){
-            throw new InvalidDataTypeException(HttpStatusResponseType.UNSUPPORTED_DATA_TYPE.getReasonPhrase());
+            throw new InvalidDataTypeException(HttpStatusResponseType.UNSUPPORTED_DATA_TYPE.getReasonPhrase()+"[dataType is null]");
         }
 
         if (cspId == null || cspId.equals("")){
-            throw new AnonException(HttpStatusResponseType.MALFORMED_INTEGRATION_DATA_STRUCTURE.getReasonPhrase());
+            throw new AnonException(HttpStatusResponseType.MALFORMED_INTEGRATION_DATA_STRUCTURE.getReasonPhrase()+"[cspId is empty]");
         }
 
         Rules rules = rulesService.getRule(dataType, cspId);
         if (rules == null){
-            throw new MappingNotFoundForGivenTupleException(HttpStatusResponseType.MAPPING_NOT_FOUND_FOR_GIVEN_TUPLE.getReasonPhrase());
+            throw new MappingNotFoundForGivenTupleException(HttpStatusResponseType.MAPPING_NOT_FOUND_FOR_GIVEN_TUPLE.getReasonPhrase()
+                    +"[dataType: "+dataType+",cspId: "+cspId+"]");
         }
 
         if (integrationAnonData.getDataObject() == null){

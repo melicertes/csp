@@ -1,0 +1,24 @@
+{
+  "rules": [
+    {
+      "field": "['default'].['name']",
+      "action": "anon",
+      "fieldtype": "string"
+    },
+    {
+      "field": "['default'].['type']",
+      "action": "pseudo",
+      "fieldtype": "string"
+    },
+    {
+      "field": "['default'].['id']",
+      "action": "anon",
+      "fieldtype": "numeric"
+    },
+    {
+      "field": "['default'].['size']",
+      "action": "anon",
+      "fieldtype": "numeric"
+    }
+  ]
+}

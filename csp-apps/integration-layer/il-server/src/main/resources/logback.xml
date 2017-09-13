@@ -5,7 +5,7 @@
     <!--<springProperty scope="context" name="appName" source="spring.application.name"/>-->
 
     <!--Basic configuration-->
-    <property name="APP_NAME" value="CSP.ANONYMIZATION"/>
+    <property name="APP_NAME" value="CSP.IL"/>
     <property name="LOGS_HOME" value="/opt/csplogs/"/>
     <property name="TYPE_EXC" value="exc"/>
     <property name="TYPE_AUD" value="aud"/>
@@ -72,7 +72,7 @@
         </rollingPolicy>
     </appender>
 
-    <logger name="com.intrasoft.csp.anon" level="info" additivity="false">
+    <logger name="com.intrasoft.csp.server" level="info" additivity="false">
         <appender-ref ref="FILE-AUDIT"/>
         <appender-ref ref="FILE-EXCEPTION"/>
         <appender-ref ref="STDOUT"/>

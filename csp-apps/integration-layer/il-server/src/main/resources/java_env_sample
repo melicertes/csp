@@ -15,6 +15,7 @@
 -DIL_EX_VULNERABILITY_APPS=taranis
 -DIL_EX_ARTEFACT_APPS=viper
 -DIL_EX_TRUSTCIRCLE_APPS=trustcircle
+-DANON_LOCAL_DOMAIN=anon.local.central-csp.athens.intrasoft-intl.private
 -DES_LOCAL_DOMAIN
 -DES_PATH=/cspdata
 -DTC_LOCAL_DOMAIN=localhost

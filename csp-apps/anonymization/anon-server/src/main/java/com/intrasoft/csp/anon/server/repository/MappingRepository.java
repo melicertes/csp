@@ -8,5 +8,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface MappingRepository extends JpaRepository <Mapping, Long>{
 
-    public Mapping findTopByDataTypeAndCspId(IntegrationDataType integrationDataType, String cspId);
+    Mapping findTopByDataTypeAndCspId(IntegrationDataType integrationDataType, String cspId);
 }
