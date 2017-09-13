@@ -20,9 +20,6 @@ import java.util.List;
 @RestController
 public class AnonController implements AnonContextUrl {
 
-    private static Logger LOG = LoggerFactory.getLogger("audit-log");
-    private static Logger LOG_EXCEPTION = LoggerFactory.getLogger("exc-log");
-
 
     @Autowired
     ApiDataHandler apiDataHandler;

@@ -1,4 +1,4 @@
-package com.intrasoft.csp.anon.server.security;
+package com.intrasoft.csp.anon.server.config.security;
 
 import com.intrasoft.csp.libraries.restclient.service.RetryRestTemplate;
 import org.slf4j.Logger;
@@ -27,7 +27,7 @@ class AuthenticationService {
     static Authentication getAuthentication(HttpServletRequest request) throws  IOException {
         String token = request.getHeader(HEADER_STRING);
 
-        System.out.println(token);
+
 
 
 

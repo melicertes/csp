@@ -1,4 +1,4 @@
-package com.intrasoft.csp.anon.server.security;
+package com.intrasoft.csp.anon.server.config.security;
 
 public class User {
 
