@@ -1,6 +1,5 @@
 package com.intrasoft.csp.anon.server.controller;
 
-import com.intrasoft.csp.anon.commons.exceptions.AnonUnauthorizedException;
 import com.intrasoft.csp.anon.commons.model.MappingDTO;
 import com.intrasoft.csp.anon.commons.model.RuleSetDTO;
 import com.intrasoft.csp.anon.commons.model.SaveMappingDTO;
@@ -65,8 +64,6 @@ public class MappingsController {
     @GetMapping("/mappings")
     public ModelAndView showMappings(@ModelAttribute("mapping") SaveMappingDTO mapping) {
         LOG.info("UI: GET mapping " + mapping.toString());
-//        if(mapping !=null){
-//        throw new AnonUnauthorizedException("");}
         return new ModelAndView("pages/mappings", "mappings", getMappings());
     }
 

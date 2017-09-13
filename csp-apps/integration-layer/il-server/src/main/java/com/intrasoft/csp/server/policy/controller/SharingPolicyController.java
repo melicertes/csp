@@ -2,11 +2,13 @@ package com.intrasoft.csp.server.policy.controller;
 
 import com.intrasoft.csp.anon.commons.model.SaveMappingDTO;
 import com.intrasoft.csp.commons.model.IntegrationDataType;
+import com.intrasoft.csp.server.config.security.User;
 import com.intrasoft.csp.server.policy.domain.SharingPolicyRoutes;
 import com.intrasoft.csp.server.policy.domain.model.PolicyDTO;
 import com.intrasoft.csp.server.policy.domain.model.SharingPolicyAction;
 import com.intrasoft.csp.server.policy.service.SharingPolicyService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -38,6 +40,11 @@ public class SharingPolicyController implements SharingPolicyRoutes {
     @ModelAttribute("policies")
     public List<PolicyDTO> getPolicies() {
         return sharingPolicyService.getPolicies();
+    }
+
+    @ModelAttribute("user")
+    public User getUser(@AuthenticationPrincipal final User user){
+        return user;
     }
 
     @RequestMapping(BASE_URL)
