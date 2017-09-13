@@ -30,47 +30,47 @@ public class AnonController implements AnonContextUrl {
     @Autowired
     AnonService anonService;
 
-    @RequestMapping(value = "/v"+REST_API_V1+"/"+ANONYMIZE, method = RequestMethod.POST)
+    @RequestMapping(value = "/v"+REST_API_V1+ANONYMIZE, method = RequestMethod.POST)
     public IntegrationAnonData anonData(@RequestBody IntegrationAnonData integrationAnonData) throws InvalidKeyException, NoSuchAlgorithmException, IOException {
         return anonService.postAnonData(integrationAnonData);
     }
 
-    @RequestMapping(value = "/v"+REST_API_V1+"/"+SAVE_RULESET, method = RequestMethod.POST)
+    @RequestMapping(value = "/v"+REST_API_V1+SAVE_RULESET, method = RequestMethod.POST)
     public RuleSetDTO saveRuleSet(@RequestBody RuleSetDTO ruleSetDTO){
         return anonService.saveRuleSet(ruleSetDTO);
     }
 
-    @RequestMapping(value = "/v"+REST_API_V1+"/"+DELETE_RULESET, method = RequestMethod.POST)
+    @RequestMapping(value = "/v"+REST_API_V1+DELETE_RULESET, method = RequestMethod.POST)
     public void deleteRuleSet(@RequestBody Long id){
         anonService.deleteRuleSet(id);
     }
 
-    @RequestMapping(value = "/v"+REST_API_V1+"/"+GET_ALL_RULESET, method = RequestMethod.GET)
+    @RequestMapping(value = "/v"+REST_API_V1+GET_ALL_RULESET, method = RequestMethod.GET)
     public List<RuleSetDTO> getAllRuleSet(){
         return anonService.getAllRuleSet();
     }
 
-    @RequestMapping(value = "/v"+REST_API_V1+"/"+GET_RULESET + "/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/v"+REST_API_V1+GET_RULESET + "/{id}", method = RequestMethod.GET)
     public RuleSetDTO getRuleSet(@PathVariable Long id){
         return anonService.getRuleSetById(id);
     }
 
-    @RequestMapping(value = "/v"+REST_API_V1+"/"+SAVE_MAPPING, method = RequestMethod.POST)
+    @RequestMapping(value = "/v"+REST_API_V1+SAVE_MAPPING, method = RequestMethod.POST)
     public MappingDTO saveMapping(@RequestBody MappingDTO mappingDTO){
         return anonService.saveMapping(mappingDTO);
     }
 
-    @RequestMapping(value = "/v"+REST_API_V1+"/"+DELETE_MAPPING, method = RequestMethod.POST)
+    @RequestMapping(value = "/v"+REST_API_V1+DELETE_MAPPING, method = RequestMethod.POST)
     public void deleteMapping(@RequestBody Long id){
         anonService.deleteMapping(id);
     }
 
-    @RequestMapping(value = "/v"+REST_API_V1+"/"+GET_MAPPING+"/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/v"+REST_API_V1+GET_MAPPING+"/{id}", method = RequestMethod.GET)
     public MappingDTO getMapping(@PathVariable Long id){
         return anonService.getMappingById(id);
     }
 
-    @RequestMapping(value = "/v"+REST_API_V1+"/"+GET_ALL_MAPPINGS, method = RequestMethod.GET)
+    @RequestMapping(value = "/v"+REST_API_V1+GET_ALL_MAPPINGS, method = RequestMethod.GET)
     public List<MappingDTO> getAllMappings(){
         return anonService.getAllMappings();
     }
