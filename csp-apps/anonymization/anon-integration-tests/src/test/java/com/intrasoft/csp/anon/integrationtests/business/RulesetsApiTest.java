@@ -34,6 +34,7 @@ import static org.junit.Assert.assertThat;
 @SpringBootTest(classes = {AnonApp.class, AnonClientConfig.class},
         webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT,
         properties = {
+                "spring.datasource.url:jdbc:h2:mem:anon",
                 "server.port: 8585",
                 "anon.server.protocol: http",
                 "anon.server.host: localhost",
@@ -44,7 +45,6 @@ import static org.junit.Assert.assertThat;
                 "key.update=10000",
                 "enable.oam:false"
         })
-@ActiveProfiles("h2mem")
 public class RulesetsApiTest implements AnonContextUrl {
 
     private static final Logger LOG = LoggerFactory.getLogger(RulesetsApiTest.class);
@@ -89,7 +89,7 @@ public class RulesetsApiTest implements AnonContextUrl {
 
     @Test
     @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
-    public void deleteRuleset() throws JsonProcessingException {
+    public void deleteRuleset() throws JsonProcessingException, InterruptedException {
 
         // Given
         RuleSetDTO ruleSetDTO = createRuleset();
@@ -97,9 +97,9 @@ public class RulesetsApiTest implements AnonContextUrl {
 
         // When
         anonClient.deleteRuleSet(ruleSetDTO.getId());
-
+        List<RuleSetDTO> list = anonClient.getAllRuleSet();
         //Then
-        assertThat(anonClient.getAllRuleSet().size(), equalTo(0));
+        assertThat(list.size(), equalTo(0));
     }
 
 }

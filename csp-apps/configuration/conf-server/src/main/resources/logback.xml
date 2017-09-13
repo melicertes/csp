@@ -2,9 +2,7 @@
 <configuration>
     <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
 
-    <!--
-    <springProperty scope="context" name="appName" source="spring.application.name"/>
-    -->
+    <!--<springProperty scope="context" name="appName" source="spring.application.name"/>-->
 
     <!--Basic configuration-->
     <property name="APP_NAME" value="CSP.CCS"/>
@@ -37,6 +35,12 @@
             <Pattern>${LOG_PATTERN}</Pattern>
         </encoder>
 
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <fileNamePattern>${FILE_EXC_ROLL_PATTERN}</fileNamePattern>
             <maxHistory>${HISTORY_EXC}</maxHistory>
@@ -50,19 +54,26 @@
             <Pattern>${LOG_PATTERN}</Pattern>
         </encoder>
 
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>INFO</level>
+            <onMatch>ACCEPT</onMatch>
+        </filter>
+
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>WARN</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <fileNamePattern>${FILE_AUD_ROLL_PATTERN}</fileNamePattern>
             <maxHistory>${HISTORY_AUD}</maxHistory>
         </rollingPolicy>
     </appender>
 
-    <logger name="exc-log" level="error" additivity="false">
-        <appender-ref ref="FILE-EXCEPTION"/>
-        <appender-ref ref="STDOUT"/>
-    </logger>
-
-    <logger name="audit-log" level="info" additivity="false">
+    <logger name="root" level="info" additivity="false">
         <appender-ref ref="FILE-AUDIT"/>
+        <appender-ref ref="FILE-EXCEPTION"/>
         <appender-ref ref="STDOUT"/>
     </logger>
 

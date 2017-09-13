@@ -81,6 +81,7 @@ public class CamelRestService {
         Boolean isFailed = exchange.isFailed();
         if(isFailed && exception != null){
             //TODO: Redelivery only at specific 5xx and maybe 408. More researched is needed
+            //HttpHostConnectException might be raised from TC calls
             if(checkForHttp4xxFailedOperationAndJustLogWithNoGRedelivery
                     &&  exception.getClass().equals(HttpOperationFailedException.class)
                     && ((HttpOperationFailedException) exception).getStatusCode()>= 400
