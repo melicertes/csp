@@ -28,6 +28,7 @@ import static org.junit.Assert.assertThat;
 @SpringBootTest(classes = {AnonApp.class, AnonClientConfig.class},
         webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT,
         properties = {
+                "spring.datasource.url:jdbc:h2:mem:anon",
                 "server.port: 8585",
                 "anon.server.protocol: http",
                 "anon.server.host: localhost",
@@ -37,7 +38,6 @@ import static org.junit.Assert.assertThat;
                 "csp.retry.maxAttempts:1",
                 "key.update=10000"
         })
-@ActiveProfiles("h2mem")
 public class MappingsApiTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(MappingsApiTest.class);

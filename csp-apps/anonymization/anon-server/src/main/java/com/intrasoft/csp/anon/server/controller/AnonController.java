@@ -51,7 +51,7 @@ public class AnonController implements AnonContextUrl {
     }
 
     @RequestMapping(value = "/v"+REST_API_V1+"/"+GET_RULESET + "/{id}", method = RequestMethod.GET)
-    public RuleSetDTO getRuleSet(@RequestParam Long id){
+    public RuleSetDTO getRuleSet(@PathVariable Long id){
         return anonService.getRuleSetById(id);
     }
 

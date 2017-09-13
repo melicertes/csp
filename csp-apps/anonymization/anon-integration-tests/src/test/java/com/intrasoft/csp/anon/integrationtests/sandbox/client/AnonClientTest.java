@@ -50,6 +50,7 @@ import static org.junit.Assert.fail;
 @SpringBootTest(classes = {AnonApp.class, AnonClientConfig.class},
         webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT,
         properties = {
+                "spring.datasource.url:jdbc:h2:mem:anon",
                 "server.port: 8585",
                 "anon.server.protocol: http",
                 "anon.server.host: localhost",
@@ -59,7 +60,6 @@ import static org.junit.Assert.fail;
                 "csp.retry.maxAttempts:1",
                 "key.update=10000"
         })
-@ActiveProfiles("h2mem") //TODO: to be changed to use H2 DB profile
 public class AnonClientTest implements AnonContextUrl {
     private static final Logger LOG = LoggerFactory.getLogger(AnonClientTest.class);
 

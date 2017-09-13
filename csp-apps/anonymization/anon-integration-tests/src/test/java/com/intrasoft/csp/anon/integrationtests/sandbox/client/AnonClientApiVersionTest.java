@@ -25,6 +25,7 @@ import static org.hamcrest.Matchers.is;
 @SpringBootTest(classes = {AnonApp.class, AnonClientConfig.class, CspRestTemplateConfiguration.class},
         webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT,
         properties = {
+                "spring.datasource.url:jdbc:h2:mem:anon",
                 "server.port: 8585",
                 "anon.server.protocol: http",
                 "anon.server.host: localhost",
@@ -34,7 +35,6 @@ import static org.hamcrest.Matchers.is;
                 "csp.retry.maxAttempts:1",
                 "key.update=10000"
         })
-@ActiveProfiles("h2mem")
 public class AnonClientApiVersionTest {
     private static final Logger LOG = LoggerFactory.getLogger(AnonClientApiVersionTest.class);
 

@@ -40,6 +40,7 @@ import static org.hamcrest.Matchers.containsString;
 @SpringBootTest(classes = {AnonApp.class, AnonClientConfig.class},
         webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT,
         properties = {
+                "spring.datasource.url:jdbc:h2:mem:anon",
                 "server.port: 8585",
                 "anon.server.protocol: http",
                 "anon.server.host: localhost",
@@ -49,7 +50,6 @@ import static org.hamcrest.Matchers.containsString;
                 "csp.retry.maxAttempts:1",
                 "key.update=10000"
         })
-@ActiveProfiles("h2mem")
 public class AnonApiTest implements AnonContextUrl {
 
     private static final Logger LOG = LoggerFactory.getLogger(AnonApiTest.class);
