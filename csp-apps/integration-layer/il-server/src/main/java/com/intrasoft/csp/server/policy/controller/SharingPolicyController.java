@@ -47,6 +47,11 @@ public class SharingPolicyController implements SharingPolicyRoutes {
         return user;
     }
 
+    @RequestMapping("/")
+    public String home(final Model model,@ModelAttribute("policy") PolicyDTO policy) {
+        return "redirect:"+BASE_URL;
+    }
+
     @RequestMapping(BASE_URL)
     public String viewPolicy(final Model model,@ModelAttribute("policy") PolicyDTO policy) {
         return HOME_TH;
