@@ -17,9 +17,6 @@ class AuthenticationService {
 
     static final String HEADER_STRING = "Cookie";
 
-    @Autowired
-    RetryRestTemplate restTemplate;
-
     static void addAuthentication(HttpServletResponse res, String username) {
 
     }

@@ -9,7 +9,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
 @Configuration
-@EnableWebSecurity(debug = true)
+@EnableWebSecurity(debug = false)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 
@@ -20,11 +20,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure( HttpSecurity httpSecurity ) throws Exception {
 
 if (enableOAM){
-//    httpSecurity.csrf().disable();
+    httpSecurity.csrf().disable();
     httpSecurity
             .authorizeRequests()
             .antMatchers( "/" ).permitAll()
-            .antMatchers( "/js/**", "/css/**", "/webjars/****" ).permitAll()
+            .antMatchers( "/js/**", "/css/**", "/webjars/**" ).permitAll()
 //            .anyRequest().authenticated()
             .and()
             .addFilterBefore(new AuthorizationFilter(), BasicAuthenticationFilter.class);
