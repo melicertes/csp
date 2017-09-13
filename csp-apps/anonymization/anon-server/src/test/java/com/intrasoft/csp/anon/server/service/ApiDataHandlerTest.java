@@ -42,7 +42,8 @@ import static org.hamcrest.Matchers.greaterThan;
                 "api.version: 1",
                 "csp.retry.backOffPeriod:10",
                 "csp.retry.maxAttempts:1",
-                "key.update=10000"
+                "key.update=10000",
+                "enable.oam:false"
         })
 public class ApiDataHandlerTest {
     @Autowired

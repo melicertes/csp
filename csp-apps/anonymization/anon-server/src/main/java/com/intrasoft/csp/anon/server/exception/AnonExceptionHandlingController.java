@@ -26,10 +26,12 @@ public class AnonExceptionHandlingController extends RestExceptionHandlingContro
 
     /**
      * Example to override default internal exception handling
-    @ExceptionHandler(value = {MappingNotFoundForGivenTupleException.class})
-    public ResponseEntity<Object>  invalidCspEntryException(WebRequest request, HttpServletRequest req, HttpServletResponse response, Exception e) throws IOException {
-        return handleException(e,HttpStatusResponseType.MAPPING_NOT_FOUND_FOR_GIVEN_TUPLE.value(),HttpStatus.BAD_REQUEST, request);
-    }*/
+     *
+     * @ExceptionHandler(value = {MappingNotFoundForGivenTupleException.class})
+     * public ResponseEntity<Object>  invalidCspEntryException(WebRequest request, HttpServletRequest req, HttpServletResponse response, Exception e) throws IOException {
+     * return handleException(e,HttpStatusResponseType.MAPPING_NOT_FOUND_FOR_GIVEN_TUPLE.value(),HttpStatus.BAD_REQUEST, request);
+     * }
+     */
 
     @ExceptionHandler({MappingNotFoundForGivenTupleException.class})
     public void handleBadRequests(HttpServletRequest request, HttpServletResponse response, Exception e) throws IOException {
@@ -45,9 +47,9 @@ public class AnonExceptionHandlingController extends RestExceptionHandlingContro
     }
 
     @ExceptionHandler(value = {InvalidDataTypeException.class})
-    public ResponseEntity<Object>  unsupportedDataType(WebRequest request, HttpServletRequest req, HttpServletResponse response, Exception e) throws IOException {
+    public ResponseEntity<Object> unsupportedDataType(WebRequest request, HttpServletRequest req, HttpServletResponse response, Exception e) throws IOException {
         return handleExceptionInternal(e,
-                super.getRestErrorDTO(e, HttpStatusResponseType.UNSUPPORTED_DATA_TYPE.value(),req.getRequestURI()),
+                super.getRestErrorDTO(e, HttpStatusResponseType.UNSUPPORTED_DATA_TYPE.value(), req.getRequestURI()),
                 new HttpHeaders(), HttpStatus.UNSUPPORTED_MEDIA_TYPE, request);
     }
 
@@ -58,10 +60,10 @@ public class AnonExceptionHandlingController extends RestExceptionHandlingContro
 //    }
 
     @ExceptionHandler(value = {AnonException.class})
-    public ResponseEntity<Object>  malformedIntegrationDataStructure(WebRequest request, HttpServletRequest req, HttpServletResponse response, Exception e) throws IOException {
+    public ResponseEntity<Object> malformedIntegrationDataStructure(WebRequest request, HttpServletRequest req, HttpServletResponse response, Exception e) throws IOException {
         return handleExceptionInternal(e,
-                super.getRestErrorDTO(e, HttpStatusResponseType.MALFORMED_INTEGRATION_DATA_STRUCTURE.value(),req.getRequestURI()),
+                super.getRestErrorDTO(e, HttpStatusResponseType.MALFORMED_INTEGRATION_DATA_STRUCTURE.value(), req.getRequestURI()),
                 new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
 
-}
+    }
 }

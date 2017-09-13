@@ -1,14 +1,18 @@
 package com.intrasoft.csp.anon.server.controller;
 
+import com.intrasoft.csp.anon.commons.exceptions.AnonUnauthorizedException;
 import com.intrasoft.csp.anon.commons.model.MappingDTO;
 import com.intrasoft.csp.anon.commons.model.RuleSetDTO;
 import com.intrasoft.csp.anon.commons.model.SaveMappingDTO;
+import com.intrasoft.csp.anon.server.config.security.User;
 import com.intrasoft.csp.anon.server.service.AnonService;
 import com.intrasoft.csp.commons.model.IntegrationDataType;
 import org.hibernate.exception.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
@@ -18,6 +22,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.security.Principal;
 import java.util.List;
 
 /**
@@ -47,6 +52,11 @@ public class MappingsController {
         return anonService.getAllRuleSet();
     }
 
+    @ModelAttribute("user")
+    public User getUser(@AuthenticationPrincipal final User user){
+        return user;
+    }
+
     @GetMapping("/")
     public ModelAndView redirectRootToMappings(@ModelAttribute("mapping") SaveMappingDTO mapping) {
         return new ModelAndView("redirect:/mappings");
@@ -55,6 +65,8 @@ public class MappingsController {
     @GetMapping("/mappings")
     public ModelAndView showMappings(@ModelAttribute("mapping") SaveMappingDTO mapping) {
         LOG.info("UI: GET mapping " + mapping.toString());
+//        if(mapping !=null){
+//        throw new AnonUnauthorizedException("");}
         return new ModelAndView("pages/mappings", "mappings", getMappings());
     }
 

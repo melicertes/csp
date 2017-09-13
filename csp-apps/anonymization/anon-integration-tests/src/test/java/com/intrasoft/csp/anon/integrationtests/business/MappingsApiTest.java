@@ -35,7 +35,8 @@ import static org.junit.Assert.assertThat;
                 "api.version: 1",
                 "csp.retry.backOffPeriod:10",
                 "csp.retry.maxAttempts:1",
-                "key.update=10000"
+                "key.update=10000",
+                "enable.oam:false"
         })
 @ActiveProfiles("h2mem")
 public class MappingsApiTest {

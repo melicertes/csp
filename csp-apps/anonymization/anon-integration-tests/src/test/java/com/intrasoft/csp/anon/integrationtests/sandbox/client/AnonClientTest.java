@@ -57,7 +57,8 @@ import static org.junit.Assert.fail;
                 "api.version: 1",
                 "csp.retry.backOffPeriod:10",
                 "csp.retry.maxAttempts:1",
-                "key.update=10000"
+                "key.update=10000",
+                "enable.oam:false"
         })
 @ActiveProfiles("h2mem") //TODO: to be changed to use H2 DB profile
 public class AnonClientTest implements AnonContextUrl {
