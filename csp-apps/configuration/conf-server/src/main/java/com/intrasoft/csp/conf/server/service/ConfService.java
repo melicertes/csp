@@ -296,12 +296,42 @@ public class ConfService implements ApiContextUrl, Configuration {
                 throw new InvalidModuleNameException(StatusResponseType.API_INVALID_MODULE_NAME.text());
             }
 
-            ModuleVersion moduleVersion = moduleVersionRepository.findByFullName(moduleInfo.getAdditionalProperties().getFullName());
-            if (moduleVersion == null) {
+            String fullNameReported = moduleInfo.getAdditionalProperties().getFullName();
+            String versionReportedS = fullNameReported.replace(module.getName(), "");
+            Integer versionReportedI;
+            //check mistyped json, version from fullname and version mismatch
+            try {
+                versionReportedI = VersionParser.fromVarious(versionReportedS);
+            } catch (NumberFormatException e) {
+                throw new InvalidModuleVersionException(StatusResponseType.API_INVALID_MODULE_VERSION.text());
+            }
+            //before compare versions ensure both have VersionParser's format
+            String s1 = String.valueOf(versionReportedI);
+            String s2 = String.valueOf(moduleInfo.getAdditionalProperties().getVersion());
+            s2 = Integer.toString(VersionParser.fromString(s2));
+            if (!s1.equals(s2)) {
+                throw new InvalidModuleVersionException(StatusResponseType.API_INVALID_MODULE_VERSION.text());
+            }
+
+            //now versions between fullname and version node are aligned. Check for names
+            fullNameReported = fullNameReported.replace(versionReportedS, "");
+            //check that is the same with module name in json
+            if (!fullNameReported.equals(moduleInfo.getName())) {
                 throw new InvalidModuleNameException(StatusResponseType.API_INVALID_MODULE_NAME.text());
             }
 
-            moduleVersion = moduleVersionRepository.findByModuleIdAndVersion(module.getId(), moduleInfo.getAdditionalProperties().getVersion());
+            //check that module version exists. Ignore reported version mistyping, i.e. 1000 <-> 10000
+            /**
+             * @TODO If we do not want to ignore version mistype, swap commented lines in next 2-checks
+             */
+            Integer v = versionReportedI;
+            //Integer v = moduleInfo.getAdditionalProperties().getVersion();
+            ModuleVersion moduleVersion = moduleVersionRepository.findByFullNameAndVersion(fullNameReported, v);
+            if (moduleVersion == null) {
+                throw new InvalidModuleVersionException(StatusResponseType.API_INVALID_MODULE_VERSION.text());
+            }
+
+            moduleVersion = moduleVersionRepository.findByModuleIdAndVersion(module.getId(), v);
             if (moduleVersion == null) {
                 throw new InvalidModuleVersionException(StatusResponseType.API_INVALID_MODULE_VERSION.text());
             }

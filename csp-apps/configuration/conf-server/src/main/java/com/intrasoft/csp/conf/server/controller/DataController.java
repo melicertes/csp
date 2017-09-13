@@ -125,7 +125,10 @@ public class DataController implements DataContextUrl, PagesContextUrl {
             List<String> confUpdates = new ArrayList<>();
             List<CspManagement> cspManagements = cspManagementRepository.findByCspId(csp.getId());
             for(CspManagement management : cspManagements) {
-                confUpdates.add(moduleVersionRepository.findOne(management.getModuleVersionId()).getFullName());
+                String s;
+                s = moduleVersionRepository.findOne(management.getModuleVersionId()).getFullName() + ":" +
+                        VersionParser.toString(moduleVersionRepository.findOne(management.getModuleVersionId()).getVersion());
+                confUpdates.add(s);
             }
             row.setConfUpdates(confUpdates);
 
@@ -134,7 +137,10 @@ public class DataController implements DataContextUrl, PagesContextUrl {
             if (cspInfo != null) {
                 List<CspModuleInfo> cspModuleInfos = cspModuleInfoRepository.findByCspInfoId(cspInfo.getId());
                 for(CspModuleInfo cspModuleInfo : cspModuleInfos) {
-                    reportUpdates.add(moduleVersionRepository.findOne(cspModuleInfo.getModuleVersionId()).getFullName());
+                    String s;
+                    s = moduleVersionRepository.findOne(cspModuleInfo.getModuleVersionId()).getFullName() + ":" +
+                            VersionParser.toString(moduleVersionRepository.findOne(cspModuleInfo.getModuleVersionId()).getVersion());
+                    reportUpdates.add(s);
                 }
             }
             row.setReportUpdates(reportUpdates);

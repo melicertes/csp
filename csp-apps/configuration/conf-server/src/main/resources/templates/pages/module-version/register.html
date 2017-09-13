@@ -39,7 +39,7 @@
                     <div class="col-md-6 col-xs-12">
                         <div class="form-group">
                             <label for="module_full_name">Full Name:</label>
-                            <input class="form-control" id="module_full_name" name="module_full_name" type="text"></input>
+                            <input class="form-control" id="module_full_name" name="module_full_name" type="text" th:value="${moduleData.getName()}" readonly="readonly"></input>
                         </div>
                     </div>
                     <div class="col-md-2 col-xs-12">
