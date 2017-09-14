@@ -217,7 +217,7 @@ public class RestApiController implements ContextUrl, ApiContextUrl {
                                 } else {
                                     log.warn("Cannot allow installations because there are {} services running",running);
                                     actions.append(
-                                            "&nbsp;Install not possible; System is running!");
+                                            "&nbsp;Install not possible; System is UP!");
                                 }
                                 break;
                             case INSTALLED:

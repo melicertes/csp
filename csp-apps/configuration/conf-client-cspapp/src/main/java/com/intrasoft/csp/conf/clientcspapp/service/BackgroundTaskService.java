@@ -181,7 +181,8 @@ public class BackgroundTaskService {
             if (installationService.canDownload() && internetAvailable) {
                 module.setModuleState(ModuleState.DOWNLOADING);
                 installationService.updateSystemModuleState(module.getId(), ModuleState.DOWNLOADING);
-                log.info("Attempting to download {}",module.getHash());
+                log.info("Attempting to download module {}:{} - this may take some time!  {}",
+                        module.getName(), module.getVersion(), module.getHash());
                 final SystemInstallationState state = installationService.getState();
                 final ResponseEntity entity = client.update(state.getCspId(), module.getHash());
                 log.info("Entity for {} received, code {}",module.getHash(), entity.getStatusCodeValue());
