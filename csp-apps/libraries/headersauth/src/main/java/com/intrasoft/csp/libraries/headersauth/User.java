@@ -1,4 +1,4 @@
-package com.intrasoft.csp.server.config.security;
+package com.intrasoft.csp.libraries.headersauth;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

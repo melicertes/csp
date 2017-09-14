@@ -1,5 +1,6 @@
 package com.intrasoft.csp.server.config.security;
 
+import com.intrasoft.csp.libraries.headersauth.AuthorizationFilter;
 import com.intrasoft.csp.server.policy.domain.SharingPolicyRoutes;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;

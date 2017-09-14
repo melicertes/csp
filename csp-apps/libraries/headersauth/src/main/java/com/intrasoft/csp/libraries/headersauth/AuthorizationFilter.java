@@ -1,4 +1,4 @@
-package com.intrasoft.csp.anon.server.config.security;
+package com.intrasoft.csp.libraries.headersauth;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +22,7 @@ public class AuthorizationFilter extends OncePerRequestFilter {
     private static final Logger LOG = LoggerFactory.getLogger(AuthorizationFilter.class);
     public static final String USER_HEADER = "Custom-User-Id";
     public static final String GROUP_HEADER = "Custom-User-Is-Member-Of";
+    public static final String ADMIN_GROUP = "csp-admin";
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -32,7 +33,7 @@ public class AuthorizationFilter extends OncePerRequestFilter {
         LOG.info("-- userHeaderValue: "+userHeaderValue);
         LOG.info("-- groupHeaderValue: "+groupHeaderValue);
 
-        if(StringUtils.isEmpty(userHeaderValue) || StringUtils.isEmpty(groupHeaderValue)){
+        if(StringUtils.isEmpty(userHeaderValue) || StringUtils.isEmpty(groupHeaderValue) || !groupHeaderValue.toLowerCase().contains(ADMIN_GROUP)){
 //            response.setStatus(401);
 //            response.getWriter().write("Unauthorized");//this will override the error page
                 response.sendError(401,"Unauthorized");

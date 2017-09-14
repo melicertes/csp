@@ -1,8 +1,7 @@
 package com.intrasoft.csp.server.policy.controller;
 
-import com.intrasoft.csp.anon.commons.model.SaveMappingDTO;
 import com.intrasoft.csp.commons.model.IntegrationDataType;
-import com.intrasoft.csp.server.config.security.User;
+import com.intrasoft.csp.libraries.headersauth.User;
 import com.intrasoft.csp.server.policy.domain.SharingPolicyRoutes;
 import com.intrasoft.csp.server.policy.domain.model.PolicyDTO;
 import com.intrasoft.csp.server.policy.domain.model.SharingPolicyAction;

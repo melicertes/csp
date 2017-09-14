@@ -19,6 +19,7 @@
     <modules>
         <module>restclient</module>
         <module>versioning</module>
+        <module>headersauth</module>
     </modules>
 
 
