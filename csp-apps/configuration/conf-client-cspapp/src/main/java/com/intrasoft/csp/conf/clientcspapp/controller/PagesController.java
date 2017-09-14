@@ -97,9 +97,13 @@ public class PagesController implements ContextUrl {
     @RequestMapping(value = PAGE_SYSTEM, method = RequestMethod.GET)
     public ModelAndView system(Model model) {
         model = this.init(model);
-
         model.addAttribute("navSystemClassActive", "active");
-
+        final String cspId = installService.getState().getCspId();
+        if (cspId != null) {
+            model.addAttribute("systemRetrieveUrl", REST_MODULESERVICES + "/" + cspId);
+            //todo queryservice?
+            //installService.queryService()
+        }
         return new ModelAndView("pages/system", "system", model);
     }
 
@@ -118,9 +122,6 @@ public class PagesController implements ContextUrl {
 
         model.addAttribute("navUpdatesClassActive", "active");
     //TODO find the inprogress task or remove these attributes
-        model.addAttribute("moduleName", "MISP");
-        model.addAttribute("moduleVersionFrom", "12.00");
-        model.addAttribute("moduleVersionTo", "12.21");
         model.addAttribute("refreshInterval", refreshInterval);
         model.addAttribute("logUrl", REST_LOG);
 
@@ -181,6 +182,11 @@ public class PagesController implements ContextUrl {
         m.addAttribute("contactUrl", jiraLink);
         m.addAttribute("dashboardLinks", PAGE_LINKS);
         m.addAttribute("dashboardStatusUrl", REST_DASHSTATUS);
+
+        m.addAttribute("startModulesUrl", PAGE_STARTMODULES);
+        m.addAttribute("stopModulesUrl", PAGE_STOPMODULES);
+        m.addAttribute("systemRetrieveUrl", REST_MODULESERVICES);
+
 
         m.addAttribute("navHomeClassActive", "");
         m.addAttribute("navInstallClassActive", "");

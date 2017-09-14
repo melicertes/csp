@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 function processExternalCerts() {
 	echo "CSPNAME   = $CSPNAME"

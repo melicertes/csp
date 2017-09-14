@@ -11,6 +11,8 @@ import com.intrasoft.csp.conf.commons.model.api.UpdateInformationDTO;
 import com.intrasoft.csp.conf.commons.types.StatusResponseType;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -80,7 +82,7 @@ public class InstallationService {
         return updates;
     }
 
-    public String findModuleInstalledActiveVersion(String moduleName) {
+    public String queryModuleInstalledActiveVersion(String moduleName) {
         final List<SystemModule> list = moduleRepository.findByNameAndActiveOrderByIdDesc(moduleName, true);
 
         if (list.size() == 0) {
@@ -189,19 +191,17 @@ public class InstallationService {
         File moduleDir = new File(module.getModulePath());
 
         final List<BackgroundTaskResult<Boolean, Integer>> list = Stream.of(moduleDir.list((File dir, String name) -> {
-            if (name.endsWith("tar")) {
+            if (name.endsWith("tar")||name.endsWith("bz2")) {
                 return true;
             } else
                 return false;
         })).map(fName -> {
             Map<String, String> env = new HashMap<>();
-            env.put("TAR_FILE", fName);
+            env.put("ARCHIVE_FILE", fName);
             env.put("WORK_DIR", moduleDir.getAbsolutePath());
 
             try {
-                final BackgroundTaskResult<Boolean, Integer> result =
-                        backgroundTaskService.executeScriptSimple("dockerLoad.sh", env);
-                return result;
+                return backgroundTaskService.executeScriptSimple("dockerLoad.sh", env);
             } catch (IOException e) {
                 log.error("Exception in load execution: {}", e.getMessage(), e);
                 return new BackgroundTaskResult<>(false, -1);
@@ -209,7 +209,7 @@ public class InstallationService {
         }).distinct().collect(Collectors.toList());
 
         for (BackgroundTaskResult<Boolean, Integer> r : list) {
-            if (r.getSource() == false) {
+            if (r.getSuccess() == false) {
                 return false;
             }
         }
@@ -226,8 +226,27 @@ public class InstallationService {
         return simpleStorage.filesInArchive(module.getArchivePath()).anyMatch( f -> f.contentEquals(filename));
     }
 
-    public List<SystemModule> findAllModulesInstalled() {
-        return moduleRepository.findByModuleStateOrderByStartPriority(ModuleState.INSTALLED);
+    public List<SystemModule> queryAllModulesInstalled(boolean orderIncreasing) {
+        if (orderIncreasing) {
+            return moduleRepository.findByModuleStateOrderByStartPriority(ModuleState.INSTALLED);
+        } else {
+            return moduleRepository.findByModuleStateOrderByStartPriorityDesc(ModuleState.INSTALLED);
+        }
+    }
+
+    public SystemService queryService(SystemModule module) {
+        return serviceRepository.findByName(module.getName());
+
+    }
+
+    public SystemService updateServiceState(SystemService service, ServiceState state) {
+        SystemService upd = serviceRepository.findByName(service.getName());
+        upd.setServiceState(state);
+        return serviceRepository.save(upd);
+    }
+
+    public List<SystemService> queryCspServices(String cspId) {
+        return serviceRepository.findAll(new Sort(Sort.Direction.ASC, "module.startPriority"));
     }
 }
 

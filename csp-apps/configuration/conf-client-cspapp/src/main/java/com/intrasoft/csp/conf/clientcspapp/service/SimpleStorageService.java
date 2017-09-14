@@ -40,9 +40,9 @@ public class SimpleStorageService {
             log.warn("Target {} existed, will remove",target.getName());
             target.delete();
         }
-        FileHelper.copy(stream, target.toPath(), (input, output) -> {
-            log.info("Downloaded : {} bytes from input {} bytes", output.getBytesWritten(), input.getBytesRead());
-        });
+
+        FileHelper.copy(stream, target.toPath(), (input, output) -> log.info("Downloaded : {} ", FileHelper.bytesToKB(output.getBytesWritten())));
+
         log.info("Saved {} (size: {} bytes)", target.getName(), target.length());
         return target.getAbsolutePath();
     }
@@ -65,9 +65,7 @@ public class SimpleStorageService {
                 ZipArchiveEntry entry = entries.nextElement();
 
                 long bytes = FileHelper.copy(zipFile.getInputStream(entry), new File(dir, entry.getName()).toPath(),
-                        (input, output) -> {
-                            log.info("Extracted : {} bytes from input {} bytes", output.getBytesWritten(), input.getBytesRead());
-                        });
+                        (input, output) -> log.info("Extracted : {}", FileHelper.bytesToKB(output.getBytesWritten())));
                 if (bytes == entry.getSize()) {
                     log.info("Extracted : {}, size {} bytes", entry.getName(), entry.getSize());
                 } else {

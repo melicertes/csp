@@ -5,8 +5,10 @@ import com.intrasoft.csp.conf.clientcspapp.ConfClientCspApplication;
 import com.intrasoft.csp.conf.clientcspapp.model.*;
 import com.intrasoft.csp.conf.clientcspapp.repo.SystemInstallationStateRepository;
 import com.intrasoft.csp.conf.clientcspapp.repo.SystemModuleRepository;
+import com.intrasoft.csp.conf.clientcspapp.repo.SystemServiceRepository;
 import com.intrasoft.csp.conf.clientcspapp.service.ExternalProcessService;
 import com.intrasoft.csp.conf.clientcspapp.service.InstallationService;
+import com.intrasoft.csp.conf.clientcspapp.util.FileHelper;
 import com.intrasoft.csp.conf.clientcspapp.util.TimeHelper;
 import com.intrasoft.csp.conf.commons.model.api.RegistrationDTO;
 import lombok.extern.slf4j.Slf4j;
@@ -17,11 +19,13 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Sort;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes={ConfClientCspApplication.class}, properties = {"spring.datasource.url=jdbc:h2:mem:testdata;DB_CLOSE_ON_EXIT=FALSE"})
@@ -37,6 +41,9 @@ public class ConfClientApplicationTests {
 	SystemModuleRepository moduleRepository;
 
 	@Autowired
+	SystemServiceRepository serviceRepository;
+
+	@Autowired
 	InstallationService installationService;
 
 	@Autowired
@@ -44,6 +51,9 @@ public class ConfClientApplicationTests {
 
 	@Test
 	public void contextLoads() {
+
+		String kb = FileHelper.bytesToKB(949494948);
+		System.out.println("KB = " + kb);
 	}
 
 	@Test
@@ -122,10 +132,40 @@ public class ConfClientApplicationTests {
 		Assert.assertEquals("hash should be same", found.getHash(), "hash");
 
 
-		Assert.assertEquals("version should be the same", installationService.findModuleInstalledActiveVersion(mod.getName()), mod.getVersion());
+		Assert.assertEquals("version should be the same", installationService.queryModuleInstalledActiveVersion(mod.getName()), mod.getVersion());
 
-		Assert.assertNull("should not be installed", installationService.findModuleInstalledActiveVersion("dummymodule"));
+		Assert.assertNull("should not be installed", installationService.queryModuleInstalledActiveVersion("dummymodule"));
 
+
+	}
+
+
+	@Test
+	@Transactional
+	public void testSystemModuleServices() throws Exception {
+
+		SystemModule m1 = new SystemModule(null, "module1","descr1",new LocalDateTime(), true, "1.0.000", "","",ModuleState.INSTALLED,"hash1",100);
+		SystemModule m2 = new SystemModule(null, "module2","descr2",new LocalDateTime(), true, "1.0.000", "","",ModuleState.INSTALLED,"hash2",101);
+
+
+		moduleRepository.save(m1);
+		moduleRepository.save(m2);
+
+
+		SystemService s1 = new SystemService(null,"module1", ServiceState.NOT_RUNNING, moduleRepository.findOneByHash("hash1"),true);
+
+		SystemService s2 = new SystemService(null,"module2", ServiceState.NOT_RUNNING, moduleRepository.findOneByHash("hash2"),true);
+
+		serviceRepository.save(s1);
+		serviceRepository.save(s2);
+
+		List<SystemService> list = serviceRepository.findAll(new Sort(Sort.Direction.ASC, "module.startPriority"));
+
+		log.info("Found {}",list.stream().map( s -> s.getModule().getStartPriority()).collect(Collectors.toList()));
+		Assert.assertTrue("should be 100", list.get(0).getModule().getStartPriority() == 100);
+		list = serviceRepository.findAll(new Sort(Sort.Direction.DESC, "module.startPriority"));
+		log.info("Found {}",list.stream().map( s -> s.getModule().getStartPriority()).collect(Collectors.toList()));
+		Assert.assertTrue("should be 101", list.get(0).getModule().getStartPriority() == 101);
 
 	}
 }

@@ -17,6 +17,12 @@ import java.util.Arrays;
 public final class FileHelper {
 
     static final int BUFFER_SIZE=64*1024;
+    static final int CALLBACK_SIZE=10*1024*1024; // every 10 MB downloaded
+
+
+    public static String bytesToKB(long bytesWritten) {
+        return ((int) (bytesWritten/1024.0) ) + "KB";
+    }
 
     /**
      * callback to implement status updates for long copy operations
@@ -42,11 +48,12 @@ public final class FileHelper {
             while ((n = input.read(buf)) > 0) {
                 output.write(buf, 0, n);
                 nread += n;
-                if (nread - lastWrite > BUFFER_SIZE*10) {
-                    if (callBack != null)
+
+                if (callBack != null) // check and callback for progress
+                    if (nread - lastWrite > CALLBACK_SIZE) {
                         callBack.callback(input,output);
-                    lastWrite = nread;
-                }
+                        lastWrite = nread;
+                    }
             }
             output.flush();
             if (callBack != null) { // final callback before closing of streams

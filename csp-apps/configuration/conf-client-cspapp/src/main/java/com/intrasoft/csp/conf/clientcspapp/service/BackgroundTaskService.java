@@ -93,7 +93,7 @@ public class BackgroundTaskService {
 
                 ModulesInfoDTO modsInfo = new ModulesInfoDTO();
                 modsInfo.setModules(
-                        installationService.findAllModulesInstalled().stream().map(m -> {
+                        installationService.queryAllModulesInstalled(true).stream().map(m -> {
                             ModuleInfoDTO info = new ModuleInfoDTO();
                             info.setName(m.getName());
 
@@ -274,7 +274,7 @@ public class BackgroundTaskService {
     public void scheduleInstall(SystemModule module) {
         addTask(() -> {
             //extract module to destination location
-            final File moduleDir = new File(modulesDirectory, module.getName());
+            final File moduleDir = new File(modulesDirectory, module.getName() + module.getHash().substring(0,12));
 
             try {
                 if (module.getActive() == false && moduleDir.exists()) {
@@ -296,6 +296,13 @@ public class BackgroundTaskService {
                 // b. copy .env from homedir to the module dir
                 copyEnvironment(moduleInstallDirectory);
                 // c. execute any first-time.sh found
+                if (installationService.moduleContains(module, "first-time.sh")) {
+                    log.info("First time init script detected. Will launch for module {}",module.getName());
+                    final BackgroundTaskResult<Boolean, Integer> result = executeScriptSimple("exec_first-time.sh", null);
+                    if (result.getSuccess() == false) {
+                        log.error("Failed execution detected on first-time.sh script - *WILL PROCEED* WITH INSTALLATION!");
+                    }
+                }
 
                 // d. set module to INSTALLED + ACTIVE = TRUE
                 module.setActive(true);
@@ -356,24 +363,106 @@ public class BackgroundTaskService {
 
     public void scheduleStartActiveModules() {
         addTask(() -> {
-            // TODO implement start active modules
             // for every active module, sort by priority
 
-            // execute start action
+            final List<BackgroundTaskResult<Boolean, Integer>> results = installationService.queryAllModulesInstalled(true).stream().map(module -> {
+                SystemService service = installationService.queryService(module);
+                if (service.getStartable() == true) {
+                    if (service.getServiceState() == ServiceState.NOT_RUNNING) {
+                        log.info("About to start service {} with start priority {}", service.getName(), module.getStartPriority());
+                        Map<String, String> env = new HashMap<String, String>();
+                        env.put("SERVICE_NAME", module.getName());
+                        env.put("SERVICE_DIR", module.getModulePath());
+                        env.put("SERVICE_PRIO", module.getStartPriority().toString());
+                        try {
+                            BackgroundTaskResult<Boolean, Integer> result = executeScriptSimple("startService.sh", env);
+                            if (result.getSuccess() == true) {
+                                service = installationService.updateServiceState(service, ServiceState.RUNNING);
+                                if (installationService.moduleContains(module, "proc_ready.source")) {
+                                    result = executeAdvancedStartMonitor(module);
+                                }
+                            } else {
+                                log.error("Executing the start script was not successful for service {}", module.getName());
+                            }
 
-            return new BackgroundTaskResult<>(false, -1);
+                            // set the name
+                            result.setModuleName(module.getName());
+
+                            return result == null ? new BackgroundTaskResult<>(false, -1000, module.getName()) : result;
+                        } catch (IOException e) {
+                            log.error("Failed to start {} with start priority {}", service.getName(), module.getStartPriority());
+                            log.error("Exception was {}", e.getMessage(), e);
+                            service = installationService.updateServiceState(service, ServiceState.NOT_RUNNING);
+                        }
+
+                        return new BackgroundTaskResult<Boolean, Integer>(false, -100, module.getName());
+                    } else {
+                        log.warn("Service {} is marked running!??? No action", service.getName());
+                    }
+                    log.info("Service {} state {}", service.getName(), service.getServiceState());
+                } else {
+                    log.info("Service {} is not a startable service, moving on");
+                }
+                return new BackgroundTaskResult<Boolean, Integer>(true, 0, module.getName());
+            }).distinct().collect(Collectors.toList());
+
+            final BackgroundTaskResult<Boolean,Integer> finalResult = new BackgroundTaskResult<Boolean, Integer>(true,0,"all");
+            results.stream().filter( r -> r.getSuccess() == false).forEach(failed -> {
+                log.error("Service {} failed to start, error code {}", failed.getModuleName(), failed.getErrorCode());
+                if (finalResult.getSuccess() == true) {
+                    finalResult.setSuccess(false);
+                }
+            });
+            return finalResult;
         });
     }
 
+    /**
+     * execute the advanced start monitor process
+     * @param module
+     */
+    private BackgroundTaskResult<Boolean, Integer> executeAdvancedStartMonitor(SystemModule module) throws IOException {
+
+        log.info("Monitoring the module startup process...");
+        Map<String,String> env = new HashMap<String, String>();
+        env.put("SERVICE_NAME", module.getName());
+        env.put("SERVICE_DIR", module.getModulePath());
+        env.put("SERVICE_PRIO", module.getStartPriority().toString());
+
+        return executeScriptSimple("startModuleMonitor.sh", env);
+    }
+
+
     public void scheduleStopActiveModules() {
         addTask(() -> {
-            // TODO implement stop active modules
-
-            // for every active module, sort by priority reversed
-
-            // execute start action
-
-            return new BackgroundTaskResult<>(false, -1);
+            // for every active module, sort by priority
+            installationService.queryAllModulesInstalled(false).forEach(module -> {
+                SystemService service = installationService.queryService(module);
+                if (service.getStartable() == true) {
+                    if (service.getServiceState() == ServiceState.RUNNING) {
+                        log.info("About to stop service {} with start priority {}", service.getName(), module.getStartPriority());
+                        Map<String,String> env = new HashMap<String, String>();
+                        env.put("SERVICE_NAME", module.getName());
+                        env.put("SERVICE_DIR", module.getModulePath());
+                        env.put("SERVICE_PRIO", module.getStartPriority().toString());
+                        try {
+                            //TODO handle stop return value
+                            executeScriptSimple("stopService.sh", env);
+                            service = installationService.updateServiceState(service,ServiceState.NOT_RUNNING);
+                        } catch (IOException e) {
+                            log.error("Failed to start {} with start priority {}", service.getName(), module.getStartPriority());
+                            log.error("Exception was {}",e.getMessage(),e);
+                            service = installationService.updateServiceState(service,ServiceState.RUNNING);
+                        }
+                    } else {
+                        log.warn("Service {} is marked NOT running!???", service.getName());
+                    }
+                    log.info("Service {} state {}", service.getName(), service.getServiceState());
+                } else {
+                    log.info("Service {} is not a startable service, moving on");
+                }
+            });
+            return new BackgroundTaskResult<>(true, 0);
         });
     }
 
@@ -413,6 +502,9 @@ public class BackgroundTaskService {
         //scriptname is full path, we only need the name
         String target = new File(scriptName).getName();
         final File targetFile = new File(targetDirectory, target);
+        if (targetFile.exists()) {
+            targetFile.delete();
+        }
         log.info("Extracting {} to {}",scriptName, targetFile.getAbsolutePath());
         long total = FileHelper.copy(script.getInputStream(), targetFile.toPath(), null, StandardCopyOption.REPLACE_EXISTING);
         return targetFile.getAbsolutePath();

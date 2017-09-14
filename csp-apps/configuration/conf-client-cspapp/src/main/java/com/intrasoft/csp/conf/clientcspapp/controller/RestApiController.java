@@ -141,6 +141,25 @@ public class RestApiController implements ContextUrl, ApiContextUrl {
         return new ResponseEntity<>(status, HttpStatus.OK);
     }
 
+
+
+
+    @RequestMapping(value = REST_MODULESERVICES + "/{cspId}",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public List<ServiceRow> services(@PathVariable String cspId) {
+
+
+        return installService.queryCspServices(cspId).stream().map(s -> ServiceRow.builder()
+                .name(s.getName())
+                .startable(s.getStartable())
+                .startPriority(s.getModule().getStartPriority())
+                .currentState(s.getServiceState().toString())
+                .version(s.getModule().getVersion()).build()).collect(Collectors.toList());
+
+    }
+
+
     @RequestMapping(value = REST_UPDATESFOUND + "/{cspId}",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
@@ -153,7 +172,7 @@ public class RestApiController implements ContextUrl, ApiContextUrl {
             List<UpdateVersion> list = cspUpdates.getAvailable().values().stream()
                     .flatMap(m -> m.stream())
                     .map( mod -> {
-                        final String versionInstalled = installService.findModuleInstalledActiveVersion(mod.getName());
+                        final String versionInstalled = installService.queryModuleInstalledActiveVersion(mod.getName());
 
                         SystemModule module = installService.findModuleByHash(mod.getHash());
                         StringBuilder actions = new StringBuilder();
@@ -166,6 +185,7 @@ public class RestApiController implements ContextUrl, ApiContextUrl {
                                     .active(false)
                                     .hash(mod.getHash())
                                     .version(mod.getVersion())
+                                    .startPriority(mod.getStartPriority())
                                     .build();
 
                             module = installService.saveSystemModule(module);

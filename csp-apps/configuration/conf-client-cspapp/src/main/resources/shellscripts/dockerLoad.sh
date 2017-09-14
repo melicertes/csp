@@ -1,11 +1,18 @@
-#!/bin/sh
+#!/bin/bash
 
-echo "TAR_FILE=$TAR_FILE"
+echo "ARCHIVE_FILE=$ARCHIVE_FILE"
 echo "WORK_DIR=$WORK_DIR"
 
 CWD=$(pwd)
 cd "$WORK_DIR"
-docker load -i "$TAR_FILE"
-RET=$?
+
+if [[ "$ARCHIVE_FILE" == *.tar.bz2 ]] ;
+then
+    bzcat "$ARCHIVE_FILE" | docker load
+    RET=$?
+else
+    cat "$ARCHIVE_FILE " | docker load
+    RET=$?
+fi
 cd "$CWD"
 exit $?

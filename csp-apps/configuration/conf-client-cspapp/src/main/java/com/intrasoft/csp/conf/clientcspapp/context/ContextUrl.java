@@ -16,6 +16,7 @@ public interface ContextUrl {
     String REST_LOG = "/log";
     String REST_DASHSTATUS = "/dstat";
     String REST_UPDATESFOUND = "/updates";
+    String REST_MODULESERVICES = "/services";
 
     String PAGE_DOWNLOADMODULE = "/downloadModule";
     String PAGE_INSTALLMODULE = "/installModule";

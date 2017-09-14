@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # generates internal certificate and CA
 # if found, it will remove it and recreate

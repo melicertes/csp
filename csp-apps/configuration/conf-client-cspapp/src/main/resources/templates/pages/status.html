@@ -19,20 +19,20 @@
 
     <div class="row">
         <div class="col-md-12">
-            <h2 class="page-header"><i class="fa fa-history fa-2x"></i> Update status</h2>
+            <h2 class="page-header"><i class="fa fa-history fa-2x"></i> System Log</h2>
         </div>
     </div>
 
     <div class="row">
         <div class="col-md-12" style="text-align: right">
-            <!--<a th:href="${updatesUrl}" class="save btn btn-default">Return to updates list</a>-->
+
         </div>
     </div>
 
     <div class="row">
         <div class="col-md-6">
             <div style="padding-top: 5px;">
-                Currently updating "<span th:text="${moduleName}"></span>" from version <span th:text="${moduleVersionFrom}"></span> to version <span th:text="${moduleVersionTo}"></span>
+                <a th:href="${updatesUrl}" class="save btn btn-default">Return to updates list</a>
             </div>
         </div>
         <div class="col-md-6">
