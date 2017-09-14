@@ -174,6 +174,11 @@ public class TcProcessor implements Processor,CamelRoutes{
     }
 
 
+    public List<Team>  getTeamsByTrustCircleIdFlow1(String tcId) throws IOException {
+        String uri = this.getTcCirclesURI() + "/" + tcId;
+        return getTcTeamsByArg(uri,true);
+    }
+
     public List<Team> getTcTeamsFlow1(IntegrationDataType integrationDataType) throws IOException {
         String uri = getTcUri(integrationDataType);
         List<Team> teams = getTcTeamsByArg(uri,true);
