@@ -11,7 +11,7 @@ then
     bzcat "$ARCHIVE_FILE" | docker load
     RET=$?
 else
-    cat "$ARCHIVE_FILE " | docker load
+    cat "$ARCHIVE_FILE" | docker load
     RET=$?
 fi
 cd "$CWD"

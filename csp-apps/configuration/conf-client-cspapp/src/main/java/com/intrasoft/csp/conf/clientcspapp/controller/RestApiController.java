@@ -150,7 +150,7 @@ public class RestApiController implements ContextUrl, ApiContextUrl {
     public List<ServiceRow> services(@PathVariable String cspId) {
 
 
-        return installService.queryCspServices(cspId).stream().map(s -> ServiceRow.builder()
+        return installService.queryCspServices().stream().map(s -> ServiceRow.builder()
                 .name(s.getName())
                 .startable(s.getStartable())
                 .startPriority(s.getModule().getStartPriority())
@@ -174,7 +174,7 @@ public class RestApiController implements ContextUrl, ApiContextUrl {
                     .map( mod -> {
                         final String versionInstalled = installService.queryModuleInstalledActiveVersion(mod.getName());
 
-                        SystemModule module = installService.findModuleByHash(mod.getHash());
+                        SystemModule module = installService.queryModuleByHash(mod.getHash());
                         StringBuilder actions = new StringBuilder();
 
                         if (module == null) { // unknown module! lets "initialize"
@@ -204,12 +204,21 @@ public class RestApiController implements ContextUrl, ApiContextUrl {
                                 );
                                 break;
                             case DOWNLOADED:
-                                actions.append(
-                                        "&nbsp;<a class=\"btn btn-xs btn-success\" title=\"Install " + module.getName() + "\" href=\"" + PAGE_INSTALLMODULE + "/" + module.getHash() + "\"><i class=\"fa fa-cogs\"></i></a>"
-                                );
-                                actions.append(
-                                        "&nbsp;<a class=\"btn btn-xs btn-danger\" title=\"Delete " + module.getName() + "\" href=\"" + PAGE_DELETEMODULE + "/" + module.getHash() + "\"><i class=\"fa fa-trash\"></i></a>"
-                                );
+                                // check services are not running!
+                                final List<SystemService> services = installService.queryCspServices().stream().filter(s -> s.getStartable()).collect(Collectors.toList());
+                                long running =  services.stream().filter(s -> s.getServiceState() == ServiceState.RUNNING).count();
+                                if (running == 0) {
+                                    actions.append(
+                                            "&nbsp;<a class=\"btn btn-xs btn-success\" title=\"Install " + module.getName() + "\" href=\"" + PAGE_INSTALLMODULE + "/" + module.getHash() + "\"><i class=\"fa fa-cogs\"></i></a>"
+                                    );
+                                    actions.append(
+                                            "&nbsp;<a class=\"btn btn-xs btn-danger\" title=\"Delete " + module.getName() + "\" href=\"" + PAGE_DELETEMODULE + "/" + module.getHash() + "\"><i class=\"fa fa-trash\"></i></a>"
+                                    );
+                                } else {
+                                    log.warn("Cannot allow installations because there are {} services running",running);
+                                    actions.append(
+                                            "&nbsp;Install not possible; System is running!");
+                                }
                                 break;
                             case INSTALLED:
                                 actions.append(

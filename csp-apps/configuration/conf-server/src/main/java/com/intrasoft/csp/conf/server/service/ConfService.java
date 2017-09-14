@@ -296,7 +296,7 @@ public class ConfService implements ApiContextUrl, Configuration {
                 throw new InvalidModuleNameException(StatusResponseType.API_INVALID_MODULE_NAME.text());
             }
 
-            String fullNameReported = moduleInfo.getAdditionalProperties().getFullName();
+            String fullNameReported = moduleInfo.getAdditionalProperties().getFullName().replace(":", "");
             String versionReportedS = fullNameReported.replace(module.getName(), "");
             Integer versionReportedI;
             //check mistyped json, version from fullname and version mismatch

@@ -4,7 +4,7 @@ echo "SERVICE_NAME=$SERVICE_NAME"
 echo "SERVICE_DIR=$SERVICE_DIR"
 echo "SERVICE_PRIO=$SERVICE_PRIO"
 
-echo "Starting $SERVICE_NAME"
+echo "Stopping $SERVICE_NAME"
 
 CWD=$(pwd)
 cd "$SERVICE_DIR"

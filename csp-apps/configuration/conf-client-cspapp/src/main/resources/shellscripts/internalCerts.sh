@@ -5,8 +5,9 @@
 # happens in /opt/csp/internalCerts
 function generateInternal() {
         echo "CSPNAME   = $CSPNAME"
-	echo "CSPDOMAIN = $CSPDOMAIN"
-        
+	    echo "CSPDOMAIN = $CSPDOMAIN"
+        mkdir -p /etc/cspinst
+
         [[ -e "/etc/cspinst/.seedkey" ]] && local seed=$(cat /etc/cspinst/.seedkey)
         if [[ -z $seed ]]; then
                 echo "Generating seed..."
@@ -59,6 +60,9 @@ function generateInternal() {
         docker run --rm -v "$(pwd)":/mnt --workdir /mnt frolvlad/alpine-oraclejdk8:slim sh -c "$CMD"
         verifyRetCode $?
 
+        mkdir -p /opt/csp/apache2/ssl/ca
+        mkdir -p /opt/csp/apache2/ssl/server
+
         cp internalCA.crt /opt/csp/apache2/ssl/ca/common-internal-ca.crt
         cp internal.server.p12 /opt/csp/apache2/ssl/server/csp-internal.p12
         cp internal.server.jks /opt/csp/apache2/ssl/server/csp-internal.jks
@@ -79,12 +83,15 @@ function generateInternal() {
 }
 
 function verifyRetCode() {
-        if [[ $1 != 0 ]]; then
-                __msg crit "an OpenSSL process has returned a non-zero code. This is probably a failure"
-        fi
-        __msg debug "Returned code $1"
-        SUMCODES=$(( $SUMCODES + $1 ))
-        return 0
+
+    if [[ $1 != 0 ]]; then
+        echo "an OpenSSL process has returned a non-zero code. This is probably a failure"
+    fi
+    echo "Returned code $1"
+    SUMCODES=$(( $SUMCODES + $1 ))
+    return 0
+
+
 }
 
 

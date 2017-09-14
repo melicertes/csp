@@ -1,5 +1,7 @@
 package com.intrasoft.csp.conf.clientcspapp.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.intrasoft.csp.conf.client.ConfClient;
 import com.intrasoft.csp.conf.clientcspapp.model.*;
 import com.intrasoft.csp.conf.clientcspapp.util.FileHelper;
@@ -23,6 +25,7 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -85,33 +88,41 @@ public class BackgroundTaskService {
 
         if (state.getInstallationState() != InstallationState.NOT_STARTED &&
                 internetAvailable) {
+            final AppInfoDTO appInfo = new AppInfoDTO();
+
             try {
                 log.info("HEARTBEAT enabled and internet connectivity verified. Will try to connect");
-                AppInfoDTO appInfo = new AppInfoDTO();
                 appInfo.setName(state.getCspRegistration().getName());
                 appInfo.setRecordDateTime(TimeHelper.isoNow());
 
                 ModulesInfoDTO modsInfo = new ModulesInfoDTO();
                 modsInfo.setModules(
-                        installationService.queryAllModulesInstalled(true).stream().map(m -> {
-                            ModuleInfoDTO info = new ModuleInfoDTO();
-                            info.setName(m.getName());
+                        installationService.queryModulesAsServicesInstalled().stream()
+                            .map(m -> {
+                                ModuleInfoDTO info = new ModuleInfoDTO();
+                                info.setName(m.getName());
 
-                            ModuleDataDTO data = new ModuleDataDTO();
-                            data.setActive(m.getActive());
-                            data.setFullName(m.getName());
-                            data.setHash(m.getHash());
-                            data.setInstalledOn(TimeHelper.isoFormat(m.getInstallDate()));
-                            data.setStartPriority(m.getStartPriority());
-                            data.setVersion(VersionParser.fromString(m.getVersion()));
-                            info.setAdditionalProperties(data);
-                            return info;
-                        }).collect(Collectors.toList())
+                                ModuleDataDTO data = new ModuleDataDTO();
+                                data.setActive(m.getActive());
+                                data.setFullName(m.getName()+ ":" + m.getVersion());
+                                data.setHash(m.getHash());
+                                data.setInstalledOn(TimeHelper.isoFormat(m.getInstallDate()));
+                                data.setStartPriority(m.getStartPriority());
+                                data.setVersion(VersionParser.fromString(m.getVersion()));
+                                info.setAdditionalProperties(data);
+                                return info;
+                            })
+                            .collect(Collectors.toList())
                 );
                 appInfo.setModuleInfo(modsInfo);
                 final ResponseDTO resp = client.appInfo(state.getCspId(), appInfo);
                 log.info("HEARTBEAT sent to CENTRAL, response was {} - {}", resp.getResponseText(), resp.getResponseCode());
             } catch (Exception e) {
+                try {
+                    log.info("/api/appinfo JSON Payload {}", new ObjectMapper().writeValueAsString(appInfo));
+                } catch (JsonProcessingException e1) {
+                    //e1.printStackTrace();
+                }
                 log.error("HEARTBEAT was not sent to CENTRAL, issue was {}",e.getMessage(),e);
             }
         }
@@ -248,7 +259,7 @@ public class BackgroundTaskService {
                 env.put("SITESC", cspSitesFile);
                 env.put("INT_IP", state.getCspRegistration().getInternalIPs().get(0));
 
-                if (smtp != null) {
+                if (smtp != null && smtp.getPort()!=null) {
                     env.put("MAIL_HOST", smtp.getHost());
                     env.put("MAIL_PORT", smtp.getPort().toString());
                     env.put("MAIL_USERNAME", smtp.getUserName());
@@ -298,7 +309,16 @@ public class BackgroundTaskService {
                 // c. execute any first-time.sh found
                 if (installationService.moduleContains(module, "first-time.sh")) {
                     log.info("First time init script detected. Will launch for module {}",module.getName());
-                    final BackgroundTaskResult<Boolean, Integer> result = executeScriptSimple("exec_first-time.sh", null);
+                    File firstTime = new File(moduleInstallDirectory, "first-time.sh");
+                    if (firstTime.exists()) {
+                        firstTime.setExecutable(true,true);
+                    } else {
+                        log.error("First time file {}  was not found although present in module {} !", firstTime.getAbsolutePath(), module.getName());
+                    }
+
+                    Map<String,String> env = new HashMap<>();
+                    env.put("DIR", moduleInstallDirectory);
+                    final BackgroundTaskResult<Boolean, Integer> result = executeScriptSimple("exec_first-time.sh", env);
                     if (result.getSuccess() == false) {
                         log.error("Failed execution detected on first-time.sh script - *WILL PROCEED* WITH INSTALLATION!");
                     }
@@ -340,6 +360,7 @@ public class BackgroundTaskService {
     public void scheduleReInstall(SystemModule module) {
         addTask(() -> {
             // the tasks below will happen in sequence:
+            log.info("Re-install scheduling a DELETE with an INSTALL afterwards...");
             scheduleDelete(module);
             scheduleInstall(module);
             return new BackgroundTaskResult<>(false, -1);
@@ -349,13 +370,19 @@ public class BackgroundTaskService {
 
     public void scheduleDelete(SystemModule module) {
         addTask(() -> {
-            // TODO implement delete module
-            // stop module ? check if module is now running!
+            // TODO check if module is running before delete
 
-            // remove module directory
-
-            // set module to DOWNLOADED + ACTIVE = FALSE
-
+            try {
+                storageService.deleteDirectoryAndContents(module.getModulePath());
+                module.setModuleState(ModuleState.DOWNLOADED);
+                module.setActive(false);
+                final SystemService service = installationService.queryService(module);
+                installationService.removeService(service);
+                log.info("Module {} has been removed and service deleted", module.getName());
+                return new BackgroundTaskResult<>(true, 0);
+            } catch (IOException e) {
+                log.error("Exception removing module {} with error {}",module.getName(), e.getMessage(),e);
+            }
             return new BackgroundTaskResult<>(false, -1);
         });
     }
@@ -401,7 +428,7 @@ public class BackgroundTaskService {
                     }
                     log.info("Service {} state {}", service.getName(), service.getServiceState());
                 } else {
-                    log.info("Service {} is not a startable service, moving on");
+                    log.info("Service {} is not a startable service, moving on", service.getName());
                 }
                 return new BackgroundTaskResult<Boolean, Integer>(true, 0, module.getName());
             }).distinct().collect(Collectors.toList());

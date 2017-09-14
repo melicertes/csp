@@ -26,8 +26,8 @@
     <div class="row">
         <div class="col-md-12">
             <div id="toolbar" class="btn-group pull-right">
-                <a href="#" id="start" class="btn btn-success"><i class="fa fa-play fa-2"></i> Start</a>
-                <a href="#" id="stop" class="btn btn-danger"><i class="fa fa-stop fa-2"></i> Stop</a>
+                <a href="#" th:href="${canStart ? startUrl : '#'}" id="start" class="btn btn-success" th:disabled="${!canStart}"><i class="fa fa-play fa-2"></i> Start</a>
+                <a href="#" th:href="${canStop ? stopUrl : '#' }" id="stop" class="btn btn-danger" th:disabled="${!canStop}"><i class="fa fa-stop fa-2"></i> Stop</a>
             </div>
             <table id="updates-table"
                    data-toggle="table"
@@ -64,8 +64,7 @@
 
 <script th:inline="javascript">
     /*<![CDATA[*/
-    var systemCanStart = [[${canStart}]];
-    var systemCanStop = !systemCanStart;
+
     /*]]>*/
 </script>
 

@@ -27,7 +27,7 @@ public class SystemService {
     @Column(columnDefinition = "VARCHAR(16)")
     ServiceState serviceState;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     SystemModule module;
 
     @Column(columnDefinition = "SMALLINT")
