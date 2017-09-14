@@ -152,9 +152,9 @@ public class RestApiController implements ContextUrl, ApiContextUrl {
 
         return installService.queryCspServices().stream().map(s -> ServiceRow.builder()
                 .name(s.getName())
-                .startable(s.getStartable())
+                .startable(s.getStartable() ? "Yes" : "No")
                 .startPriority(s.getModule().getStartPriority())
-                .currentState(s.getServiceState().toString())
+                .currentState(s.getServiceState() == ServiceState.NOT_RUNNING ? "Stopped" : "Running")
                 .version(s.getModule().getVersion()).build()).collect(Collectors.toList());
 
     }

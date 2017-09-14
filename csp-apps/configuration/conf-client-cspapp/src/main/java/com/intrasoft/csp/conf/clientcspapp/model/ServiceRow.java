@@ -14,7 +14,7 @@ import lombok.*;
 public class ServiceRow {
     String name;
     String currentState;
-    Boolean startable;
+    String startable;
     Integer startPriority;
 
     String version;
