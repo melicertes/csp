@@ -2,9 +2,12 @@ package com.intrasoft.csp.conf.clientcspapp.controller;
 
 
 import com.intrasoft.csp.conf.clientcspapp.context.ContextUrl;
+import com.intrasoft.csp.conf.clientcspapp.model.ServiceState;
+import com.intrasoft.csp.conf.clientcspapp.model.SystemService;
 import com.intrasoft.csp.conf.clientcspapp.service.BackgroundTaskService;
 import com.intrasoft.csp.conf.clientcspapp.service.InstallationService;
 import com.intrasoft.csp.conf.commons.types.ContactType;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
@@ -15,9 +18,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Controller
+@Slf4j
 public class PagesController implements ContextUrl {
 
     @Value("${client.ui.jiralink}")
@@ -100,9 +106,21 @@ public class PagesController implements ContextUrl {
         model.addAttribute("navSystemClassActive", "active");
         final String cspId = installService.getState().getCspId();
         if (cspId != null) {
+
+            final List<SystemService> services = installService.queryCspServices().stream().filter(s -> s.getStartable()).collect(Collectors.toList());
+
+            long notRunning =  services.stream().filter(s -> s.getServiceState() == ServiceState.NOT_RUNNING).count();
+            long running =  services.stream().filter(s -> s.getServiceState() == ServiceState.RUNNING).count();
+
+            log.info("Services RUNNING {} / NOT RUNNING {}", running, notRunning);
+
             model.addAttribute("systemRetrieveUrl", REST_MODULESERVICES + "/" + cspId);
-            //todo queryservice?
-            //installService.queryService()
+            model.addAttribute("canStart", notRunning >= 0 && running == 0);
+            model.addAttribute("canStop", running > 0);
+
+            model.addAttribute("startUrl", PAGE_STARTMODULES + "/" + cspId);
+            model.addAttribute("stopUrl", PAGE_STOPMODULES + "/" + cspId);
+
         }
         return new ModelAndView("pages/system", "system", model);
     }
@@ -131,27 +149,27 @@ public class PagesController implements ContextUrl {
 
     @RequestMapping(value = PAGE_DOWNLOADMODULE + "/{hash}", method = RequestMethod.GET)
     public String downloadModule(@PathVariable String hash) {
-        backgroundTaskService.scheduleDownload(installService.findModuleByHash(hash));
+        backgroundTaskService.scheduleDownload(installService.queryModuleByHash(hash));
         return "redirect:"+PAGE_STATUS;
     }
 
 
     @RequestMapping(value = PAGE_INSTALLMODULE + "/{hash}", method = RequestMethod.GET)
     public String installModule(@PathVariable String hash) {
-        backgroundTaskService.scheduleInstall(installService.findModuleByHash(hash));
+        backgroundTaskService.scheduleInstall(installService.queryModuleByHash(hash));
         return "redirect:"+PAGE_STATUS;
     }
 
 
     @RequestMapping(value = PAGE_REINSTALLMODULE + "/{hash}", method = RequestMethod.GET)
     public String reInstallModule(@PathVariable String hash) {
-        backgroundTaskService.scheduleReInstall(installService.findModuleByHash(hash));
+        backgroundTaskService.scheduleReInstall(installService.queryModuleByHash(hash));
         return "redirect:"+PAGE_STATUS;
     }
 
     @RequestMapping(value = PAGE_DELETEMODULE + "/{hash}", method = RequestMethod.GET)
     public String deleteModule(@PathVariable String hash) {
-        backgroundTaskService.scheduleDelete(installService.findModuleByHash(hash));
+        backgroundTaskService.scheduleDelete(installService.queryModuleByHash(hash));
         return "redirect:"+PAGE_STATUS;
     }
 

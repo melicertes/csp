@@ -11,13 +11,13 @@ import com.intrasoft.csp.conf.commons.model.api.UpdateInformationDTO;
 import com.intrasoft.csp.conf.commons.types.StatusResponseType;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -109,7 +109,7 @@ public class InstallationService {
         return moduleRepository.save(module);
     }
 
-    public SystemModule findModuleByHash(String hash) {
+    public SystemModule queryModuleByHash(String hash) {
         SystemModule module = moduleRepository.findOneByHash(hash);
         if (module != null) {
             log.info("Module {} retrieved!", module);
@@ -245,8 +245,20 @@ public class InstallationService {
         return serviceRepository.save(upd);
     }
 
-    public List<SystemService> queryCspServices(String cspId) {
+    public List<SystemService> queryCspServices() {
         return serviceRepository.findAll(new Sort(Sort.Direction.ASC, "module.startPriority"));
+    }
+
+    public void removeService(SystemService service) {
+        serviceRepository.delete(service.getId());
+    }
+
+    public List<SystemModule> queryModulesAsServicesInstalled() {
+
+        List<SystemModule> modules = new ArrayList<>();
+        serviceRepository.findAll(new Sort(Sort.Direction.ASC,"module.startPriority")).forEach(service -> modules.add(service.getModule()));
+
+        return modules;
     }
 }
 

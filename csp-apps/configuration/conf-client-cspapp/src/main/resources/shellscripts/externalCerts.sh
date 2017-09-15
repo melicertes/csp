@@ -1,19 +1,34 @@
 #!/bin/bash
 
+function verifyRetCode() {
+
+    if [[ $1 != 0 ]]; then
+        echo "an OpenSSL process has returned a non-zero code. This is probably a failure"
+    fi
+    echo "Returned code $1"
+    SUMCODES=$(( $SUMCODES + $1 ))
+    return 0
+
+
+}
+
 function processExternalCerts() {
-	echo "CSPNAME   = $CSPNAME"
-	echo "CSPDOMAIN = $CSPDOMAIN"
-	echo "TMPDIR    = $TMPDIR"
+    	echo "CSPNAME   = $CSPNAME"
+	    echo "CSPDOMAIN = $CSPDOMAIN"
+	    echo "TMPDIR    = $TMPDIR"
 
 
         rm -fr /opt/csp/externalCerts .statefiles
         mkdir -p /opt/csp/externalCerts &>/dev/null
         mv $TMPDIR/ca-bundle.crt /opt/csp/externalCerts &>/dev/null
-        mv $TMPDIR/sslprivate.key /opt/csp/externalCerts &>/dev/null
-        mv $TMPDIR/sslpublic.crt /opt/csp/externalCerts &>/dev/null
+        cp $TMPDIR/sslprivate.key /opt/csp/externalCerts &>/dev/null
+        mv $TMPDIR/sslprivate.key /opt/csp/externalCerts/$CSPNAME.$CSPDOMAIN.key &>/dev/null
+
+        cp $TMPDIR/sslpublic.crt /opt/csp/externalCerts &>/dev/null
+        mv $TMPDIR/sslpublic.crt /opt/csp/externalCerts/$CSPNAME.$CSPDOMAIN.crt &>/dev/null
 
         local counted=$(ls -l /opt/csp/externalCerts |grep -v total | wc -l)
-        if [[ $counted == 3 ]]; then
+        if [[ $counted == 5 ]]; then
                 echo "Files copied correctly"
         else
                 echo "Files not copied correctly or not found in /tmp folder with expected names"

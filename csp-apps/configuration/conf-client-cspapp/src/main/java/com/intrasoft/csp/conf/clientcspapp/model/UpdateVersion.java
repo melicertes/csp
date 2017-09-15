@@ -6,7 +6,7 @@ import lombok.*;
  * Created by tangelatos on 09/09/2017.
  */
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor
-@ToString @EqualsAndHashCode
+@ToString @EqualsAndHashCode(exclude = {"btn"})
 @Builder
 public class UpdateVersion {
 

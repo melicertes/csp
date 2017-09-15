@@ -10,10 +10,10 @@ CWD=$(pwd)
 cd "$SERVICE_DIR"
 
 #make sure the existing container is stopped.
-docker-compose kill &> /dev/null
+/usr/local/bin/docker-compose kill &> /dev/null
 
 #create and start detached
-docker-compose up -d
+/usr/local/bin/docker-compose up -d
 RET=$?
 
 echo "Priority $SERVICE_PRIO"
