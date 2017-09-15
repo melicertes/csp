@@ -106,7 +106,7 @@
                                 <th>Actions</th>
                             </tr>
                             </thead>
-                            <tr th:id="${policy.id}" th:each="policy,iterStat: ${policies}">
+                            <tr th:id="${policy.id}" th:each="policy,iterStat: ${policies}" th:class="${id != null and id == policy.id? 'table-success success':''}">
                                 <!--/*<td th:text="${iterStat.count}"></td>*/-->
                                 <td th:text="${policy.id}"></td>
                                 <td th:text="${policy.integrationDataType}"></td>
