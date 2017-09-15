@@ -15,16 +15,14 @@ import eu.europa.csp.vcbadmin.config.VcbadminProperties;
 
 @SpringBootApplication
 @ComponentScan("eu.europa.csp.vcbadmin")
-@EnableConfigurationProperties({OpenfireProperties.class,VcbadminProperties.class})
-@EntityScan(
-        basePackageClasses = {Application.class, Jsr310JpaConverters.class}
-)
+@EnableConfigurationProperties({ OpenfireProperties.class, VcbadminProperties.class })
+@EntityScan(basePackageClasses = { Application.class, Jsr310JpaConverters.class })
 @EnableScheduling
 @EnableAsync
 public class Application extends WebMvcConfigurerAdapter {
 
-    public static void main(String[] args) throws Throwable {
-        SpringApplication.run(Application.class, args);
-    }
+	public static void main(String[] args) throws Throwable {
+		SpringApplication.run(Application.class, args);
+	}
 
 }
