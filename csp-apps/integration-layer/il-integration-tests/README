@@ -37,8 +37,12 @@ apk --no-cache add curl
 
 curl -v -s -k --key /opt/ssl/server/csp-internal.key --cert /opt/ssl/server/csp-internal.crt -H "Content-Type: application/json" -X POST -d @data.json https://integration.local.demo1-csp.athens.intrasoft-intl.private/v1/dsl/integrationData
 
-curl -v -s -k --key /opt/ssl/server/csp-internal.key --cert /opt/ssl/server/csp-internal.crt https://anon.local.demo1-cs
-p.athens.intrasoft-intl.private/apiversion
+curl -v -s -k --key /opt/ssl/server/csp-internal.key --cert /opt/ssl/server/csp-internal.crt https://anon.local.demo1-csp.athens.intrasoft-intl.private/apiversion
 
-curl -v -s -k --key /opt/ssl/server/csp-internal.key --cert /opt/ssl/server/csp-internal.crt https://anon.local.demo1-cs
-p.athens.intrasoft-intl.private/v1/ruleset/getAll
+curl -v -s -k --key /opt/ssl/server/csp-internal.key --cert /opt/ssl/server/csp-internal.crt https://anon.local.demo1-csp.athens.intrasoft-intl.private/v1/ruleset/getAll
+
+
+scp csp@central-csp:/opt/csp/anon/anon-server-0.2.0-SNAPSHOT-exec.jar anon-server-0.2.0-SNAPSHOT-exec.jar
+
+scp csp@central-csp:/opt/csp/il/il-server-0.2.0-SNAPSHOT-exec.jar il-server-0.2.0-SNAPSHOT-exec.jar
+scp csp@central-csp:/opt/csp/il/integration-tests-0.2.0-SNAPSHOT.jar integration-tests-0.2.0-SNAPSHOT.jar
