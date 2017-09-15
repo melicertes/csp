@@ -52,4 +52,24 @@ function createEnvironment() {
 	return 0
 }
 
+function createDockerVolumes() {
+    ### make a dir here.
+    mkdir -p /opt/csp/logs
+
+    docker volume create SSLDatavolume
+    local R1=$?
+    docker run -d --rm -v SSLDatavolume:/ssl_data -v /opt/csp/apache2/ssl/:/mnt frolvlad/alpine-oraclejdk8:slim sh -c "cp -r /mnt/server /mnt/ca  /ssl_data"
+    local R2=$(( $? + $R1 ))
+
+    return $R2
+}
+
 createEnvironment
+RENV=$?
+createDockerVolumes
+RDOC=$?
+
+echo "Environment $RENV Volumes $RDOC"
+# we need to sum the exit codes to 0 for all to be well.
+RALL=$(( $RDOC + $RENV ))
+exit $RALL
