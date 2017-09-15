@@ -55,6 +55,12 @@ integration-tests-0.2.0-SNAPSHOT.jar \
 com.intrasoft.csp.integration.business.server.internal.CspServerInternalBusinessTestFlow2
 
 
+curl commands on demo1:
+
+curl -v -s -k --key /opt/ssl/server/csp-internal.key --cert /opt/ssl/server/csp-internal.crt -H "Content-Type: application/json" -X POST -d @artefact.json https://integration.local.demo1-csp.athens.intrasoft-intl.private/v1/dsl/integrationData
+
+
+
 
 Demo2:
 ------

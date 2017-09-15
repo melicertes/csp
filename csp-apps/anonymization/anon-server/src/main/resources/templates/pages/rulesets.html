@@ -20,9 +20,9 @@
     <div class="row">
         <div class="col-md-12">
             <h2 class="page-header"><i class="fa fa-gavel"></i> Rulesets
-            <a th:href="'#rulesetHelpModal/'" data-target="#rulesetHelpModal" th:class="pull-right" data-toggle="modal">
-                <i class="fa fa-question-circle-o" aria-hidden="true"></i>
-            </a>
+                <a th:href="'#rulesetHelpModal/'" data-target="#rulesetHelpModal" th:class="pull-right" data-toggle="modal">
+                    <i class="fa fa-question-circle-o" aria-hidden="true"></i>
+                </a>
 
                 <!-- Help Modal -->
                 <div class="modal fade" th:id="'rulesetHelpModal'" aria-labelledby="tiketLabel" tabindex="-1" role="dialog" aria-hidden="true">
@@ -36,49 +36,46 @@
                                 <h4 class="modal-title" th:id="tiketLabel">
                                 </h4>
                                 <small>
-                                <ul><b>field:</b> The field of the dataObject json that should be anonymized.</ul>
-                                <ul><b>action:</b> Two options 1) Anon (******), Pseudo (key based hashing)</ul>
-                                <ul><b>fieldtype:</b> The type of the field to anonymize: available options are
-                                    <ul><b>string</b> anonymized as **********</ul>
-                                    <ul><b>numeric</b> anonymized as ########</ul>
-                                    <ul><b>ip</b> anonymized as ***.***.***.***</ul>
-                                    <ul><b>email</b> anonymized as ****@******.**</ul>
-                                </ul>
-                                <b>NOTE:</b> node arrays are denoted as node[*] <br />
+                                    <ul><b>field:</b> The field of the dataObject json that should be anonymized.</ul>
+                                    <ul><b>action:</b> Two options 1) Anon (******), Pseudo (key based hashing)</ul>
+                                    <ul><b>fieldtype:</b> The type of the field to anonymize: available options are
+                                        <ul><b>string</b> anonymized as **********</ul>
+                                        <ul><b>numeric</b> anonymized as ########</ul>
+                                        <ul><b>ip</b> anonymized as ***.***.***.***</ul>
+                                        <ul><b>email</b> anonymized as ****@******.**</ul>
+                                    </ul>
+                                    <b>NOTE:</b> node arrays are denoted as node[*] <br />
                                     Sample file:
-                                <code>
+                                    <code>
 <pre>
     {
-        "rules": [
-            {
-                "field": "$.trustcircle.short_name",
-                "action": "anon",
-                "fieldtype": "string"
-            },
-            {
-                "field": "$.trustcircle.created",
-                "action": "pseudo",
-                "fieldtype": "string"
-            },
-            {
-                "field": "$.trustcircle.teams[*].description",
-                "action": "anon",
-                "fieldtype": "string"
-            },
-            {
-                "field": "$.trustcircle.teams[*].theip",
-                "action": "anon",
-                "fieldtype": "ip"
-            },
-            {
-                "field": "$.trustcircle.teams[*].theemail",
-                "action": "anon",
-                "fieldtype": "email"
-            }
-        ]
+        {
+  "rules": [
+    {
+      "field": "['response'][*].['Event'].['id']",
+      "action": "anon",
+      "fieldtype": "numeric"
+    },
+    {
+      "field": "['response'][*].['Event'].['info']",
+      "action": "anon",
+      "fieldtype": "string"
+    },
+    {
+      "field": "['response'][*].['Event'].['uuid']",
+      "action": "anon",
+      "fieldtype": "string"
+    },
+    {
+      "field": "['response'][*].['Event'].['disable_correlation']",
+      "action": "anon",
+      "fieldtype": "string"
+    }
+  ]
+}
     }
 </pre>
-                                </code>
+                                    </code>
                                 </small>
                             </div>
                             <div class="modal-footer">
