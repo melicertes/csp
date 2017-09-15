@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments::head(title='Error', description='Resource not found')"></head>
+
+<body>
+
+<nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container" th:fragment="nav">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
+                    aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">
+                <img th:src="@{/assets/img/logo.png}" style="float: left; margin-top: -15px;"/>
+            </a>
+            <span class="navbar-brand" style="">CSP Installation</span>
+
+
+        </div>
+        <ul class="nav navbar-nav">
+            <li><a href="dashboard.html">
+                <i class="fa fa-dashboard"></i> Dashboard</a>
+            </li>
+            <li><a href="install.html">
+                <i class="fa fa-cube"></i> Installation</a>
+            </li>
+            <li><a href="updates.html">
+                <i class="fa fa-download "></i> Updates</a>
+            </li>
+            <li><a href="https://jira.intrasoft-intl.com/" target="_blank">
+                <i class="fa fa-comment-o "></i> Contact Us</a>
+            </li>
+        </ul>
+
+    </div>
+</nav>
+
+<div class="container">
+
+    <div class="row">
+        <div class="col-md-12">
+            <p>&nbsp;</p>
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="col-md-12">
+            <h1 class="page-header"><i class="fa fa-thumbs-o-down"></i> Page not found!</h1>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    The page you requested was not found! Please visit <a href="/">Home Page</a> instead.
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+<th:block th:replace="fragments::scripts"></th:block>
+
+</body>
+
+</html>

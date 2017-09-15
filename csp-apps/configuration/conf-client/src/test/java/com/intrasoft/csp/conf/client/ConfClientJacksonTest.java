@@ -1,6 +1,6 @@
 package com.intrasoft.csp.conf.client;
 
-import com.intrasoft.csp.conf.commons.model.RegistrationDTO;
+import com.intrasoft.csp.conf.commons.model.api.RegistrationDTO;
 import com.intrasoft.csp.conf.commons.types.ContactType;
 import org.apache.commons.io.IOUtils;
 import org.junit.Assert;

@@ -1,7 +1,6 @@
 package eu.europa.csp.vcbadmin.controller;
 
 import java.io.IOException;
-import java.util.Scanner;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,11 +16,10 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import eu.europa.csp.vcbadmin.constants.EmailTemplateType;
-import eu.europa.csp.vcbadmin.model.EmailTemplate;
 import eu.europa.csp.vcbadmin.model.User;
 import eu.europa.csp.vcbadmin.repository.EmailTemplateRepository;
 import eu.europa.csp.vcbadmin.repository.UserRepository;
+import eu.europa.csp.vcbadmin.service.UserDetailsService;
 
 @Controller
 @RequestMapping("/register")
@@ -33,6 +31,9 @@ public class RegisterController {
 	private PasswordEncoder passwordEncoder;
 
 	private EmailTemplateRepository emailTemplateRepository;
+
+	@Autowired
+	UserDetailsService userDetailsService;
 
 	@Autowired
 	public RegisterController(UserRepository userRepository, EmailTemplateRepository emailTemplateRepository,
@@ -57,27 +58,7 @@ public class RegisterController {
 	@PostMapping
 	public String postRegistrationPage(@Validated @ModelAttribute("userForm") User userForm, Model model)
 			throws IOException {
-		userForm.setPassword(passwordEncoder.encode(userForm.getPassword()));
-		log.info("Creating user {}", userForm);
-		User user = userRepository.save(userForm);
-
-		log.debug("Constructing init invitation email for user {}", user.getEmail());
-		EmailTemplate et = new EmailTemplate("Auto-generated Invitation", true);
-		et.setSubject("Invitation: [(${meeting_subject})]");
-		String content = new Scanner(invitationHTML.getInputStream(), "utf-8").useDelimiter("\\Z").next();
-		et.setContent(content);
-		et.setType(EmailTemplateType.INVITATION);
-		et.setUser(user);
-		EmailTemplate invitation = emailTemplateRepository.save(et);
-
-		log.debug("Constructing init cancellation email for user {}", user.getEmail());
-		et = new EmailTemplate("Auto-generated Cancellation", true);
-		et.setSubject("Cancelled: [(${meeting_subject})]");
-		content = new Scanner(cancellationHTML.getInputStream(), "utf-8").useDelimiter("\\Z").next();
-		et.setContent(content);
-		et.setType(EmailTemplateType.CANCELLATION);
-		et.setUser(user);
-		EmailTemplate cancellation = emailTemplateRepository.save(et);
+		userDetailsService.createNewUser(userForm);
 
 		// user.setInvitation(invitation);
 		// user.setCancellation(cancellation);

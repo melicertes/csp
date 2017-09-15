@@ -1,8 +1,6 @@
 package com.intrasoft.csp.conf.integrationtests.sandbox.client;
 
-import com.intrasoft.csp.conf.commons.model.AppInfoDTO;
-import com.intrasoft.csp.conf.commons.model.RegistrationDTO;
-import com.intrasoft.csp.conf.commons.types.ContactType;
+import com.intrasoft.csp.conf.commons.model.api.AppInfoDTO;
 import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
 import org.junit.Test;

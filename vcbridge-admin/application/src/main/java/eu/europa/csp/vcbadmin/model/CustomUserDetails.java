@@ -12,6 +12,7 @@ public class CustomUserDetails extends org.springframework.security.core.userdet
 	private String timezone;
 	private String firstname;
 	private String lastname;
+	private String group;
 
 	public CustomUserDetails(String username, String password, Collection<? extends GrantedAuthority> authorities,
 			String timezone, String firstname, String lastname) {
@@ -43,6 +44,14 @@ public class CustomUserDetails extends org.springframework.security.core.userdet
 
 	public void setLastname(String lastname) {
 		this.lastname = lastname;
+	}
+
+	public String getGroup() {
+		return group;
+	}
+
+	public void setGroup(String group) {
+		this.group = group;
 	}
 
 }

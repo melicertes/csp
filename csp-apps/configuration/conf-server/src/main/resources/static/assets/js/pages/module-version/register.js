@@ -60,10 +60,14 @@ $(document).ready(function(){
     form.submit(function (e) {
         e.preventDefault();
 
+
         if (form.valid()) {
             $('button.save.btn-success').attr('disabled', 'disabled');
             var f = document.getElementById('module-version-form');
             var formData = new FormData(f);
+
+            // save us from double-saving
+            $('button.save.btn-success').prop("disabled", true);
 
             $.ajax({
                 type: 'POST',
@@ -86,7 +90,7 @@ $(document).ready(function(){
                 },
                 error:function (xhr, ajaxOptions, thrownError){
                     $('#result').html('<div class="alert alert-dismissable alert-danger"><a class="close" data-dismiss="alert" href="#" aria-hidden="true">×</a><strong>Error: '+xhr.responseJSON.status+'</strong><br>'+xhr.responseJSON.error+'<br>'+xhr.responseJSON.message+'</div>');
-                    $('button.save.btn-success').removeAttr('disabled');
+                    $('button.save.btn-success').prop("disabled", false);
                 }
             });
         }

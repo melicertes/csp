@@ -1,12 +1,12 @@
 package com.intrasoft.csp.conf.server.controller;
 
+import com.intrasoft.csp.conf.commons.types.ContactType;
+import com.intrasoft.csp.conf.commons.utils.VersionParser;
 import com.intrasoft.csp.conf.server.context.DataContextUrl;
 import com.intrasoft.csp.conf.server.context.PagesContextUrl;
-import com.intrasoft.csp.conf.commons.types.ContactType;
-import com.intrasoft.csp.conf.server.domain.data.table.ManagementRow;
+import com.intrasoft.csp.conf.server.domain.data.ManagementRow;
 import com.intrasoft.csp.conf.server.domain.entities.*;
 import com.intrasoft.csp.conf.server.repository.*;
-import com.intrasoft.csp.conf.server.utils.VersionParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
+import org.thymeleaf.templateresolver.ITemplateResolver;
+import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -179,7 +181,7 @@ public class MvcController implements PagesContextUrl, DataContextUrl {
         Csp csp = cspRepository.findOne(cspId);
         if (csp == null) {
             return new ModelAndView("error", "error", model);
-    }
+        }
 
         model.addAttribute("cspUpdateUrl", DATA_BASEURL + DATA_CSP_UPDATE);
         model.addAttribute("cspListUrl", PAGES_CSP_LIST);

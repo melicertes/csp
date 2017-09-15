@@ -16,7 +16,9 @@ public interface ModuleVersionRepository extends JpaRepository<ModuleVersion, Lo
 
     public ModuleVersion findByModuleIdAndVersion(Long moduleId, Integer version);
 
-    public ModuleVersion findByFullName(String fullName);
+    public ModuleVersion findByFullNameAndVersion(String fullName, Integer version);
+
+    public List<ModuleVersion> findByFullName(String fullName);
 
     public ModuleVersion findByHash(String hash);
 

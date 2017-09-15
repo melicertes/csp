@@ -34,7 +34,7 @@ public class RestExceptionHandlingController extends ResponseEntityExceptionHand
                 request.getRemoteHost(),
                 e.getStackTrace()[0].toString(),
                 e.getLocalizedMessage());
-
+	LOGGER.error("Exception stacktrace: ",e);
         response.sendError(HttpStatus.BAD_REQUEST.value(), e.getLocalizedMessage());
     }
 
