@@ -13,7 +13,7 @@ $(document).ready(function() {
         }, 800);
     });
     $('#to-bottom').click(function(){
-        var count = $("#scroll p").length;
+        var count = $("#scroll div").length;
 
         var scrollPos = $('#row' + count).position().top; // use the text of the span to create an ID and get the top position of that element
         $('#scroll').animate({ // animate your right div
