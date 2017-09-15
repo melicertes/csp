@@ -287,6 +287,24 @@ public class ConfService implements ApiContextUrl, Configuration {
     }
 
     private void updateModulesInfo(String cspId, List<ModuleInfoDTO> moduleInfoList) {
+        /*
+        Clear old CspInfo records, before persisting
+        */
+        List<CspInfo> cspInfoList = cspInfoRepository.findByCspId(cspId);
+        //cspModuleRepository.removeByCspId(cspId);
+        for(CspInfo info : cspInfoList) {
+            cspModuleInfoRepository.removeByCspInfoId(info.getId());
+        }
+        cspInfoRepository.removeByCspId(cspId);
+
+        /*
+        Create CspInfo entry
+         */
+        CspInfo cspInfo = new CspInfo();
+        cspInfo.setCspId(cspId);
+        cspInfo.setRecordDateTime(JodaConverter.getCurrentJodaString());
+        cspInfo = cspInfoRepository.save(cspInfo);
+
         for(ModuleInfoDTO moduleInfo : moduleInfoList) {
             /*
             Check for errors
@@ -342,23 +360,8 @@ public class ConfService implements ApiContextUrl, Configuration {
             }
 
             /*
-            Clear old records, before persisting
-             */
-            List<CspInfo> cspInfoList = cspInfoRepository.findByCspId(cspId);
-            //cspModuleRepository.removeByCspId(cspId);
-            for(CspInfo cspInfo : cspInfoList) {
-                cspModuleInfoRepository.removeByCspInfoId(cspInfo.getId());
-            }
-            cspInfoRepository.removeByCspId(cspId);
-
-            /*
             Persist data
              */
-            CspInfo cspInfo = new CspInfo();
-            cspInfo.setCspId(cspId);
-            cspInfo.setRecordDateTime(JodaConverter.getCurrentJodaString());
-            cspInfo = cspInfoRepository.save(cspInfo);
-
             CspModuleInfo cspModuleInfo = new CspModuleInfo();
             cspModuleInfo.setCspInfoId(cspInfo.getId());
             cspModuleInfo.setModuleVersionId(moduleVersion.getId());
