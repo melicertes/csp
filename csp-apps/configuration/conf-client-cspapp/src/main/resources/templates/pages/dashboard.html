@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments::head(title='Dashboard', description='dashboard description')"></head>
+
+<body>
+
+<nav class="navbar navbar-inverse navbar-fixed-top">
+    <div th:replace="fragments::nav"></div>
+</nav>
+
+<div class="container">
+
+    <div class="row">
+        <div class="col-md-12">
+            <p>&nbsp;</p>
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="col-md-12">
+            <h2 class="page-header"><i class="fa fa-dashboard fa-2x"></i> CSP Installation</h2>
+        </div>
+        <div class="col-md-12">
+            <p class="pull-right" th:if="${cspId != null}">CSP Id: <span th:text="${cspId}"></span> </p>
+        </div>
+    </div>
+    <div class="row" th:if="${ internetAvailable == null || internetAvailable == false  }">
+        <div class="alert alert-dismissable alert-danger">
+            <a class="close" data-dismiss="alert" href="#" aria-hidden="true">×</a>
+            <strong>Error: Internet connectivity test failure.</strong><br/>Please check connectivity with internet and DNS</div>
+    </div>
+    <div class="row">
+        <div class="col-md-3 col-xs-12">
+            <div class="pie-chart2 pie-chart pie-number" data-percent="26">
+                <span class="percent">26%</span>
+            </div>
+        </div>
+        <div class="col-md-9 col-xs-12">
+            <div class="message-text">
+                <p>
+                    Welcome to the CSP Installation Control Application - Dashboard.
+                </p>
+                <p th:unless="${links != null}">
+                    To proceed with installation, please go to the <a href="#" th:href="${installUrl}">installation</a> page to configure the CSP or the
+                    <a href="#" th:href="${updatesUrl}">Updates page</a> to see updates and installation status.
+                </p>
+            </div>
+            <div class="container" id="linksStatus"></div>
+        </div>
+    </div>
+
+</div>
+
+
+<th:block th:replace="fragments::scripts"></th:block>
+
+<script th:src="@{/webjars/easy-pie-chart/2.1.6/dist/easypiechart.min.js}"></script>
+<script th:src="@{/webjars/easy-pie-chart/2.1.6/dist/jquery.easypiechart.min.js}"></script>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    var ASYNC_INTERVAL = [[${asyncInterval}]];
+    var dashboardStatusUrl = [[${dashboardStatusUrl}]];
+
+    $("#linksStatus").load([[${dashboardLinks}]])
+    /*]]>*/
+</script>
+
+<script th:src="@{/assets/js/pages/dashboard.js}"></script>
+
+</body>
+
+</html>

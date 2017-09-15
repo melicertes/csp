@@ -1,18 +1,18 @@
 package com.intrasoft.csp.conf.clientcspapp.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 /**
  * Created by tangelatos on 06/09/2017.
  */
-@Getter @Setter @AllArgsConstructor @ToString
+@Getter @Setter @RequiredArgsConstructor @AllArgsConstructor @ToString @EqualsAndHashCode
 public class BackgroundTaskResult<S, R> {
 
-    private S source;
-    private R result;
+    @NonNull
+    private S success;
+    @NonNull
+    private R errorCode;
 
 
+    private String moduleName;
 }

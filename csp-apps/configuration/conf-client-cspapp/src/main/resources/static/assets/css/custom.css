@@ -1,0 +1,257 @@
+/* Move down content because we have a fixed navbar that is 50px tall */
+body {
+    padding-top: 50px;
+    padding-bottom: 20px;
+}
+
+
+.h1button {
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+
+#id_csp_installed {
+    width: 20px;
+    float: left;
+    padding: 0px;
+    margin: 0;
+    height: 20px;
+}
+
+.item {
+    white-space: nowrap;
+    display: inline
+}
+
+.delete-form {
+    display: inline;
+}
+
+.list-group-item .icon .glyphicon-pencil {
+    margin-right: 0.5em;
+}
+
+.modal-body label {
+    font-weight: normal;
+}
+
+.navbar-login {
+    width: 100%;
+    /*padding: 10px;*/
+    padding-bottom: 0px;
+}
+
+.navbar-login-session {
+    padding: 10px;
+    padding-bottom: 0px;
+    padding-top: 0px;
+}
+
+.icon-size {
+    font-size: 87px;
+}
+
+.form-group .errorlist {
+    float: right;
+    list-style: none;
+    color: red;
+}
+
+.huge {
+    font-size: 40px;
+}
+
+.panel-green {
+    border-color: #5cb85c;
+}
+
+.panel-green > .panel-heading {
+    border-color: #5cb85c;
+    color: white;
+    background-color: #5cb85c;
+}
+
+.panel-green > a {
+    color: #5cb85c;
+}
+
+.panel-green > a:hover {
+    color: #3d8b3d;
+}
+
+.panel-red {
+    border-color: #d9534f;
+}
+
+.panel-red > .panel-heading {
+    border-color: #d9534f;
+    color: white;
+    background-color: #d9534f;
+}
+
+.panel-red > a {
+    color: #d9534f;
+}
+
+.panel-red > a:hover {
+    color: #b52b27;
+}
+
+.panel-yellow {
+    border-color: #f0ad4e;
+}
+
+.panel-yellow > .panel-heading {
+    border-color: #f0ad4e;
+    color: white;
+    background-color: #f0ad4e;
+}
+
+.panel-yellow > a {
+    color: #f0ad4e;
+}
+
+.panel-yellow > a:hover {
+    color: #df8a13;
+}
+
+
+
+
+
+/*.wrapped {*/
+/*max-width:200px;*/
+/*word-wrap:break-word;*/
+/**/
+/*}*/
+
+.navbar-header > span.navbar-brand:hover {
+    color: #9d9d9d;
+    text-decoration: none;
+}
+
+label.error{
+    color: #c9302c;
+    display: block;
+}
+input.error, select.error {
+    border-color: #c9302c;
+}
+
+.wrapped:before {
+    word-wrap:break-word;
+    /*content:"\,";*/
+    /*white-space:pre;*/
+    /*word-wrap:break-word;*/
+}
+
+
+
+/* CHART */
+.pie-chart {
+    text-align: center; }
+.pie-chart #pie-chart {
+    display: inline-block;
+    vertical-align: middle; }
+.pie-chart ul.chart-key {
+    display: inline-block;
+    vertical-align: middle;
+    list-style: none;
+    padding: 0;
+    margin: 0 0 0 30px; }
+.pie-chart ul.chart-key li {
+    margin: 10px 0;
+    color: #888888; }
+.pie-chart ul.chart-key li span {
+    width: 20px;
+    height: 15px;
+    margin-right: 10px;
+    display: inline-block;
+    vertical-align: middle; }
+.pie-chart ul.chart-key li span.green {
+    background: #81e970; }
+.pie-chart ul.chart-key li span.orange {
+    background: #f5af50; }
+.pie-chart ul.chart-key li span.red {
+    background: #f46f50; }
+.pie-chart ul.chart-key li span.blue {
+    background: #a0eeed; }
+
+
+.pie-chart canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+audio, canvas, video {
+    display: inline-block;
+}
+
+.easyPieChart {
+    position: relative;
+    text-align: center;
+    margin: 5px auto 27px; }
+.easyPieChart canvas {
+    position: absolute;
+    top: 0;
+    left: 0; }
+
+.pie-number {
+    font-size: 4.5em;
+    font-weight: 100;
+    letter-spacing: -0.05em;
+    padding-top: 33%;
+    color: #bbbbbb; }
+
+.pie-text {
+    text-align: center;
+    padding: 8px 0 14px 0; }
+
+
+/* DASHBOARD */
+.message-text {
+    padding: 15px;
+}
+
+/* UPDATES */
+#updates-table > tbody > tr > td > a, #updates-table > tbody > tr > td > a:hover {
+    text-decoration: none;
+}
+
+/* STATUS */
+/* Error log */
+a#to-bottom, a#to-top, a#to-bottom:hover, a#to-top:hover {
+    text-decoration: none;
+}
+#scroll {
+    position: relative; /* you'll need some position here for jQuery's position to work, otherwise it will be based on the document */
+    width: 100%;
+    height: 400px;
+    overflow-y: scroll;
+    display: block;
+}
+
+#bottom,
+#top {
+    font-size: 12px;
+    cursor: pointer;
+    min-width: 50px;
+    padding: 5px;
+    border: 2px solid #0099f9;
+    border-radius: 5px;
+}
+/*.error-log{*/
+    /*width: 100%;*/
+    /*height: 400px;*/
+    /*overflow-y: scroll;*/
+/*}*/
+
+/*.error-log ul{*/
+    /*list-style-type: none;*/
+    /*margin: 0px;*/
+    /*padding: 0px;*/
+/*}*/
+
+/*.error-log ul li{*/
+    /*padding: 10px 0px;*/
+/*}*/

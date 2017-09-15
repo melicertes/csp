@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments::head(title='Updates', description='dashboard description')"></head>
+
+<body>
+
+<nav class="navbar navbar-inverse navbar-fixed-top">
+    <div th:replace="fragments::nav"></div>
+</nav>
+
+<div class="container">
+
+    <div class="row">
+        <div class="col-md-12">
+            <p>&nbsp;</p>
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="col-md-12">
+            <h2 class="page-header"><i class="fa fa-download fa-2x"></i> Updates</h2>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div id="toolbar" class="btn-group pull-right">
+                <a href="#" id="checkAgain" class="btn btn-primary"><i class="fa fa-refresh"></i> Click here to check again</a>
+                <a href="#" th:href="${statusUrl}" id="systemlogs" class="btn btn-primary"><i class="fa fa-history"></i> See the system log</a>
+            </div>
+            <table id="updates-table"
+                   data-toggle="table"
+                   th:attr="data-url=${updatesRetrieveUrl}"
+                   data-cache="false"
+                   data-query-params="queryParams"
+                   data-pagination="true"
+                   data-page-size="5"
+                   data-page-list="[5, 10, 25]"
+                   data-search="true"
+                   data-show-refresh="true"
+                   data-show-toggle="true"
+                   data-show-columns="true"
+                   data-toolbar="#toolbar"
+                   data-toolbarAlign="right"
+                   data-buttonsAlign="left">
+                <thead>
+                <tr>
+                    <th data-field="name" data-sortable="true">Name</th>
+                    <th data-field="description" data-sortable="true">Description</th>
+                    <th data-field="version" data-sortable="true">Version Available</th>
+                    <th data-field="versionInstalled" data-sortable="true">Version Installed</th>
+                    <th data-field="released" data-sortable="true">Release Date</th>
+                    <th data-field="hash" data-sortable="false" data-visible="false">hash</th>
+                    <th data-field="btn" data-sortable="false" data-align="center">Actions</th>
+                </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+
+<th:block th:replace="fragments::scripts"></th:block>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    //var ASYNC_INTERVAL = [[${asyncInterval}]];
+    /*]]>*/
+</script>
+
+<script th:src="@{/assets/js/pages/updates.js}"></script>
+
+</body>
+
+</html>

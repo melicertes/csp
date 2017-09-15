@@ -3,13 +3,13 @@ package com.intrasoft.csp.conf.server.service;
 import com.intrasoft.csp.conf.commons.context.ApiContextUrl;
 import com.intrasoft.csp.conf.commons.exceptions.*;
 import com.intrasoft.csp.conf.commons.interfaces.Configuration;
-import com.intrasoft.csp.conf.commons.model.*;
+import com.intrasoft.csp.conf.commons.model.api.*;
 import com.intrasoft.csp.conf.commons.types.StatusResponseType;
+import com.intrasoft.csp.conf.commons.utils.JodaConverter;
+import com.intrasoft.csp.conf.commons.utils.VersionParser;
 import com.intrasoft.csp.conf.server.domain.entities.*;
 import com.intrasoft.csp.conf.server.repository.*;
 import com.intrasoft.csp.conf.server.utils.FileHelper;
-import com.intrasoft.csp.conf.server.utils.JodaConverter;
-import com.intrasoft.csp.conf.server.utils.VersionParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +19,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.method.P;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -96,7 +95,6 @@ public class ConfService implements ApiContextUrl, Configuration {
                     //send only if reported version is different than managed version
                     ModuleVersion versionManaged = moduleVersionRepository.findOne(cspManagement.getModuleVersionId());
                     CspInfo cspInfo = cspInfoRepository.findTop1ByCspIdOrderByRecordDateTimeDesc(cspId);
-
                     //if csp has already reported updates, search for updates not existed in the last report
                     if (cspInfo != null) {
                         CspModuleInfo cspModuleInfo = cspModuleInfoRepository.findTop1ByCspInfoIdOrderByCspInfoIdDesc(cspInfo.getId());
@@ -170,8 +168,11 @@ public class ConfService implements ApiContextUrl, Configuration {
         this.updateCspContactsFromRegistration(cspId, cspRegistration);
 
         //ModuleInfo
-        List<ModuleInfoDTO> moduleInfoList = cspRegistration.getModuleInfo().getModules();
-        this.updateModulesInfo(cspId, moduleInfoList);
+        ModulesInfoDTO modulesInfo = cspRegistration.getModuleInfo();
+        if (modulesInfo.getModules() != null) {
+            this.updateModulesInfo(cspId, modulesInfo.getModules());
+        }
+
 
         LOG_AUDIT.info(logInfo + StatusResponseType.OK.text());
         ResponseDTO response = new ResponseDTO(StatusResponseType.OK.code(), StatusResponseType.OK.text());
@@ -286,6 +287,24 @@ public class ConfService implements ApiContextUrl, Configuration {
     }
 
     private void updateModulesInfo(String cspId, List<ModuleInfoDTO> moduleInfoList) {
+        /*
+        Clear old CspInfo records, before persisting
+        */
+        List<CspInfo> cspInfoList = cspInfoRepository.findByCspId(cspId);
+        //cspModuleRepository.removeByCspId(cspId);
+        for(CspInfo info : cspInfoList) {
+            cspModuleInfoRepository.removeByCspInfoId(info.getId());
+        }
+        cspInfoRepository.removeByCspId(cspId);
+
+        /*
+        Create CspInfo entry
+         */
+        CspInfo cspInfo = new CspInfo();
+        cspInfo.setCspId(cspId);
+        cspInfo.setRecordDateTime(JodaConverter.getCurrentJodaString());
+        cspInfo = cspInfoRepository.save(cspInfo);
+
         for(ModuleInfoDTO moduleInfo : moduleInfoList) {
             /*
             Check for errors
@@ -295,12 +314,42 @@ public class ConfService implements ApiContextUrl, Configuration {
                 throw new InvalidModuleNameException(StatusResponseType.API_INVALID_MODULE_NAME.text());
             }
 
-            ModuleVersion moduleVersion = moduleVersionRepository.findByFullName(moduleInfo.getAdditionalProperties().getFullName());
-            if (moduleVersion == null) {
+            String fullNameReported = moduleInfo.getAdditionalProperties().getFullName().replace(":", "");
+            String versionReportedS = fullNameReported.replace(module.getName(), "");
+            Integer versionReportedI;
+            //check mistyped json, version from fullname and version mismatch
+            try {
+                versionReportedI = VersionParser.fromVarious(versionReportedS);
+            } catch (NumberFormatException e) {
+                throw new InvalidModuleVersionException(StatusResponseType.API_INVALID_MODULE_VERSION.text());
+            }
+            //before compare versions ensure both have VersionParser's format
+            String s1 = String.valueOf(versionReportedI);
+            String s2 = String.valueOf(moduleInfo.getAdditionalProperties().getVersion());
+            s2 = Integer.toString(VersionParser.fromString(s2));
+            if (!s1.equals(s2)) {
+                throw new InvalidModuleVersionException(StatusResponseType.API_INVALID_MODULE_VERSION.text());
+            }
+
+            //now versions between fullname and version node are aligned. Check for names
+            fullNameReported = fullNameReported.replace(versionReportedS, "");
+            //check that is the same with module name in json
+            if (!fullNameReported.equals(moduleInfo.getName())) {
                 throw new InvalidModuleNameException(StatusResponseType.API_INVALID_MODULE_NAME.text());
             }
 
-            moduleVersion = moduleVersionRepository.findByModuleIdAndVersion(module.getId(), moduleInfo.getAdditionalProperties().getVersion());
+            //check that module version exists. Ignore reported version mistyping, i.e. 1000 <-> 10000
+            /**
+             * @TODO If we do not want to ignore version mistype, swap commented lines in next 2-checks
+             */
+            Integer v = versionReportedI;
+            //Integer v = moduleInfo.getAdditionalProperties().getVersion();
+            ModuleVersion moduleVersion = moduleVersionRepository.findByFullNameAndVersion(fullNameReported, v);
+            if (moduleVersion == null) {
+                throw new InvalidModuleVersionException(StatusResponseType.API_INVALID_MODULE_VERSION.text());
+            }
+
+            moduleVersion = moduleVersionRepository.findByModuleIdAndVersion(module.getId(), v);
             if (moduleVersion == null) {
                 throw new InvalidModuleVersionException(StatusResponseType.API_INVALID_MODULE_VERSION.text());
             }
@@ -311,23 +360,8 @@ public class ConfService implements ApiContextUrl, Configuration {
             }
 
             /*
-            Clear old records, before persisting
-             */
-            List<CspInfo> cspInfoList = cspInfoRepository.findByCspId(cspId);
-            //cspModuleRepository.removeByCspId(cspId);
-            for(CspInfo cspInfo : cspInfoList) {
-                cspModuleInfoRepository.removeByCspInfoId(cspInfo.getId());
-            }
-            cspInfoRepository.removeByCspId(cspId);
-
-            /*
             Persist data
              */
-            CspInfo cspInfo = new CspInfo();
-            cspInfo.setCspId(cspId);
-            cspInfo.setRecordDateTime(JodaConverter.getCurrentJodaString());
-            cspInfo = cspInfoRepository.save(cspInfo);
-
             CspModuleInfo cspModuleInfo = new CspModuleInfo();
             cspModuleInfo.setCspInfoId(cspInfo.getId());
             cspModuleInfo.setModuleVersionId(moduleVersion.getId());

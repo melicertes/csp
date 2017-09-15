@@ -2,26 +2,25 @@ package com.intrasoft.csp.conf.server.controller;
 
 
 import com.intrasoft.csp.conf.commons.exceptions.ConfException;
-import com.intrasoft.csp.conf.server.context.DataContextUrl;
-import com.intrasoft.csp.conf.server.context.PagesContextUrl;
+import com.intrasoft.csp.conf.commons.model.ContactDTO;
+import com.intrasoft.csp.conf.commons.model.api.ResponseDTO;
+import com.intrasoft.csp.conf.commons.model.forms.CspForm;
+import com.intrasoft.csp.conf.commons.model.forms.ManagementForm;
+import com.intrasoft.csp.conf.commons.model.forms.ManagementFormModule;
+import com.intrasoft.csp.conf.commons.model.forms.ModuleForm;
 import com.intrasoft.csp.conf.commons.types.ContactType;
 import com.intrasoft.csp.conf.commons.types.StatusResponseType;
-import com.intrasoft.csp.conf.commons.model.ResponseDTO;
-import com.intrasoft.csp.conf.server.domain.data.Contact;
-import com.intrasoft.csp.conf.server.domain.data.form.CspForm;
-import com.intrasoft.csp.conf.server.domain.data.form.ManagementForm;
-import com.intrasoft.csp.conf.server.domain.data.form.ManagementFormModule;
-import com.intrasoft.csp.conf.server.domain.data.form.ModuleForm;
-import com.intrasoft.csp.conf.server.domain.data.table.CspRow;
-import com.intrasoft.csp.conf.server.domain.data.table.DashboardRow;
-import com.intrasoft.csp.conf.server.domain.data.table.ModuleRow;
-import com.intrasoft.csp.conf.server.domain.data.table.ModuleVersionRow;
+import com.intrasoft.csp.conf.commons.utils.JodaConverter;
+import com.intrasoft.csp.conf.commons.utils.VersionParser;
+import com.intrasoft.csp.conf.server.context.DataContextUrl;
+import com.intrasoft.csp.conf.server.context.PagesContextUrl;
+import com.intrasoft.csp.conf.server.domain.data.CspRow;
+import com.intrasoft.csp.conf.server.domain.data.DashboardRow;
+import com.intrasoft.csp.conf.server.domain.data.ModuleRow;
+import com.intrasoft.csp.conf.server.domain.data.ModuleVersionRow;
 import com.intrasoft.csp.conf.server.domain.entities.*;
 import com.intrasoft.csp.conf.server.repository.*;
 import com.intrasoft.csp.conf.server.utils.FileHelper;
-import com.intrasoft.csp.conf.server.utils.JodaConverter;
-import com.intrasoft.csp.conf.server.utils.VersionParser;
-import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,12 +31,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.NoSuchFileException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.zip.ZipFile;
 
 @RestController
 public class DataController implements DataContextUrl, PagesContextUrl {
@@ -52,6 +51,8 @@ public class DataController implements DataContextUrl, PagesContextUrl {
     String fileTemp;
     @Value("${server.digest.algorithm}")
     String digestAlgorithm;
+    @Value("${server.manifest}")
+    String manifestName;
 
     @Autowired
     CspRepository cspRepository;
@@ -124,7 +125,10 @@ public class DataController implements DataContextUrl, PagesContextUrl {
             List<String> confUpdates = new ArrayList<>();
             List<CspManagement> cspManagements = cspManagementRepository.findByCspId(csp.getId());
             for(CspManagement management : cspManagements) {
-                confUpdates.add(moduleVersionRepository.findOne(management.getModuleVersionId()).getFullName());
+                String s;
+                s = moduleVersionRepository.findOne(management.getModuleVersionId()).getFullName() + ":" +
+                        VersionParser.toString(moduleVersionRepository.findOne(management.getModuleVersionId()).getVersion());
+                confUpdates.add(s);
             }
             row.setConfUpdates(confUpdates);
 
@@ -133,7 +137,10 @@ public class DataController implements DataContextUrl, PagesContextUrl {
             if (cspInfo != null) {
                 List<CspModuleInfo> cspModuleInfos = cspModuleInfoRepository.findByCspInfoId(cspInfo.getId());
                 for(CspModuleInfo cspModuleInfo : cspModuleInfos) {
-                    reportUpdates.add(moduleVersionRepository.findOne(cspModuleInfo.getModuleVersionId()).getFullName());
+                    String s;
+                    s = moduleVersionRepository.findOne(cspModuleInfo.getModuleVersionId()).getFullName() + ":" +
+                            VersionParser.toString(moduleVersionRepository.findOne(cspModuleInfo.getModuleVersionId()).getVersion());
+                    reportUpdates.add(s);
                 }
             }
             row.setReportUpdates(reportUpdates);
@@ -595,13 +602,14 @@ public class DataController implements DataContextUrl, PagesContextUrl {
 
             //check for manifest.json within archive
             String moduleZipFile = FileHelper.getFileFromHash(fileTemp, hash);
-            String zipContainer = FileHelper.unzip(fileTemp + moduleZipFile, fileTemp);
-            if (!FileHelper.exists(zipContainer, "manifest.json")) {
-                throw new ConfException(StatusResponseType.DATA_MODULE_VERSION_INVALID_ARCHIVE.text(), StatusResponseType.DATA_MODULE_VERSION_INVALID_ARCHIVE.code());
+            try (ZipFile zf = new ZipFile(fileTemp + moduleZipFile)) {
+                if (zf.getEntry(manifestName) == null) {
+                    zf.close();
+                    //delete  module zip
+                    FileHelper.removeFile(fileTemp, moduleZipFile);
+                    throw new ConfException(StatusResponseType.DATA_MODULE_VERSION_INVALID_ARCHIVE.text(), StatusResponseType.DATA_MODULE_VERSION_INVALID_ARCHIVE.code());
+                }
             }
-
-            //delete directory for zip extracting
-            FileUtils.deleteDirectory(new File(zipContainer));
             //copy final file to repository
             FileHelper.copyFromTempToRepo(fileTemp, fileRepository, hash);
 
@@ -620,9 +628,9 @@ public class DataController implements DataContextUrl, PagesContextUrl {
             return new ResponseEntity<>(response, HttpStatus.OK);
 
         } catch (IOException e) {
-            throw new ConfException(StatusResponseType.DATA_MODULE_VERSION_SAVE_FILE.text(), e.getCause(), StatusResponseType.DATA_MODULE_VERSION_SAVE_FILE.code());
+            throw new ConfException(StatusResponseType.DATA_MODULE_VERSION_SAVE_FILE.text(), e, StatusResponseType.DATA_MODULE_VERSION_SAVE_FILE.code());
         } catch (NoSuchAlgorithmException e) {
-            throw new ConfException(StatusResponseType.DATA_MODULE_VERSION_HASH_FILE.text(), e.getCause(), StatusResponseType.DATA_MODULE_VERSION_HASH_FILE.code());
+            throw new ConfException(StatusResponseType.DATA_MODULE_VERSION_HASH_FILE.text(), e, StatusResponseType.DATA_MODULE_VERSION_HASH_FILE.code());
         }
     }
 
@@ -679,15 +687,17 @@ public class DataController implements DataContextUrl, PagesContextUrl {
 
                 //check for manifest.json within archive
                 String moduleZipFile = FileHelper.getFileFromHash(fileTemp, newHash);
-                String zipContainer = FileHelper.unzip(fileTemp + moduleZipFile, fileTemp);
-                if (!FileHelper.exists(zipContainer, "manifest.json")) {
+                ZipFile zf = new ZipFile(fileTemp + moduleZipFile);
+                if (zf.getEntry(manifestName) == null) {
+                    zf.close();
+                    //delete  module zip
+                    FileHelper.removeFile(fileTemp, moduleZipFile);
                     throw new ConfException(StatusResponseType.DATA_MODULE_VERSION_INVALID_ARCHIVE.text(), StatusResponseType.DATA_MODULE_VERSION_INVALID_ARCHIVE.code());
                 }
+                zf.close();
 
                 //copy final file to repository
                 FileHelper.copyFromTempToRepo(fileTemp, fileRepository, newHash);
-                //delete directory for zip extracting
-                FileUtils.deleteDirectory(new File(zipContainer));
                 //find filename from hash and remove old file from file repository
                 fileName = FileHelper.getFileFromHash(fileRepository, oldHash);
                 FileHelper.removeFile(fileRepository, fileName);
@@ -774,7 +784,7 @@ public class DataController implements DataContextUrl, PagesContextUrl {
 
         //save csp contacts
         cspContactRepository.removeByCspId(csp.getId());
-        for (Contact contact : cspForm.getContacts()) {
+        for (ContactDTO contact : cspForm.getContacts()) {
             CspContact cspContact = new CspContact();
             cspContact.setCspId(csp.getId());
             cspContact.setPersonName(contact.getPersonName());

@@ -4,7 +4,7 @@ import com.intrasoft.csp.conf.client.ConfClient;
 import com.intrasoft.csp.conf.client.config.ConfClientConfig;
 import com.intrasoft.csp.conf.commons.context.ApiContextUrl;
 import com.intrasoft.csp.conf.commons.exceptions.InvalidCspEntryException;
-import com.intrasoft.csp.conf.commons.model.UpdateInformationDTO;
+import com.intrasoft.csp.conf.commons.model.api.UpdateInformationDTO;
 import com.intrasoft.csp.conf.commons.types.StatusResponseType;
 import com.intrasoft.csp.conf.server.ConfApp;
 import com.intrasoft.csp.libraries.restclient.service.RetryRestTemplate;

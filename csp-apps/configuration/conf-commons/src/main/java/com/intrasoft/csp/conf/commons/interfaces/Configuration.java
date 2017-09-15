@@ -2,10 +2,10 @@ package com.intrasoft.csp.conf.commons.interfaces;
 
 
 import com.intrasoft.csp.conf.commons.exceptions.InvalidCspEntryException;
-import com.intrasoft.csp.conf.commons.model.AppInfoDTO;
-import com.intrasoft.csp.conf.commons.model.RegistrationDTO;
-import com.intrasoft.csp.conf.commons.model.ResponseDTO;
-import com.intrasoft.csp.conf.commons.model.UpdateInformationDTO;
+import com.intrasoft.csp.conf.commons.model.api.AppInfoDTO;
+import com.intrasoft.csp.conf.commons.model.api.RegistrationDTO;
+import com.intrasoft.csp.conf.commons.model.api.ResponseDTO;
+import com.intrasoft.csp.conf.commons.model.api.UpdateInformationDTO;
 import org.springframework.http.ResponseEntity;
 
 
