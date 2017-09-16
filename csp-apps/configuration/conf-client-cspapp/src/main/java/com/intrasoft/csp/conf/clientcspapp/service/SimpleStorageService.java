@@ -4,6 +4,7 @@ import com.intrasoft.csp.conf.clientcspapp.util.FileHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipFile;
+import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -63,21 +64,28 @@ public class SimpleStorageService {
             final Enumeration<ZipArchiveEntry> entries = zipFile.getEntriesInPhysicalOrder();
             while (entries.hasMoreElements()) {
                 ZipArchiveEntry entry = entries.nextElement();
-                if (entry.getSize() != 0) {
+                if ( !entry.isDirectory() ) {
                     //element MAY contain a directory!
                     File targetFile = new File(dir, entry.getName());
                     File containerDir = targetFile.getParentFile();
                     log.info("Parsed as folder {} and file {}",containerDir, targetFile.getName());
                     containerDir.mkdirs();
-                    long bytes = FileHelper.copy(zipFile.getInputStream(entry), targetFile.toPath(),
-                            (input, output) -> log.info("Extracted : {}", FileHelper.bytesToKB(output.getBytesWritten())));
-                    if (bytes == entry.getSize()) {
-                        log.info("Extracted : {}, size {} bytes", entry.getName(), entry.getSize());
+                    if (entry.getSize() > 0) {
+                        long bytes = FileHelper.copy(zipFile.getInputStream(entry), targetFile.toPath(),
+                                (input, output) -> log.info("Extracted : {}", FileHelper.bytesToKB(output.getBytesWritten())));
+                        if (bytes == entry.getSize()) {
+                            log.info("Extracted : {}, size {} bytes", entry.getName(), entry.getSize());
+                        } else {
+                            log.warn("Extracted : {}, extracted {} != {} ", entry.getName(), bytes, entry.getSize());
+                        }
                     } else {
-                        log.warn("Extracted : {}, extracted {} != {} ", entry.getName(), bytes, entry.getSize());
+                        FileUtils.touch(targetFile);
+                        log.info("0-size file created: {}", targetFile.getAbsolutePath());
                     }
                 } else {
-                    log.info("Directory or 0-size file not extracted: {}",entry.getName());
+                    File targetDirectory = new File(dir, entry.getName());
+                    targetDirectory.mkdirs();
+                    log.info("Directory created: {}", targetDirectory.getAbsolutePath());
                 }
             }
             return directory;

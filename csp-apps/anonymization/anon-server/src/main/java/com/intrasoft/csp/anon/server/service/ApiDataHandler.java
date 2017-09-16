@@ -151,9 +151,9 @@ public class ApiDataHandler {
             case "email":
                 return "***@******.**";
             case "alphanumeric":
-                return "##########";
+                return "00000000";
             case "numeric":
-                return "##########";
+                return "00000000";
             default:
                 return "$$$$$$$$$";
         }

@@ -100,7 +100,7 @@ public class ApiDataHandlerTest {
         assertThat(jsonOut, containsString("\"destination.local_hostname\":\"hostname\""));
         assertThat(jsonOut, containsString("\"destination.local_ip\":\"***.***.***.***\""));
         assertThat(jsonOut, containsString("\"destination.account\":\"***@******.**\""));
-        assertThat(jsonOut, containsString("\"destination.asn\":\"##########\""));
+        assertThat(jsonOut, containsString("\"destination.asn\":\"00000000\""));
     }
 
     @DirtiesContext
@@ -129,7 +129,7 @@ public class ApiDataHandlerTest {
 
         String jsonOut = objectMapper.writeValueAsString(anonData.getDataObject());
 //        assertThat(jsonOut, containsString("\"classification.taxonomy\":\""));//cannot really test the randomness of anon here
-        assertThat(jsonOut, containsString("\"id\":\"##########\""));
+        assertThat(jsonOut, containsString("\"id\":\"00000000\""));
         assertThat(jsonOut, containsString("\"info\":\"*******\""));
         assertThat(jsonOut, containsString("\"uuid\":\"*******\""));
         assertThat(jsonOut, containsString("\"disable_correlation\":\"*******\""));
@@ -161,8 +161,8 @@ public class ApiDataHandlerTest {
 
         String jsonOut = objectMapper.writeValueAsString(anonData.getDataObject());
         assertThat(jsonOut, containsString("\"type\":\""));//cannot really test the randomness of anon here
-        assertThat(jsonOut, containsString("\"id\":\"##########\""));
-        assertThat(jsonOut, containsString("\"size\":\"##########\""));
+        assertThat(jsonOut, containsString("\"id\":\"00000000\""));
+        assertThat(jsonOut, containsString("\"size\":\"00000000\""));
         assertThat(jsonOut, containsString("\"name\":\"*******\""));
     }
 
@@ -193,7 +193,7 @@ public class ApiDataHandlerTest {
         String jsonOut = objectMapper.writeValueAsString(anonData.getDataObject());
 //        assertThat(jsonOut, containsString("\"classification.taxonomy\":\""));//cannot really test the randomness of anon here
         assertThat(jsonOut, containsString("\"affected_products_text\":\""));//cannot really test the randomness of anon here
-        assertThat(jsonOut, containsString("\"version\":\"##########\""));
+        assertThat(jsonOut, containsString("\"version\":\"00000000\""));
         assertThat(jsonOut, containsString("\"producer\":\"*******\""));
     }
 

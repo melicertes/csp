@@ -18,10 +18,10 @@
               ProxyPass {{ path }} !
               {% endfor %}
               {% if service.docr_name == 'tc'-%}
-              Alias /static/ /opt/tc/static/
+              Alias /static/ /opt/tc/var/static/
               ProxyPass /static/ !
 
-              <Directory /opt/tc/static/>
+              <Directory /opt/tc/var/static/>
                 Require all granted
               </Directory>
               {% endif -%}
@@ -37,8 +37,9 @@
               {% endif %}
               {% endif -%}
 
-              ProxyPass / {{ service.protocol }}://csp-{{ service.docr_name }}:{{ service.docr_port }}{{ service.base_path }}
-              ProxyPassReverse / {{ service.protocol }}://csp-{{ service.docr_name }}:{{ service.docr_port }}{{ service.base_path }}
+              {% set docr_name = service.docr_name.split('-')[0] %}
+              ProxyPass / {{ service.protocol }}://csp-{{ docr_name }}:{{ service.docr_port }}{{ service.base_path }}
+              ProxyPassReverse / {{ service.protocol }}://csp-{{ docr_name }}:{{ service.docr_port }}{{ service.base_path }}
 
         </VirtualHost>
         {% endif -%}
@@ -53,11 +54,11 @@
               ProxyPass {{ path }} !
               {% endfor %}
               {% if service.docr_name == 'tc'-%}
-              Alias /static/ /opt/tc/static/
+              Alias /static/ /opt/tc/var/static/
               ProxyPass /static/ !
               ProxyPass /api/ !
 
-              <Directory /opt/tc/static/>
+              <Directory /opt/tc/var/static/>
                 Require all granted
               </Directory>
               {% endif -%}
@@ -83,8 +84,9 @@
               {% endif -%}
               {% endif -%}
 
-              ProxyPass / {{ service.protocol }}://csp-{{ service.docr_name }}:{{ service.docr_port }}{{ service.base_path }}
-              ProxyPassReverse / {{ service.protocol }}://csp-{{ service.docr_name }}:{{ service.docr_port }}{{ service.base_path }}
+              {% set docr_name = service.docr_name.split('-')[0] %}
+              ProxyPass / {{ service.protocol }}://csp-{{ docr_name }}:{{ service.docr_port }}{{ service.base_path }}
+              ProxyPassReverse / {{ service.protocol }}://csp-{{ docr_name }}:{{ service.docr_port }}{{ service.base_path }}
 
               {% if 'name' in service.agent -%}
               AmAgent On

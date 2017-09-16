@@ -90,42 +90,18 @@ public class ConfService implements ApiContextUrl, Configuration {
             List<ModuleUpdateInfoDTO> updates = new ArrayList<>();
             List<CspManagement> cspManagementList = cspManagementRepository.findByCspIdAndModuleId(cspId, module.getId());
             //return only modules having versions
-            if (cspManagementList.size() > 0) {
-                for (CspManagement cspManagement : cspManagementList) {
-                    //send only if reported version is different than managed version
-                    ModuleVersion versionManaged = moduleVersionRepository.findOne(cspManagement.getModuleVersionId());
-                    CspInfo cspInfo = cspInfoRepository.findTop1ByCspIdOrderByRecordDateTimeDesc(cspId);
-                    //if csp has already reported updates, search for updates not existed in the last report
-                    if (cspInfo != null) {
-                        CspModuleInfo cspModuleInfo = cspModuleInfoRepository.findTop1ByCspInfoIdOrderByCspInfoIdDesc(cspInfo.getId());
-                        ModuleVersion versionReported = moduleVersionRepository.findOne(cspModuleInfo.getModuleVersionId());
-                        if (versionManaged.getVersion() != versionReported.getVersion()) {
-                            ModuleUpdateInfoDTO moduleUpdateInfo = new ModuleUpdateInfoDTO();
-                            moduleUpdateInfo.setName(moduleVersionRepository.findOne(cspManagement.getModuleVersionId()).getFullName());
-                            moduleUpdateInfo.setDescription(moduleVersionRepository.findOne(cspManagement.getModuleVersionId()).getDescription());
-                            moduleUpdateInfo.setVersion(VersionParser.toString(moduleVersionRepository.findOne(cspManagement.getModuleVersionId()).getVersion()));
-                            moduleUpdateInfo.setReleased(moduleVersionRepository.findOne(cspManagement.getModuleVersionId()).getReleasedOn());
-                            moduleUpdateInfo.setHash(moduleVersionRepository.findOne(cspManagement.getModuleVersionId()).getHash());
-                            moduleUpdateInfo.setStartPriority(module.getStartPriority());
-
-                            updates.add(moduleUpdateInfo);
-                        }
-                    }
-                    else {
-                        ModuleUpdateInfoDTO moduleUpdateInfo = new ModuleUpdateInfoDTO();
-                        moduleUpdateInfo.setName(moduleVersionRepository.findOne(cspManagement.getModuleVersionId()).getFullName());
-                        moduleUpdateInfo.setDescription(moduleVersionRepository.findOne(cspManagement.getModuleVersionId()).getDescription());
-                        moduleUpdateInfo.setVersion(VersionParser.toString(moduleVersionRepository.findOne(cspManagement.getModuleVersionId()).getVersion()));
-                        moduleUpdateInfo.setReleased(moduleVersionRepository.findOne(cspManagement.getModuleVersionId()).getReleasedOn());
-                        moduleUpdateInfo.setHash(moduleVersionRepository.findOne(cspManagement.getModuleVersionId()).getHash());
-                        moduleUpdateInfo.setStartPriority(module.getStartPriority());
-                        
-                        updates.add(moduleUpdateInfo);
-                    }
-
-                }
-                available.put(module.getName(), updates);
+            for (CspManagement cspManagement : cspManagementList) {
+                ModuleVersion versionManaged = moduleVersionRepository.findOne(cspManagement.getModuleVersionId());
+                ModuleUpdateInfoDTO moduleUpdateInfo = new ModuleUpdateInfoDTO();
+                moduleUpdateInfo.setName(versionManaged.getFullName());
+                moduleUpdateInfo.setDescription(versionManaged.getDescription());
+                moduleUpdateInfo.setVersion(VersionParser.toString(versionManaged.getVersion()));
+                moduleUpdateInfo.setReleased(versionManaged.getReleasedOn());
+                moduleUpdateInfo.setHash(versionManaged.getHash());
+                moduleUpdateInfo.setStartPriority(module.getStartPriority());
+                updates.add(moduleUpdateInfo);
             }
+            available.put(module.getName(), updates);
         }
         updateInformation.setAvailable(available);
 
@@ -136,7 +112,7 @@ public class ConfService implements ApiContextUrl, Configuration {
     @Override
     public ResponseDTO register(String cspId, RegistrationDTO cspRegistration) {
         String user = "system";
-        String logInfo = user + ", " +  "/v" + REST_API_V1 +  API_REGISTER + "/" + cspId + ": ";
+        String logInfo = user + ", " + "/v" + REST_API_V1 + API_REGISTER + "/" + cspId + ": ";
         LOG_AUDIT.info(logInfo + "POST Request received");
 
         if (cspRepository.exists(cspId) && cspRegistration.getRegistrationIsUpdate()) {
@@ -144,17 +120,14 @@ public class ConfService implements ApiContextUrl, Configuration {
             Csp csp = this.getCspFromRegistration(cspRegistration);
             csp.setId(cspId);
             cspRepository.save(csp);
-        }
-        else if (!cspRepository.exists(cspId) && !cspRegistration.getRegistrationIsUpdate()) {
+        } else if (!cspRepository.exists(cspId) && !cspRegistration.getRegistrationIsUpdate()) {
             // insert Csp basic info
             Csp csp = this.getCspFromRegistration(cspRegistration);
             csp.setId(cspId);
             cspRepository.save(csp);
-        }
-        else if (cspRepository.exists(cspId) && !cspRegistration.getRegistrationIsUpdate()) {
+        } else if (cspRepository.exists(cspId) && !cspRegistration.getRegistrationIsUpdate()) {
             throw new ConfException(StatusResponseType.API_REGISTER_NOT_UPDATABLE.text(), StatusResponseType.API_REGISTER_NOT_UPDATABLE.code());
-        }
-        else {
+        } else {
             throw new ConfException(StatusResponseType.API_INVALID_CSP_ENTRY.text(), StatusResponseType.API_INVALID_CSP_ENTRY.code());
         }
 
@@ -230,7 +203,7 @@ public class ConfService implements ApiContextUrl, Configuration {
     @Override
     public ResponseDTO appInfo(String cspId, AppInfoDTO appInfo) {
         String user = "system";
-        String logInfo = user + ", " + "/v" + REST_API_V1 +  API_APPINFO + "/" + cspId + ": ";
+        String logInfo = user + ", " + "/v" + REST_API_V1 + API_APPINFO + "/" + cspId + ": ";
         LOG_AUDIT.info(logInfo + "POST Request received");
 
         //search for CSP
@@ -292,7 +265,7 @@ public class ConfService implements ApiContextUrl, Configuration {
         */
         List<CspInfo> cspInfoList = cspInfoRepository.findByCspId(cspId);
         //cspModuleRepository.removeByCspId(cspId);
-        for(CspInfo info : cspInfoList) {
+        for (CspInfo info : cspInfoList) {
             cspModuleInfoRepository.removeByCspInfoId(info.getId());
         }
         cspInfoRepository.removeByCspId(cspId);
@@ -305,7 +278,7 @@ public class ConfService implements ApiContextUrl, Configuration {
         cspInfo.setRecordDateTime(JodaConverter.getCurrentJodaString());
         cspInfo = cspInfoRepository.save(cspInfo);
 
-        for(ModuleInfoDTO moduleInfo : moduleInfoList) {
+        for (ModuleInfoDTO moduleInfo : moduleInfoList) {
             /*
             Check for errors
              */

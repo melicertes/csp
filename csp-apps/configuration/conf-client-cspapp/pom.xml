@@ -180,6 +180,12 @@
 			<version>1.9</version>
 		</dependency>
 
+		<!-- for touch() -->
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>2.5</version>
+		</dependency>
 
 		<dependency>
 			<groupId>com.fasterxml.jackson.datatype</groupId>
