@@ -12,7 +12,7 @@
   "sharingParams": {
     "toShare": true,
     "isExternal": false,
-    "tcId": "",
+    "trustCircleId": "",
     "teamId": ""
   },
   "dataType": "incident",
