@@ -32,7 +32,7 @@
                 <div class="row">
                     <div class="col-md-12" style="text-align: right">
                         <a th:href="${dashboardUrl}" class="save btn btn-default">Cancel</a>
-                        <button type="submit" class="save btn btn-success">Save</button>
+                        <button type="submit" class="save btn btn-success save-certs">Save</button>
                     </div>
                 </div>
 
@@ -63,7 +63,7 @@
                     </div>
                 </div>
             </form>
-
+            <div id="result-certs"></div>
         </div>
     </div>
 
@@ -271,6 +271,7 @@
 <script th:src="@{/webjars/jquery-mask-plugin/1.14.10/dist/jquery.mask.min.js}"></script>
 <script th:src="@{/webjars/bootstrap-checkbox/1.2.5/dist/js/bootstrap-checkbox.min.js}"></script>
 <script th:src="@{/webjars/bootstrap-fileinput/4.4.0/js/fileinput.min.js}"></script>
+<script th:src="@{/webjars/bootstrap3-dialog/1.35.3/dist/js/bootstrap-dialog.min.js}"></script>
 
 <script th:src="@{/assets/js/vendor/jquery.duplicate.min.js}"></script>
 <script th:src="@{/assets/js/vendor/jquery.serializeObject.js}"></script>
