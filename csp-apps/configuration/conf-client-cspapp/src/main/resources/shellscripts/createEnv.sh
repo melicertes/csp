@@ -26,11 +26,13 @@ function createEnvironment() {
 	    return 2
 	fi
 
+    echo "User home is set to $HOME"
+
     ### generate env file
-	$J2 $J2ENV $ENVJSON > ~/.env
-	cp ~/.env ~/env
+	$J2 $J2ENV $ENVJSON > $HOME/.env
+	cp $HOME/.env $HOME/env
     ## generate sites conf
-	$J2 $SITESC $ENVJSON  > ~/csp-sites.conf
+	$J2 $SITESC $ENVJSON  > $HOME/csp-sites.conf
 
         ### create docker network
 	local DN=$(docker network ls |grep local.$CSPNAME.$CSPDOMAIN|wc -l)
@@ -45,7 +47,7 @@ function createEnvironment() {
 	rm -fr /opt/csp/apache2/csp-sites
     mkdir -p /opt/csp/apache2/csp-sites
 
-    cp ~/csp-sites.conf /opt/csp/apache2/csp-sites
+    cp $HOME/csp-sites.conf /opt/csp/apache2/csp-sites
     echo "Site configuration copied"
     ls -l /opt/csp/apache2/csp-sites
 
