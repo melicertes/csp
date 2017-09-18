@@ -15,4 +15,4 @@ else
     RET=$?
 fi
 cd "$CWD"
-exit $?
+exit $RET

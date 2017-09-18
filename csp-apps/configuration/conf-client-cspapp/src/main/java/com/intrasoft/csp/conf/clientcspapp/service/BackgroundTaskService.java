@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -505,6 +504,8 @@ public class BackgroundTaskService {
         Map<String, String> envVars = new HashMap<String, String>();
         envVars.put("CSPNAME", state.getCspRegistration().getName());
         envVars.put("CSPDOMAIN", state.getCspRegistration().getDomainName());
+        envVars.put("CSPHOME", modulesDirectory);
+        envVars.put("HOME",System.getProperty("user.home")); // make sure $HOME is set
         if (env != null) {
             envVars.putAll(env);
         }

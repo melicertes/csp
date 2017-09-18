@@ -13,24 +13,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.client.ClientHttpRequestFactory;
-import org.springframework.http.client.ClientHttpResponse;
-import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.ResponseExtractor;
 
-import java.io.File;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 
 @Service
 public class ConfClientImpl implements ConfClient, ApiContextUrl {
@@ -50,23 +43,16 @@ public class ConfClientImpl implements ConfClient, ApiContextUrl {
     public UpdateInformationDTO updates(String cspId) {
         final String url = apiVersionClient.getApiUrl() + API_UPDATES + "/" + cspId;
         LOG.debug("Configuration call [GET]: " + url);
-        synchronized (retryRestTemplate) { //making sure only we use the template now
-
-            UpdateInformationDTO response = retryRestTemplate.getForObject(url, UpdateInformationDTO.class);
-            return response;
-
-        }
+        UpdateInformationDTO response = retryRestTemplate.getForObject(url, UpdateInformationDTO.class);
+        return response;
     }
 
     @Override
     public ResponseDTO register(String cspId, RegistrationDTO cspRegistration) {
         final String url = apiVersionClient.getApiUrl() + API_REGISTER + "/" + cspId;
         LOG.debug("Configuration call [POST]: " + url);
-        synchronized (retryRestTemplate) { //making sure only we use the template now
-
-            ResponseDTO responseDTO = retryRestTemplate.postForObject(url, cspRegistration, ResponseDTO.class);
-            return responseDTO;
-        }
+        ResponseDTO responseDTO = retryRestTemplate.postForObject(url, cspRegistration, ResponseDTO.class);
+        return responseDTO;
     }
 
 
@@ -76,29 +62,25 @@ public class ConfClientImpl implements ConfClient, ApiContextUrl {
         final String url = apiVersionClient.getApiUrl() + API_UPDATE + "/" + cspId + "/" + updateHash;
         LOG.debug("Configuration call [GET]: " + url);
 
-        SimpleClientHttpRequestFactory unbufferedFactory = new SimpleClientHttpRequestFactory();
-        unbufferedFactory.setBufferRequestBody(false);
-        ClientHttpRequestFactory orig = retryRestTemplate.getRequestFactory();
-
         try {
-            synchronized (retryRestTemplate) { //making sure only we use the template now
-                retryRestTemplate.setRequestFactory(unbufferedFactory);
-                ResponseEntity response = retryRestTemplate.execute(new URI(url), HttpMethod.GET, null, (ResponseExtractor<ResponseEntity<Resource>>) clientHttpResponse -> {
-                    if (clientHttpResponse.getStatusCode() == HttpStatus.OK) {
-                        Path tmpLocation = new File(System.getProperty("java.io.tmpdir"),"download"+System.currentTimeMillis()+".tmp").toPath();
-                        Files.copy( clientHttpResponse.getBody(), tmpLocation);
-                        return new ResponseEntity<Resource>(new FileSystemResource(tmpLocation.toFile()),clientHttpResponse.getStatusCode());
-                    } else {
-                        return new ResponseEntity<Resource>(clientHttpResponse.getStatusCode());
-                    }
-                });
-                return response;
+            URLConnection urlConnection =
+                    new URL(url).openConnection();
+            urlConnection.setConnectTimeout(60000);
+            urlConnection.setReadTimeout(90000);
+            urlConnection.setUseCaches(false);
+            urlConnection.connect();
+            int code = 200;
+            if (urlConnection instanceof HttpURLConnection) {
+                code =( (HttpURLConnection) urlConnection).getResponseCode();
             }
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
+            return new ResponseEntity<>(new InputStreamResource(urlConnection.getInputStream()),
+                    HttpStatus.valueOf(code));
+        } catch (MalformedURLException e) {
+            LOG.error("URL created is not correct, error : {}",e.getMessage(),e);
             return new ResponseEntity<Resource>(HttpStatus.NO_CONTENT);
-        } finally {
-            retryRestTemplate.setRequestFactory(orig);
+        } catch (IOException e) {
+            LOG.error("Download error occured, error : {}",e.getMessage(),e);
+            return new ResponseEntity<Resource>(HttpStatus.NO_CONTENT);
         }
     }
 
