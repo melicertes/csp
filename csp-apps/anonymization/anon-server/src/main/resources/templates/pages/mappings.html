@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="fragments::head(title='Dashboard', description='dashboard description')"></head>
+<head th:replace="fragments::head(title='Dashboard', description='dashboard description')">
+</head>
 
 <body>
 
@@ -29,19 +30,19 @@
     <div class="row">
         <div class="col-md-12 col-sm-12">
             <div class="row" data-duplicate="contact" data-duplicate-min="2" data-duplicate-max="10">
-                <form th:action="@{/mapping/save}" th:object="${mapping}" enctype="multipart/form-data" method="post">
+                <form th:id="mappingForm" id="mappingForm" th:action="@{/mapping/save}" th:object="${mapping}" enctype="multipart/form-data" method="post" data-toggle="validator">
                     <div class="col-md-3 col-xs-12">
                         <div class="form-group">
                             <label>CSP id:</label>
                             <input class="form-control" th:field="*{id}" name="id" type="hidden"/>
-                            <input class="form-control" th:field="*{cspId}" name="cspId" type="text"/>
+                            <input id="cspId" th:id="cspId" class="form-control" th:field="*{cspId}" name="cspId" th:name="cspId" type="text" required="required"/>
                             <span th:if="${#fields.hasErrors('cspId')}" th:errors="*{cspId}">cspId Error</span>
                         </div>
                     </div>
                     <div class="col-md-3 col-xs-12">
                         <label>Data Type:</label>
                         <div class="input-group" style="width: 100%;">
-                            <select th:field="*{dataType}" class="form-control">
+                            <select id="selectDataTypeId" th:id="selectDataTypeId" th:field="*{dataType}" class="form-control" name="selectDataType" th:name="selectDataType" required="required">
                                 <option th:value="${null}" th:text="${'select datatype'}" th:selected="selected"></option>
                                 <option th:each="dataType : ${integrationDataTypes}"
                                         th:value="${dataType.name()}"
@@ -54,7 +55,7 @@
                     <div class="col-md-4 col-xs-12">
                         <label>RuleSet:</label>
                         <div class="input-group" style="width: 100%;">
-                            <select th:field="*{ruleSetId}" class="form-control" th:selected="null">
+                            <select id="selectRulesetId" th:id="selectRulesetId" th:field="*{ruleSetId}" class="form-control" th:selected="null" name="selectRuleset" th:name="selectRuleset" required="required">
                                 <option th:value="${null}" th:text="${'select ruleset'}" th:selected="selected"></option>
                                 <option th:each="ruleset : ${rulesets}"
                                         th:value="${ruleset.id}"
@@ -84,7 +85,7 @@
                                     <th>Actions</th>
                                 </tr>
                                 </thead>
-                                <tr th:id="${mapping.id}" th:each="mapping,iterStat: ${mappings}">
+                                <tr th:id="${mapping.id}" th:each="mapping,iterStat: ${mappings}"  th:class="${id != null and id == mapping.id? 'table-success success':''}">
                                     <td th:text="${iterStat.count}"></td>
                                     <td th:text="${mapping.cspId}"></td>
                                     <td th:text="${mapping.dataType}"></td>
@@ -120,8 +121,18 @@
     </div>
 </div>
 <th:block th:replace="fragments::scripts"></th:block>
+<script th:src="@{/webjars/jquery-validation/1.16.0/jquery.validate.min.js}"></script>
+<script th:src="@{/webjars/jquery-validation/1.16.0/additional-methods.min.js}"></script>
 
-
+<script>
+    $("#mappingForm").validate(
+        {
+            submitHandler: function(form) {
+                form.submit();
+            }
+        }
+    );
+</script>
 </body>
 
 </html>

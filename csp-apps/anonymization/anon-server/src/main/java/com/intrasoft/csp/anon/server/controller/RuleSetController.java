@@ -43,7 +43,6 @@ public class RuleSetController {
     @GetMapping("/rulesets")
     public String showRulesets(RuleSet ruleset, Model model) {
         LOG.info("UI: GET rulesets ");
-        LOG.warn("UI: GET rulesets ");
         List<RuleSetDTO> rulesets =anonService.getAllRuleSet();
         model.addAttribute("rulesets", rulesets);
         model.addAttribute("ruleset", ruleset);
@@ -62,7 +61,7 @@ public class RuleSetController {
         model.addAttribute("id", ruleset.getId());
         ruleset.setFilename(file.getOriginalFilename());
         ruleset.setFile(file.getBytes());
-        if (file.isEmpty()) {
+        if (file.isEmpty() && ruleset.getId() == null) {
             redirectAttributes.addFlashAttribute("error", "Please select a file to upload");
             return "redirect:";
         }

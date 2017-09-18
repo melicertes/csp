@@ -140,7 +140,7 @@
                                 <th>Actions</th>
                             </tr>
                             </thead>
-                            <tr th:id="${ruleset.id}" th:each="ruleset,iterStat: ${rulesets}">
+                            <tr th:id="${ruleset.id}" th:each="ruleset,iterStat: ${rulesets}"  th:class="${id != null and id == ruleset.id? 'table-success success':''}">
                                 <td th:text="${iterStat.count}"></td>
                                 <td th:text="${ruleset.filename}"></td>
                                 <td th:text="${ruleset.description}"></td>
