@@ -148,12 +148,14 @@ public class TcProcessor implements Processor,CamelRoutes{
             //make call to TC-team
             Team team = camelRestService.send(this.getTcTeamsURI() + "/" + teamId, teamId, HttpMethod.GET.name(), Team.class);
             if (team.getShortName() == null) {
+                //TODO: this will activate GDelivery. Do we want this?
                 throw new CspBusinessException("Team short name received from TC API is null - cannot proceed. \n" +
                         "TrustCircle: " + tc.toString() + "\n" +
                         "Team: " + team.toString());
             }
 
             if (team.getCspId() == null) {
+                //TODO: this will activate GDelivery. Do we want this?
                 throw new CspBusinessException("CspId received from TC API is null - cannot proceed. \n" +
                         "TrustCircle: " + tc.toString() + "\n" +
                         "Team: " + team.toString());
@@ -174,25 +176,23 @@ public class TcProcessor implements Processor,CamelRoutes{
     }
 
 
-    public List<Team>  getTeamsByTrustCircleIdFlow1(String tcId) throws IOException {
+    public List<Team> getTeamsByTrustCircleIdFlow1(String tcId) throws IOException {
         String uri = this.getTcCirclesURI() + "/" + tcId;
         return getTcTeamsByArg(uri,true);
     }
 
     public List<Team> getTcTeamsFlow1(IntegrationDataType integrationDataType) throws IOException {
         String uri = getTcUri(integrationDataType);
-        List<Team> teams = getTcTeamsByArg(uri,true);
-        return teams;
+        return getTcTeamsByArg(uri,true);
     }
 
     public List<Team> getAllTcTeams(IntegrationDataType integrationDataType) throws IOException {
         String uri = getTcUri(integrationDataType);
-        List<Team> teams = getTcTeamsByArg(uri,false);
-        return teams;
+        return getTcTeamsByArg(uri,false);
     }
 
     public String getTcUri(IntegrationDataType integrationDataType) throws IOException {
-        String uri = null;
+        String uri;
         String getAllTcUri = this.getTcCirclesURI();
         List<TrustCircle> tcList = camelRestService.sendAndGetList(getAllTcUri, null,  HttpMethod.GET.name(), TrustCircle.class,null);
 
@@ -238,10 +238,12 @@ public class TcProcessor implements Processor,CamelRoutes{
     private Team getTeamByRestCall(String teamId) throws IOException {
         Team team = camelRestService.send(this.getTcTeamsURI() + "/" + teamId, teamId, HttpMethod.GET.name(), Team.class);
         if(team.getShortName()==null){
+            //TODO: this will activate GDelivery. Do we want this?
             throw new CspBusinessException("Team short name received from TC API is null - cannot proceed. \n" +
                     "Team: "+team.toString());
         }
         if(team.getCspId()==null){
+            //TODO: this will activate GDelivery. Do we want this?
             throw new CspBusinessException("CspId received from TC API is null - cannot proceed. \n" +
                     "Team: "+team.toString());
         }

@@ -80,7 +80,7 @@ public class CamelRestService {
         Boolean isExternalRedelivered = exchange.isExternalRedelivered();
         Boolean isFailed = exchange.isFailed();
         if(isFailed && exception != null){
-            //TODO: Redelivery only at specific 5xx and maybe 408. More researched is needed
+            //TODO: Redelivery only at specific 5xx and maybe 408. More researched is needed. Check SXCSP-282
             //HttpHostConnectException might be raised from TC calls
             if(checkForHttp4xxFailedOperationAndJustLogWithNoGRedelivery
                     &&  exception.getClass().equals(HttpOperationFailedException.class)

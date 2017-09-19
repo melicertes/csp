@@ -81,6 +81,7 @@ public class ElasticProcessor implements Processor {
             LOG.info("Elastic - ES Search response: " + response);
 
             if(response == null){
+                //TODO: this will activate GDelivery. Do we want this?
                 throw new CspBusinessException("No response from Elastic (null). Processor will fail and should send message to DeadLetterQ");
             }
 
@@ -121,6 +122,7 @@ public class ElasticProcessor implements Processor {
             LOG.info("ES Search response: " + response);
 
             if(response == null){
+                //TODO: this will activate GDelivery. Do we want this?
                 throw new CspBusinessException("No response from Elastic (null). Processor will fail and should send message to DeadLetterQ");
             }
 
