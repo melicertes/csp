@@ -1,5 +1,6 @@
 package com.intrasoft.csp.server.processors;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.intrasoft.csp.commons.model.IntegrationData;
 import com.intrasoft.csp.commons.routes.HeaderName;
 import com.intrasoft.csp.server.service.CamelRestService;
@@ -27,6 +28,9 @@ public class AppProcessor implements Processor{
     @Autowired
     CamelRestService camelRestService;
 
+    @Autowired
+    ObjectMapper objectMapper;
+
     @Override
     public void process(Exchange exchange) throws Exception {
         String appName = (String) exchange.getIn().getHeader(HeaderName.APP_NAME);
@@ -36,6 +40,8 @@ public class AppProcessor implements Processor{
         String appUri = cspUtils.getAppUri(appName);
         if(!StringUtils.isEmpty(appUri)){
             LOG.info("DSL - Send to internal application: " + appName + " - " + appUri);
+            String json = objectMapper.writeValueAsString(integrationData);
+            LOG.trace("---- Integration Data Object: \n\n"+json);
             camelRestService.send(appUri,integrationData, httpMethod, true);
         }else{
             //handle situation

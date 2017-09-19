@@ -169,7 +169,7 @@ public class TcProcessor implements Processor,CamelRoutes{
                 teams.add(team);
             }
         }
-        LOG.info("-- Teams: "+teams.toString());
+        LOG.trace("-- Teams: "+teams.toString());
         return teams;
     }
 
@@ -226,8 +226,8 @@ public class TcProcessor implements Processor,CamelRoutes{
         if(originEndpoint.equals(routes.apply(CamelRoutes.DCL))) {//flow1
             for(Team t:teams) {
                 //send to ECSP
-                LOG.info(t.toString());
-                LOG.info(integrationData.toString());
+                LOG.trace(t.toString());
+                LOG.trace(integrationData.toString());
                 handleDclFlowAndSendToECSP(httpMethod, t, integrationData);
             }
         }else if(originEndpoint.equals(routes.apply(CamelRoutes.EDCL))){//flow2
@@ -279,7 +279,8 @@ public class TcProcessor implements Processor,CamelRoutes{
                     return;
                 }
                 integrationData.setDataObject(anonData.getDataObject());
-                LOG.info("-- Anonymized dataObject: "+anonData.getDataObject().toString());
+                String json = objectMapper.writeValueAsString(integrationData);
+                LOG.trace("---- Anonymized json: \n\n"+json);
                 break;
             case DO_NOT_SHARE:
                 return;

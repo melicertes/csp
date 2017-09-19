@@ -25,9 +25,6 @@ public class EdclProcessor implements Processor,CamelRoutes {
     @Autowired
     RouteUtils routes;
 
-    private static HashMap<String, String> dataTypesAppMapping = new HashMap<>();
-    private List<String> ecsps = new ArrayList<String>();
-
     @Autowired
     CspUtils cspUtils;
 
@@ -37,12 +34,10 @@ public class EdclProcessor implements Processor,CamelRoutes {
     @Autowired
     ObjectMapper objectMapper;
 
-    private boolean authorized = false;
-
     @Override
     public void process(Exchange exchange) throws IOException {
         LOG.info("DCL - received integrationData from external CSP");
-        List<String> recipients = new ArrayList<>();
+
         IntegrationData integrationData = cspUtils.getExchangeData(exchange, IntegrationData.class);
         String httpMethod = (String) exchange.getIn().getHeader(Exchange.HTTP_METHOD);
 
