@@ -5,16 +5,21 @@ import com.intrasoft.csp.commons.routes.CamelRoutes;
 import com.intrasoft.csp.server.routes.RouteUtils;
 import org.apache.camel.ConsumerTemplate;
 import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
 import org.apache.camel.ProducerTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by iskitsas on 5/5/17.
@@ -69,9 +74,10 @@ public class ErrorMessageHandler implements CamelRoutes {
 
     public String consumeErrorMessages(Integer maxMessagesToConsume, Long msDelay, String reportLB){
         StringBuilder ret = new StringBuilder();
+        Map<Integer, Exchange> failuresMap = new HashMap<>();
         for(int i=0; i<maxMessagesToConsume;i++){
             String line = "Consuming from "+endpoint.apply(ERROR)+", Count "+(i+1)+": ";
-            String c = consumeErrorMessage(msDelay,i);
+            String c = consumeErrorMessage(msDelay,i,failuresMap);
             if(c!=null){
                 line += c;
             }else{
@@ -83,7 +89,7 @@ public class ErrorMessageHandler implements CamelRoutes {
         return ret.toString();
     }
 
-    private String consumeErrorMessage(Long msDelay, int count){
+    private String consumeErrorMessage(Long msDelay, int count, Map<Integer,Exchange> failuresMap){
         String ret = "";
         Exchange exchange = consumer.receive(endpoint.apply(ERROR),msDelay);
 
@@ -102,7 +108,28 @@ public class ErrorMessageHandler implements CamelRoutes {
                 LOG.trace("[DLQ] -- json: "+json);
                 LOG.trace("[DLQ] -- json hash: "+json.hashCode());
                 Map<String, Object> headers = exchange.getIn().getHeaders();
-                producer.sendBodyAndHeaders(endpointUri, body, headers);//IF it fails, it will be stacked in DLQ instantly
+                if(failuresMap.containsKey(json.hashCode())){
+                    //in this run this object has already been tried and should wait the next scheduled time-frame to be redelivered
+                    LOG.trace("In this run this object has already been tried and should wait the next scheduled time frame to be redelivered");
+                }else {
+                    //producer.sendBodyAndHeaders(endpointUri, body, headers);//IF it fails, it will be stacked in DLQ instantly
+                    Exchange exch = producer.send(endpointUri, new Processor() {
+                        public void process(Exchange exchange) throws Exception {
+                            if(headers!=null){
+                                for (Map.Entry<String, Object> entry : headers.entrySet()) {
+                                    exchange.getIn().setHeader(entry.getKey(), entry.getValue());
+                                }
+
+                            }
+                            exchange.getIn().setBody(body);
+                        }
+                    });
+                    //should be added only on fail
+                    Exception cause = exch.getProperty(Exchange.EXCEPTION_CAUGHT, Exception.class);
+                    if(cause!=null) {//add in checkMap only if there is a failure on redelivery
+                        failuresMap.put(json.hashCode(), exch);
+                    }
+                }
                 if(count < maxMessagesToConsume){
                     ret = "found message for "+endpointUri+", consuming and redelivering..";
                 }else{
@@ -125,17 +152,23 @@ public class ErrorMessageHandler implements CamelRoutes {
 
     public void consumeErrorMessagesOnIterval(){
         LOG.info("Consume any messages found in "+endpoint.apply(ERROR)+" on specific time interval.");
-
+        Map<Integer, Exchange> failuresMap = new HashMap<>();
         boolean consumeWhileFound = true;
         int count = 0;
         while(consumeWhileFound || count < maxMessagesToConsume){ //try for 10 x consumptionDelay (ms)
-            String c = consumeErrorMessage(consumptionDelay,count);
+            String c = consumeErrorMessage(consumptionDelay,count,failuresMap);
             if(c == null){
                 consumeWhileFound = false;
             }
             count++;
             if(count <= maxMessagesToConsume) {
                 LOG.trace(" -- Redelivery attempt: " + count);
+            }
+        }
+        if(!failuresMap.isEmpty()){
+            for (Map.Entry<Integer, Exchange> entry : failuresMap.entrySet()) {
+                //resend to DLQ any tried and failed
+                producer.send(endpoint.apply(ERROR),entry.getValue());
             }
         }
     }
