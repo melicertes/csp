@@ -1,5 +1,6 @@
 package com.intrasoft.csp.server.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.intrasoft.csp.commons.routes.CamelRoutes;
 import com.intrasoft.csp.server.routes.RouteUtils;
 import org.apache.camel.ConsumerTemplate;
@@ -37,11 +38,17 @@ public class ErrorMessageHandler implements CamelRoutes {
     @Value("${consume.errorq.fixed.delay}")
     Long fixedDelay;
 
+    @Value("${consume.errorq.max.messages}")
+    Integer maxMessagesToConsume;
+
     @Value("${consume.errorq.initial.delay}")
     Long initialDelay;
 
     @Value("${consume.errorq.message.consumption.delay}")
     Long consumptionDelay;
+
+    @Autowired
+    ObjectMapper objectMapper;
 
     @PostConstruct
     public void init(){
@@ -64,7 +71,7 @@ public class ErrorMessageHandler implements CamelRoutes {
         StringBuilder ret = new StringBuilder();
         for(int i=0; i<maxMessagesToConsume;i++){
             String line = "Consuming from "+endpoint.apply(ERROR)+", Count "+(i+1)+": ";
-            String c = consumeErrorMessage(msDelay);
+            String c = consumeErrorMessage(msDelay,i);
             if(c!=null){
                 line += c;
             }else{
@@ -76,7 +83,7 @@ public class ErrorMessageHandler implements CamelRoutes {
         return ret.toString();
     }
 
-    public String consumeErrorMessage(Long msDelay){
+    private String consumeErrorMessage(Long msDelay, int count){
         String ret = "";
         Exchange exchange = consumer.receive(endpoint.apply(ERROR),msDelay);
 
@@ -88,9 +95,22 @@ public class ErrorMessageHandler implements CamelRoutes {
 
                 //try to redeliver the message
                 Object body = exchange.getIn().getBody();
+                LOG.trace("[DLQ] -- exchangeId: "+exchange.getExchangeId());
+                LOG.trace("[DLQ] -- messageId: "+exchange.getIn().getMessageId());
+                LOG.trace("[DLQ] -- body message hash: "+exchange.getIn().getBody().hashCode());
+                String json = objectMapper.writeValueAsString(body);
+                LOG.trace("[DLQ] -- json: "+json);
+                LOG.trace("[DLQ] -- json hash: "+json.hashCode());
                 Map<String, Object> headers = exchange.getIn().getHeaders();
-                producer.sendBodyAndHeaders(endpointUri, body, headers);
-                ret = "found message for "+endpointUri+", consuming and redelivering..";
+                producer.sendBodyAndHeaders(endpointUri, body, headers);//IF it fails, it will be stacked in DLQ instantly
+                if(count < maxMessagesToConsume){
+                    ret = "found message for "+endpointUri+", consuming and redelivering..";
+                }else{
+                    ret = null;
+                    LOG.warn("It seems that not all error messages managed to be consumed in the interval: "+msDelay+"(ms) * count: "+count+" * max redelivery attempts" +
+                            "\n Will give up for now and try in next time frame in: "+ fixedDelay+"ms");
+                }
+
             }catch (Exception e){
                 LOG.error("CRITICAL error, message from "+endpoint.apply(ERROR)+" will be lost." +
                         "Headers:"+exchange.getIn().getHeaders().toString()+", Body:"+exchange.getIn().getBody().toString(), e);
@@ -105,14 +125,18 @@ public class ErrorMessageHandler implements CamelRoutes {
 
     public void consumeErrorMessagesOnIterval(){
         LOG.info("Consume any messages found in "+endpoint.apply(ERROR)+" on specific time interval.");
+
         boolean consumeWhileFound = true;
         int count = 0;
-        while(consumeWhileFound || count < 10){
-            String c = consumeErrorMessage(consumptionDelay);
+        while(consumeWhileFound || count < maxMessagesToConsume){ //try for 10 x consumptionDelay (ms)
+            String c = consumeErrorMessage(consumptionDelay,count);
             if(c == null){
                 consumeWhileFound = false;
             }
             count++;
+            if(count <= maxMessagesToConsume) {
+                LOG.trace(" -- Redelivery attempt: " + count);
+            }
         }
     }
 }
