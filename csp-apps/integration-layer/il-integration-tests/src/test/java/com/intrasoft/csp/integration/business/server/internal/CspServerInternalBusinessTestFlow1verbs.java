@@ -188,42 +188,42 @@ public class CspServerInternalBusinessTestFlow1verbs implements CamelRoutes {
     @Test
     public void dslFlow1DataTypePostToShareTest() throws Exception {
         mockUtils.sendFlow1Data(mvc,serverName, applicationId, false, true, this.dataTypeToTest, HttpMethods.POST.name());
-        assertPostPutFlow(tcProcessor.getTcTeamsFlow1(this.dataTypeToTest).size());
+        assertPostPutFlow(tcProcessor.getTcTeamsFlow1(this.dataTypeToTest).size(),null,null);
     }
 
     @DirtiesContext
     @Test
     public void dslFlow1TcIdPostToShareTest() throws Exception {
         mockUtils.sendFlow1Data(mvc,serverName, applicationId,tcId,null, false, true, this.dataTypeToTest, HttpMethods.POST.name());
-        assertPostPutFlow(tcProcessor.getTeamsByTrustCircleIdFlow1(tcId).size());
+        assertPostPutFlow(tcProcessor.getTeamsByTrustCircleIdFlow1(tcId).size(),tcId,null);
     }
 
     @DirtiesContext
     @Test
     public void dslFlow1TeamIdPostToShareTest() throws Exception {
         mockUtils.sendFlow1Data(mvc,serverName, applicationId,null,teamId, false, true, this.dataTypeToTest, HttpMethods.POST.name());
-        assertPostPutFlow(1);
+        assertPostPutFlow(1,null,teamId);
     }
 
     @DirtiesContext
     @Test
     public void dslFlow1DataTypePutToShareTest() throws Exception {
         mockUtils.sendFlow1Data(mvc,serverName, applicationId, false, true, this.dataTypeToTest, HttpMethods.PUT.name());
-        assertPostPutFlow(tcProcessor.getTcTeamsFlow1(this.dataTypeToTest).size());
+        assertPostPutFlow(tcProcessor.getTcTeamsFlow1(this.dataTypeToTest).size(),null,null);
     }
 
     @DirtiesContext
     @Test
     public void dslFlow1TcIdPutToShareTest() throws Exception {
         mockUtils.sendFlow1Data(mvc,serverName, applicationId,tcId,null, false, true, this.dataTypeToTest, HttpMethods.PUT.name());
-        assertPostPutFlow(tcProcessor.getTeamsByTrustCircleIdFlow1(tcId).size());
+        assertPostPutFlow(tcProcessor.getTeamsByTrustCircleIdFlow1(tcId).size(),tcId,null);
     }
 
     @DirtiesContext
     @Test
     public void dslFlow1TeamIdPutToShareTest() throws Exception {
         mockUtils.sendFlow1Data(mvc,serverName, applicationId,null,teamId, false, true, this.dataTypeToTest, HttpMethods.PUT.name());
-        assertPostPutFlow(1);
+        assertPostPutFlow(1,null,teamId);
     }
 
     @DirtiesContext
@@ -255,7 +255,7 @@ public class CspServerInternalBusinessTestFlow1verbs implements CamelRoutes {
     }
 
 
-    private void assertPostPutFlow(Integer expectedEscpMessages) throws Exception {
+    private void assertPostPutFlow(Integer expectedEscpMessages, String tcId, String teamId) throws Exception {
        /*
         DSL
          */
@@ -330,8 +330,15 @@ public class CspServerInternalBusinessTestFlow1verbs implements CamelRoutes {
         for (Exchange exchange : list) {
             Message in = exchange.getIn();
             EnhancedTeamDTO enhancedTeamDTO = in.getBody(EnhancedTeamDTO.class);
-            assertThat(tcProcessor.getTcTeamsFlow1(this.dataTypeToTest).stream()
-                    .anyMatch(t->t.getUrl().toLowerCase().equals(enhancedTeamDTO.getTeam().getUrl())),is(true));
+            if(!StringUtils.isEmpty(tcId)){
+                assertThat(tcProcessor.getTeamsByTrustCircleIdFlow1(tcId).stream()
+                        .anyMatch(t -> t.getUrl().toLowerCase().equals(enhancedTeamDTO.getTeam().getUrl())), is(true));
+            }else if(!StringUtils.isEmpty(teamId)){
+                assertThat(tcProcessor.getTeamByRestCall(teamId).getUrl().toLowerCase().equals(enhancedTeamDTO.getTeam().getUrl()), is(true));
+            }else {
+                assertThat(tcProcessor.getTcTeamsFlow1(this.dataTypeToTest).stream() //BUG in assertion when using tcId or teamId
+                        .anyMatch(t -> t.getUrl().toLowerCase().equals(enhancedTeamDTO.getTeam().getUrl())), is(true));
+            }
         }
 
         //ELASTIC

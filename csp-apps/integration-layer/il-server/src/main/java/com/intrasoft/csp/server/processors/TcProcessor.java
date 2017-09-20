@@ -235,7 +235,7 @@ public class TcProcessor implements Processor,CamelRoutes{
         }
     }
 
-    private Team getTeamByRestCall(String teamId) throws IOException {
+    public Team getTeamByRestCall(String teamId) throws IOException {
         Team team = camelRestService.send(this.getTcTeamsURI() + "/" + teamId, teamId, HttpMethod.GET.name(), Team.class);
         if(team.getShortName()==null){
             //TODO: this will activate GDelivery. Do we want this?
