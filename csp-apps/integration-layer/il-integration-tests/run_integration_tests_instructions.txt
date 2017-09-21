@@ -1,0 +1,46 @@
+1. Connect to the java docker container
+***************************************
+
+$ docker exec -ti csp-il /bin/sh
+
+
+2. Run the tests
+****************
+
+In the home directory you will find the integration tests jar. You can use the following commands to run various tests
+
+For teamId and tcId tests you must provide a team or tc that exists in TC db, where you run the tests, otherwise dummy
+hardcoced values will be used ("teamId","tcId"). In order to pass the values you can use the following arguments:
+-DextTcId=<REPLACE-WITH-TC-UUID>
+-DextTeamId=<REPLACE-WITH-TEAM-UUID>
+
+
+iTest1:
+-------
+
+java -jar -Dspring.profiles.active=docker -Dapache.camel.use.activemq=false -Dembedded.activemq.start=false -Dserver.ssl.enabled=false \
+-DextTcId=<REPLACE-WITH-TC-UUID> -DextTeamId=<REPLACE-WITH-TEAM-UUID> \
+itests.jar \
+com.intrasoft.csp.integration.business.server.internal.CspServerInternalBusinessTestFlow1dataTypes
+
+
+iTest2:
+-------
+
+java -jar -Dspring.profiles.active=docker -Dapache.camel.use.activemq=false -Dembedded.activemq.start=false -Dserver.ssl.enabled=false \
+-DextTcId=<REPLACE-WITH-TC-UUID> -DextTeamId=<REPLACE-WITH-TEAM-UUID> \
+itests.jar \
+com.intrasoft.csp.integration.business.server.internal.CspServerInternalBusinessTestFlow1verbs
+
+
+iTest3:
+-------
+In this test you must also use an extCspId argument having a value that exists in your TC db and is NOT the same with the cspId of the machine you
+ are running these tests:
+-DextCspId=<REPLACE-WITH-INCOMING-CSPID-NOT-SAME-WITH-RUNNING-MACHINE>
+
+
+java -jar -Dspring.profiles.active=docker -Dapache.camel.use.activemq=false -Dembedded.activemq.start=false -Dserver.ssl.enabled=false \
+-DextCspId=<REPLACE-WITH-INCOMING-CSPID-NOT-SAME-WITH-RUNNING-MACHINE> -DextTcId=<REPLACE-WITH-TC-UUID> -DextTeamId=<REPLACE-WITH-TEAM-UUID> \
+itests.jar \
+com.intrasoft.csp.integration.business.server.internal.CspServerInternalBusinessTestFlow2
