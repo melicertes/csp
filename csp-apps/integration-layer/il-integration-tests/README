@@ -46,3 +46,53 @@ scp csp@central-csp:/opt/csp/anon/anon-server-0.2.0-SNAPSHOT-exec.jar anon-serve
 
 scp csp@central-csp:/opt/csp/il/il-server-0.2.0-SNAPSHOT-exec.jar il-server-0.2.0-SNAPSHOT-exec.jar
 scp csp@central-csp:/opt/csp/il/integration-tests-0.2.0-SNAPSHOT.jar integration-tests-0.2.0-SNAPSHOT.jar
+
+
+******************
+* MANUAL TESTING *
+******************
+
+
+Test 1:
+-------
+
+Scenario: demo3 will send integration data to demo1 having a policy NOT TO SHARE
+
+Path with json resources:
+https://bitbucket.sastix.com/projects/SXCSP/repos/sxcsp/browse/csp-apps/integration-layer/il-integration-tests/src/test/resources/json
+
+1. Connect to demo3 with ssh
+2. Connect to csp-il container
+    $ docker exec -ti csp-il /bin/sh
+3. Check if curl works, if not install it.
+    $ apk --no-cache add curl
+4. Create integration data json object based on the files exist in git repo (copy-paste content in artefact.json and change the fields as needed)
+    $ vi threat.json
+5. Send the object with curl:
+    $ curl -v -s -k --key /opt/ssl/server/csp-internal.key --cert /opt/ssl/server/csp-internal.crt -H "Content-Type: application/json" -X POST -d @threat.json https://integration.local.demo3-csp.athens.intrasoft-intl.private/v1/dsl/integrationData
+
+
+Test 2:
+-------
+Scenario: same with test1 but having a policy to SHARE AS IS (change policy in integration-ui)
+
+Replay step 5 from previous step
+
+
+Test 3:
+-------
+Scenario: same with test1 but having a policy to SHARE ANONYMIZED (change policy in integration-ui)
+
+Replay step 5 from previous step
+
+
+Consume from DLQ
+-----------------
+$ docker exec -ti csp-il /bin/sh
+$ apk --no-cache add curl
+$ curl -v -s -k --key /opt/ssl/server/csp-internal.key --cert /opt/ssl/server/csp-internal.crt https://integration.local.demo3-csp.athens.intrasoft-intl.private/v1/manage/consume/errorq/10/300
+
+
+
+
+
