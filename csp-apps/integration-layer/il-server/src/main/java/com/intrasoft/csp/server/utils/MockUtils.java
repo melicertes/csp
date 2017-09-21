@@ -22,10 +22,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.PostConstruct;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -402,5 +400,17 @@ public class MockUtils implements ContextUrl {
 
     public void setDataObjectMap(Map<IntegrationDataType, String> dataObjectMap) {
         this.dataObjectMap = dataObjectMap;
+    }
+
+    public Integer getExpectedInternalAppsCount(String applicationId, String appsStr){
+        List<String> apps = new ArrayList<>();
+        if(!StringUtils.isEmpty(appsStr)){
+            String[] appsArr =  appsStr.split(",");
+            apps = Arrays.asList(appsArr).stream().map(s->s.trim()).collect(Collectors.toList());
+            //remove myself from internal apps
+            apps.remove(applicationId.toLowerCase());
+        }
+
+        return apps.size();
     }
 }
