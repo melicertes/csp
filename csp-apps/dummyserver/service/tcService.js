@@ -21,6 +21,6 @@ exports.getTeams = function (req, res) {
     console.log("tc team got it!");
     //res.send(err);
     //res.json({cspId:['http://ex.csp1.com']});
-    res.json({id:1,short_name:'',csp_id:'',name:'aaacsp'+cnt,csp_domain:'http://ex.aaacsp'+cnt+'.com'});
+    res.json({id:1,short_name:'cspId',csp_id:'cspId',name:'aaacsp'+cnt,csp_domain:'http://ex.aaacsp'+cnt+'.com'});
     //res.send('Successful creation');
 };

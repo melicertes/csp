@@ -1,5 +1,7 @@
 package com.intrasoft.csp.server.routes;
 
+import com.intrasoft.csp.commons.exceptions.ErrorLogException;
+import com.intrasoft.csp.commons.exceptions.InvalidSharingParamsException;
 import com.intrasoft.csp.commons.routes.CamelRoutes;
 import com.intrasoft.csp.server.processors.*;
 import org.apache.camel.LoggingLevel;
@@ -52,23 +54,28 @@ public class CspRoutes extends RouteBuilder implements CamelRoutes{
     public void configure() {
 
         // same approach with onException below
-        errorHandler(deadLetterChannel(endpoint.apply(ERROR))
+        /*errorHandler(deadLetterChannel(endpoint.apply(ERROR))
                 .maximumRedeliveries(maxRedeliveryAttempts)
                 .redeliveryDelay(redeliveryDelay)
                 .retryAttemptedLogLevel(LoggingLevel.WARN)
                 //.onRedelivery(exceptionProcessor)
                 .onPrepareFailure(exceptionProcessor)
-        );
+        );*/
+
 
         // same approach with errorHandler and DQL above
-        /*onException(Exception.class)
+        onException(Exception.class)
                 .maximumRedeliveries(maxRedeliveryAttempts)
                 .redeliveryDelay(redeliveryDelay)
                 .retryAttemptedLogLevel(LoggingLevel.WARN)
                 .process(exceptionProcessor)
                 .handled(true)
                 .inOnly(endpoint.apply(ERROR))
-        ;*/
+        ;
+
+        //just handle the specific exception without any redelivery, just let the exceptionProcessor log the error
+        onException(ErrorLogException.class).process(exceptionProcessor).handled(true);
+        onException(InvalidSharingParamsException.class).process(exceptionProcessor).handled(true);
 
         from(endpoint.apply(DSL))
                 .process(dslProcessor)

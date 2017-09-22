@@ -4,7 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.intrasoft.csp.anon.client.AnonClient;
 import com.intrasoft.csp.anon.commons.exceptions.AnonException;
 import com.intrasoft.csp.anon.commons.exceptions.InvalidDataTypeException;
+import com.intrasoft.csp.anon.commons.exceptions.MappingNotFoundForGivenTupleException;
 import com.intrasoft.csp.anon.commons.model.IntegrationAnonData;
+import com.intrasoft.csp.commons.exceptions.ErrorLogException;
 import com.intrasoft.csp.commons.exceptions.InvalidSharingParamsException;
 import com.intrasoft.csp.commons.model.*;
 import com.intrasoft.csp.commons.routes.CamelRoutes;
@@ -90,6 +92,7 @@ public class TcProcessor implements Processor,CamelRoutes{
         // SXCSP-185. tcId and teamId logic to be implemented - if both throw exception - Malformed 4xx
         if (!StringUtils.isEmpty(integrationData.getSharingParams().getTcId())
                 && !StringUtils.isEmpty(integrationData.getSharingParams().getTeamId())) {
+            //DO NOT ACTIVATE GDELIVERY by throwing any exception, just log the error
             throw new InvalidSharingParamsException("Invalid sharing params provided: tcId and team were both provided. " +
                     "Only one or none should be provided. "+integrationData.getSharingParams().toString());
         }
@@ -121,7 +124,8 @@ public class TcProcessor implements Processor,CamelRoutes{
         if(optionalTc.isPresent()){
             sendByTcId(optionalTc.get().getId(),exchange);
         }else{
-            throw new CspBusinessException("Could not find trust circle id for this data. "+integrationData.toString());
+            //DO NO ACTIVATE GDELIVERY by throwing any exception, just log the error
+            throw new ErrorLogException("Could not find trust circle id for this data. "+integrationData.toString());
         }
     }
 
@@ -136,7 +140,7 @@ public class TcProcessor implements Processor,CamelRoutes{
 
     List<Team> getTcTeams(String uri, Exchange exchange) throws IOException {
         String originEndpoint = (String) exchange.getIn().getHeader(CamelRoutes.ORIGIN_ENDPOINT);
-        boolean isFlow1 = originEndpoint.equals(routes.apply(CamelRoutes.DCL))?true:false;
+        boolean isFlow1 = originEndpoint.equals(routes.apply(CamelRoutes.DCL));
         return  getTcTeamsByArg(uri,isFlow1);
     }
 
@@ -147,18 +151,20 @@ public class TcProcessor implements Processor,CamelRoutes{
         for (String teamId : tc.getTeams()) {
             //make call to TC-team
             Team team = camelRestService.send(this.getTcTeamsURI() + "/" + teamId, teamId, HttpMethod.GET.name(), Team.class);
-            if (team.getShortName() == null) {
-                //TODO: this will activate GDelivery. Do we want this?
-                throw new CspBusinessException("Team short name received from TC API is null - cannot proceed. \n" +
+            if (StringUtils.isEmpty(team.getShortName())) {
+                //DO NO ACTIVATE GDELIVERY by throwing any exception, just log the error and let the code flow to next iteration
+                LOG.error("Team short name received from TC API is empty/null - SKIPPING this team... \n" +
                         "TrustCircle: " + tc.toString() + "\n" +
                         "Team: " + team.toString());
+                continue; // continue to next iteration
             }
 
-            if (team.getCspId() == null) {
-                //TODO: this will activate GDelivery. Do we want this?
-                throw new CspBusinessException("CspId received from TC API is null - cannot proceed. \n" +
+            if (StringUtils.isEmpty(team.getCspId())) {
+                //DO NO ACTIVATE GDELIVERY by throwing any exception, just log the error and let the code flow to next iteration
+                LOG.error("CspId received from TC API is empty/null - SKIPPING this team... \n" +
                         "TrustCircle: " + tc.toString() + "\n" +
                         "Team: " + team.toString());
+                continue;// continue to next iteration
             }
 
             if(isFlow1){
@@ -200,7 +206,8 @@ public class TcProcessor implements Processor,CamelRoutes{
         if(optionalTc.isPresent()){
             uri = this.getTcCirclesURI() + "/" + optionalTc.get().getId();
         }else{
-            throw new CspBusinessException("Integration Test error: Could not find trust circle id for this data. ");
+            //SHOULD NOT activate GDelivery. Log as error
+            throw new ErrorLogException("Integration Test error: Could not find trust circle id for this data. ");
         }
         return uri;
     }
@@ -238,13 +245,13 @@ public class TcProcessor implements Processor,CamelRoutes{
     public Team getTeamByRestCall(String teamId) throws IOException {
         Team team = camelRestService.send(this.getTcTeamsURI() + "/" + teamId, teamId, HttpMethod.GET.name(), Team.class);
         if(team.getShortName()==null){
-            //TODO: this will activate GDelivery. Do we want this?
-            throw new CspBusinessException("Team short name received from TC API is null - cannot proceed. \n" +
+            //SHOULD NOT activate GDelivery
+            throw new ErrorLogException("Team short name received from TC API is null - cannot proceed. \n" +
                     "Team: "+team.toString());
         }
         if(team.getCspId()==null){
-            //TODO: this will activate GDelivery. Do we want this?
-            throw new CspBusinessException("CspId received from TC API is null - cannot proceed. \n" +
+            //SHOULD NOT activate GDelivery
+            throw new ErrorLogException("CspId received from TC API is null - cannot proceed. \n" +
                     "Team: "+team.toString());
         }
         return team;
@@ -276,7 +283,7 @@ public class TcProcessor implements Processor,CamelRoutes{
                 IntegrationAnonData anonData = null;
                 try {
                     anonData = anonClient.postAnonData(integrationAnonData);
-                } catch (InvalidDataTypeException|NoSuchAlgorithmException|InvalidKeyException|IOException|AnonException e) {
+                } catch (InvalidDataTypeException|NoSuchAlgorithmException|InvalidKeyException|IOException|AnonException|MappingNotFoundForGivenTupleException e) {
                     LOG.error("Could not anonymize, falling back to 'DO_NOT_SHARE'. "+integrationAnonData.toString(),e);
                     return;
                 }

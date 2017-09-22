@@ -110,7 +110,7 @@ public class ErrorMessageHandler implements CamelRoutes {
                 Map<String, Object> headers = exchange.getIn().getHeaders();
                 if(failuresMap.containsKey(json.hashCode())){
                     //in this run this object has already been tried and should wait the next scheduled time-frame to be redelivered
-                    LOG.trace("In this run this object has already been tried and should wait the next scheduled time frame to be redelivered");
+                    LOG.trace("In this run this object has already been tried and should wait the next scheduled time frame to be redelivered. Going to next message from DQL");
                 }else {
                     //producer.sendBodyAndHeaders(endpointUri, body, headers);//IF it fails, it will be stacked in DLQ instantly
                     Exchange exch = producer.send(endpointUri, new Processor() {
