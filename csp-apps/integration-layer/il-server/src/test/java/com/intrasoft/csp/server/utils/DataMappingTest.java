@@ -3,11 +3,10 @@ package com.intrasoft.csp.server.utils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.intrasoft.csp.commons.model.DataParams;
-import com.intrasoft.csp.commons.model.IntegrationData;
-import com.intrasoft.csp.commons.model.IntegrationDataType;
-import com.intrasoft.csp.commons.model.SharingParams;
+import com.intrasoft.csp.commons.model.*;
 import com.intrasoft.csp.server.CspApp;
+import com.intrasoft.csp.server.policy.service.SharingPolicyService;
+import org.apache.commons.io.FileUtils;
 import org.joda.time.DateTime;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -18,7 +17,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.StringUtils;
 
+import javax.script.ScriptException;
+import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.charset.Charset;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -40,7 +44,10 @@ public class DataMappingTest {
     ObjectMapper objectMapper;
     @Autowired
     MockUtils mockUtils;
+    URL data_artefact = getClass().getClassLoader().getResource("data_artefact.json");
 
+    @Autowired
+    SharingPolicyService sharingPolicyService;
     @Test
     public void outputJsonDataObjectTest() throws IOException {
         String tcId = "justATcId";
@@ -95,5 +102,17 @@ public class DataMappingTest {
         String inStr = "{\"dataParams\":null,\"sharingParams\":{\"toShare\":null,\"isExternal\":null,\"trustCircleId\":\"dummyTcId\",\"teamId\":null},\"dataType\":\"incident\",\"dataObject\":null}";
         IntegrationData integrationData = objectMapper.readValue(inStr,IntegrationData.class);
         assertThat(integrationData.getSharingParams().getTcId(), is("dummyTcId"));
+    }
+
+    @Test
+    public void policyConditionTest() throws IOException, ScriptException, URISyntaxException {
+        String condition = "function(i,t)  i.dataObject.default.sha1 == '13da502ab0d75daca5e5075c60e81bfe3b7a637f' && t.cspId=='testCspId<UUID>' ";//Object.prototype.toString.call(jsArray)
+        Team team = new Team();
+        team.setCspId("testCspId<UUID>");
+
+        String json = FileUtils.readFileToString(new File(data_artefact.toURI()), Charset.forName("UTF-8"));
+        IntegrationData integrationData = objectMapper.readValue(json,IntegrationData.class);
+
+        assertThat(sharingPolicyService.checkCondition(condition,integrationData,team), is(true));
     }
 }
