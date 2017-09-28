@@ -16,6 +16,7 @@ exports.create = function (req, res) {
     console.log(req.body.dataType);
     console.log(req.body.dataParams);
     console.log(req.body.sharingParams);
+    console.log(JSON.stringify(req.body.dataObject, null, 2));
 
 };
 
@@ -29,6 +30,7 @@ exports.update = function (req, res) {
     console.log(req.body.dataType);
     console.log(req.body.dataParams);
     console.log(req.body.sharingParams);
+    console.log(JSON.stringify(req.body.dataObject, null, 2));
 };
 
 exports.delete = function (req, res) {
@@ -38,6 +40,7 @@ exports.delete = function (req, res) {
     console.log(req.body.dataType);
     console.log(req.body.dataParams);
     console.log(req.body.sharingParams);
+    console.log(JSON.stringify(req.body.dataObject, null, 2));
 };
 
 exports.version = function (req, res) {
