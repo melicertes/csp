@@ -66,10 +66,10 @@ https://bitbucket.sastix.com/projects/SXCSP/repos/sxcsp/browse/csp-apps/integrat
     $ docker exec -ti csp-il /bin/sh
 3. Check if curl works, if not install it.
     $ apk --no-cache add curl
-4. Create integration data json object based on the files exist in git repo (copy-paste content in artefact.json and change the fields as needed)
-    $ vi threat.json
+4. Create integration data json object based on the files exist in git repo (copy-paste content from artefact.json and change the fields as needed)
+    $ vi in.json
 5. Send the object with curl:
-    $ curl -v -s -k --key /opt/ssl/server/csp-internal.key --cert /opt/ssl/server/csp-internal.crt -H "Content-Type: application/json" -X POST -d @threat.json https://integration.local.demo3-csp.athens.intrasoft-intl.private/v1/dsl/integrationData
+    $ curl -v -s -k --key /opt/ssl/server/csp-internal.key --cert /opt/ssl/server/csp-internal.crt -H "Content-Type: application/json" -X POST -d @in.json https://integration.local.demo3-csp.athens.intrasoft-intl.private/v1/dsl/integrationData
 
 
 Test 2:
