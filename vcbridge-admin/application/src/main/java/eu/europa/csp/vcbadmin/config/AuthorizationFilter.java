@@ -1,29 +1,24 @@
 package eu.europa.csp.vcbadmin.config;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
+import eu.europa.csp.vcbadmin.model.CustomUserDetails;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
+import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
-import org.springframework.stereotype.Component;
-import org.springframework.util.Assert;
-import org.springframework.util.StringUtils;
-import org.springframework.web.filter.OncePerRequestFilter;
-
-import eu.europa.csp.vcbadmin.model.CustomUserDetails;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
 
 //@Component
 public class AuthorizationFilter extends OncePerRequestFilter {
@@ -59,7 +54,7 @@ public class AuthorizationFilter extends OncePerRequestFilter {
 			user = new CustomUserDetails(userHeaderValue, "123456", authorities, null, null, null);
 			user.setGroup(groupHeaderValue);
 
-			Authentication auth = new UsernamePasswordAuthenticationToken(user, "12345", user.getAuthorities());
+			Authentication auth = new UserPassAuthenticationToken(user, "12345", user.getAuthorities());
 
 			SecurityContextHolder.getContext().setAuthentication(this.authenticationManager
 					.authenticate(auth));
