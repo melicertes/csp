@@ -17,6 +17,7 @@
     <packaging>pom</packaging>
 
     <modules>
+        <module>misp-adapter-emitter</module>
         <module>misp-client</module>
         <module>misp-commons</module>
         <module>misp-tests</module>
