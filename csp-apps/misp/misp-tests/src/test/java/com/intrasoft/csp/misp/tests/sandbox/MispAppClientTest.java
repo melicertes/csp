@@ -27,8 +27,8 @@ import static org.hamcrest.Matchers.is;
 @SpringBootTest(classes = {MispAppClient.class, MispAppClientConfig.class},
         properties = {
                 "misp.app.protocol:http",//ms
-                "misp.app.host:localhost",
-                "misp.app.port:8181",
+                "misp.app.host:misp.dimitris.dk",
+                "misp.app.port:80",
                 "misp.app.authorization.key:JNqWBxfPiIywz7hUe58MyJf6sD5PrTVaGm7hTn6c"})
 public class MispAppClientTest {
     private static final Logger LOG = LoggerFactory.getLogger(MispAppClientTest.class);
@@ -66,6 +66,13 @@ public class MispAppClientTest {
         String event = new String(Files.readAllBytes(Paths.get(url.toURI())));
         mispAppClient.setProtocolHostPortHeaders(protocol, host, port, authorizationKey);
         ResponseEntity<String> response = mispAppClient.updateMispEvent(event);
+        assertThat(response.getStatusCodeValue(), is(200));
+    }
+
+    @Test
+    public void deleteMispEventTest() throws URISyntaxException, IOException {
+        mispAppClient.setProtocolHostPortHeaders(protocol, host, port, authorizationKey);
+        ResponseEntity<String> response = mispAppClient.deleteMispEvent(687);
         assertThat(response.getStatusCodeValue(), is(200));
     }
 }

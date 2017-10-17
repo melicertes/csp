@@ -22,7 +22,7 @@ public class MispAppClientImpl implements MispAppClient{
 //    RetryRestTemplate retryRestTemplate;
 
     @Value("${misp.app.events.path}")
-    String eVentsPath;
+    String eventsPath;
 
 
     @Override
@@ -44,23 +44,38 @@ public class MispAppClientImpl implements MispAppClient{
 
     @Override
     public ResponseEntity<String> addMispEvent(String object) {
-        String url = context  + "/" + eVentsPath;
+        String url = context  + "/" + eventsPath;
 
         LOG.info("API call [post]: " + url);
         RestTemplate restTemplate = new RestTemplate();
         HttpEntity<String> request = new HttpEntity<>(new String(object.toString()), headers);
-        ResponseEntity<String> response = restTemplate.exchange(context, HttpMethod.POST, request, String.class);
+        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, request, String.class);
         return response;
     }
 
     @Override
     public ResponseEntity<String> updateMispEvent(String object) {
-        String url = context  + "/" + eVentsPath;
+        String url = context  + "/" + eventsPath;
 
-        LOG.info("API call [post]: " + url);
+        LOG.info("API call [put]: " + url);
         RestTemplate restTemplate = new RestTemplate();
         HttpEntity<String> request = new HttpEntity<>(new String(object.toString()), headers);
-        ResponseEntity<String> response = restTemplate.exchange(context, HttpMethod.PUT, request, String.class);
+        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.PUT, request, String.class);
+        return response;
+    }
+
+    @Override
+    public ResponseEntity<String> deleteMispEvent(Integer id) {
+        String url = context  + "/" + eventsPath + "/" + id;
+
+        LOG.info("API call [delete]: " + url);
+        RestTemplate restTemplate = new RestTemplate();
+        HttpEntity<?> request = new HttpEntity<>(headers);
+        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.DELETE, request, String.class);
+
+        LOG.info(response.toString());
+        restTemplate.delete(url);
+
         return response;
     }
 }

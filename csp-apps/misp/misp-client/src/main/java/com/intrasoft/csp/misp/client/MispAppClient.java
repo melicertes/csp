@@ -11,5 +11,6 @@ public interface MispAppClient {
 
 	ResponseEntity<String> addMispEvent(String object);
 	ResponseEntity<String> updateMispEvent(String object);
+	ResponseEntity<String> deleteMispEvent(Integer id);
 
 }
