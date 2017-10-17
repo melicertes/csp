@@ -1,6 +1,6 @@
 package com.intrasoft.csp.misp.api;
 
-import com.intrasoft.csp.libraries.model.IntegrationData;
+import com.intrasoft.csp.commons.model.IntegrationData;
 import com.intrasoft.csp.misp.commons.config.ApiContextUrl;
 import com.intrasoft.csp.misp.service.AdapterDataHandler;
 import org.slf4j.Logger;

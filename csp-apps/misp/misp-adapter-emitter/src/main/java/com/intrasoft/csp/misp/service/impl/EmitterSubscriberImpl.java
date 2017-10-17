@@ -1,9 +1,9 @@
 package com.intrasoft.csp.misp.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.intrasoft.csp.libraries.model.DataParams;
-import com.intrasoft.csp.libraries.model.IntegrationData;
-import com.intrasoft.csp.libraries.model.SharingParams;
+import com.intrasoft.csp.commons.model.DataParams;
+import com.intrasoft.csp.commons.model.IntegrationData;
+import com.intrasoft.csp.commons.model.SharingParams;
 import com.intrasoft.csp.misp.service.EmitterSubscriber;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
