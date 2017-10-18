@@ -4,9 +4,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.intrasoft.csp.commons.model.DataParams;
 import com.intrasoft.csp.commons.model.IntegrationData;
 import com.intrasoft.csp.commons.model.SharingParams;
+import com.intrasoft.csp.misp.service.EmitterDataHandler;
 import com.intrasoft.csp.misp.service.EmitterSubscriber;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.zeromq.ZMQ;
@@ -31,6 +33,9 @@ public class EmitterSubscriberImpl implements EmitterSubscriber{
     @Value("${zeromq.topic}")
     String zeroMQtopic;
 
+    @Autowired
+    EmitterDataHandler emitterDataHandler;
+
     @Override
     public void subscribe() {
         // Prepare our context and subscriber
@@ -49,27 +54,9 @@ public class EmitterSubscriberImpl implements EmitterSubscriber{
 
             LOG.info(topic + ": " + content);
 
-            DataParams dataParams = new DataParams();
 
-            SharingParams sharingParams = new SharingParams();
-            sharingParams.setIsExternal(true);
 
-            IntegrationData integrationData = new IntegrationData();
-            integrationData.setDataParams(dataParams);
-            integrationData.setSharingParams(sharingParams);
-            integrationData.setDataObject(content);
-
-            ObjectMapper objectMapper = new ObjectMapper();
-            Map<?,?> empMap = null;
-            try {
-                empMap = objectMapper.readValue(new ByteArrayInputStream(content.getBytes()),Map.class);
-                for (Map.Entry<?, ?> entry : empMap.entrySet())
-                {
-//                    logger.info("\n----------------------------\n"+entry.getKey() + "=" + entry.getValue()+"\n");
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            emitterDataHandler.handleMispData(content);
 
         }
         subscriber.close ();
