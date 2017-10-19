@@ -74,7 +74,7 @@ public class MispAppClientTest {
     @Test
     public void deleteMispEventTest() throws URISyntaxException, IOException {
         mispAppClient.setProtocolHostPortHeaders(protocol, host, port, authorizationKey);
-        ResponseEntity<String> response = mispAppClient.deleteMispEvent(687);
+        ResponseEntity<String> response = mispAppClient.deleteMispEvent(763);
         LOG.info(response.toString());
         assertThat(response.getStatusCodeValue(), is(200));
     }

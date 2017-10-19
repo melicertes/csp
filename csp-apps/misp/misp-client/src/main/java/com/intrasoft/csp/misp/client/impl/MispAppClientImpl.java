@@ -49,6 +49,7 @@ public class MispAppClientImpl implements MispAppClient{
         LOG.info("API call [post]: " + url);
         RestTemplate restTemplate = new RestTemplate();
         HttpEntity<String> request = new HttpEntity<>(new String(object.toString()), headers);
+//        LOG.info();
         ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, request, String.class);
         return response;
     }

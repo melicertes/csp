@@ -27,6 +27,7 @@ public class AdapterController implements ApiContextUrl {
         return adapterDataHandler.handleIntegrationData(integrationData, "POST");
     }
 
+
     @RequestMapping(value = API_BASE + "v/" + REST_API_V1 + "/" + API_ADAPTER,
             consumes = {"application/json"},
             method = RequestMethod.PUT)

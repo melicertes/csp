@@ -1,9 +1,5 @@
 package com.intrasoft.csp.misp.service.impl;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.intrasoft.csp.commons.model.DataParams;
-import com.intrasoft.csp.commons.model.IntegrationData;
-import com.intrasoft.csp.commons.model.SharingParams;
 import com.intrasoft.csp.misp.service.EmitterDataHandler;
 import com.intrasoft.csp.misp.service.EmitterSubscriber;
 import org.slf4j.Logger;
@@ -12,10 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.zeromq.ZMQ;
-
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.util.Map;
 
 @Service
 public class EmitterSubscriberImpl implements EmitterSubscriber{
@@ -53,11 +45,7 @@ public class EmitterSubscriberImpl implements EmitterSubscriber{
             String content = msg.substring(msg.indexOf(' ') + 1);
 
             LOG.info(topic + ": " + content);
-
-
-
             emitterDataHandler.handleMispData(content);
-
         }
         subscriber.close ();
         context.term ();
