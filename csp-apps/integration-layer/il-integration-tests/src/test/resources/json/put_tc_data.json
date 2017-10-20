@@ -1,0 +1,48 @@
+{
+  "dataParams": {
+    "cspId": "central-csp",
+    "applicationId": "trustCircle",
+    "recordId": "team:578c0e4e-ebaf-455b-a2a1-faffb14be9e1",
+    "dateTime": "2017-09-14T14:56:58.000Z",
+    "originCspId": "central-csp",
+    "originApplicationId": "trustCircle",
+    "originRecordId": "team:578c0e4e-ebaf-455b-a2a1-faffb14be9e1",
+    "url": "null"
+  },
+  "sharingParams": {
+    "toShare": true,
+    "isExternal": false,
+    "trustCircleId": "",
+    "teamId": ""
+  },
+  "dataType": "trustCircle",
+  "dataObject": [
+    {
+      "fields": {
+        "status": "c3d6f205-eb4d-4a1b-ac2e-37a2ef80f69d",
+        "established": "2017-03-27",
+        "additional_countries": [],
+        "name": "demo1-csp",
+        "host_organisation": "demo1-csp",
+        "created": "2017-04-25T14:07:24.533Z",
+        "country": "41d68647-1c3a-4681-8c7e-e85cd374d2cd",
+        "nis_team_types": [
+          "04215624-e922-4e7d-9eb3-d8e005cdff2e",
+          "2282af0e-292d-400b-ba31-047d9d43f229"
+        ],
+        "short_name": "demo1-csp",
+        "csp_installed": true,
+        "nis_sectors": [
+          "38b6a409-5601-4814-b55d-93e741c71dd9"
+        ],
+        "csp_id": "demo1-csp",
+        "csp_domain": "demo1-csp.athens.intrasoft-intl.private",
+        "description": "demo1-csp aela kalo mou 9999"
+      },
+      "model": "ctc.team",
+      "pk": "578c0e4e-ebaf-455b-a2a1-faffb14be9e1"
+    }
+  ]
+}
+
+

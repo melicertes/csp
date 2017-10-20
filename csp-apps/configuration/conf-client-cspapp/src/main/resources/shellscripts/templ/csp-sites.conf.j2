@@ -1,0 +1,229 @@
+################################
+## CSP Services
+################################
+{% for service in services -%}
+    {% if ( (is_central == true and service.central_only == true) or (is_central == false and service.central_only == false)  or (is_central == true and service.central_only == false) ) %}
+    #------------------------------------------------------------#
+    #   Docker   :     {{ service.docr_name }}
+    #   Internal :     {{ service.internal_name }}
+    #   External :     {{ service.external_name }}
+    #------------------------------------------------------------#
+        {% if (  service.internal_name) -%}
+        #        Internal
+        #--------------------------------------------------------#
+        <VirtualHost *:443>
+
+              ServerName {{ service.internal_name }}.local.{{ csp_name }}.{{ domain }}
+              {% for path in service.skip_reverse_proxy_paths -%}
+              ProxyPass {{ path }} !
+              {% endfor %}
+              {% if service.docr_name == 'tc'-%}
+              Alias /static/ /opt/tc/var/static/
+              ProxyPass /static/ !
+
+              <Directory /opt/tc/var/static/>
+                Require all granted
+              </Directory>
+              {% endif -%}
+
+              SSLEngine on
+              SSLCertificateFile    {{ internalSSLCertificateFile }}
+              SSLCertificateKeyFile {{ internalSSLCertificateKeyFile }}
+              {% if service.mutual_ssl.internal == true-%}
+              SSLVerifyClient require
+              SSLVerifyDepth 1
+              {% if internalSSLCACertificateFile is defined %}
+              SSLCACertificateFile {{ internalSSLCACertificateFile }}
+              {% endif %}
+              {% endif -%}
+
+              {% set docr_name = service.docr_name.split('-')[0] %}
+              ProxyPass / {{ service.protocol }}://csp-{{ docr_name }}:{{ service.docr_port }}{{ service.base_path }}
+              ProxyPassReverse / {{ service.protocol }}://csp-{{ docr_name }}:{{ service.docr_port }}{{ service.base_path }}
+
+        </VirtualHost>
+        {% endif -%}
+        {% if ( service.external_name) -%}
+        #--------------------------------------------------------#
+        #        External
+        #--------------------------------------------------------#
+         <VirtualHost *:443>
+
+              ServerName {{ service.external_name }}.{{ csp_name }}.{{ domain }}
+              {% for path in service.skip_reverse_proxy_paths -%}
+              ProxyPass {{ path }} !
+              {% endfor %}
+              {% if service.docr_name == 'tc'-%}
+              Alias /static/ /opt/tc/var/static/
+              ProxyPass /static/ !
+              ProxyPass /api/ !
+
+              <Directory /opt/tc/var/static/>
+                Require all granted
+              </Directory>
+              {% endif -%}
+
+              SSLEngine on
+              SSLCertificateFile    {{ externalSSLCertificateFile }}
+              SSLCertificateKeyFile {{ externalSSLCertificateKeyFile }}
+
+              {% if service.docr_name == 'oam' -%}
+              SSLVerifyDepth 1
+              SSLVerifyClient optional
+              SSLProxyEngine on
+              RequestHeader set SSL_CLIENT_CERT ""
+              RequestHeader set SSL_CLIENT_CERT "%{SSL_CLIENT_CERT}s"
+              SSLCACertificateFile {{ externalSSLCACertificateFile }}
+              {% endif -%}
+
+              {% if service.mutual_ssl.external == true-%}
+              SSLVerifyClient require
+              SSLVerifyDepth 1
+              {% if externalSSLCACertificateFile is defined %}
+              SSLCACertificateFile {{ externalSSLCACertificateFile }}
+              {% endif -%}
+              {% endif -%}
+
+              {% set docr_name = service.docr_name.split('-')[0] %}
+              ProxyPass / {{ service.protocol }}://csp-{{ docr_name }}:{{ service.docr_port }}{{ service.base_path }}
+              ProxyPassReverse / {{ service.protocol }}://csp-{{ docr_name }}:{{ service.docr_port }}{{ service.base_path }}
+
+              {% if 'name' in service.agent -%}
+              AmAgent On
+              AmAgentConf /web_agents/apache24_agent/bin/../instances/{{ service.agent['name'] }}/config/agent.conf
+              {% endif -%}
+
+        </VirtualHost>
+        {% endif -%}
+    {% endif -%}
+{% endfor %}
+
+
+################################
+## CSP Applications
+################################
+
+{% for service in applications -%}
+{% if service.docr_name != 'tc'-%}
+    {% if ( (is_central == true and service.central_only == true) or (is_central == false and service.central_only == false) or (is_central == true and service.central_only == false) ) %}
+    #------------------------------------------------------------#
+    #   Docker   :     {{ service.docr_name }}
+    #   Internal :     {{ service.internal_name }}
+    #   External :     {{ service.external_name }}
+    #------------------------------------------------------------#
+        {% if (  service.internal_name) -%}
+        #        Internal
+        #--------------------------------------------------------#
+        <VirtualHost *:443>
+
+              ServerName {{ service.internal_name }}.local.{{ csp_name }}.{{ domain }}
+              {% for path in service.skip_reverse_proxy_paths -%}
+              ProxyPass {{ path }} !
+              {% endfor %}
+              SSLEngine on
+              SSLCertificateFile    {{ internalSSLCertificateFile }}
+              SSLCertificateKeyFile {{ internalSSLCertificateKeyFile }}
+              {% if service.mutual_ssl.internal == true-%}
+              SSLVerifyClient require
+              SSLVerifyDepth 1
+              {% if internalSSLCACertificateFile is defined %}
+              SSLCACertificateFile {{ internalSSLCACertificateFile }}
+              {% endif -%}
+              {% endif -%}
+
+             # ProxyPass / {{ service.protocol }}://csp-{{ service.docr_name }}:{{ service.docr_port }}{{ service.base_path }}
+             # ProxyPassReverse / {{ service.protocol }}://csp-{{ service.docr_name }}:{{ service.docr_port }}{{ service.base_path }}
+             # mocked
+              ProxyPass / {{ service.protocol }}://csp-mock:3002/
+              ProxyPassReverse / {{ service.protocol }}://csp-mock:3002/
+
+        </VirtualHost>
+        {% endif -%}
+        {% if ( service.external_name) -%}
+        #--------------------------------------------------------#
+        #        External
+        #--------------------------------------------------------#
+         <VirtualHost *:443>
+
+              ServerName {{ service.external_name }}.{{ csp_name }}.{{ domain }}
+              {% for path in service.skip_reverse_proxy_paths -%}
+              ProxyPass {{ path }} !
+              {% endfor %}
+              SSLEngine on
+              SSLCertificateFile    {{ externalSSLCertificateFile }}
+              SSLCertificateKeyFile {{ externalSSLCertificateKeyFile }}
+              {% if service.mutual_ssl.external == true-%}
+              SSLVerifyClient require
+              SSLVerifyDepth 1
+              {% if externalSSLCACertificateFile is defined %}
+              SSLCACertificateFile {{ externalSSLCACertificateFile }}
+              {% endif -%}
+              {% endif -%}
+
+              {% if service.docr_name == 'jitsi'-%}
+	      SSLProxyEngine on
+              SSLProxyVerify none
+              SSLProxyCheckPeerCN off
+              SSLProxyCheckPeerName off
+
+              ProxyPreserveHost on
+
+              ProxyPass /ofmeet http://{{ host_ip }}:7070/ofmeet
+              ProxyPassReverse /ofmeet http://{{ host_ip }}:7070/ofmeet
+
+              ProxyPass /ofmeetws ws://{{ host_ip }}:7070/ofmeetws
+              ProxyPassReverse /ofmeetws ws://{{ host_ip }}:7070/ofmeetws
+
+              ProxyPass / {{ service.protocol }}://{{ host_ip }}:7070/
+              ProxyPassReverse / {{ service.protocol }}://{{ host_ip }}:7070/
+              {% endif -%}
+
+              {% if service.docr_name == 'jitsi'-%}
+              
+              {% else -%}
+              ProxyPass / {{ service.protocol }}://csp-{{ service.docr_name }}:{{ service.docr_port }}{{ service.base_path }}
+              ProxyPassReverse / {{ service.protocol }}://csp-{{ service.docr_name }}:{{ service.docr_port }}{{ service.base_path }}
+              {% endif -%}
+
+              {% if 'name' in service.agent -%}
+              AmAgent On
+              AmAgentConf /web_agents/apache24_agent/bin/../instances/{{ service.agent['name'] }}/config/agent.conf
+              {% endif -%}
+
+
+        </VirtualHost>
+         {% if service.docr_name == 'jitsi'-%}
+
+       #--------------------------------------------------------#
+        #        Jitsi Admin External (jitsi-vc-bridge)
+        #--------------------------------------------------------#
+         <VirtualHost *:{{ service.external_port }}>
+
+              ServerName {{ service.external_name }}.{{ csp_name }}.{{ domain }}
+
+              SSLEngine on
+              SSLCertificateFile    {{ externalSSLCertificateFile }}
+              SSLCertificateKeyFile {{ externalSSLCertificateKeyFile }}
+              {% if service.mutual_ssl.external == true-%}
+              SSLVerifyClient require
+              SSLVerifyDepth 1
+              {% if externalSSLCACertificateFile is defined %}
+              SSLCACertificateFile {{ externalSSLCACertificateFile }}
+              {% endif -%}
+              {% endif -%}
+
+              ProxyPass / {{ service.protocol }}://{{ host_ip }}:{{ service.internal_port }}{{ service.base_path }}
+              ProxyPassReverse / {{ service.protocol }}://{{ host_ip }}:{{ service.internal_port }}{{ service.base_path }}
+
+              {% if 'name' in service.agent -%}
+              AmAgent On
+              AmAgentConf /web_agents/apache24_agent/bin/../instances/{{ service.agent['name'] }}/config/agent.conf
+              {% endif -%}
+
+         </VirtualHost>
+         {% endif -%}
+        {% endif -%}
+    {% endif -%}
+{% endif -%}
+{% endfor %}
+

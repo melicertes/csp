@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments::head(title='Dashboard', description='dashboard description')">
+</head>
+
+<body>
+
+<nav class="navbar navbar-inverse navbar-fixed-top">
+    <div th:replace="fragments::nav"></div>
+</nav>
+
+<div class="container">
+
+    <div class="row">
+        <div class="col-md-12">
+            <p>&nbsp;</p>
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="col-md-12">
+            <h2 class="page-header"><i class="fa fa-list"></i> CSP Mappings</h2>
+        </div>
+    </div>
+
+    <div class = "alert alert-success" th:if="${msg}">
+        <span th:text="${msg}"></span>
+    </div>
+    <div class="row">
+        <div class="col-md-12 col-sm-12">
+            <div class="row" data-duplicate="contact" data-duplicate-min="2" data-duplicate-max="10">
+                <form th:id="mappingForm" id="mappingForm" th:action="@{/mapping/save}" th:object="${mapping}" enctype="multipart/form-data" method="post" data-toggle="validator">
+                    <div class="col-md-3 col-xs-12">
+                        <div class="form-group">
+                            <label>CSP id:</label>
+                            <input class="form-control" th:field="*{id}" name="id" type="hidden"/>
+                            <input id="cspId" th:id="cspId" class="form-control" th:field="*{cspId}" name="cspId" th:name="cspId" type="text" required="required"/>
+                            <span th:if="${#fields.hasErrors('cspId')}" th:errors="*{cspId}">cspId Error</span>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-xs-12">
+                        <label>Data Type:</label>
+                        <div class="input-group" style="width: 100%;">
+                            <select id="selectDataTypeId" th:id="selectDataTypeId" th:field="*{dataType}" class="form-control" name="selectDataType" th:name="selectDataType" required="required">
+                                <option th:value="${null}" th:text="${'select datatype'}" th:selected="selected"></option>
+                                <option th:each="dataType : ${integrationDataTypes}"
+                                        th:value="${dataType.name()}"
+                                        th:text="${dataType}">
+                                </option>
+                            </select>
+                            <span th:if="${#fields.hasErrors('dataType')}" th:errors="*{dataType}">dataType Error</span>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-xs-12">
+                        <label>RuleSet:</label>
+                        <div class="input-group" style="width: 100%;">
+                            <select id="selectRulesetId" th:id="selectRulesetId" th:field="*{ruleSetId}" class="form-control" th:selected="null" name="selectRuleset" th:name="selectRuleset" required="required">
+                                <option th:value="${null}" th:text="${'select ruleset'}" th:selected="selected"></option>
+                                <option th:each="ruleset : ${rulesets}"
+                                        th:value="${ruleset.id}"
+                                        th:text="${ruleset.filename}">
+                                </option>
+                            </select>
+                            <span th:if="${#fields.hasErrors('ruleSetId')}" th:errors="*{ruleSetId}">ruleset Error</span>
+                        </div>
+                    </div>
+                    <div class="col-md-2 col-xs-12" style="text-align: right">
+                        <div class="form-group">
+                            <p>&nbsp;</p>
+                            <button type="submit" value="Submit" class="save btn btn-success"><i class="glyphicon glyphicon-plus"></i>&nbsp;Save</button>&nbsp;
+                            <button type="reset" value="Reset" class="save btn btn-default pull-right" onclick="window.location='/mappings'">Clear</button>
+                        </div>
+                    </div>
+                </form>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <table data-toggle="table" data-page-size="20" data-pagination="true">
+                                <thead>
+                                <tr>
+                                    <th><i class="fa  fa-file-code-o"></i></th>
+                                    <th data-sortable="true">CSP Id</th>
+                                    <th data-sortable="true">Data Type</th>
+                                    <th data-sortable="true">Ruleset</th>
+                                    <th>Actions</th>
+                                </tr>
+                                </thead>
+                                <tr th:id="${mapping.id}" th:each="mapping,iterStat: ${mappings}"  th:class="${id != null and id == mapping.id? 'table-success success':''}">
+                                    <td th:text="${iterStat.count}"></td>
+                                    <td th:text="${mapping.cspId}"></td>
+                                    <td th:text="${mapping.dataType}"></td>
+                                    <td th:text="${mapping.ruleSetDTO.filename}"></td>
+                                    <td><a th:href="'#'+${mapping.id}"  data-toggle="modal" ><i class="fa fa-trash" aria-hidden="true"></i></a>
+                                        <a th:href="'/mappings/'+${mapping.id}"><i class="fa fa-edit" aria-hidden="true"></i></a></td>
+                                    <!-- Modal -->
+                                    <div class="modal fade" th:id="${mapping.id}" aria-labelledby="tiketLabel" tabindex="-1" role="dialog" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                                                    <h4 class="modal-title" id="tiketLabel"><span th:text="Confirm"></span></h4>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <h4 class="modal-title" th:id="tiketLabel">Are you sure you want to delete mapping for cspId
+                                                        <span th:text="${mapping.cspId}"></span> and datatype <span th:text="${mapping.dataType}"></span> ?
+                                                    </h4>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <a th:href="@{'/mapping/delete/' + ${mapping.id}}" class="btn btn-danger pull-left">Delete</a>
+                                                    <button class="btn btn-default pull-right" data-dismiss="modal">No</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+            </div>
+        </div>
+    </div>
+</div>
+<th:block th:replace="fragments::scripts"></th:block>
+<script th:src="@{/webjars/jquery-validation/1.16.0/jquery.validate.min.js}"></script>
+<script th:src="@{/webjars/jquery-validation/1.16.0/additional-methods.min.js}"></script>
+
+<script>
+    $("#mappingForm").validate(
+        {
+            submitHandler: function(form) {
+                form.submit();
+            }
+        }
+    );
+</script>
+</body>
+
+</html>

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments::head(title='Dashboard', description='dashboard description')"></head>
+
+<body>
+
+<nav class="navbar navbar-inverse navbar-fixed-top">
+    <div th:replace="fragments::nav"></div>
+</nav>
+
+<div class="container">
+
+    <div class="row">
+        <div class="col-md-12">
+            <p>&nbsp;</p>
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="col-md-12">
+            <h2 class="page-header"><i class="fa fa-dashboard"></i> Core Service Platforms Configuration Dashboard</h2>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <table data-toggle="table"
+                   th:attr="data-url=${dataDashboardUrl}"
+                   data-cache="false"
+                   data-query-params="queryParams"
+                   data-pagination="true"
+                   data-page-size="5"
+                   data-page-list="[10, 20, 50]"
+                   data-search="true"
+                   data-show-refresh="true"
+                   data-show-toggle="true"
+                   data-show-columns="true">
+                <thead>
+                <tr>
+                    <th data-field="icon" data-align="center"></th>
+                    <th data-field="name" data-sortable="true">CSP Name</th>
+                    <th data-field="domain" data-sortable="true">Domain</th>
+                    <th data-field="registrationDate" data-sortable="true">Registration Date</th>
+                    <th data-field="lastUpdate" data-sortable="true">Last Heartbeat</th>
+                    <th data-field="lastManaged" data-sortable="true" data-visible="false" class="col-xs-1">Last Managed</th>
+                    <th data-field="confUpdates" data-sortable="false" data-visible="false" class="col-xs-1">Configured Updates</th>
+                    <th data-field="reportUpdates" data-sortable="false" data-visible="false" class="col-xs-1">Reported Updates</th>
+                    <th data-field="btn" data-sortable="false" data-align="center">Actions</th>
+                </tr>
+                </thead>
+
+            </table>
+        </div>
+    </div>
+
+</div>
+
+
+<th:block th:replace="fragments::scripts"></th:block>
+<script th:src="@{/assets/js/pages/dashboard.js}"></script>
+
+</body>
+
+</html>

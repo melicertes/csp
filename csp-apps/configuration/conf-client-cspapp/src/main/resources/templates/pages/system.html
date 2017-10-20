@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments::head(title='System Status', description='dashboard description')"></head>
+
+<body>
+
+<nav class="navbar navbar-inverse navbar-fixed-top">
+    <div th:replace="fragments::nav"></div>
+</nav>
+
+<div class="container">
+
+    <div class="row">
+        <div class="col-md-12">
+            <p>&nbsp;</p>
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="col-md-12">
+            <h2 class="page-header"><i class="fa fa-hdd-o fa-2x"></i> System</h2>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div id="toolbar" class="btn-group pull-right">
+                <a href="#" th:href="${canStart ? startUrl : '#'}" id="start" class="btn btn-success" th:disabled="${!canStart}"><i class="fa fa-play fa-2"></i> Start</a>
+                <a href="#" th:href="${canStop ? stopUrl : '#' }" id="stop" class="btn btn-danger" th:disabled="${!canStop}"><i class="fa fa-stop fa-2"></i> Stop</a>
+            </div>
+            <table id="updates-table"
+                   data-toggle="table"
+                   th:attr="data-url=${systemRetrieveUrl}"
+                   data-cache="false"
+                   data-query-params="queryParams"
+                   data-pagination="true"
+                   data-page-size="20"
+                   data-page-list="[20, 50, 100]"
+                   data-search="true"
+                   data-show-refresh="true"
+                   data-show-toggle="true"
+                   data-show-columns="true"
+                   data-toolbar="#toolbar"
+                   data-toolbarAlign="right"
+                   data-buttonsAlign="left">
+                <thead>
+                <tr>
+                    <th data-field="name" data-sortable="false">Name</th>
+                    <th data-field="currentState" data-sortable="false">Current State</th>
+                    <th data-field="startable" data-sortable="false">Can start?</th>
+                    <th data-field="startPriority" data-sortable="true">Priority</th>
+                    <th data-field="version" data-sortable="false">Version</th>
+                </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+
+<th:block th:replace="fragments::scripts"></th:block>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+
+    /*]]>*/
+</script>
+
+<script th:src="@{/assets/js/pages/system.js}"></script>
+
+</body>
+
+</html>

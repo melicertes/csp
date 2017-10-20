@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments::head(title='Error', description='Resource not found')"></head>
+
+<body>
+
+<nav class="navbar navbar-inverse navbar-fixed-top">
+    <div th:replace="fragments::nav"></div>
+</nav>
+
+<div class="container">
+
+    <div class="row">
+        <div class="col-md-12">
+            <p>&nbsp;</p>
+        </div>
+    </div>
+
+
+    <h2 th:text="#{error.message}"></h2>
+    <div class="error-desc">
+        <h3 th:text="${errorMessage}" />
+        <a th:href="@{${T(com.intrasoft.csp.conf.commons.context.ApiContextUrl).HOME_PAGE}}"
+           class="btn btn-default m-t col-md-offset-3 col-xs-6"
+           style="white-space:normal !important; word-wrap:break-word;" th:text="Home Page" />
+    </div>
+
+</div>
+
+
+<th:block th:replace="fragments::scripts"></th:block>
+
+</body>
+
+</html>
+
+
+
+

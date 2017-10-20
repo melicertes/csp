@@ -1,0 +1,24 @@
+{
+  "rules": [
+    {
+      "field": "['response'][*].['Event'].['id']",
+      "action": "anon",
+      "fieldtype": "numeric"
+    },
+    {
+      "field": "['response'][*].['Event'].['info']",
+      "action": "anon",
+      "fieldtype": "string"
+    },
+    {
+      "field": "['response'][*].['Event'].['uuid']",
+      "action": "anon",
+      "fieldtype": "string"
+    },
+    {
+      "field": "['response'][*].['Event'].['disable_correlation']",
+      "action": "anon",
+      "fieldtype": "string"
+    }
+  ]
+}

@@ -1,0 +1,98 @@
+---------------------------------------------------
+-- Running an integration test from command line --
+---------------------------------------------------
+
+1. First build the project
+--------------------------
+$ mvn clean install -DskipTests
+
+
+2. Navigate to target folder and locate the jar file
+----------------------------------------------------
+$ cd csp-apps/integration-tests/target
+
+
+3. Run one or more test-classes by providing the package+classnames as arguments
+--------------------------------------------------------------------------------
+$ java -jar integration-tests-0.2.0-SNAPSHOT.jar com.intrasoft.csp.integration.sandbox.server.internal.CspServerInternalSandboxTest
+
+APPENDIX
+--------
+
+Sample with docker profile and env vars
+
+java -jar -Dspring.profiles.active=docker -DES_PATH_BASE=/pathbse -DES_PORT=9000 -DES_LOCAL_DOMAIN=es.local -DIL_SSL_KEYSTORE_PASS=123456 -DIL_SSL_KEY_PASS=12345 -DIL_CSP_SUBDOMAIN_PREFIX=pref -DTC_PATH_TEAMS=/teams  -DTC_PATH_CIRCLES=/circles -DCSP_NAME -DTC_LOCAL_DOMAIN=tc.local  integration-tests-0.2.0-SNAPSHOT.jar com.intrasoft.csp.integration.business.server.internal.CspServerInternalBusinessTcTest
+
+
+USEFUL Docker commands
+----------------------
+
+$ docker exec -i -t csp-il  /bin/sh
+
+USEFUL CURLs
+------------
+
+For alpine distros:
+apk --no-cache add curl
+
+curl -v -s -k --key /opt/ssl/server/csp-internal.key --cert /opt/ssl/server/csp-internal.crt -H "Content-Type: application/json" -X POST -d @data.json https://integration.local.demo1-csp.athens.intrasoft-intl.private/v1/dsl/integrationData
+
+curl -v -s -k --key /opt/ssl/server/csp-internal.key --cert /opt/ssl/server/csp-internal.crt https://anon.local.demo1-csp.athens.intrasoft-intl.private/apiversion
+
+curl -v -s -k --key /opt/ssl/server/csp-internal.key --cert /opt/ssl/server/csp-internal.crt https://anon.local.demo1-csp.athens.intrasoft-intl.private/v1/ruleset/getAll
+
+
+scp csp@central-csp:/opt/csp/anon/anon-server-0.2.0-SNAPSHOT-exec.jar anon-server-0.2.0-SNAPSHOT-exec.jar
+
+scp csp@central-csp:/opt/csp/il/il-server-0.2.0-SNAPSHOT-exec.jar il-server-0.2.0-SNAPSHOT-exec.jar
+scp csp@central-csp:/opt/csp/il/integration-tests-0.2.0-SNAPSHOT.jar integration-tests-0.2.0-SNAPSHOT.jar
+
+
+******************
+* MANUAL TESTING *
+******************
+
+
+Test 1:
+-------
+
+Scenario: demo3 will send integration data to demo1 having a policy NOT TO SHARE
+
+Path with json resources:
+https://bitbucket.sastix.com/projects/SXCSP/repos/sxcsp/browse/csp-apps/integration-layer/il-integration-tests/src/test/resources/json
+
+1. Connect to demo3 with ssh
+2. Connect to csp-il container
+    $ docker exec -ti csp-il /bin/sh
+3. Check if curl works, if not install it.
+    $ apk --no-cache add curl
+4. Create integration data json object based on the files exist in git repo (copy-paste content from artefact.json and change the fields as needed)
+    $ vi in.json
+5. Send the object with curl:
+    $ curl -v -s -k --key /opt/ssl/server/csp-internal.key --cert /opt/ssl/server/csp-internal.crt -H "Content-Type: application/json" -X POST -d @in.json https://integration.local.demo3-csp.athens.intrasoft-intl.private/v1/dsl/integrationData
+
+
+Test 2:
+-------
+Scenario: same with test1 but having a policy to SHARE AS IS (change policy in integration-ui)
+
+Replay step 5 from previous step
+
+
+Test 3:
+-------
+Scenario: same with test1 but having a policy to SHARE ANONYMIZED (change policy in integration-ui)
+
+Replay step 5 from previous step
+
+
+Consume from DLQ
+-----------------
+$ docker exec -ti csp-il /bin/sh
+$ apk --no-cache add curl
+$ curl -v -s -k --key /opt/ssl/server/csp-internal.key --cert /opt/ssl/server/csp-internal.crt https://integration.local.demo3-csp.athens.intrasoft-intl.private/v1/manage/consume/errorq/10/300
+
+
+
+
+

@@ -1,6 +1,6 @@
 swagger: '2.0'
 info:
-  version: 1.0.4
+  version: 1.0.5
   title: CSP Server Configuration API
   description: ''
 schemes:
@@ -124,8 +124,7 @@ paths:
   '/v1/update/{cspId}/{updateHash}':
     get:
       description: |
-        Retrieves a list of available updates, for registered modules of the
-        CSP. See the "register" API call on how to register modules
+        Requests the specific update. The server verifies that this update is available for this CSP and allows download or returns error. See the "register" API call on how to register modules
       consumes:
         - application/json
       produces:
@@ -143,7 +142,7 @@ paths:
           type: string
         - name: updateHash
           in: path
-          description: >
+          description: 
             a unique identifier hash for the given update. The system must
             verify that this
 
@@ -375,6 +374,8 @@ definitions:
       released:
         type: string
         format: date-time
+      startPriority:
+        type: number  
       hash:
         type: string
         description: |
@@ -384,6 +385,7 @@ definitions:
       - name
       - description
       - version
+      - startPriority
       - released
       - hash
     example:
@@ -391,4 +393,5 @@ definitions:
       description: Rolling update of 20170331 to fix CSR-3988
       version: 10100
       released: '2017-03-30T11:12:33Z'
+      startPriority: 2
       hash: c0535e4be2b79ffd93291305436bf889314e4a3faec05ecffcbb7df31ad9e51a

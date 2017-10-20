@@ -1,0 +1,32 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <title th:text="#{home.title}">Title</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1"/>
+    <!--<meta th:name="_csrf" th:content="${_csrf.token}"/>-->
+    <!--<meta th:name="_csrf_header" th:content="${_csrf.headerName}"/>-->
+    <!--font-awsome-->
+    <link th:href="@{/webjars/font-awesome/css/font-awesome.min.css}" rel="stylesheet" media="screen" />
+    <script type="text/javascript" src="/webjars/jquery/3.2.1/jquery.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="/webjars/bootstrap/3.3.7/css/bootstrap.min.css"/>
+    <link th:href="@{/webjars/bootstrap-table/1.9.1/bootstrap-table.css}" rel="stylesheet"></link>
+    <script th:src="@{/webjars/bootstrap-table/1.9.1/bootstrap-table.js}"></script>
+    <script th:src="@{/webjars/bootstrap-table/1.9.1/locale/bootstrap-table-en-US.js}"></script>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/3.3.7/css/bootstrap-theme.min.css}"/>
+    <link rel="stylesheet" th:href="@{/css/main.css}" href="/css/main.css"/>
+    <script type="text/javascript" src="/webjars/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="/js/main.js"></script>
+</head>
+<body>
+
+    <!--Navbar-->
+    <th:block th:include="layout/navbar::init"></th:block>
+    <!--Main Content-->
+    <div class="container">
+        <th:block layout:fragment="main-content"></th:block>
+    </div>
+
+</body>
+</html>
