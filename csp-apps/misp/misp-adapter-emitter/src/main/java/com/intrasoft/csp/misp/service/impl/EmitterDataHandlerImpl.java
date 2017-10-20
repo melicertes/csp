@@ -38,7 +38,7 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler {
         dataParams.setCspId("LOCAL-CERT");
         // TODO find enum from IL
         dataParams.setApplicationId("misp");
-        // TODO record UUID
+        // TODO record UUID (from content)
         dataParams.setRecordId(uuid);
         // TODO emition datetime
         dataParams.setDateTime(new DateTime());

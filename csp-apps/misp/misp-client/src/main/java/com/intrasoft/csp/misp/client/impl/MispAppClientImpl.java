@@ -11,6 +11,11 @@ import org.springframework.web.client.RestTemplate;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * @TODO change {@link RestTemplate} to {@link com.intrasoft.csp.libraries.restclient.service.RetryRestTemplate}
+ */
+
+
 public class MispAppClientImpl implements MispAppClient{
 
     String context;
