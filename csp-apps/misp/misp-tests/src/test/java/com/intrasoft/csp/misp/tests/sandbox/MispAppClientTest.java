@@ -23,6 +23,8 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
+import static com.intrasoft.csp.misp.commons.utils.JsonObjectHandler.readField;
+import static com.intrasoft.csp.misp.commons.utils.JsonObjectHandler.updateField;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
@@ -133,17 +135,4 @@ public class MispAppClientTest {
         return response;
     }
 
-    public static String readField(String json, String name) throws IOException {
-        JsonNode object = new ObjectMapper().readTree(json);
-        JsonNode node = object.path("Event").get(name);
-        return (node == null ? null : node.textValue());
-    }
-
-    public static String updateField(String json, String name, String value) throws IOException {
-        JsonNode object = new ObjectMapper().readTree(json);
-        JsonNode node = object.path("Event");
-        ObjectNode objectNode = (ObjectNode) node;
-        objectNode.put(name, value);
-        return object.toString();
-    }
 }

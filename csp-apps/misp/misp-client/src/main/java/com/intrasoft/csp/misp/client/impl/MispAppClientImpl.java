@@ -5,10 +5,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.intrasoft.csp.misp.client.MispAppClient;
+import com.intrasoft.csp.misp.commons.config.MispContextUrl;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
 
@@ -21,7 +21,7 @@ import java.util.List;
  */
 
 
-public class MispAppClientImpl implements MispAppClient{
+public class MispAppClientImpl implements MispAppClient, MispContextUrl {
 
     String context;
     HttpHeaders headers;
@@ -30,10 +30,6 @@ public class MispAppClientImpl implements MispAppClient{
 //    @Autowired
 //    @Qualifier("CspRestTemplate")
 //    RetryRestTemplate retryRestTemplate;
-
-    @Value("${misp.app.events.path}")
-    String eventsPath;
-
 
     @Override
     public void setProtocolHostPortHeaders(String protocol, String host, String port, String authorizationKey) {
@@ -54,7 +50,7 @@ public class MispAppClientImpl implements MispAppClient{
 
     @Override
     public ResponseEntity<String> addMispEvent(String object) {
-        String url = context  + "/" + eventsPath;
+        String url = context  + "/" + MISP_EVENTS;
 
         LOG.info("API call [post]: " + url);
         RestTemplate restTemplate = new RestTemplate();
@@ -66,7 +62,7 @@ public class MispAppClientImpl implements MispAppClient{
 
     @Override
     public ResponseEntity<String> updateMispEvent(String uuid, String object) throws IOException {
-        String url = context  + "/" + eventsPath + "/" + uuid;
+        String url = context  + "/" + MISP_EVENTS + "/" + uuid;
 
         JsonNode jsonNode = new ObjectMapper().readTree(object);
         JsonNode node = jsonNode.path("Event");
@@ -84,7 +80,7 @@ public class MispAppClientImpl implements MispAppClient{
 
     @Override
     public ResponseEntity<String> deleteMispEvent(String uuid) {
-        String url = context  + "/" + eventsPath + "/" + uuid;
+        String url = context  + "/" + MISP_EVENTS + "/" + uuid;
 
         LOG.info("API call [delete]: " + url);
         RestTemplate restTemplate = new RestTemplate();
