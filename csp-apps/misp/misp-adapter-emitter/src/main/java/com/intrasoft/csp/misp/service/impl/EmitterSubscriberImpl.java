@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.zeromq.ZMQ;
 
+import java.io.IOException;
+
 @Service
 public class EmitterSubscriberImpl implements EmitterSubscriber{
     final Logger LOG = LoggerFactory.getLogger(EmitterSubscriber.class);
@@ -45,7 +47,14 @@ public class EmitterSubscriberImpl implements EmitterSubscriber{
             String content = msg.substring(msg.indexOf(' ') + 1);
 
             LOG.info(topic + ": " + content);
-            emitterDataHandler.handleMispData(content);
+            if (topic.equals("misp_json")){
+                try {
+                    emitterDataHandler.handleMispData(content);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
         }
         subscriber.close ();
         context.term ();
