@@ -1,13 +1,18 @@
 package com.intrasoft.csp.misp.client.impl;
 
 //import com.intrasoft.csp.libraries.restclient.service.RetryRestTemplate;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.intrasoft.csp.misp.client.MispAppClient;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -60,8 +65,15 @@ public class MispAppClientImpl implements MispAppClient{
     }
 
     @Override
-    public ResponseEntity<String> updateMispEvent(String object) {
-        String url = context  + "/" + eventsPath;
+    public ResponseEntity<String> updateMispEvent(String uuid, String object) throws IOException {
+        String url = context  + "/" + eventsPath + "/" + uuid;
+
+        JsonNode jsonNode = new ObjectMapper().readTree(object);
+        JsonNode node = jsonNode.path("Event");
+        ObjectNode objectNode = (ObjectNode) node;
+        objectNode.put("timestamp", String.valueOf(DateTime.now().getMillis()/1000));
+//        return object.toString();
+        object = jsonNode.toString();
 
         LOG.info("API call [put]: " + url);
         RestTemplate restTemplate = new RestTemplate();
@@ -71,8 +83,8 @@ public class MispAppClientImpl implements MispAppClient{
     }
 
     @Override
-    public ResponseEntity<String> deleteMispEvent(Integer id) {
-        String url = context  + "/" + eventsPath + "/" + id;
+    public ResponseEntity<String> deleteMispEvent(String uuid) {
+        String url = context  + "/" + eventsPath + "/" + uuid;
 
         LOG.info("API call [delete]: " + url);
         RestTemplate restTemplate = new RestTemplate();

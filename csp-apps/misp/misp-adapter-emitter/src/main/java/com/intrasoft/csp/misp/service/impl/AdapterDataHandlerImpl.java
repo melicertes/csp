@@ -8,6 +8,8 @@ import org.json.JSONObject;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+
 @Service
 public class AdapterDataHandlerImpl implements AdapterDataHandler{
     @Override
@@ -29,11 +31,15 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler{
             mispAppClient.addMispEvent((String) integrationData.getDataObject());
         }
         else if (requestMethod.equals("PUT")){
-            mispAppClient.updateMispEvent((String) integrationData.getDataObject());
+            try {
+                mispAppClient.updateMispEvent(new JSONObject(integrationData.getDataObject()).getJSONObject("Event").getString("uuid"), (String) integrationData.getDataObject());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
         else if (requestMethod.equals("DELETE")){
             // TODO id is not unique among the csps,needs care and proderm
-            mispAppClient.deleteMispEvent(new JSONObject(integrationData).getInt("id"));
+            mispAppClient.deleteMispEvent(new JSONObject(integrationData.getDataObject()).getJSONObject("Event").getString("uuid"));
         }
 
         return null;
