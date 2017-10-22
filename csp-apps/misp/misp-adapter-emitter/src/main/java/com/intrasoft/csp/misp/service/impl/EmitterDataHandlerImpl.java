@@ -1,5 +1,6 @@
 package com.intrasoft.csp.misp.service.impl;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.intrasoft.csp.client.CspClient;
 import com.intrasoft.csp.client.impl.CspClientImpl;
@@ -43,12 +44,14 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler {
     String eventsPath;
 
     @Override
-    public void handleMispData(String content) throws IOException {
+    public void handleMispData(Object object) throws IOException {
         final Logger LOG = LoggerFactory.getLogger(EmitterDataHandlerImpl.class);
+
+        JsonNode jsonNode = (JsonNode) object;
 
         String uuid = "";
         try{
-            uuid = readField( content, "uuid");
+            uuid = jsonNode.get("Event").get("uuid").toString();
         }
         catch (JSONException e){
 
@@ -95,7 +98,7 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler {
         IntegrationData integrationData = new IntegrationData();
         integrationData.setDataParams(dataParams);
         integrationData.setSharingParams(sharingParams);
-        integrationData.setDataObject(content);
+        integrationData.setDataObject(jsonNode);
 
         integrationData.setDataType(IntegrationDataType.EVENT);
 
@@ -109,9 +112,9 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler {
 //        CspClient cspClient = new CspClientImpl();
 //        cspClient.postIntegrationData(integrationData, DSL_INTEGRATION_DATA);
 
-//        MispAppClient mispAppClient = new MispAppClientImpl();
-//        mispAppClient.setProtocolHostPortHeaders(protocol, host, port, eventsPath, authorizationKey);
-//        mispAppClient.updateMispEvent(uuid, new ObjectMapper().writeValueAsString(integrationData.getDataObject()));
+        MispAppClient mispAppClient = new MispAppClientImpl();
+        mispAppClient.setProtocolHostPortHeaders(protocol, host, port, authorizationKey);
+        mispAppClient.updateMispEvent(uuid.replace("\"",""), new ObjectMapper().writeValueAsString(integrationData.getDataObject()));
 
     }
 }
