@@ -77,7 +77,7 @@ public class CspClientTest implements ContextUrl {
         sharingParams.setIsExternal(false);
         sharingParams.setToShare(true);
         integrationData.setSharingParams(sharingParams);
-        ResponseEntity<String> response = cspClient.postIntegrationData(integrationData, DSL_INTEGRATION_DATA);
+        ResponseEntity<String> response = cspClient.postIntegrationData(integrationData);
         assertThat(response.getStatusCode(),is(HttpStatus.OK));
 
         mockServer.verify();

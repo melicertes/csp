@@ -10,7 +10,7 @@ import org.springframework.http.ResponseEntity;
  */
 public interface CspClient {
     VersionDTO getApiVersion();
-    ResponseEntity<String> postIntegrationData(IntegrationData integrationData, String context) throws InvalidDataTypeException;
-    ResponseEntity<String> updateIntegrationData(IntegrationData integrationData, String context);
-    ResponseEntity<String> deleteIntegrationData(IntegrationData integrationData, String context);
+    ResponseEntity<String> postIntegrationData(IntegrationData integrationData) throws InvalidDataTypeException;
+    ResponseEntity<String> updateIntegrationData(IntegrationData integrationData);
+    ResponseEntity<String> deleteIntegrationData(IntegrationData integrationData);
 }

@@ -110,7 +110,7 @@ public class CspSSLTest implements ContextUrl {
         sharingParams.setToShare(true);
         integrationData.setDataObject("something");
         integrationData.setSharingParams(sharingParams);
-        ResponseEntity<String> response = cspClient.postIntegrationData(integrationData, DSL_INTEGRATION_DATA);
+        ResponseEntity<String> response = cspClient.postIntegrationData(integrationData);
         assertThat(response.getStatusCode(),is(HttpStatus.OK));
     }
 }

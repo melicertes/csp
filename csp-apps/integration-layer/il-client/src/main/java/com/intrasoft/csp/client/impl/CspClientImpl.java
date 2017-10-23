@@ -36,16 +36,16 @@ public class CspClientImpl implements CspClient, ContextUrl {
     }
 
     @Override
-    public ResponseEntity<String> postIntegrationData(IntegrationData integrationData, String context) throws InvalidDataTypeException{
-        final String url = apiVersionClient.getApiUrl() + context;
+    public ResponseEntity<String> postIntegrationData(IntegrationData integrationData) throws InvalidDataTypeException{
+        final String url = apiVersionClient.getApiUrl() + DSL_INTEGRATION_DATA;
         LOG.debug("API call [post]: " + url);
         ResponseEntity<String> response = retryRestTemplate.exchange(url, HttpMethod.POST, new HttpEntity<Object>(integrationData), String.class);
         return response;
     }
 
     @Override
-    public ResponseEntity<String> updateIntegrationData(IntegrationData integrationData, String context) {
-        final String url = apiVersionClient.getApiUrl() + context;
+    public ResponseEntity<String> updateIntegrationData(IntegrationData integrationData) {
+        final String url = apiVersionClient.getApiUrl() + DSL_INTEGRATION_DATA;
         LOG.debug("API call [put]: " + url);
         ResponseEntity<String> response = retryRestTemplate.exchange(url, HttpMethod.PUT,new HttpEntity<Object>(integrationData), String.class);
         LOG.debug("status code: "+response.getStatusCode());
@@ -53,8 +53,8 @@ public class CspClientImpl implements CspClient, ContextUrl {
     }
 
     @Override
-    public ResponseEntity<String> deleteIntegrationData(IntegrationData integrationData, String context) {
-        final String url = apiVersionClient.getApiUrl() + context;
+    public ResponseEntity<String> deleteIntegrationData(IntegrationData integrationData) {
+        final String url = apiVersionClient.getApiUrl() + DSL_INTEGRATION_DATA;
         LOG.debug("API call [delete]: " + url);
         ResponseEntity<String> response = retryRestTemplate.exchange(url, HttpMethod.DELETE,new HttpEntity<Object>(integrationData), String.class);
         LOG.debug("status code: "+response.getStatusCode());

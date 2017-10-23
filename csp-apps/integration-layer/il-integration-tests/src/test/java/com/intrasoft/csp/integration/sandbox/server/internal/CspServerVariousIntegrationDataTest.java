@@ -96,7 +96,7 @@ public class CspServerVariousIntegrationDataTest implements CamelRoutes, Context
         integrationData.setDataParams(dataParams);
 
         try {
-            cspClient.postIntegrationData(integrationData, DSL_INTEGRATION_DATA);
+            cspClient.postIntegrationData(integrationData);
             fail("Expected InvalidDataTypeException exception");
         }catch (InvalidDataTypeException e){
             assertThat(e.getMessage(),containsString("Field error in object 'integrationData'"));
@@ -120,7 +120,7 @@ public class CspServerVariousIntegrationDataTest implements CamelRoutes, Context
         integrationData.setDataParams(dataParams);
         integrationData.setDataObject(null);
         try {
-        cspClient.postIntegrationData(integrationData, DSL_INTEGRATION_DATA);
+        cspClient.postIntegrationData(integrationData);
             fail("Expected InvalidDataTypeException exception");
         }catch (InvalidDataTypeException e){
             assertThat(e.getMessage(),containsString(HttpStatusResponseType.MALFORMED_INTEGRATION_DATA_STRUCTURE.getReasonPhrase()));
