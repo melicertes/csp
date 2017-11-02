@@ -25,6 +25,9 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = {CspApp.class, ElasticClientConfig.class},
         properties = {
@@ -65,7 +68,8 @@ public class ElasticClientSandboxTest {
 
         integrationData.setDataType(IntegrationDataType.EVENT);
 
-        elasticClient.searchObject(integrationData);
+        boolean exists = elasticClient.objectExists(integrationData);
+        assertThat(exists, is(false));
     }
 
     public String loadJsonFromFile() throws URISyntaxException, IOException {
