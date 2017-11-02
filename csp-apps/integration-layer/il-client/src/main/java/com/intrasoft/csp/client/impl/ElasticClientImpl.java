@@ -54,7 +54,7 @@ public class ElasticClientImpl implements ElasticClient {
     }
 
     @Override
-    public void searchObject(IntegrationData integrationData) throws IOException {
+    public boolean objectExists(IntegrationData integrationData) throws IOException {
         ElasticSearchRequest elasticSearchRequest = this.getElasticSearchRequest(integrationData);
         IntegrationDataType dataType = integrationData.getDataType();
 
@@ -78,6 +78,9 @@ public class ElasticClientImpl implements ElasticClient {
             String updateResponse = camelRestService.send(this.getElasticURI() + "/" + dataType.toString().toLowerCase() + "/" + hit.getId() + "", elasticData, HttpMethods.POST.name());
             LOG.info("Elastic - ES Update index "+hit.getId()+" response: " + updateResponse);
         }
+
+        if (elasticSearchResponse.getHits().getTotal() == 0) return  false;
+        else return true;
     }
 
 
