@@ -58,27 +58,16 @@ public class ElasticClientImpl implements ElasticClient {
         ElasticSearchRequest elasticSearchRequest = this.getElasticSearchRequest(integrationData);
         IntegrationDataType dataType = integrationData.getDataType();
 
-        //query ES to get IDs
         String response = camelRestService.send(this.getElasticURI() + "/" + dataType.toString().toLowerCase() + "/_search?pretty&_source=false", elasticSearchRequest, HttpMethods.POST.name());
         LOG.info("Elastic - ES Search response: " + response);
 
         if(response == null){
-            //TODO: this will activate GDelivery. Do we want this?
+            //TODO: What do we want here
             LOG.info("Response from ES is null");
 //            throw new CspBusinessException("No response from Elastic (null). Processor will fail and should send message to DeadLetterQ");
         }
 
-        //create update transaction object
-        ElasticData elasticData = new ElasticData(integrationData.getDataParams(), integrationData.getDataObject());
-
         ElasticSearchResponse elasticSearchResponse = new ObjectMapper().readValue(response, ElasticSearchResponse.class);
-        for(Hit hit : elasticSearchResponse.getHits().getHits()) {
-            LOG.info(hit.getId());
-            //query ES to perform update
-            String updateResponse = camelRestService.send(this.getElasticURI() + "/" + dataType.toString().toLowerCase() + "/" + hit.getId() + "", elasticData, HttpMethods.POST.name());
-            LOG.info("Elastic - ES Update index "+hit.getId()+" response: " + updateResponse);
-        }
-
         if (elasticSearchResponse.getHits().getTotal() == 0) return  false;
         else return true;
     }
