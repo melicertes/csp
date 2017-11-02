@@ -58,6 +58,11 @@
 			<artifactId>misp-client</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+        <dependency>
+            <groupId>com.intrasoft.csp</groupId>
+            <artifactId>il-server</artifactId>
+            <version>0.3.0-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 
 	<build>

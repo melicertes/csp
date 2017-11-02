@@ -44,7 +44,7 @@ public class EmitterSubscriberImpl implements EmitterSubscriber{
         String addr = zeroMQprotocol + "://" + zeroMQhost + ":" + zeroMQport;
 
         boolean subscribed = subscriber.connect(addr);
-        LOG.info("Subscribed: " + subscribed);
+        LOG.info("Subscribed to " + zeroMQhost + ":" + zeroMQport + ", " + subscribed);
         subscriber.subscribe("");
         while (!Thread.currentThread ().isInterrupted ()) {
 

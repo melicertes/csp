@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 @JsonPropertyOrder({
         "total",
         "successful",
+        "skipped",
         "failed"
 })
 public class Shards {
@@ -16,6 +17,8 @@ public class Shards {
     private Integer total;
     @JsonProperty("successful")
     private Integer successful;
+    @JsonProperty("skipped")
+    private Integer skipped;
     @JsonProperty("failed")
     private Integer failed;
 
@@ -49,4 +52,13 @@ public class Shards {
         this.failed = failed;
     }
 
+    @JsonProperty("skipped")
+    public Integer getSkipped() {
+        return skipped;
+    }
+
+    @JsonProperty("skipped")
+    public void setSkipped(Integer skipped) {
+        this.skipped = skipped;
+    }
 }
