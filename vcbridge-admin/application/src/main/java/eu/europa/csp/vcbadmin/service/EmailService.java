@@ -1,18 +1,9 @@
 package eu.europa.csp.vcbadmin.service;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Scanner;
-
-import javax.mail.internet.MimeMessage;
-import javax.mail.util.ByteArrayDataSource;
-
+import eu.europa.csp.vcbadmin.constants.EmailTemplateType;
+import eu.europa.csp.vcbadmin.model.EmailTemplate;
+import eu.europa.csp.vcbadmin.model.Meeting;
+import eu.europa.csp.vcbadmin.model.Participant;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.safety.Whitelist;
@@ -30,192 +21,194 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import eu.europa.csp.vcbadmin.constants.EmailTemplateType;
-import eu.europa.csp.vcbadmin.model.EmailTemplate;
-import eu.europa.csp.vcbadmin.model.Meeting;
-import eu.europa.csp.vcbadmin.model.Participant;
+import javax.mail.internet.MimeMessage;
+import javax.mail.util.ByteArrayDataSource;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 public class EmailService {
-	static class MessagePreparatorImpl implements MimeMessagePreparator {
-		public MessagePreparatorImpl(Meeting meeting, EmailTemplate et, MailContentBuilder mailContentBuilder,
-				Participant p, String ics) {
-			super();
-			this.meeting = meeting;
-			this.et = et;
-			this.mailContentBuilder = mailContentBuilder;
-			this.p = p;
-			this.ics = ics;
-		}
+    private static final Logger log = LoggerFactory.getLogger(EmailService.class);
+    @Autowired
+    JavaMailSender mailSender;
+    @Autowired
+    MailContentBuilder mailContentBuilder;
+    @Value(value = "classpath:templates/icalendar/meeting.ics")
+    private Resource meetingTemplate;
 
-		EmailTemplate et;
-		Meeting meeting;
-		MailContentBuilder mailContentBuilder;
-		Participant p;
-		String ics;
+    public static String br2nl(String html) {
+        if (html == null)
+            return html;
+        Document document = Jsoup.parse(html);
+        document.outputSettings(new Document.OutputSettings().prettyPrint(false));// makes
+        // html()
+        // preserve
+        // linebreaks
+        // and
+        // spacing
+        document.select("br").append("\\n");
+        document.select("p").prepend("\\n\\n");
+        String s = document.html().replaceAll("\\\\n", "\n");
+        return Jsoup.clean(s, "", Whitelist.none(), new Document.OutputSettings().prettyPrint(false));
+    }
 
-		@Override
-		public void prepare(MimeMessage mimeMessage) throws Exception {
-			Map<String, Object> m = new HashMap<>();
-			MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage, true);
-			// messageHelper.setFrom(meeting.getUser().getEmail());
-			messageHelper.setFrom("do-not-reply@sastix.com");
-			messageHelper.setTo(p.getEmail());
+    // @Value(value =
+    // "classpath:templates/icalendar/invitation_description.txt")
+    // private Resource meetingTemplateInvitation;
 
-			m.put("email", p.getEmail());
-			m.put("meeting_date", meeting.getStart().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
-			m.put("meeting_time", meeting.getStart().format(DateTimeFormatter.ofPattern("HH:mm ZZZ")));
-			m.put("meeting_username", p.getUsername());
-			m.put("meeting_password", p.getPassword());
-			m.put("meeting_url", meeting.getUrl());
-			m.put("meeting_subject", meeting.getSubject());
-			m.put("user_first", meeting.getUser().getFirstName());
-			m.put("user_lastname", meeting.getUser().getLastName());
+    // @Value(value =
+    // "classpath:templates/icalendar/cancellation_description.txt")
+    // private Resource meetingTemplateCancellation;
 
-			String subject = mailContentBuilder.build(et.getSubject(), m);
-			messageHelper.setSubject(subject);
-			String content = mailContentBuilder.build(et.getContent(), m);
+    @Async
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void prepareAndSend(EmailTemplate et, Meeting meeting) throws IOException {
+        Map<String, Object> m = new HashMap<>();
+        log.debug("Participants: " + meeting.getParticipants());
+        for (Participant p : meeting.getParticipants()) {
+            // MimeMessageHelper messageHelper = new MimeMessageHelper(new
+            // MimeMessage((Session)(null)));
 
-			messageHelper.setText(content, true);
-			if (et.getType().equals(EmailTemplateType.INVITATION)) {
+            MimeMessagePreparator messagePreparator = mimeMessage -> {
+                MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage, true);
+                // messageHelper.setFrom(meeting.getUser().getEmail());
+                messageHelper.setFrom("do-not-reply@sastix.com");
+                messageHelper.setTo(p.getEmail());
 
-				messageHelper.addAttachment("meeting.ics", new ByteArrayDataSource(ics, "text/calendar"));
-			}
-		}
+                m.put("email", p.getEmail());
+                m.put("meeting_date", meeting.getStart().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+                m.put("meeting_time", meeting.getStart().format(DateTimeFormatter.ofPattern("HH:mm ZZZ")));
+                m.put("meeting_duration", meeting.getDurationAsTime().format(DateTimeFormatter.ofPattern("HH:mm")));
+                m.put("meeting_duration_str", meeting.getDurationAsTime()
+                        .format(DateTimeFormatter.ofPattern("H' hour(s) and 'mm' minutes'")));
+                m.put("meeting_username", p.getUsername());
+                m.put("meeting_password", p.getPassword());
+                m.put("meeting_url", meeting.getUrl());
+                m.put("meeting_subject", meeting.getSubject());
+                m.put("user_first", meeting.getUser().getFirstName());
+                m.put("user_lastname", meeting.getUser().getLastName());
 
-	}
+                String subject = mailContentBuilder.build(et.getSubject(), m);
+                messageHelper.setSubject(subject);
+                String content = mailContentBuilder.build(et.getContent(), m);
 
-	private static final Logger log = LoggerFactory.getLogger(EmailService.class);
-	@Autowired
-	JavaMailSender mailSender;
+                messageHelper.setText(content, true);
 
-	@Autowired
-	MailContentBuilder mailContentBuilder;
+                String icalendar_descripion = br2nl(content).replaceAll("(\\r|\\n|\\r\\n)+", "\\\\n");// Jsoup.parse(content).text();
 
-	@Value(value = "classpath:templates/icalendar/meeting.ics")
-	private Resource meetingTemplate;
+                // icalendar stuff
+                BufferedReader br = new BufferedReader(new InputStreamReader(meetingTemplate.getInputStream()), 1024);
+                String line;
+                StringBuilder meetingICSBuilder = new StringBuilder();
+                while ((line = br.readLine()) != null) {
+                    meetingICSBuilder.append(line).append('\n');
+                }
+                br.close();
+                m.put("organizer", meeting.getUser().getFullName());
+                m.put("organizerEmail", meeting.getUser().getEmail());
+                m.put("summary", subject);
+                m.put("duration", meeting.getDuration().toString());
+                m.put("start", DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmmssX")
+                        .format(ZonedDateTime.ofInstant(meeting.getStart().toInstant(), ZoneOffset.UTC)));
+                m.put("uid", meeting.getUid());
+                m.put("location", meeting.getUrl());
+                //m.put("comment", icalendar_descripion);
+                m.put("description", mailContentBuilder.build(icalendar_descripion, m));
+                StringBuilder attendee_string = new StringBuilder();
+                for (Participant part : meeting.getParticipants()) {
+                    attendee_string
+                            .append(String.format("ATTENDEE;ROLE=REQ-PARTICIPANT;PARTSTAT=TENTATIVE;CN=%s:MAILTO:%s",
+                                    part.getFullname(), part.getEmail()));
+                    attendee_string.append("\n");
+                }
+                m.put("attendee", attendee_string.toString());
+                if (et.getType().equals(EmailTemplateType.INVITATION)) {
+                    // String ics_description_template = new
+                    // Scanner(meetingTemplateInvitation.getInputStream(),
+                    // "utf-8")
+                    // .useDelimiter("\\Z").next();
+                    m.put("seq", 0);
+                    m.put("status", "CONFIRMED");
 
-	// @Value(value =
-	// "classpath:templates/icalendar/invitation_description.txt")
-	// private Resource meetingTemplateInvitation;
+                } else {
+                    // String ics_description_template = new
+                    // Scanner(meetingTemplateCancellation.getInputStream(),
+                    // "utf-8")
+                    // .useDelimiter("\\Z").next();
+                    m.put("seq", 1);
+                    m.put("status", "CANCELLED");
+                }
 
-	// @Value(value =
-	// "classpath:templates/icalendar/cancellation_description.txt")
-	// private Resource meetingTemplateCancellation;
+                String ics = mailContentBuilder.build(meetingICSBuilder.toString(), m);
+                mimeMessage.setHeader("Content-Class", "urn:content-  classes:calendarmessage");
+                mimeMessage.setHeader("Content-ID", "calendar_message");
+                messageHelper.addAttachment("Mail Attachment.ics", new ByteArrayDataSource(ics, "text/calendar"));
+            };
 
-	@Async
-	@Transactional(propagation = Propagation.REQUIRES_NEW)
-	public void prepareAndSend(EmailTemplate et, Meeting meeting) throws IOException {
-		Map<String, Object> m = new HashMap<>();
-		// String ics = null;
+            // MimeMessagePreparator messagePreparator = new
+            // MessagePreparatorImpl(meeting, et, mailContentBuilder, p,
+            // ics);
+            try {
+                mailSender.send(messagePreparator);
+                log.info("Email sent to {}", p.getEmail());
+            } catch (MailException e) {
+                log.error("Error sending email to " + p.getEmail(), e);
+                // runtime exception; compiler will not force you to handle it
+            }
+        }
+    }
 
-		// System.out.println("Participants!!:: " + meeting.getParticipants());
-		for (Participant p : meeting.getParticipants()) {
-			// MimeMessageHelper messageHelper = new MimeMessageHelper(new
-			// MimeMessage((Session)(null)));
+    static class MessagePreparatorImpl implements MimeMessagePreparator {
+        EmailTemplate et;
+        Meeting meeting;
+        MailContentBuilder mailContentBuilder;
+        Participant p;
+        String ics;
 
-			MimeMessagePreparator messagePreparator = mimeMessage -> {
-				MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage, true);
-				// messageHelper.setFrom(meeting.getUser().getEmail());
-				messageHelper.setFrom("do-not-reply@sastix.com");
-				messageHelper.setTo(p.getEmail());
+        public MessagePreparatorImpl(Meeting meeting, EmailTemplate et, MailContentBuilder mailContentBuilder,
+                                     Participant p, String ics) {
+            super();
+            this.meeting = meeting;
+            this.et = et;
+            this.mailContentBuilder = mailContentBuilder;
+            this.p = p;
+            this.ics = ics;
+        }
 
-				m.put("email", p.getEmail());
-				m.put("meeting_date", meeting.getStart().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
-				m.put("meeting_time", meeting.getStart().format(DateTimeFormatter.ofPattern("HH:mm ZZZ")));
-				m.put("meeting_duration", meeting.getDurationAsTime().format(DateTimeFormatter.ofPattern("HH:mm")));
-				m.put("meeting_duration_str", meeting.getDurationAsTime()
-						.format(DateTimeFormatter.ofPattern("H' hour(s) and 'mm' minutes'")));
-				m.put("meeting_username", p.getUsername());
-				m.put("meeting_password", p.getPassword());
-				m.put("meeting_url", meeting.getUrl());
-				m.put("meeting_subject", meeting.getSubject());
-				m.put("user_first", meeting.getUser().getFirstName());
-				m.put("user_lastname", meeting.getUser().getLastName());
+        @Override
+        public void prepare(MimeMessage mimeMessage) throws Exception {
+            Map<String, Object> m = new HashMap<>();
+            MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage, true);
+            // messageHelper.setFrom(meeting.getUser().getEmail());
+            messageHelper.setFrom("do-not-reply@sastix.com");
+            messageHelper.setTo(p.getEmail());
 
-				String subject = mailContentBuilder.build(et.getSubject(), m);
-				messageHelper.setSubject(subject);
-				String content = mailContentBuilder.build(et.getContent(), m);
+            m.put("email", p.getEmail());
+            m.put("meeting_date", meeting.getStart().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+            m.put("meeting_time", meeting.getStart().format(DateTimeFormatter.ofPattern("HH:mm ZZZ")));
+            m.put("meeting_username", p.getUsername());
+            m.put("meeting_password", p.getPassword());
+            m.put("meeting_url", meeting.getUrl());
+            m.put("meeting_subject", meeting.getSubject());
+            m.put("user_first", meeting.getUser().getFirstName());
+            m.put("user_lastname", meeting.getUser().getLastName());
 
-				messageHelper.setText(content, true);
+            String subject = mailContentBuilder.build(et.getSubject(), m);
+            messageHelper.setSubject(subject);
+            String content = mailContentBuilder.build(et.getContent(), m);
 
-				String icalendar_descripion = br2nl(content).replaceAll("(\\r|\\n|\\r\\n)+", "\\\\n");// Jsoup.parse(content).text();
+            messageHelper.setText(content, true);
+            if (et.getType().equals(EmailTemplateType.INVITATION)) {
 
-				// icalendar stuff
-				BufferedReader br = new BufferedReader(new InputStreamReader(meetingTemplate.getInputStream()), 1024);
-				String line;
-				StringBuilder meetingICSBuilder = new StringBuilder();
-				while ((line = br.readLine()) != null) {
-					meetingICSBuilder.append(line).append('\n');
-				}
-				br.close();
-				m.put("organizer", meeting.getUser().getFullName());
-				m.put("organizerEmail", meeting.getUser().getEmail());
-				m.put("summary", subject);
-				m.put("duration", meeting.getDuration().toString());
-				m.put("start", DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmmssX")
-						.format(ZonedDateTime.ofInstant(meeting.getStart().toInstant(), ZoneOffset.UTC)));
-				m.put("uid", meeting.getUid());
-				m.put("location", meeting.getUrl());
-				//m.put("comment", icalendar_descripion);
-				m.put("description", mailContentBuilder.build(icalendar_descripion, m));
-				StringBuilder attendee_string = new StringBuilder();
-				for (Participant part : meeting.getParticipants()) {
-					attendee_string
-							.append(String.format("ATTENDEE;ROLE=REQ-PARTICIPANT;PARTSTAT=TENTATIVE;CN=%s:MAILTO:%s",
-									part.getFullname(), part.getEmail()));
-					attendee_string.append("\n");
-				}
-				m.put("attendee", attendee_string.toString());
-				if (et.getType().equals(EmailTemplateType.INVITATION)) {
-					// String ics_description_template = new
-					// Scanner(meetingTemplateInvitation.getInputStream(),
-					// "utf-8")
-					// .useDelimiter("\\Z").next();
-					m.put("seq", 0);
-					m.put("status", "CONFIRMED");
+                messageHelper.addAttachment("meeting.ics", new ByteArrayDataSource(ics, "text/calendar"));
+            }
+        }
 
-				} else {
-					// String ics_description_template = new
-					// Scanner(meetingTemplateCancellation.getInputStream(),
-					// "utf-8")
-					// .useDelimiter("\\Z").next();
-					m.put("seq", 1);
-					m.put("status", "CANCELLED");
-				}
-
-				String ics = mailContentBuilder.build(meetingICSBuilder.toString(), m);
-				mimeMessage.setHeader("Content-Class", "urn:content-  classes:calendarmessage");
-				mimeMessage.setHeader("Content-ID", "calendar_message");
-				messageHelper.addAttachment("Mail Attachment.ics", new ByteArrayDataSource(ics, "text/calendar"));
-			};
-
-			// MimeMessagePreparator messagePreparator = new
-			// MessagePreparatorImpl(meeting, et, mailContentBuilder, p,
-			// ics);
-			try {
-				mailSender.send(messagePreparator);
-				log.info("Email sent to {}", p.getEmail());
-			} catch (MailException e) {
-				log.error("Error sending email to " + p.getEmail(), e);
-				// runtime exception; compiler will not force you to handle it
-			}
-		}
-	}
-
-	public static String br2nl(String html) {
-		if (html == null)
-			return html;
-		Document document = Jsoup.parse(html);
-		document.outputSettings(new Document.OutputSettings().prettyPrint(false));// makes
-																					// html()
-																					// preserve
-																					// linebreaks
-																					// and
-																					// spacing
-		document.select("br").append("\\n");
-		document.select("p").prepend("\\n\\n");
-		String s = document.html().replaceAll("\\\\n", "\n");
-		return Jsoup.clean(s, "", Whitelist.none(), new Document.OutputSettings().prettyPrint(false));
-	}
+    }
 }

@@ -36,9 +36,9 @@ public class UserDetailsService implements org.springframework.security.core.use
     private PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserDetailsService(UserRepository userRepository,PasswordEncoder passwordEncoder) {
+    public UserDetailsService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
-        this.passwordEncoder=passwordEncoder;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Value(value = "classpath:templates/email/invitation.html")
@@ -62,10 +62,6 @@ public class UserDetailsService implements org.springframework.security.core.use
         grantedAuthorities.add(grantedAuthority);
         return new CustomUserDetails(user.getEmail(), user.getPassword(), grantedAuthorities, user.getTimezone(),
                 user.getFirstName(), user.getLastName());
-        // return new
-        // org.springframework.security.core.userdetails.User(user.getEmail(),
-        // user.getPassword(), grantedAuthorities);
-
     }
 
     /**
@@ -75,9 +71,8 @@ public class UserDetailsService implements org.springframework.security.core.use
     @Transactional
     public User createUserIfNotExists(String username) {
         Optional<User> u = userRepository.findByEmail(username);
-        System.out.println(u);
         if (!u.isPresent()) {
-            log.info("IS PRESENT");
+            log.info("User not found. Creating profile automatically..");
             // create profile automatically
             User new_user = new User();
             new_user.setEmail(username);
@@ -93,6 +88,7 @@ public class UserDetailsService implements org.springframework.security.core.use
                 return null;
             }
         }
+        log.debug("User found in db.");
         return u.get();
 
     }
