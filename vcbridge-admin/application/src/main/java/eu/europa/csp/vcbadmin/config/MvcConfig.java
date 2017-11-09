@@ -18,9 +18,15 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 
 import eu.europa.csp.vcbadmin.config.formatters.DurationFormatter;
 import eu.europa.csp.vcbadmin.config.formatters.ZoneDateTimeFormatter;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.crypto.password.StandardPasswordEncoder;
 
 @Configuration
 public class MvcConfig extends WebMvcConfigurerAdapter {
+	@Bean
+	public PasswordEncoder passwordEncoder() {
+		return new StandardPasswordEncoder();
+	}
 
 	@Override
 	public void addViewControllers(ViewControllerRegistry registry) {
