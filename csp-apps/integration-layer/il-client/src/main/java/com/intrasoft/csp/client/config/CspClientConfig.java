@@ -66,7 +66,7 @@ public class CspClientConfig implements ContextUrl {
 
     }
 
-    @Bean
+    @Bean(name = "CspClient")
     public CspClient cspClient(){
         return new CspClientImpl();
     }

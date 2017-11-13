@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ElasticClientImpl implements ElasticClient {
-    private static final Logger LOG = LoggerFactory.getLogger(ElasticProcessor.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ElasticClientImpl.class);
 
     @Value("${elastic.protocol}")
     String elasticProtocol;
@@ -59,16 +59,16 @@ public class ElasticClientImpl implements ElasticClient {
 //        String response = camelRestService.send(this.getElasticURI() + "/" + dataType.toString().toLowerCase() + "/_search?pretty&_source=false", elasticSearchRequest, HttpMethods.POST.name());
         LOG.info(this.getElasticURI() + dataType.toString().toLowerCase() + "/_search?pretty&_source=false");
         LOG.info(elasticSearchRequest.toString());
-        ResponseEntity<String> response2 = retryRestTemplate.postForEntity(this.getElasticURI() + "/" + dataType.toString().toLowerCase() + "/_search?pretty&_source=false", elasticSearchRequest,String.class);
-        LOG.info("Elastic - ES Search response: " + response2);
+        ResponseEntity<String> response = retryRestTemplate.postForEntity(this.getElasticURI() + "/" + dataType.toString().toLowerCase() + "/_search?pretty&_source=false", elasticSearchRequest,String.class);
+        LOG.info("Elastic - ES Search response: " + response);
 
-        if(response2 == null){
+        if(response == null){
             //TODO: What do we want here
             LOG.info("Response from ES is null");
 //            throw new CspBusinessException("No response from Elastic (null). Processor will fail and should send message to DeadLetterQ");
         }
 
-        ElasticSearchResponse elasticSearchResponse = new ObjectMapper().readValue(response2.getBody(), ElasticSearchResponse.class);
+        ElasticSearchResponse elasticSearchResponse = new ObjectMapper().readValue(response.getBody(), ElasticSearchResponse.class);
         if (elasticSearchResponse.getHits().getTotal() == 0) return  false;
         else return true;
     }
