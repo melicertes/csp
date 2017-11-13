@@ -3,6 +3,7 @@ package com.intrasoft.csp.misp.service.impl;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.intrasoft.csp.misp.commons.config.MispContextUrl;
 import com.intrasoft.csp.misp.service.EmitterDataHandler;
 import com.intrasoft.csp.misp.service.EmitterSubscriber;
 import org.slf4j.Logger;
@@ -16,8 +17,11 @@ import org.zeromq.ZMsg;
 
 import java.io.IOException;
 
+import static com.intrasoft.csp.misp.commons.config.MispContextUrl.MISP_ATTRIBUTE;
+import static com.intrasoft.csp.misp.commons.config.MispContextUrl.MISP_EVENT;
+
 @Service
-public class EmitterSubscriberImpl implements EmitterSubscriber{
+public class EmitterSubscriberImpl implements EmitterSubscriber, MispContextUrl{
     final Logger LOG = LoggerFactory.getLogger(EmitterSubscriber.class);
 
     @Value("${zeromq.protocol}")
@@ -44,7 +48,7 @@ public class EmitterSubscriberImpl implements EmitterSubscriber{
         String addr = zeroMQprotocol + "://" + zeroMQhost + ":" + zeroMQport;
 
         boolean subscribed = subscriber.connect(addr);
-        LOG.info("Subscribed: " + subscribed);
+        LOG.info("Subscribed to " + zeroMQhost + ":" + zeroMQport + ", " + subscribed);
         subscriber.subscribe("");
         while (!Thread.currentThread ().isInterrupted ()) {
 
@@ -61,24 +65,26 @@ public class EmitterSubscriberImpl implements EmitterSubscriber{
             try {
                 jsonNode = new ObjectMapper().disable(SerializationFeature.INDENT_OUTPUT).readValue(content, JsonNode.class);
                 content =jsonNode.toString();
-                LOG.info(content);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+                LOG.info(topic + ": " + content);
 
-            LOG.info(topic + ": " + jsonNode.toString());
-            if (topic.equals("misp_json")){
-                try {
-                    LOG.info("Event message received from queue.");
-                    emitterDataHandler.handleMispData(jsonNode);
-                } catch (IOException e) {
-                    e.printStackTrace();
+                switch (topic){
+                    case MISP_EVENT:
+                        LOG.info("Event message received from queue.");
+                        emitterDataHandler.handleMispData(jsonNode, MispEntity.EVENT);
+                        break;
+                    case MISP_ATTRIBUTE:
+                        LOG.info("Event message received from queue.");
+                        emitterDataHandler.handleMispData(jsonNode, MispEntity.ATTRIBUTE);
+                        break;
+                    default:
+//                        LOG.info("");
+                        break;
                 }
+            } catch (IOException e) {
+                LOG.error("Json serialization failed");
             }
-
         }
         subscriber.close ();
         context.term ();
-
     }
 }

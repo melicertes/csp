@@ -1,32 +1,32 @@
 package com.intrasoft.csp.misp.service.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.intrasoft.csp.client.CspClient;
-import com.intrasoft.csp.client.impl.CspClientImpl;
+import com.intrasoft.csp.client.ElasticClient;
 import com.intrasoft.csp.commons.model.DataParams;
 import com.intrasoft.csp.commons.model.IntegrationData;
 import com.intrasoft.csp.commons.model.IntegrationDataType;
 import com.intrasoft.csp.commons.model.SharingParams;
-import com.intrasoft.csp.misp.client.MispAppClient;
-import com.intrasoft.csp.misp.client.impl.MispAppClientImpl;
+import com.intrasoft.csp.misp.commons.config.MispContextUrl;
+import com.intrasoft.csp.misp.domain.model.Origin;
+import com.intrasoft.csp.misp.domain.service.impl.OriginServiceImpl;
 import com.intrasoft.csp.misp.service.EmitterDataHandler;
-import com.intrasoft.csp.misp.service.EmitterSubscriber;
 import org.joda.time.DateTime;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.List;
 
-import static com.intrasoft.csp.commons.routes.ContextUrl.DSL_INTEGRATION_DATA;
-import static com.intrasoft.csp.misp.commons.utils.JsonObjectHandler.readField;
+import static com.intrasoft.csp.misp.commons.config.MispContextUrl.MispEntity.ATTRIBUTE;
+import static com.intrasoft.csp.misp.commons.config.MispContextUrl.MispEntity.EVENT;
 
 @Service
-public class EmitterDataHandlerImpl implements EmitterDataHandler {
+public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUrl {
 
     @Value("${misp.app.protocol}")
     String protocol;
@@ -43,47 +43,91 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler {
     @Value("${misp.app.events.path}")
     String eventsPath;
 
+    @Value("${server.name}")
+    String cspId;
+
+    @Autowired
+    CspClient cspClient;
+
+    @Autowired
+    OriginServiceImpl originService;
+
+    @Value("${elastic.protocol}")
+    String elasticProtocol;
+    @Value("${elastic.host}")
+    String elasticHost;
+    @Value("${elastic.port}")
+    String elasticPort;
+    @Value("${elastic.path}")
+    String elasticPath;
+
+    @Autowired
+    ElasticClient elasticClient;
+
     @Override
-    public void handleMispData(Object object) throws IOException {
+    public void handleMispData(Object object, MispEntity mispEntity) throws IOException {
         final Logger LOG = LoggerFactory.getLogger(EmitterDataHandlerImpl.class);
 
         JsonNode jsonNode = (JsonNode) object;
 
         String uuid = "";
-        try{
-            uuid = jsonNode.get("Event").get("uuid").toString();
-        }
-        catch (JSONException e){
 
+        switch (mispEntity) {
+            case EVENT:
+                LOG.info(EVENT.toString());
+                uuid = jsonNode.get(EVENT.toString()).get("uuid").toString();
+                break;
+            case ATTRIBUTE:
+                LOG.info(ATTRIBUTE.toString());
+                uuid = jsonNode.get(ATTRIBUTE.toString()).get("uuid").toString();
+                break;
         }
 
         DataParams dataParams = new DataParams();
-         /** @TODO get it from application.properties*/
-        dataParams.setCspId("LOCAL-CERT");
-         /** @TODO find enum from IL*/
+        /** @TODO get it from application.properties: FIXED
+         * */
+        dataParams.setCspId(cspId);
+        /** @TODO find enum from IL: ENUM NOT AVAILABLE
+         * */
         dataParams.setApplicationId("misp");
         dataParams.setRecordId(uuid);
         dataParams.setDateTime(new DateTime());
-         /** @TODO origing fields
-          * the originids should stay the same (read from confluence)
-          * check local mapping table, if not found use our own values*/
-        dataParams.setOriginCspId("LOCAL-CERT");
-        dataParams.setOriginApplicationId("misp");
+
+        /** issue: SXCSP-332
+         * origin fields
+         * the originids should stay the same (read from confluence)
+         * check local mapping table, if not found use our own values*/
+
+        List<Origin> origins = originService.findByRecordUuid(uuid);
+        if (origins.isEmpty()){
+            dataParams.setOriginCspId(cspId);
+            dataParams.setOriginApplicationId("misp");
+        }
+        else {
+            dataParams.setOriginCspId(origins.get(0).getOriginCspId());
+            dataParams.setOriginApplicationId(origins.get(0).getOriginApplicationId());
+        }
+
         dataParams.setOriginRecordId(uuid);
-        /** @TODO setUrl
+        /** @FIXME setUrl: FIXED
          * get base url from application.properties
-         * bug in misp, uuid always returns 1st event, Kyr. should report it
-         * how does the url update from emiter of source to adapter of destination*/
+         * how does the url update from emitter of source to adapter of destination*/
         dataParams.setUrl(host + ":" + port + "/events/" + uuid);
 
         SharingParams sharingParams = new SharingParams();
         sharingParams.setIsExternal(false);
-         /** @TODO setToShare
-          * When the adapter receives data from an external CSP (the “isExternal” flag is set to TRUE)
-          * the operation should trigger an emitter response. The emitter should emit this record (for indexing) and
-          * set the “toShare” flag to FALSE (rest on conluence https://confluence.sastix.com/display/SXCSP/Integration+Layer+Flows).*/
+
+        /** @FIXME issue: SXCSP-339
+         * setToShare
+         * When the adapter receives data from an external CSP (the “isExternal” flag is set to TRUE)
+         * the operation should trigger an emitter response. The emitter should emit this record (for indexing) and
+         * set the “toShare” flag to FALSE (rest on conluence https://confluence.sastix.com/display/SXCSP/Integration+Layer+Flows).*/
         sharingParams.setToShare(true);
-        /** @TODO setTcId and setTeamID
+
+
+
+        /** issue: SXCSP-337
+         * setTcId and setTeamID
          * should be harvested from dataobject when we support for the user to specify tc or team as recipient
          * find out how to differentiate our custom shared groups from the normal ones
          * use custom sharing groups uuids as tcid, use custom organizations(?) uuids as team id.
@@ -91,30 +135,48 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler {
         sharingParams.setTcId("\"\"");
         sharingParams.setTeamId("\"\"");
 
-
-
-
-
         IntegrationData integrationData = new IntegrationData();
         integrationData.setDataParams(dataParams);
         integrationData.setSharingParams(sharingParams);
         integrationData.setDataObject(jsonNode);
 
-        integrationData.setDataType(IntegrationDataType.EVENT);
-
-
+        /**
+         * issue: SXCSP-333
+         * define a classification to diferentiate between threat/event
+         */
+        IntegrationDataType integrationDataType = IntegrationDataType.EVENT;
+        for (JsonNode jn : jsonNode.get(EVENT.toString()).get("Attribute")){
+            LOG.info(jn.toString());
+            if (jn.get("type").equals("threat") && jn.get("value").equals("threat")){
+                integrationDataType = IntegrationDataType.THREAT;
+            }
+        }
+        integrationData.setDataType(integrationDataType);
         LOG.info("Integration data: " + integrationData.toString());
 
-        /** @TODO how to identify if it is post or put
-         * shoud search in ES to see if this uuid exists
+        /** issue: SXCSP-334
+         * how to identify if it is post or put
+         * should search in ES to see if this uuid exists
          * query the index based on datatype (event/threat), if found send put else send post */
 
-//        CspClient cspClient = new CspClientImpl();
-//        cspClient.postIntegrationData(integrationData, DSL_INTEGRATION_DATA);
+        boolean objextExists = false;
+        try {
+            objextExists = elasticClient.objectExists(integrationData);
+        }
+        catch (Exception e){
+            LOG.info(e.getMessage());
+        }
 
-        MispAppClient mispAppClient = new MispAppClientImpl();
-        mispAppClient.setProtocolHostPortHeaders(protocol, host, port, authorizationKey);
-        mispAppClient.updateMispEvent(uuid.replace("\"",""), new ObjectMapper().writeValueAsString(integrationData.getDataObject()));
+        LOG.info("Object exists: " + objextExists);
 
+
+        if (objextExists){
+            cspClient.updateIntegrationData(integrationData);
+        }
+        else {
+            cspClient.postIntegrationData(integrationData);
+        }
     }
+
+
 }

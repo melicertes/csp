@@ -33,8 +33,8 @@ import static org.hamcrest.Matchers.is;
 @SpringBootTest(classes = {MispAppClient.class, MispAppClientConfig.class},
         properties = {
                 "misp.app.protocol:http",
-                "misp.app.host:misp.dimitris.dk",
-                "misp.app.port:80",
+                "misp.app.host:localhost",
+                "misp.app.port:8181",
                 "misp.app.authorization.key:JNqWBxfPiIywz7hUe58MyJf6sD5PrTVaGm7hTn6c"})
 public class MispAppClientTest {
     private static final Logger LOG = LoggerFactory.getLogger(MispAppClientTest.class);
