@@ -17,13 +17,14 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = {MispAdapterEmitterApplication.class, MispClient.class, MispClientConfig.class},
+        webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT,
         properties = {
                 "zeromq.protocol:tcp",
                 "zeromq.host:localhost",
                 "zeromq.port:50000",
                 "zeromq.topic:misp_json",
                 "server.name:LOCAL-CERT",
-                "logging.level.:trace",
+                //"logging.level.:trace",
                 "adapter.server.protocol:http",
                 "adapter.server.host:localhost",
                 "adapter.server.port:8081",

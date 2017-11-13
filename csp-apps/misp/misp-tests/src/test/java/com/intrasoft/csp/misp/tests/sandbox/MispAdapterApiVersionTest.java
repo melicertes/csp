@@ -54,7 +54,7 @@ public class MispAdapterApiVersionTest {
         String apiUrl = apiVersionClient.getApiUrl();
         String anonContext = apiVersionClient.getContext();
         assertThat(versionDTO.getMaxVersion(),is(1.0));
-        assertThat(apiUrl,is("http://localhost:8081/v1"));
+        assertThat(apiUrl,is("http://localhost:8585/v1"));
         assertThat(anonContext,is("/v1"));
     }
 }

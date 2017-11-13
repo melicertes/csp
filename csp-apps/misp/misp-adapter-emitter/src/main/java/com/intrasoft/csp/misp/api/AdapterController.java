@@ -10,8 +10,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 
+@RestController
 public class AdapterController implements ApiContextUrl {
 
     private static final Logger LOG = LoggerFactory.getLogger(AdapterController.class);
@@ -19,7 +21,7 @@ public class AdapterController implements ApiContextUrl {
     @Autowired
     AdapterDataHandler adapterDataHandler;
 
-    @RequestMapping(value = API_BASE + "v/" + REST_API_V1 + "/" + API_ADAPTER,
+    @RequestMapping(value = API_BASE + "/v" + REST_API_V1 + "/" + API_ADAPTER,
             consumes = {"application/json"},
             method = RequestMethod.POST)
     public ResponseEntity<String> synchNewIntData(@RequestBody IntegrationData integrationData) {
@@ -28,7 +30,7 @@ public class AdapterController implements ApiContextUrl {
     }
 
 
-    @RequestMapping(value = API_BASE + "v/" + REST_API_V1 + "/" + API_ADAPTER,
+    @RequestMapping(value = API_BASE + "/v" + REST_API_V1 + "/" + API_ADAPTER,
             consumes = {"application/json"},
             method = RequestMethod.PUT)
     public ResponseEntity<String> synchUpdatedIntData(@RequestBody IntegrationData integrationData) {
@@ -36,7 +38,7 @@ public class AdapterController implements ApiContextUrl {
         return adapterDataHandler.handleIntegrationData(integrationData, "PUT");
     }
 
-    @RequestMapping(value = API_BASE + "v/" + REST_API_V1 + "/" + API_ADAPTER,
+    @RequestMapping(value = API_BASE + "/v" + REST_API_V1 + "/" + API_ADAPTER,
             consumes = {"application/json"},
             method = RequestMethod.DELETE)
     public ResponseEntity<String> synchDeletedIntData(@RequestBody IntegrationData integrationData) {
