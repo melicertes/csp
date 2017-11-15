@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.support.ResourcePatternResolver;
 
@@ -33,19 +32,19 @@ public class ElasticClientConfig {
     @Value("${elastic.path}")
     String elasticPath;
 
-    @Value("${anon.retry.backOffPeriod:5000}")
+    @Value("${csp.retry.backOffPeriod:5000}")
     private String backOffPeriod;
 
-    @Value("${anon.retry.maxAttempts:3}")
+    @Value("${csp.retry.maxAttempts:3}")
     private String maxAttempts;
 
-    @Value("${anon.client.ssl.enabled:false}")
+    @Value("${csp.client.ssl.enabled:false}")
     Boolean cspClientSslEnabled;
 
-    @Value("${anon.client.ssl.jks.keystore:path}")
+    @Value("${csp.client.ssl.jks.keystore:path}")
     String cspClientSslJksKeystore;
 
-    @Value("${anon.client.ssl.jks.keystore.password:securedPass}")
+    @Value("${csp.client.ssl.jks.keystore.password:securedPass}")
     String cspClientSslJksKeystorePassword;
 
     @Autowired
@@ -57,7 +56,7 @@ public class ElasticClientConfig {
         SUPPORTED_EXCEPTIONS.put(CspBusinessException.class.getName(), CspBusinessException::new);
     }
 
-    @Bean(name = "elasticClient")
+    @Bean(name = "ElasticClient")
     public ElasticClient getElasticClient(){
         ElasticClient elasticClient = new ElasticClientImpl();
         elasticClient.setProtocolHostPort(elasticProtocol,elasticHost,elasticPort);
