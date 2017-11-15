@@ -83,8 +83,6 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
         }
 
         DataParams dataParams = new DataParams();
-        /** @TODO get it from application.properties: FIXED
-         * */
         dataParams.setCspId(cspId);
         /** @TODO find enum from IL: ENUM NOT AVAILABLE
          * */
@@ -96,7 +94,6 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
          * origin fields
          * the originids should stay the same (read from confluence)
          * check local mapping table, if not found use our own values*/
-
         List<Origin> origins = originService.findByRecordUuid(uuid);
         if (origins.isEmpty()){
             dataParams.setOriginCspId(cspId);
@@ -106,8 +103,8 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
             dataParams.setOriginCspId(origins.get(0).getOriginCspId());
             dataParams.setOriginApplicationId(origins.get(0).getOriginApplicationId());
         }
-
         dataParams.setOriginRecordId(uuid);
+
         /** @FIXME setUrl: FIXED
          * get base url from application.properties
          * how does the url update from emitter of source to adapter of destination*/
@@ -122,8 +119,6 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
          * the operation should trigger an emitter response. The emitter should emit this record (for indexing) and
          * set the “toShare” flag to FALSE (rest on conluence https://confluence.sastix.com/display/SXCSP/Integration+Layer+Flows).*/
         sharingParams.setToShare(true);
-
-
 
         /** issue: SXCSP-337
          * setTcId and setTeamID
@@ -155,7 +150,7 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
             }
         }
         catch (NullPointerException e){
-            // Object has no tags
+            // Object has no assigned tags
         }
         integrationData.setDataType(integrationDataType);
         LOG.info("Integration data: " + integrationData.toString());
@@ -183,6 +178,4 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
             cspClient.postIntegrationData(integrationData);
         }
     }
-
-
 }
