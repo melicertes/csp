@@ -15,7 +15,6 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -112,7 +111,7 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
         /** @FIXME setUrl: FIXED
          * get base url from application.properties
          * how does the url update from emitter of source to adapter of destination*/
-        dataParams.setUrl(host + ":" + port + "/events/" + uuid);
+        dataParams.setUrl(protocol + "://" + host + ":" + port + "/events/" + uuid.replace("\"", ""));
 
         SharingParams sharingParams = new SharingParams();
         sharingParams.setIsExternal(false);
@@ -132,8 +131,8 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
          * find out how to differentiate our custom shared groups from the normal ones
          * use custom sharing groups uuids as tcid, use custom organizations(?) uuids as team id.
          * harvest only from the dataobject part which dictates which organization or sharing group should get this event*/
-        sharingParams.setTcId("\"\"");
-        sharingParams.setTeamId("\"\"");
+//        sharingParams.setTcId("\"\"");
+//        sharingParams.setTeamId("\"\"");
 
         IntegrationData integrationData = new IntegrationData();
         integrationData.setDataParams(dataParams);
@@ -145,11 +144,18 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
          * define a classification to diferentiate between threat/event
          */
         IntegrationDataType integrationDataType = IntegrationDataType.EVENT;
-        for (JsonNode jn : jsonNode.get(EVENT.toString()).get("Attribute")){
-            LOG.info(jn.toString());
-            if (jn.get("type").equals("threat") && jn.get("value").equals("threat")){
-                integrationDataType = IntegrationDataType.THREAT;
+        try{
+            for (JsonNode jn : jsonNode.get(EVENT.toString()).get("Tag")){
+                LOG.info(jn.toString());
+                LOG.info(jn.get("name").toString());
+                if (jn.get("name").toString().equals("\"threat\"")){
+                    LOG.info("THREAT");
+                    integrationDataType = IntegrationDataType.THREAT;
+                }
             }
+        }
+        catch (NullPointerException e){
+            // Object has no tags
         }
         integrationData.setDataType(integrationDataType);
         LOG.info("Integration data: " + integrationData.toString());
