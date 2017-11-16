@@ -74,6 +74,8 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler{
 //        MispAppClient mispAppClient = new MispAppClientImpl();
 //        mispAppClient.setProtocolHostPortHeaders(protocol,host,port,authorizationKey);
 
+        mispAppClient.addMispEvent((String) jsonNode.toString());
+        /*
         if (requestMethod.equals("POST")){
             mispAppClient.addMispEvent((String) integrationData.getDataObject());
         }
@@ -88,7 +90,7 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler{
         else if (requestMethod.equals("DELETE")){
             // TODO id is not unique among the csps,needs care and proderm
             mispAppClient.deleteMispEvent(new JSONObject(integrationData.getDataObject()).getJSONObject("Event").getString("uuid"));
-        }
+        }*/
 
         /**
          * issue: SXCSP-339
