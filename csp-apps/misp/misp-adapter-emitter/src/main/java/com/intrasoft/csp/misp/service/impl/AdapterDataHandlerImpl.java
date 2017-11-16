@@ -1,6 +1,7 @@
 package com.intrasoft.csp.misp.service.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.intrasoft.csp.commons.model.IntegrationData;
 import com.intrasoft.csp.misp.client.MispAppClient;
 import com.intrasoft.csp.misp.client.MispClient;
@@ -8,17 +9,16 @@ import com.intrasoft.csp.misp.client.impl.MispAppClientImpl;
 import com.intrasoft.csp.misp.domain.model.Origin;
 import com.intrasoft.csp.misp.domain.service.impl.OriginServiceImpl;
 import com.intrasoft.csp.misp.service.AdapterDataHandler;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.List;
 
 @Service
@@ -28,19 +28,19 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler{
     OriginServiceImpl originService;
 
     @Autowired
+    @Qualifier("MispClient")
     MispClient mispClient;
 
-/*    @Autowired
-    @Qualifier("uuidSet")
-    HashSet<String> uuidSet;*/
+    @Autowired
+    @Qualifier("MispAppClient")
+    MispAppClient mispAppClient;
+
 
     @Override
     public ResponseEntity<String> handleIntegrationData(IntegrationData integrationData, String requestMethod) {
 
         final Logger LOG = LoggerFactory.getLogger(AdapterDataHandlerImpl.class);
         //TODO process and post integration data to MISP API
-
-        MispAppClient mispAppClient = new MispAppClientImpl();
 
         // TODO deduplication, nothing needed, push the event, if the event exists we should a redirect, read the API
         // TODO reemission, if external == true then toShare = false, two options
@@ -50,15 +50,12 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler{
 
         // TODO reference resolving
 
-        JsonNode jsonNode = (JsonNode) integrationData.getDataObject();
-
         String uuid = "";
-        try{
-            uuid = jsonNode.get("Event").get("uuid").toString();
-        }
-        catch (JSONException e){
-
-        }
+        JsonNode jsonNode = new ObjectMapper().convertValue(integrationData.getDataObject(), JsonNode.class);
+        LOG.info(jsonNode.toString());
+        LOG.info(jsonNode.get("Event").toString());
+        LOG.info(jsonNode.get("Event").get("id").toString());
+        uuid = jsonNode.get("Event").get("uuid").toString();
 
         List<Origin> origins = originService.findByRecordUuid(uuid);
         if (origins.isEmpty()){
@@ -74,12 +71,16 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler{
             LOG.debug("Origin params already found in table");
         }
 
+//        MispAppClient mispAppClient = new MispAppClientImpl();
+//        mispAppClient.setProtocolHostPortHeaders(protocol,host,port,authorizationKey);
+
         if (requestMethod.equals("POST")){
             mispAppClient.addMispEvent((String) integrationData.getDataObject());
         }
         else if (requestMethod.equals("PUT")){
             try {
-                mispAppClient.updateMispEvent(new JSONObject(integrationData.getDataObject()).getJSONObject("Event").getString("uuid"), (String) integrationData.getDataObject());
+                LOG.info(jsonNode.toString());
+                mispAppClient.updateMispEvent(uuid.replace("\"",""), jsonNode.toString());
             } catch (IOException e) {
 //                e.printStackTrace();
             }

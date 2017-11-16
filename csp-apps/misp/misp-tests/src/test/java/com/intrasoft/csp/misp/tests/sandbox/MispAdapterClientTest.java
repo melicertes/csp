@@ -15,6 +15,13 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = {MispAdapterEmitterApplication.class, MispClient.class, MispClientConfig.class},
         webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT,
@@ -66,11 +73,23 @@ public class MispAdapterClientTest {
         IntegrationData integrationData = new IntegrationData();
         integrationData.setDataParams(dataParams);
         integrationData.setSharingParams(sharingParams);
-//        integrationData.setDataObject(loadJsonFromFile());
+        integrationData.setDataObject(loadJsonFromFile());
 
         integrationData.setDataType(IntegrationDataType.EVENT);
         mispClient.postIntegrationDataAdapter(integrationData);
+    }
 
-
+    public String loadJsonFromFile(){
+        URL url = getClass().getClassLoader().getResource("json/event.json");
+        File file = new File(url.getFile());
+        String event = null;
+        try {
+            event = new String(Files.readAllBytes(Paths.get(url.toURI())));
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+        return event;
     }
 }

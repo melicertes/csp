@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.util.List;
 
+import static com.intrasoft.csp.misp.commons.config.MispContextUrl.MispEntity.ACTION;
 import static com.intrasoft.csp.misp.commons.config.MispContextUrl.MispEntity.ATTRIBUTE;
 import static com.intrasoft.csp.misp.commons.config.MispContextUrl.MispEntity.EVENT;
 
@@ -159,6 +160,19 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
          * how to identify if it is post or put
          * should search in ES to see if this uuid exists
          * query the index based on datatype (event/threat), if found send put else send post */
+
+
+        try {
+            String action = jsonNode.get(ACTION.toString()).toString();
+            LOG.info(action);
+            if (action.toLowerCase().equals("delete")) {
+                cspClient.deleteIntegrationData(integrationData);
+            }
+            return;
+        }
+        catch (NullPointerException e){
+            // NOT A DELETE ACTION
+        }
 
         boolean objextExists = false;
         try {

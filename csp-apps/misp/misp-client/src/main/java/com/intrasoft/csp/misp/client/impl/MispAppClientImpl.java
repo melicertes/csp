@@ -4,11 +4,14 @@ package com.intrasoft.csp.misp.client.impl;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.intrasoft.csp.libraries.restclient.service.RetryRestTemplate;
 import com.intrasoft.csp.misp.client.MispAppClient;
 import com.intrasoft.csp.misp.commons.config.MispContextUrl;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
 
@@ -27,9 +30,9 @@ public class MispAppClientImpl implements MispAppClient, MispContextUrl {
     HttpHeaders headers;
     private Logger LOG = (Logger) LoggerFactory.getLogger(MispAppClientImpl.class);
 
-//    @Autowired
-//    @Qualifier("CspRestTemplate")
-//    RetryRestTemplate retryRestTemplate;
+    @Autowired
+    @Qualifier("MispAppRestTemplate")
+    RetryRestTemplate retryRestTemplate;
 
     @Override
     public void setProtocolHostPortHeaders(String protocol, String host, String port, String authorizationKey) {
@@ -53,10 +56,8 @@ public class MispAppClientImpl implements MispAppClient, MispContextUrl {
         String url = context  + "/" + MISP_EVENTS;
 
         LOG.info("API call [post]: " + url);
-        RestTemplate restTemplate = new RestTemplate();
         HttpEntity<String> request = new HttpEntity<>(new String(object.toString()), headers);
-//        LOG.info();
-        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, request, String.class);
+        ResponseEntity<String> response = retryRestTemplate.exchange(url, HttpMethod.POST, request, String.class);
         return response;
     }
 
@@ -72,9 +73,8 @@ public class MispAppClientImpl implements MispAppClient, MispContextUrl {
         object = jsonNode.toString();
 
         LOG.info("API call [put]: " + url);
-        RestTemplate restTemplate = new RestTemplate();
         HttpEntity<String> request = new HttpEntity<>(new String(object.toString()), headers);
-        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.PUT, request, String.class);
+        ResponseEntity<String> response = retryRestTemplate.exchange(url, HttpMethod.PUT, request, String.class);
         return response;
     }
 
@@ -83,12 +83,11 @@ public class MispAppClientImpl implements MispAppClient, MispContextUrl {
         String url = context  + "/" + MISP_EVENTS + "/" + uuid;
 
         LOG.info("API call [delete]: " + url);
-        RestTemplate restTemplate = new RestTemplate();
         HttpEntity<?> request = new HttpEntity<>(headers);
-        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.DELETE, request, String.class);
+        ResponseEntity<String> response = retryRestTemplate.exchange(url, HttpMethod.DELETE, request, String.class);
 
         LOG.info(response.toString());
-        restTemplate.delete(url);
+        retryRestTemplate.delete(url);
 
         return response;
     }
