@@ -1,5 +1,6 @@
 package com.intrasoft.csp.client.impl;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.intrasoft.csp.client.ElasticClient;
 import com.intrasoft.csp.commons.model.IntegrationData;
@@ -73,6 +74,32 @@ public class ElasticClientImpl implements ElasticClient {
         else return true;
     }
 
+    @Override
+    public JsonNode getESobject(IntegrationData integrationData) throws IOException {
+        ElasticSearchRequest elasticSearchRequest = this.getElasticSearchRequest(integrationData);
+        IntegrationDataType dataType = integrationData.getDataType();
+
+        ResponseEntity<String> response = retryRestTemplate.postForEntity(this.getElasticURI() + "/" + dataType.toString().toLowerCase() + "/_search?pretty&_source=false", elasticSearchRequest,String.class);
+
+        if(response == null){
+            return null;
+        }
+
+        ElasticSearchResponse elasticSearchResponse = new ObjectMapper().readValue(response.getBody(), ElasticSearchResponse.class);
+        if (elasticSearchResponse.getHits().getTotal() != 0) {
+            String esId = elasticSearchResponse.getHits().getHits().get(0).getId();
+
+            //http://csp0.dangerduck.gr:9200/cspdata/event/_search?q=_id:AV_WK4S8ZikppFWMb1IJ
+            ResponseEntity<String> o = retryRestTemplate.getForEntity(this.getElasticURI() + "/" + dataType.toString().toLowerCase() + "/_search?q=_id:" + esId, String.class);
+
+            JsonNode jsonNode = new ObjectMapper().readValue(o.getBody(), JsonNode.class);
+            for (JsonNode jn : jsonNode.get("hits").get("hits")){
+                return jn.get("_source");
+            }
+        }
+
+        return null;
+    }
 
     private String getElasticURI() {
         return elasticProtocol + "://" + elasticHost + ":" + elasticPort + "/" + elasticPath;

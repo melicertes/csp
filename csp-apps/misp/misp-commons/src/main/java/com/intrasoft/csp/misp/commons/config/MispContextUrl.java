@@ -24,4 +24,23 @@ public interface MispContextUrl {
         }
     }
 
+    public static enum RTIREntity {
+        RTIR_NAME("\"rtir\""),
+        TITLE_CATEGORY("\"Internal reference\""),
+        TITLE_RELATION("\"classification\""),
+        URL_CATEGORY("\"Internal reference\""),
+        URL_RELATION("\"Attribution\"");
+
+
+        private final String value;
+
+        RTIREntity(String value) {
+            this.value = value;
+        }
+
+        public String toString(){
+            return this.value;
+        }
+    }
+
 }
