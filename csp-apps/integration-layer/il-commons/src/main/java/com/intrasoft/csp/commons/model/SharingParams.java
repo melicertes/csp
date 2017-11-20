@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -22,10 +23,10 @@ public class SharingParams implements Serializable {
     private Boolean isExternal;
 
     @JsonProperty("trustCircleId")
-    private String tcId;
+    private List<String> tcId;
 
     @JsonProperty("teamId")
-    private String teamId;
+    private List<String> teamId;
 
     public SharingParams() {
     }
@@ -51,19 +52,19 @@ public class SharingParams implements Serializable {
         this.isExternal = isExternal;
     }
 
-    public String getTcId() {
+    public List<String> getTcId() {
         return tcId;
     }
 
-    public void setTcId(String tcId) {
+    public void setTcId(List<String> tcId) {
         this.tcId = tcId;
     }
 
-    public String getTeamId() {
+    public List<String> getTeamId() {
         return teamId;
     }
 
-    public void setTeamId(String teamId) {
+    public void setTeamId(List<String> teamId) {
         this.teamId = teamId;
     }
 

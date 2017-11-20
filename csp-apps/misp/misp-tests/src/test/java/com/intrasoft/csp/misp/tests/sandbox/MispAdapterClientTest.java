@@ -80,8 +80,8 @@ public class MispAdapterClientTest {
         SharingParams sharingParams = new SharingParams();
         sharingParams.setIsExternal(false);
         sharingParams.setToShare(true);
-        sharingParams.setTcId("\"\"");
-        sharingParams.setTeamId("\"\"");
+        sharingParams.setTcId(null);
+        sharingParams.setTeamId(null);
 
         IntegrationData integrationData = new IntegrationData();
         integrationData.setDataParams(dataParams);

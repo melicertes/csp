@@ -183,10 +183,14 @@ public class MockUtils implements ContextUrl {
         sharingParams.setIsExternal(isExternal);
         sharingParams.setToShare(true);
         if(!StringUtils.isEmpty(tcId)){
-            sharingParams.setTcId(tcId);
+            List<String> list = new ArrayList<>();
+            list.add(tcId);
+            sharingParams.setTcId(list);
         }
         if(!StringUtils.isEmpty(teamId)){
-            sharingParams.setTeamId(teamId);
+            List<String> list = new ArrayList<>();
+            list.add(teamId);
+            sharingParams.setTeamId(list);
         }
         integrationData.setDataParams(dataParams);
         String data = dataObjectToTest!=null?dataObjectToTest:dataObjectMap.get(integrationData.getDataType());
@@ -222,10 +226,14 @@ public class MockUtils implements ContextUrl {
         sharingParams.setIsExternal(isExternal);
         sharingParams.setToShare(toShare);
         if(!StringUtils.isEmpty(tcId)){
-            sharingParams.setTcId(tcId);
+            List<String> list = new ArrayList<>();
+            list.add(tcId);
+            sharingParams.setTcId(list);
         }
         if(!StringUtils.isEmpty(teamId)){
-            sharingParams.setTeamId(teamId);
+            List<String> list = new ArrayList<>();
+            list.add(teamId);
+            sharingParams.setTeamId(list);
         }
         integrationData.setSharingParams(sharingParams);
         DataParams dataParams = new DataParams();
@@ -279,10 +287,14 @@ public class MockUtils implements ContextUrl {
         sharingParams.setIsExternal(isExternal);
         sharingParams.setToShare(toShare);
         if(!StringUtils.isEmpty(tcId)){
-            sharingParams.setTcId(tcId);
+            List<String> list = new ArrayList<>();
+            list.add(tcId);
+            sharingParams.setTcId(list);
         }
         if(!StringUtils.isEmpty(teamId)){
-            sharingParams.setTeamId(teamId);
+            List<String> list = new ArrayList<>();
+            list.add(teamId);
+            sharingParams.setTeamId(list);
         }
         integrationData.setSharingParams(sharingParams);
         DataParams dataParams = new DataParams();
