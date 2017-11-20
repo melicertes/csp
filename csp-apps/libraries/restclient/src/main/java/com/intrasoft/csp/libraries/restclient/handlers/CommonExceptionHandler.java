@@ -3,6 +3,7 @@ package com.intrasoft.csp.libraries.restclient.handlers;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.intrasoft.csp.libraries.restclient.exceptions.CspBusinessException;
+import com.intrasoft.csp.libraries.restclient.exceptions.StatusCodeException;
 import com.intrasoft.csp.libraries.restclient.model.RestErrorDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +41,13 @@ public class CommonExceptionHandler implements ResponseErrorHandler {
      * HashMap which holds the supported exception classes.
      */
     private final ConcurrentHashMap<String, ExceptionHandler> exceptionClasses = new ConcurrentHashMap<>();
+
+    /**
+     * HashMap which holds the supported status error codes, and when thrown it will raise a runtime exception with
+     * relative message and avoid retry policy
+     * */
+
+    private ConcurrentHashMap<Integer, String> avoidRetryOnStatusCodeMap;
 
     public CommonExceptionHandler() {
         exceptionClasses.put(CspBusinessException.class.getName(), CspBusinessException::new);
@@ -97,10 +105,14 @@ public class CommonExceptionHandler implements ResponseErrorHandler {
                 final HttpHeaders httpHeaders = response.getHeaders();
                 final RestErrorDTO errorDTO;
 
-                if (statusCode == HttpStatus.NOT_FOUND){
-                    throw new RuntimeException("not found event");
+                if(getAvoidRetryOnStatusCodeMap()!=null) {
+                    Integer statusCodeValue = statusCode.value();
+                    String statusCodeMessage = getAvoidRetryOnStatusCodeMap().get(statusCodeValue);
+                    if (getAvoidRetryOnStatusCodeMap().containsKey(statusCodeValue)) {
+                        throw new StatusCodeException(statusCodeMessage, statusCodeValue, httpHeaders);
+                    }
                 }
-                
+
                 try {
                     errorDTO = objectMapper.readValue(new String(responseBody, charset), RestErrorDTO.class);
                     LOGGER.error("Exception: " + errorDTO.toString());
@@ -108,7 +120,7 @@ public class CommonExceptionHandler implements ResponseErrorHandler {
                     //Wasn't able to map String on ErrorDTO.
                     //It is an Unknown Exception
                     //Throw Default Exception
-                     final HttpClientErrorException clientErrorException = new HttpClientErrorException(statusCode, statusText, httpHeaders, responseBody, charset);
+                    final HttpClientErrorException clientErrorException = new HttpClientErrorException(statusCode, statusText, httpHeaders, responseBody, charset);
                     LOGGER.error("Unknown Exception: " + clientErrorException.getMessage());
                     throw clientErrorException;
                 }
@@ -154,4 +166,11 @@ public class CommonExceptionHandler implements ResponseErrorHandler {
         exceptionClasses.putAll(exceptionHandlers);
     }
 
+    public ConcurrentHashMap<Integer, String> getAvoidRetryOnStatusCodeMap() {
+        return avoidRetryOnStatusCodeMap;
+    }
+
+    public void setAvoidRetryOnStatusCodeMap(ConcurrentHashMap<Integer, String> avoidRetryOnStatusCodeMap) {
+        this.avoidRetryOnStatusCodeMap = avoidRetryOnStatusCodeMap;
+    }
 }
