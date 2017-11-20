@@ -34,7 +34,7 @@ public class MispClientImpl implements MispClient, ApiContextUrl, MispContextUrl
     @Override
     public IntegrationData postIntegrationDataEmitter(IntegrationData integrationData) {
         final String url = apiVersionClient.getApiUrl() + API_EMITTER;
-        LOG.info("MISP-ADAPTER call [post]: " + url);
+        LOG.info("MISP-EMITTER call [post]: " + url);
         IntegrationData response = retryRestTemplate.postForObject(url, integrationData, IntegrationData.class);
         return response;
     }

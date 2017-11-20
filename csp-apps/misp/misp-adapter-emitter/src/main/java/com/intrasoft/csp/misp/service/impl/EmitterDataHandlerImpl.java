@@ -65,7 +65,7 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
     ElasticClient elasticClient;
 
     @Override
-    public void handleMispData(Object object, MispEntity mispEntity) throws IOException {
+    public void handleMispData(Object object, MispEntity mispEntity, boolean isDelete) {
         final Logger LOG = LoggerFactory.getLogger(EmitterDataHandlerImpl.class);
 
         JsonNode jsonNode = (JsonNode) object;
@@ -184,12 +184,16 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
 
         LOG.info("Object exists: " + objextExists);
 
-
-        if (objextExists){
-            cspClient.updateIntegrationData(integrationData);
+        if (isDelete){
+            cspClient.deleteIntegrationData(integrationData);
         }
         else {
-            cspClient.postIntegrationData(integrationData);
+            if (objextExists){
+                cspClient.updateIntegrationData(integrationData);
+            }
+            else {
+                cspClient.postIntegrationData(integrationData);
+            }
         }
     }
 }

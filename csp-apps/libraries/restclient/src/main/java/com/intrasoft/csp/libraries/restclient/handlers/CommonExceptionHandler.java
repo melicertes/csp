@@ -96,6 +96,10 @@ public class CommonExceptionHandler implements ResponseErrorHandler {
                 final String statusText = response.getStatusText();
                 final HttpHeaders httpHeaders = response.getHeaders();
                 final RestErrorDTO errorDTO;
+
+                if (statusCode == HttpStatus.NOT_FOUND){
+                    throw new RuntimeException("not found event");
+                }
                 
                 try {
                     errorDTO = objectMapper.readValue(new String(responseBody, charset), RestErrorDTO.class);
@@ -104,7 +108,7 @@ public class CommonExceptionHandler implements ResponseErrorHandler {
                     //Wasn't able to map String on ErrorDTO.
                     //It is an Unknown Exception
                     //Throw Default Exception
-                    final HttpClientErrorException clientErrorException = new HttpClientErrorException(statusCode, statusText, httpHeaders, responseBody, charset);
+                     final HttpClientErrorException clientErrorException = new HttpClientErrorException(statusCode, statusText, httpHeaders, responseBody, charset);
                     LOGGER.error("Unknown Exception: " + clientErrorException.getMessage());
                     throw clientErrorException;
                 }

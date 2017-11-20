@@ -56,9 +56,9 @@ public class MispAppClientConfig {
 
     private static final ConcurrentHashMap<String, ExceptionHandler> SUPPORTED_EXCEPTIONS = new ConcurrentHashMap<>();
 
-    static {
+/*    static {
         SUPPORTED_EXCEPTIONS.put(CspBusinessException.class.getName(), CspBusinessException::new);
-    }
+    }*/
 
     @Autowired
     @Qualifier("MispAppRestTemplate")

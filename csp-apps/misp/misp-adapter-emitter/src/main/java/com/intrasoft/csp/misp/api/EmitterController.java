@@ -30,7 +30,7 @@ public class EmitterController implements ApiContextUrl {
     public void synchNewIntData(@RequestBody IntegrationData integrationData) {
         LOG.info("MISP Endpoint: POST received");
         try {
-            emitterDataHandler.handleMispData(integrationData, MispContextUrl.MispEntity.EVENT);
+            emitterDataHandler.handleMispData(integrationData, MispContextUrl.MispEntity.EVENT, false);
         } catch (IOException e) {
 
         }

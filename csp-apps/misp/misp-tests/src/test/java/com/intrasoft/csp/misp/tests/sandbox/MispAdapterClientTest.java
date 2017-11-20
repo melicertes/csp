@@ -1,5 +1,9 @@
 package com.intrasoft.csp.misp.tests.sandbox;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.intrasoft.csp.commons.model.DataParams;
 import com.intrasoft.csp.commons.model.IntegrationData;
 import com.intrasoft.csp.commons.model.IntegrationDataType;
@@ -7,9 +11,12 @@ import com.intrasoft.csp.commons.model.SharingParams;
 import com.intrasoft.csp.misp.MispAdapterEmitterApplication;
 import com.intrasoft.csp.misp.client.MispClient;
 import com.intrasoft.csp.misp.client.config.MispClientConfig;
+import com.intrasoft.csp.misp.service.impl.AdapterDataHandlerImpl;
 import org.joda.time.DateTime;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -26,6 +33,10 @@ import java.nio.file.Paths;
 @SpringBootTest(classes = {MispAdapterEmitterApplication.class, MispClient.class, MispClientConfig.class},
         webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT,
         properties = {
+        "misp.app.protocol:http",
+                "misp.app.host:misp.dimitris.dk",
+                "misp.app.port:80",
+                "misp.app.authorization.key:JNqWBxfPiIywz7hUe58MyJf6sD5PrTVaGm7hTn6c",
                 "zeromq.protocol:tcp",
                 "zeromq.host:localhost",
                 "zeromq.port:50000",
@@ -47,6 +58,8 @@ import java.nio.file.Paths;
                 "client.ssl.enabled:false",
                 "consume.errorq.max.messages:3"})
 public class MispAdapterClientTest {
+
+    final Logger LOG = LoggerFactory.getLogger(MispAdapterClientTest.class);
 
     @Autowired
     @Qualifier("MispClient")
@@ -76,15 +89,25 @@ public class MispAdapterClientTest {
         integrationData.setDataObject(loadJsonFromFile());
 
         integrationData.setDataType(IntegrationDataType.EVENT);
+        try {
+            LOG.info(new ObjectMapper().writeValueAsString(integrationData));
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
         mispClient.postIntegrationDataAdapter(integrationData);
     }
 
     public String loadJsonFromFile(){
         URL url = getClass().getClassLoader().getResource("json/event.json");
         File file = new File(url.getFile());
+        String prettyEvent = null;
         String event = null;
         try {
-            event = new String(Files.readAllBytes(Paths.get(url.toURI())));
+            prettyEvent = new String(Files.readAllBytes(Paths.get(url.toURI())));
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode jsonNode = objectMapper.readValue(prettyEvent, JsonNode.class);
+            event = jsonNode.toString();
+            LOG.info("EVENT: " + prettyEvent);
         } catch (IOException e) {
             e.printStackTrace();
         } catch (URISyntaxException e) {

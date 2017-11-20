@@ -66,15 +66,16 @@ public class EmitterSubscriberImpl implements EmitterSubscriber, MispContextUrl{
                 jsonNode = new ObjectMapper().disable(SerializationFeature.INDENT_OUTPUT).readValue(content, JsonNode.class);
                 content =jsonNode.toString();
                 LOG.info(topic + ": " + content);
-
+                boolean isDelete = content.contains("\"action\":\"delete\"");
+                LOG.info("isdelete: " + isDelete);
                 switch (topic){
                     case MISP_EVENT:
                         LOG.info("Event message received from queue.");
-                        emitterDataHandler.handleMispData(jsonNode, MispEntity.EVENT);
+                        emitterDataHandler.handleMispData(jsonNode, MispEntity.EVENT, isDelete);
                         break;
                     case MISP_ATTRIBUTE:
                         LOG.info("Event message received from queue.");
-                        emitterDataHandler.handleMispData(jsonNode, MispEntity.ATTRIBUTE);
+                        emitterDataHandler.handleMispData(jsonNode, MispEntity.ATTRIBUTE, isDelete);
                         break;
                     default:
 //                        LOG.info("");

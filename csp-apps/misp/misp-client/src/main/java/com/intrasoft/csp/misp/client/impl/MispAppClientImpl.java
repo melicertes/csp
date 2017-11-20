@@ -4,6 +4,8 @@ package com.intrasoft.csp.misp.client.impl;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.intrasoft.csp.libraries.restclient.exceptions.CspBusinessException;
+import com.intrasoft.csp.libraries.restclient.handlers.CommonExceptionHandler;
 import com.intrasoft.csp.libraries.restclient.service.RetryRestTemplate;
 import com.intrasoft.csp.misp.client.MispAppClient;
 import com.intrasoft.csp.misp.commons.config.MispContextUrl;
@@ -52,29 +54,54 @@ public class MispAppClientImpl implements MispAppClient, MispContextUrl {
     }
 
     @Override
-    public ResponseEntity<String> addMispEvent(String object) {
+    public ResponseEntity<String> addMispEvent(String body) {
         String url = context  + "/" + MISP_EVENTS;
 
         LOG.info("API call [post]: " + url);
-        HttpEntity<String> request = new HttpEntity<>(new String(object.toString()), headers);
-        ResponseEntity<String> response = retryRestTemplate.exchange(url, HttpMethod.POST, request, String.class);
+        HttpEntity<String> request = new HttpEntity<>(body, headers);
+        ResponseEntity<String> response = new ResponseEntity<String>(HttpStatus.OK);
+        response = retryRestTemplate.exchange(url, HttpMethod.POST, request, String.class);
         return response;
     }
 
     @Override
-    public ResponseEntity<String> updateMispEvent(String uuid, String object) throws IOException {
+    public ResponseEntity<String> updateMispEvent(String body) {
+        String url = context  + "/" + MISP_EVENTS;
+
+        JsonNode jsonNode = new ObjectMapper().convertValue(body, JsonNode.class);
+        JsonNode node = jsonNode.path("Event");
+        ObjectNode objectNode = (ObjectNode) node;
+        objectNode.put("timestamp", String.valueOf(DateTime.now().getMillis()/1000));
+        body = jsonNode.toString();
+
+        LOG.info("API call [put]: " + url);
+        HttpEntity<String> request = new HttpEntity<>(body, headers);
+        ResponseEntity<String> response = new ResponseEntity<String>(HttpStatus.OK);
+        response = retryRestTemplate.exchange(url, HttpMethod.PUT, request, String.class);
+        LOG.error(response.getBody());
+        return response;
+    }
+
+    @Override
+    public ResponseEntity<String> updateMispEvent(String uuid, String body) {
         String url = context  + "/" + MISP_EVENTS + "/" + uuid;
 
-        JsonNode jsonNode = new ObjectMapper().readTree(object);
+        JsonNode jsonNode = new ObjectMapper().convertValue(body, JsonNode.class);
         JsonNode node = jsonNode.path("Event");
         ObjectNode objectNode = (ObjectNode) node;
         objectNode.put("timestamp", String.valueOf(DateTime.now().getMillis()/1000));
 //        return object.toString();
-        object = jsonNode.toString();
+        body = jsonNode.toString();
 
         LOG.info("API call [put]: " + url);
-        HttpEntity<String> request = new HttpEntity<>(new String(object.toString()), headers);
-        ResponseEntity<String> response = retryRestTemplate.exchange(url, HttpMethod.PUT, request, String.class);
+        HttpEntity<String> request = new HttpEntity<>(body, headers);
+        ResponseEntity<String> response = new ResponseEntity<String>(HttpStatus.OK);
+        try {
+            response = retryRestTemplate.exchange(url, HttpMethod.PUT, request, String.class);
+        }
+        catch (CspBusinessException e){
+
+        }
         return response;
     }
 

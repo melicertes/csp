@@ -12,7 +12,8 @@ public interface MispAppClient {
 	String getContext();
 
 	ResponseEntity<String> addMispEvent(String object);
-	ResponseEntity<String> updateMispEvent(String uuid, String object) throws IOException;
+	ResponseEntity<String> updateMispEvent(String object);
+	ResponseEntity<String> updateMispEvent(String uuid, String object) ;
 	ResponseEntity<String> deleteMispEvent(String uuid);
 
 }

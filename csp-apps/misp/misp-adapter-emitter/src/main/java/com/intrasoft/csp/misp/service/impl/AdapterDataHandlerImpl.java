@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.intrasoft.csp.commons.model.IntegrationData;
 import com.intrasoft.csp.misp.client.MispAppClient;
 import com.intrasoft.csp.misp.client.MispClient;
-import com.intrasoft.csp.misp.client.impl.MispAppClientImpl;
 import com.intrasoft.csp.misp.domain.model.Origin;
 import com.intrasoft.csp.misp.domain.service.impl.OriginServiceImpl;
 import com.intrasoft.csp.misp.service.AdapterDataHandler;
@@ -14,7 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -51,11 +50,12 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler{
         // TODO reference resolving
 
         String uuid = "";
+        LOG.info(integrationData.getDataObject().toString());
         JsonNode jsonNode = new ObjectMapper().convertValue(integrationData.getDataObject(), JsonNode.class);
         LOG.info(jsonNode.toString());
-        LOG.info(jsonNode.get("Event").toString());
-        LOG.info(jsonNode.get("Event").get("id").toString());
-        uuid = jsonNode.get("Event").get("uuid").toString();
+//        LOG.info(jsonNode.get("Event").toString());
+//        LOG.info(jsonNode.get("Event").get("id").toString());
+//        uuid = jsonNode.get("Event").get("uuid").toString();
 
         List<Origin> origins = originService.findByRecordUuid(uuid);
         if (origins.isEmpty()){
@@ -74,7 +74,20 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler{
 //        MispAppClient mispAppClient = new MispAppClientImpl();
 //        mispAppClient.setProtocolHostPortHeaders(protocol,host,port,authorizationKey);
 
-        mispAppClient.addMispEvent((String) jsonNode.toString());
+        LOG.info("requestMethod: " + requestMethod);
+        if (requestMethod.equals("DELETE")){
+            // TODO id is not unique among the csps,needs care and proderm
+            mispAppClient.deleteMispEvent(new JSONObject(integrationData.getDataObject()).getJSONObject("Event").getString("uuid"));
+        }
+        else {
+            try {
+                ResponseEntity<String> responseEntity = mispAppClient.addMispEvent(integrationData.getDataObject().toString());
+                LOG.info(responseEntity.toString());
+            }
+            catch (Exception e){
+                LOG.error(e.getMessage());
+            }
+        }
         /*
         if (requestMethod.equals("POST")){
             mispAppClient.addMispEvent((String) integrationData.getDataObject());
@@ -97,9 +110,9 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler{
          * Implement reemition flow
          */
         integrationData.getSharingParams().setToShare(false);
-        mispClient.postIntegrationDataEmitter(integrationData);
+//        mispClient.postIntegrationDataEmitter(integrationData);
 
 //        uuidSet.add(uuid);
-        return null;
+        return new ResponseEntity<String>(HttpStatus.OK);
     }
 }
