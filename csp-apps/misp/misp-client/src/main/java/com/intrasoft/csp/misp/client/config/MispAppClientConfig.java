@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.support.ResourcePatternResolver;
+import org.springframework.http.HttpStatus;
 
 import java.io.IOException;
 import java.security.KeyManagementException;
@@ -55,9 +56,11 @@ public class MispAppClientConfig {
     ResourcePatternResolver resourcePatternResolver;
 
     private static final ConcurrentHashMap<String, ExceptionHandler> SUPPORTED_EXCEPTIONS = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<Integer, String> AVOID_RETRY_ON_STATUS_CODE = new ConcurrentHashMap<>();
 
     static {
         SUPPORTED_EXCEPTIONS.put(CspBusinessException.class.getName(), CspBusinessException::new);
+        AVOID_RETRY_ON_STATUS_CODE.put(HttpStatus.NOT_FOUND.value(), "Event already exists or url not found");
     }
 
     @Autowired
@@ -67,7 +70,7 @@ public class MispAppClientConfig {
     @Bean(name="MispAppRestTemplate")
     public RetryRestTemplate getRetryRestTemplate() throws CertificateException, UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException, KeyManagementException, IOException {
         RestTemplateConfiguration restTemplateConfiguration = new RestTemplateConfiguration(backOffPeriod, maxAttempts, cspClientSslEnabled, cspClientSslJksKeystore, cspClientSslJksKeystorePassword, resourcePatternResolver);
-        return restTemplateConfiguration.getRestTemplateWithSupportedExceptions(SUPPORTED_EXCEPTIONS);
+        return restTemplateConfiguration.getRestTemplateWithOptions(SUPPORTED_EXCEPTIONS, AVOID_RETRY_ON_STATUS_CODE);
     }
 
     @Bean(name = "MispAppClient")

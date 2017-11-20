@@ -94,6 +94,10 @@ public class RestTemplateConfiguration {
     }
 
     public RetryRestTemplate getRestTemplateWithSupportedExceptions(ConcurrentHashMap<String, ExceptionHandler> supportedExceptionsMap) throws CertificateException, UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException, KeyManagementException, IOException {
+        return getRestTemplateWithOptions(supportedExceptionsMap,null);
+    }
+
+    public RetryRestTemplate getRestTemplateWithOptions(ConcurrentHashMap<String, ExceptionHandler> supportedExceptionsMap,ConcurrentHashMap<Integer, String> avoidRetryOnStatusCodeMap) throws CertificateException, UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException, KeyManagementException, IOException {
         //Creates the restTemplate instance
         final RetryRestTemplate retryRestTemplate = new RetryRestTemplate();
         if(cspClientSslEnabled!=null && cspClientSslEnabled) {
@@ -101,6 +105,10 @@ public class RestTemplateConfiguration {
         }
         //Create Custom Exception Handler
         final CommonExceptionHandler exceptionHandler = new CommonExceptionHandler();
+
+        if(avoidRetryOnStatusCodeMap!=null){
+            exceptionHandler.setAvoidRetryOnStatusCodeMap(avoidRetryOnStatusCodeMap);
+        }
 
         //Set Supported Exceptions
         exceptionHandler.setSupportedExceptions(supportedExceptionsMap);
