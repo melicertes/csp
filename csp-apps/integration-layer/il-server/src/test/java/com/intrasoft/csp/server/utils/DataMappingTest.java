@@ -23,6 +23,8 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -68,10 +70,14 @@ public class DataMappingTest {
         sharingParams.setIsExternal(true);
         sharingParams.setToShare(true);
         if(!StringUtils.isEmpty(tcId)){
-            sharingParams.setTcId(tcId);
+            List<String> list = new ArrayList<>();
+            list.add(tcId);
+            sharingParams.setTcId(list);
         }
         if(!StringUtils.isEmpty(teamId)){
-            sharingParams.setTeamId(teamId);
+            List<String> list = new ArrayList<>();
+            list.add(teamId);
+            sharingParams.setTeamId(list);
         }
         integrationData.setDataParams(dataParams);
         String data = mockUtils.getDataObjectMap().get(integrationData.getDataType());
@@ -90,7 +96,10 @@ public class DataMappingTest {
         IntegrationData integrationData = new IntegrationData();
         integrationData.setDataType(IntegrationDataType.INCIDENT);
         SharingParams sharingParams = new SharingParams();
-        sharingParams.setTcId("dummyTcId");
+        String tcId="dummyYcId";
+        List<String> list = new ArrayList<>();
+        list.add(tcId);
+        sharingParams.setTcId(list);
         integrationData.setSharingParams(sharingParams);
         String out = objectMapper.writeValueAsString(integrationData);
         LOG.info(out);

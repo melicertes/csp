@@ -98,12 +98,16 @@ public class TcProcessor implements Processor,CamelRoutes{
         }
 
         if(isFlow1) {
-            if (!StringUtils.isEmpty(integrationData.getSharingParams().getTcId())) {
+            if (integrationData.getSharingParams().getTcId()!=null && integrationData.getSharingParams().getTcId().size()>0) {
                 //send by tcId provided - only in flow1
-                sendByTcId(integrationData.getSharingParams().getTcId(), exchange);
-            } else if (!StringUtils.isEmpty(integrationData.getSharingParams().getTeamId())) {
+                for(String tcId:integrationData.getSharingParams().getTcId()) {
+                    sendByTcId(tcId, exchange);
+                }
+            } else if (integrationData.getSharingParams().getTeamId()!=null && integrationData.getSharingParams().getTeamId().size()>0) {
                 //send by teamId provided - only in flow1
-                sendByTeamId(integrationData.getSharingParams().getTeamId(), exchange);
+                for(String teamId:integrationData.getSharingParams().getTeamId()) {
+                    sendByTeamId(teamId, exchange);
+                }
             } else {
                 //send by dataType
                 sendByDataType(integrationData, exchange, originEndpoint, httpMethod);
