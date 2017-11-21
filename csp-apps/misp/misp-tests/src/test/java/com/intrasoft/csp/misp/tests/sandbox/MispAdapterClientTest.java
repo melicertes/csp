@@ -66,7 +66,7 @@ public class MispAdapterClientTest {
     MispClient mispClient;
 
     @Test
-    public void testPost(){
+    public void testPost() throws JsonProcessingException {
         DataParams dataParams = new DataParams();
         dataParams.setCspId("LOCAL-CERT");
         dataParams.setApplicationId("misp");
@@ -97,15 +97,16 @@ public class MispAdapterClientTest {
         mispClient.postIntegrationDataAdapter(integrationData);
     }
 
-    public String loadJsonFromFile(){
+    public JsonNode loadJsonFromFile() throws JsonProcessingException {
         URL url = getClass().getClassLoader().getResource("json/event.json");
         File file = new File(url.getFile());
         String prettyEvent = null;
         String event = null;
+        JsonNode jsonNode = null;
         try {
             prettyEvent = new String(Files.readAllBytes(Paths.get(url.toURI())));
             ObjectMapper objectMapper = new ObjectMapper();
-            JsonNode jsonNode = objectMapper.readValue(prettyEvent, JsonNode.class);
+            jsonNode = objectMapper.readValue(prettyEvent, JsonNode.class);
             event = jsonNode.toString();
             LOG.info("EVENT: " + prettyEvent);
         } catch (IOException e) {
@@ -113,6 +114,6 @@ public class MispAdapterClientTest {
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
-        return event;
+        return jsonNode;
     }
 }

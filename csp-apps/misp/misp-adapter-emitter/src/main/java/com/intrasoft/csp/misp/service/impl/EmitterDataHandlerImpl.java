@@ -1,6 +1,7 @@
 package com.intrasoft.csp.misp.service.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.intrasoft.csp.client.CspClient;
 import com.intrasoft.csp.client.ElasticClient;
 import com.intrasoft.csp.commons.model.DataParams;
@@ -65,12 +66,14 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
     ElasticClient elasticClient;
 
     @Override
-    public void handleMispData(Object object, MispEntity mispEntity, boolean isDelete) {
+    public void handleMispData(Object object, MispEntity mispEntity, boolean isDelete, boolean isReEmittion) {
         final Logger LOG = LoggerFactory.getLogger(EmitterDataHandlerImpl.class);
 
-        JsonNode jsonNode = (JsonNode) object;
+        JsonNode jsonNode = new ObjectMapper().convertValue(object, JsonNode.class);
 
         String uuid = "";
+
+        LOG.info(jsonNode.toString());
 
         switch (mispEntity) {
             case EVENT:
@@ -119,7 +122,12 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
          * When the adapter receives data from an external CSP (the “isExternal” flag is set to TRUE)
          * the operation should trigger an emitter response. The emitter should emit this record (for indexing) and
          * set the “toShare” flag to FALSE (rest on conluence https://confluence.sastix.com/display/SXCSP/Integration+Layer+Flows).*/
-        sharingParams.setToShare(true);
+        if (isReEmittion){
+            sharingParams.setToShare(false);
+        }
+        else {
+            sharingParams.setToShare(true);
+        }
 
         /** issue: SXCSP-337
          * setTcId and setTeamID
@@ -195,5 +203,10 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
                 cspClient.postIntegrationData(integrationData);
             }
         }
+    }
+
+    @Override
+    public void handleReemittionMispData(IntegrationData integrationData, MispEntity mispEntity, boolean isDelete, boolean isReEmittion) throws IOException {
+        handleMispData(integrationData.getDataObject(), mispEntity, isDelete, true);
     }
 }

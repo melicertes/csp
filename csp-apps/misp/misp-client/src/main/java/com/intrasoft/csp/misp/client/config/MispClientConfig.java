@@ -43,13 +43,13 @@ public class MispClientConfig {
     @Value("${retry.maxAttempts:3}")
     private String maxAttempts;
 
-    @Value("${client.ssl.enabled:false}")
+    @Value("${csp.client.ssl.enabled:false}")
     Boolean cspClientSslEnabled;
 
-    @Value("${client.ssl.jks.keystore:path}")
+    @Value("${csp.client.ssl.jks.keystore:path}")
     String cspClientSslJksKeystore;
 
-    @Value("${client.ssl.jks.keystore.password:securedPass}")
+    @Value("${csp.client.ssl.jks.keystore.password:securedPass}")
     String cspClientSslJksKeystorePassword;
 
     @Autowired

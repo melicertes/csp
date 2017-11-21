@@ -83,25 +83,13 @@ public class MispAppClientImpl implements MispAppClient, MispContextUrl {
     }
 
     @Override
-    public ResponseEntity<String> updateMispEvent(String uuid, String body) {
-        String url = context  + "/" + MISP_EVENTS + "/" + uuid;
-
-        JsonNode jsonNode = new ObjectMapper().convertValue(body, JsonNode.class);
-        JsonNode node = jsonNode.path("Event");
-        ObjectNode objectNode = (ObjectNode) node;
-        objectNode.put("timestamp", String.valueOf(DateTime.now().getMillis()/1000));
-//        return object.toString();
-        body = jsonNode.toString();
+    public ResponseEntity<String> updateMispEvent(String location, String body) {
+        String url = context  + "/" + MISP_EVENTS + "/" + location.split("/events/")[1];
 
         LOG.info("API call [put]: " + url);
         HttpEntity<String> request = new HttpEntity<>(body, headers);
         ResponseEntity<String> response = new ResponseEntity<String>(HttpStatus.OK);
-        try {
-            response = retryRestTemplate.exchange(url, HttpMethod.PUT, request, String.class);
-        }
-        catch (CspBusinessException e){
-
-        }
+        response = retryRestTemplate.exchange(url, HttpMethod.PUT, request, String.class);
         return response;
     }
 

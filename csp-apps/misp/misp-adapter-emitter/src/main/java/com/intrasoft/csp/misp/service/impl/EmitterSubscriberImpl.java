@@ -71,11 +71,11 @@ public class EmitterSubscriberImpl implements EmitterSubscriber, MispContextUrl{
                 switch (topic){
                     case MISP_EVENT:
                         LOG.info("Event message received from queue.");
-                        emitterDataHandler.handleMispData(jsonNode, MispEntity.EVENT, isDelete);
+                        emitterDataHandler.handleMispData(jsonNode, MispEntity.EVENT, isDelete, false);
                         break;
                     case MISP_ATTRIBUTE:
                         LOG.info("Event message received from queue.");
-                        emitterDataHandler.handleMispData(jsonNode, MispEntity.ATTRIBUTE, isDelete);
+                        emitterDataHandler.handleMispData(jsonNode, MispEntity.ATTRIBUTE, isDelete, false);
                         break;
                     default:
 //                        LOG.info("");

@@ -28,11 +28,11 @@ public class EmitterController implements ApiContextUrl {
             consumes = {"application/json"},
             method = RequestMethod.POST)
     public void synchNewIntData(@RequestBody IntegrationData integrationData) {
-        LOG.info("MISP Endpoint: POST received");
+        LOG.info("MISP EMITTER Endpoint: POST received");
         try {
-            emitterDataHandler.handleMispData(integrationData, MispContextUrl.MispEntity.EVENT, false);
+            emitterDataHandler.handleReemittionMispData(integrationData, MispContextUrl.MispEntity.EVENT, false, true);
         } catch (IOException e) {
-
+            LOG.error("Error: ", e);
         }
     }
 }
