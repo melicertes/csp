@@ -8,6 +8,7 @@ import org.apache.camel.http.common.HttpOperationFailedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +16,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 /**
  * Created by iskitsas on 4/8/17.
@@ -22,6 +25,10 @@ import java.util.Map;
 @Service
 public class CamelRestService {
     private static final Logger LOG = LoggerFactory.getLogger(CamelRestService.class);
+
+    @Value("${server.camel.rest.service.is.async:true}")
+    Boolean camelRestServiceIsAsync;
+
     @Autowired
     ObjectMapper objectMapper;
 
@@ -61,19 +68,8 @@ public class CamelRestService {
         //objectMapper.configure(JsonGenerator.Feature.QUOTE_FIELD_NAMES, false);
         //objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
         byte[] b = objectMapper.writeValueAsBytes(obj);
-        Exchange exchange = producerTemplate.send(uri, new Processor() {
-            public void process(Exchange exchange) throws Exception {
-                exchange.getIn().setHeader(Exchange.HTTP_METHOD, httpMethod);
-                exchange.getIn().setHeader(Exchange.CONTENT_TYPE, MediaType.APPLICATION_JSON);
-                if(headers!=null){
-                    for (Map.Entry<String, Object> entry : headers.entrySet()) {
-                        exchange.getIn().setHeader(entry.getKey(), entry.getValue());
-                    }
 
-                }
-                exchange.getIn().setBody(b);
-            }
-        });
+        Exchange exchange = getExchange(camelRestServiceIsAsync,uri,b,httpMethod,headers);
 
         String out = exchange.getOut().getBody(String.class);
         Exception exception = exchange.getException();
@@ -93,5 +89,44 @@ public class CamelRestService {
             }
         }
         return out;
+    }
+
+    private Exchange getExchange(Boolean isAsyncEnabled,String uri, byte[] data, String httpMethod, Map<String,Object> headers){
+        Exchange ret = null;
+        if(isAsyncEnabled){
+            CompletableFuture<Exchange> exchangeCompletableFuture = producerTemplate.asyncSend(uri, exchange -> {
+                exchange.getIn().setHeader(Exchange.HTTP_METHOD, httpMethod);
+                exchange.getIn().setHeader(Exchange.CONTENT_TYPE, MediaType.APPLICATION_JSON);
+                if(headers!=null){
+                    for (Map.Entry<String, Object> entry : headers.entrySet()) {
+                        exchange.getIn().setHeader(entry.getKey(), entry.getValue());
+                    }
+
+                }
+                exchange.getIn().setBody(data);
+            });
+
+            try {
+                ret = exchangeCompletableFuture.get();
+            } catch (InterruptedException e) {
+                LOG.error("Unrecoverable error occured.",e);
+            } catch (ExecutionException e) {
+                LOG.error("Unrecoverable error occured.",e);
+            }
+        }else{
+            ret = producerTemplate.send(uri, exchange -> {
+                exchange.getIn().setHeader(Exchange.HTTP_METHOD, httpMethod);
+                exchange.getIn().setHeader(Exchange.CONTENT_TYPE, MediaType.APPLICATION_JSON);
+                if(headers!=null){
+                    for (Map.Entry<String, Object> entry : headers.entrySet()) {
+                        exchange.getIn().setHeader(entry.getKey(), entry.getValue());
+                    }
+
+                }
+                exchange.getIn().setBody(data);
+            });
+        }
+
+        return ret;
     }
 }
