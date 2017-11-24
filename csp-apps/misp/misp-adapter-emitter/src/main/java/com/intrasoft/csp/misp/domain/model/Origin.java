@@ -11,7 +11,6 @@ public class Origin {
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     Long id;
-    String originUuid;
     String originCspId;
     String originApplicationId;
     String originRecordId;
@@ -21,14 +20,6 @@ public class Origin {
 
     public Long getId() {
         return id;
-    }
-
-    public String getOriginUuid() {
-        return originUuid;
-    }
-
-    public void setOriginUuid(String originUuid) {
-        this.originUuid = originUuid;
     }
 
     public void setId(Long id) {
@@ -87,7 +78,6 @@ public class Origin {
     public String toString() {
         final StringBuilder sb = new StringBuilder("Origin{");
         sb.append("id=").append(id);
-        sb.append(", originUuid='").append(originUuid).append('\'');
         sb.append(", originCspId='").append(originCspId).append('\'');
         sb.append(", originApplicationId='").append(originApplicationId).append('\'');
         sb.append(", originRecordId='").append(originRecordId).append('\'');

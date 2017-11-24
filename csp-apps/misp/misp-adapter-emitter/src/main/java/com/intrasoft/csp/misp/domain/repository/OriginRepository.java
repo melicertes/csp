@@ -12,5 +12,4 @@ public interface OriginRepository extends JpaRepository<Origin, Long> {
     List<Origin> findByOriginApplicationId(String originApplicationId);
     List<Origin> findByOriginCspId(String originCspId);
     List<Origin> findByOriginRecordId(String originRecordId);
-    List<Origin> findByOriginUuid(String uuid);
 }

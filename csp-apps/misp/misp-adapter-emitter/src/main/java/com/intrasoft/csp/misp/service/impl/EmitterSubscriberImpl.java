@@ -59,6 +59,7 @@ public class EmitterSubscriberImpl implements EmitterSubscriber, MispContextUrl{
                 LOG.info("Frame: " + new String(frame.getData().));
             }*/
             String msg = subscriber.recvStr();
+            LOG.info(msg);
             String topic = msg.substring(0, msg.indexOf(' '));
             String content = msg.substring(msg.indexOf(' ') + 1);
             JsonNode jsonNode = null;
@@ -67,18 +68,22 @@ public class EmitterSubscriberImpl implements EmitterSubscriber, MispContextUrl{
                 content =jsonNode.toString();
                 LOG.info(topic + ": " + content);
                 boolean isDelete = content.contains("\"action\":\"delete\"");
+                LOG.info("topic: " + topic);
                 LOG.info("isdelete: " + isDelete);
                 switch (topic){
                     case MISP_EVENT:
                         LOG.info("Event message received from queue.");
-                        emitterDataHandler.handleMispData(jsonNode, MispEntity.EVENT, isDelete, false);
+                        emitterDataHandler.handleMispData(jsonNode, MispEntity.EVENT, isDelete, isDelete);
                         break;
                     case MISP_ATTRIBUTE:
-                        LOG.info("Event message received from queue.");
-                        emitterDataHandler.handleMispData(jsonNode, MispEntity.ATTRIBUTE, isDelete, false);
+                        LOG.info("Attribute message received from queue.");
+                        emitterDataHandler.handleMispData(jsonNode, MispEntity.ATTRIBUTE, isDelete, isDelete);
                         break;
-                    default:
-//                        LOG.info("");
+                    case MISP_EVENT_DELETE:
+                        LOG.info("Received: " + topic + " idDelete: " + isDelete);
+                        if (isDelete){
+                            emitterDataHandler.handleMispData(jsonNode, MispEntity.EVENT, isDelete, isDelete);
+                        }
                         break;
                 }
             } catch (IOException e) {

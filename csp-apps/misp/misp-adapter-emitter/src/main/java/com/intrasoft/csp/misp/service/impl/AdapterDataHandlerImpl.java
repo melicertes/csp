@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -37,6 +38,11 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler{
     @Autowired
     EmitterDataHandler emitterDataHandler;
 
+    @Value("${server.name}")
+    String cspId;
+
+    HttpStatus status;
+
 
     @Override
     public ResponseEntity<String> handleIntegrationData(IntegrationData integrationData, String requestMethod) {
@@ -44,7 +50,8 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler{
         final Logger LOG = LoggerFactory.getLogger(AdapterDataHandlerImpl.class);
 
         LOG.info(integrationData.getDataObject().toString());
-        String uuid = new JSONObject(integrationData.getDataObject()).getJSONObject("Event").getString("uuid");
+        String uuid = integrationData.getDataParams().getOriginRecordId();
+
         JsonNode jsonNode = null;
         jsonNode = new ObjectMapper().convertValue(integrationData.getDataObject(), JsonNode.class);
         LOG.info(jsonNode.toString());
@@ -54,15 +61,18 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler{
             e.printStackTrace();
         }
 
-        List<Origin> origins = originService.findByRecordUuid(uuid);
+        List<Origin> origins = originService.findByOriginRecordId(uuid);
         if (origins.isEmpty()){
+            LOG.info("Entry for " + uuid + " not found.");
             Origin origin = new Origin();
-            origin.setOriginApplicationId(integrationData.getDataParams().getOriginApplicationId());
             origin.setOriginCspId(integrationData.getDataParams().getOriginCspId());
+            origin.setOriginApplicationId(integrationData.getDataParams().getOriginApplicationId());
             origin.setOriginRecordId(integrationData.getDataParams().getOriginRecordId());
-            origin.setApplicationId(integrationData.getDataParams().getApplicationId());
-            origin.setCspId(integrationData.getDataParams().getCspId());
-            origin.setRecordId(integrationData.getDataParams().getRecordId());
+            origin.setCspId(cspId);
+            origin.setApplicationId("misp");
+            origin.setRecordId(integrationData.getDataParams().getOriginRecordId());
+            Origin org = originService.saveOrUpdate(origin);
+            LOG.info("Origin inserted: " + org);
         }
         else {
             LOG.debug("Origin params already found in table");
@@ -79,16 +89,18 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler{
             try {
                 LOG.info(integrationData.getDataObject().toString());
                 ResponseEntity<String> responseEntity = mispAppClient.addMispEvent(jsonNode.toString());
+                status = responseEntity.getStatusCode();
                 LOG.info(responseEntity.toString());
             }
             catch (StatusCodeException e){
                 LOG.error(e.getMessage());
                 if (!e.getHttpHeaders().get("location").isEmpty()){
                     String location = e.getHttpHeaders().get("location").get(0);
-                    LOG.info("Event already exists at: " + location);
+                    LOG.info("" + location);
                     jsonNode = ((ObjectNode) jsonNode.get("Event")).put("timestamp", String.valueOf(Instant.now().getEpochSecond() + 1));
                     LOG.info(jsonNode.toString());
                     ResponseEntity<String> responseEntity = mispAppClient.updateMispEvent(location, jsonNode.toString());
+                    status = responseEntity.getStatusCode();
                     LOG.info(responseEntity.toString());
                 }
             }
@@ -98,7 +110,14 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler{
          * issue: SXCSP-339
          * Implement reemition flow
          */
-        emitterDataHandler.handleReemittionMispData(integrationData, MispContextUrl.MispEntity.EVENT, false, true);
-        return new ResponseEntity<String>(HttpStatus.OK);
+        try {
+            emitterDataHandler.handleReemittionMispData(integrationData, MispContextUrl.MispEntity.EVENT, false, true);
+        }
+        catch (Exception e){
+            LOG.error("RE - EMITTION FAILED: ", e);
+        }
+
+
+        return new ResponseEntity<String>(status);
     }
 }

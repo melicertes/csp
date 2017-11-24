@@ -4,6 +4,7 @@ package com.intrasoft.csp.misp.commons.config;
 public interface MispContextUrl {
 
     public static String MISP_EVENT = "misp_json";
+    public static String MISP_EVENT_DELETE = "misp_json_event";
     public static String MISP_ATTRIBUTE = "misp_json_attribute";
     public static String MISP_DELETE = "delete";
     public static String MISP_HEARTBEAT = "misp_json_self";

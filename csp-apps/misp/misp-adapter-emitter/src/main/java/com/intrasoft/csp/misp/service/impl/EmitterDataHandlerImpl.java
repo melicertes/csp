@@ -8,6 +8,7 @@ import com.intrasoft.csp.commons.model.DataParams;
 import com.intrasoft.csp.commons.model.IntegrationData;
 import com.intrasoft.csp.commons.model.IntegrationDataType;
 import com.intrasoft.csp.commons.model.SharingParams;
+import com.intrasoft.csp.misp.client.MispAppClient;
 import com.intrasoft.csp.misp.commons.config.MispContextUrl;
 import com.intrasoft.csp.misp.domain.model.Origin;
 import com.intrasoft.csp.misp.domain.service.impl.OriginServiceImpl;
@@ -16,7 +17,9 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -35,6 +38,9 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
     @Value("${misp.app.host}")
     String host;
 
+    @Value("${misp.ui.host}")
+    String uiHost;
+
     @Value("${misp.app.port}")
     String port;
 
@@ -52,6 +58,10 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
 
     @Autowired
     OriginServiceImpl originService;
+
+    @Autowired
+    @Qualifier("MispAppClient")
+    MispAppClient mispAppClient;
 
     @Value("${elastic.protocol}")
     String elasticProtocol;
@@ -78,41 +88,54 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
         switch (mispEntity) {
             case EVENT:
                 LOG.info(EVENT.toString());
-                uuid = jsonNode.get(EVENT.toString()).get("uuid").toString();
+                uuid = jsonNode.get(EVENT.toString()).get("uuid").toString().replace("\"","");
                 break;
             case ATTRIBUTE:
                 LOG.info(ATTRIBUTE.toString());
-                uuid = jsonNode.get(ATTRIBUTE.toString()).get("uuid").toString();
+                uuid = jsonNode.get(ATTRIBUTE.toString()).get("uuid").toString().replace("\"","");
                 break;
         }
 
+/*        LOG.info("Get event with uuid: " + uuid);
+        ResponseEntity<String> responseEntity = mispAppClient.getMispEvent(uuid.replace("\"",""));
+        jsonNode = new ObjectMapper().convertValue(responseEntity.getBody(), JsonNode.class);*/
+
         DataParams dataParams = new DataParams();
-        dataParams.setCspId(cspId);
-        /** @TODO find enum from IL: ENUM NOT AVAILABLE
-         * */
-        dataParams.setApplicationId("misp");
-        dataParams.setRecordId(uuid);
         dataParams.setDateTime(new DateTime());
+
+/*        dataParams.setCspId(cspId);
+        dataParams.setApplicationId("misp");
+        dataParams.setOriginRecordId(uuid);*/
 
         /** issue: SXCSP-332
          * origin fields
          * the originids should stay the same (read from confluence)
          * check local mapping table, if not found use our own values*/
-        List<Origin> origins = originService.findByRecordUuid(uuid);
+        List<Origin> origins = originService.findByOriginRecordId(uuid);
         if (origins.isEmpty()){
+            LOG.info("Origin not found");
             dataParams.setOriginCspId(cspId);
             dataParams.setOriginApplicationId("misp");
+            dataParams.setOriginRecordId(uuid);
+            dataParams.setCspId(cspId);
+            dataParams.setApplicationId("misp");
+            dataParams.setRecordId(uuid);
         }
         else {
+            LOG.info("Origin found" + origins.toString());
             dataParams.setOriginCspId(origins.get(0).getOriginCspId());
             dataParams.setOriginApplicationId(origins.get(0).getOriginApplicationId());
+            dataParams.setOriginRecordId(origins.get(0).getOriginRecordId());
+            dataParams.setCspId(cspId);
+            dataParams.setApplicationId("misp");
+            dataParams.setRecordId(uuid);
         }
-        dataParams.setOriginRecordId(uuid);
+
 
         /** @FIXME setUrl: FIXED
          * get base url from application.properties
          * how does the url update from emitter of source to adapter of destination*/
-        dataParams.setUrl(protocol + "://" + host + ":" + port + "/events/" + uuid.replace("\"", ""));
+        dataParams.setUrl(protocol + "://" + uiHost + ":" + port + "/events/" + uuid.replace("\"", ""));
 
         SharingParams sharingParams = new SharingParams();
         sharingParams.setIsExternal(false);
@@ -172,8 +195,8 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
 
         try {
             String action = jsonNode.get(ACTION.toString()).toString();
-            LOG.info(action);
-            if (action.toLowerCase().equals("delete")) {
+            LOG.info(action.replace("\"",""));
+            if (isDelete) {
                 cspClient.deleteIntegrationData(integrationData);
             }
             return;

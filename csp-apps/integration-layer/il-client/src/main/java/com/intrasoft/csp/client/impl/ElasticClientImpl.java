@@ -12,7 +12,6 @@ import com.intrasoft.csp.commons.model.elastic.query.Match;
 import com.intrasoft.csp.commons.model.elastic.query.Must;
 import com.intrasoft.csp.commons.model.elastic.query.Query;
 import com.intrasoft.csp.libraries.restclient.service.RetryRestTemplate;
-import com.intrasoft.csp.server.processors.ElasticProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
