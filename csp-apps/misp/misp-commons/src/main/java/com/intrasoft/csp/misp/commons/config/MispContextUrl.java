@@ -31,7 +31,15 @@ public interface MispContextUrl {
         TITLE_CATEGORY("\"Internal reference\""),
         TITLE_RELATION("\"classification\""),
         URL_CATEGORY("\"Internal reference\""),
-        URL_RELATION("\"Attribution\"");
+        URL_RELATION("\"Attribution\""),
+
+
+        MAP_URL_CSPID("\"classification\""),
+        MAP_URL_VALUE("\"csp::url\""),
+        MAP_CSPID_VALUE("\"csp::originCspId\""),
+
+        MAP_TITLE("\"subject\""),
+        MAP_RECORDID("\"ticket-number\"");
 
 
         private final String value;
