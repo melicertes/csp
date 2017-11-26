@@ -152,21 +152,17 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler{
                     JsonNode esObject = elasticClient.getESobject(searchData);
                     if (esObject != null) {
                         LOG.info("FOUND TRUE");
-                        LOG.info(esObject.toString());
-                        /**
-                         * TODO: Actual string replace
-                         */
                         newURL = esObject.get("dataParams").get("url").toString();
-                        //replace
-                        for (JsonNode ja : jn.get("Attribute")){
-                            if (ja.get("object_relation").toString().toLowerCase().equals(MispContextUrl.RTIREntity.MAP_URL_CSPID.toString().toLowerCase()) &&
-                                    ja.get("value").toString().toLowerCase().equals(MispContextUrl.RTIREntity.MAP_URL_VALUE.toString().toLowerCase()) ) {
-                                ((ObjectNode)ja).put("comment",  newURL);
-                            }
-                        }
                     }
                     else {
                         LOG.info("NOT FOUND");
+                    }
+                    //replace
+                    for (JsonNode ja : jn.get("Attribute")){
+                        if (ja.get("object_relation").toString().toLowerCase().equals(MispContextUrl.RTIREntity.MAP_URL_CSPID.toString().toLowerCase()) &&
+                                ja.get("value").toString().toLowerCase().equals(MispContextUrl.RTIREntity.MAP_URL_VALUE.toString().toLowerCase()) ) {
+                            ((ObjectNode)ja).put("comment",  newURL);
+                        }
                     }
                 }
                 catch (Exception e){
@@ -198,20 +194,18 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler{
 
 
         LOG.info("requestMethod: " + requestMethod);
-        if (requestMethod.equals("DELETE")){
+        if (requestMethod.equals("DELETE")) {
             LOG.info("Delete event with uuid: " + uuid);
             mispAppClient.deleteMispEvent(uuid);
-        }
-        else {
+        } else {
             try {
                 LOG.info(integrationData.getDataObject().toString());
                 ResponseEntity<String> responseEntity = mispAppClient.addMispEvent(jsonNode.toString());
                 status = responseEntity.getStatusCode();
                 LOG.info(responseEntity.toString());
-            }
-            catch (StatusCodeException e){
+            } catch (StatusCodeException e) {
                 LOG.error(e.getMessage());
-                if (!e.getHttpHeaders().get("location").isEmpty()){
+                if (!e.getHttpHeaders().get("location").isEmpty()) {
                     String location = e.getHttpHeaders().get("location").get(0);
                     LOG.info("" + location);
                     jsonNode = ((ObjectNode) jsonNode.get("Event")).put("timestamp", String.valueOf(Instant.now().getEpochSecond() + 1));
