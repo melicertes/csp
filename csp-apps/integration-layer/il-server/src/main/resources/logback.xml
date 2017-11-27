@@ -17,7 +17,7 @@
               value="%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}"/>
     <property name="FILE_EXC_LOG_PATTERN" value="${LOGS_HOME}${APP_NAME}-${TYPE_EXC}.log"></property>
     <property name="FILE_AUD_LOG_PATTERN" value="${LOGS_HOME}${APP_NAME}-${TYPE_AUD}.log"></property>
-    <property name="LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss} ${HOSTNAME} ${APP_NAME:-}[${PID:-}]: %msg%n"></property>
+    <property name="LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss} ${HOSTNAME} ${APP_NAME:-}[${PID:-}]: %replace(%msg){'\n',' '}%n"></property>
     <property name="FILE_EXC_ROLL_PATTERN" value="${LOGS_HOME}${APP_NAME}-${TYPE_EXC}.%d{yyyy-MM-dd}.log"></property>
     <property name="FILE_AUD_ROLL_PATTERN" value="${LOGS_HOME}${APP_NAME}-${TYPE_AUD}.%d{yyyy-MM-dd}.log"></property>
 
