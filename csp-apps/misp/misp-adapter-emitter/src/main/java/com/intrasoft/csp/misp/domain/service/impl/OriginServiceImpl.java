@@ -40,7 +40,7 @@ public class OriginServiceImpl implements OriginService{
     }
 
     @Override
-    public List<Origin> findByRecordUuid(String uuid) {
-        return originRepository.findByOriginUuid(uuid);
+    public List<Origin> findByOriginRecordId(String uuid) {
+        return originRepository.findByOriginRecordId(uuid);
     }
 }

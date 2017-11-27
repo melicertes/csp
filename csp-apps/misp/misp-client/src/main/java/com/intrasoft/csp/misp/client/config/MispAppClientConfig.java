@@ -80,5 +80,4 @@ public class MispAppClientConfig {
         client.setProtocolHostPortHeaders(protocol,host,port, authorizationKey);
         return client;
     }
-
 }

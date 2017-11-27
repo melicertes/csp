@@ -14,5 +14,5 @@ public interface OriginService {
     List<Origin> findByApplicationId(String applicationId);
     List<Origin> findByCspId(String cspId);
     List<Origin> findByRecordId(String recordId);
-    List<Origin> findByRecordUuid(String uuid);
+    List<Origin> findByOriginRecordId(String uuid);
 }

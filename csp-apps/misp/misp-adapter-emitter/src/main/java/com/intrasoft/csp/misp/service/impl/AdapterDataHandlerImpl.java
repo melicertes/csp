@@ -4,7 +4,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.intrasoft.csp.client.ElasticClient;
+import com.intrasoft.csp.commons.model.DataParams;
 import com.intrasoft.csp.commons.model.IntegrationData;
+import com.intrasoft.csp.commons.model.IntegrationDataType;
 import com.intrasoft.csp.libraries.restclient.exceptions.StatusCodeException;
 import com.intrasoft.csp.misp.client.MispAppClient;
 import com.intrasoft.csp.misp.commons.config.MispContextUrl;
@@ -17,12 +20,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.List;
+
+import static com.intrasoft.csp.misp.commons.config.MispContextUrl.MispEntity.EVENT;
 
 @Service
 public class AdapterDataHandlerImpl implements AdapterDataHandler{
@@ -35,7 +41,15 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler{
     MispAppClient mispAppClient;
 
     @Autowired
+    ElasticClient elasticClient;
+
+    @Autowired
     EmitterDataHandler emitterDataHandler;
+
+    @Value("${server.name}")
+    String cspId;
+
+    HttpStatus status;
 
 
     @Override
@@ -44,7 +58,8 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler{
         final Logger LOG = LoggerFactory.getLogger(AdapterDataHandlerImpl.class);
 
         LOG.info(integrationData.getDataObject().toString());
-        String uuid = new JSONObject(integrationData.getDataObject()).getJSONObject("Event").getString("uuid");
+        String uuid = integrationData.getDataParams().getOriginRecordId();
+
         JsonNode jsonNode = null;
         jsonNode = new ObjectMapper().convertValue(integrationData.getDataObject(), JsonNode.class);
         LOG.info(jsonNode.toString());
@@ -54,41 +69,149 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler{
             e.printStackTrace();
         }
 
-        List<Origin> origins = originService.findByRecordUuid(uuid);
+        List<Origin> origins = originService.findByOriginRecordId(uuid);
         if (origins.isEmpty()){
+            LOG.info("Entry for " + uuid + " not found.");
             Origin origin = new Origin();
-            origin.setOriginApplicationId(integrationData.getDataParams().getOriginApplicationId());
             origin.setOriginCspId(integrationData.getDataParams().getOriginCspId());
+            origin.setOriginApplicationId(integrationData.getDataParams().getOriginApplicationId());
             origin.setOriginRecordId(integrationData.getDataParams().getOriginRecordId());
-            origin.setApplicationId(integrationData.getDataParams().getApplicationId());
-            origin.setCspId(integrationData.getDataParams().getCspId());
-            origin.setRecordId(integrationData.getDataParams().getRecordId());
+            origin.setCspId(cspId);
+            origin.setApplicationId("misp");
+            origin.setRecordId(integrationData.getDataParams().getOriginRecordId());
+            Origin org = originService.saveOrUpdate(origin);
+            LOG.info("Origin inserted: " + org);
         }
         else {
             LOG.debug("Origin params already found in table");
         }
 
+
+        /**
+         * Issue: SXCSP-340, SXCSP-341
+         * Reference resolving in RTIR objects
+         */
+        // TODO reference resolving
+        String title = "";
+        String url = "";
+        String recordId = "";
+        String originCspId = "";
+        String applicationId = "rt";
+
+        if (jsonNode.get(EVENT.toString()).has("Object")) {
+            for (JsonNode jn : jsonNode.get(EVENT.toString()).get("Object")){
+                //LOG.info(jn.toString());
+                //LOG.info(jn.get("name").toString());
+                //LOG.info(MispContextUrl.RTIREntity.RTIR_NAME.toString());
+                if (jn.get("name").toString().toLowerCase().equals(MispContextUrl.RTIREntity.RTIR_NAME.toString().toLowerCase())){
+                    for (JsonNode ja : jn.get("Attribute")){
+                        //LOG.info(ja.toString());
+                        //LOG.info(ja.get("object_relation").toString().toLowerCase());
+                        //LOG.info(MispContextUrl.RTIREntity.TITLE_RELATION.toString().toLowerCase());
+                        if (ja.get("object_relation").toString().toLowerCase().equals(MispContextUrl.RTIREntity.MAP_URL_CSPID.toString().toLowerCase()) &&
+                                ja.get("value").toString().toLowerCase().equals(MispContextUrl.RTIREntity.MAP_URL_VALUE.toString().toLowerCase()) &&
+                                url.length() == 0) {
+                            url = ja.get("comment").toString();
+                            //LOG.info("============RTIR title: " + title);
+                        }
+                        if (ja.get("object_relation").toString().toLowerCase().equals(MispContextUrl.RTIREntity.MAP_URL_CSPID.toString().toLowerCase()) &&
+                                ja.get("value").toString().toLowerCase().equals(MispContextUrl.RTIREntity.MAP_CSPID_VALUE.toString().toLowerCase()) &&
+                                originCspId.length() == 0) {
+                            originCspId = ja.get("comment").toString();
+                            //LOG.info("============RTIR url: " + url);
+                        }
+                        if (ja.get("object_relation").toString().toLowerCase().equals(MispContextUrl.RTIREntity.MAP_TITLE.toString().toLowerCase()) &&
+                                title.length() == 0) {
+                            title = ja.get("value").toString();
+                        }
+                        if (ja.get("object_relation").toString().toLowerCase().equals(MispContextUrl.RTIREntity.MAP_RECORDID.toString().toLowerCase()) &&
+                                recordId.length() == 0) {
+                            recordId = ja.get("value").toString();
+                        }
+                    }
+                }
+
+                /**
+                 * TODO:
+                 1. The adapter queries ES for the existence of an "incident" with the given origin cspid/appid/id
+                 2. If it finds such incidence, it rewrites the incidence url inside the RTIR object with the url that this incidence has in ES
+                 3. If not It deletes the url field (Which field? RTIR or dataParams)!!!!!
+                 4. It pushes the event with the rewriten RTIR fields to misp
+                 */
+                String newURL = "";
+                try {
+                    IntegrationData searchData = new IntegrationData();
+                    DataParams searchParams = new DataParams();
+                    searchParams.setRecordId(recordId);
+                    searchParams.setApplicationId(applicationId);
+                    searchParams.setCspId(originCspId);
+
+                    searchData.setDataParams(searchParams);
+                    searchData.setDataType(IntegrationDataType.EVENT);
+
+                    JsonNode esObject = elasticClient.getESobject(searchData);
+                    if (esObject != null) {
+                        LOG.info("FOUND TRUE");
+                        newURL = esObject.get("dataParams").get("url").toString();
+                    }
+                    else {
+                        LOG.info("NOT FOUND");
+                    }
+                    //replace
+                    for (JsonNode ja : jn.get("Attribute")){
+                        if (ja.get("object_relation").toString().toLowerCase().equals(MispContextUrl.RTIREntity.MAP_URL_CSPID.toString().toLowerCase()) &&
+                                ja.get("value").toString().toLowerCase().equals(MispContextUrl.RTIREntity.MAP_URL_VALUE.toString().toLowerCase()) ) {
+                            ((ObjectNode)ja).put("comment",  newURL);
+                        }
+                    }
+                }
+                catch (Exception e){
+                    LOG.info(e.getMessage());
+                }
+                LOG.info("RTIR new URL: " + newURL);
+            }
+        }
+
+        //update IntegrationData
+        integrationData.setDataObject(jsonNode);
+
+
+        title = title.replaceAll("\"", "");
+        url = url.replaceAll("\"", "");
+        recordId = recordId.replaceAll("\"", "");
+        originCspId = originCspId.replaceAll("\"", "");
+        LOG.info("RTIR title: " + title);
+        LOG.info("RTIR url: " + url);
+        LOG.info("RTIR recordId: " + recordId);
+        LOG.info("RTIR originCspId: " + originCspId);
+        LOG.info("MODIFIED IL OBJECT: " + integrationData);
+
+
+
         integrationData.getSharingParams().setToShare(false);
 
+
+
+
         LOG.info("requestMethod: " + requestMethod);
-        if (requestMethod.equals("DELETE")){
+        if (requestMethod.equals("DELETE")) {
             LOG.info("Delete event with uuid: " + uuid);
             mispAppClient.deleteMispEvent(uuid);
-        }
-        else {
+        } else {
             try {
                 LOG.info(integrationData.getDataObject().toString());
                 ResponseEntity<String> responseEntity = mispAppClient.addMispEvent(jsonNode.toString());
+                status = responseEntity.getStatusCode();
                 LOG.info(responseEntity.toString());
-            }
-            catch (StatusCodeException e){
+            } catch (StatusCodeException e) {
                 LOG.error(e.getMessage());
-                if (!e.getHttpHeaders().get("location").isEmpty()){
+                if (!e.getHttpHeaders().get("location").isEmpty()) {
                     String location = e.getHttpHeaders().get("location").get(0);
-                    LOG.info("Event already exists at: " + location);
+                    LOG.info("" + location);
                     jsonNode = ((ObjectNode) jsonNode.get("Event")).put("timestamp", String.valueOf(Instant.now().getEpochSecond() + 1));
                     LOG.info(jsonNode.toString());
                     ResponseEntity<String> responseEntity = mispAppClient.updateMispEvent(location, jsonNode.toString());
+                    status = responseEntity.getStatusCode();
                     LOG.info(responseEntity.toString());
                 }
             }
@@ -98,7 +221,14 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler{
          * issue: SXCSP-339
          * Implement reemition flow
          */
-        emitterDataHandler.handleReemittionMispData(integrationData, MispContextUrl.MispEntity.EVENT, false, true);
-        return new ResponseEntity<String>(HttpStatus.OK);
+        try {
+            emitterDataHandler.handleReemittionMispData(integrationData, MispContextUrl.MispEntity.EVENT, false, true);
+        }
+        catch (Exception e){
+            LOG.error("RE - EMITTION FAILED: ", e);
+        }
+
+
+        return new ResponseEntity<String>(status);
     }
 }

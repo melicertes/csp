@@ -62,6 +62,13 @@ public class MispAppClientTest {
     }
 
     @Test
+    public void getMispEventTest() throws URISyntaxException, IOException {
+        ResponseEntity<String> responseEntity = mispAppClient.getMispEvent("5a12bb50-fcb4-4345-9bae-619a9e459fec");
+        LOG.info(responseEntity.getBody().toString());
+        assertThat(responseEntity.getStatusCodeValue(), is(200));
+    }
+
+    @Test
     public void updateMispEventByUUIDTest() throws URISyntaxException, IOException {
 
         ResponseEntity<String> postResponse = postEvent();

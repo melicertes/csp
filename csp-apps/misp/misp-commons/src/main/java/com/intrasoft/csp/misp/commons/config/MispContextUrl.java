@@ -4,6 +4,7 @@ package com.intrasoft.csp.misp.commons.config;
 public interface MispContextUrl {
 
     public static String MISP_EVENT = "misp_json";
+    public static String MISP_EVENT_DELETE = "misp_json_event";
     public static String MISP_ATTRIBUTE = "misp_json_attribute";
     public static String MISP_DELETE = "delete";
     public static String MISP_HEARTBEAT = "misp_json_self";
@@ -30,7 +31,15 @@ public interface MispContextUrl {
         TITLE_CATEGORY("\"Internal reference\""),
         TITLE_RELATION("\"classification\""),
         URL_CATEGORY("\"Internal reference\""),
-        URL_RELATION("\"Attribution\"");
+        URL_RELATION("\"Attribution\""),
+
+
+        MAP_URL_CSPID("\"classification\""),
+        MAP_URL_VALUE("\"csp::url\""),
+        MAP_CSPID_VALUE("\"csp::originCspId\""),
+
+        MAP_TITLE("\"subject\""),
+        MAP_RECORDID("\"ticket-number\"");
 
 
         private final String value;
