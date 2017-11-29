@@ -29,7 +29,7 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
  * Created by iskitsas on 4/10/17.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringBootTest(classes = {CspApp.class, TrustCirclesClientConfig.class, CspClientConfig.class,MockUtils.class},
+@SpringBootTest(classes = {CspApp.class, TrustCirclesClientConfig.class, MockUtils.class},
         properties = {
                 "spring.datasource.url:jdbc:h2:mem:csp_policy",
                 "csp.retry.backOffPeriod:10",
@@ -40,7 +40,7 @@ public class TcClientSandboxTest {
     TrustCirclesClient tcClient;
 
     @Autowired
-    @Qualifier("CspRestTemplate")
+    @Qualifier("TcRestTemplate")
     RetryRestTemplate retryRestTemplate;
 
     @Autowired
@@ -63,7 +63,7 @@ public class TcClientSandboxTest {
         mockServer.expect(requestTo(trustCirclesContext))
                 .andRespond(withSuccess(TestUtil.convertObjectToJsonBytes(mockUtils.getMockedTrustCircle(14)), TestUtil.APPLICATION_JSON_UTF8));
 
-        TrustCircle trustCircle = tcClient.getTrustCircle(1);
+        TrustCircle trustCircle = tcClient.getTrustCircleByUuid("1");
         assertThat(trustCircle.getTeams().size(), is(14));
 
         mockServer.verify();

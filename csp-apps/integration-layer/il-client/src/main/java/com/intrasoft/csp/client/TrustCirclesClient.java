@@ -1,6 +1,9 @@
 package com.intrasoft.csp.client;
 
+import com.intrasoft.csp.commons.model.Team;
 import com.intrasoft.csp.commons.model.TrustCircle;
+
+import java.util.List;
 
 /**
  * Created by iskitsas on 4/8/17.
@@ -10,5 +13,11 @@ public interface TrustCirclesClient {
 
     String getContext();
 
-    TrustCircle getTrustCircle(Integer id);
+    List<TrustCircle> getAllTrustCircles();
+
+    List<Team> getAllTeams();
+
+    TrustCircle getTrustCircleByUuid(String uuid);
+
+    Team getTeamByUuid(String uuid);
 }
