@@ -1,0 +1,19 @@
+{
+  "Organisation": {
+    "id": "",
+    "name": "Organismos",
+    "alias": "",
+    "anonymise": false,
+    "date_created": "",
+    "date_modified": "",
+    "description": "",
+    "type": "",
+    "nationality": "",
+    "sector": "",
+    "created_by": "",
+    "uuid": "",
+    "contacts": "",
+    "local": true,
+    "landingpage": ""
+  }
+}

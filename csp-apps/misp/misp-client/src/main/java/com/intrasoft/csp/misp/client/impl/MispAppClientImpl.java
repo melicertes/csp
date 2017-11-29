@@ -45,7 +45,6 @@ public class MispAppClientImpl implements MispAppClient, MispContextUrl {
         accepts.add(MediaType.APPLICATION_JSON);
         headers.setAccept(accepts);
         headers.set("Authorization", authorizationKey);
-
     }
 
     @Override
@@ -116,5 +115,59 @@ public class MispAppClientImpl implements MispAppClient, MispContextUrl {
         retryRestTemplate.delete(url);
 
         return response;
+    }
+
+    @Override
+    public ResponseEntity<String> getMispOrganisation(String uuid) {
+        String url = context  + "/" + MISP_ORGANISATIONS_VIEW + "/" + uuid;
+
+        LOG.info("API call [GET]: " + url);
+        HttpEntity<String> request = new HttpEntity<>(headers);
+        ResponseEntity<String> response = new ResponseEntity<String>(HttpStatus.OK);
+        response = retryRestTemplate.exchange(url, HttpMethod.GET, request, String.class);
+        return response;
+    }
+
+    @Override
+    public ResponseEntity<String> addMispOrganisation(String body) {
+        String url = context  + "/" + MISP_ORGANISATIONS_ADD;
+
+        LOG.info("API call [POST]: " + url);
+        HttpEntity<String> request = new HttpEntity<>(body, headers);
+        ResponseEntity<String> response = new ResponseEntity<String>(HttpStatus.OK);
+        response = retryRestTemplate.exchange(url, HttpMethod.POST, request, String.class);
+        return response;
+    }
+
+//    TODO: Investigate why MISP's REST API for editing Organisations doesn't seem to work properly.
+//    Even though we're getting an OK response, the only modifiable field is "name".
+    @Override
+    public ResponseEntity<String> updateMispOrganisation(String body) {
+        return null;
+    }
+
+    @Override
+    public ResponseEntity<String> updateMispOrganisation(String uuid, String object) {
+        return null;
+    }
+
+    @Override
+    public ResponseEntity<String> deleteMispOrganisation(String id) {
+        String url = context  + "/" + MISP_ORGANISATIONS_DELETE + "/" + id;
+
+        LOG.info("API call [POST]: " + url);
+        HttpEntity<?> request = new HttpEntity<>(headers);
+        ResponseEntity<String> response = retryRestTemplate.exchange(url, HttpMethod.POST, request, String.class);
+
+        LOG.info(response.toString());
+        retryRestTemplate.delete(url);
+
+        return response;
+
+    }
+
+    @Override
+    public ResponseEntity<String> getAllMispSharingGroups() {
+        return null;
     }
 }

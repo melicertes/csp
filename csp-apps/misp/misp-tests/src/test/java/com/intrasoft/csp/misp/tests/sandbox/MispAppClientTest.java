@@ -2,6 +2,7 @@ package com.intrasoft.csp.misp.tests.sandbox;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.intrasoft.csp.misp.client.MispAppClient;
 import com.intrasoft.csp.misp.client.config.MispAppClientConfig;
 import org.junit.Test;
@@ -32,9 +33,10 @@ import static org.hamcrest.Matchers.is;
 @SpringBootTest(classes = {MispAppClient.class, MispAppClientConfig.class},
         properties = {
                 "misp.app.protocol:http",
-                "misp.app.host:misp.dimitris.dk",
+                "misp.app.host:192.168.56.50",
                 "misp.app.port:80",
                 "misp.app.authorization.key:JNqWBxfPiIywz7hUe58MyJf6sD5PrTVaGm7hTn6c"})
+// misp.app.host:misp.dimitris.dk
 public class MispAppClientTest {
     private static final Logger LOG = LoggerFactory.getLogger(MispAppClientTest.class);
 
@@ -156,5 +158,78 @@ public class MispAppClientTest {
         ResponseEntity<String> response = mispAppClient.addMispEvent(event);
         return response;
     }
+
+
+    // TODO: Test Organisations and Sharing Groups; (full CRUD API support for Sharing Groups still in investigation)
+
+    @Test
+    public void getMispOrganisationTest() throws URISyntaxException, IOException {
+        ResponseEntity<String> responseEntity = mispAppClient.getMispOrganisation("56ef3277-1ad4-42f6-b90b-04e5c0a83832");
+        LOG.info(responseEntity.getBody().toString());
+        assertThat(responseEntity.getStatusCodeValue(), is(200));
+    }
+
+//  TODO: The value of the field "name" inside the resource file can't already exist in MISP when running the test. Fix it.
+//  Even though UUID and ID is auto-generated, the field "name" must also be unique in order for this test to pass.
+    @Test
+    public void addMispOrganisationTest() throws URISyntaxException, IOException {
+        ResponseEntity<String> response = postOrganisation();
+        LOG.info(response.getBody().toString());
+        assertThat(response.getStatusCodeValue(), is(200));
+    }
+
+    @Test
+    public void updateMispOrganisationTestByUuid() throws URISyntaxException, IOException {
+    }
+
+    @Test
+    public void updateMispOrganisationTestById() throws URISyntaxException, IOException {
+    }
+
+    @Test
+    public void deleteMispOrganisationTest() throws URISyntaxException, IOException {
+
+        // First, create an Organisation using the organisation resource file.
+        // It will be the organisation for our deletion test.
+        ResponseEntity<String> postResponse = postOrganisation();
+
+        // Id will be used for targeting the right organisation to be deleted
+        // In order to do that we need to extract the id from the response entity.
+        String body = postResponse.getBody();
+        JsonNode object = new ObjectMapper().readTree(body);
+        JsonNode node = object.path("Organisation").get("id");
+        String id = node.textValue();
+
+        LOG.info(id);
+
+        // Begin actual deletion procedure via our MispAppClient object
+        mispAppClient.setProtocolHostPortHeaders(protocol, host, port, authorizationKey);
+        ResponseEntity<String> response = mispAppClient.deleteMispOrganisation(id);
+
+        LOG.info(response.toString());
+        assertThat(response.getStatusCodeValue(), is(200));
+        assertThat(response.getBody(), containsString("Organisation deleted"));
+
+    }
+
+
+    @Test
+    public void getAllMispSharingGroupsTest() throws URISyntaxException, IOException {
+    }
+
+    private ResponseEntity<String> postOrganisation () throws URISyntaxException, IOException {
+        URL url = getClass().getClassLoader().getResource("json/organisation.json");
+        File file = new File(url.getFile());
+        String fieldToModify = "description";
+
+        String organisation = new String(Files.readAllBytes(Paths.get(url.toURI())));
+//        if (forDeletionTest)
+//            organisation = updateField(organisation, fieldToModify, readField(organisation, fieldToModify) + " test");
+
+        mispAppClient.setProtocolHostPortHeaders(protocol, host, port, authorizationKey);
+        ResponseEntity<String> response = mispAppClient.addMispOrganisation(organisation);
+        return response;
+    }
+
 
 }

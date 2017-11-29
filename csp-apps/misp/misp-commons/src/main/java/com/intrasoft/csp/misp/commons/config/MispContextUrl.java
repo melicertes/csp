@@ -9,11 +9,16 @@ public interface MispContextUrl {
     public static String MISP_DELETE = "delete";
     public static String MISP_HEARTBEAT = "misp_json_self";
     public static String MISP_EVENTS = "events";
+    public static String MISP_ORGANISATIONS_VIEW = "organisations/view";
+    public static String MISP_ORGANISATIONS_ADD = "admin/organisations/add";
+    public static String MISP_ORGANISATIONS_EDIT = "admin/organisations/edit";
+    public static String MISP_ORGANISATIONS_DELETE = "admin/organisations/delete";
 
     public static enum MispEntity {
         EVENT("Event"),
         ACTION("action"),
-        ATTRIBUTE("Attribute");
+        ATTRIBUTE("Attribute"),
+        ORGANISATION("Organisation");
 
         private final String value;
 
