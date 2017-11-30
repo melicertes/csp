@@ -189,12 +189,11 @@ public class MispAppClientTest {
     @Test
     public void deleteMispOrganisationTest() throws URISyntaxException, IOException {
 
-        // First, create an Organisation using the organisation resource file.
-        // It will be the organisation for our deletion test.
+        // First, create an Organisation on MISP for our deletion test using the organisation resource file sample.
         ResponseEntity<String> postResponse = postOrganisation();
 
-        // Id will be used for targeting the right organisation to be deleted
-        // In order to do that we need to extract the id from the response entity.
+        // The Organisation's id field will be used as the key for the deletion.
+        // To do that we need to extract that id out of the response entity object.
         String body = postResponse.getBody();
         JsonNode object = new ObjectMapper().readTree(body);
         JsonNode node = object.path("Organisation").get("id");
@@ -230,6 +229,5 @@ public class MispAppClientTest {
         ResponseEntity<String> response = mispAppClient.addMispOrganisation(organisation);
         return response;
     }
-
 
 }
