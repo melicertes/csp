@@ -166,8 +166,5 @@ public class MispAppClientImpl implements MispAppClient, MispContextUrl {
 
     }
 
-    @Override
-    public ResponseEntity<String> getAllMispSharingGroups() {
-        return null;
-    }
+
 }

@@ -19,12 +19,13 @@ public interface MispAppClient {
 
 	ResponseEntity<String> getMispOrganisation(String uuid);
 	ResponseEntity<String> addMispOrganisation(String object);
-//	TODO: Implementations of updating Misp Organisations are on hold; MISP's API doesn't update values for fields other than "name".
+//	TODO: Implementations of updating Misp Organisations are put on hold;
+//  MISP's Organisation API updates only the "name" field. Investigation in progress.
 	ResponseEntity<String> updateMispOrganisation(String object);
 	ResponseEntity<String> updateMispOrganisation(String uuid, String object) ;
 	ResponseEntity<String> deleteMispOrganisation(String id);
 
-//	TODO: Can't find any MISP REST API for full CRUD operations on Sharing Groups yet; investigation in progress.
-	ResponseEntity<String> getAllMispSharingGroups();
+//	TODO: There isn't any MISP REST API support for full CRUD operations on Sharing Groups yet.
+
 
 }

@@ -222,8 +222,6 @@ public class MispAppClientTest {
         String fieldToModify = "description";
 
         String organisation = new String(Files.readAllBytes(Paths.get(url.toURI())));
-//        if (forDeletionTest)
-//            organisation = updateField(organisation, fieldToModify, readField(organisation, fieldToModify) + " test");
 
         mispAppClient.setProtocolHostPortHeaders(protocol, host, port, authorizationKey);
         ResponseEntity<String> response = mispAppClient.addMispOrganisation(organisation);
