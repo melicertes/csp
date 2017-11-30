@@ -41,7 +41,7 @@ import static org.junit.Assert.fail;
 public class TcClientBusinessTest {
     private static final Logger LOG = LoggerFactory.getLogger(TcClientBusinessTest.class);
     @Autowired
-    @Qualifier(value = "trustCirclesClient")
+    @Qualifier(value = "TcClient")
     TrustCirclesClient tcClient;
 
     @Rule
@@ -55,20 +55,20 @@ public class TcClientBusinessTest {
     public void getCspsDataBadRequestTestWay1(){
         exception.expect(ResourceAccessException.class);
         tcClient.setProtocolHostPort("http","dummy","9999");
-        tcClient.getTrustCircle(1);
+        tcClient.getTrustCircleByUuid("1");
     }
 
     @Test(expected = ResourceAccessException.class)
     public void getCspsDataBadRequestTestWay2(){
         tcClient.setProtocolHostPort("http","dummy","9999");
-        tcClient.getTrustCircle(1);
+        tcClient.getTrustCircleByUuid("1");
     }
 
     @Test
     public void getCspsDataBadRequestTestWay3(){
         try {
             tcClient.setProtocolHostPort("http","dummy","9999");
-            tcClient.getTrustCircle(1);
+            tcClient.getTrustCircleByUuid("1");
             fail("Expected ResourceAccessException Exception");
         } catch (ResourceAccessException e) {
             assertThat(e.getMessage(),containsString("I/O error on GET request"));
@@ -78,7 +78,7 @@ public class TcClientBusinessTest {
     @Test
     public void getTrustCircleTest(){
         tcClient.setProtocolHostPort("http","csp.dangerduck.gr","8000");
-        TrustCircle trustCircle = tcClient.getTrustCircle(1);
+        TrustCircle trustCircle = tcClient.getTrustCircleByUuid("1");
         LOG.info(trustCircle.toString());
         assertThat(trustCircle.getTeams().size(),is(2));
     }

@@ -48,6 +48,9 @@ scp csp@central-csp:/opt/csp/il/il-server-0.3.0-SNAPSHOT-exec.jar il-server-0.3.
 scp csp@central-csp:/opt/csp/il/integration-tests-0.3.0-SNAPSHOT.jar integration-tests-0.3.0-SNAPSHOT.jar
 
 
+Get the TC data using curl:
+curl -v -s -k --key /opt/ssl/server/csp-internal.key --cert /opt/ssl/server/csp-internal.crt https://tc.local.demo1-csp.athens.intrasoft-intl.private/api/v1/circles
+
 ******************
 * MANUAL TESTING *
 ******************
