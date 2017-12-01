@@ -141,6 +141,7 @@ public class MispAppClientImpl implements MispAppClient, MispContextUrl {
 
 //    TODO: Investigate why MISP's REST API for editing Organisations doesn't seem to work properly.
 //    Even though we're getting an OK response, the only modifiable field is "name".
+
     @Override
     public ResponseEntity<String> updateMispOrganisation(String body) {
         return null;

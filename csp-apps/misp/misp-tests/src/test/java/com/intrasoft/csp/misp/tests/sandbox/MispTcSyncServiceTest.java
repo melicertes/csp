@@ -7,7 +7,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 
-public class MispTcSynchronizerTest {
+public class MispTcSyncServiceTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(MispAppClientTest.class);
 

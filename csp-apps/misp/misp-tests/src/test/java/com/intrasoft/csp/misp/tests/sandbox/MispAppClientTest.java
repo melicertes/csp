@@ -178,6 +178,8 @@ public class MispAppClientTest {
         assertThat(response.getStatusCodeValue(), is(200));
     }
 
+
+
     @Test
     public void updateMispOrganisationTestByUuid() throws URISyntaxException, IOException {
     }
