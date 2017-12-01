@@ -15,7 +15,6 @@ import com.intrasoft.csp.misp.domain.model.Origin;
 import com.intrasoft.csp.misp.domain.service.impl.OriginServiceImpl;
 import com.intrasoft.csp.misp.service.AdapterDataHandler;
 import com.intrasoft.csp.misp.service.EmitterDataHandler;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +31,8 @@ import static com.intrasoft.csp.misp.commons.config.MispContextUrl.MispEntity.EV
 
 @Service
 public class AdapterDataHandlerImpl implements AdapterDataHandler{
+
+    private Logger LOG = LoggerFactory.getLogger(AdapterDataHandlerImpl.class);
 
     @Autowired
     OriginServiceImpl originService;
@@ -54,8 +55,6 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler{
 
     @Override
     public ResponseEntity<String> handleIntegrationData(IntegrationData integrationData, String requestMethod) {
-
-        final Logger LOG = LoggerFactory.getLogger(AdapterDataHandlerImpl.class);
 
         LOG.info(integrationData.getDataObject().toString());
         String uuid = integrationData.getDataParams().getOriginRecordId();
@@ -87,104 +86,10 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler{
         }
 
 
-        /**
-         * Issue: SXCSP-340, SXCSP-341
-         * Reference resolving in RTIR objects
+        /*
+        Search and handle RTIR objects
          */
-        // TODO reference resolving
-        String title = "";
-        String url = "";
-        String recordId = "";
-        String originCspId = "";
-        String applicationId = "rt";
-
-        if (jsonNode.get(EVENT.toString()).has("Object")) {
-            for (JsonNode jn : jsonNode.get(EVENT.toString()).get("Object")){
-                //LOG.info(jn.toString());
-                //LOG.info(jn.get("name").toString());
-                //LOG.info(MispContextUrl.RTIREntity.RTIR_NAME.toString());
-                if (jn.get("name").toString().toLowerCase().equals(MispContextUrl.RTIREntity.RTIR_NAME.toString().toLowerCase())){
-                    for (JsonNode ja : jn.get("Attribute")){
-                        //LOG.info(ja.toString());
-                        //LOG.info(ja.get("object_relation").toString().toLowerCase());
-                        //LOG.info(MispContextUrl.RTIREntity.TITLE_RELATION.toString().toLowerCase());
-                        if (ja.get("object_relation").toString().toLowerCase().equals(MispContextUrl.RTIREntity.MAP_URL_CSPID.toString().toLowerCase()) &&
-                                ja.get("value").toString().toLowerCase().equals(MispContextUrl.RTIREntity.MAP_URL_VALUE.toString().toLowerCase()) &&
-                                url.length() == 0) {
-                            url = ja.get("comment").toString();
-                            //LOG.info("============RTIR title: " + title);
-                        }
-                        if (ja.get("object_relation").toString().toLowerCase().equals(MispContextUrl.RTIREntity.MAP_URL_CSPID.toString().toLowerCase()) &&
-                                ja.get("value").toString().toLowerCase().equals(MispContextUrl.RTIREntity.MAP_CSPID_VALUE.toString().toLowerCase()) &&
-                                originCspId.length() == 0) {
-                            originCspId = ja.get("comment").toString();
-                            //LOG.info("============RTIR url: " + url);
-                        }
-                        if (ja.get("object_relation").toString().toLowerCase().equals(MispContextUrl.RTIREntity.MAP_TITLE.toString().toLowerCase()) &&
-                                title.length() == 0) {
-                            title = ja.get("value").toString();
-                        }
-                        if (ja.get("object_relation").toString().toLowerCase().equals(MispContextUrl.RTIREntity.MAP_RECORDID.toString().toLowerCase()) &&
-                                recordId.length() == 0) {
-                            recordId = ja.get("value").toString();
-                        }
-                    }
-                }
-
-                /**
-                 * TODO:
-                 1. The adapter queries ES for the existence of an "incident" with the given origin cspid/appid/id
-                 2. If it finds such incidence, it rewrites the incidence url inside the RTIR object with the url that this incidence has in ES
-                 3. If not It deletes the url field (Which field? RTIR or dataParams)!!!!!
-                 4. It pushes the event with the rewriten RTIR fields to misp
-                 */
-                String newURL = "";
-                try {
-                    IntegrationData searchData = new IntegrationData();
-                    DataParams searchParams = new DataParams();
-                    searchParams.setRecordId(recordId);
-                    searchParams.setApplicationId(applicationId);
-                    searchParams.setCspId(originCspId);
-
-                    searchData.setDataParams(searchParams);
-                    searchData.setDataType(IntegrationDataType.EVENT);
-
-                    JsonNode esObject = elasticClient.getESobject(searchData);
-                    if (esObject != null) {
-                        LOG.info("FOUND TRUE");
-                        newURL = esObject.get("dataParams").get("url").toString();
-                    }
-                    else {
-                        LOG.info("NOT FOUND");
-                    }
-                    //replace
-                    for (JsonNode ja : jn.get("Attribute")){
-                        if (ja.get("object_relation").toString().toLowerCase().equals(MispContextUrl.RTIREntity.MAP_URL_CSPID.toString().toLowerCase()) &&
-                                ja.get("value").toString().toLowerCase().equals(MispContextUrl.RTIREntity.MAP_URL_VALUE.toString().toLowerCase()) ) {
-                            ((ObjectNode)ja).put("comment",  newURL);
-                        }
-                    }
-                }
-                catch (Exception e){
-                    LOG.info(e.getMessage());
-                }
-                LOG.info("RTIR new URL: " + newURL);
-            }
-        }
-
-        //update IntegrationData
-        integrationData.setDataObject(jsonNode);
-
-
-        title = title.replaceAll("\"", "");
-        url = url.replaceAll("\"", "");
-        recordId = recordId.replaceAll("\"", "");
-        originCspId = originCspId.replaceAll("\"", "");
-        LOG.info("RTIR title: " + title);
-        LOG.info("RTIR url: " + url);
-        LOG.info("RTIR recordId: " + recordId);
-        LOG.info("RTIR originCspId: " + originCspId);
-        LOG.info("MODIFIED IL OBJECT: " + integrationData);
+        integrationData = handleRTIR(integrationData);
 
 
 
@@ -230,5 +135,130 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler{
 
 
         return new ResponseEntity<String>(status);
+    }
+
+
+    private IntegrationData handleRTIR(IntegrationData ilData) {
+        IntegrationData modifiedIlData = ilData;
+
+        //Convert Integration Data to JSON
+        JsonNode jsonNode = new ObjectMapper().convertValue(modifiedIlData.getDataObject(), JsonNode.class);
+
+        /**
+         * Issue: SXCSP-340, SXCSP-341
+         * Reference resolving in RTIR objects
+         */
+        // TODO reference resolving
+        String title = "";
+        String url = "";
+        String recordId = "";
+        String originCspId = "";
+        String originRecordId = "";
+        String applicationId = MispContextUrl.RTIREntity.APPLICATION_ID.toString();
+
+        if (jsonNode.get(EVENT.toString()).has("Object")) {
+            for (JsonNode jn : jsonNode.get(EVENT.toString()).get("Object")){
+                //LOG.info(jn.toString());
+                //LOG.info(jn.get("name").toString());
+                //LOG.info(MispContextUrl.RTIREntity.RTIR_NAME.toString());
+                if (jn.get("name").toString().toLowerCase().equals(MispContextUrl.RTIREntity.RTIR_NAME.toString().toLowerCase())){
+                    for (JsonNode ja : jn.get("Attribute")){
+                        //LOG.info(ja.toString());
+                        //LOG.info(ja.get("object_relation").toString().toLowerCase());
+                        //LOG.info(MispContextUrl.RTIREntity.TITLE_RELATION.toString().toLowerCase());
+                        if (ja.get("object_relation").toString().toLowerCase().equals(MispContextUrl.RTIREntity.MAP_CSP_FIELDS.toString().toLowerCase()) &&
+                                ja.get("value").toString().toLowerCase().equals(MispContextUrl.RTIREntity.MAP_CSP_URL_VALUE.toString().toLowerCase()) &&
+                                url.length() == 0) {
+                            url = ja.get("comment").toString();
+                            //LOG.info("============RTIR title: " + title);
+                        }
+                        if (ja.get("object_relation").toString().toLowerCase().equals(MispContextUrl.RTIREntity.MAP_CSP_FIELDS.toString().toLowerCase()) &&
+                                ja.get("value").toString().toLowerCase().equals(MispContextUrl.RTIREntity.MAP_ORIGIN_CSP_ID_VALUE.toString().toLowerCase()) &&
+                                originCspId.length() == 0) {
+                            originCspId = ja.get("comment").toString();
+                            //LOG.info("============RTIR url: " + url);
+                        }
+                        if (ja.get("object_relation").toString().toLowerCase().equals(MispContextUrl.RTIREntity.MAP_CSP_FIELDS.toString().toLowerCase()) &&
+                                ja.get("value").toString().toLowerCase().equals(MispContextUrl.RTIREntity.MAP_ORIGIN_RECORD_ID_VALUE.toString().toLowerCase()) &&
+                                originRecordId.length() == 0) {
+                            originRecordId = ja.get("comment").toString();
+                            //LOG.info("============RTIR url: " + url);
+                        }
+                        if (ja.get("object_relation").toString().toLowerCase().equals(MispContextUrl.RTIREntity.MAP_TITLE.toString().toLowerCase()) &&
+                                title.length() == 0) {
+                            title = ja.get("value").toString();
+                        }
+                        if (ja.get("object_relation").toString().toLowerCase().equals(MispContextUrl.RTIREntity.MAP_TICKET_NO.toString().toLowerCase()) &&
+                                recordId.length() == 0) {
+                            recordId = ja.get("value").toString();
+                        }
+                    }
+                }
+
+                /**
+                 * TODO:
+                 1. The adapter queries ES for the existence of an "incident" with the given origin cspid/appid/id
+                 2. If it finds such incidence, it rewrites the incidence url inside the RTIR object with the url that this incidence has in ES
+                 3. If not It deletes the url field (Which field? RTIR or dataParams)!!!!!
+                 4. It pushes the event with the rewriten RTIR fields to misp
+                 */
+                String newURL = "";
+                String newTickerNumber = "";
+                try {
+                    IntegrationData searchData = new IntegrationData();
+                    DataParams searchParams = new DataParams();
+                    searchParams.setOriginRecordId(originRecordId);
+                    searchParams.setOriginApplicationId(applicationId);
+                    searchParams.setOriginCspId(originCspId);
+
+                    searchData.setDataParams(searchParams);
+                    searchData.setDataType(IntegrationDataType.EVENT);
+
+                    JsonNode esObject = elasticClient.getESobjectFromOrigin(searchData);
+                    if (esObject != null) {
+                        LOG.info("FOUND TRUE");
+                        newURL = esObject.get("dataParams").get("url").toString();
+                        newTickerNumber = esObject.get("dataParams").get("recordId").toString();
+                        newURL = newURL.replaceAll("\"", "");
+                        newTickerNumber = newTickerNumber.replaceAll("\"", "");
+                    }
+                    else {
+                        LOG.info("NOT FOUND");
+                    }
+                    //replace
+                    for (JsonNode ja : jn.get("Attribute")){
+                        if (ja.get("object_relation").toString().toLowerCase().equals(MispContextUrl.RTIREntity.MAP_CSP_FIELDS.toString().toLowerCase()) &&
+                                ja.get("value").toString().toLowerCase().equals(MispContextUrl.RTIREntity.MAP_CSP_URL_VALUE.toString().toLowerCase()) ) {
+                            ((ObjectNode)ja).put("comment",  newURL);
+                        }
+                        if (ja.get("object_relation").toString().toLowerCase().equals(MispContextUrl.RTIREntity.MAP_TICKET_NO.toString().toLowerCase()) ) {
+                            ((ObjectNode)ja).put("value",  newTickerNumber);
+                        }
+                    }
+                }
+                catch (Exception e){
+                    LOG.info(e.getMessage());
+                }
+                LOG.info("RTIR new URL: " + newURL);
+            }
+        }
+
+        //update IntegrationData
+        modifiedIlData.setDataObject(jsonNode);
+
+
+        title = title.replaceAll("\"", "");
+        url = url.replaceAll("\"", "");
+        recordId = recordId.replaceAll("\"", "");
+        originCspId = originCspId.replaceAll("\"", "");
+        originRecordId = originRecordId.replaceAll("\"", "");
+        LOG.info("RTIR title: " + title);
+        LOG.info("RTIR url: " + url);
+        LOG.info("RTIR recordId: " + recordId);
+        LOG.info("RTIR originCspId: " + originCspId);
+        LOG.info("RTIR originRecordId: " + originRecordId);
+        LOG.info("MODIFIED IL DATA: " + modifiedIlData.toString());
+
+        return modifiedIlData;
     }
 }

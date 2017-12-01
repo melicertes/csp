@@ -27,19 +27,16 @@ public interface MispContextUrl {
     }
 
     public static enum RTIREntity {
+        APPLICATION_ID("rt"),
         RTIR_NAME("\"rtir\""),
-        TITLE_CATEGORY("\"Internal reference\""),
-        TITLE_RELATION("\"classification\""),
-        URL_CATEGORY("\"Internal reference\""),
-        URL_RELATION("\"Attribution\""),
 
-
-        MAP_URL_CSPID("\"classification\""),
-        MAP_URL_VALUE("\"csp::url\""),
-        MAP_CSPID_VALUE("\"csp::originCspId\""),
+        MAP_CSP_FIELDS("\"classification\""),
+        MAP_CSP_URL_VALUE("\"csp::url\""),
+        MAP_ORIGIN_CSP_ID_VALUE("\"csp::originCspId\""),
+        MAP_ORIGIN_RECORD_ID_VALUE("\"csp::originRecordId\""),
 
         MAP_TITLE("\"subject\""),
-        MAP_RECORDID("\"ticket-number\"");
+        MAP_TICKET_NO("\"ticket-number\"");
 
 
         private final String value;
