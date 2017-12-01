@@ -90,7 +90,10 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler{
         Search and handle RTIR objects
          */
         integrationData = handleRTIR(integrationData);
-
+        /*
+        Remake jsonNode
+         */
+        jsonNode = new ObjectMapper().convertValue(integrationData.getDataObject(), JsonNode.class);
 
 
         integrationData.getSharingParams().setToShare(false);
@@ -105,6 +108,9 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler{
         } else {
             try {
                 LOG.info(integrationData.getDataObject().toString());
+                /**
+                 * jsonNode has initial Data, should be changed??????????????????
+                 */
                 ResponseEntity<String> responseEntity = mispAppClient.addMispEvent(jsonNode.toString());
                 status = responseEntity.getStatusCode();
                 LOG.info(responseEntity.toString());
@@ -212,7 +218,7 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler{
                     searchParams.setOriginCspId(originCspId);
 
                     searchData.setDataParams(searchParams);
-                    searchData.setDataType(IntegrationDataType.EVENT);
+                    searchData.setDataType(IntegrationDataType.INCIDENT);
 
                     JsonNode esObject = elasticClient.getESobjectFromOrigin(searchData);
                     if (esObject != null) {

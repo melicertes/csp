@@ -90,10 +90,10 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
                 LOG.info(EVENT.toString());
                 uuid = jsonNode.get(EVENT.toString()).get("uuid").toString().replace("\"","");
                 break;
-            case ATTRIBUTE:
+/*            case ATTRIBUTE:
                 LOG.info(ATTRIBUTE.toString());
                 uuid = jsonNode.get(ATTRIBUTE.toString()).get("uuid").toString().replace("\"","");
-                break;
+                break;*/
         }
 
 /*        LOG.info("Get event with uuid: " + uuid);
