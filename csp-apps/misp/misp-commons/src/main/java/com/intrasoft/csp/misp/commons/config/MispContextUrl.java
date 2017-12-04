@@ -38,10 +38,35 @@ public interface MispContextUrl {
         MAP_TITLE("\"subject\""),
         MAP_TICKET_NO("\"ticket-number\"");
 
-
         private final String value;
 
         RTIREntity(String value) {
+            this.value = value;
+        }
+
+        public String toString(){
+            return this.value;
+        }
+    }
+
+    public static enum VULNERABILITYEntity {
+        APPLICATION_ID("rt"),
+        VULNERABILITY_NAME("\"vulnerability\""),
+
+        MAP_CSP_FIELDS("\"vulnerable_configuration\""),
+        MAP_CSP_URL_VALUE("\"csp::url\""),
+        MAP_ORIGIN_CSP_ID_VALUE("\"csp::originCspId\""),
+        MAP_ORIGIN_RECORD_ID_VALUE("\"csp::originRecordId\""),
+
+        MAP_TITLE_RELATION("\"text\""),
+        MAP_TITLE_CATEGORY("\"Other\""),
+
+        MAP_RECORD_RELATION("\"id\""),
+        MAP_RECORD_CATEGORY("\"External analysis\"");
+
+        private final String value;
+
+        VULNERABILITYEntity(String value) {
             this.value = value;
         }
 
