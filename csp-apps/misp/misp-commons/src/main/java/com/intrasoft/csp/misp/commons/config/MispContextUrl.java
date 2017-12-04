@@ -50,7 +50,7 @@ public interface MispContextUrl {
     }
 
     public static enum VULNERABILITYEntity {
-        APPLICATION_ID("rt"),
+        APPLICATION_ID("taranis"),
         VULNERABILITY_NAME("\"vulnerability\""),
 
         MAP_CSP_FIELDS("\"vulnerable_configuration\""),
