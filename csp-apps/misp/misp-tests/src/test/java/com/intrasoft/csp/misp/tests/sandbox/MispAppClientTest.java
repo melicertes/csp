@@ -27,6 +27,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.UUID;
 
 import static com.intrasoft.csp.misp.commons.utils.JsonObjectHandler.readField;
 import static com.intrasoft.csp.misp.commons.utils.JsonObjectHandler.updateField;
@@ -63,8 +64,6 @@ public class MispAppClientTest {
     @Qualifier(value = "MispAppClient")
     MispAppClient mispAppClient;
 
-    @Rule
-    public final ExpectedException exception = ExpectedException.none();
 
     @Test
     public void addMispEventTest() throws URISyntaxException, IOException {
@@ -185,7 +184,7 @@ public class MispAppClientTest {
     }
 
 
-//  Adding an organisation in MISP using only the mandatory field "name". The value must be unique.
+//  Adding an organisation in MISP using the fields "name" and a uuid. Both values must be unique.
     @Test
     public void addMispOrganisationTest() throws URISyntaxException, IOException {
 
@@ -199,26 +198,35 @@ public class MispAppClientTest {
         testDTO.setName("test-" + RandomStringUtils.random(4,true,false));
         testDTO.setDescription("delete me");
 
+        // Generating a v4 UUID implementation (MISP recommends UUID v4) for our test organisation.
+        UUID generatedUuid = UUID.randomUUID();
+        testDTO.setUuid(generatedUuid.toString());
+
         mispAppClient.setProtocolHostPortHeaders(protocol, host, port, authorizationKey);
         OrganisationDTO responseDTO = mispAppClient.addMispOrganisation(testDTO);
 
         LOG.info(responseDTO.toString());
         assertThat(testDTO.getName(), is(responseDTO.getName()));
+        assertThat(testDTO.getUuid(), is(responseDTO.getUuid()));
     }
 
-    //  Adding an organisation in MISP with a name that already exists should throw an HttpClientErrorException.
-    @Test
+    //  Adding an organisation in MISP with a name that already exists should throw an exception.
+    @Test(expected = HttpClientErrorException.class)
     public void addMispOrganisationDuplicateNameThrowsExceptionTest() throws URISyntaxException, IOException {
 
         OrganisationDTO testDTO = new OrganisationDTO();
 
-        // This name should already exist in our MISP instance in order for this test to be successful.
+        // This organisation name should already exist in our MISP instance in order for the test to be successful.
         testDTO.setName("CIRCL");
-
-        exception.expect(HttpClientErrorException.class);
 
         mispAppClient.setProtocolHostPortHeaders(protocol, host, port, authorizationKey);
         OrganisationDTO responseDTO = mispAppClient.addMispOrganisation(testDTO);
+
+    }
+
+    @Test
+    public void updateMispOrganisationTest() throws URISyntaxException, IOException {
+
 
     }
 
@@ -226,6 +234,8 @@ public class MispAppClientTest {
 
     @Test
     public void updateMispOrganisationTestByUuid() throws URISyntaxException, IOException {
+
+
     }
 
     @Test

@@ -159,12 +159,25 @@ public class MispAppClientImpl implements MispAppClient, MispContextUrl {
 */
     }
 
-//    TODO: Investigate why MISP's REST API for editing Organisations doesn't seem to work properly.
-//    Even though we're getting an OK response, the only modifiable field is "name".
-
+//  TODO: MISP's REST API for editing Organisations doesn't seem to work properly. Reported and waiting for feedback.
+//  Even though we're getting an OK response, the only modifiable field is "name". Editing other fields in MISPS' UI
+//  works fine.
     @Override
-    public ResponseEntity<String> updateMispOrganisation(String body) {
-        return null;
+    public OrganisationDTO updateMispOrganisation(OrganisationDTO organisationDTO) {
+
+        String url = context  + "/" + MISP_ORGANISATIONS_EDIT;
+        LOG.info("API call [POST]: " + url);
+
+        OrganisationWrapper tempWrapper = new OrganisationWrapper();
+        tempWrapper.setOrganisationDTO(organisationDTO);
+
+        HttpEntity<OrganisationWrapper> request = new HttpEntity<>(tempWrapper, headers);
+
+        ResponseEntity<OrganisationWrapper> organisationWrapper = new ResponseEntity<>(HttpStatus.OK);
+
+        organisationWrapper = retryRestTemplate.exchange(url, HttpMethod.POST, request, OrganisationWrapper.class);
+        return organisationWrapper.getBody().getOrganisation();
+
     }
 
     @Override

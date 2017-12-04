@@ -22,8 +22,8 @@ public interface MispAppClient {
 	OrganisationDTO getMispOrganisation(String uuid);
 	OrganisationDTO addMispOrganisation(OrganisationDTO organisationDTO);
 //	TODO: Implementations of updating Misp Organisations are put on hold;
-//  MISP's Organisation API updates only the "name" field. Investigation in progress.
-	ResponseEntity<String> updateMispOrganisation(String object);
+//  MISP's Organisation API updates only the "name" field and it has been reported; waiting for feedback.
+	OrganisationDTO updateMispOrganisation(OrganisationDTO organisationDTO);
 	ResponseEntity<String> updateMispOrganisation(String uuid, String object) ;
 	ResponseEntity<String> deleteMispOrganisation(String id);
 
