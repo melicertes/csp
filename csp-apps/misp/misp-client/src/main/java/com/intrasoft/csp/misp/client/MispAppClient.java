@@ -1,5 +1,8 @@
 package com.intrasoft.csp.misp.client;
 
+import com.intrasoft.csp.misp.commons.models.Organisation;
+import com.intrasoft.csp.misp.commons.models.OrganisationDTO;
+import com.intrasoft.csp.misp.commons.models.OrganisationWrapper;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +20,9 @@ public interface MispAppClient {
 	ResponseEntity<String> updateMispEvent(String uuid, String object) ;
 	ResponseEntity<String> deleteMispEvent(String uuid);
 
-	ResponseEntity<String> getMispOrganisation(String uuid);
+	// Return type
+//	ResponseEntity<String> getMispOrganisation(String uuid);
+	OrganisationDTO getMispOrganisation(String uuid);
 	ResponseEntity<String> addMispOrganisation(String object);
 //	TODO: Implementations of updating Misp Organisations are put on hold;
 //  MISP's Organisation API updates only the "name" field. Investigation in progress.

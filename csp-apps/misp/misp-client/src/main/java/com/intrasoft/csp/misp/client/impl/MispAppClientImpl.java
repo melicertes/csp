@@ -9,6 +9,9 @@ import com.intrasoft.csp.libraries.restclient.handlers.CommonExceptionHandler;
 import com.intrasoft.csp.libraries.restclient.service.RetryRestTemplate;
 import com.intrasoft.csp.misp.client.MispAppClient;
 import com.intrasoft.csp.misp.commons.config.MispContextUrl;
+import com.intrasoft.csp.misp.commons.models.Organisation;
+import com.intrasoft.csp.misp.commons.models.OrganisationDTO;
+import com.intrasoft.csp.misp.commons.models.OrganisationWrapper;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -118,14 +121,21 @@ public class MispAppClientImpl implements MispAppClient, MispContextUrl {
     }
 
     @Override
-    public ResponseEntity<String> getMispOrganisation(String uuid) {
+    public OrganisationDTO getMispOrganisation(String uuid) {
+
         String url = context  + "/" + MISP_ORGANISATIONS_VIEW + "/" + uuid;
 
         LOG.info("API call [GET]: " + url);
-        HttpEntity<String> request = new HttpEntity<>(headers);
-        ResponseEntity<String> response = new ResponseEntity<String>(HttpStatus.OK);
-        response = retryRestTemplate.exchange(url, HttpMethod.GET, request, String.class);
-        return response;
+        HttpEntity<OrganisationWrapper> request = new HttpEntity<>(headers);
+
+//        response = retryRestTemplate.exchange(url, HttpMethod.GET, request, String.class);
+        ResponseEntity<OrganisationWrapper> organisationWrapper = retryRestTemplate.exchange(url, HttpMethod.GET, request, OrganisationWrapper.class);
+
+
+
+//        OrganisationWrapper organisationWrapper = retryRestTemplate.getForObject(url,  OrganisationWrapper.class);
+
+        return organisationWrapper.getBody().getOrganisation();
     }
 
     @Override
