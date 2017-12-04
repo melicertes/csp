@@ -170,5 +170,24 @@ public class OrganisationDTO {
         this.landingPage = landingPage;
     }
 
-
+    @Override
+    public String toString() {
+        return "Organisation {" +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                ", alias='" + alias + '\'' +
+                ", anonymise=" + anonymise +
+                ", date_created='" + dateCreated + '\'' +
+                ", date_modified='" + dateModified + '\'' +
+                ", description='" + description + '\'' +
+                ", type='" + type + '\'' +
+                ", nationality='" + nationality + '\'' +
+                ", sector='" + sector + '\'' +
+                ", created_by='" + createdBy + '\'' +
+                ", uuid='" + uuid + '\'' +
+                ", contacts='" + contacts + '\'' +
+                ", local=" + local +
+                ", landingPage='" + landingPage + '\'' +
+                '}';
+    }
 }

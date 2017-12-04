@@ -1,6 +1,7 @@
 package com.intrasoft.csp.misp.client.impl;
 
 //import com.intrasoft.csp.libraries.restclient.service.RetryRestTemplate;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -9,7 +10,6 @@ import com.intrasoft.csp.libraries.restclient.handlers.CommonExceptionHandler;
 import com.intrasoft.csp.libraries.restclient.service.RetryRestTemplate;
 import com.intrasoft.csp.misp.client.MispAppClient;
 import com.intrasoft.csp.misp.commons.config.MispContextUrl;
-import com.intrasoft.csp.misp.commons.models.Organisation;
 import com.intrasoft.csp.misp.commons.models.OrganisationDTO;
 import com.intrasoft.csp.misp.commons.models.OrganisationWrapper;
 import org.joda.time.DateTime;
@@ -124,22 +124,31 @@ public class MispAppClientImpl implements MispAppClient, MispContextUrl {
     public OrganisationDTO getMispOrganisation(String uuid) {
 
         String url = context  + "/" + MISP_ORGANISATIONS_VIEW + "/" + uuid;
-
         LOG.info("API call [GET]: " + url);
         HttpEntity<OrganisationWrapper> request = new HttpEntity<>(headers);
 
-//        response = retryRestTemplate.exchange(url, HttpMethod.GET, request, String.class);
-        ResponseEntity<OrganisationWrapper> organisationWrapper = retryRestTemplate.exchange(url, HttpMethod.GET, request, OrganisationWrapper.class);
-
-
-
-//        OrganisationWrapper organisationWrapper = retryRestTemplate.getForObject(url,  OrganisationWrapper.class);
-
+        ResponseEntity<OrganisationWrapper> organisationWrapper =
+                                    retryRestTemplate.exchange(url, HttpMethod.GET, request, OrganisationWrapper.class);
         return organisationWrapper.getBody().getOrganisation();
     }
 
     @Override
-    public ResponseEntity<String> addMispOrganisation(String body) {
+    public OrganisationDTO addMispOrganisation(OrganisationDTO organisationDTO) {
+        String url = context  + "/" + MISP_ORGANISATIONS_ADD;
+        LOG.info("API call [POST]: " + url);
+
+        OrganisationWrapper tempWrapper = new OrganisationWrapper();
+        tempWrapper.setOrganisationDTO(organisationDTO);
+
+        HttpEntity<OrganisationWrapper> request = new HttpEntity<>(tempWrapper, headers);
+
+        ResponseEntity<OrganisationWrapper> organisationWrapper = new ResponseEntity<>(HttpStatus.OK);
+
+        organisationWrapper = retryRestTemplate.exchange(url, HttpMethod.POST, request, OrganisationWrapper.class);
+        return organisationWrapper.getBody().getOrganisation();
+
+
+/*
         String url = context  + "/" + MISP_ORGANISATIONS_ADD;
 
         LOG.info("API call [POST]: " + url);
@@ -147,6 +156,7 @@ public class MispAppClientImpl implements MispAppClient, MispContextUrl {
         ResponseEntity<String> response = new ResponseEntity<String>(HttpStatus.OK);
         response = retryRestTemplate.exchange(url, HttpMethod.POST, request, String.class);
         return response;
+*/
     }
 
 //    TODO: Investigate why MISP's REST API for editing Organisations doesn't seem to work properly.
