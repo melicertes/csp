@@ -358,10 +358,12 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler{
                                 ja.get("value").toString().toLowerCase().equals(MispContextUrl.VULNERABILITYEntity.MAP_CSP_URL_VALUE.toString().toLowerCase()) ) {
                             ((ObjectNode)ja).put("comment",  newURL);
                         }
+                        /*
                         if (ja.get("object_relation").toString().toLowerCase().equals(MispContextUrl.VULNERABILITYEntity.MAP_RECORD_RELATION.toString().toLowerCase()) &&
                                 ja.get("category").toString().toLowerCase().equals(MispContextUrl.VULNERABILITYEntity.MAP_RECORD_CATEGORY.toString().toLowerCase()) ) {
                             ((ObjectNode)ja).put("value",  newTickerNumber);
                         }
+                        */
                     }
                 }
                 catch (Exception e){
