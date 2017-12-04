@@ -339,7 +339,7 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler{
                     searchParams.setOriginCspId(originCspId);
 
                     searchData.setDataParams(searchParams);
-                    searchData.setDataType(IntegrationDataType.INCIDENT);
+                    searchData.setDataType(IntegrationDataType.VULNERABILITY);
 
                     JsonNode esObject = elasticClient.getESobjectFromOrigin(searchData);
                     if (esObject != null) {
