@@ -34,6 +34,7 @@ import static com.intrasoft.csp.misp.commons.utils.JsonObjectHandler.updateField
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertNull;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = {MispAppClient.class, MispAppClientConfig.class},
@@ -172,7 +173,7 @@ public class MispAppClientTest {
     // TODO: Test Organisations and Sharing Groups; (Waiting for full CRUD API support for Sharing Groups)
 
     @Test
-    public void getMispOrganisationTest() throws URISyntaxException, IOException {
+    public void getMispOrganisationByUuidTest() throws URISyntaxException, IOException {
 
         // This is our search key; organisation should exist on our MISP instance
         String uuid = "56ef3277-1ad4-42f6-b90b-04e5c0a83832";
@@ -182,6 +183,17 @@ public class MispAppClientTest {
         assertThat(organisationDTO.getUuid(), is(uuid));
 
     }
+
+    @Test
+    public void getMispOrganisationShouldReturnNullTest() throws URISyntaxException, IOException {
+
+        // This is our search key. Organisation should NOT exist on our MISP instance for this test to work
+        String uuid = "39049c69-8355-47c3-86e3-929b77373aff";
+
+        assertNull(mispAppClient.getMispOrganisation(uuid));
+
+    }
+
 
 
 //  Adding an organisation in MISP using the fields "name" and a uuid. Both values must be unique.

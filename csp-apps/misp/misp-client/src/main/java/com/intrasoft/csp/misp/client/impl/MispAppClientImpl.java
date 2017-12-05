@@ -130,8 +130,16 @@ public class MispAppClientImpl implements MispAppClient, MispContextUrl {
         LOG.info("API call [GET]: " + url);
         HttpEntity<OrganisationWrapper> request = new HttpEntity<>(headers);
 
-        ResponseEntity<OrganisationWrapper> organisationWrapper =
-                                    retryRestTemplate.exchange(url, HttpMethod.GET, request, OrganisationWrapper.class);
+        ResponseEntity<OrganisationWrapper> organisationWrapper;
+        try {
+            organisationWrapper = retryRestTemplate.exchange(url, HttpMethod.GET, request, OrganisationWrapper.class);
+
+        } catch (Exception e) {
+            LOG.error(e.getMessage());
+            return null;
+        }
+
+
         return organisationWrapper.getBody().getOrganisation();
     }
 
@@ -176,7 +184,11 @@ public class MispAppClientImpl implements MispAppClient, MispContextUrl {
 
     @Override
     public OrganisationDTO deleteMispOrganisation(String id) {
+/*
+        // SearchKey might as well be Id or UUid
         String url = context  + "/" + MISP_ORGANISATIONS_DELETE + "/" + id;
+
+
 
         LOG.info("API call [POST]: " + url);
         HttpEntity<?> request = new HttpEntity<>(headers);
@@ -186,7 +198,8 @@ public class MispAppClientImpl implements MispAppClient, MispContextUrl {
         retryRestTemplate.delete(url);
 
         return response;
-
+*/
+        return null;
     }
 
 
