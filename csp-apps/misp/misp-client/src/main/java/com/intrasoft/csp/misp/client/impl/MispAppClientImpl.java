@@ -183,23 +183,28 @@ public class MispAppClientImpl implements MispAppClient, MispContextUrl {
     }
 
     @Override
-    public OrganisationDTO deleteMispOrganisation(String id) {
-/*
-        // SearchKey might as well be Id or UUid
+    public boolean deleteMispOrganisation(String id) {
+
         String url = context  + "/" + MISP_ORGANISATIONS_DELETE + "/" + id;
-
-
-
         LOG.info("API call [POST]: " + url);
-        HttpEntity<?> request = new HttpEntity<>(headers);
-        ResponseEntity<String> response = retryRestTemplate.exchange(url, HttpMethod.POST, request, String.class);
 
-        LOG.info(response.toString());
-        retryRestTemplate.delete(url);
+        HttpEntity<OrganisationWrapper> request = new HttpEntity<>(headers);
 
-        return response;
-*/
-        return null;
+        ResponseEntity<OrganisationWrapper> organisationWrapper;
+        try {
+            organisationWrapper = retryRestTemplate.exchange(url, HttpMethod.POST, request, OrganisationWrapper.class);
+
+        } catch (Exception e) {
+            LOG.error(e.getMessage());
+            return false;
+        }
+
+        if (organisationWrapper.getStatusCode().value() == 200)
+            return true;
+
+
+        return false;
+
     }
 
 

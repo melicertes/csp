@@ -25,8 +25,8 @@ public interface MispAppClient {
 //  MISP's Organisation API updates only the "name" field and it has been reported; waiting for feedback.
 	OrganisationDTO updateMispOrganisation(OrganisationDTO organisationDTO);
 
-	// Returns the successfully deleted organisation as object, otherwise returns null
-	OrganisationDTO deleteMispOrganisation(String id);
+	// Returns true when organisation is deleted
+	boolean deleteMispOrganisation(String id);
 
 //	TODO: There isn't any MISP REST API support for full CRUD operations on Sharing Groups yet.
 

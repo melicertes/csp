@@ -34,7 +34,9 @@ import static com.intrasoft.csp.misp.commons.utils.JsonObjectHandler.updateField
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = {MispAppClient.class, MispAppClientConfig.class},
@@ -185,7 +187,7 @@ public class MispAppClientTest {
     }
 
     @Test
-    public void getMispOrganisationShouldReturnNullTest() throws URISyntaxException, IOException {
+    public void getMispOrganisationNotFoundShouldReturnNullTest() throws URISyntaxException, IOException {
 
         // This is our search key. Organisation should NOT exist on our MISP instance for this test to work
         String uuid = "39049c69-8355-47c3-86e3-929b77373aff";
@@ -236,6 +238,7 @@ public class MispAppClientTest {
 
     }
 
+    // Creating a dummy organisation for update testing purposes
     @Test
     public void updateMispOrganisationTest() throws URISyntaxException, IOException {
 
@@ -265,42 +268,25 @@ public class MispAppClientTest {
 
     }
 
-
-
-    @Test
-    public void updateMispOrganisationTestByUuid() throws URISyntaxException, IOException {
-
-
-    }
-
-    @Test
-    public void updateMispOrganisationTestById() throws URISyntaxException, IOException {
-    }
-
+//  Create a dummy organisation and try deleting it
     @Test
     public void deleteMispOrganisationTest() throws URISyntaxException, IOException {
 
-/*
-        // First, create an Organisation on MISP for our deletion test using the organisation resource file sample.
-        ResponseEntity<String> postResponse = postOrganisation();
+        // First, create a dummy organisation and try deleting it
+        OrganisationDTO testDTO = new OrganisationDTO();
+        testDTO.setName("test-" + RandomStringUtils.random(4,true,false));
+        testDTO.setDescription("delete me");
 
-        // The Organisation's id field will be used as the key for the deletion.
-        // To do that we need to extract that id out of the response entity object.
-        String body = postResponse.getBody();
-        JsonNode object = new ObjectMapper().readTree(body);
-        JsonNode node = object.path("Organisation").get("id");
-        String id = node.textValue();
-
-        LOG.info(id);
-
-        // Begin actual deletion procedure via our MispAppClient object
         mispAppClient.setProtocolHostPortHeaders(protocol, host, port, authorizationKey);
-        ResponseEntity<String> response = mispAppClient.deleteMispOrganisation(id);
+        OrganisationDTO addResponseDTO = mispAppClient.addMispOrganisation(testDTO);
 
-        LOG.info(response.toString());
-        assertThat(response.getStatusCodeValue(), is(200));
-        assertThat(response.getBody(), containsString("Organisation deleted"));
-*/
+        // Misp App client will need to get hold of the MISP-generated id in order to delete the organisation.
+        // The add response DTO should provide it.
+        String id = addResponseDTO.getId();
+
+
+        assertTrue(mispAppClient.deleteMispOrganisation(id));
+        LOG.info("Deleted Organisation " + addResponseDTO.getName() + " with and ID of " + addResponseDTO.getId());
 
     }
 
