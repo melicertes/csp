@@ -16,11 +16,8 @@ public class MispTcSyncServiceImpl implements MispTcSyncService {
 
     private static final Logger LOG = LoggerFactory.getLogger(MispTcSyncServiceImpl.class);
 
-
-
     @Autowired
     TrustCirclesClient trustCirclesClient;
-
 
     @Autowired
     MispAppClient mispAppClient;

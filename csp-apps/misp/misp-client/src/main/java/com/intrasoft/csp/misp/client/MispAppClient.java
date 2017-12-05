@@ -21,11 +21,12 @@ public interface MispAppClient {
 
 	OrganisationDTO getMispOrganisation(String uuid);
 	OrganisationDTO addMispOrganisation(OrganisationDTO organisationDTO);
-//	TODO: Implementations of updating Misp Organisations are put on hold;
+//	TODO: Implementation of updating MISP Organisations is partially working until REST API problem is solved.
 //  MISP's Organisation API updates only the "name" field and it has been reported; waiting for feedback.
 	OrganisationDTO updateMispOrganisation(OrganisationDTO organisationDTO);
-	ResponseEntity<String> updateMispOrganisation(String uuid, String object) ;
-	ResponseEntity<String> deleteMispOrganisation(String id);
+
+	// Returns the successfully deleted organisation as object, otherwise returns null
+	OrganisationDTO deleteMispOrganisation(String id);
 
 //	TODO: There isn't any MISP REST API support for full CRUD operations on Sharing Groups yet.
 

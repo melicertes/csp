@@ -247,7 +247,7 @@ public class MispAppClientTest {
 
         assertThat(updateResponseDTO.getName(), is(addResponseDTO.getName()));
 
-//      TODO: These should be successful but they're not because of the Organisations MISP REST API updating problem.
+//      TODO: These should be successful but they're not because of the Organisations REST API updating problem.
         assertThat(updateResponseDTO.isLocal(), is(addResponseDTO.isLocal()));
         assertThat(updateResponseDTO.getDescription(), is(addResponseDTO.getDescription()));
 

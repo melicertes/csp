@@ -34,22 +34,26 @@ public class MispTcSyncServiceTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(MispTcSyncService.class);
 
-/*
     @Autowired
     TrustCirclesClient trustCirclesClient;
 
     @Autowired
     MispAppClient mispAppClient;
-*/
 
     @Autowired
     MispTcSyncService mispTcSyncService;
 
-
+    // Sync teams with organisations
     @Test
-    public void simplestTest() {
+    public void tcTeamsMispOrganisationsSyncTest() {
 
-//       assertTrue(mispTcSyncService.sync());
+
+    }
+
+    // Sync trust cicles with sharing groups
+    @Test
+    public void tcTrustCirclesMispSharingGroupsSyncTest() {
+
 
     }
 

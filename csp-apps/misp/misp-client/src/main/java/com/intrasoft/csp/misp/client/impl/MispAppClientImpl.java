@@ -120,6 +120,9 @@ public class MispAppClientImpl implements MispAppClient, MispContextUrl {
         return response;
     }
 
+    /*
+    * Organisations management API
+    * */
     @Override
     public OrganisationDTO getMispOrganisation(String uuid) {
 
@@ -147,23 +150,14 @@ public class MispAppClientImpl implements MispAppClient, MispContextUrl {
         organisationWrapper = retryRestTemplate.exchange(url, HttpMethod.POST, request, OrganisationWrapper.class);
         return organisationWrapper.getBody().getOrganisation();
 
-
-/*
-        String url = context  + "/" + MISP_ORGANISATIONS_ADD;
-
-        LOG.info("API call [POST]: " + url);
-        HttpEntity<String> request = new HttpEntity<>(body, headers);
-        ResponseEntity<String> response = new ResponseEntity<String>(HttpStatus.OK);
-        response = retryRestTemplate.exchange(url, HttpMethod.POST, request, String.class);
-        return response;
-*/
     }
 
-//  TODO: MISP's REST API for editing Organisations doesn't seem to work properly. Reported and waiting for feedback.
-//  Even though we're getting an OK response, the only modifiable field is "name". Editing other fields in MISPS' UI
+//  TODO: MISP's REST API for editing Organisations is partially working. Issue reported; waiting for feedback.
+//  Although we're getting an OK response, the only modifiable field is "name". Editing other fields in MISPS' UI
 //  works fine.
     @Override
     public OrganisationDTO updateMispOrganisation(OrganisationDTO organisationDTO) {
+
 
         String url = context  + "/" + MISP_ORGANISATIONS_EDIT + "/" + organisationDTO.getId();
         LOG.info("API call [POST]: " + url);
@@ -181,12 +175,7 @@ public class MispAppClientImpl implements MispAppClient, MispContextUrl {
     }
 
     @Override
-    public ResponseEntity<String> updateMispOrganisation(String uuid, String object) {
-        return null;
-    }
-
-    @Override
-    public ResponseEntity<String> deleteMispOrganisation(String id) {
+    public OrganisationDTO deleteMispOrganisation(String id) {
         String url = context  + "/" + MISP_ORGANISATIONS_DELETE + "/" + id;
 
         LOG.info("API call [POST]: " + url);
