@@ -17,12 +17,20 @@ public interface MispContextUrl {
     public static String MISP_ORGANISATIONS_ADD = "admin/organisations/add";
     public static String MISP_ORGANISATIONS_EDIT = "admin/organisations/edit";
     public static String MISP_ORGANISATIONS_DELETE = "admin/organisations/delete";
+    public static String MISP_SHARINGGROUPS_VIEW_ALL = "sharing_groups";
+    public static String MISP_SHARINGGROUPS_VIEW = "sharing_groups/view";
+    public static String MISP_SHARINGGROUPS_ADD = "admin/sharing_groups/add";
+    public static String MISP_SHARINGGROUPS_EDIT = "admin/sharing_groups/edit";
+    public static String MISP_SHARINGGROUPS_DELETE = "admin/sharing_groups/delete";
+
+
 
     public static enum MispEntity {
         EVENT("Event"),
         ACTION("action"),
         ATTRIBUTE("Attribute"),
-        ORGANISATION("Organisation");
+        ORGANISATION("Organisation"),
+        SHARINGGROUP("SharingGroup");
 
         private final String value;
 

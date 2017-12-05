@@ -13,33 +13,19 @@ public class OrganisationDTO {
 
 
     private String id;
-
     private String name;
-
     private String alias;
-
     private boolean anonymise;
-
     private String dateCreated;
-
     private String dateModified;
-
     private String description;
-
     private String type;
-
     private String nationality;
-
     private String sector;
-
     private String createdBy;
-
     private String uuid;
-
     private String contacts;
-
     private boolean local;
-
     private String landingPage;
 
 

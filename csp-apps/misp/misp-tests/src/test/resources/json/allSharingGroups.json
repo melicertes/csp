@@ -1,0 +1,159 @@
+{
+  "response": [
+    {
+      "SharingGroup": {
+        "id": "1",
+        "name": "CTC::CSP_ALL",
+        "description": "CTC::CSP_ALL",
+        "releasability": "",
+        "local": true,
+        "active": true
+      },
+      "Organisation": {
+        "id": "1",
+        "name": "MISP",
+        "uuid": "56ef3277-1ad4-42f6-b90b-04e5c0a83832"
+      },
+      "SharingGroupOrg": [
+        {
+          "id": "1",
+          "sharing_group_id": "1",
+          "org_id": "1",
+          "extend": true,
+          "Organisation": {
+            "name": "MISP",
+            "id": "1",
+            "uuid": "56ef3277-1ad4-42f6-b90b-04e5c0a83832"
+          }
+        },
+        {
+          "id": "2",
+          "sharing_group_id": "1",
+          "org_id": "13",
+          "extend": false,
+          "Organisation": {
+            "name": "demo1-csp",
+            "id": "13",
+            "uuid": "578c0e4e-ebaf-455b-a2a1-faffb14be9e1"
+          }
+        },
+        {
+          "id": "3",
+          "sharing_group_id": "1",
+          "org_id": "12",
+          "extend": false,
+          "Organisation": {
+            "name": "LUKE-CSP",
+            "id": "12",
+            "uuid": "5a1c2c9a-f788-46d1-8729-0606c0a83832"
+          }
+        },
+        {
+          "id": "4",
+          "sharing_group_id": "1",
+          "org_id": "11",
+          "extend": false,
+          "Organisation": {
+            "name": "YODA-CSPer",
+            "id": "11",
+            "uuid": "c48936df-d718-4994-95e9-d4062def9f6c"
+          }
+        },
+        {
+          "id": "5",
+          "sharing_group_id": "1",
+          "org_id": "3",
+          "extend": false,
+          "Organisation": {
+            "name": "CthulhuSPRL.be",
+            "id": "3",
+            "uuid": "55f6ea5f-fd34-43b8-ac1d-40cb950d210f"
+          }
+        }
+      ],
+      "SharingGroupServer": [
+        {
+          "all_orgs": false,
+          "server_id": "0",
+          "sharing_group_id": "1",
+          "Server": []
+        }
+      ],
+      "editable": true
+    },
+    {
+      "SharingGroup": {
+        "id": "2",
+        "name": "CTC::SHARING_DATA_EVENT",
+        "description": "4b2bb43a-c98e-440e-a4b2-2df6802f63dd",
+        "releasability": "",
+        "local": true,
+        "active": true
+      },
+      "Organisation": {
+        "id": "1",
+        "name": "MISP",
+        "uuid": "56ef3277-1ad4-42f6-b90b-04e5c0a83832"
+      },
+      "SharingGroupOrg": [
+        {
+          "id": "6",
+          "sharing_group_id": "2",
+          "org_id": "1",
+          "extend": true,
+          "Organisation": {
+            "name": "MISP",
+            "id": "1",
+            "uuid": "56ef3277-1ad4-42f6-b90b-04e5c0a83832"
+          }
+        }
+      ],
+      "SharingGroupServer": [
+        {
+          "all_orgs": false,
+          "server_id": "0",
+          "sharing_group_id": "2",
+          "Server": []
+        }
+      ],
+      "editable": true
+    },
+    {
+      "SharingGroup": {
+        "id": "3",
+        "name": "Test-SG",
+        "description": "Test description",
+        "releasability": "",
+        "local": true,
+        "active": true
+      },
+      "Organisation": {
+        "id": "1",
+        "name": "MISP",
+        "uuid": "56ef3277-1ad4-42f6-b90b-04e5c0a83832"
+      },
+      "SharingGroupOrg": [
+        {
+          "id": "7",
+          "sharing_group_id": "3",
+          "org_id": "1",
+          "extend": true,
+          "Organisation": {
+            "name": "MISP",
+            "id": "1",
+            "uuid": "56ef3277-1ad4-42f6-b90b-04e5c0a83832"
+          }
+        }
+      ],
+      "SharingGroupServer": [
+        {
+          "all_orgs": false,
+          "server_id": "0",
+          "sharing_group_id": "3",
+          "Server": []
+        }
+      ],
+      "editable": true
+    }
+  ]
+}

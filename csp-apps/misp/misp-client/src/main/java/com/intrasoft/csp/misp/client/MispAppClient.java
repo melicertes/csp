@@ -2,11 +2,13 @@ package com.intrasoft.csp.misp.client;
 
 import com.intrasoft.csp.misp.commons.models.OrganisationDTO;
 import com.intrasoft.csp.misp.commons.models.OrganisationWrapper;
+import com.intrasoft.csp.misp.commons.models.SharingGroupDTO;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.http.ResponseEntity;
 
 import java.io.IOException;
+import java.util.List;
 
 public interface MispAppClient {
 	void setProtocolHostPortHeaders(String protocol, String host, String port, String authorizationKey);
@@ -24,11 +26,16 @@ public interface MispAppClient {
 //	TODO: Implementation of updating MISP Organisations is partially working until REST API problem is solved.
 //  MISP's Organisation API updates only the "name" field and it has been reported; waiting for feedback.
 	OrganisationDTO updateMispOrganisation(OrganisationDTO organisationDTO);
-
 	// Returns true when organisation is deleted
 	boolean deleteMispOrganisation(String id);
 
 //	TODO: There isn't any MISP REST API support for full CRUD operations on Sharing Groups yet.
+    List<SharingGroupDTO> getAllSharingGroups();
+    SharingGroupDTO getMispSharingGroup(String uuid);
+    SharingGroupDTO addMispSharingGroup(SharingGroupDTO sharingGroupDTO);
+    SharingGroupDTO updateMispSharingGroup(SharingGroupDTO sharingGroupDTO);
+    boolean deleteMispSharingGroup(String id);
+
 
 
 }
