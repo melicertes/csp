@@ -227,6 +227,29 @@ public class MispAppClientTest {
     @Test
     public void updateMispOrganisationTest() throws URISyntaxException, IOException {
 
+        // First, create an organisation with a random name in our MISP instance.
+        OrganisationDTO testDTO = new OrganisationDTO();
+        testDTO.setName("test-" + RandomStringUtils.random(4,true,false));
+        testDTO.setDescription("delete me");
+
+        mispAppClient.setProtocolHostPortHeaders(protocol, host, port, authorizationKey);
+        OrganisationDTO addResponseDTO = mispAppClient.addMispOrganisation(testDTO);
+
+        // Change some fields and try updating it.
+        String updateString = " updated";
+        addResponseDTO.setName(addResponseDTO.getName() + updateString);
+        addResponseDTO.setLocal(true);
+        addResponseDTO.setDescription(addResponseDTO.getDescription() + updateString);
+
+        // Misp App client will need to get hold of the MISP-generated id in order to update the organisation.
+        // The response DTO should provide it.
+        OrganisationDTO updateResponseDTO = mispAppClient.updateMispOrganisation(addResponseDTO);
+
+        assertThat(updateResponseDTO.getName(), is(addResponseDTO.getName()));
+
+//      TODO: These should be successful but they're not because of the Organisations MISP REST API updating problem.
+        assertThat(updateResponseDTO.isLocal(), is(addResponseDTO.isLocal()));
+        assertThat(updateResponseDTO.getDescription(), is(addResponseDTO.getDescription()));
 
     }
 

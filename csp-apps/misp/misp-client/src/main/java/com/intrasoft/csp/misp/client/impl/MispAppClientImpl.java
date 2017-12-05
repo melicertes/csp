@@ -165,7 +165,7 @@ public class MispAppClientImpl implements MispAppClient, MispContextUrl {
     @Override
     public OrganisationDTO updateMispOrganisation(OrganisationDTO organisationDTO) {
 
-        String url = context  + "/" + MISP_ORGANISATIONS_EDIT;
+        String url = context  + "/" + MISP_ORGANISATIONS_EDIT + "/" + organisationDTO.getId();
         LOG.info("API call [POST]: " + url);
 
         OrganisationWrapper tempWrapper = new OrganisationWrapper();
