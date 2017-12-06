@@ -8,6 +8,7 @@ import com.intrasoft.csp.misp.client.MispAppClient;
 import com.intrasoft.csp.misp.client.config.MispAppClientConfig;
 import com.intrasoft.csp.misp.commons.models.OrganisationDTO;
 import com.intrasoft.csp.misp.commons.models.SharingGroupDTO;
+import com.intrasoft.csp.misp.commons.models.generated.Organisation;
 import com.intrasoft.csp.server.utils.TestUtil;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -320,6 +321,10 @@ public class MispAppClientTest {
                 .andRespond(MockRestResponseCreators.withSuccess(FileUtils.readFileToString(new File(sharingGroupUrl.toURI()), Charset.forName("UTF-8")).getBytes(), MediaType.APPLICATION_JSON_UTF8));
 
 
+
+
+
+
 /*
         mockServer.expect(requestTo(apiUrl+"/"+uuid))
                 .andRespond(MockRestResponseCreators
@@ -332,7 +337,7 @@ public class MispAppClientTest {
         assertThat(team.getHostOrganisation(),is("delete me"));
         mockServer.verify();
 */
-
+        assertTrue(true);
         mockServer.verify();
     }
 
