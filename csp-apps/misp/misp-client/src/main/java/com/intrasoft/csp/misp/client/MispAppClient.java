@@ -1,13 +1,10 @@
 package com.intrasoft.csp.misp.client;
 
 import com.intrasoft.csp.misp.commons.models.OrganisationDTO;
-import com.intrasoft.csp.misp.commons.models.OrganisationWrapper;
 import com.intrasoft.csp.misp.commons.models.SharingGroupDTO;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import com.intrasoft.csp.misp.commons.models.generated.SharingGroup;
 import org.springframework.http.ResponseEntity;
 
-import java.io.IOException;
 import java.util.List;
 
 public interface MispAppClient {
@@ -31,7 +28,7 @@ public interface MispAppClient {
 
 //	TODO: There isn't any MISP REST API support for full CRUD operations on Sharing Groups yet.
     List<SharingGroupDTO> getAllSharingGroups();
-    SharingGroupDTO getMispSharingGroup(String uuid);
+    SharingGroup getMispSharingGroup(String uuid);
     SharingGroupDTO addMispSharingGroup(SharingGroupDTO sharingGroupDTO);
     SharingGroupDTO updateMispSharingGroup(SharingGroupDTO sharingGroupDTO);
     boolean deleteMispSharingGroup(String id);

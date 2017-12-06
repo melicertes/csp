@@ -1,20 +1,14 @@
 package com.intrasoft.csp.misp.tests.sandbox;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.intrasoft.csp.libraries.restclient.service.RetryRestTemplate;
 import com.intrasoft.csp.misp.client.MispAppClient;
 import com.intrasoft.csp.misp.client.config.MispAppClientConfig;
 import com.intrasoft.csp.misp.commons.models.OrganisationDTO;
-import com.intrasoft.csp.misp.commons.models.SharingGroupDTO;
-import com.intrasoft.csp.misp.commons.models.generated.Organisation;
-import com.intrasoft.csp.server.utils.TestUtil;
+import com.intrasoft.csp.misp.commons.models.generated.SharingGroup;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -309,35 +303,20 @@ public class MispAppClientTest {
     @Test
     public void getMispSharingGroupByUuidTest() throws URISyntaxException, IOException {
 
-
         String uuid = "a36c31f4-dad3-4f49-b443-e6d6333649b1";
         String apiUrl = "http://192.168.56.50:80/sharing_groups/view";
-
 
         mispAppClient.setProtocolHostPortHeaders(protocol, host, port, authorizationKey);
 
         MockRestServiceServer mockServer = MockRestServiceServer.bindTo(retryRestTemplate).build();
         mockServer.expect(requestTo(apiUrl+"/"+uuid))
-                .andRespond(MockRestResponseCreators.withSuccess(FileUtils.readFileToString(new File(sharingGroupUrl.toURI()), Charset.forName("UTF-8")).getBytes(), MediaType.APPLICATION_JSON_UTF8));
+                .andRespond(MockRestResponseCreators.withSuccess
+                        (FileUtils.readFileToString(new File(sharingGroupUrl.toURI()), Charset.forName("UTF-8"))
+                                .getBytes(), MediaType.APPLICATION_JSON_UTF8));
 
+        SharingGroup sharingGroup = mispAppClient.getMispSharingGroup(uuid);
 
-
-
-
-
-/*
-        mockServer.expect(requestTo(apiUrl+"/"+uuid))
-                .andRespond(MockRestResponseCreators
-                        .withSuccess(TcMockUtil.getJsonBytesForTeamByUuid(allTeams,uuid),TestUtil.APPLICATION_JSON_UTF8));
-
-
-        //test client
-        Team team = tcClient.getTeamByUuid(uuid);
-        assertThat(team.getId(),is(uuid));
-        assertThat(team.getHostOrganisation(),is("delete me"));
-        mockServer.verify();
-*/
-        assertTrue(true);
+        assertThat(sharingGroup.getUuid(), is(uuid));
         mockServer.verify();
     }
 

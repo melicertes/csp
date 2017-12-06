@@ -1,19 +1,17 @@
 package com.intrasoft.csp.misp.client.impl;
 
 //import com.intrasoft.csp.libraries.restclient.service.RetryRestTemplate;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.intrasoft.csp.libraries.restclient.exceptions.CspBusinessException;
-import com.intrasoft.csp.libraries.restclient.handlers.CommonExceptionHandler;
 import com.intrasoft.csp.libraries.restclient.service.RetryRestTemplate;
 import com.intrasoft.csp.misp.client.MispAppClient;
 import com.intrasoft.csp.misp.commons.config.MispContextUrl;
 import com.intrasoft.csp.misp.commons.models.OrganisationDTO;
 import com.intrasoft.csp.misp.commons.models.OrganisationWrapper;
 import com.intrasoft.csp.misp.commons.models.SharingGroupDTO;
-import com.intrasoft.csp.misp.commons.models.SharingGroupWrapper;
+import com.intrasoft.csp.misp.commons.models.generated.Response;
+import com.intrasoft.csp.misp.commons.models.generated.SharingGroup;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +20,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -218,23 +215,23 @@ public class MispAppClientImpl implements MispAppClient, MispContextUrl {
     }
 
     @Override
-    public SharingGroupDTO getMispSharingGroup(String uuid) {
+    public SharingGroup getMispSharingGroup(String uuid) {
 
         String url = context  + "/" + MISP_SHARINGGROUPS_VIEW + "/" + uuid;
 
         LOG.info("API call [GET]: " + url);
-        HttpEntity<SharingGroupWrapper> request = new HttpEntity<>(headers);
+        HttpEntity<Response> request = new HttpEntity<>(headers);
 
-        ResponseEntity<SharingGroupWrapper> sharingGroupWrapper;
+        ResponseEntity<Response> response;
         try {
-            sharingGroupWrapper = retryRestTemplate.exchange(url, HttpMethod.GET, request, SharingGroupWrapper.class);
+            response = retryRestTemplate.exchange(url, HttpMethod.GET, request, Response.class);
 
         } catch (Exception e) {
             LOG.error(e.getMessage());
             return null;
         }
 
-        return sharingGroupWrapper.getBody().getSharingGroup();
+        return response.getBody().getSharingGroup();
 
     }
 

@@ -3,6 +3,7 @@ package com.intrasoft.csp.misp.commons.models.generated;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import javax.annotation.Generated;
 
+@Generated("com.robohorse.robopojogenerator")
 public class SharingGroup{
 
 	@JsonProperty("releasability")
@@ -19,6 +20,9 @@ public class SharingGroup{
 
 	@JsonProperty("id")
 	private String id;
+
+	@JsonProperty("uuid")
+	private String uuid;
 
 	@JsonProperty("local")
 	private boolean local;
@@ -63,6 +67,14 @@ public class SharingGroup{
 		return id;
 	}
 
+	public void setUuid(String uuid){
+		this.uuid = uuid;
+	}
+
+	public String getUuid(){
+		return uuid;
+	}
+
 	public void setLocal(boolean local){
 		this.local = local;
 	}
@@ -80,6 +92,7 @@ public class SharingGroup{
 			",description = '" + description + '\'' + 
 			",active = '" + active + '\'' + 
 			",id = '" + id + '\'' + 
+			",uuid = '" + uuid + '\'' + 
 			",local = '" + local + '\'' + 
 			"}";
 		}
