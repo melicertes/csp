@@ -5,6 +5,7 @@ import com.intrasoft.csp.libraries.restclient.service.RetryRestTemplate;
 import com.intrasoft.csp.misp.client.MispAppClient;
 import com.intrasoft.csp.misp.client.config.MispAppClientConfig;
 import com.intrasoft.csp.misp.commons.models.OrganisationDTO;
+import com.intrasoft.csp.misp.commons.models.generated.Response;
 import com.intrasoft.csp.misp.commons.models.generated.SharingGroup;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -30,6 +31,8 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import static com.intrasoft.csp.misp.commons.utils.JsonObjectHandler.readField;
@@ -315,29 +318,94 @@ public class MispAppClientTest {
                                 .getBytes(), MediaType.APPLICATION_JSON_UTF8));
 
         SharingGroup sharingGroup = mispAppClient.getMispSharingGroup(uuid);
+        LOG.info(sharingGroup.toString());
 
         assertThat(sharingGroup.getUuid(), is(uuid));
         mockServer.verify();
     }
 
+    @Test
+    public void addMispSharingGroupWithNameAndUuidTest() throws URISyntaxException, IOException {
+
+        String apiUrl = "http://192.168.56.50:80/admin/sharing_groups/add";
+
+        // Instantiating a sharing group and adding some data; a random name and a random v4 uuid
+        SharingGroup sg = new SharingGroup();
+        sg.setName("test-" + RandomStringUtils.random(4,true,false));
+        sg.setDescription("delete me");
+        // Generating a v4 UUID
+        UUID generatedUuid = UUID.randomUUID();
+        sg.setUuid(generatedUuid.toString());
+
+//        TODO: Try adding also a list of organisations
+//        TODO: Maybe Response as class name is misguiding when posting; maybe change it to something like wrapper?
+
+        // Mocking Setup
+        MockRestServiceServer mockServer = MockRestServiceServer.bindTo(retryRestTemplate).build();
+        mockServer.expect(requestTo(apiUrl))
+                .andRespond(MockRestResponseCreators.withSuccess
+                        (FileUtils.readFileToString(new File(sharingGroupUrl.toURI()), Charset.forName("UTF-8"))
+                                .getBytes(), MediaType.APPLICATION_JSON_UTF8));
+
+        SharingGroup sgResponse = mispAppClient.addMispSharingGroup(sg);
+        LOG.info(sgResponse.toString());
+        assertTrue(sgResponse.getUuid().equals("a36c31f4-dad3-4f49-b443-e6d6333649b1"));
+        mockServer.verify();
+
+    }
 
     @Test
-    public void getAllMispSharingGroupsTest() throws URISyntaxException, IOException {
+    public void updateMispSharingGroupTest() throws URISyntaxException, IOException {
+
+        String apiUrl = "http://192.168.56.50:80/admin/sharing_groups/edit";
+        String uuid = "a36c31f4-dad3-4f49-b443-e6d6333649b1";
+
+        // Instantiating a sharing group and populating its fields with data.
+        SharingGroup sg = new SharingGroup();
+        sg.setName("test-" + RandomStringUtils.random(4,true,false));
+        sg.setDescription("delete me");
+        sg.setId("66");
+        sg.setUuid(uuid);
+        // This "Response" class' name is misguiding. It should be called a wrapper. TODO: Refactor/change name of class
+        Response res = new Response();
+        res.setSharingGroup(sg);
+
+        // Mocking Setup
+        MockRestServiceServer mockServer = MockRestServiceServer.bindTo(retryRestTemplate).build();
+        mockServer.expect(requestTo(apiUrl+"/"+sg.getId()))
+                .andRespond(MockRestResponseCreators.withSuccess
+                        (FileUtils.readFileToString(new File(sharingGroupUrl.toURI()), Charset.forName("UTF-8"))
+                                .getBytes(), MediaType.APPLICATION_JSON_UTF8));
+
+        SharingGroup sgResponse = mispAppClient.updateMispSharingGroup(sg);
+        LOG.info(sgResponse.toString());
+        assertThat(sgResponse.getUuid(), is(sg.getUuid()));
+        mockServer.verify();
+
     }
 
-/*
-    private ResponseEntity<String> postOrganisation () throws URISyntaxException, IOException {
-        URL url = getClass().getClassLoader().getResource("json/organisation.json");
-        File file = new File(url.getFile());
-        String fieldToModify = "description";
+    // Although MISP's REST API for SGs supports this call, we will be mocking it because of the "uuid" field's absence.
+    // TODO: Doesn't work yet; look into it later
+    @Test
+    public void getAllMispSharingGroupsTest() throws URISyntaxException, IOException {
 
-        String organisation = new String(Files.readAllBytes(Paths.get(url.toURI())));
 
+        String apiUrl = "http://192.168.56.50:80/sharing_groups";
 
         mispAppClient.setProtocolHostPortHeaders(protocol, host, port, authorizationKey);
-        ResponseEntity<String> response = mispAppClient.addMispOrganisation(organisation);
-        return response;
+
+        MockRestServiceServer mockServer = MockRestServiceServer.bindTo(retryRestTemplate).build();
+        mockServer.expect(requestTo(apiUrl))
+                .andRespond(MockRestResponseCreators.withSuccess
+                        (FileUtils.readFileToString(new File(allSharingGroupsUrl.toURI()), Charset.forName("UTF-8"))
+                                .getBytes(), MediaType.APPLICATION_JSON_UTF8));
+
+        List<SharingGroup> sharingGroupsList = mispAppClient.getAllMispSharingGroups();
+
+        assertThat(sharingGroupsList.size(), is(3));
+        mockServer.verify();
+
     }
-*/
+
 
 }

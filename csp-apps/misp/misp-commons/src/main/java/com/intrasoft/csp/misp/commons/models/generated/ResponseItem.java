@@ -4,7 +4,7 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import javax.annotation.Generated;
 
-public class Response{
+public class ResponseItem{
 
 	@JsonProperty("Organisation")
 	private Organisation organisation;
@@ -64,7 +64,7 @@ public class Response{
 	@Override
  	public String toString(){
 		return 
-			"Response{" + 
+			"ResponseItem{" + 
 			"organisation = '" + organisation + '\'' + 
 			",editable = '" + editable + '\'' + 
 			",sharingGroupServer = '" + sharingGroupServer + '\'' + 

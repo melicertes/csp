@@ -11,15 +11,19 @@ import com.intrasoft.csp.misp.commons.models.OrganisationDTO;
 import com.intrasoft.csp.misp.commons.models.OrganisationWrapper;
 import com.intrasoft.csp.misp.commons.models.SharingGroupDTO;
 import com.intrasoft.csp.misp.commons.models.generated.Response;
+import com.intrasoft.csp.misp.commons.models.generated.ResponseAll;
+import com.intrasoft.csp.misp.commons.models.generated.ResponseItem;
 import com.intrasoft.csp.misp.commons.models.generated.SharingGroup;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
 
+import java.security.interfaces.RSAPrivateCrtKey;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -164,7 +168,6 @@ public class MispAppClientImpl implements MispAppClient, MispContextUrl {
     @Override
     public OrganisationDTO updateMispOrganisation(OrganisationDTO organisationDTO) {
 
-
         String url = context  + "/" + MISP_ORGANISATIONS_EDIT + "/" + organisationDTO.getId();
         LOG.info("API call [POST]: " + url);
 
@@ -210,7 +213,21 @@ public class MispAppClientImpl implements MispAppClient, MispContextUrl {
     * */
 
     @Override
-    public List<SharingGroupDTO> getAllSharingGroups() {
+    public List<SharingGroup> getAllMispSharingGroups() {
+
+        String url = context  + "/" + MISP_SHARINGGROUPS_VIEW_ALL;
+        LOG.info("API call [GET]: " + url);
+        HttpEntity<ResponseAll> request = new HttpEntity<>(headers);
+
+        ResponseEntity<ResponseAll> response;
+        try {
+            response = retryRestTemplate.exchange(url, HttpMethod.GET, request, ResponseAll.class);
+        } catch (Exception e) {
+            LOG.error(e.getMessage());
+            return null;
+        }
+
+        // TODO: Fix the return type; extract a list of maps sharing groups out of the response
         return null;
     }
 
@@ -236,15 +253,51 @@ public class MispAppClientImpl implements MispAppClient, MispContextUrl {
     }
 
     @Override
-    public SharingGroupDTO addMispSharingGroup(SharingGroupDTO sharingGroupDTO) {
-        return null;
+    public SharingGroup addMispSharingGroup(SharingGroup sharingGroup) {
+        String url = context  + "/" + MISP_SHARINGGROUPS_ADD;
+
+        Response resp = new Response();
+        resp.setSharingGroup(sharingGroup);
+
+        LOG.info("API call [POST]: " + url);
+        HttpEntity<Response> request = new HttpEntity<>(headers);
+
+        ResponseEntity<Response> response;
+        try {
+            response = retryRestTemplate.exchange(url, HttpMethod.POST, request, Response.class);
+
+        } catch (Exception e) {
+            LOG.error(e.getMessage());
+            return null;
+        }
+
+        return response.getBody().getSharingGroup();
     }
 
     @Override
-    public SharingGroupDTO updateMispSharingGroup(SharingGroupDTO sharingGroupDTO) {
-        return null;
+    public SharingGroup updateMispSharingGroup(SharingGroup sharingGroup) {
+
+        // Just like MISP's Organisations REST API, we're assuming SharingGroups API also uses id and not uuid in the url.
+        String url = context  + "/" + MISP_SHARINGGROUPS_EDIT + "/" + sharingGroup.getId();
+
+        Response resp = new Response();
+        resp.setSharingGroup(sharingGroup);
+
+        LOG.info("API call [POST]: " + url);
+        HttpEntity<Response> request = new HttpEntity<>(headers);
+
+        ResponseEntity<Response> response;
+        try {
+            response = retryRestTemplate.exchange(url, HttpMethod.POST, request, Response.class);
+        } catch (Exception e) {
+            LOG.error(e.getMessage());
+            return null;
+        }
+
+        return response.getBody().getSharingGroup();
     }
 
+//    TODO: Finish the implementation
     @Override
     public boolean deleteMispSharingGroup(String id) {
         return false;
