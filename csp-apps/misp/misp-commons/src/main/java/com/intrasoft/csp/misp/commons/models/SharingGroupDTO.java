@@ -12,6 +12,10 @@ public class SharingGroupDTO {
     private boolean local;
     private boolean active;
 
+    private OrganisationWrapper organisationWrapper;
+
+
+
     private List<String> organisationsUuids = new ArrayList<>();
 
     public String getId() {

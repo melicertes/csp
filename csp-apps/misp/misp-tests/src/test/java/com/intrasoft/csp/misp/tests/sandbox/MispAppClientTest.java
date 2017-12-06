@@ -3,9 +3,13 @@ package com.intrasoft.csp.misp.tests.sandbox;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.intrasoft.csp.libraries.restclient.service.RetryRestTemplate;
 import com.intrasoft.csp.misp.client.MispAppClient;
 import com.intrasoft.csp.misp.client.config.MispAppClientConfig;
 import com.intrasoft.csp.misp.commons.models.OrganisationDTO;
+import com.intrasoft.csp.misp.commons.models.SharingGroupDTO;
+import com.intrasoft.csp.server.utils.TestUtil;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Rule;
 import org.junit.Test;
@@ -17,14 +21,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.web.client.MockRestServiceServer;
+import org.springframework.test.web.client.response.MockRestResponseCreators;
 import org.springframework.web.client.HttpClientErrorException;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.UUID;
@@ -37,6 +45,7 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = {MispAppClient.class, MispAppClientConfig.class},
@@ -67,6 +76,12 @@ public class MispAppClientTest {
     @Qualifier(value = "MispAppClient")
     MispAppClient mispAppClient;
 
+    @Autowired
+    @Qualifier("MispAppRestTemplate")
+    RetryRestTemplate retryRestTemplate;
+
+    URL sharingGroupUrl = getClass().getClassLoader().getResource("json/sharingGroup.json");
+    URL allSharingGroupsUrl = getClass().getClassLoader().getResource("json/allSharingGroups.json");
 
     @Test
     public void addMispEventTest() throws URISyntaxException, IOException {
@@ -177,7 +192,7 @@ public class MispAppClientTest {
     @Test
     public void getMispOrganisationByUuidTest() throws URISyntaxException, IOException {
 
-        // This is our search key; organisation should exist on our MISP instance
+        // This is our search key; Organisation should exist on our MISP instance
         String uuid = "56ef3277-1ad4-42f6-b90b-04e5c0a83832";
 
         OrganisationDTO organisationDTO = mispAppClient.getMispOrganisation(uuid);
@@ -189,7 +204,7 @@ public class MispAppClientTest {
     @Test
     public void getMispOrganisationNotFoundShouldReturnNullTest() throws URISyntaxException, IOException {
 
-        // This is our search key. Organisation should NOT exist on our MISP instance for this test to work
+        // This is our search key. Organisation should NOT exist on our MISP instance
         String uuid = "39049c69-8355-47c3-86e3-929b77373aff";
 
         assertNull(mispAppClient.getMispOrganisation(uuid));
@@ -268,11 +283,11 @@ public class MispAppClientTest {
 
     }
 
-//  Create a dummy organisation and try deleting it
+//  Create an organisation for the deletion test
     @Test
     public void deleteMispOrganisationTest() throws URISyntaxException, IOException {
 
-        // First, create a dummy organisation and try deleting it
+        // First, create a dummy organisation with a random name.
         OrganisationDTO testDTO = new OrganisationDTO();
         testDTO.setName("test-" + RandomStringUtils.random(4,true,false));
         testDTO.setDescription("delete me");
@@ -288,6 +303,37 @@ public class MispAppClientTest {
         assertTrue(mispAppClient.deleteMispOrganisation(id));
         LOG.info("Deleted Organisation " + addResponseDTO.getName() + " with and ID of " + addResponseDTO.getId());
 
+    }
+
+    @Test
+    public void getMispSharingGroupByUuidTest() throws URISyntaxException, IOException {
+
+
+        String uuid = "a36c31f4-dad3-4f49-b443-e6d6333649b1";
+        String apiUrl = "http://192.168.56.50:80/sharing_groups/view";
+
+
+        mispAppClient.setProtocolHostPortHeaders(protocol, host, port, authorizationKey);
+
+        MockRestServiceServer mockServer = MockRestServiceServer.bindTo(retryRestTemplate).build();
+        mockServer.expect(requestTo(apiUrl+"/"+uuid))
+                .andRespond(MockRestResponseCreators.withSuccess(FileUtils.readFileToString(new File(sharingGroupUrl.toURI()), Charset.forName("UTF-8")).getBytes(), MediaType.APPLICATION_JSON_UTF8));
+
+
+/*
+        mockServer.expect(requestTo(apiUrl+"/"+uuid))
+                .andRespond(MockRestResponseCreators
+                        .withSuccess(TcMockUtil.getJsonBytesForTeamByUuid(allTeams,uuid),TestUtil.APPLICATION_JSON_UTF8));
+
+
+        //test client
+        Team team = tcClient.getTeamByUuid(uuid);
+        assertThat(team.getId(),is(uuid));
+        assertThat(team.getHostOrganisation(),is("delete me"));
+        mockServer.verify();
+*/
+
+        mockServer.verify();
     }
 
 

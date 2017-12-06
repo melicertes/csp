@@ -13,6 +13,7 @@ import com.intrasoft.csp.misp.commons.config.MispContextUrl;
 import com.intrasoft.csp.misp.commons.models.OrganisationDTO;
 import com.intrasoft.csp.misp.commons.models.OrganisationWrapper;
 import com.intrasoft.csp.misp.commons.models.SharingGroupDTO;
+import com.intrasoft.csp.misp.commons.models.SharingGroupWrapper;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -218,24 +219,23 @@ public class MispAppClientImpl implements MispAppClient, MispContextUrl {
 
     @Override
     public SharingGroupDTO getMispSharingGroup(String uuid) {
-        String url = context  + "/" + MISP_SHARINGGROUPS_VIEW + "/" + uuid;
-        LOG.info("API call [GET]: " + url);
-/*
-        HttpEntity<OrganisationWrapper> request = new HttpEntity<>(headers);
 
-        ResponseEntity<OrganisationWrapper> organisationWrapper;
+        String url = context  + "/" + MISP_SHARINGGROUPS_VIEW + "/" + uuid;
+
+        LOG.info("API call [GET]: " + url);
+        HttpEntity<SharingGroupWrapper> request = new HttpEntity<>(headers);
+
+        ResponseEntity<SharingGroupWrapper> sharingGroupWrapper;
         try {
-            organisationWrapper = retryRestTemplate.exchange(url, HttpMethod.GET, request, OrganisationWrapper.class);
+            sharingGroupWrapper = retryRestTemplate.exchange(url, HttpMethod.GET, request, SharingGroupWrapper.class);
 
         } catch (Exception e) {
             LOG.error(e.getMessage());
             return null;
         }
 
-        return organisationWrapper.getBody().getOrganisation();
+        return sharingGroupWrapper.getBody().getSharingGroup();
 
-*/
-        return null;
     }
 
     @Override
