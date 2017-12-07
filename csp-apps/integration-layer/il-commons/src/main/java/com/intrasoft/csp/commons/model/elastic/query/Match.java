@@ -11,7 +11,10 @@ import java.util.Map;
 @JsonPropertyOrder({
         "dataParams.recordId",
         "dataParams.cspId",
-        "dataParams.applicationId"
+        "dataParams.applicationId",
+        "dataParams.originRecordId",
+        "dataParams.originCspId",
+        "dataParams.originApplicationId"
 })
 public class Match {
 
@@ -26,6 +29,19 @@ public class Match {
     @JsonProperty("dataParams.applicationId")
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String applicationId;
+
+    @JsonProperty("dataParams.originRecordId")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private String originRecordId;
+
+    @JsonProperty("dataParams.originCspId")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private String originCspId;
+
+    @JsonProperty("dataParams.originApplicationId")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private String originApplicationId;
+
 
 
     @JsonProperty("dataParams.recordId")
@@ -61,12 +77,46 @@ public class Match {
         this.applicationId = applicationId;
     }
 
+
+    @JsonProperty("dataParams.originRecordId")
+    public String getOriginRecordId() {
+        return originRecordId;
+    }
+
+    @JsonProperty("dataParams.originRecordId")
+    public void setOriginRecordId(String originRecordId) {
+        this.originRecordId = originRecordId;
+    }
+
+    @JsonProperty("dataParams.originCspId")
+    public String getOriginCspId() {
+        return originCspId;
+    }
+
+    @JsonProperty("dataParams.originCspId")
+    public void setOriginCspId(String originCspId) {
+        this.originCspId = originCspId;
+    }
+
+    @JsonProperty("dataParams.originApplicationId")
+    public String getOriginApplicationId() {
+        return originApplicationId;
+    }
+
+    @JsonProperty("dataParams.originApplicationId")
+    public void setOriginApplicationId(String originApplicationId) {
+        this.originApplicationId = originApplicationId;
+    }
+
     @Override
     public String toString() {
-        return "Term{" +
+        return "Match{" +
                 "recordId='" + recordId + '\'' +
                 ", cspId='" + cspId + '\'' +
                 ", applicationId='" + applicationId + '\'' +
+                ", originRecordId='" + originRecordId + '\'' +
+                ", originCspId='" + originCspId + '\'' +
+                ", originApplicationId='" + originApplicationId + '\'' +
                 '}';
     }
 }

@@ -10,4 +10,5 @@ public interface ElasticClient {
     public String getContext();
     public boolean objectExists(IntegrationData integrationData) throws IOException;
     public JsonNode getESobject(IntegrationData integrationData) throws IOException;
+    public JsonNode getESobjectFromOrigin(IntegrationData integrationData) throws IOException;
 }

@@ -100,6 +100,33 @@ public class ElasticClientImpl implements ElasticClient {
         return null;
     }
 
+    @Override
+    public JsonNode getESobjectFromOrigin(IntegrationData integrationData) throws IOException {
+        ElasticSearchRequest elasticSearchRequest = this.getElasticOriginSearchRequest(integrationData);
+        IntegrationDataType dataType = integrationData.getDataType();
+
+        ResponseEntity<String> response = retryRestTemplate.postForEntity(this.getElasticURI() + "/" + dataType.toString().toLowerCase() + "/_search?pretty&_source=false", elasticSearchRequest,String.class);
+
+        if(response == null){
+            return null;
+        }
+
+        ElasticSearchResponse elasticSearchResponse = new ObjectMapper().readValue(response.getBody(), ElasticSearchResponse.class);
+        if (elasticSearchResponse.getHits().getTotal() != 0) {
+            String esId = elasticSearchResponse.getHits().getHits().get(0).getId();
+
+            //http://csp0.dangerduck.gr:9200/cspdata/event/_search?q=_id:AV_WK4S8ZikppFWMb1IJ
+            ResponseEntity<String> o = retryRestTemplate.getForEntity(this.getElasticURI() + "/" + dataType.toString().toLowerCase() + "/_search?q=_id:" + esId, String.class);
+
+            JsonNode jsonNode = new ObjectMapper().readValue(o.getBody(), JsonNode.class);
+            for (JsonNode jn : jsonNode.get("hits").get("hits")){
+                return jn.get("_source");
+            }
+        }
+
+        return null;
+    }
+
     private String getElasticURI() {
         return elasticProtocol + "://" + elasticHost + ":" + elasticPort + "/" + elasticPath;
     }
@@ -135,6 +162,51 @@ public class ElasticClientImpl implements ElasticClient {
 
         return query;
     }
+
+    private Query getElasticOriginQuery(IntegrationData integrationData) {
+        Match t1 = new Match();
+        Match t2 = new Match();
+        Match t3 = new Match();
+
+        t1.setOriginRecordId(integrationData.getDataParams().getOriginRecordId());
+        t2.setOriginCspId(integrationData.getDataParams().getOriginCspId());
+        t3.setOriginApplicationId(integrationData.getDataParams().getOriginApplicationId());
+
+        Must m1 = new Must();
+        Must m2 = new Must();
+        Must m3 = new Must();
+
+        m1.setMatch(t1);
+        m2.setMatch(t2);
+        m3.setMatch(t3);
+
+        ArrayList<Must> must = new ArrayList<>();
+        must.add(m1);
+        must.add(m2);
+        must.add(m3);
+
+        Bool bool = new Bool();
+        bool.setMust(must);
+
+        Query query = new Query();
+        query.setBool(bool);
+
+        return query;
+    }
+
+    private ElasticSearchRequest getElasticOriginSearchRequest(IntegrationData integrationData) {
+        //create search transaction object
+        List<String> fields = new ArrayList<>();
+        fields.add("_id");
+
+        ElasticSearchRequest elasticSearchRequest = new ElasticSearchRequest();
+        elasticSearchRequest.setQuery(this.getElasticOriginQuery(integrationData));
+        //elasticSearchRequest.setFields(fields);
+
+        return elasticSearchRequest;
+    }
+
+
 
     private ElasticSearchRequest getElasticSearchRequest(IntegrationData integrationData) {
         //create search transaction object
