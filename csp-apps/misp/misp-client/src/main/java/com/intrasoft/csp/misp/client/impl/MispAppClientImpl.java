@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
 
@@ -122,7 +123,7 @@ public class MispAppClientImpl implements MispAppClient, MispContextUrl {
     }
 
     /*
-    * Organisations management API
+    * Organisations API management
     * */
     @Override
     public OrganisationDTO getMispOrganisation(String uuid) {
@@ -141,6 +142,33 @@ public class MispAppClientImpl implements MispAppClient, MispContextUrl {
         }
 
         return organisationWrapper.getBody().getOrganisation();
+    }
+
+    @Override
+    public List<OrganisationDTO> getAllMispOrganisations() {
+//      TODO: Which filter to use here? Local or both local and external?
+        String url = context  + "/" + MISP_ORGANISATIONS_VIEW_ALL_LOCAL_AND_EXTERNAL;
+        LOG.info("API call [GET]: " + url);
+        HttpEntity<OrganisationDTO> request = new HttpEntity<>(headers);
+
+        // JSON response's structure for this call is straightforward and doesn't require a wrapper.
+        ResponseEntity<List<OrganisationDTO>> organisationResponse;
+        try {
+            organisationResponse = retryRestTemplate.exchange(url, HttpMethod.GET, request, new ParameterizedTypeReference<List<OrganisationDTO>>() {});
+        } catch (Exception e) {
+            LOG.error(e.getMessage());
+            return null;
+        }
+//        LOG.info(organisationResponse.getStatusCode().toString() + " " +
+//                organisationResponse.getStatusCode().getReasonPhrase());
+/*
+        List<OrganisationWrapper> oWList = organisationResponse.getBody();
+        List<OrganisationDTO> orgDtoList=null;
+        for (OrganisationWrapper oWrapper : oWList) {
+            orgDtoList.add(oWrapper.getOrganisation());
+        }
+*/
+        return organisationResponse.getBody();
     }
 
     @Override
@@ -207,7 +235,7 @@ public class MispAppClientImpl implements MispAppClient, MispContextUrl {
     }
 
     /*
-    * Sharing Groups API
+    * Sharing Groups API management
     * */
 
     @Override

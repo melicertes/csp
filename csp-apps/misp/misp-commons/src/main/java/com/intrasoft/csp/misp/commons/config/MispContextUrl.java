@@ -10,10 +10,10 @@ public interface MispContextUrl {
     public static String MISP_HEARTBEAT = "misp_json_self";
     public static String MISP_EVENTS = "events";
     public static String MISP_ORGANISATIONS_VIEW = "organisations/view";
-    public static String MISP_ORGANISATIONS_VIEW_ALL_ON_INSTANCE = "organisations/view/index";
-    public static String MISP_ORGANISATIONS_VIEW_ALL_LOCAL = "organisations/view/index/scope:local";
-    public static String MISP_ORGANISATIONS_VIEW_ALL_EXTERNAL = "organisations/view/index/scope:external";
-    public static String MISP_ORGANISATIONS_VIEW_ALL_LOCAL_AND_EXTERNAL = "organisations/view/index/scope:all";
+    public static String MISP_ORGANISATIONS_VIEW_ALL_ON_INSTANCE = "organisations/index";
+    public static String MISP_ORGANISATIONS_VIEW_ALL_LOCAL = "organisations/index/scope:local";
+    public static String MISP_ORGANISATIONS_VIEW_ALL_EXTERNAL = "organisations/index/scope:external";
+    public static String MISP_ORGANISATIONS_VIEW_ALL_LOCAL_AND_EXTERNAL = "organisations/index/scope:all";
     public static String MISP_ORGANISATIONS_ADD = "admin/organisations/add";
     public static String MISP_ORGANISATIONS_EDIT = "admin/organisations/edit";
     public static String MISP_ORGANISATIONS_DELETE = "admin/organisations/delete";

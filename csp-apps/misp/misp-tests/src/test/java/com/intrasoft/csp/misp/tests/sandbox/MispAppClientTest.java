@@ -185,8 +185,9 @@ public class MispAppClientTest {
     }
 
 
-    // TODO: Test Organisations and Sharing Groups; (Waiting for full CRUD API support for Sharing Groups)
-
+    /*
+    * MISP Organisations tests section
+    * */
     @Test
     public void getMispOrganisationByUuidTest() throws URISyntaxException, IOException {
 
@@ -209,6 +210,12 @@ public class MispAppClientTest {
 
     }
 
+    @Test
+    public void getAllMispOrganisationsTest() {
+        int expectedSize = 28;
+        List<OrganisationDTO> mispOrgList = mispAppClient.getAllMispOrganisations();
+        assertThat(mispOrgList.size(), is(expectedSize));
+    }
 
 
 //  Adding an organisation in MISP using the fields "name" and a uuid. Both values must be unique.
@@ -281,11 +288,11 @@ public class MispAppClientTest {
 
     }
 
-//  Create an organisation for the deletion test
+//  Create an organisation to use for the deletion test
     @Test
     public void deleteMispOrganisationTest() throws URISyntaxException, IOException {
 
-        // First, create a dummy organisation with a random name.
+        // First, create an organisation with a random name.
         OrganisationDTO testDTO = new OrganisationDTO();
         testDTO.setName("test-" + RandomStringUtils.random(4,true,false));
         testDTO.setDescription("delete me");
@@ -302,6 +309,10 @@ public class MispAppClientTest {
         LOG.info("Deleted Organisation " + addResponseDTO.getName() + " with and ID of " + addResponseDTO.getId());
 
     }
+
+    /*
+    * MISP Sharing Groups tests section
+    * */
 
     @Test
     public void getMispSharingGroupByUuidTest() throws URISyntaxException, IOException {
@@ -381,7 +392,7 @@ public class MispAppClientTest {
     }
 
     // Although MISP's REST API for SGs supports this call, we will be mocking it because of the "uuid" field's absence.
-    // List size should equal to the number of sharing groups in the response mock file
+    // List size should be equal to the number of sharing groups in the response mock file
     @Test
     public void getAllMispSharingGroupsTest() throws URISyntaxException, IOException {
 

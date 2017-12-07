@@ -19,6 +19,7 @@ public interface MispAppClient {
 	ResponseEntity<String> deleteMispEvent(String uuid);
 
 	OrganisationDTO getMispOrganisation(String uuid);
+	List<OrganisationDTO> getAllMispOrganisations();
 	OrganisationDTO addMispOrganisation(OrganisationDTO organisationDTO);
 //	TODO: Implementation of updating MISP Organisations is partially working until REST API problem is solved.
 //  MISP's Organisation API updates only the "name" field and it has been reported; waiting for feedback.
