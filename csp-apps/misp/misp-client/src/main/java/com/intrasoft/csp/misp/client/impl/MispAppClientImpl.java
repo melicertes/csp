@@ -9,7 +9,6 @@ import com.intrasoft.csp.misp.client.MispAppClient;
 import com.intrasoft.csp.misp.commons.config.MispContextUrl;
 import com.intrasoft.csp.misp.commons.models.OrganisationDTO;
 import com.intrasoft.csp.misp.commons.models.OrganisationWrapper;
-import com.intrasoft.csp.misp.commons.models.SharingGroupDTO;
 import com.intrasoft.csp.misp.commons.models.generated.Response;
 import com.intrasoft.csp.misp.commons.models.generated.ResponseAll;
 import com.intrasoft.csp.misp.commons.models.generated.ResponseItem;
@@ -19,7 +18,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
 
@@ -227,8 +225,13 @@ public class MispAppClientImpl implements MispAppClient, MispContextUrl {
             return null;
         }
 
-        // TODO: Fix the return type; extract a list of maps sharing groups out of the response
-        return null;
+        List<SharingGroup> sgList = new ArrayList<>();
+        for (ResponseItem ri : response.getBody().getResponse()) {
+            sgList.add(ri.getSharingGroup());
+        }
+
+        LOG.info(response.getStatusCode().toString());
+        return sgList;
     }
 
     @Override
@@ -270,7 +273,7 @@ public class MispAppClientImpl implements MispAppClient, MispContextUrl {
             LOG.error(e.getMessage());
             return null;
         }
-
+        LOG.info(response.getStatusCode().toString());
         return response.getBody().getSharingGroup();
     }
 
@@ -297,9 +300,23 @@ public class MispAppClientImpl implements MispAppClient, MispContextUrl {
         return response.getBody().getSharingGroup();
     }
 
-//    TODO: Finish the implementation
     @Override
     public boolean deleteMispSharingGroup(String id) {
-        return false;
+        String url = context  + "/" + MISP_SHARINGGROUPS_DELETE + "/" + id;
+
+        LOG.info("API call [POST]: " + url);
+        HttpEntity<Response> request = new HttpEntity<>(headers);
+
+        ResponseEntity<Boolean> response;
+        try {
+            response = retryRestTemplate.exchange(url, HttpMethod.POST, request, Boolean.class);
+
+        } catch (Exception e) {
+            LOG.error(e.getMessage());
+            return false;
+        }
+
+        LOG.error(response.getStatusCode() + " " + response.getStatusCode().getReasonPhrase());
+        return true;
     }
 }

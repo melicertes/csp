@@ -337,10 +337,6 @@ public class MispAppClientTest {
         UUID generatedUuid = UUID.randomUUID();
         sg.setUuid(generatedUuid.toString());
 
-//        TODO: Try adding also a list of organisations
-//        TODO: Maybe Response as class name is misguiding when posting; maybe change it to something like wrapper?
-
-        // Mocking Setup
         MockRestServiceServer mockServer = MockRestServiceServer.bindTo(retryRestTemplate).build();
         mockServer.expect(requestTo(apiUrl))
                 .andRespond(MockRestResponseCreators.withSuccess
@@ -385,10 +381,11 @@ public class MispAppClientTest {
     }
 
     // Although MISP's REST API for SGs supports this call, we will be mocking it because of the "uuid" field's absence.
-    // TODO: Doesn't work yet; look into it later
+    // List size should equal to the number of sharing groups in the response mock file
     @Test
     public void getAllMispSharingGroupsTest() throws URISyntaxException, IOException {
 
+        int sharingGroupsOnMockResponseFile = 3;
 
         String apiUrl = "http://192.168.56.50:80/sharing_groups";
 
@@ -402,7 +399,25 @@ public class MispAppClientTest {
 
         List<SharingGroup> sharingGroupsList = mispAppClient.getAllMispSharingGroups();
 
-        assertThat(sharingGroupsList.size(), is(3));
+        assertThat(sharingGroupsList.size(), is(sharingGroupsOnMockResponseFile));
+        mockServer.verify();
+
+    }
+
+    @Test
+    public void deleteSharingGroupTest() throws URISyntaxException, IOException {
+
+        String id = "3";
+        String apiUrl = "http://192.168.56.50:80/admin/sharing_groups/delete/" + id;
+
+        mispAppClient.setProtocolHostPortHeaders(protocol, host, port, authorizationKey);
+
+        MockRestServiceServer mockServer = MockRestServiceServer.bindTo(retryRestTemplate).build();
+        mockServer.expect(requestTo(apiUrl))
+                .andRespond(MockRestResponseCreators.withSuccess());
+
+
+        assertTrue(mispAppClient.deleteMispSharingGroup(id));
         mockServer.verify();
 
     }
