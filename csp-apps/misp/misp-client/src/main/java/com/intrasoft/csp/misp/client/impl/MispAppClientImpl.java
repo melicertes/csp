@@ -246,9 +246,16 @@ public class MispAppClientImpl implements MispAppClient, MispContextUrl {
             return null;
         }
 
+        // Manually mapping the Sharing Group creator organisation and editable field.
         List<SharingGroup> sgList = new ArrayList<>();
+        SharingGroup tempSg = null;
         for (ResponseItem ri : response.getBody().getResponse()) {
-            sgList.add(ri.getSharingGroup());
+            tempSg = ri.getSharingGroup();
+            tempSg.setCreatedBy(ri.getOrganisation());
+            tempSg.setEditable(ri.isEditable());
+            tempSg.setSharingGroupOrg(ri.getSharingGroupOrg());
+            tempSg.setSharingGroupServer(ri.getSharingGroupServer());
+            sgList.add(tempSg);
         }
 
         LOG.info(response.getStatusCode().toString());

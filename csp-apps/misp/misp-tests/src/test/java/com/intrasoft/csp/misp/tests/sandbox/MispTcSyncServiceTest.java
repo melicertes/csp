@@ -47,7 +47,6 @@ public class MispTcSyncServiceTest {
     @Test
     public void tcTeamsMispOrganisationsSyncTest() {
 
-
     }
 
     // Sync trust cicles with sharing groups

@@ -2,12 +2,14 @@ package com.intrasoft.csp.misp.commons.models.generated;
 
 import java.util.List;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.intrasoft.csp.misp.commons.models.OrganisationDTO;
+
 import javax.annotation.Generated;
 
 public class ResponseItem{
 
 	@JsonProperty("Organisation")
-	private Organisation organisation;
+	private OrganisationDTO organisation;
 
 	@JsonProperty("editable")
 	private boolean editable;
@@ -21,11 +23,11 @@ public class ResponseItem{
 	@JsonProperty("SharingGroup")
 	private SharingGroup sharingGroup;
 
-	public void setOrganisation(Organisation organisation){
+	public void setOrganisation(OrganisationDTO organisation){
 		this.organisation = organisation;
 	}
 
-	public Organisation getOrganisation(){
+	public OrganisationDTO getOrganisation(){
 		return organisation;
 	}
 

@@ -6,6 +6,7 @@ import com.intrasoft.csp.commons.model.TrustCircle;
 import com.intrasoft.csp.misp.client.MispAppClient;
 import com.intrasoft.csp.misp.commons.models.OrganisationDTO;
 import com.intrasoft.csp.misp.commons.models.generated.SharingGroup;
+import com.intrasoft.csp.misp.commons.models.generated.SharingGroupOrgItem;
 import com.intrasoft.csp.misp.service.MispTcSyncService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +16,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -22,9 +24,6 @@ import java.util.Map;
 public class MispTcSyncServiceImpl implements MispTcSyncService {
 
     private static final Logger LOG = LoggerFactory.getLogger(MispTcSyncServiceImpl.class);
-
-    private Map<String, String> teamsToOrgs;
-    private Map<String, String> tcsToSgs;
 
     @Autowired
     TrustCirclesClient trustCirclesClient;
@@ -69,17 +68,18 @@ public class MispTcSyncServiceImpl implements MispTcSyncService {
                 // Match
                 if (teamList.get(i).getId().equals(organisation.getUuid())) {
                     // Populating this MISP organisation with this TC team's data and updating MISP.
-                    mapTeamToOrg(teamList.get(i), organisation);
+                    mapTeamToOrganisation(teamList.get(i), organisation);
                     mispAppClient.updateMispOrganisation(organisation);
                     break;
                 }
             }
             // No match; create this team as an organisation in MISP.
-            mapTeamToOrg(teamList.get(i), organisation);
+            mapTeamToOrganisation(teamList.get(i), organisation);
             mispAppClient.addMispOrganisation(organisation);
         }
 
-        // Delete orphan MISP organisations
+        // Delete orphan MISP organisations procedure
+        // Deleted organisations are removed automatically from any sharing groups when deleted. Tested in MISP UI.
 
         // Refreshing our list first
         orgList = mispAppClient.getAllMispOrganisations();
@@ -105,27 +105,26 @@ public class MispTcSyncServiceImpl implements MispTcSyncService {
         List<SharingGroup> sgList = mispAppClient.getAllMispSharingGroups();
         SharingGroup sharingGroup = null;
 
-//      TODO: Currently Sharing Groups don't have a uuid field but we'll be treating them like they do.
-
         for (int i=0; i<tcList.size(); i++) {
             for (int j=0; j<sgList.size(); j++) {
                 sharingGroup = sgList.get(j);
                 // Match
                 if (tcList.get(i).getId().equals(sharingGroup.getUuid())) {
                     // Populating this MISP sharing group with the matching TC trust circle data and updating MISP.
-                    // todo: map trust circle to sharing group
-                    // todo: update misp
+                    mapTrustCircleToSharingGroup(tcList.get(i), sharingGroup);
+                    mispAppClient.updateMispSharingGroup(sharingGroup);
                     break;
                 }
             }
             // No match; create this Trust Circle as a Sharing Group in MISP.
-
+            sharingGroup = new SharingGroup();
+            mapTrustCircleToSharingGroup(tcList.get(i), sharingGroup);
+            mispAppClient.addMispSharingGroup(sharingGroup);
         }
 
     }
 
-
-    private void mapTeamToOrg(Team team, OrganisationDTO organisation) {
+    private void mapTeamToOrganisation(Team team, OrganisationDTO organisation) {
 
         organisation.setUuid(team.getId());
         organisation.setName(team.getName());
@@ -134,17 +133,40 @@ public class MispTcSyncServiceImpl implements MispTcSyncService {
 
     }
 
-    private void mapTcToSg(TrustCircle tc, SharingGroup sg) {
+    private void mapTrustCircleToSharingGroup(TrustCircle tCircle, SharingGroup sGroup) {
 
-        sg.setUuid(tc.getId());
-        sg.setName(tc.getName());
-        sg.setDescription(tc.getDescription());
+        sGroup.setUuid(tCircle.getId());
+        sGroup.setName(tCircle.getName());
+        sGroup.setDescription(tCircle.getDescription());
 
-        // Organisations list and generated class mappings
-        
+        List<String> tCircleTeamsUuids = tCircle.getTeams();
+        List<SharingGroupOrgItem>  sharingGroupOrgItemList = sGroup.getSharingGroupOrg();
+
+        Map<String, Boolean> sGroupOrgCheckmap = new HashMap<>();
+
+        // Organisations in Sharing Groups have meta data and they're actually part of another object, SharingGroupOrg
+        tCircleTeamsUuids.forEach( uuid -> {
+            sharingGroupOrgItemList.forEach(sgoi -> {
+                // If the uuid is found, just update the hashmap in order to know what team is already there
+                if (uuid.equals(sgoi.getOrganisation().getUuid()))
+                    sGroupOrgCheckmap.put(uuid,true);
+            });
+        });
+
+        // For any false value in the map, get the corresponding keys' organisations in MISP and add it in the sharing
+        // group's list of organisations (list of SharingGroupOrgItems).
+        sGroupOrgCheckmap.forEach((k,v)-> {
+            if (v == false) {
+                // Sharing Group method for adding a sharingGroupOrgItem which contains an organisation with this uuid.
+                SharingGroupOrgItem newSgOrgItem = new SharingGroupOrgItem();
+                // There should be an organisation from MISP with this ID fetch it and add it.
+                OrganisationDTO newOrg = new OrganisationDTO();
+                newOrg = mispAppClient.getMispOrganisation(k);
+                newSgOrgItem.setOrganisation(newOrg);
+                sGroup.addSharingGroupOrgItem(newSgOrgItem);
+            }
+        });
 
     }
-
-
 
 }

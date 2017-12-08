@@ -373,9 +373,6 @@ public class MispAppClientTest {
         sg.setDescription("delete me");
         sg.setId("66");
         sg.setUuid(uuid);
-        // This "Response" class' name is misguiding. It should be called a wrapper. TODO: Refactor/change name of class
-        Response res = new Response();
-        res.setSharingGroup(sg);
 
         // Mocking Setup
         MockRestServiceServer mockServer = MockRestServiceServer.bindTo(retryRestTemplate).build();

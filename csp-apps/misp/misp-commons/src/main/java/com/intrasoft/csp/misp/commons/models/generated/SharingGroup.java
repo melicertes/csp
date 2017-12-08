@@ -1,6 +1,9 @@
 package com.intrasoft.csp.misp.commons.models.generated;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.intrasoft.csp.misp.commons.models.OrganisationDTO;
+
+import java.util.List;
 
 public class SharingGroup{
 
@@ -24,6 +27,18 @@ public class SharingGroup{
 
 	@JsonProperty("local")
 	private boolean local;
+
+	@JsonProperty("editable")
+	private boolean editable;
+
+	@JsonProperty("Organisation")
+    private OrganisationDTO createdBy;
+
+    @JsonProperty("SharingGroupOrg")
+    private List<SharingGroupOrgItem> sharingGroupOrg;
+
+    @JsonProperty("SharingGroupServer")
+    private List<SharingGroupServerItem> sharingGroupServer;
 
 	public void setReleasability(String releasability){
 		this.releasability = releasability;
@@ -81,7 +96,43 @@ public class SharingGroup{
 		return local;
 	}
 
-	@Override
+	public boolean isEditable() {
+		return editable;
+	}
+
+	public void setEditable(boolean editable) {
+		this.editable = editable;
+	}
+
+    public OrganisationDTO getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(OrganisationDTO createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public List<SharingGroupOrgItem> getSharingGroupOrg() {
+        return sharingGroupOrg;
+    }
+
+    public void setSharingGroupOrg(List<SharingGroupOrgItem> sharingGroupOrg) {
+        this.sharingGroupOrg = sharingGroupOrg;
+    }
+
+    public void addSharingGroupOrgItem(SharingGroupOrgItem sharingGroupOrgItem) {
+	    sharingGroupOrg.add(sharingGroupOrgItem);
+    }
+
+    public List<SharingGroupServerItem> getSharingGroupServer() {
+        return sharingGroupServer;
+    }
+
+    public void setSharingGroupServer(List<SharingGroupServerItem> sharingGroupServer) {
+        this.sharingGroupServer = sharingGroupServer;
+    }
+
+    @Override
  	public String toString(){
 		return 
 			"SharingGroup{" + 

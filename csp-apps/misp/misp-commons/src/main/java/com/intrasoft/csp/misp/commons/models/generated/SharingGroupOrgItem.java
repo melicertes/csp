@@ -1,6 +1,7 @@
 package com.intrasoft.csp.misp.commons.models.generated;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.intrasoft.csp.misp.commons.models.OrganisationDTO;
 
 public class SharingGroupOrgItem{
 
@@ -11,7 +12,7 @@ public class SharingGroupOrgItem{
 	private String sharingGroupId;
 
 	@JsonProperty("Organisation")
-	private Organisation organisation;
+	private OrganisationDTO organisation;
 
 	@JsonProperty("org_id")
 	private String orgId;
@@ -35,11 +36,11 @@ public class SharingGroupOrgItem{
 		return sharingGroupId;
 	}
 
-	public void setOrganisation(Organisation organisation){
+	public void setOrganisation(OrganisationDTO organisation){
 		this.organisation = organisation;
 	}
 
-	public Organisation getOrganisation(){
+	public OrganisationDTO getOrganisation(){
 		return organisation;
 	}
 
