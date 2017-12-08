@@ -146,9 +146,11 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
          * the operation should trigger an emitter response. The emitter should emit this record (for indexing) and
          * set the “toShare” flag to FALSE (rest on conluence https://confluence.sastix.com/display/SXCSP/Integration+Layer+Flows).*/
         if (isReEmittion){
+            LOG.info("Is Reemittion: false");
             sharingParams.setToShare(false);
         }
         else {
+            LOG.info("Is Reemittion: true");
             sharingParams.setToShare(true);
         }
 
@@ -215,16 +217,21 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
 
         LOG.info("Object exists: " + objextExists);
 
-        if (isDelete){
-            cspClient.deleteIntegrationData(integrationData);
-        }
-        else {
-            if (objextExists){
-                cspClient.updateIntegrationData(integrationData);
+        try {
+            if (isDelete){
+                cspClient.deleteIntegrationData(integrationData);
             }
             else {
-                cspClient.postIntegrationData(integrationData);
+                if (objextExists){
+                    cspClient.updateIntegrationData(integrationData);
+                }
+                else {
+                    cspClient.postIntegrationData(integrationData);
+                }
             }
+        }
+        catch (Exception e){
+            LOG.error("Forward to IL failed with: ", e);
         }
     }
 
