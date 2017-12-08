@@ -154,20 +154,13 @@ public class MispAppClientImpl implements MispAppClient, MispContextUrl {
         // JSON response's structure for this call is straightforward and doesn't require a wrapper.
         ResponseEntity<List<OrganisationDTO>> organisationResponse;
         try {
-            organisationResponse = retryRestTemplate.exchange(url, HttpMethod.GET, request, new ParameterizedTypeReference<List<OrganisationDTO>>() {});
+            organisationResponse = retryRestTemplate.exchange(url, HttpMethod.GET, request,
+                    new ParameterizedTypeReference<List<OrganisationDTO>>() {});
         } catch (Exception e) {
             LOG.error(e.getMessage());
             return null;
         }
-//        LOG.info(organisationResponse.getStatusCode().toString() + " " +
-//                organisationResponse.getStatusCode().getReasonPhrase());
-/*
-        List<OrganisationWrapper> oWList = organisationResponse.getBody();
-        List<OrganisationDTO> orgDtoList=null;
-        for (OrganisationWrapper oWrapper : oWList) {
-            orgDtoList.add(oWrapper.getOrganisation());
-        }
-*/
+
         return organisationResponse.getBody();
     }
 
