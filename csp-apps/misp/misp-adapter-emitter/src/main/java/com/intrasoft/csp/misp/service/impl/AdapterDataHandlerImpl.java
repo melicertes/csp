@@ -221,11 +221,11 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler{
                     if (esObject != null) {
                         LOG.info("FOUND TRUE");
                         newURL = esObject.get("dataParams").get("url").toString();
-                        newTickerNumber = esObject.get("dataParams").get("recordId").toString();
                         newURL = newURL.replaceAll("\"", "");
                         /**
-                         * @TODO: replace with dataObject.id
+                         * SXCSP-386
                          */
+                        newTickerNumber = esObject.get("dataObject").get("id").toString();
                         newTickerNumber = newTickerNumber.replaceAll("\"", "");
                     }
                     else {
