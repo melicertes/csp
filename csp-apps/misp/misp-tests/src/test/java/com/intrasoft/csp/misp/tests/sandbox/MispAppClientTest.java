@@ -212,7 +212,7 @@ public class MispAppClientTest {
 
     @Test
     public void getAllMispOrganisationsTest() {
-        int expectedSize = 28;
+        int expectedSize = 30;
         List<OrganisationDTO> mispOrgList = mispAppClient.getAllMispOrganisations();
         assertThat(mispOrgList.size(), is(expectedSize));
     }

@@ -4,6 +4,11 @@ package com.intrasoft.csp.misp.service;
 
 public interface MispTcSyncService {
 
-      void sync();
+      void syncAll();
+
+      public void syncOrganisations();
+
+      public void syncSharingGroups();
+
 
 }

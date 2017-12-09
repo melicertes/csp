@@ -48,7 +48,7 @@ public class MispTcSyncServiceImpl implements MispTcSyncService {
 
     @Scheduled(fixedDelayString = "${misp.sync.fixed.delay}", initialDelayString = "${misp.sync.initial.delay}")
     @Override
-    public void sync() {
+    public void syncAll() {
 
         // It would be wise to have organisations synchronized first, before synchronizing sharing groups.
         syncOrganisations();
@@ -56,7 +56,8 @@ public class MispTcSyncServiceImpl implements MispTcSyncService {
 
     }
 
-    private void syncOrganisations() {
+
+    public void syncOrganisations() {
         List<Team> teamList = trustCirclesClient.getAllTeams();
         List<OrganisationDTO> orgList = mispAppClient.getAllMispOrganisations();
         OrganisationDTO organisation = null;
@@ -99,7 +100,7 @@ public class MispTcSyncServiceImpl implements MispTcSyncService {
 
     }
 
-    private void syncSharingGroups() {
+    public void syncSharingGroups() {
 
         List<TrustCircle> tcList = trustCirclesClient.getAllTrustCircles();
         List<SharingGroup> sgList = mispAppClient.getAllMispSharingGroups();

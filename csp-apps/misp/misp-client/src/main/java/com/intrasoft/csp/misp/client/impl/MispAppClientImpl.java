@@ -149,19 +149,25 @@ public class MispAppClientImpl implements MispAppClient, MispContextUrl {
 //      TODO: Which filter to use here? Local or both local and external?
         String url = context  + "/" + MISP_ORGANISATIONS_VIEW_ALL_LOCAL_AND_EXTERNAL;
         LOG.info("API call [GET]: " + url);
-        HttpEntity<OrganisationDTO> request = new HttpEntity<>(headers);
+        HttpEntity<OrganisationWrapper> request = new HttpEntity<>(headers);
 
         // JSON response's structure for this call is straightforward and doesn't require a wrapper.
-        ResponseEntity<List<OrganisationDTO>> organisationResponse;
+        ResponseEntity<List<OrganisationWrapper>> organisationResponse;
         try {
             organisationResponse = retryRestTemplate.exchange(url, HttpMethod.GET, request,
-                    new ParameterizedTypeReference<List<OrganisationDTO>>() {});
+                    new ParameterizedTypeReference<List<OrganisationWrapper>>() {});
         } catch (Exception e) {
             LOG.error(e.getMessage());
             return null;
         }
 
-        return organisationResponse.getBody();
+        // Unwrap the organisation dtos and finally return them as a list
+        List<OrganisationDTO> returnList = new ArrayList<>();
+        organisationResponse.getBody().forEach(wrapper -> {
+            returnList.add(wrapper.getOrganisation());
+        });
+
+        return returnList;
     }
 
     @Override
