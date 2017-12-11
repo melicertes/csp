@@ -38,9 +38,6 @@ public class MispTcSyncServiceImpl implements MispTcSyncService {
     Long initialDelay;
 
 //  TODO: Investigate which additional fields can be mapped
-//  TODO: Try using and keeping only OrganisationDTO and SharingGroupDTO instead of the generated classes before pushing!
-//  Questions:
-//  TODO: If a trust circle/sharing group only exists in MISP should it be deleted?
 
     private void setup() {
 
@@ -56,42 +53,63 @@ public class MispTcSyncServiceImpl implements MispTcSyncService {
 
     }
 
-
+//  TODO: Add name validation (name duplicates not allowed)
+//  TODO: Organisations can't be deleted when they reference users or are referenced themselves by misp events
+//    Team objects with new Uuids also need to have new names (case-sensitive) in order to be created in MISP.
     public void syncOrganisations() {
         List<Team> teamList = trustCirclesClient.getAllTeams();
         List<OrganisationDTO> orgList = mispAppClient.getAllMispOrganisations();
         OrganisationDTO organisation = null;
 
-        // Algorithm that makes the necessary Organisation API calls to MISP, depending on TC's Teams content.
+        // Making the necessary calls to MISP, depending on TC's Teams content.
+        boolean loopBreak;
         for (int i=0; i<teamList.size(); i++) {
+            loopBreak = false;
             for (int j=0; j<orgList.size(); j++) {
                 organisation = orgList.get(j);
-                // Match
+                // Uuid Match
                 if (teamList.get(i).getId().equals(organisation.getUuid())) {
-                    // Populating this MISP organisation with this TC team's data and updating MISP.
+                    // Updating the MISP organisation with the TC team data.
                     mapTeamToOrganisation(teamList.get(i), organisation);
                     mispAppClient.updateMispOrganisation(organisation);
+                    loopBreak = true;
+                    break;
+                // Name match
+                } else if (teamList.get(i).getName().equals(organisation.getName())){
+//                    TODO: What should the default behavior be? Update the organisation when found only by name?
+                    LOG.info("*** Found the same organisation name with a different UUID; updating to match TC... "
+                            + organisation.getUuid());
+                    mapTeamToOrganisation(teamList.get(i), organisation);
+                    mispAppClient.updateMispOrganisation(organisation);
+                    loopBreak = true;
                     break;
                 }
             }
+            if (loopBreak) continue;
             // No match; create this team as an organisation in MISP.
-            mapTeamToOrganisation(teamList.get(i), organisation);
-            mispAppClient.addMispOrganisation(organisation);
+            OrganisationDTO newOrg = new OrganisationDTO();
+            mapTeamToOrganisation(teamList.get(i), newOrg);
+            mispAppClient.addMispOrganisation(newOrg);
         }
 
-        // Delete orphan MISP organisations procedure
-        // Deleted organisations are removed automatically from any sharing groups when deleted. Tested in MISP UI.
+        // Delete any MISP Organisations that don't exist in Trust Circles.
+        // (Organisation references are removed automatically from any sharing groups when deleted. Tested in MISP UI)
 
-        // Refreshing our list first
+        // Refreshing our lists first
         orgList = mispAppClient.getAllMispOrganisations();
+//        teamList = trustCirclesClient.getAllTeams();
         List<String> teamIdList = new ArrayList<>();
 
         // Getting orphan MISP organisation ids
         for (OrganisationDTO org : orgList) {
+            loopBreak = false;
             for (Team team : teamList) {
-                if (org.getUuid().equals(team.getId()))
+                if (org.getUuid().equals(team.getId())) {
+                    loopBreak = true;
                     break;
+                }
             }
+            if (loopBreak) continue;
             teamIdList.add(org.getId());
         }
 
@@ -131,6 +149,7 @@ public class MispTcSyncServiceImpl implements MispTcSyncService {
         organisation.setName(team.getName());
         organisation.setDescription(team.getDescription());
         organisation.setNationality(team.getCountry());
+        organisation.setLocal(true); // What's the deal with this?
 
     }
 

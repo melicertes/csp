@@ -1,0 +1,47 @@
+[
+  {
+    "id": "56ef3277-1ad4-42f6-b90b-04e5c0a83832",
+    "short_name": "MISP",
+    "name": "MISP",
+    "host_organisation": "CERT-EU",
+    "description": "Host organisation for the training instance",
+    "country": "International",
+    "additional_countries": [],
+    "established": "",
+    "nis_team_types": [],
+    "nis_sectors": [
+      "Transport"
+    ],
+    "created": "",
+    "csp_installed": true,
+    "csp_id": "",
+    "csp_domain": "",
+    "status": "Active"
+  },
+  {
+    "id": "55f6ea5e-2c60-40e5-964f-47a8950d210f",
+    "short_name": "CIRCL",
+    "name": "CIRCL",
+    "host_organisation": "",
+    "description": "",
+    "country": "Greece",
+    "additional_countries": [
+      "European Union",
+      "Greece"
+    ],
+    "established": "2010-01-27",
+    "nis_team_types": [
+      "MS Competent Authority",
+      "MS National SPoC"
+    ],
+    "nis_sectors": [
+      "Energy",
+      "Transport"
+    ],
+    "created": "2017-10-02T21:29:03.544000Z",
+    "csp_installed": true,
+    "csp_id": "delete me",
+    "csp_domain": "delete me",
+    "status": "Known"
+  }
+]

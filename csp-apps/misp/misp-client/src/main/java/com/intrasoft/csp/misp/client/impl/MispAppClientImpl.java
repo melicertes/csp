@@ -147,7 +147,7 @@ public class MispAppClientImpl implements MispAppClient, MispContextUrl {
     @Override
     public List<OrganisationDTO> getAllMispOrganisations() {
 //      TODO: Which filter to use here? Local or both local and external?
-        String url = context  + "/" + MISP_ORGANISATIONS_VIEW_ALL_LOCAL_AND_EXTERNAL;
+        String url = context  + "/" + MISP_ORGANISATIONS_VIEW_ALL_LOCAL; // There are external and all options as well.
         LOG.info("API call [GET]: " + url);
         HttpEntity<OrganisationWrapper> request = new HttpEntity<>(headers);
 
@@ -183,6 +183,7 @@ public class MispAppClientImpl implements MispAppClient, MispContextUrl {
         ResponseEntity<OrganisationWrapper> organisationWrapper = new ResponseEntity<>(HttpStatus.OK);
 
         organisationWrapper = retryRestTemplate.exchange(url, HttpMethod.POST, request, OrganisationWrapper.class);
+        LOG.info(organisationWrapper.getStatusCode().toString() + " " + organisationWrapper.getStatusCode().getReasonPhrase());
         return organisationWrapper.getBody().getOrganisation();
 
     }
@@ -224,6 +225,7 @@ public class MispAppClientImpl implements MispAppClient, MispContextUrl {
             LOG.error(e.getMessage());
             return false;
         }
+        LOG.info(organisationWrapper.getStatusCode().getReasonPhrase());
 
         if (organisationWrapper.getStatusCode().value() == 200)
             return true;

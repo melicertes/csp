@@ -5,7 +5,6 @@ import com.intrasoft.csp.client.config.TrustCirclesClientConfig;
 import com.intrasoft.csp.libraries.restclient.service.RetryRestTemplate;
 import com.intrasoft.csp.misp.client.MispAppClient;
 import com.intrasoft.csp.misp.client.config.MispAppClientConfig;
-import com.intrasoft.csp.misp.commons.models.OrganisationDTO;
 import com.intrasoft.csp.misp.config.MispTcSyncServiceConfig;
 import com.intrasoft.csp.misp.service.MispTcSyncService;
 import org.apache.commons.io.FileUtils;
@@ -72,18 +71,51 @@ public class MispTcSyncServiceTest {
 
     // Necessary mock response files
     URL allTeams = getClass().getClassLoader().getResource("json/allTeams.json");
+    URL twoTeams = getClass().getClassLoader().getResource("json/twoTeams.json");
     URL allTrustCircles = getClass().getClassLoader().getResource("json/allTrustCircles.json");
     URL sharingGroupUrl = getClass().getClassLoader().getResource("json/sharingGroup.json");
     URL allSharingGroupsUrl = getClass().getClassLoader().getResource("json/allSharingGroups.json");
 
-    //Description
+    // Service should synchronize Trust Circles' Teams with MISP's Organisations.
+    // TODO: Organisations in MISP can't be deleted when tied with users or events. UI Response Message:
+    // "Organisation could not be deleted. Generally organisations should never be deleted, instead consider moving them
+    // to the known remote organisations list. Alternatively, if you are certain that you would like to remove an
+    // organisation and are aware of the impact, make sure that there are no users or events still tied to this
+    // organisation before deleting it."
+    // Given 6 TC Teams, MISP should create them if they don't already exist.
     @Test
-    public void syncOrganisationsScenarioATest() {
-        List<OrganisationDTO> orgList = mispAppClient.getAllMispOrganisations();
+    public void syncOrganisationsShouldAddSixReturnEightTest() throws URISyntaxException, IOException {
+
+        //mock the TC server using json retrieved from a real TC (6 teams in file)
+
+        String apiUrl = tcConfig.getTcTeamsURI();
+        MockRestServiceServer mockServer = MockRestServiceServer.bindTo(tcRetryRestTemplate).build();
+        mockServer.expect(requestTo(apiUrl))
+                .andRespond(MockRestResponseCreators
+                        .withSuccess(FileUtils.readFileToString(new File(allTeams.toURI()), Charset.forName("UTF-8"))
+                                .getBytes(), MediaType.APPLICATION_JSON_UTF8));
+
+        mispTcSyncService.syncOrganisations();
+
+        // TODO: Remove plus 2 when synchronizing implementation supports deletion for organisations tied to events/users
+        assertThat(mispAppClient.getAllMispOrganisations().size(), is(6+2));
+        mockServer.verify();
     }
-    //Description
+    // When two TC teams exist, those two MISP organisations should only be left in MISP after synchronizing.
     @Test
-    public void syncOrganisationsScenarioBTest() {
+    public void syncOrganisationsGivenTwoTeamsReturnTwoOrganisationsTest() throws URISyntaxException, IOException {
+
+        String apiUrl = tcConfig.getTcTeamsURI();
+        MockRestServiceServer mockServer = MockRestServiceServer.bindTo(tcRetryRestTemplate).build();
+        mockServer.expect(requestTo(apiUrl))
+                .andRespond(MockRestResponseCreators
+                        .withSuccess(FileUtils.readFileToString(new File(twoTeams.toURI()), Charset.forName("UTF-8"))
+                                .getBytes(), MediaType.APPLICATION_JSON_UTF8));
+
+        mispTcSyncService.syncOrganisations();
+
+        assertThat(mispAppClient.getAllMispOrganisations().size(), is(2));
+        mockServer.verify();
 
     }
     //Description
@@ -107,33 +139,5 @@ public class MispTcSyncServiceTest {
 
     }
 
-
-
-
-/*    //  TODO: Delete this
-
-    public void basicAutowiringTest() throws IOException, URISyntaxException {
-
-        //mock the TC server using json retrieved from a real TC
-        String apiUrl = tcConfig.getTcTeamsURI();
-        MockRestServiceServer mockServer = MockRestServiceServer.bindTo(tcRetryRestTemplate).build();
-        mockServer.expect(requestTo(apiUrl))
-                .andRespond(MockRestResponseCreators
-                        .withSuccess(FileUtils.readFileToString(new File(allTeams.toURI()), Charset.forName("UTF-8"))
-                                .getBytes(), MediaType.APPLICATION_JSON_UTF8));
-
-
-        //mock the misp server using json retrieved from a real TC
-        MockRestServiceServer mockServer = MockRestServiceServer.bindTo(retryRestTemplate).build();
-        mockServer.expect(requestTo(apiUrl))
-                .andRespond(MockRestResponseCreators.withSuccess
-                        (FileUtils.readFileToString(new File(allSharingGroupsUrl.toURI()), Charset.forName("UTF-8"))
-                                .getBytes(), MediaType.APPLICATION_JSON_UTF8));
-
-
-
-//        assertThat(mispTcSyncService.getTeams(),is(6));
-        mockServer.verify();
-    }*/
 
 }

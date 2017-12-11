@@ -1,7 +1,6 @@
 package com.intrasoft.csp.misp.client;
 
 import com.intrasoft.csp.misp.commons.models.OrganisationDTO;
-import com.intrasoft.csp.misp.commons.models.SharingGroupDTO;
 import com.intrasoft.csp.misp.commons.models.generated.SharingGroup;
 import org.springframework.http.ResponseEntity;
 

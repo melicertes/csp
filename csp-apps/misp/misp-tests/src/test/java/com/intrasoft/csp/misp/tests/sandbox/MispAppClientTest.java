@@ -212,7 +212,7 @@ public class MispAppClientTest {
 
     @Test
     public void getAllMispOrganisationsTest() {
-        int expectedSize = 30;
+        int expectedSize = 8;  // for demonstration purposes; check number number of organisations (local) in UI
         List<OrganisationDTO> mispOrgList = mispAppClient.getAllMispOrganisations();
         assertThat(mispOrgList.size(), is(expectedSize));
     }
@@ -288,7 +288,7 @@ public class MispAppClientTest {
 
     }
 
-//  Create an organisation to use for the deletion test
+//  Creates and deletes an organisation
     @Test
     public void deleteMispOrganisationTest() throws URISyntaxException, IOException {
 

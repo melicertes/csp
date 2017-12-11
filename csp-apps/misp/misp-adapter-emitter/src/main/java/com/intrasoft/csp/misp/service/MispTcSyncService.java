@@ -6,9 +6,9 @@ public interface MispTcSyncService {
 
       void syncAll();
 
-      public void syncOrganisations();
+      void syncOrganisations();
 
-      public void syncSharingGroups();
+      void syncSharingGroups();
 
 
 }
