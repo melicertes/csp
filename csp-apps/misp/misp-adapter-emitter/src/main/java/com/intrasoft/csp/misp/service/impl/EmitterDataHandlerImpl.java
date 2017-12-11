@@ -86,7 +86,7 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
             case EVENT:
                 LOG.info(EVENT.toString());
                 uuid = jsonNode.get(EVENT.toString()).get("uuid").toString().replace("\"","");
-                object = mispAppClient.getMispEvent(uuid);
+                object = mispAppClient.getMispEvent(uuid).getBody();
                 jsonNode = new ObjectMapper().convertValue(object, JsonNode.class);
                 break;
 /*            case ATTRIBUTE:
@@ -136,8 +136,8 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
          * When the adapter receives data from an external CSP (the “isExternal” flag is set to TRUE)
          * the operation should trigger an emitter response. The emitter should emit this record (for indexing) and
          * set the “toShare” flag to FALSE (rest on conluence https://confluence.sastix.com/display/SXCSP/Integration+Layer+Flows).*/
+        LOG.info("Is Reemittion: " + isReEmittion);
         if (isReEmittion){
-            LOG.info("Is Reemittion: false");
             sharingParams.setToShare(false);
         }
         else {
