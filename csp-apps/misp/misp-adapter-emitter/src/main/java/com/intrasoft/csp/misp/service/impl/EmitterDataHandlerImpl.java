@@ -141,8 +141,14 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
             sharingParams.setToShare(false);
         }
         else {
-            LOG.info("Is Reemittion: true");
-            sharingParams.setToShare(true);
+            /**
+             * SXCSP-384: setToShare=True only if MISP event is published
+             */
+            Boolean eventPublished = Boolean.parseBoolean(jsonNode.get(EVENT.toString()).get("published").toString());
+            sharingParams.setToShare(eventPublished);
+            LOG.info("Is Reemittion: " + eventPublished);
+            //sharingParams.setToShare(true);
+
         }
 
         /** issue: SXCSP-337

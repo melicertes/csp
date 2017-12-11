@@ -223,6 +223,9 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler{
                         newURL = esObject.get("dataParams").get("url").toString();
                         newTickerNumber = esObject.get("dataParams").get("recordId").toString();
                         newURL = newURL.replaceAll("\"", "");
+                        /**
+                         * @TODO: replace with dataObject.id
+                         */
                         newTickerNumber = newTickerNumber.replaceAll("\"", "");
                     }
                     else {
