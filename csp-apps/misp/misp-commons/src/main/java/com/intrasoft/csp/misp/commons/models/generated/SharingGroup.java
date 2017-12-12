@@ -132,17 +132,20 @@ public class SharingGroup{
         this.sharingGroupServer = sharingGroupServer;
     }
 
-    @Override
- 	public String toString(){
-		return 
-			"SharingGroup{" + 
-			"releasability = '" + releasability + '\'' + 
-			",name = '" + name + '\'' + 
-			",description = '" + description + '\'' + 
-			",active = '" + active + '\'' + 
-			",id = '" + id + '\'' + 
-			",uuid = '" + uuid + '\'' + 
-			",local = '" + local + '\'' + 
-			"}";
-		}
+	@Override
+	public String toString() {
+		return "SharingGroup{" +
+				"releasability='" + releasability + '\'' +
+				", name='" + name + '\'' +
+				", description='" + description + '\'' +
+				", active=" + active +
+				", id='" + id + '\'' +
+				", uuid='" + uuid + '\'' +
+				", local=" + local +
+				", editable=" + editable +
+				", createdBy=" + createdBy +
+				", sharingGroupOrg=" + sharingGroupOrg +
+				", sharingGroupServer=" + sharingGroupServer +
+				'}';
+	}
 }

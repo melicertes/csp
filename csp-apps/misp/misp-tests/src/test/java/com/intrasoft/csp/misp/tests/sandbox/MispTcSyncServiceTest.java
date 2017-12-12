@@ -25,10 +25,8 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.Charset;
-import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertTrue;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
@@ -73,8 +71,8 @@ public class MispTcSyncServiceTest {
     URL allTeams = getClass().getClassLoader().getResource("json/allTeams.json");
     URL twoTeams = getClass().getClassLoader().getResource("json/twoTeams.json");
     URL allTrustCircles = getClass().getClassLoader().getResource("json/allTrustCircles.json");
-    URL sharingGroupUrl = getClass().getClassLoader().getResource("json/sharingGroup.json");
-    URL allSharingGroupsUrl = getClass().getClassLoader().getResource("json/allSharingGroups.json");
+    URL sharingGroup = getClass().getClassLoader().getResource("json/sharingGroup.json");
+    URL allSharingGroups = getClass().getClassLoader().getResource("json/allSharingGroups.json");
 
     // Service should synchronize Trust Circles' Teams with MISP's Organisations.
     // TODO: Organisations in MISP can't be deleted when tied with users or events. UI Response Message:
@@ -120,8 +118,34 @@ public class MispTcSyncServiceTest {
     }
     //Description
     @Test
-    public void syncSharingGroupsScenarioATest() {
+    public void syncSharingGroupsScenarioATest() throws URISyntaxException, IOException {
+        String tcCirclesURI = tcConfig.getTcCirclesURI();
+        String mispGroupsURI = "http://192.168.56.50:80/sharing_groups";
+        String mispAddGroupURI = "http://192.168.56.50:80/admin/sharing_groups/add";
 
+        // We first need to mock TC server's getAllTrustCircles response
+        MockRestServiceServer tcMockServer = MockRestServiceServer.bindTo(tcRetryRestTemplate).build();
+        tcMockServer.expect(requestTo(tcCirclesURI))
+                .andRespond(MockRestResponseCreators
+                        .withSuccess(FileUtils.readFileToString(new File(allTrustCircles.toURI()),
+                                Charset.forName("UTF-8")).getBytes(), MediaType.APPLICATION_JSON_UTF8));
+        // ... MISP's getAllSharingGroups response
+        MockRestServiceServer mispMockServer = MockRestServiceServer.bindTo(mispRetryRestTemplate).build();
+        mispMockServer.expect(requestTo(mispGroupsURI))
+                .andRespond(MockRestResponseCreators
+                        .withSuccess(FileUtils.readFileToString(new File(allSharingGroups.toURI()),
+                                Charset.forName("UTF-8")).getBytes(), MediaType.APPLICATION_JSON_UTF8));
+        // ... and finally MISP's addSharingGroup response
+        mispMockServer.expect(requestTo(mispAddGroupURI))
+                .andRespond(MockRestResponseCreators
+                        .withSuccess(FileUtils.readFileToString(new File(sharingGroup.toURI()),
+                                Charset.forName("UTF-8")).getBytes(), MediaType.APPLICATION_JSON_UTF8));
+
+
+        mispTcSyncService.syncSharingGroups();
+
+        tcMockServer.verify();
+        mispMockServer.verify();
     }
     //Description
     @Test

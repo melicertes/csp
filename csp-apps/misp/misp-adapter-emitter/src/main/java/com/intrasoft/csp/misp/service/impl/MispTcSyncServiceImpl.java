@@ -55,7 +55,7 @@ public class MispTcSyncServiceImpl implements MispTcSyncService {
 
 //  TODO: Add name validation (name duplicates not allowed)
 //  TODO: Organisations can't be deleted when they reference users or are referenced themselves by misp events
-//    Team objects with new Uuids also need to have new names (case-sensitive) in order to be created in MISP.
+//    Team objects with new Uuids also need to have unique names (case-sensitive) in order to be created in MISP.
     public void syncOrganisations() {
         List<Team> teamList = trustCirclesClient.getAllTeams();
         List<OrganisationDTO> orgList = mispAppClient.getAllMispOrganisations();
@@ -124,7 +124,9 @@ public class MispTcSyncServiceImpl implements MispTcSyncService {
         List<SharingGroup> sgList = mispAppClient.getAllMispSharingGroups();
         SharingGroup sharingGroup = null;
 
+        boolean loopBreak;
         for (int i=0; i<tcList.size(); i++) {
+            loopBreak=false;
             for (int j=0; j<sgList.size(); j++) {
                 sharingGroup = sgList.get(j);
                 // Match
@@ -132,9 +134,11 @@ public class MispTcSyncServiceImpl implements MispTcSyncService {
                     // Populating this MISP sharing group with the matching TC trust circle data and updating MISP.
                     mapTrustCircleToSharingGroup(tcList.get(i), sharingGroup);
                     mispAppClient.updateMispSharingGroup(sharingGroup);
+                    loopBreak=true;
                     break;
                 }
             }
+            if (loopBreak) continue;
             // No match; create this Trust Circle as a Sharing Group in MISP.
             sharingGroup = new SharingGroup();
             mapTrustCircleToSharingGroup(tcList.get(i), sharingGroup);
@@ -160,28 +164,33 @@ public class MispTcSyncServiceImpl implements MispTcSyncService {
         sGroup.setDescription(tCircle.getDescription());
 
         List<String> tCircleTeamsUuids = tCircle.getTeams();
-        List<SharingGroupOrgItem>  sharingGroupOrgItemList = sGroup.getSharingGroupOrg();
+        List<SharingGroupOrgItem> sharingGroupOrgItemList = (sGroup.getSharingGroupOrg() == null) ?
+                new ArrayList<>() : sGroup.getSharingGroupOrg();
 
-        Map<String, Boolean> sGroupOrgCheckmap = new HashMap<>();
+        Map<String, Boolean> sGroupOrgCheckMap = new HashMap<>();
 
-        // Organisations in Sharing Groups have meta data and they're actually part of another object, SharingGroupOrg
-        tCircleTeamsUuids.forEach( uuid -> {
-            sharingGroupOrgItemList.forEach(sgoi -> {
-                // If the uuid is found, just update the hashmap in order to know what team is already there
-                if (uuid.equals(sgoi.getOrganisation().getUuid()))
-                    sGroupOrgCheckmap.put(uuid,true);
+        // If it's not a new sharing group, check which of the team uuids already exist as orgs in the MISP sh. group.
+        if (sharingGroupOrgItemList.size()>0) {
+            tCircleTeamsUuids.forEach( uuid -> {
+                sharingGroupOrgItemList.forEach(sgoi -> {
+                    // If the uuid is found, just update the hashmap in order to know what team is already there
+                    if (uuid.equals(sgoi.getOrganisation().getUuid()))
+                        sGroupOrgCheckMap.put(uuid,true);
+                });
             });
-        });
+        } else {
+            tCircleTeamsUuids.forEach(uuid ->sGroupOrgCheckMap.put(uuid, false));
+        }
 
         // For any false value in the map, get the corresponding keys' organisations in MISP and add it in the sharing
         // group's list of organisations (list of SharingGroupOrgItems).
-        sGroupOrgCheckmap.forEach((k,v)-> {
+        sGroupOrgCheckMap.forEach((k,v)-> {
             if (v == false) {
                 // Sharing Group method for adding a sharingGroupOrgItem which contains an organisation with this uuid.
                 SharingGroupOrgItem newSgOrgItem = new SharingGroupOrgItem();
-                // There should be an organisation from MISP with this ID fetch it and add it.
-                OrganisationDTO newOrg = new OrganisationDTO();
-                newOrg = mispAppClient.getMispOrganisation(k);
+                // Since organisations are synchronized first, the organisation in MISP with this UUID key should exist;
+                // we just need to fetch it and assign it to the current sharing group.
+                OrganisationDTO newOrg = mispAppClient.getMispOrganisation(k);
                 newSgOrgItem.setOrganisation(newOrg);
                 sGroup.addSharingGroupOrgItem(newSgOrgItem);
             }
