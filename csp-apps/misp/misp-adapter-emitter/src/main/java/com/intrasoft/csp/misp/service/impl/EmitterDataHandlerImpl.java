@@ -19,14 +19,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.util.List;
 
 import static com.intrasoft.csp.misp.commons.config.MispContextUrl.MispEntity.ACTION;
-import static com.intrasoft.csp.misp.commons.config.MispContextUrl.MispEntity.ATTRIBUTE;
 import static com.intrasoft.csp.misp.commons.config.MispContextUrl.MispEntity.EVENT;
 
 @Service
@@ -89,6 +86,8 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
             case EVENT:
                 LOG.info(EVENT.toString());
                 uuid = jsonNode.get(EVENT.toString()).get("uuid").toString().replace("\"","");
+                object = mispAppClient.getMispEvent(uuid).getBody();
+                jsonNode = new ObjectMapper().convertValue(object, JsonNode.class);
                 break;
 /*            case ATTRIBUTE:
                 LOG.info(ATTRIBUTE.toString());
@@ -96,16 +95,8 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
                 break;*/
         }
 
-/*        LOG.info("Get event with uuid: " + uuid);
-        ResponseEntity<String> responseEntity = mispAppClient.getMispEvent(uuid.replace("\"",""));
-        jsonNode = new ObjectMapper().convertValue(responseEntity.getBody(), JsonNode.class);*/
-
         DataParams dataParams = new DataParams();
         dataParams.setDateTime(new DateTime());
-
-/*        dataParams.setCspId(cspId);
-        dataParams.setApplicationId("misp");
-        dataParams.setOriginRecordId(uuid);*/
 
         /** issue: SXCSP-332
          * origin fields
@@ -145,8 +136,8 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
          * When the adapter receives data from an external CSP (the “isExternal” flag is set to TRUE)
          * the operation should trigger an emitter response. The emitter should emit this record (for indexing) and
          * set the “toShare” flag to FALSE (rest on conluence https://confluence.sastix.com/display/SXCSP/Integration+Layer+Flows).*/
+        LOG.info("Is Reemittion: " + isReEmittion);
         if (isReEmittion){
-            LOG.info("Is Reemittion: false");
             sharingParams.setToShare(false);
         }
         else {
@@ -166,9 +157,6 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
          * find out how to differentiate our custom shared groups from the normal ones
          * use custom sharing groups uuids as tcid, use custom organizations(?) uuids as team id.
          * harvest only from the dataobject part which dictates which organization or sharing group should get this event*/
-//        sharingParams.setTcId("\"\"");
-//        sharingParams.setTeamId("\"\"");
-
         IntegrationData integrationData = new IntegrationData();
         integrationData.setDataParams(dataParams);
         integrationData.setSharingParams(sharingParams);
@@ -190,7 +178,7 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
             }
         }
         catch (NullPointerException e){
-            // Object has no assigned tags
+            LOG.info(" Object has no assigned tags");
         }
         integrationData.setDataType(integrationDataType);
         LOG.info("Integration data: " + integrationData.toString());
@@ -199,9 +187,7 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
          * how to identify if it is post or put
          * should search in ES to see if this uuid exists
          * query the index based on datatype (event/threat), if found send put else send post */
-
-
-        try {
+        if (jsonNode.has(ACTION.toString())){
             String action = jsonNode.get(ACTION.toString()).toString();
             LOG.info(action.replace("\"",""));
             if (isDelete) {
@@ -209,31 +195,23 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
             }
             return;
         }
-        catch (NullPointerException e){
-            // NOT A DELETE ACTION
-        }
 
         boolean objextExists = false;
         try {
             objextExists = elasticClient.objectExists(integrationData);
         }
         catch (Exception e){
-            LOG.info(e.getMessage());
+            LOG.info("Elastic query failed, " + e.getMessage());
         }
 
         LOG.info("Object exists: " + objextExists);
 
         try {
-            if (isDelete){
-                cspClient.deleteIntegrationData(integrationData);
+            if (objextExists){
+                cspClient.updateIntegrationData(integrationData);
             }
             else {
-                if (objextExists){
-                    cspClient.updateIntegrationData(integrationData);
-                }
-                else {
-                    cspClient.postIntegrationData(integrationData);
-                }
+                cspClient.postIntegrationData(integrationData);
             }
         }
         catch (Exception e){

@@ -54,13 +54,13 @@ public class MispAppClientImpl implements MispAppClient, MispContextUrl {
     }
 
     @Override
-    public ResponseEntity<String> getMispEvent(String uuid) {
+    public ResponseEntity<Object> getMispEvent(String uuid) {
         String url = context  + "/" + MISP_EVENTS + "/" + uuid;
 
-        LOG.info("API call [post]: " + url);
+        LOG.info("API call [get]: " + url);
         HttpEntity<String> request = new HttpEntity<>(headers);
-        ResponseEntity<String> response = new ResponseEntity<String>(HttpStatus.OK);
-        response = retryRestTemplate.exchange(url, HttpMethod.GET, request, String.class);
+        ResponseEntity<Object> response = new ResponseEntity<Object>(HttpStatus.OK);
+        response = retryRestTemplate.exchange(url, HttpMethod.GET, request, Object.class);
         return response;
     }
 
