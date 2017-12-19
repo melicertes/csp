@@ -5,8 +5,10 @@ import com.intrasoft.csp.client.config.TrustCirclesClientConfig;
 import com.intrasoft.csp.libraries.restclient.service.RetryRestTemplate;
 import com.intrasoft.csp.misp.client.MispAppClient;
 import com.intrasoft.csp.misp.client.config.MispAppClientConfig;
+import com.intrasoft.csp.misp.commons.models.OrganisationDTO;
 import com.intrasoft.csp.misp.config.MispTcSyncServiceConfig;
 import com.intrasoft.csp.misp.service.MispTcSyncService;
+import com.intrasoft.csp.misp.tests.sandbox.util.MispMockUtil;
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -71,8 +73,10 @@ public class MispTcSyncServiceTest {
     URL allTeams = getClass().getClassLoader().getResource("json/allTeams.json");
     URL twoTeams = getClass().getClassLoader().getResource("json/twoTeams.json");
     URL allTrustCircles = getClass().getClassLoader().getResource("json/allTrustCircles.json");
+    URL twoTrustCircles = getClass().getClassLoader().getResource("json/twoTrustCircles.json");
     URL sharingGroup = getClass().getClassLoader().getResource("json/sharingGroup.json");
     URL allSharingGroups = getClass().getClassLoader().getResource("json/allSharingGroups.json");
+    URL organisation = getClass().getClassLoader().getResource("json/organisation.json");
 
     // Service should synchronize Trust Circles' Teams with MISP's Organisations.
     // TODO: Organisations in MISP can't be deleted when tied with users or events. UI Response Message:
@@ -116,40 +120,59 @@ public class MispTcSyncServiceTest {
         mockServer.verify();
 
     }
-    //Description
+    //This is the scenario where TC' Trust Circles don't already exist in MISP and need to be created.
+    //Mocking a response where TC returns two Trust Circles and MISP creates them as Sharing Groups if they don't exist.
     @Test
-    public void syncSharingGroupsScenarioATest() throws URISyntaxException, IOException {
+    public void syncSharingGroupsNonExistingSharingGroupsTest() throws URISyntaxException, IOException {
         String tcCirclesURI = tcConfig.getTcCirclesURI();
         String mispGroupsURI = "http://192.168.56.50:80/sharing_groups";
         String mispAddGroupURI = "http://192.168.56.50:80/admin/sharing_groups/add";
+        String sharingGroupUuid = "a36c31f4-dad3-4f49-b443-e6d6333649b1";
 
         // We first need to mock TC server's getAllTrustCircles response
         MockRestServiceServer tcMockServer = MockRestServiceServer.bindTo(tcRetryRestTemplate).build();
         tcMockServer.expect(requestTo(tcCirclesURI))
                 .andRespond(MockRestResponseCreators
-                        .withSuccess(FileUtils.readFileToString(new File(allTrustCircles.toURI()),
+                        .withSuccess(FileUtils.readFileToString(new File(twoTrustCircles.toURI()),
                                 Charset.forName("UTF-8")).getBytes(), MediaType.APPLICATION_JSON_UTF8));
-        // ... MISP's getAllSharingGroups response
+        // then MISP's getAllSharingGroups response
         MockRestServiceServer mispMockServer = MockRestServiceServer.bindTo(mispRetryRestTemplate).build();
         mispMockServer.expect(requestTo(mispGroupsURI))
                 .andRespond(MockRestResponseCreators
                         .withSuccess(FileUtils.readFileToString(new File(allSharingGroups.toURI()),
                                 Charset.forName("UTF-8")).getBytes(), MediaType.APPLICATION_JSON_UTF8));
-        // ... and finally MISP's addSharingGroup response
+        // then MISP's first addSharingGroup response (first mock tc doesn't have any teams; adding sg straight away)
         mispMockServer.expect(requestTo(mispAddGroupURI))
                 .andRespond(MockRestResponseCreators
                         .withSuccess(FileUtils.readFileToString(new File(sharingGroup.toURI()),
                                 Charset.forName("UTF-8")).getBytes(), MediaType.APPLICATION_JSON_UTF8));
+        // then MISP's first getOrganisation call (sg sync mechanism gets organisation objects by uuid)
+        mispMockServer.expect(requestTo("http://192.168.56.50:80/organisations/view/578c0e4e-ebaf-455b-a2a1-faffb14be9e1"))
+                .andRespond(MockRestResponseCreators
+                        .withSuccess(FileUtils.readFileToString(new File(organisation.toURI()),
+                                Charset.forName("UTF-8")).getBytes(), MediaType.APPLICATION_JSON_UTF8));
+        // then MISP's 2nd getOrganisation call (the 2nd organisation of the 2nd sharing group)
+        mispMockServer.expect(requestTo("http://192.168.56.50:80/organisations/view/af9d06ac-d7be-4684-86a3-808fe4f4d17c"))
+                .andRespond(MockRestResponseCreators
+                        .withSuccess(FileUtils.readFileToString(new File(organisation.toURI()),
+                                Charset.forName("UTF-8")).getBytes(), MediaType.APPLICATION_JSON_UTF8));
+
+        // finally mocking MISP server's response for creating the 2nd sharing group in MISP
+        mispMockServer.expect(requestTo(mispAddGroupURI))
+                .andRespond(MockRestResponseCreators
+                        .withSuccess(MispMockUtil.getJsonBytesForSharingGroupByUuid(allSharingGroups, sharingGroupUuid),
+                                MediaType.APPLICATION_JSON_UTF8));
 
 
+//        TODO: Fix rejection of further requests and write assertions before moving to scenario b
         mispTcSyncService.syncSharingGroups();
 
         tcMockServer.verify();
         mispMockServer.verify();
     }
-    //Description
+    ////This is the scenario where some of the TC' Trust Circles already exist in MISP and need to be updated.
     @Test
-    public void syncSharingGroupsScenarioBTest() {
+    public void syncSharingGroupsExistingSharingGroupsTest() {
 
     }
     //Description

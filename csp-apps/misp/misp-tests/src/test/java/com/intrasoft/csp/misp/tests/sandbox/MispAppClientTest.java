@@ -192,7 +192,7 @@ public class MispAppClientTest {
     public void getMispOrganisationByUuidTest() throws URISyntaxException, IOException {
 
         // This is our search key; Organisation should exist on our MISP instance
-        String uuid = "56ef3277-1ad4-42f6-b90b-04e5c0a83832";
+        String uuid = "5a3043f4-0444-4a2b-93ff-7754580897c0";
 
         OrganisationDTO organisationDTO = mispAppClient.getMispOrganisation(uuid);
         LOG.info(organisationDTO.toString());
@@ -212,7 +212,7 @@ public class MispAppClientTest {
 
     @Test
     public void getAllMispOrganisationsTest() {
-        int expectedSize = 8;  // for demonstration purposes; check number number of organisations (local) in UI
+        int expectedSize = 4;  // for demonstration purposes; check number number of organisations (local) in UI
         List<OrganisationDTO> mispOrgList = mispAppClient.getAllMispOrganisations();
         assertThat(mispOrgList.size(), is(expectedSize));
     }
@@ -231,6 +231,16 @@ public class MispAppClientTest {
         // Setting the mandatory field's "name" value as "test-" plus some random string to prevent possible collisions.
         testDTO.setName("test-" + RandomStringUtils.random(4,true,false));
         testDTO.setDescription("delete me");
+        testDTO.setLocal(true);
+        testDTO.setNationality("delete me");
+        testDTO.setAlias("delete me");
+        testDTO.setAnonymise(true);
+        testDTO.setContacts("delete me");
+        testDTO.setCreatedBy("delete me");
+        testDTO.setDateCreated("delete me");
+        testDTO.setLandingPage("delete me");
+        testDTO.setSector("delete me");
+        testDTO.setType("delete me");
 
         // Generating a v4 UUID implementation (MISP recommends UUID v4) for our test organisation.
         UUID generatedUuid = UUID.randomUUID();

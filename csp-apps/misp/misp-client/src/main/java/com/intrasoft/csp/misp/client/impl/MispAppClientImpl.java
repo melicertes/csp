@@ -11,7 +11,6 @@ import com.intrasoft.csp.misp.commons.models.OrganisationDTO;
 import com.intrasoft.csp.misp.commons.models.OrganisationWrapper;
 import com.intrasoft.csp.misp.commons.models.generated.Response;
 import com.intrasoft.csp.misp.commons.models.generated.ResponseAll;
-import com.intrasoft.csp.misp.commons.models.generated.ResponseItem;
 import com.intrasoft.csp.misp.commons.models.generated.SharingGroup;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -22,7 +21,6 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
 
-import java.security.interfaces.RSAPrivateCrtKey;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -151,7 +149,6 @@ public class MispAppClientImpl implements MispAppClient, MispContextUrl {
         LOG.info("API call [GET]: " + url);
         HttpEntity<OrganisationWrapper> request = new HttpEntity<>(headers);
 
-        // JSON response's structure for this call is straightforward and doesn't require a wrapper.
         ResponseEntity<List<OrganisationWrapper>> organisationResponse;
         try {
             organisationResponse = retryRestTemplate.exchange(url, HttpMethod.GET, request,
@@ -257,7 +254,7 @@ public class MispAppClientImpl implements MispAppClient, MispContextUrl {
         // Manually mapping the Sharing Group creator organisation and editable field.
         List<SharingGroup> sgList = new ArrayList<>();
         SharingGroup tempSg = null;
-        for (ResponseItem ri : response.getBody().getResponse()) {
+        for (Response ri : response.getBody().getResponse()) {
             tempSg = ri.getSharingGroup();
             tempSg.setCreatedBy(ri.getOrganisation());
             tempSg.setEditable(ri.isEditable());

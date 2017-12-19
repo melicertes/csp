@@ -5,7 +5,7 @@
         "id": "1",
         "name": "CTC::CSP_ALL",
         "description": "CTC::CSP_ALL",
-        "uuid": "",
+        "uuid": "a36c31f4-dad3-4f49-b443-e6d6333649b1",
         "releasability": "",
         "local": true,
         "active": true
@@ -86,8 +86,8 @@
       "SharingGroup": {
         "id": "2",
         "name": "CTC::SHARING_DATA_EVENT",
-        "description": "4b2bb43a-c98e-440e-a4b2-2df6802f63dd",
-        "uuid": "",
+        "description": "",
+        "uuid": "4b2bb43a-c98e-440e-a4b2-2df6802f63dd",
         "releasability": "",
         "local": true,
         "active": true
@@ -125,7 +125,7 @@
         "id": "3",
         "name": "Test-SG",
         "description": "Test description",
-        "uuid": "",
+        "uuid": "9bd4028b-1be9-46ac-ace0-e03629afbc10",
         "releasability": "",
         "local": true,
         "active": true

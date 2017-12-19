@@ -129,7 +129,7 @@ public class MispTcSyncServiceImpl implements MispTcSyncService {
             loopBreak=false;
             for (int j=0; j<sgList.size(); j++) {
                 sharingGroup = sgList.get(j);
-                // Match
+                // Uuid Match
                 if (tcList.get(i).getId().equals(sharingGroup.getUuid())) {
                     // Populating this MISP sharing group with the matching TC trust circle data and updating MISP.
                     mapTrustCircleToSharingGroup(tcList.get(i), sharingGroup);
@@ -179,6 +179,7 @@ public class MispTcSyncServiceImpl implements MispTcSyncService {
                 });
             });
         } else {
+            sGroup.setSharingGroupOrg(new ArrayList<SharingGroupOrgItem>());
             tCircleTeamsUuids.forEach(uuid ->sGroupOrgCheckMap.put(uuid, false));
         }
 
