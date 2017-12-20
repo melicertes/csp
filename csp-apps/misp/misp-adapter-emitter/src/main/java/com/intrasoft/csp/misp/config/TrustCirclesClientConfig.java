@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.support.ResourcePatternResolver;
+import org.springframework.http.HttpStatus;
 
 import java.io.IOException;
 import java.security.KeyManagementException;
@@ -33,7 +34,7 @@ public class TrustCirclesClientConfig implements ContextUrl {
     @Value("${tc.host:localhost}")
     private String host;
 
-    @Value("${tc.port:8081}")
+    @Value("${tc.port:9000}")
     private String port;
 
     @Value("${tc.path.circles}")
@@ -61,14 +62,16 @@ public class TrustCirclesClientConfig implements ContextUrl {
     ResourcePatternResolver resourcePatternResolver;
 
     private static final ConcurrentHashMap<String, ExceptionHandler> SUPPORTED_EXCEPTIONS = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<Integer, String> AVOID_RETRY_ON_STATUS_CODE = new ConcurrentHashMap<>();
 
     static {
         SUPPORTED_EXCEPTIONS.put(CspGeneralException.class.getName(), CspGeneralException::new);
+        AVOID_RETRY_ON_STATUS_CODE.put(HttpStatus.NOT_FOUND.value(), "TC server responded with 404");
     }
 
     @Bean(name = "TcClient")
     public TrustCirclesClient tcClient(){
-        return new TrustCirclesClientImpl();
+        return new TrustCirclesClientImpl(getTcBaseContext(),getTcPathCircles(),getTcPathTeams());
     }
 
     @Autowired
@@ -79,7 +82,7 @@ public class TrustCirclesClientConfig implements ContextUrl {
     public RetryRestTemplate getRetryRestTemplate() throws CertificateException, UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException, KeyManagementException, IOException {
         RestTemplateConfiguration restTemplateConfiguration = new RestTemplateConfiguration(backOffPeriod, maxAttempts,
                 tcClientSslEnabled, tcClientSslJksKeystore, tcClientSslJksKeystorePassword, resourcePatternResolver);
-        return restTemplateConfiguration.getRestTemplateWithSupportedExceptions(SUPPORTED_EXCEPTIONS);
+        return restTemplateConfiguration.getRestTemplateWithOptions(SUPPORTED_EXCEPTIONS,AVOID_RETRY_ON_STATUS_CODE);
     }
 
     public String getTcPathCircles() {

@@ -26,13 +26,20 @@ public class TrustCirclesClientImpl implements TrustCirclesClient {
     @Qualifier("TcRestTemplate")
     RetryRestTemplate retryRestTemplate;
 
-    @Autowired
-    TrustCirclesClientConfig config;
 
+    String baseContextPath;
+    String pathCircles;
+    String pathTeams;
+
+    public TrustCirclesClientImpl(String baseContextPath, String pathCircles, String pathTeams) {
+        this.baseContextPath = baseContextPath;
+        this.pathCircles = pathCircles;
+        this.pathTeams = pathTeams;
+    }
 
     @PostConstruct
     public void init(){
-        context = config.getTcBaseContext();
+        context = baseContextPath;
     }
 
     @Override
@@ -43,7 +50,7 @@ public class TrustCirclesClientImpl implements TrustCirclesClient {
 
     @Override
     public List<TrustCircle> getAllTrustCircles() {
-        String url = context + config.getTcPathCircles();
+        String url = context + pathCircles;
         LOG.debug("API call [post]: " + url);
         List<TrustCircle> list = Arrays.asList(retryRestTemplate.getForObject(url, TrustCircle[].class));
         return list;
@@ -51,7 +58,7 @@ public class TrustCirclesClientImpl implements TrustCirclesClient {
 
     @Override
     public List<Team> getAllTeams() {
-        String url = context + config.getTcPathTeams();
+        String url = context + pathTeams;
         LOG.debug("API call [post]: " + url);
         List<Team> list = Arrays.asList(retryRestTemplate.getForObject(url, Team[].class));
         return list;
@@ -59,7 +66,7 @@ public class TrustCirclesClientImpl implements TrustCirclesClient {
 
     @Override
     public TrustCircle getTrustCircleByUuid(String uuid) {
-        String url = context + config.getTcPathCircles() +"/"+uuid;
+        String url = context + pathCircles +"/"+uuid;
         LOG.debug("API call [post]: " + url);
         TrustCircle trustCircle = retryRestTemplate.getForObject(url, TrustCircle.class);
         return trustCircle;
@@ -67,7 +74,7 @@ public class TrustCirclesClientImpl implements TrustCirclesClient {
 
     @Override
     public Team getTeamByUuid(String uuid) {
-        String url = context + config.getTcPathTeams() +"/"+uuid;
+        String url = context + pathTeams +"/"+uuid;
         LOG.debug("API call [post]: " + url);
         Team team = retryRestTemplate.getForObject(url, Team.class);
         return team;
