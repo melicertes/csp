@@ -99,3 +99,29 @@ sudo /usr/local/java/jdk1.8.0_131/bin/keytool -importcert -file /data/common/ssl
 
 TEST
 curl -v -s -k --key client.key --cert client.crt https://localhost:8081/tc/212
+
+
+Creation of env file
+
+go to deployments project
+
+go to configuraiton templates
+
+scripts / configuration templates
+
+env.demo1-csp.json
+
+When adding a new service, go to services dictionary
+
+
+
+Go to demo1-csp
+
+at ~/deployments/scripts/configuration-templates
+
+git pull to get the latest
+
+Create a template:
+
+ $ git pull
+ $ j2 templates/.env.j2 env.demo1-csp.json

@@ -13,9 +13,11 @@ import com.intrasoft.csp.server.CspApp;
 import com.intrasoft.csp.server.utils.TestUtil;
 import org.apache.camel.test.spring.CamelSpringBootRunner;
 import org.apache.camel.test.spring.MockEndpointsAndSkip;
+import org.apache.commons.io.FileUtils;
 import org.joda.time.DateTime;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,8 +30,13 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.io.File;
 import java.io.IOException;
+import java.net.URL;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertThat;
@@ -68,6 +75,10 @@ public class CspServerVariousIntegrationDataTest implements CamelRoutes, Context
 
     private HttpMessageConverter mappingJackson2HttpMessageConverter;
 
+
+    URL data_artefact_with_team_id = getClass().getClassLoader().getResource("json/data_artefact_with_team_id.json");
+    URL data_artefact_with_teamid_arr = getClass().getClassLoader().getResource("json/data_artefact_with_teamid_arr.json");
+
     @Autowired
     void setConverters(HttpMessageConverter<?>[] converters) {
         this.mappingJackson2HttpMessageConverter = Arrays.asList(converters)
@@ -100,6 +111,41 @@ public class CspServerVariousIntegrationDataTest implements CamelRoutes, Context
             fail("Expected InvalidDataTypeException exception");
         }catch (InvalidDataTypeException e){
             assertThat(e.getMessage(),containsString("Field error in object 'integrationData'"));
+        }
+
+    }
+
+    @Test
+    public void InvalidSharingParamsTest() throws Exception {
+        IntegrationData integrationData = new IntegrationData();
+        integrationData.setDataType(IntegrationDataType.CHAT);
+
+        DataParams dataParams = new DataParams();
+        dataParams.setApplicationId("appid");
+        dataParams.setCspId("cspid");
+        dataParams.setRecordId("recordId");
+        dataParams.setDateTime(DateTime.now());
+        dataParams.setOriginApplicationId("origin");
+        dataParams.setOriginCspId("origin");
+        dataParams.setOriginRecordId("origin");
+        integrationData.setDataParams(dataParams);
+        SharingParams sharingParams = new SharingParams();
+        sharingParams.setIsExternal(false);
+        sharingParams.setToShare(false);
+        List<Boolean> teams= new ArrayList<>();
+        teams.add(true);
+        teams.add(false);
+        sharingParams.setTeamId(teams);
+        integrationData.setSharingParams(sharingParams);
+
+        integrationData.setDataObject(sharingParams);
+
+
+        try {
+            cspClient.postIntegrationData(integrationData);
+            fail("Expected InvalidDataTypeException exception");
+        }catch (InvalidDataTypeException e){
+            assertThat(e.getMessage(),containsString("teamId should be an array of strings"));
         }
 
     }
@@ -153,6 +199,28 @@ public class CspServerVariousIntegrationDataTest implements CamelRoutes, Context
                 .andExpect(status().isOk())
                 .andExpect(content().string(HttpStatusResponseType.SUCCESSFUL_OPERATION.getReasonPhrase()));
 
+    }
+
+    @Ignore
+    @Test
+    public void teamsTest() throws Exception {
+        String jsonStr = FileUtils.readFileToString(new File(data_artefact_with_team_id.toURI()), Charset.forName("UTF-8"));
+        mvc.perform(post("/v"+REST_API_V1+"/"+DSL_INTEGRATION_DATA).accept(MediaType.TEXT_PLAIN)
+                .content(jsonStr)
+                .contentType(TestUtil.APPLICATION_JSON_UTF8))
+                .andExpect(status().isOk())
+                .andExpect(content().string(HttpStatusResponseType.SUCCESSFUL_OPERATION.getReasonPhrase()));
+    }
+
+    @Ignore
+    @Test
+    public void teamsArrTest() throws Exception {
+        String jsonStr = FileUtils.readFileToString(new File(data_artefact_with_teamid_arr.toURI()), Charset.forName("UTF-8"));
+        mvc.perform(post("/v"+REST_API_V1+"/"+DSL_INTEGRATION_DATA).accept(MediaType.TEXT_PLAIN)
+                .content(jsonStr)
+                .contentType(TestUtil.APPLICATION_JSON_UTF8))
+                .andExpect(status().isOk())
+                .andExpect(content().string(HttpStatusResponseType.SUCCESSFUL_OPERATION.getReasonPhrase()));
     }
 
     protected String json(Object object) throws IOException {

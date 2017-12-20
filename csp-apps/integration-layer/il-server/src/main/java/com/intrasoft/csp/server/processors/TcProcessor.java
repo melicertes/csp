@@ -98,15 +98,42 @@ public class TcProcessor implements Processor,CamelRoutes{
         }
 
         if(isFlow1) {
-            if (integrationData.getSharingParams().getTcId()!=null && integrationData.getSharingParams().getTcId().size()>0) {
+            if (integrationData.getSharingParams().getTcId()!=null) {
                 //send by tcId provided - only in flow1
-                for(String tcId:integrationData.getSharingParams().getTcId()) {
-                    sendByTcId(tcId, exchange);
+                if(integrationData.getSharingParams().getTcId() instanceof List){
+                    List<String> list = (List<String>) integrationData.getSharingParams().getTcId();
+                    if(list.size()>0){
+                        for(String tcId:list) {
+                            if(!StringUtils.isEmpty(tcId)) {
+                                sendByTcId(tcId, exchange);
+                            }
+                        }
+                    }
+                }else if(integrationData.getSharingParams().getTcId() instanceof String){
+                    String tcId = (String) integrationData.getSharingParams().getTcId();
+                    if(!StringUtils.isEmpty(tcId)) {
+                        sendByTcId(tcId, exchange);
+                    }
                 }
-            } else if (integrationData.getSharingParams().getTeamId()!=null && integrationData.getSharingParams().getTeamId().size()>0) {
+
+            } else if (integrationData.getSharingParams().getTeamId()!=null) {
                 //send by teamId provided - only in flow1
-                for(String teamId:integrationData.getSharingParams().getTeamId()) {
-                    sendByTeamId(teamId, exchange);
+
+
+                if(integrationData.getSharingParams().getTeamId() instanceof List){
+                    List<String> list = (List<String>) integrationData.getSharingParams().getTeamId();
+                    if(list.size()>0){
+                        for(String teamId:list) {
+                            if(!StringUtils.isEmpty(teamId)) {
+                                sendByTeamId(teamId, exchange);
+                            }
+                        }
+                    }
+                }else if(integrationData.getSharingParams().getTeamId() instanceof String){
+                    String teamId = (String) integrationData.getSharingParams().getTeamId();
+                    if(!StringUtils.isEmpty(teamId)) {
+                        sendByTeamId(teamId, exchange);
+                    }
                 }
             } else {
                 //send by dataType

@@ -23,10 +23,10 @@ public class SharingParams implements Serializable {
     private Boolean isExternal;
 
     @JsonProperty("trustCircleId")
-    private List<String> tcId;
+    private Object tcId; //supported values: String or Array
 
     @JsonProperty("teamId")
-    private List<String> teamId;
+    private Object teamId;//supported values: String or Array
 
     public SharingParams() {
     }
@@ -52,19 +52,19 @@ public class SharingParams implements Serializable {
         this.isExternal = isExternal;
     }
 
-    public List<String> getTcId() {
+    public Object getTcId() {
         return tcId;
     }
 
-    public void setTcId(List<String> tcId) {
+    public void setTcId(Object tcId) {
         this.tcId = tcId;
     }
 
-    public List<String> getTeamId() {
+    public Object getTeamId() {
         return teamId;
     }
 
-    public void setTeamId(List<String> teamId) {
+    public void setTeamId(Object teamId) {
         this.teamId = teamId;
     }
 
