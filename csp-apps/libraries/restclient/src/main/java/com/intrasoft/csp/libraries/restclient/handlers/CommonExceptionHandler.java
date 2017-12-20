@@ -125,6 +125,10 @@ public class CommonExceptionHandler implements ResponseErrorHandler {
                     throw clientErrorException;
                 }
 
+                if(errorDTO.getException()==null){
+                    throw new HttpClientErrorException(statusCode, statusText, httpHeaders, responseBody, charset);
+                }
+
                 if (exceptionClasses.containsKey(errorDTO.getException())) {
                     throw (exceptionClasses.get(errorDTO.getException())).create(errorDTO.getMessage());
                 } else {
