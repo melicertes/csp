@@ -9,7 +9,6 @@ import com.intrasoft.csp.misp.commons.models.OrganisationWrapper;
 import com.intrasoft.csp.misp.commons.models.generated.Response;
 import com.intrasoft.csp.misp.commons.models.generated.ResponseAll;
 import com.intrasoft.csp.misp.commons.models.generated.SharingGroup;
-import jdk.internal.org.objectweb.asm.TypeReference;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
