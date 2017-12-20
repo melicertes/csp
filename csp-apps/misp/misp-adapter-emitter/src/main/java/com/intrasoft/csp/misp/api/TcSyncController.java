@@ -5,12 +5,11 @@ import com.intrasoft.csp.misp.service.MispTcSyncService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-public class TCSyncController implements ApiContextUrl{
-    private static final Logger LOG = LoggerFactory.getLogger(TCSyncController.class);
+public class TcSyncController implements ApiContextUrl{
+    private static final Logger LOG = LoggerFactory.getLogger(TcSyncController.class);
 
     @Autowired
     MispTcSyncService mispTcSyncService;

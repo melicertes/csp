@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -31,6 +32,9 @@ public class MispTcSyncServiceImpl implements MispTcSyncService {
     @Autowired
     MispAppClient mispAppClient;
 
+    @Value("${misp.sync.enabled}")
+    Boolean syncEnabled;
+
     @Value("${misp.sync.fixed.delay}")
     Long fixedDelay;
 
@@ -39,17 +43,20 @@ public class MispTcSyncServiceImpl implements MispTcSyncService {
 
 //  TODO: Investigate which additional fields can be mapped
 
-    private void setup() {
-
+    @PostConstruct
+    private void init() {
+        LOG.info(" -- Misp sync "+(syncEnabled?"enabled":"disabled"));
     }
 
     @Scheduled(fixedDelayString = "${misp.sync.fixed.delay}", initialDelayString = "${misp.sync.initial.delay}")
     @Override
     public void syncAll() {
-
-        // It would be wise to have organisations synchronized first, before synchronizing sharing groups.
-        syncOrganisations();
-        syncSharingGroups();
+        if(syncEnabled) {
+            LOG.info("Misp sync triggered. Will sync all.");
+            // It would be wise to have organisations synchronized first, before synchronizing sharing groups.
+            syncOrganisations();
+            syncSharingGroups();
+        }
 
     }
 
