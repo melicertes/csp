@@ -4,20 +4,20 @@ import com.fasterxml.jackson.annotation.*;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-        "match"
+        "match_phrase"
 })
 public class Must {
 
-    @JsonProperty("match")
+    @JsonProperty("match_phrase")
     private Match match;
 
 
-    @JsonProperty("match")
+    @JsonProperty("match_phrase")
     public Match getMatch() {
         return match;
     }
 
-    @JsonProperty("match")
+    @JsonProperty("match_phrase")
     public void setMatch(Match match) {
         this.match = match;
     }
@@ -25,7 +25,7 @@ public class Must {
     @Override
     public String toString() {
         return "Must{" +
-                "match=" + match +
+                "match_phrase=" + match +
                 '}';
     }
 }

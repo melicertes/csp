@@ -80,7 +80,7 @@ public class TcProcessor implements Processor,CamelRoutes{
         String originEndpoint = (String) exchange.getIn().getHeader(CamelRoutes.ORIGIN_ENDPOINT);
         String msg = originEndpoint.equals(routes.apply(CamelRoutes.DCL))? "send to external CSP":
                 originEndpoint.equals(routes.apply(CamelRoutes.EDCL))? " handle from external CSP":"";
-        LOG.info("DCL - Get Trust Circles from TC API and "+msg+" [ORIGIN_ENDPOINT:"+originEndpoint+"]");
+        LOG.debug("DCL - Get Trust Circles from TC API and "+msg+" [ORIGIN_ENDPOINT:"+originEndpoint+"]");
 
         boolean isFlow1 = originEndpoint.equals(routes.apply(CamelRoutes.DCL))?true:false;
         boolean isFlow2 = originEndpoint.equals(routes.apply(CamelRoutes.EDCL))?true:false;

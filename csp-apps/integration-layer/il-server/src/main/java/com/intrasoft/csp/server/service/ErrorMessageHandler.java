@@ -151,7 +151,7 @@ public class ErrorMessageHandler implements CamelRoutes {
     }
 
     public void consumeErrorMessagesOnIterval(){
-        LOG.info("Consume any messages found in "+endpoint.apply(ERROR)+" on specific time interval.");
+        LOG.debug("Consume any messages found in "+endpoint.apply(ERROR)+" on specific time interval.");
         Map<Integer, Exchange> failuresMap = new HashMap<>();
         boolean consumeWhileFound = true;
         int count = 0;

@@ -90,7 +90,7 @@ public class ElasticProcessor implements Processor {
 
             ElasticSearchResponse elasticSearchResponse = new ObjectMapper().readValue(response, ElasticSearchResponse.class);
             for(Hit hit : elasticSearchResponse.getHits().getHits()) {
-                LOG.info(hit.getId());
+                LOG.debug(hit.getId());
                 //query ES to perform update
                 String updateResponse = camelRestService.send(this.getElasticURI() + "/" + dataType.toString().toLowerCase() + "/" + hit.getId() + "", elasticData, HttpMethods.POST.name());
                 LOG.info("Elastic - ES Update index "+hit.getId()+" response: " + updateResponse);
@@ -128,7 +128,7 @@ public class ElasticProcessor implements Processor {
 
             ElasticSearchResponse elasticSearchResponse = new ObjectMapper().readValue(response, ElasticSearchResponse.class);
             for(Hit hit : elasticSearchResponse.getHits().getHits()) {
-                LOG.info(hit.getId());
+                LOG.debug(hit.getId());
                 //query ES to perform deletion
                 String deleteResponse = camelRestService.send(this.getElasticURI() + "/" + dataType.toString().toLowerCase() + "/" + hit.getId(), null, HttpMethod.DELETE.name());
                 LOG.info("ES Delete index "+hit.getId()+"response: " + deleteResponse);

@@ -49,7 +49,7 @@ import static org.springframework.test.web.client.match.MockRestRequestMatchers.
 @SpringBootTest(classes = {MispAppClient.class, MispAppClientConfig.class},
         properties = {
                 "misp.app.protocol:http",
-                "misp.app.host:192.168.56.50",
+                "misp.app.host:misp.dimitris.dk",
                 "misp.app.port:80",
                 "misp.app.authorization.key:JNqWBxfPiIywz7hUe58MyJf6sD5PrTVaGm7hTn6c",
                 "spring.jackson.deserialization.unwrap-root-value=true"
@@ -90,9 +90,9 @@ public class MispAppClientTest {
 
     @Test
     public void getMispEventTest() throws URISyntaxException, IOException {
-//        ResponseEntity<String> responseEntity = mispAppClient.getMispEvent("5a12bb50-fcb4-4345-9bae-619a9e459fec");
-//        LOG.info(responseEntity.getBody().toString());
-//        assertThat(responseEntity.getStatusCodeValue(), is(200));
+        ResponseEntity<Object> responseEntity = mispAppClient.getMispEvent("5a12bb50-fcb4-4345-9bae-619a9e459fec");
+        LOG.info(responseEntity.getBody().toString());
+        assertThat(responseEntity.getStatusCodeValue(), is(200));
     }
 
     @Test
