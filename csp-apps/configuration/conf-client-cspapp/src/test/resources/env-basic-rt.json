@@ -1,0 +1,21 @@
+{
+  "services": [
+    {
+      "internal_name": "csp-rt",
+      "external_name": "rt",
+      "version": "1.0",
+      "docr_name": "csp-rt",
+      "docr_port": "80",
+      "protocol": "http",
+      "central_only": "false",
+      "base_path": "/",
+      "mutual_ssl": {
+        "external": false,
+        "internal": true
+      },
+      "agent": true
+    }
+
+  ]
+}
+

@@ -1,0 +1,36 @@
+{
+  "services": [
+    {
+      "internal_name": "csp-rt",
+      "external_name": "rt",
+      "version": "1.0",
+      "docr_name": "csp-rt",
+      "docr_port": "80",
+      "protocol": "http",
+      "central_only": "false",
+      "base_path": "/",
+      "skip_reverse_proxy_paths": [
+        "/policies/",
+        "/api"
+      ],
+      "mutual_ssl": {
+        "external": false,
+        "internal": true
+      },
+      "agent": true,
+      "paths": {
+        "circles": "/api/v1/circles",
+        "teams": "/api/v1/teams"
+      },
+      "env_properties": {
+        "EVENT_APPS": "misp",
+        "THREAT_APPS": "misp",
+        "INCIDENT_APPS": "rt,intelmq",
+        "VULNERABILITY_APPS": "taranis,misp",
+        "ARTEFACT_APPS": "misp,viper"
+      }
+    }
+
+  ]
+}
+

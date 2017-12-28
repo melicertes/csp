@@ -118,7 +118,7 @@ public class InstallationService {
     }
 
     @Transactional
-    public SystemService saveSystemModuleService(SystemModule module) {
+    public SystemService saveSystemModuleService(SystemModule module, Boolean legacyMode, boolean needsAgent, boolean needsVhost) {
 
         SystemModule savedModule = moduleRepository.save(module);
 
@@ -134,6 +134,10 @@ public class InstallationService {
             systemService.setModule(savedModule);
             systemService.setStartable(moduleContains(module,"docker-compose.yml"));
         }
+        systemService.setLegacy(legacyMode);
+        systemService.setOamAgentNecessary(needsAgent);
+        systemService.setVHostNecessary(needsVhost);
+
         return serviceRepository.save(systemService);
 
     }

@@ -41,7 +41,7 @@ public class SystemModule implements Serializable {
     String modulePath;
 
     @Enumerated(EnumType.STRING)
-    @Column(columnDefinition = "VARCHAR(12)")
+    @Column(columnDefinition = "VARCHAR(12) default 'UNKNOWN'", nullable = false)
     ModuleState moduleState = ModuleState.UNKNOWN;
 
     @Column(columnDefinition = "TEXT")

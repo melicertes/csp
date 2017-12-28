@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.intrasoft.csp.conf.client.ConfClient;
 import com.intrasoft.csp.conf.clientcspapp.model.*;
+import com.intrasoft.csp.conf.clientcspapp.model.json.Environment;
+import com.intrasoft.csp.conf.clientcspapp.model.json.Manifest;
 import com.intrasoft.csp.conf.clientcspapp.util.FileHelper;
 import com.intrasoft.csp.conf.clientcspapp.util.TimeHelper;
 import com.intrasoft.csp.conf.commons.model.api.*;
@@ -19,13 +21,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.nio.file.StandardCopyOption;
 import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -79,6 +81,9 @@ public class BackgroundTaskService {
 
     @Autowired
     ExternalProcessService externalProcessService;
+
+    @Autowired
+    ObjectMapper jacksonObjectMapper;
 
 
     @Scheduled(initialDelay = 10000, fixedRate = 600000)
@@ -286,6 +291,9 @@ public class BackgroundTaskService {
         addTask(() -> {
             //extract module to destination location
             final File moduleDir = new File(modulesDirectory, module.getName() + module.getHash().substring(0,12));
+            boolean isLegacy = false;
+            Manifest manifest = null;
+            Environment customEnv = null;
 
             try {
                 if (module.getActive() == false && moduleDir.exists()) {
@@ -293,6 +301,29 @@ public class BackgroundTaskService {
                 }
                 String moduleInstallDirectory = storageService.extractArchive(module.getArchivePath(),
                         moduleDir.getAbsolutePath());
+                // check to see if manifest.json exists (mandatory!)
+                if (installationService.moduleContains(module, "manifest.json") ) {
+                    File manifestFile = new File(moduleInstallDirectory, "manifest.json");
+                    manifest = jacksonObjectMapper.readValue(manifestFile, Manifest.class);
+
+                    if (manifest.getFormat() == 1.0) {
+                        log.warn("Manifest version 1.0 detected! LEGACY MODE = ON");
+                        isLegacy = true;
+                    } else if (manifest.getFormat() == 1.1) {
+                        log.warn("Manifest version 1.1 detected!");
+                        if (installationService.moduleContains(module, "env.json") ) {
+                            customEnv = jacksonObjectMapper.readValue(new File(moduleInstallDirectory, "env.json"), Environment.class);
+                        }
+                    } else {
+                        log.error("Unsupported manifest.json !!! Rejected!!");
+                        return new BackgroundTaskResult<>(false, -1);
+
+                    }
+                } else {
+                    log.error("Module does not contain a manifest.json description! Rejected!");
+                    return new BackgroundTaskResult<>(false, -1);
+                }
+
 
                 // set module to INSTALLING
                 module.setModuleState(ModuleState.INSTALLING);
@@ -329,7 +360,8 @@ public class BackgroundTaskService {
                 module.setModuleState(ModuleState.INSTALLED);
                 module.setInstallDate(new LocalDateTime());
                 module.setModulePath(moduleDir.getPath());
-                installationService.saveSystemModuleService(module);
+                installationService.saveSystemModuleService(module, isLegacy, needsAgent(customEnv),
+                        needsVhost(customEnv));
 
                 return new BackgroundTaskResult<>(true, 0);
 
@@ -343,6 +375,17 @@ public class BackgroundTaskService {
                 return new BackgroundTaskResult<>(false, -1);
             }
         });
+    }
+
+    private boolean needsVhost(Environment customEnv) {
+        com.intrasoft.csp.conf.clientcspapp.model.json.Service srv = customEnv.getServices().get(0);
+        return !StringUtils.isEmpty(srv.getInternalName()) ||
+                !StringUtils.isEmpty(srv.getExternalName());
+
+    }
+
+    private boolean needsAgent(Environment customEnv) {
+        return customEnv.getServices().get(0).isAgent();
     }
 
     private void copyEnvironment(String targetDirectory) throws IOException{
@@ -535,7 +578,9 @@ public class BackgroundTaskService {
             targetFile.delete();
         }
         log.info("Extracting {} to {}",scriptName, targetFile.getAbsolutePath());
-        long total = FileHelper.copy(script.getInputStream(), targetFile.toPath(), null, StandardCopyOption.REPLACE_EXISTING);
+
+        //long total = FileHelper.copy(script.getInputStream(), targetFile.toPath(), null, StandardCopyOption.REPLACE_EXISTING);
+        FileHelper.copy(script.getFile().toPath(), targetFile.toPath());
         return targetFile.getAbsolutePath();
     }
 }
