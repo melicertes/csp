@@ -50,5 +50,7 @@ public class SystemModule implements Serializable {
     @Column(columnDefinition = "INTEGER")
     Integer startPriority;
 
+    @Column(columnDefinition = "VARCHAR(2000)")
+    String manifestJsonAsText;
 
 }
