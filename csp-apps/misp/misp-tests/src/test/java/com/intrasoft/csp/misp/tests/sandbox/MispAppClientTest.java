@@ -54,7 +54,7 @@ import static org.springframework.test.web.client.match.MockRestRequestMatchers.
                 "misp.app.authorization.key:JNqWBxfPiIywz7hUe58MyJf6sD5PrTVaGm7hTn6c",
                 "spring.jackson.deserialization.unwrap-root-value=true"
         })
-// misp.app.host:misp.dimitris.dk
+
 public class MispAppClientTest {
     private static final Logger LOG = LoggerFactory.getLogger(MispAppClientTest.class);
 

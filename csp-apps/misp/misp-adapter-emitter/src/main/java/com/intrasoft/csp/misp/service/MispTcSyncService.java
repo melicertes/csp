@@ -9,6 +9,4 @@ public interface MispTcSyncService {
       void syncOrganisations();
 
       void syncSharingGroups();
-
-
 }

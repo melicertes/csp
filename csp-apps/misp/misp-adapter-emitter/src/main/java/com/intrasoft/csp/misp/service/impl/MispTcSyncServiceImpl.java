@@ -32,6 +32,9 @@ public class MispTcSyncServiceImpl implements MispTcSyncService {
     @Autowired
     MispAppClient mispAppClient;
 
+    @Value("${server.name}")
+    String cspId;
+
     @Value("${misp.sync.enabled}")
     Boolean syncEnabled;
 
@@ -61,7 +64,6 @@ public class MispTcSyncServiceImpl implements MispTcSyncService {
     }
 
 //  TODO: Add name validation (name duplicates not allowed)
-//  TODO: Organisations can't be deleted when they reference users or are referenced themselves by misp events
 //    Team objects with new Uuids also need to have unique names (case-sensitive) in order to be created in MISP.
     public void syncOrganisations() {
         List<Team> teamList = trustCirclesClient.getAllTeams();
@@ -99,8 +101,7 @@ public class MispTcSyncServiceImpl implements MispTcSyncService {
             mispAppClient.addMispOrganisation(newOrg);
         }
 
-        // Delete any MISP Organisations that don't exist in Trust Circles.
-        // (Organisation references are removed automatically from any sharing groups when deleted. Tested in MISP UI)
+        // Finding orphan MISP organisations
 
         // Refreshing our lists first
         orgList = mispAppClient.getAllMispOrganisations();
@@ -121,7 +122,8 @@ public class MispTcSyncServiceImpl implements MispTcSyncService {
         }
 
         LOG.info("Found " + teamIdList.size() + " orphan organisations in MISP");
-        teamIdList.forEach(id -> mispAppClient.deleteMispOrganisation(id));
+        // TODO: What is the action to be taken when a MISP organisation does not have a corresponding team in TC? (deletion is not an option for now)
+        // teamIdList.forEach(id -> mispAppClient.deleteMispOrganisation(id));
 
     }
 
@@ -160,9 +162,10 @@ public class MispTcSyncServiceImpl implements MispTcSyncService {
         organisation.setName(team.getName());
         organisation.setDescription(team.getDescription());
         organisation.setNationality(team.getCountry());
-        organisation.setLocal(true); // What's the deal with this?
-
-    }
+        // SXCSP-420: "The team with the csp-id that is equal to this csp-id should be imported as local org."
+        if (team.getCspId().equals(cspId)) // case-sensitivity?
+            organisation.setLocal(true);
+        }
 
     private void mapTrustCircleToSharingGroup(TrustCircle tCircle, SharingGroup sGroup) {
 

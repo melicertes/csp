@@ -79,12 +79,14 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
         JsonNode jsonNode = new ObjectMapper().convertValue(object, JsonNode.class);
 
         String uuid = "";
+        String sharingGroupUuid = "";
 
         LOG.info(jsonNode.toString());
 
         switch (mispEntity) {
             case EVENT:
                 LOG.info(EVENT.toString());
+                sharingGroupUuid = jsonNode.get(EVENT.toString()).get("SharingGroup").get("uuid").toString().replace("\"","");
                 uuid = jsonNode.get(EVENT.toString()).get("uuid").toString().replace("\"","");
                 object = mispAppClient.getMispEvent(uuid).getBody();
                 jsonNode = new ObjectMapper().convertValue(object, JsonNode.class);
@@ -157,6 +159,7 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
          * find out how to differentiate our custom shared groups from the normal ones
          * use custom sharing groups uuids as tcid, use custom organizations(?) uuids as team id.
          * harvest only from the dataobject part which dictates which organization or sharing group should get this event*/
+        sharingParams.setTcId(sharingGroupUuid);
         IntegrationData integrationData = new IntegrationData();
         integrationData.setDataParams(dataParams);
         integrationData.setSharingParams(sharingParams);
