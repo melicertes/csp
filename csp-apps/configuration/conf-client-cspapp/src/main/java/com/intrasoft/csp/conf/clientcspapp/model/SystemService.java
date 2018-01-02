@@ -1,6 +1,7 @@
 package com.intrasoft.csp.conf.clientcspapp.model;
 
 import lombok.*;
+import org.joda.time.LocalDateTime;
 
 import javax.persistence.*;
 
@@ -32,5 +33,22 @@ public class SystemService {
 
     @Column(columnDefinition = "SMALLINT")
     Boolean startable;
+
+    @Column(columnDefinition = "SMALLINT")
+    Boolean legacy;
+
+    @Column(columnDefinition = "SMALLINT default '0'", nullable = false)
+    Boolean oamAgentNecessary;
+
+    @Column(columnDefinition = "SMALLINT default '0'", nullable = false)
+    Boolean vHostNecessary;
+
+    @Convert(converter = JpaConverterLocalDateTime.class)
+    @Column(columnDefinition = "VARCHAR(23)")
+    LocalDateTime oamAgentCreated;
+
+    @Convert(converter = JpaConverterLocalDateTime.class)
+    @Column(columnDefinition = "VARCHAR(23)")
+    LocalDateTime vhostCreated;
 
 }

@@ -152,9 +152,11 @@ public class ConfClientApplicationTests {
 		moduleRepository.save(m2);
 
 
-		SystemService s1 = new SystemService(null,"module1", ServiceState.NOT_RUNNING, moduleRepository.findOneByHash("hash1"),true);
+		SystemService s1 = new SystemService(null,"module1", ServiceState.NOT_RUNNING, moduleRepository.findOneByHash("hash1"),true,
+				false,false,false, null,null);
 
-		SystemService s2 = new SystemService(null,"module2", ServiceState.NOT_RUNNING, moduleRepository.findOneByHash("hash2"),true);
+		SystemService s2 = new SystemService(null,"module2", ServiceState.NOT_RUNNING, moduleRepository.findOneByHash("hash2"),true,
+				false, false, false, null, null);
 
 		serviceRepository.save(s1);
 		serviceRepository.save(s2);

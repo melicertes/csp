@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.intrasoft.csp.conf.client.ConfClient;
 import com.intrasoft.csp.conf.clientcspapp.model.*;
+import com.intrasoft.csp.conf.clientcspapp.model.json.Environment;
+import com.intrasoft.csp.conf.clientcspapp.model.json.Manifest;
 import com.intrasoft.csp.conf.clientcspapp.util.FileHelper;
 import com.intrasoft.csp.conf.clientcspapp.util.TimeHelper;
 import com.intrasoft.csp.conf.commons.model.api.*;
@@ -19,13 +21,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.nio.file.StandardCopyOption;
 import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -79,6 +81,9 @@ public class BackgroundTaskService {
 
     @Autowired
     ExternalProcessService externalProcessService;
+
+    @Autowired
+    ObjectMapper jacksonObjectMapper;
 
 
     @Scheduled(initialDelay = 10000, fixedRate = 600000)
@@ -282,38 +287,70 @@ public class BackgroundTaskService {
 
     }
 
-    public void scheduleInstall(SystemModule module) {
+    public void scheduleInstall(final SystemModule module) {
         addTask(() -> {
             //extract module to destination location
             final File moduleDir = new File(modulesDirectory, module.getName() + module.getHash().substring(0,12));
-
+            boolean isLegacy = false;
+            Manifest manifest;
+            Environment customEnv = null;
+            SystemModule installingModule = module;
             try {
-                if (module.getActive() == false && moduleDir.exists()) {
+                if (installingModule.getActive() == false && moduleDir.exists()) {
                     storageService.deleteDirectoryAndContents(moduleDir.getAbsolutePath());
                 }
-                String moduleInstallDirectory = storageService.extractArchive(module.getArchivePath(),
+                String moduleInstallDirectory = storageService.extractArchive(installingModule.getArchivePath(),
                         moduleDir.getAbsolutePath());
+                // check to see if manifest.json exists (mandatory!)
+                if (installationService.moduleContains(installingModule, "manifest.json") ) {
+                    File manifestFile = new File(moduleInstallDirectory, "manifest.json");
+                    manifest = jacksonObjectMapper.readValue(manifestFile, Manifest.class);
+                    if (manifest.getFormat() == 1.0) {
+                        log.warn("Manifest version 1.0 detected! LEGACY MODE = ON");
+                        isLegacy = true;
+                    } else if (manifest.getFormat() == 1.1) {
+                        log.warn("Manifest version 1.1 detected!");
+                        if (installationService.moduleContains(installingModule, "env.json") ) {
+                            customEnv = jacksonObjectMapper.readValue(new File(moduleInstallDirectory, "env.json"), Environment.class);
+                        }
+                    } else {
+                        log.error("Unsupported manifest.json !!! Rejected!!");
+                        return new BackgroundTaskResult<>(false, -1);
+
+                    }
+
+                    installingModule.setManifestJsonAsText(jacksonObjectMapper.writeValueAsString(manifest));
+                } else {
+                    log.error("Module does not contain a manifest.json description! Rejected!");
+                    return new BackgroundTaskResult<>(false, -1);
+                }
+
 
                 // set module to INSTALLING
-                module.setModuleState(ModuleState.INSTALLING);
-                module.setModulePath(moduleInstallDirectory);
-                installationService.saveSystemModule(module);
+                installingModule.setModuleState(ModuleState.INSTALLING);
+                installingModule.setModulePath(moduleInstallDirectory);
+                installingModule = installationService.saveSystemModule(installingModule);
 
 
                 //perform all operations:
                 // a. load any docker.tar found
-                installationService.installDockerImages(module);
+                installationService.installDockerImages(installingModule);
 
                 // b. copy .env from homedir to the module dir
                 copyEnvironment(moduleInstallDirectory);
+
+                createCustomEnv(customEnv, installingModule);
                 // c. execute any first-time.sh found
-                if (installationService.moduleContains(module, "first-time.sh")) {
-                    log.info("First time init script detected. Will launch for module {}",module.getName());
+                // TODO 1.1 change "first-time.sh" to defined name for first time file
+
+                if (installationService.moduleContains(installingModule, "first-time.sh")) {
+                    log.info("First time init script detected. Will launch for module {}",installingModule.getName());
                     File firstTime = new File(moduleInstallDirectory, "first-time.sh");
                     if (firstTime.exists()) {
                         firstTime.setExecutable(true,true);
                     } else {
-                        log.error("First time file {}  was not found although present in module {} !", firstTime.getAbsolutePath(), module.getName());
+                        log.error("First time file {}  was not found although present in module {} !",
+                                firstTime.getAbsolutePath(), installingModule.getName());
                     }
 
                     Map<String,String> env = new HashMap<>();
@@ -325,11 +362,12 @@ public class BackgroundTaskService {
                 }
 
                 // d. set module to INSTALLED + ACTIVE = TRUE
-                module.setActive(true);
-                module.setModuleState(ModuleState.INSTALLED);
-                module.setInstallDate(new LocalDateTime());
-                module.setModulePath(moduleDir.getPath());
-                installationService.saveSystemModuleService(module);
+                installingModule.setActive(true);
+                installingModule.setModuleState(ModuleState.INSTALLED);
+                installingModule.setInstallDate(new LocalDateTime());
+                installingModule.setModulePath(moduleDir.getPath());
+                installationService.saveSystemModuleService(installingModule, isLegacy, needsAgent(customEnv),
+                        needsVhost(customEnv));
 
                 return new BackgroundTaskResult<>(true, 0);
 
@@ -337,17 +375,49 @@ public class BackgroundTaskService {
 
             } catch (IOException e) {
                 log.error("Failed to extract and install module",e);
-                module.setModuleState(ModuleState.DOWNLOADED);
-                module.setModulePath(null);
-                installationService.saveSystemModule(module);
+                installingModule.setModuleState(ModuleState.DOWNLOADED);
+                installingModule.setModulePath(null);
+                installationService.saveSystemModule(installingModule);
                 return new BackgroundTaskResult<>(false, -1);
             }
         });
     }
 
+    private void createCustomEnv(Environment customEnv, SystemModule installingModule) {
+        // TODO 1.1 create env.modulename from j2 env.json
+        // we execute j2 on the env.json and relevant conf template to create additional environment variables here
+        // we save the env as env.startpriority.modulename here and in /root
+        // we append this env to the ".env" found here
+        // we save the vhost and overwrite (to vhost configured location)
+    }
+
+    private boolean needsVhost(Environment customEnv) {
+        if (customEnv == null) {
+            return false;
+        }
+        com.intrasoft.csp.conf.clientcspapp.model.json.Service srv = customEnv.getServices().get(0);
+        return !StringUtils.isEmpty(srv.getInternalName()) ||
+                !StringUtils.isEmpty(srv.getExternalName());
+
+    }
+
+    private boolean needsAgent(Environment customEnv) {
+        return customEnv == null ? false : customEnv.getServices().get(0).isAgent();
+    }
+
     private void copyEnvironment(String targetDirectory) throws IOException{
         //by now we expect environment to be prepared.
         File rootEnv = new File(System.getProperty("user.home"), "env");
+
+        // TODO 1.1 concatenate all "env.<modulename>" files to a global .env file here
+        // we re-copy all env files in proper order, to this directory using START_PRIORITY
+        // split them with new lines! on concatenation
+
+
+        // split filename on "." - e.g. env.800.rt = String[] { "env", "800", "rt" }
+        // we use the 2nd arg to add to a TreeMap<Double,"filename">
+        // we read them ascending and concatenate to a global "new" env (this gets copied BUT NOT SAVED)
+
 
         if (rootEnv.exists()) {
             FileHelper.copy(rootEnv.toPath(), new File(targetDirectory, ".env").toPath());
@@ -373,6 +443,9 @@ public class BackgroundTaskService {
             // TODO check if module is running before delete
 
             try {
+                // execute any last-time.sh found
+                // TODO 1.1 execute "last-time.sh" as defined name for last time file, JSON is in module entity
+
                 storageService.deleteDirectoryAndContents(module.getModulePath());
                 module.setModuleState(ModuleState.DOWNLOADED);
                 module.setActive(false);
@@ -395,6 +468,17 @@ public class BackgroundTaskService {
             final List<BackgroundTaskResult<Boolean, Integer>> results = installationService.queryAllModulesInstalled(true).stream().map(module -> {
                 SystemService service = installationService.queryService(module);
                 if (service.getStartable() == true) {
+
+                    //copy the environment again before starting
+                    try {
+                        copyEnvironment(module.getModulePath());
+                    } catch (IOException e) {
+                        log.error("Failed to copy ENVIRONMENT! {}", e.getMessage(),e);
+                    }
+
+                    checkOAMAgentCreation(module,service);
+                    checkVHostCreation(module,service);
+
                     if (service.getServiceState() == ServiceState.NOT_RUNNING) {
                         log.info("About to start service {} with start priority {}", service.getName(), module.getStartPriority());
                         Map<String, String> env = new HashMap<String, String>();
@@ -404,10 +488,11 @@ public class BackgroundTaskService {
                         try {
                             BackgroundTaskResult<Boolean, Integer> result = executeScriptSimple("startService.sh", env);
                             if (result.getSuccess() == true) {
-                                service = installationService.updateServiceState(service, ServiceState.RUNNING);
                                 if (installationService.moduleContains(module, "proc_ready.source")) {
                                     result = executeAdvancedStartMonitor(module);
                                 }
+                                service = installationService.updateServiceState(service, ServiceState.RUNNING);
+
                             } else {
                                 log.error("Executing the start script was not successful for service {}", module.getName());
                             }
@@ -442,6 +527,23 @@ public class BackgroundTaskService {
             });
             return finalResult;
         });
+    }
+
+    private void checkVHostCreation(SystemModule module, SystemService service) {
+        //TODO 1.1 Check if VHost is required and CREATE IT
+        if (service.getVHostNecessary() && service.getVhostCreated() == null) {
+            //do it here
+        }
+
+    }
+
+    private void checkOAMAgentCreation(SystemModule module, SystemService service) {
+        //TODO 1.1 Check if OAM agent is required and CREATE IT
+
+        if (service.getOamAgentNecessary() && service.getOamAgentCreated() == null) {
+            //do it here
+
+        }
     }
 
     /**
@@ -535,7 +637,9 @@ public class BackgroundTaskService {
             targetFile.delete();
         }
         log.info("Extracting {} to {}",scriptName, targetFile.getAbsolutePath());
-        long total = FileHelper.copy(script.getInputStream(), targetFile.toPath(), null, StandardCopyOption.REPLACE_EXISTING);
+
+        //long total = FileHelper.copy(script.getInputStream(), targetFile.toPath(), null, StandardCopyOption.REPLACE_EXISTING);
+        FileHelper.copy(script.getFile().toPath(), targetFile.toPath());
         return targetFile.getAbsolutePath();
     }
 }
