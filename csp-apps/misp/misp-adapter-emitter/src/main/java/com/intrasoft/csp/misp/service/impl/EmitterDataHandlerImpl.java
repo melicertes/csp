@@ -2,6 +2,7 @@ package com.intrasoft.csp.misp.service.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.intrasoft.csp.client.CspClient;
 import com.intrasoft.csp.client.ElasticClient;
 import com.intrasoft.csp.commons.model.DataParams;
@@ -21,6 +22,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.List;
 
 import static com.intrasoft.csp.misp.commons.config.MispContextUrl.MispEntity.ACTION;
@@ -72,27 +74,24 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
     @Autowired
     ElasticClient elasticClient;
 
+    private JsonNode jsonNode;
+
     @Override
     public void handleMispData(Object object, MispEntity mispEntity, boolean isDelete, boolean isReEmittion) {
         final Logger LOG = LoggerFactory.getLogger(EmitterDataHandlerImpl.class);
 
-        JsonNode jsonNode = new ObjectMapper().convertValue(object, JsonNode.class);
+        jsonNode = new ObjectMapper().convertValue(object, JsonNode.class);
 
         String uuid = "";
 
-        LOG.info(jsonNode.toString());
+        LOG.info("Received from emmiter: " + jsonNode.toString());
 
         switch (mispEntity) {
             case EVENT:
-                LOG.info(EVENT.toString());
-                uuid = jsonNode.get(EVENT.toString()).get("uuid").toString().replace("\"","");
+                uuid = jsonNode.get(EVENT.toString()).get("uuid").textValue();
                 object = mispAppClient.getMispEvent(uuid).getBody();
-                jsonNode = new ObjectMapper().convertValue(object, JsonNode.class);
+                jsonNode = updateTimestamp(new ObjectMapper().convertValue(object, JsonNode.class));
                 break;
-/*            case ATTRIBUTE:
-                LOG.info(ATTRIBUTE.toString());
-                uuid = jsonNode.get(ATTRIBUTE.toString()).get("uuid").toString().replace("\"","");
-                break;*/
         }
 
         DataParams dataParams = new DataParams();
@@ -146,9 +145,7 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
              */
             Boolean eventPublished = Boolean.parseBoolean(jsonNode.get(EVENT.toString()).get("published").toString());
             sharingParams.setToShare(eventPublished);
-            LOG.info("Is Reemittion: " + eventPublished);
-            //sharingParams.setToShare(true);
-
+            LOG.info("Is event published: " + eventPublished);
         }
 
         /** issue: SXCSP-337
@@ -167,21 +164,19 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
          * define a classification to diferentiate between threat/event
          */
         IntegrationDataType integrationDataType = IntegrationDataType.EVENT;
-        try{
+        if (jsonNode.get(EVENT.toString()).has("Tag")){
             for (JsonNode jn : jsonNode.get(EVENT.toString()).get("Tag")){
-                LOG.info(jn.toString());
-                LOG.info(jn.get("name").toString());
                 if (jn.get("name").toString().equals("\"threat\"")){
                     LOG.info("THREAT");
                     integrationDataType = IntegrationDataType.THREAT;
                 }
             }
         }
-        catch (NullPointerException e){
-            LOG.info(" Object has no assigned tags");
+        else {
+            LOG.info("Object has no assigned tags");
         }
+
         integrationData.setDataType(integrationDataType);
-        LOG.info("Integration data: " + integrationData.toString());
 
         /** issue: SXCSP-334
          * how to identify if it is post or put
@@ -196,12 +191,14 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
             return;
         }
 
+        LOG.info("Integration Data Forwarded to IL: " + integrationData);
+
         boolean objextExists = false;
         try {
             objextExists = elasticClient.objectExists(integrationData);
         }
         catch (Exception e){
-            LOG.info("Elastic query failed, " + e.getMessage());
+            LOG.error("Elastic query failed, " + e.getMessage());
         }
 
         LOG.info("Object exists: " + objextExists);
@@ -222,5 +219,24 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
     @Override
     public void handleReemittionMispData(IntegrationData integrationData, MispEntity mispEntity, boolean isDelete, boolean isReEmittion) {
         handleMispData(integrationData.getDataObject(), mispEntity, isDelete, true);
+    }
+
+    private JsonNode updateTimestamp(JsonNode rootNode) {
+
+        if (rootNode.has(EVENT.toString())) {
+            ((ObjectNode) rootNode.get(EVENT.toString())).put("timestamp", String.valueOf(Instant.now().getEpochSecond()));
+
+            if (rootNode.get(EVENT.toString()).has("Object") && rootNode.get(EVENT.toString()).get("Object").isArray()) {
+                for (JsonNode jn : rootNode.get(EVENT.toString()).get("Object")) {
+                    ((ObjectNode) jn).put("timestamp", String.valueOf(Instant.now().getEpochSecond()));
+                    if (jn.has("Attribute") && jn.get("Attribute").isArray()) {
+                        for (JsonNode jn2 : jn.get("Attribute")) {
+                            ((ObjectNode) jn2).put("timestamp", String.valueOf(Instant.now().getEpochSecond()));
+                        }
+                    }
+                }
+            }
+        }
+        return rootNode;
     }
 }
