@@ -9,7 +9,7 @@ info:
     external CSPs, authorizes that data based on data specific trust circles and
     the integration layer performs synchronization of that data between eligible
     applications.
-  version: 1.0.4
+  version: 1.0.5
   title: Integration Layer API
 schemes:
   - https
@@ -202,9 +202,23 @@ definitions:
       isExternal:
         type: boolean
       trustCircleId:
-        type: string
+        description: >-
+          An array of strings with the trust circle uuids. For backwards
+          combatibility a single string value is also accepted. Empty strings
+          will result in validation error. If trustCircleId is not null then
+          teamId is disregarded
+        type: array
+        items:
+          type: string
       teamId:
-        type: string
+        description: >-
+          An array of string with the team uuids. For backwards combatibility a
+          single string value is also accepted. Empty strings will result in
+          validation error. If trustCircleId is not null then teamId is
+          disregarded
+        type: array
+        items:
+          type: string
     required:
       - toShare
       - isExternal
