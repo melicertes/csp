@@ -2,6 +2,7 @@ package com.intrasoft.csp.misp.service.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.intrasoft.csp.client.CspClient;
 import com.intrasoft.csp.client.ElasticClient;
 import com.intrasoft.csp.commons.model.DataParams;
@@ -21,6 +22,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.intrasoft.csp.misp.commons.config.MispContextUrl.MispEntity.ACTION;
@@ -46,6 +48,12 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
 
     @Value("${misp.app.events.path}")
     String eventsPath;
+
+    @Value("${misp.sync.prefix}")
+    String prefix;
+
+    @Value("${misp.sync.type}")
+    String syncType;
 
     @Value("${server.name}")
     String cspId;
@@ -80,13 +88,44 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
 
         String uuid = "";
         String sharingGroupUuid = "";
+        List<String> syncedOrgsUuids = new ArrayList<>();
 
         LOG.info(jsonNode.toString());
 
         switch (mispEntity) {
             case EVENT:
                 LOG.info(EVENT.toString());
-                sharingGroupUuid = jsonNode.get(EVENT.toString()).get("SharingGroup").get("uuid").toString().replace("\"","");
+                String sharingGroupName = new String();
+                // Sharing Group / Organisations synchronization validation for use with Sharing Params
+                try { // handling the case when there's no sharing group specified in the event's distribution setting.
+                    sharingGroupName = jsonNode.get(EVENT.toString()).get("SharingGroup").get("name").toString().replace("\"","");
+                } catch (NullPointerException e) {
+                    LOG.info("No sharing group distribution set for this event");
+                }
+                if (sharingGroupName.startsWith(prefix)) {  // if this sharing group was synchronized
+                    sharingGroupUuid = jsonNode.get(EVENT.toString()).get("SharingGroup").get("uuid").toString().replace("\"","");
+                    // Get any organisations found in the sharing group node.
+                    ArrayNode sGroupOrgs = (ArrayNode) jsonNode.get(EVENT.toString()).get("SharingGroup").get("SharingGroupOrg");
+                    // Catch the exception in case the sharing group has no organisations at all.
+                    boolean proceed = false;
+                    try {
+                        sGroupOrgs.isNull();
+                        proceed = true;
+                    } catch (NullPointerException e) {
+                        LOG.info("No organisations found in the sharing group");
+                    }
+                    if (proceed) {
+                        sGroupOrgs.forEach(o -> {
+                            // For each valid (synchronized) organisation, add its uuid in the list for use with sharing params.
+                            // Currently checking for both synchronization indications (name prefix and organisation type)
+                            if (o.get("Organisation").get("name").toString().replace("\"","").startsWith(prefix)
+                                    || o.get("Organisation").get("type").toString().replace("\"","").equals(syncType)) {
+                                syncedOrgsUuids.add(o.get("Organisation").get("uuid").toString().replace("\"",""));
+                            }
+                        });
+                    }
+                }
+
                 uuid = jsonNode.get(EVENT.toString()).get("uuid").toString().replace("\"","");
                 object = mispAppClient.getMispEvent(uuid).getBody();
                 jsonNode = new ObjectMapper().convertValue(object, JsonNode.class);
@@ -159,7 +198,10 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
          * find out how to differentiate our custom shared groups from the normal ones
          * use custom sharing groups uuids as tcid, use custom organizations(?) uuids as team id.
          * harvest only from the dataobject part which dictates which organization or sharing group should get this event*/
-        sharingParams.setTcId(sharingGroupUuid);
+        if (mispEntity.equals(EVENT) && (!sharingGroupUuid.isEmpty() || syncedOrgsUuids.size()>0)) {
+            sharingParams.setTcId(sharingGroupUuid);
+            sharingParams.setTeamId(syncedOrgsUuids.size() > 0 ? syncedOrgsUuids : null);
+        }
         IntegrationData integrationData = new IntegrationData();
         integrationData.setDataParams(dataParams);
         integrationData.setSharingParams(sharingParams);

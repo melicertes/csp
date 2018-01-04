@@ -44,6 +44,9 @@ public class MispTcSyncServiceImpl implements MispTcSyncService {
     @Value("${misp.sync.initial.delay}")
     Long initialDelay;
 
+    @Value("$misp.sync.prefix")
+    String prefix;
+
 //  TODO: Investigate which additional fields can be mapped
 
     @PostConstruct
@@ -159,7 +162,8 @@ public class MispTcSyncServiceImpl implements MispTcSyncService {
     private void mapTeamToOrganisation(Team team, OrganisationDTO organisation) {
 
         organisation.setUuid(team.getId());
-        organisation.setName(team.getName());
+        // Modifying the name field to differentiate synchronized organisations.
+        organisation.setName(prefix + team.getName());
         organisation.setDescription(team.getDescription());
         organisation.setNationality(team.getCountry());
         // SXCSP-420: "The team with the csp-id that is equal to this csp-id should be imported as local org."
@@ -170,7 +174,8 @@ public class MispTcSyncServiceImpl implements MispTcSyncService {
     private void mapTrustCircleToSharingGroup(TrustCircle tCircle, SharingGroup sGroup) {
 
         sGroup.setUuid(tCircle.getId());
-        sGroup.setName(tCircle.getName());
+        // Modifying the name field to differentiate synchronized sharing groups.
+        sGroup.setName(prefix + tCircle.getName());
         sGroup.setDescription(tCircle.getDescription());
 
         List<String> tCircleTeamsUuids = tCircle.getTeams();
