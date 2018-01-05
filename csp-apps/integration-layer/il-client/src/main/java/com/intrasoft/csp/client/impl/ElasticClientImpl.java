@@ -103,8 +103,6 @@ public class ElasticClientImpl implements ElasticClient {
     @Override
     public JsonNode getESobjectFromOrigin(IntegrationData integrationData) throws IOException {
         ElasticSearchRequest elasticSearchRequest = this.getElasticOriginSearchRequest(integrationData);
-        System.out.println(elasticSearchRequest.toString());
-
         IntegrationDataType dataType = integrationData.getDataType();
 
         ResponseEntity<String> response = retryRestTemplate.postForEntity(this.getElasticURI() + "/" + dataType.toString().toLowerCase() + "/_search?pretty&_source=false", elasticSearchRequest,String.class);
