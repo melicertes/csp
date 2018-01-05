@@ -168,8 +168,6 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
             sharingParams.setTeamId(eventValidationMap.get("org"));
         } else if (eventValidationMap.containsKey("sg")) { // Valid Sharing Group without any valid organisations
             sharingParams.setTcId(eventValidationMap.get("sg"));
-        } else { // Event failed validation
-            LOG.warn("Could not retrieve a team id or tc id from dataObject");
         }
         IntegrationData integrationData = new IntegrationData();
         integrationData.setDataParams(dataParams);
@@ -246,34 +244,33 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
             result.put("", new ArrayList<>());
             return result; // returns empty map on sharing group absence
         }
-        if (sharingGroupName.startsWith(prefix)) {  // if this sharing group is valid (was synchronized)
-            sharingGroupUuid = jsonNode.get(EVENT.toString()).get("SharingGroup").get("uuid").toString().replace("\"","");
-            // Get any organisations found in the sharing group node.
-            ArrayNode sGroupOrgs = (ArrayNode) jsonNode.get(EVENT.toString()).get("SharingGroup").get("SharingGroupOrg");
-            // Catch the exception in case the sharing group has no organisations at all.
-            boolean proceed = false;
-            try {
-                sGroupOrgs.isNull();
-                proceed = true;
-            } catch (NullPointerException e) {
-                LOG.info("No organisations found in the sharing group");
-            }
-            if (proceed) {
-                sGroupOrgs.forEach(o -> {
-                    // For each valid (synchronized) organisation, add its uuid in the list for use with sharing params.
-                    // Currently checking for both synchronization indications (name prefix and organisation type)
-                    if (o.get("Organisation").get("name").toString().replace("\"","").startsWith(prefix)
-                            || o.get("Organisation").get("type").toString().replace("\"","").equals(syncType)) {
-                        syncedOrgsUuids.add(o.get("Organisation").get("uuid").toString().replace("\"",""));
-                    }
-                });
-                result.put("org", syncedOrgsUuids);
-                return result; // When Sharing Group is valid, method returns its valid Organisations UUIDs along with a key indication.
-            }
-            result.put("sg", Arrays.asList(sharingGroupUuid));
-            return result; // When Sharing Group is valid but has no Organisations, method returns its UUID along with a key indication.
+        // Retrieving any synchronized Organisations in the Sharing Group even if it has no synchronization prefix.
+        sharingGroupUuid = jsonNode.get(EVENT.toString()).get("SharingGroup").get("uuid").toString().replace("\"","");
+        // Get any organisations found in the sharing group node.
+        ArrayNode sGroupOrgs = (ArrayNode) jsonNode.get(EVENT.toString()).get("SharingGroup").get("SharingGroupOrg");
+        // Catch the exception in case the sharing group has no organisations at all.
+        boolean proceed = false;
+        try {
+            sGroupOrgs.isNull();
+            proceed = true;
+        } catch (NullPointerException e) {
+            LOG.info("No organisations found in the sharing group");
+            return result;
         }
-        return null;
+        if (proceed) {
+            sGroupOrgs.forEach(o -> {
+                // For each valid (synchronized) organisation, add its uuid in the list for use with sharing params.
+                // Currently checking for both synchronization indications (name prefix OR organisation type)
+                if (o.get("Organisation").get("name").toString().replace("\"","").startsWith(prefix)
+                        || o.get("Organisation").get("type").toString().replace("\"","").equals(syncType)) {
+                    syncedOrgsUuids.add(o.get("Organisation").get("uuid").toString().replace("\"",""));
+                }
+            });
+            result.put("org", syncedOrgsUuids);
+            return result; // When Sharing Group is valid, method returns its valid Organisations UUIDs along with a key indication.
+        }
+        result.put("sg", Arrays.asList(sharingGroupUuid));
+        return result; // When Sharing Group is valid but has no Organisations, method returns its UUID along with a key indication.
     }
 
     @Override
