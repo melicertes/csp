@@ -6,27 +6,27 @@ import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-        "must"
+        "filter"
 })
 public class Bool {
 
-    @JsonProperty("must")
-    private List<Must> must = null;
+    @JsonProperty("filter")
+    private List<Filter> filter = null;
 
-    @JsonProperty("must")
-    public List<Must> getMust() {
-        return must;
+    @JsonProperty("filter")
+    public List<Filter> getFilter() {
+        return filter;
     }
 
-    @JsonProperty("must")
-    public void setMust(List<Must> must) {
-        this.must = must;
+    @JsonProperty("filter")
+    public void setFilter(List<Filter> filter) {
+        this.filter = filter;
     }
 
     @Override
     public String toString() {
         return "Bool{" +
-                "must=" + must +
+                "filter=" + filter +
                 '}';
     }
 

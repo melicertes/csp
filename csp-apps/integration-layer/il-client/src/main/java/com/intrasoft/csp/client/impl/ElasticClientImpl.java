@@ -8,8 +8,8 @@ import com.intrasoft.csp.commons.model.IntegrationDataType;
 import com.intrasoft.csp.commons.model.elastic.ElasticSearchRequest;
 import com.intrasoft.csp.commons.model.elastic.ElasticSearchResponse;
 import com.intrasoft.csp.commons.model.elastic.query.Bool;
-import com.intrasoft.csp.commons.model.elastic.query.Match;
-import com.intrasoft.csp.commons.model.elastic.query.Must;
+import com.intrasoft.csp.commons.model.elastic.query.Term;
+import com.intrasoft.csp.commons.model.elastic.query.Filter;
 import com.intrasoft.csp.commons.model.elastic.query.Query;
 import com.intrasoft.csp.libraries.restclient.service.RetryRestTemplate;
 import org.slf4j.Logger;
@@ -103,6 +103,8 @@ public class ElasticClientImpl implements ElasticClient {
     @Override
     public JsonNode getESobjectFromOrigin(IntegrationData integrationData) throws IOException {
         ElasticSearchRequest elasticSearchRequest = this.getElasticOriginSearchRequest(integrationData);
+        System.out.println(elasticSearchRequest.toString());
+
         IntegrationDataType dataType = integrationData.getDataType();
 
         ResponseEntity<String> response = retryRestTemplate.postForEntity(this.getElasticURI() + "/" + dataType.toString().toLowerCase() + "/_search?pretty&_source=false", elasticSearchRequest,String.class);
@@ -133,29 +135,29 @@ public class ElasticClientImpl implements ElasticClient {
 
     private Query getElasticQuery(IntegrationData integrationData) {
 
-        Match t1 = new Match();
+        Term t1 = new Term();
         t1.setRecordId(integrationData.getDataParams().getRecordId());
 
-        Match t2 = new Match();
+        Term t2 = new Term();
         t2.setCspId(integrationData.getDataParams().getCspId());
 
-        Match t3 = new Match();
+        Term t3 = new Term();
         t3.setApplicationId(integrationData.getDataParams().getApplicationId());
 
-        Must m1 = new Must();
-        m1.setMatch(t1);
-        Must m2 = new Must();
-        m2.setMatch(t2);
-        Must m3 = new Must();
-        m3.setMatch(t3);
+        Filter m1 = new Filter();
+        m1.setTerm(t1);
+        Filter m2 = new Filter();
+        m2.setTerm(t2);
+        Filter m3 = new Filter();
+        m3.setTerm(t3);
 
-        ArrayList<Must> must = new ArrayList<>();
-        must.add(m1);
-        must.add(m2);
-        must.add(m3);
+        ArrayList<Filter> filter = new ArrayList<>();
+        filter.add(m1);
+        filter.add(m2);
+        filter.add(m3);
 
         Bool bool = new Bool();
-        bool.setMust(must);
+        bool.setFilter(filter);
 
         Query query = new Query();
         query.setBool(bool);
@@ -164,29 +166,29 @@ public class ElasticClientImpl implements ElasticClient {
     }
 
     private Query getElasticOriginQuery(IntegrationData integrationData) {
-        Match t1 = new Match();
-        Match t2 = new Match();
-        Match t3 = new Match();
+        Term t1 = new Term();
+        Term t2 = new Term();
+        Term t3 = new Term();
 
         t1.setOriginRecordId(integrationData.getDataParams().getOriginRecordId());
         t2.setOriginCspId(integrationData.getDataParams().getOriginCspId());
         t3.setOriginApplicationId(integrationData.getDataParams().getOriginApplicationId());
 
-        Must m1 = new Must();
-        Must m2 = new Must();
-        Must m3 = new Must();
+        Filter m1 = new Filter();
+        Filter m2 = new Filter();
+        Filter m3 = new Filter();
 
-        m1.setMatch(t1);
-        m2.setMatch(t2);
-        m3.setMatch(t3);
+        m1.setTerm(t1);
+        m2.setTerm(t2);
+        m3.setTerm(t3);
 
-        ArrayList<Must> must = new ArrayList<>();
-        must.add(m1);
-        must.add(m2);
-        must.add(m3);
+        ArrayList<Filter> filter = new ArrayList<>();
+        filter.add(m1);
+        filter.add(m2);
+        filter.add(m3);
 
         Bool bool = new Bool();
-        bool.setMust(must);
+        bool.setFilter(filter);
 
         Query query = new Query();
         query.setBool(bool);
