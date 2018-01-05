@@ -144,8 +144,8 @@ public class MispAppClientImpl implements MispAppClient, MispContextUrl {
 
     @Override
     public List<OrganisationDTO> getAllMispOrganisations() {
-//      TODO: Which filter to use here? Local or both local and external?
-        String url = context  + "/" + MISP_ORGANISATIONS_VIEW_ALL_LOCAL; // There are external and all options as well.
+//      TODO: Which filter to use here? Local or both local and external? Create separate get methods for each filter?
+        String url = context  + "/" + MISP_ORGANISATIONS_VIEW_ALL_LOCAL_AND_EXTERNAL;
         LOG.info("API call [GET]: " + url);
         HttpEntity<OrganisationWrapper> request = new HttpEntity<>(headers);
 

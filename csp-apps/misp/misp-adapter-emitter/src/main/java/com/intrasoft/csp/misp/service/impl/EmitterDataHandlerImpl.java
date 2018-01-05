@@ -165,14 +165,12 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
          * find out how to differentiate our custom shared groups from the normal ones
          * use custom sharing groups uuids as tcid, use custom organizations(?) uuids as team id.
          * harvest only from the dataobject part which dictates which organization or sharing group should get this event*/
-        if (eventValidationMap.containsKey("org")) { // Valid Sharing Group with Valid Organisations;
+        if (eventValidationMap.containsKey("org")) { // Valid Sharing Group with valid Organisations
             sharingParams.setTeamId(eventValidationMap.get("org"));
-        } else if (eventValidationMap.containsKey("sg")) { // Valid Sharing Group without valid organisations
+        } else if (eventValidationMap.containsKey("sg")) { // Valid Sharing Group without any valid organisations
             sharingParams.setTcId(eventValidationMap.get("sg"));
         } else { // Event failed validation
-            LOG.warn("Event failed validation"); // TODO: Assign empty lists to sharing params ids or leave them intact?
-            sharingParams.setTcId(new ArrayList<String>());
-            sharingParams.setTeamId(new ArrayList<String>());
+            LOG.warn("Could not retrieve a team id or tc id from dataObject");
         }
         IntegrationData integrationData = new IntegrationData();
         integrationData.setDataParams(dataParams);
@@ -274,7 +272,7 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
                 return result; // When Sharing Group is valid, method returns its valid Organisations UUIDs along with a key indication.
             }
             result.put("sg", Arrays.asList(sharingGroupUuid));
-            return result; // When Sharing Group is valid but has no Organisations, method returns its UUID
+            return result; // When Sharing Group is valid but has no Organisations, method returns its UUID along with a key indication.
         }
         return null;
     }

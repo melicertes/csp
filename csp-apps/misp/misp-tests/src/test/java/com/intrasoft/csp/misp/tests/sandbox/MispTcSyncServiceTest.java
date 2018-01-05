@@ -26,6 +26,8 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.util.Arrays;
+import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -83,9 +85,10 @@ public class MispTcSyncServiceTest {
     // to the known remote organisations list. Alternatively, if you are certain that you would like to remove an
     // organisation and are aware of the impact, make sure that there are no users or events still tied to this
     // organisation before deleting it."
-    // Given 6 TC Teams, MISP should create them if they don't already exist.
+    // Given 6 TC Teams, service should create all 6 of them (assuming they don't already exist)
+    // Also tests for the existence of the name prefix after synchronizing
     @Test
-    public void syncOrganisationsShouldAddSixReturnEightTest() throws URISyntaxException, IOException {
+    public void syncOrganisationsSixTeamsShouldAddSixOrgsTest() throws URISyntaxException, IOException {
 
         //mock the TC server using json retrieved from a real TC (6 teams in file)
 
@@ -98,13 +101,21 @@ public class MispTcSyncServiceTest {
 
         mispTcSyncService.syncOrganisations();
 
-        // TODO: Remove plus 2 when synchronizing implementation supports deletion for organisations tied to events/users
-        assertThat(mispAppClient.getAllMispOrganisations().size(), is(6+2));
+        List<String> uuidList = Arrays.asList("306de7b8-5e8c-4a5e-9de2-1f837713bfc1", "974b5557-9aca-468c-90cc-961b31df0ef6",
+                "578c0e4e-ebaf-455b-a2a1-faffb14be9e1", "af9d06ac-d7be-4684-86a3-808fe4f4d17c",
+                "88557939-db1c-4411-831a-9b6226ef4819", "6a552fd8-100c-4c3f-8b0f-5ec1d6bf009d");
+
+        uuidList.forEach(uuid -> {
+            assertThat(uuid, is(mispAppClient.getMispOrganisation(uuid).getUuid()));
+            assertTrue(mispAppClient.getMispOrganisation(uuid).getName().startsWith("CSP::"));
+        });
+
         mockServer.verify();
     }
-    // When two TC teams exist, those two MISP organisations should only be left in MISP after synchronizing.
+    // When two TC teams exist, their two corresponding MISP organisations should only be left in MISP after synchronizing.
+    // (This test will now fail because we've removed the organisation deletion from the synchronization logic.)
     @Test
-    public void syncOrganisationsGivenTwoTeamsReturnTwoOrganisationsTest() throws URISyntaxException, IOException {
+    public void syncOrganisationsTwoTeamsShouldSyncTwoOrgsTest() throws URISyntaxException, IOException {
 
         String apiUrl = tcConfig.getTcTeamsURI();
         MockRestServiceServer mockServer = MockRestServiceServer.bindTo(tcRetryRestTemplate).build();

@@ -44,7 +44,7 @@ public class MispTcSyncServiceImpl implements MispTcSyncService {
     @Value("${misp.sync.initial.delay}")
     Long initialDelay;
 
-    @Value("$misp.sync.prefix")
+    @Value("${misp.sync.prefix}")
     String prefix;
 
 //  TODO: Investigate which additional fields can be mapped
@@ -167,9 +167,11 @@ public class MispTcSyncServiceImpl implements MispTcSyncService {
         organisation.setDescription(team.getDescription());
         organisation.setNationality(team.getCountry());
         // SXCSP-420: "The team with the csp-id that is equal to this csp-id should be imported as local org."
-        if (team.getCspId().equals(cspId)) // case-sensitivity?
+        if (team.getCspId().equals(cspId))  // case-sensitivity?
             organisation.setLocal(true);
-        }
+        else
+            organisation.setLocal(false);
+    }
 
     private void mapTrustCircleToSharingGroup(TrustCircle tCircle, SharingGroup sGroup) {
 
