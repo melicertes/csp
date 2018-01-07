@@ -117,7 +117,7 @@ public class ConfClientApplicationTests {
 	@Transactional
 	public void testPersistingModules() throws Exception {
 
-		SystemModule mod = new SystemModule(null, "base", "DESC", new LocalDateTime(), true, "1.0.000","arcPath","modPath", ModuleState.UNKNOWN, "hash",1);
+		SystemModule mod = new SystemModule(null, "base", "DESC", new LocalDateTime(), true, "1.0.000","arcPath","modPath", ModuleState.UNKNOWN, "hash",1, "");
 
 		SystemModule saved = moduleRepository.save(mod);
 
@@ -144,8 +144,8 @@ public class ConfClientApplicationTests {
 	@Transactional
 	public void testSystemModuleServices() throws Exception {
 
-		SystemModule m1 = new SystemModule(null, "module1","descr1",new LocalDateTime(), true, "1.0.000", "","",ModuleState.INSTALLED,"hash1",100);
-		SystemModule m2 = new SystemModule(null, "module2","descr2",new LocalDateTime(), true, "1.0.000", "","",ModuleState.INSTALLED,"hash2",101);
+		SystemModule m1 = new SystemModule(null, "module1","descr1",new LocalDateTime(), true, "1.0.000", "","",ModuleState.INSTALLED,"hash1",100,"");
+		SystemModule m2 = new SystemModule(null, "module2","descr2",new LocalDateTime(), true, "1.0.000", "","",ModuleState.INSTALLED,"hash2",101,"");
 
 
 		moduleRepository.save(m1);
