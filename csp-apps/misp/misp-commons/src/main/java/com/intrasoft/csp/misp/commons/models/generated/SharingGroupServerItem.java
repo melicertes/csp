@@ -1,8 +1,11 @@
 package com.intrasoft.csp.misp.commons.models.generated;
 
-import java.util.List;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import javax.annotation.Generated;
+import com.intrasoft.csp.misp.commons.models.generated.Server;
+
+import java.util.List;
+
 
 public class SharingGroupServerItem{
 
@@ -13,7 +16,11 @@ public class SharingGroupServerItem{
 	private String sharingGroupId;
 
 	@JsonProperty("Server")
-	private List<Object> server;
+    @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
+	private List<Server> server;
+
+	@JsonProperty("id")
+	private String id;
 
 	@JsonProperty("server_id")
 	private String serverId;
@@ -34,12 +41,20 @@ public class SharingGroupServerItem{
 		return sharingGroupId;
 	}
 
-	public void setServer(List<Object> server){
+	public void setServer(List<Server> server){
 		this.server = server;
 	}
 
-	public List<Object> getServer(){
+	public List<Server> getServer(){
 		return server;
+	}
+
+	public void setId(String id){
+		this.id = id;
+	}
+
+	public String getId(){
+		return id;
 	}
 
 	public void setServerId(String serverId){
@@ -50,13 +65,14 @@ public class SharingGroupServerItem{
 		return serverId;
 	}
 
-	@Override
+    @Override
  	public String toString(){
 		return 
 			"SharingGroupServerItem{" + 
 			"all_orgs = '" + allOrgs + '\'' + 
 			",sharing_group_id = '" + sharingGroupId + '\'' + 
-			",server = '" + server + '\'' + 
+			",server = '" + server + '\'' +
+			",id = '" + id + '\'' +
 			",server_id = '" + serverId + '\'' + 
 			"}";
 		}

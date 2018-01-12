@@ -136,7 +136,7 @@ public class MispTcSyncServiceTest {
     public void syncSharingGroupsNonExistingSharingGroupsTest() throws URISyntaxException, IOException {
         String tcCirclesURI = tcConfig.getTcCirclesURI();
         String mispGroupsURI = "http://192.168.56.50:80/sharing_groups";
-        String mispAddGroupURI = "http://192.168.56.50:80/admin/sharing_groups/add";
+        String mispAddGroupURI = "http://192.168.56.50:80/sharing_groups/add";
         String sharingGroupUuid = "a36c31f4-dad3-4f49-b443-e6d6333649b1";
 
         // We first need to mock TC server's getAllTrustCircles response

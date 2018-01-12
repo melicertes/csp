@@ -32,5 +32,5 @@ public interface MispAppClient {
     SharingGroup getMispSharingGroup(String uuid);
     SharingGroup addMispSharingGroup(SharingGroup sharingGroup);
     SharingGroup updateMispSharingGroup(SharingGroup sharingGroup);
-    boolean deleteMispSharingGroup(String id);
+    Boolean deleteMispSharingGroup(String id);
 }

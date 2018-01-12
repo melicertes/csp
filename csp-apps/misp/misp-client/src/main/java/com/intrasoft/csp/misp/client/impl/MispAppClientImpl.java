@@ -256,7 +256,7 @@ public class MispAppClientImpl implements MispAppClient, MispContextUrl {
         SharingGroup tempSg = null;
         for (Response ri : response.getBody().getResponse()) {
             tempSg = ri.getSharingGroup();
-            tempSg.setCreatedBy(ri.getOrganisation());
+            tempSg.setOrganisation(ri.getOrganisation());
             tempSg.setEditable(ri.isEditable());
             tempSg.setSharingGroupOrg(ri.getSharingGroupOrg());
             tempSg.setSharingGroupServer(ri.getSharingGroupServer());
@@ -284,7 +284,12 @@ public class MispAppClientImpl implements MispAppClient, MispContextUrl {
             return null;
         }
 
-        return response.getBody().getSharingGroup();
+//      TODO: Rearrange classes to avoid this manual mapping
+        SharingGroup sharingGroup = response.getBody().getSharingGroup();
+        sharingGroup.setOrganisation(response.getBody().getOrganisation());
+        sharingGroup.setSharingGroupOrg(response.getBody().getSharingGroupOrg());
+        sharingGroup.setSharingGroupServer(response.getBody().getSharingGroupServer());
+        return sharingGroup;
 
     }
 
@@ -292,22 +297,26 @@ public class MispAppClientImpl implements MispAppClient, MispContextUrl {
     public SharingGroup addMispSharingGroup(SharingGroup sharingGroup) {
         String url = context  + "/" + MISP_SHARINGGROUPS_ADD;
 
-        Response resp = new Response();
-        resp.setSharingGroup(sharingGroup);
-
         LOG.info("API call [POST]: " + url);
-        HttpEntity<Response> request = new HttpEntity<>(headers);
 
-        ResponseEntity<Response> response;
+        HttpEntity<SharingGroup> request = new HttpEntity<>(sharingGroup, headers);
+        ResponseEntity<List<Response>> response;
         try {
-            response = retryRestTemplate.exchange(url, HttpMethod.POST, request, Response.class);
+            response = retryRestTemplate.exchange(url, HttpMethod.POST, request,
+                    new ParameterizedTypeReference<List<Response>>() {
+                    });
 
         } catch (Exception e) {
             LOG.error(e.getMessage());
             return null;
         }
         LOG.info(response.getStatusCode().toString());
-        return response.getBody().getSharingGroup();
+
+//      TODO: Is the Sharing Groups API supposed to respond with an array when adding a Sharing Group? Investigate.
+//      SharingGroupOrg is not embedded in the response's Sharing Group object; mapping it manually
+        SharingGroup returnedSg = response.getBody().get(0).getSharingGroup();
+        returnedSg.setSharingGroupOrg(response.getBody().get(0).getSharingGroupOrg());
+        return returnedSg;
     }
 
     @Override
@@ -334,22 +343,22 @@ public class MispAppClientImpl implements MispAppClient, MispContextUrl {
     }
 
     @Override
-    public boolean deleteMispSharingGroup(String id) {
+    public Boolean deleteMispSharingGroup(String id) {
         String url = context  + "/" + MISP_SHARINGGROUPS_DELETE + "/" + id;
 
         LOG.info("API call [POST]: " + url);
         HttpEntity<Response> request = new HttpEntity<>(headers);
 
-        ResponseEntity<Boolean> response;
+        ResponseEntity<Response> response;
         try {
-            response = retryRestTemplate.exchange(url, HttpMethod.POST, request, Boolean.class);
+            response = retryRestTemplate.exchange(url, HttpMethod.POST, request, Response.class);
 
         } catch (Exception e) {
             LOG.error(e.getMessage());
             return false;
         }
 
-        LOG.error(response.getStatusCode() + " " + response.getStatusCode().getReasonPhrase());
+        LOG.info(response.getStatusCode() + " " + response.getStatusCode().getReasonPhrase());
         return true;
     }
 }
