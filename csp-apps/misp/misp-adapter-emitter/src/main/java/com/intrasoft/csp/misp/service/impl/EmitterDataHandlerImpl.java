@@ -77,7 +77,7 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
     private JsonNode jsonNode;
 
     @Override
-    public void handleMispData(Object object, MispEntity mispEntity, boolean isDelete, boolean isReEmittion) {
+    public void handleMispData(Object object, MispEntity mispEntity, boolean isReEmittion) {
         final Logger LOG = LoggerFactory.getLogger(EmitterDataHandlerImpl.class);
 
         jsonNode = new ObjectMapper().convertValue(object, JsonNode.class);
@@ -89,7 +89,13 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
         switch (mispEntity) {
             case EVENT:
                 uuid = jsonNode.get(EVENT.toString()).get("uuid").textValue();
-                object = mispAppClient.getMispEvent(uuid).getBody();
+                try{
+                    object = mispAppClient.getMispEvent(uuid).getBody();
+                }
+                catch (Exception e){
+                    LOG.error("Get Event from MISP API Failed: ", e);
+                    return;
+                }
                 jsonNode = updateTimestamp(new ObjectMapper().convertValue(object, JsonNode.class));
                 break;
         }
@@ -182,14 +188,6 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
          * how to identify if it is post or put
          * should search in ES to see if this uuid exists
          * query the index based on datatype (event/threat), if found send put else send post */
-        if (jsonNode.has(ACTION.toString())){
-            String action = jsonNode.get(ACTION.toString()).toString();
-            LOG.info(action.replace("\"",""));
-            if (isDelete) {
-                cspClient.deleteIntegrationData(integrationData);
-            }
-            return;
-        }
 
         LOG.info("Integration Data Forwarded to IL: " + integrationData);
 
@@ -218,7 +216,7 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
 
     @Override
     public void handleReemittionMispData(IntegrationData integrationData, MispEntity mispEntity, boolean isDelete, boolean isReEmittion) {
-        handleMispData(integrationData.getDataObject(), mispEntity, isDelete, true);
+        handleMispData(integrationData.getDataObject(), mispEntity, true);
     }
 
     private JsonNode updateTimestamp(JsonNode rootNode) {
