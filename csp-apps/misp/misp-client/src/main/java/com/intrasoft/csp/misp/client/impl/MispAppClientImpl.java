@@ -284,7 +284,7 @@ public class MispAppClientImpl implements MispAppClient, MispContextUrl {
             return null;
         }
 
-//      TODO: Rearrange classes to avoid this manual mapping
+//      TODO: avoid this manual mapping
         SharingGroup sharingGroup = response.getBody().getSharingGroup();
         sharingGroup.setOrganisation(response.getBody().getOrganisation());
         sharingGroup.setSharingGroupOrg(response.getBody().getSharingGroupOrg());
@@ -322,24 +322,25 @@ public class MispAppClientImpl implements MispAppClient, MispContextUrl {
     @Override
     public SharingGroup updateMispSharingGroup(SharingGroup sharingGroup) {
 
-        // Just like MISP's Organisations REST API, we're assuming SharingGroups API also uses id and not uuid in the url.
+        // Just like MISP's Organisations REST API, SharingGroups API also uses id and not uuid in the url.
         String url = context  + "/" + MISP_SHARINGGROUPS_EDIT + "/" + sharingGroup.getId();
 
-        Response resp = new Response();
-        resp.setSharingGroup(sharingGroup);
-
         LOG.info("API call [POST]: " + url);
-        HttpEntity<Response> request = new HttpEntity<>(headers);
+        HttpEntity<SharingGroup> request = new HttpEntity<>(sharingGroup, headers);
 
-        ResponseEntity<Response> response;
+        ResponseEntity<List<Response>> response;
         try {
-            response = retryRestTemplate.exchange(url, HttpMethod.POST, request, Response.class);
+            response = retryRestTemplate.exchange(url, HttpMethod.POST, request,
+                    new ParameterizedTypeReference<List<Response>>() {
+                    });
         } catch (Exception e) {
             LOG.error(e.getMessage());
             return null;
         }
 
-        return response.getBody().getSharingGroup();
+//      TODO: Temporary fix; the sharing group should have the organisations
+        response.getBody().get(0).getSharingGroup().setSharingGroupOrg(response.getBody().get(0).getSharingGroupOrg());
+        return response.getBody().get(0).getSharingGroup();
     }
 
     @Override
