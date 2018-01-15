@@ -31,7 +31,6 @@ import static com.intrasoft.csp.misp.commons.config.MispContextUrl.MispEntity.EV
 
 @Service
 public class AdapterDataHandlerImpl implements AdapterDataHandler{
-
     private Logger LOG = LoggerFactory.getLogger(AdapterDataHandlerImpl.class);
 
     @Autowired

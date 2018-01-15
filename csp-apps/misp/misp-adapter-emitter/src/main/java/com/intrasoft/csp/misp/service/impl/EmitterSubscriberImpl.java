@@ -23,7 +23,9 @@ import static com.intrasoft.csp.misp.commons.config.MispContextUrl.MISP_EVENT;
 
 @Service
 public class EmitterSubscriberImpl implements EmitterSubscriber, MispContextUrl{
-    final Logger LOG = LoggerFactory.getLogger(EmitterSubscriber.class);
+    final private static Logger LOG = LoggerFactory.getLogger("root");
+
+    //final Logger LOG = LoggerFactory.getLogger(EmitterSubscriber.class);
 
     @Value("${zeromq.protocol}")
     String zeroMQprotocol;
@@ -52,11 +54,12 @@ public class EmitterSubscriberImpl implements EmitterSubscriber, MispContextUrl{
         String addr = zeroMQprotocol + "://" + zeroMQhost + ":" + zeroMQport;
 
         boolean subscribed = subscriber.connect(addr);
+
         LOG.info("Subscribed to " + zeroMQhost + ":" + zeroMQport + ", " + subscribed);
         subscriber.subscribe("");
         while (!Thread.currentThread ().isInterrupted ()) {
             String msg = subscriber.recvStr();
-            LOG.info(msg);
+            //LOG.info(msg);
             String topic = msg.substring(0, msg.indexOf(' '));
             String content = msg.substring(msg.indexOf(' ') + 1);
             JsonNode jsonNode = null;
