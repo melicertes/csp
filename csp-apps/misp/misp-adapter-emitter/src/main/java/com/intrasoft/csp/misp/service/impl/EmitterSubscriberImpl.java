@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.intrasoft.csp.misp.commons.config.MispContextUrl;
+import com.intrasoft.csp.misp.service.EmitterAuditLogHandler;
 import com.intrasoft.csp.misp.service.EmitterDataHandler;
 import com.intrasoft.csp.misp.service.EmitterSubscriber;
 import org.slf4j.Logger;
@@ -22,7 +23,9 @@ import static com.intrasoft.csp.misp.commons.config.MispContextUrl.MISP_EVENT;
 
 @Service
 public class EmitterSubscriberImpl implements EmitterSubscriber, MispContextUrl{
-    final Logger LOG = LoggerFactory.getLogger(EmitterSubscriber.class);
+    final private static Logger LOG = LoggerFactory.getLogger("root");
+
+    //final Logger LOG = LoggerFactory.getLogger(EmitterSubscriber.class);
 
     @Value("${zeromq.protocol}")
     String zeroMQprotocol;
@@ -39,6 +42,9 @@ public class EmitterSubscriberImpl implements EmitterSubscriber, MispContextUrl{
     @Autowired
     EmitterDataHandler emitterDataHandler;
 
+    @Autowired
+    EmitterAuditLogHandler auditLogHandler;
+
     @Override
     public void subscribe() {
         // Prepare our context and subscriber
@@ -48,42 +54,27 @@ public class EmitterSubscriberImpl implements EmitterSubscriber, MispContextUrl{
         String addr = zeroMQprotocol + "://" + zeroMQhost + ":" + zeroMQport;
 
         boolean subscribed = subscriber.connect(addr);
+
         LOG.info("Subscribed to " + zeroMQhost + ":" + zeroMQport + ", " + subscribed);
         subscriber.subscribe("");
         while (!Thread.currentThread ().isInterrupted ()) {
-
-            /*ZMsg msg2 = ZMsg.recvMsg(subscriber);
-            LOG.info(String.format("Received message: %s", msg2));
-            LOG.info(new String(msg2.getFirst().getData()));
-            for (ZFrame frame: msg2){
-                LOG.info("Frame: " + new String(frame.getData().));
-            }*/
             String msg = subscriber.recvStr();
-//            LOG.info(msg);
+            //LOG.info(msg);
             String topic = msg.substring(0, msg.indexOf(' '));
             String content = msg.substring(msg.indexOf(' ') + 1);
             JsonNode jsonNode = null;
             try {
                 jsonNode = new ObjectMapper().disable(SerializationFeature.INDENT_OUTPUT).readValue(content, JsonNode.class);
-                content =jsonNode.toString();
-//                LOG.info(topic + ": " + content);
-                boolean isDelete = content.contains("\"action\":\"delete\"");
-//                LOG.info("topic: " + topic);
-//                LOG.info("isdelete: " + isDelete);
                 switch (topic){
                     case MISP_EVENT:
                         LOG.info("Event message received from queue.");
-                        emitterDataHandler.handleMispData(jsonNode, MispEntity.EVENT, isDelete, isDelete);
+                        emitterDataHandler.handleMispData(jsonNode, MispEntity.EVENT, false);
                         break;
-/*                    case MISP_ATTRIBUTE:
-                        LOG.info("Attribute message received from queue.");
-                        emitterDataHandler.handleMispData(jsonNode, MispEntity.ATTRIBUTE, isDelete, isDelete);
-                        break;*/
-                    case MISP_EVENT_DELETE:
-                        LOG.info("Received: " + topic + " idDelete: " + isDelete);
-                        if (isDelete){
-                            emitterDataHandler.handleMispData(jsonNode, MispEntity.EVENT, isDelete, isDelete);
-                        }
+                    case MISP_AUDIT:
+                        LOG.info("Audit log received from queue.");
+                        auditLogHandler.handleAuditLog(jsonNode);
+                        break;
+                    default:
                         break;
                 }
             } catch (IOException e) {
