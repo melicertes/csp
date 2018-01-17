@@ -289,7 +289,12 @@ public class TcProcessor implements Processor,CamelRoutes{
     }
 
     //flow1
-    private void handleDclFlowAndSendToECSP(String httpMethod, Team team, IntegrationData integrationData) throws NoSuchAlgorithmException, InvalidKeyException, IOException {
+    private void handleDclFlowAndSendToECSP(String httpMethod, Team team, IntegrationData coreIntegrationData) throws NoSuchAlgorithmException, InvalidKeyException, IOException {
+
+        //[fix] SXCSP-431: clone the integrationData object to avoid any changes by reference when anonymizing
+        String jsonIntegrationData = objectMapper.writeValueAsString(coreIntegrationData);
+        IntegrationData integrationData = objectMapper.readValue(jsonIntegrationData, IntegrationData.class);
+
         // SXCSP-85 Sharing Policy to be integrated only when sending to ECSP; TrustCircle should be excluded
         SharingPolicyAction sharingPolicyAction = SharingPolicyAction.SHARE_AS_IS;
         /**
@@ -331,7 +336,7 @@ public class TcProcessor implements Processor,CamelRoutes{
         Map<String, Object> headers = new HashMap<>();
 
         headers.put(Exchange.HTTP_METHOD, httpMethod);
-        producer.sendBodyAndHeaders(routes.apply(ECSP), ExchangePattern.InOut, enhancedTeamDTO, headers);
+        producer.sendBodyAndHeaders(routes.apply(ECSP), ExchangePattern.InOut, enhancedTeamDTO, headers);//TODO: investigate SXCSP-430 - do we need inOut here?
     }
 
     // flow2
