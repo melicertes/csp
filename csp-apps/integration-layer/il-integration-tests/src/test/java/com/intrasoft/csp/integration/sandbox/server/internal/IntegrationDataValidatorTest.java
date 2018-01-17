@@ -51,8 +51,8 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
                 "apache.camel.use.activemq:false",
                 "external.use.ssl:false",
                 "internal.use.ssl:false",
-                "misp.protocol:http",
-                "taranis.protocol:http",
+                "app.misp.protocol:http",
+                "app.taranis.protocol:http",
         })
 @MockEndpointsAndSkip("http:*")
 public class IntegrationDataValidatorTest implements ContextUrl {

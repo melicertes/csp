@@ -1,6 +1,7 @@
 package com.intrasoft.csp.server.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.intrasoft.csp.commons.routes.ContextUrl;
 import org.apache.camel.Exchange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,10 +25,10 @@ public class CspUtils {
 
     public String getAppUri(String appName){
         LOG.debug(appName);
-        String appProtocol = env.getProperty(appName+".protocol");
-        String appHost = env.getProperty(appName+".host");
-        String appPort = env.getProperty(appName+".port");
-        String appPath = env.getProperty(appName+".path");
+        String appProtocol = env.getProperty(ContextUrl.APP_PROPERTIES_PREFIX+"."+appName+".protocol");
+        String appHost = env.getProperty(ContextUrl.APP_PROPERTIES_PREFIX+"."+appName+".host");
+        String appPort = env.getProperty(ContextUrl.APP_PROPERTIES_PREFIX+"."+appName+".port");
+        String appPath = env.getProperty(ContextUrl.APP_PROPERTIES_PREFIX+"."+appName+".path");
 
         String appUri = appProtocol+"://"+appHost+":"+appPort+appPath;
         return appUri;

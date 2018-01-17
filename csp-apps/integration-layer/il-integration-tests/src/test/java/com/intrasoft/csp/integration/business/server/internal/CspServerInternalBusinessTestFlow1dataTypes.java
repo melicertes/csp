@@ -67,15 +67,15 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
                 "external.ssl.keystore.resource: sslcert/csp-internal.jks",
                 "external.ssl.keystore.passphrase: 123456",
 
-                "misp.protocol: http",
-                "misp.host: csp2.dangerduck.gr",
-                "misp.port: 8082",
-                "misp.path: /adapter/misp",
+                "app.misp.protocol: http",
+                "app.misp.host: csp2.dangerduck.gr",
+                "app.misp.port: 8082",
+                "app.misp.path: /adapter/misp",
 
-                "viper.protocol: http",
-                "viper.host: csp2.dangerduck.gr",
-                "viper.port: 8082",
-                "viper.path: /adapter/viper",
+                "app.viper.protocol: http",
+                "app.viper.host: csp2.dangerduck.gr",
+                "app.viper.port: 8082",
+                "app.viper.path: /adapter/viper",
 
                 "tc.protocol: http",
                 "tc.host: tc.csp2.dangerduck.gr",
@@ -83,10 +83,10 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
                 "tc.path.circles: /api/v1/circles",
                 "tc.path.teams: /api/v1/teams",
 
-                "trustcircle.protocol: http",
-                "trustcircle.host: csp2.dangerduck.gr",
-                "trustcircle.port: 8082",
-                "trustcircle.path: /adapter/tc",
+                "app.trustcircle.protocol: http",
+                "app.trustcircle.host: csp2.dangerduck.gr",
+                "app.trustcircle.port: 8082",
+                "app.trustcircle.path: /adapter/tc",
 
                 "elastic.protocol: http",
                 "elastic.host: csp2.dangerduck.gr",
