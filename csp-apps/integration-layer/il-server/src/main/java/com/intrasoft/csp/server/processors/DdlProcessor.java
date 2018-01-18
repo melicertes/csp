@@ -41,21 +41,30 @@ public class DdlProcessor implements Processor,CamelRoutes {
     @Override
     public void process(Exchange exchange) throws Exception {
         IntegrationData integrationData = cspUtils.getExchangeData(exchange, IntegrationData.class);
-        Boolean toShare = integrationData.getSharingParams().getToShare();
 
+        String jsonIntegrationData = objectMapper.writeValueAsString(integrationData);
+        IntegrationData integrationDataCopy = objectMapper.readValue(jsonIntegrationData, IntegrationData.class);
+
+        Boolean toShare = integrationData.getSharingParams().getToShare();
+        String httpMethod = (String) exchange.getIn().getHeader(Exchange.HTTP_METHOD);
         List<String> recipients = new ArrayList<>();
 
         if (toShare) {
             LOG.info("DDL - received integrationData with datatype: " + integrationData.getDataType() + ", toShare = true, sending to DCL" );
             if (!exchange.getIn().getHeader(Exchange.HTTP_METHOD).toString().equals(HttpMethods.DELETE.toString())){
                 LOG.info(exchange.getIn().getHeader(Exchange.HTTP_METHOD).toString());
-                recipients.add(routes.apply(DCL));}
+                recipients.add(routes.apply(DCL));
                 //producerTemplate.sendBodyAndHeader(routes.apply(DCL), ExchangePattern.InOut,integrationData, Exchange.HTTP_METHOD, httpMethod);
+            }
         }
 
         if (enableElastic && !integrationData.getDataType().equals(IntegrationDataType.TRUSTCIRCLE)){
-            recipients.add(routes.apply(ELASTIC));
-            //producerTemplate.sendBodyAndHeader(routes.apply(ELASTIC), ExchangePattern.InOut,integrationData, Exchange.HTTP_METHOD, httpMethod);
+            //recipients.add(routes.apply(ELASTIC));//Do not use this, because it share the exchange and will cause the bug described in SXCSP-430
+            //Instead, use a copy of IntegrationData and send it using producer and HTTP
+            //sync version
+            //producerTemplate.sendBodyAndHeader(routes.apply(ELASTIC), ExchangePattern.InOnly,integrationDataCopy, Exchange.HTTP_METHOD, httpMethod);
+            //async version
+            producerTemplate.asyncRequestBodyAndHeader(routes.apply(ELASTIC),integrationDataCopy, Exchange.HTTP_METHOD, httpMethod);
         }
 
         exchange.getIn().setHeader("recipients", recipients);

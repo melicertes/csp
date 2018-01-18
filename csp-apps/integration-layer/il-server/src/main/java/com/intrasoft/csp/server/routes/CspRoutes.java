@@ -85,6 +85,7 @@ public class CspRoutes extends RouteBuilder implements CamelRoutes{
 
         from(endpoint.apply(DDL))
                 .process(ddlProcessor)
+                .setExchangePattern(ExchangePattern.InOnly)
                 .recipientList(header("recipients"));
 
         from(endpoint.apply(DCL))
@@ -97,6 +98,7 @@ public class CspRoutes extends RouteBuilder implements CamelRoutes{
 
         //TrustCircles Circles routes
         from(endpoint.apply(TC))
+                .threads(10)//TC processing is heavy worker,thus making it threaded
                 .process(tcProcessor)
         ;
 
@@ -111,6 +113,7 @@ public class CspRoutes extends RouteBuilder implements CamelRoutes{
 
         //Elastic route
         from(endpoint.apply(ELASTIC))
+                .threads(10)
                 .process(elasticProcessor);
 
     }
