@@ -79,13 +79,14 @@ public class CspRoutes extends RouteBuilder implements CamelRoutes{
         onException(InvalidSharingParamsException.class).process(exceptionProcessor).handled(true);
 
         from(endpoint.apply(DSL))
+                .setExchangePattern(ExchangePattern.InOnly)
+                //.threads(10)
                 .process(dslProcessor)
-                //.setExchangePattern(ExchangePattern.InOnly)//TODO: investigate SXCSP-430
                 .recipientList(header("recipients"));
 
         from(endpoint.apply(DDL))
-                .process(ddlProcessor)
                 .setExchangePattern(ExchangePattern.InOnly)
+                .process(ddlProcessor)
                 .recipientList(header("recipients"));
 
         from(endpoint.apply(DCL))
@@ -104,6 +105,7 @@ public class CspRoutes extends RouteBuilder implements CamelRoutes{
 
         //ExternalCSPs
         from(endpoint.apply(ECSP))
+                .setExchangePattern(ExchangePattern.InOnly)
                 .process(ecspProcessor);
 
 
@@ -113,6 +115,7 @@ public class CspRoutes extends RouteBuilder implements CamelRoutes{
 
         //Elastic route
         from(endpoint.apply(ELASTIC))
+                .setExchangePattern(ExchangePattern.InOnly)
                 .threads(10)
                 .process(elasticProcessor);
 
