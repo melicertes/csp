@@ -13,6 +13,7 @@ import com.intrasoft.csp.commons.apiHttpStatusResponse.HttpStatusResponseType;
 import com.intrasoft.csp.commons.model.IntegrationDataType;
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.Option;
 import com.jayway.jsonpath.TypeRef;
 import com.jayway.jsonpath.spi.json.JacksonJsonNodeJsonProvider;
 import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
@@ -50,6 +51,7 @@ public class ApiDataHandler {
     private static ObjectMapper mapper = new ObjectMapper();
 
     private static final Configuration configuration = Configuration.builder()
+//            .options(Option.DEFAULT_PATH_LEAF_TO_NULL)
             .jsonProvider(new JacksonJsonNodeJsonProvider())
             .mappingProvider(new JacksonMappingProvider())
             .build();
@@ -78,6 +80,7 @@ public class ApiDataHandler {
 
         Rules rules = rulesService.getRule(dataType, cspId);
         if (rules == null){
+            LOG.debug("Ruleset mapping not found, using default.");
             throw new MappingNotFoundForGivenTupleException(HttpStatusResponseType.MAPPING_NOT_FOUND_FOR_GIVEN_TUPLE.getReasonPhrase()
                     +"[dataType: "+dataType+",cspId: "+cspId+"]");
         }
@@ -93,18 +96,36 @@ public class ApiDataHandler {
                 List<String> vals = JsonPath.using(configuration).parse(out).read(rule.getField(), new TypeRef<List<String>>(){});
                 for (int i = 0; i < vals.size() ; i++){
                     String jpointer = rule.getField().replace("*",String.valueOf(i));
+                    String value = null;
+                    if (rule.getValue() != null){
+                        value = rule.getValue().replace("*",String.valueOf(i));
+                    }
                     String action = rule.getAction();
                     String fieldType = rule.getFieldType();
-                    String fieldValue = JsonPath.using(configuration).parse(out).read(jpointer, String.class);
-                    out = JsonPath.using(configuration).parse(out).set(jpointer, updateField(action, fieldType, fieldValue)).json();
+                    String fieldValue = null;
+                    if (value != null){
+                        fieldValue = JsonPath.using(configuration).parse(out).read(value, String.class);
+                        out = JsonPath.using(configuration).parse(out).set(value, updateField(action, fieldType, fieldValue)).json();
+                    } else {
+                        fieldValue = JsonPath.using(configuration).parse(out).read(jpointer, String.class);
+                        out = JsonPath.using(configuration).parse(out).set(jpointer, updateField(action, fieldType, fieldValue)).json();
+                    }
+
                 }
             }
             else {
                 String jpointer = rule.getField();
+                String value = rule.getValue();
                 String action = rule.getAction();
                 String fieldType = rule.getFieldType();
-                String fieldValue = JsonPath.using(configuration).parse(out).read(jpointer, String.class);
-                out = JsonPath.using(configuration).parse(out).set(jpointer, updateField(action, fieldType, fieldValue)).json();
+                String fieldValue = null;
+                if (value != null){
+                    fieldValue = JsonPath.using(configuration).parse(out).read(value, String.class);
+                    out = JsonPath.using(configuration).parse(out).set(value, updateField(action, fieldType, fieldValue)).json();
+                } else {
+                    fieldValue = JsonPath.using(configuration).parse(out).read(jpointer, String.class);
+                    out = JsonPath.using(configuration).parse(out).set(jpointer, updateField(action, fieldType, fieldValue)).json();
+                }
             }
         }
 

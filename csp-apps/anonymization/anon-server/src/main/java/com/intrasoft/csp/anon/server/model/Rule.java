@@ -13,18 +13,30 @@ public class Rule {
     @JsonProperty("field")
     private String field;
 
+    @JsonProperty("value")
+    private String value;
+
     @JsonProperty("action")
     private String action;
 
     @JsonProperty("fieldtype")
     private String fieldType;
 
+    public String getValue() {
+        return value;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
+    }
+
     public Rule() {
         super();
     }
 
-    public Rule(String field, String action, String fieldType) {
+    public Rule(String field, String value, String action, String fieldType) {
         this.field = field;
+        this.value = value;
         this.action = action;
         this.fieldType = fieldType;
     }
@@ -56,9 +68,10 @@ public class Rule {
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("Rule{");
-        sb.append(", field='").append(field).append('\'');
-        sb.append(", action=").append(action);
-        sb.append(", fieldType=").append(fieldType);
+        sb.append("field='").append(field).append('\'');
+        sb.append(", value='").append(value).append('\'');
+        sb.append(", action='").append(action).append('\'');
+        sb.append(", fieldType='").append(fieldType).append('\'');
         sb.append('}');
         return sb.toString();
     }
