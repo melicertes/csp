@@ -43,7 +43,8 @@ import static org.hamcrest.Matchers.greaterThan;
                 "csp.retry.backOffPeriod:10",
                 "csp.retry.maxAttempts:1",
                 "key.update=10000",
-                "enable.oam:false"
+                "enable.oam:false",
+                "logging.level.com.intrasoft.csp.anon=DEBUG"
         })
 public class ApiDataHandlerTest {
     @Autowired
@@ -60,6 +61,10 @@ public class ApiDataHandlerTest {
 
     URL data_vulnerability = getClass().getClassLoader().getResource("data_vulnerability.json");
     URL rules_vulnerability = getClass().getClassLoader().getResource("rules_vulnerability.json");
+
+    URL data_event = getClass().getClassLoader().getResource("data_event.json");
+    URL rules_event = getClass().getClassLoader().getResource("rules_event.json");
+
 
     @Autowired
     ObjectMapper objectMapper;
@@ -195,6 +200,40 @@ public class ApiDataHandlerTest {
         assertThat(jsonOut, containsString("\"affected_products_text\":\""));//cannot really test the randomness of anon here
         assertThat(jsonOut, containsString("\"version\":\"00000000\""));
         assertThat(jsonOut, containsString("\"producer\":\"*******\""));
+    }
+
+    @DirtiesContext
+    @Test
+    public void handleAnonEventsTest() throws URISyntaxException, IOException, InvalidKeyException, NoSuchAlgorithmException {
+        String json = FileUtils.readFileToString(new File(data_event.toURI()), Charset.forName("UTF-8"));
+        IntegrationData integrationData = objectMapper.readValue(json,IntegrationData.class);
+
+        String cspId = integrationData.getDataParams().getCspId();
+        //insert mapping and ruleset
+        RuleSetDTO ruleSetDTO = new RuleSetDTO();
+        ruleSetDTO.setFilename(new File(rules_event.getFile()).getName());
+        ruleSetDTO.setFile(FileUtils.readFileToByteArray(new File(rules_event.toURI())));
+        ruleSetDTO.setDescription("event ruleset");
+        RuleSetDTO savedRuleSet = anonService.saveRuleSet(ruleSetDTO);
+
+        MappingDTO mappingDTO = new MappingDTO("demo2-csp",savedRuleSet,integrationData.getDataType());
+        MappingDTO defaultmappingDTO = new MappingDTO("**",savedRuleSet,integrationData.getDataType());
+        MappingDTO savedMapping = anonService.saveMapping(mappingDTO);
+        anonService.saveMapping(defaultmappingDTO);
+
+        IntegrationAnonData integrationAnonData = new IntegrationAnonData();
+        integrationAnonData.setCspId(cspId);
+        integrationAnonData.setDataType(integrationData.getDataType());
+        integrationAnonData.setDataObject(integrationData.getDataObject());
+
+        IntegrationAnonData anonData = apiDataHandler.handleAnonIntegrationData(integrationAnonData);
+
+        String jsonOut = objectMapper.writeValueAsString(anonData.getDataObject());
+        System.out.println(jsonOut.toString());
+//        assertThat(jsonOut, containsString("\"classification.taxonomy\":\""));//cannot really test the randomness of anon here
+//        assertThat(jsonOut, containsString("\"affected_products_text\":\""));//cannot really test the randomness of anon here
+//        assertThat(jsonOut, containsString("\"version\":\"00000000\""));
+//        assertThat(jsonOut, containsString("\"producer\":\"*******\""));
     }
 
     @DirtiesContext

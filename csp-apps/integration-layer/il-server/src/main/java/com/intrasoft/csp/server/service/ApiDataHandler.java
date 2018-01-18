@@ -12,11 +12,14 @@ import org.apache.camel.ProducerTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
+
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Created by iskitsas on 6/10/17.
@@ -31,6 +34,9 @@ public class ApiDataHandler implements CamelRoutes{
     @Autowired
     IntegrationDataValidator integrationDataValidator;
 
+    @Value("${server.camel.rest.service.is.async:true}")
+    Boolean camelRestServiceIsAsync;
+
     @Produce
     private ProducerTemplate producerTemplate;
 
@@ -41,7 +47,11 @@ public class ApiDataHandler implements CamelRoutes{
             throw new InvalidDataTypeException(bindingResult.getAllErrors().toString());
         }
 
-        producerTemplate.sendBodyAndHeader(route, integrationData, Exchange.HTTP_METHOD, requestMethod);
+        if(camelRestServiceIsAsync){
+            producerTemplate.asyncRequestBodyAndHeader(route, integrationData, Exchange.HTTP_METHOD, requestMethod);
+        }else{
+            producerTemplate.sendBodyAndHeader(route, integrationData, Exchange.HTTP_METHOD, requestMethod);
+        }
 
         return new ResponseEntity<>(HttpStatusResponseType.SUCCESSFUL_OPERATION.getReasonPhrase(),
                 HttpStatus.OK);

@@ -1,0 +1,15 @@
+{
+  "rules": [
+    {
+      "field": "['Event'].['Attribute'][*].['ip-src']",
+      "value": "['Event'].['Attribute'][*].['value']",
+      "action": "anon",
+      "fieldtype": "ip"
+    },
+    {
+      "field": "['Event'].['event_creator_email']",
+      "action": "anon",
+      "fieldtype": "email"
+    }
+  ]
+}

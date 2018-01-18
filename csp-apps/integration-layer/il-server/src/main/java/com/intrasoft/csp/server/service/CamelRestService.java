@@ -86,6 +86,7 @@ public class CamelRestService {
                 LOG.error("ENDPOINT "+uri+" responded with statusCode "+ef.getStatusCode() + " "+ef.getStatusText());
             }else {
                 throw new CspBusinessException("Exception in external request: " + exception.getMessage(), exception);
+                //exception.getClass().equals(ConnectException.class)
             }
         }
         return out;
