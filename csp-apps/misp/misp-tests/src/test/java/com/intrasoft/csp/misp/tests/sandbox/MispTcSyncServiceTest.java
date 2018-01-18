@@ -5,6 +5,7 @@ import com.intrasoft.csp.client.config.TrustCirclesClientConfig;
 import com.intrasoft.csp.libraries.restclient.service.RetryRestTemplate;
 import com.intrasoft.csp.misp.client.MispAppClient;
 import com.intrasoft.csp.misp.client.config.MispAppClientConfig;
+import com.intrasoft.csp.misp.commons.models.generated.SharingGroup;
 import com.intrasoft.csp.misp.service.MispTcSyncService;
 import com.intrasoft.csp.misp.service.impl.MispTcSyncServiceImpl;
 import com.intrasoft.csp.misp.tests.sandbox.util.MispMockUtil;
@@ -145,6 +146,7 @@ public class MispTcSyncServiceTest {
                 .andRespond(MockRestResponseCreators
                         .withSuccess(FileUtils.readFileToString(new File(twoTrustCircles.toURI()),
                                 Charset.forName("UTF-8")).getBytes(), MediaType.APPLICATION_JSON_UTF8));
+/*
         // then MISP's getAllSharingGroups response
         MockRestServiceServer mispMockServer = MockRestServiceServer.bindTo(mispRetryRestTemplate).build();
         mispMockServer.expect(requestTo(mispGroupsURI))
@@ -172,17 +174,45 @@ public class MispTcSyncServiceTest {
                 .andRespond(MockRestResponseCreators
                         .withSuccess(MispMockUtil.getJsonBytesForSharingGroupByUuid(allSharingGroups, sharingGroupUuid),
                                 MediaType.APPLICATION_JSON_UTF8));
+*/
 
 
-//        TODO: Fix rejection of further requests and write assertions before moving to scenario b
         mispTcSyncService.syncSharingGroups();
 
+        // Assert that the Trust Circles corresponding Sharing Groups exist.
+        List<SharingGroup> sharingGroups = mispAppClient.getAllMispSharingGroups();
+        // Temporary fix for unknown Sharing Group UUIDs API issue; making extra GET calls to fetch them
+        sharingGroups.forEach(sharingGroup ->  {
+            sharingGroup.setUuid(mispAppClient.getMispSharingGroup(sharingGroup.getId()).getUuid());
+        });
+        List<String> tcUuids = Arrays.asList("2883f242-3e07-4378-9091-0d198e4886ba", "61ee0197-587f-43ce-afcf-310b36b5bfe9");
+
+        tcUuids.forEach(uuid -> {
+            assertTrue(sharingGroups.stream().anyMatch(sharingGroup -> sharingGroup.getUuid().equals(uuid)));
+        });
+
+
         tcMockServer.verify();
-        mispMockServer.verify();
+//      mispMockServer.verify();
     }
     ////This is the scenario where some of the TC' Trust Circles already exist in MISP and need to be updated.
     @Test
-    public void syncSharingGroupsExistingSharingGroupsTest() {
+    public void syncSharingGroupsExistingSharingGroupsTest() throws URISyntaxException, IOException {
+        String tcCirclesURI = tcConfig.getTcCirclesURI();
+        String mispGroupsURI = "http://192.168.56.50:80/sharing_groups";
+        String mispAddGroupURI = "http://192.168.56.50:80/sharing_groups/add";
+        String sharingGroupUuid = "a36c31f4-dad3-4f49-b443-e6d6333649b1";
+
+        // We first need to mock TC server's getAllTrustCircles response
+        MockRestServiceServer tcMockServer = MockRestServiceServer.bindTo(tcRetryRestTemplate).build();
+        tcMockServer.expect(requestTo(tcCirclesURI))
+                .andRespond(MockRestResponseCreators
+                        .withSuccess(FileUtils.readFileToString(new File(twoTrustCircles.toURI()),
+                                Charset.forName("UTF-8")).getBytes(), MediaType.APPLICATION_JSON_UTF8));
+
+        mispTcSyncService.syncSharingGroups();
+
+        tcMockServer.verify();
 
     }
     //Description

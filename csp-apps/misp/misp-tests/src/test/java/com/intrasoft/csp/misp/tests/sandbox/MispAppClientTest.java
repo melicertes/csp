@@ -45,10 +45,11 @@ import static org.springframework.test.web.client.match.MockRestRequestMatchers.
 @SpringBootTest(classes = {MispAppClient.class, MispAppClientConfig.class},
         properties = {
                 "misp.app.protocol:http",
-                "misp.app.host:misp.dimitris.dk",
+                "misp.app.host:192.168.56.50",
                 "misp.app.port:80",
                 "misp.app.authorization.key:JNqWBxfPiIywz7hUe58MyJf6sD5PrTVaGm7hTn6c",
                 "spring.jackson.deserialization.unwrap-root-value=true"
+                //"misp.app.host:misp.dimitris.dk"
         })
 
 public class MispAppClientTest {
@@ -354,7 +355,7 @@ public class MispAppClientTest {
 
         SharingGroup sharingGroup = new SharingGroup();
         sharingGroup.setName("test-" + RandomStringUtils.random(4,true,false));
-        sharingGroup.setReleasability("TY");
+        sharingGroup.setReleasability("DELETE ME");  // mandatory field
         sharingGroup.setActive(true);
         sharingGroup.setDescription("DELETE ME");
         String uuid = UUID.randomUUID().toString();

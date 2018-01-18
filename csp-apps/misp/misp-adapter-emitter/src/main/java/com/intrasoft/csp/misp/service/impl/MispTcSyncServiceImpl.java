@@ -130,10 +130,18 @@ public class MispTcSyncServiceImpl implements MispTcSyncService {
 
     }
 
+//  TODO: Sharing Groups API response on GET calls for all Sharing Groups does not include their UUIDs.
+//  This could be an overkill considering all the extra GET calls.
     public void syncSharingGroups() {
 
         List<TrustCircle> tcList = trustCirclesClient.getAllTrustCircles();
         List<SharingGroup> sgList = mispAppClient.getAllMispSharingGroups();
+
+//      Temporary fix for unknown Sharing Group UUIDs; extra calls on server
+        sgList.forEach(sharingGroup ->  {
+            sharingGroup.setUuid(mispAppClient.getMispSharingGroup(sharingGroup.getId()).getUuid());
+        });
+
         SharingGroup sharingGroup = null;
 
         boolean loopBreak;
@@ -179,6 +187,8 @@ public class MispTcSyncServiceImpl implements MispTcSyncService {
         // Modifying the name field to differentiate synchronized sharing groups.
         sGroup.setName(prefix + tCircle.getName());
         sGroup.setDescription(tCircle.getDescription());
+        sGroup.setReleasability(""); // informational but mandatory;
+        sGroup.setActive(true);
 
         List<String> tCircleTeamsUuids = tCircle.getTeams();
         List<SharingGroupOrgItem> sharingGroupOrgItemList = (sGroup.getSharingGroupOrg() == null) ?
@@ -196,7 +206,7 @@ public class MispTcSyncServiceImpl implements MispTcSyncService {
                 });
             });
         } else {
-            sGroup.setSharingGroupOrg(new ArrayList<SharingGroupOrgItem>());
+            sGroup.setSharingGroupOrg(null);
             tCircleTeamsUuids.forEach(uuid ->sGroupOrgCheckMap.put(uuid, false));
         }
 
@@ -210,7 +220,12 @@ public class MispTcSyncServiceImpl implements MispTcSyncService {
                 // we just need to fetch it and assign it to the current sharing group.
                 OrganisationDTO newOrg = mispAppClient.getMispOrganisation(k);
                 newSgOrgItem.setOrganisation(newOrg);
-                sGroup.addSharingGroupOrgItem(newSgOrgItem);
+                try {
+                    sGroup.addSharingGroupOrgItem(newSgOrgItem);
+                } catch (NullPointerException e) {
+                    LOG.warn("Unable to find Organisation with UUID " + k);
+                }
+
             }
         });
 
