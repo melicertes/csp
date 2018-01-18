@@ -171,7 +171,8 @@ public class MispTcSyncServiceImpl implements MispTcSyncService {
 
         organisation.setUuid(team.getId());
         // Modifying the name field to differentiate synchronized organisations.
-        organisation.setName(prefix + team.getName());
+        if (!organisation.getName().startsWith(prefix))  // prevents from adding the prefix each and every time
+            organisation.setName(prefix + team.getName());
         organisation.setDescription(team.getDescription());
         organisation.setNationality(team.getCountry());
         // SXCSP-420: "The team with the csp-id that is equal to this csp-id should be imported as local org."
@@ -185,35 +186,38 @@ public class MispTcSyncServiceImpl implements MispTcSyncService {
 
         sGroup.setUuid(tCircle.getId());
         // Modifying the name field to differentiate synchronized sharing groups.
-        sGroup.setName(prefix + tCircle.getName());
+        try {
+            if (!sGroup.getName().startsWith(prefix))  // prevents from adding the prefix each and every time
+                sGroup.setName(prefix + tCircle.getName());
+        } catch (NullPointerException e) {
+            sGroup.setName(prefix + tCircle.getName());
+        }
         sGroup.setDescription(tCircle.getDescription());
         sGroup.setReleasability(""); // informational but mandatory;
         sGroup.setActive(true);
 
         List<String> tCircleTeamsUuids = tCircle.getTeams();
-        List<SharingGroupOrgItem> sharingGroupOrgItemList = (sGroup.getSharingGroupOrg() == null) ?
+        List<SharingGroupOrgItem> sharingGroupOrg = (sGroup.getSharingGroupOrg() == null) ?
                 new ArrayList<>() : sGroup.getSharingGroupOrg();
 
+        // Mapping existing/non-existing Organisations UUIDs to true/false
         Map<String, Boolean> sGroupOrgCheckMap = new HashMap<>();
+        tCircleTeamsUuids.forEach( uuid -> {
+            sGroupOrgCheckMap.put(uuid, (mispAppClient.getMispOrganisation(uuid)!=null));
+        });
 
-        // If it's not a new sharing group, check which of the team uuids already exist as orgs in the MISP sh. group.
-        if (sharingGroupOrgItemList.size()>0) {
-            tCircleTeamsUuids.forEach( uuid -> {
-                sharingGroupOrgItemList.forEach(sgoi -> {
-                    // If the uuid is found, just update the hashmap in order to know what team is already there
-                    if (uuid.equals(sgoi.getOrganisation().getUuid()))
-                        sGroupOrgCheckMap.put(uuid,true);
-                });
-            });
-        } else {
-            sGroup.setSharingGroupOrg(null);
-            tCircleTeamsUuids.forEach(uuid ->sGroupOrgCheckMap.put(uuid, false));
-        }
-
-        // For any false value in the map, get the corresponding keys' organisations in MISP and add it in the sharing
-        // group's list of organisations (list of SharingGroupOrgItems).
         sGroupOrgCheckMap.forEach((k,v)-> {
-            if (v == false) {
+            if (v) { // If the Organisation already exists assign it to the Sharing Group
+                OrganisationDTO organisationDTO = mispAppClient.getMispOrganisation(k);
+                if (!organisationDTO.getName().startsWith(prefix))
+                    organisationDTO.setName(prefix+organisationDTO.getName());
+                mispAppClient.updateMispOrganisation(organisationDTO);
+                SharingGroupOrgItem sgoi = new SharingGroupOrgItem();
+                sgoi.setOrganisation(organisationDTO);
+                sgoi.setExtend(false);
+                sgoi.setOrgId(organisationDTO.getId());
+                sharingGroupOrg.add(sgoi);
+            } else if (!v) {
                 // Sharing Group method for adding a sharingGroupOrgItem which contains an organisation with this uuid.
                 SharingGroupOrgItem newSgOrgItem = new SharingGroupOrgItem();
                 // Since organisations are synchronized first, the organisation in MISP with this UUID key should exist;
@@ -225,10 +229,12 @@ public class MispTcSyncServiceImpl implements MispTcSyncService {
                 } catch (NullPointerException e) {
                     LOG.warn("Unable to find Organisation with UUID " + k);
                 }
-
             }
         });
-
+        if (!(tCircleTeamsUuids.size()>0))
+            sGroup.setSharingGroupOrg(null);
+        else
+            sGroup.setSharingGroupOrg(sharingGroupOrg);
     }
 
 }
