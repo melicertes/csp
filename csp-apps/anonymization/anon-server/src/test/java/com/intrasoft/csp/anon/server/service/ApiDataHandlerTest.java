@@ -216,9 +216,9 @@ public class ApiDataHandlerTest {
         ruleSetDTO.setDescription("event ruleset");
         RuleSetDTO savedRuleSet = anonService.saveRuleSet(ruleSetDTO);
 
-        MappingDTO mappingDTO = new MappingDTO("demo2-csp",savedRuleSet,integrationData.getDataType());
+        MappingDTO mappingDTO = new MappingDTO(cspId,savedRuleSet,integrationData.getDataType());
         MappingDTO defaultmappingDTO = new MappingDTO("**",savedRuleSet,integrationData.getDataType());
-        MappingDTO savedMapping = anonService.saveMapping(mappingDTO);
+        anonService.saveMapping(mappingDTO);
         anonService.saveMapping(defaultmappingDTO);
 
         IntegrationAnonData integrationAnonData = new IntegrationAnonData();
@@ -230,10 +230,8 @@ public class ApiDataHandlerTest {
 
         String jsonOut = objectMapper.writeValueAsString(anonData.getDataObject());
         System.out.println(jsonOut.toString());
-//        assertThat(jsonOut, containsString("\"classification.taxonomy\":\""));//cannot really test the randomness of anon here
-//        assertThat(jsonOut, containsString("\"affected_products_text\":\""));//cannot really test the randomness of anon here
-//        assertThat(jsonOut, containsString("\"version\":\"00000000\""));
-//        assertThat(jsonOut, containsString("\"producer\":\"*******\""));
+        assertThat(jsonOut, containsString("\"value\":\"***.***.***.***\""));
+        assertThat(jsonOut, containsString("\"event_creator_email\":\"***@******.**\""));
     }
 
     @DirtiesContext
