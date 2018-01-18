@@ -4,6 +4,7 @@ import com.intrasoft.csp.commons.exceptions.ErrorLogException;
 import com.intrasoft.csp.commons.exceptions.InvalidSharingParamsException;
 import com.intrasoft.csp.commons.routes.CamelRoutes;
 import com.intrasoft.csp.server.processors.*;
+import org.apache.camel.ExchangePattern;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.builder.RouteBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,6 +80,7 @@ public class CspRoutes extends RouteBuilder implements CamelRoutes{
 
         from(endpoint.apply(DSL))
                 .process(dslProcessor)
+                //.setExchangePattern(ExchangePattern.InOnly)//TODO: investigate SXCSP-430
                 .recipientList(header("recipients"));
 
         from(endpoint.apply(DDL))

@@ -11,6 +11,7 @@ public interface ContextUrl {
     String MANAGE_CONSUME_ERROR_Q= "/manage/consume/errorq";
 
     String GET_API_VERSION = "apiversion";
+    String APP_PROPERTIES_PREFIX = "app";
 
     /**
      * REST API versions supported.
