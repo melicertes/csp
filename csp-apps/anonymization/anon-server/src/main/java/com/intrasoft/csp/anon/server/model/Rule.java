@@ -41,6 +41,12 @@ public class Rule {
         this.fieldType = fieldType;
     }
 
+    public Rule(String field, String value, String action) {
+        this.field = field;
+        this.value = value;
+        this.action = action;
+    }
+
     public String getField() {
         return field;
     }
