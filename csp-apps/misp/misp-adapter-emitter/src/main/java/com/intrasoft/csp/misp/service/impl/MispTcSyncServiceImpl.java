@@ -212,29 +212,27 @@ public class MispTcSyncServiceImpl implements MispTcSyncService {
                 if (!organisationDTO.getName().startsWith(prefix))
                     organisationDTO.setName(prefix+organisationDTO.getName());
                 mispAppClient.updateMispOrganisation(organisationDTO);
-                SharingGroupOrgItem sgoi = new SharingGroupOrgItem();
-                sgoi.setOrganisation(organisationDTO);
-                sgoi.setExtend(false);
-                sgoi.setOrgId(organisationDTO.getId());
-                sharingGroupOrg.add(sgoi);
-            } else if (!v) {
-                // Sharing Group method for adding a sharingGroupOrgItem which contains an organisation with this uuid.
-                SharingGroupOrgItem newSgOrgItem = new SharingGroupOrgItem();
-                // Since organisations are synchronized first, the organisation in MISP with this UUID key should exist;
-                // we just need to fetch it and assign it to the current sharing group.
-                OrganisationDTO newOrg = mispAppClient.getMispOrganisation(k);
-                newSgOrgItem.setOrganisation(newOrg);
-                try {
-                    sGroup.addSharingGroupOrgItem(newSgOrgItem);
-                } catch (NullPointerException e) {
-                    LOG.warn("Unable to find Organisation with UUID " + k);
-                }
+                sharingGroupOrg.add(addOrgAsSGOI(organisationDTO));
+            } else if (!v) {  // otherwise, create it now
+                Team team = trustCirclesClient.getTeamByUuid(k);
+                OrganisationDTO organisationDTO = new OrganisationDTO();
+                mapTeamToOrganisation(team,organisationDTO);
+                mispAppClient.addMispOrganisation(organisationDTO);
+                sharingGroupOrg.add(addOrgAsSGOI(organisationDTO));
             }
         });
         if (!(tCircleTeamsUuids.size()>0))
             sGroup.setSharingGroupOrg(null);
         else
             sGroup.setSharingGroupOrg(sharingGroupOrg);
+    }
+
+    private SharingGroupOrgItem addOrgAsSGOI(OrganisationDTO organisationDTO) {
+        SharingGroupOrgItem sgoi = new SharingGroupOrgItem();
+        sgoi.setOrganisation(organisationDTO);
+        sgoi.setExtend(false);
+        sgoi.setOrgId(organisationDTO.getId());
+        return sgoi;
     }
 
 }

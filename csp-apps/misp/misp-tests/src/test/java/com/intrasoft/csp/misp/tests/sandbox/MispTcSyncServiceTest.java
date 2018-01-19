@@ -8,7 +8,6 @@ import com.intrasoft.csp.misp.client.config.MispAppClientConfig;
 import com.intrasoft.csp.misp.commons.models.generated.SharingGroup;
 import com.intrasoft.csp.misp.service.MispTcSyncService;
 import com.intrasoft.csp.misp.service.impl.MispTcSyncServiceImpl;
-import com.intrasoft.csp.misp.tests.sandbox.util.MispMockUtil;
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -131,8 +130,10 @@ public class MispTcSyncServiceTest {
         mockServer.verify();
 
     }
-    //This is the scenario where TC' Trust Circles don't already exist in MISP and need to be created.
-    //Mocking a response where TC returns two Trust Circles and MISP creates them as Sharing Groups if they don't exist.
+
+    // This is the scenario where two Trust Circles don't already exist in MISP and need to be created,
+    // while the Teams referenced in one of the Trust Circles already exist in MISP as Organisations.
+    // Trust Circle A has no Teams while Trust Circle B has two.
     @Test
     public void syncSharingGroupsNonExistingSharingGroupsTest() throws URISyntaxException, IOException {
         String tcCirclesURI = tcConfig.getTcCirclesURI();
@@ -146,36 +147,6 @@ public class MispTcSyncServiceTest {
                 .andRespond(MockRestResponseCreators
                         .withSuccess(FileUtils.readFileToString(new File(twoTrustCircles.toURI()),
                                 Charset.forName("UTF-8")).getBytes(), MediaType.APPLICATION_JSON_UTF8));
-/*
-        // then MISP's getAllSharingGroups response
-        MockRestServiceServer mispMockServer = MockRestServiceServer.bindTo(mispRetryRestTemplate).build();
-        mispMockServer.expect(requestTo(mispGroupsURI))
-                .andRespond(MockRestResponseCreators
-                        .withSuccess(FileUtils.readFileToString(new File(allSharingGroups.toURI()),
-                                Charset.forName("UTF-8")).getBytes(), MediaType.APPLICATION_JSON_UTF8));
-        // then MISP's first addSharingGroup response (first mock tc doesn't have any teams; adding sg straight away)
-        mispMockServer.expect(requestTo(mispAddGroupURI))
-                .andRespond(MockRestResponseCreators
-                        .withSuccess(FileUtils.readFileToString(new File(sharingGroup.toURI()),
-                                Charset.forName("UTF-8")).getBytes(), MediaType.APPLICATION_JSON_UTF8));
-        // then MISP's first getOrganisation call (sg sync mechanism gets organisation objects by uuid)
-        mispMockServer.expect(requestTo("http://192.168.56.50:80/organisations/view/578c0e4e-ebaf-455b-a2a1-faffb14be9e1"))
-                .andRespond(MockRestResponseCreators
-                        .withSuccess(FileUtils.readFileToString(new File(organisation.toURI()),
-                                Charset.forName("UTF-8")).getBytes(), MediaType.APPLICATION_JSON_UTF8));
-        // then MISP's 2nd getOrganisation call (the 2nd organisation of the 2nd sharing group)
-        mispMockServer.expect(requestTo("http://192.168.56.50:80/organisations/view/af9d06ac-d7be-4684-86a3-808fe4f4d17c"))
-                .andRespond(MockRestResponseCreators
-                        .withSuccess(FileUtils.readFileToString(new File(organisation.toURI()),
-                                Charset.forName("UTF-8")).getBytes(), MediaType.APPLICATION_JSON_UTF8));
-
-        // finally mocking MISP server's response for creating the 2nd sharing group in MISP
-        mispMockServer.expect(requestTo(mispAddGroupURI))
-                .andRespond(MockRestResponseCreators
-                        .withSuccess(MispMockUtil.getJsonBytesForSharingGroupByUuid(allSharingGroups, sharingGroupUuid),
-                                MediaType.APPLICATION_JSON_UTF8));
-*/
-
 
         mispTcSyncService.syncSharingGroups();
 
@@ -191,28 +162,26 @@ public class MispTcSyncServiceTest {
             assertTrue(sharingGroups.stream().anyMatch(sharingGroup -> sharingGroup.getUuid().equals(uuid)));
         });
 
+        // Assert that the Sharing Groups Organisation content matches the Trust Circles Team content.
+        // Sharing Group A should be empty, while Sharing Group B should reference 2 Organisations
+        SharingGroup sharingGroupA = sharingGroups.stream().filter(sg -> sg.getUuid().equals(tcUuids.get(0))).findFirst().get();
+        SharingGroup sharingGroupB = sharingGroups.stream().filter(sg -> sg.getUuid().equals(tcUuids.get(1))).findFirst().get();
+        assertThat(sharingGroupA.getSharingGroupOrg().size(), is(0));
+        assertThat(sharingGroupB.getSharingGroupOrg().size(), is(2));
+
+        // TODO: Server adds MISP Organisation by default upon Sharing Group creation without Organisations.
+        // Therefore, the assertion for sharingGroupA fails. Find a way to override this behavior.
+
+        // TODO: Assert Organisation content on Sharing Group B
 
         tcMockServer.verify();
 //      mispMockServer.verify();
     }
-    ////This is the scenario where some of the TC' Trust Circles already exist in MISP and need to be updated.
+
+    // TODO: The scenario where some of the TC' Trust Circles already exist in MISP and need to be updated.
     @Test
     public void syncSharingGroupsExistingSharingGroupsTest() throws URISyntaxException, IOException {
-        String tcCirclesURI = tcConfig.getTcCirclesURI();
-        String mispGroupsURI = "http://192.168.56.50:80/sharing_groups";
-        String mispAddGroupURI = "http://192.168.56.50:80/sharing_groups/add";
-        String sharingGroupUuid = "a36c31f4-dad3-4f49-b443-e6d6333649b1";
 
-        // We first need to mock TC server's getAllTrustCircles response
-        MockRestServiceServer tcMockServer = MockRestServiceServer.bindTo(tcRetryRestTemplate).build();
-        tcMockServer.expect(requestTo(tcCirclesURI))
-                .andRespond(MockRestResponseCreators
-                        .withSuccess(FileUtils.readFileToString(new File(twoTrustCircles.toURI()),
-                                Charset.forName("UTF-8")).getBytes(), MediaType.APPLICATION_JSON_UTF8));
-
-        mispTcSyncService.syncSharingGroups();
-
-        tcMockServer.verify();
 
     }
     //Description
