@@ -51,7 +51,7 @@ public class ApiDataHandler {
     private static ObjectMapper mapper = new ObjectMapper();
 
     private static final Configuration configuration = Configuration.builder()
-//            .options(Option.DEFAULT_PATH_LEAF_TO_NULL)
+            .options(Option.DEFAULT_PATH_LEAF_TO_NULL)
             .jsonProvider(new JacksonJsonNodeJsonProvider())
             .mappingProvider(new JacksonMappingProvider())
             .build();
@@ -67,6 +67,10 @@ public class ApiDataHandler {
 
     public IntegrationAnonData handleAnonIntegrationData(IntegrationAnonData integrationAnonData) throws NoSuchAlgorithmException, InvalidKeyException, IOException {
 
+        if(integrationAnonData == null){
+            throw new AnonException(HttpStatusResponseType.MALFORMED_INTEGRATION_DATA_STRUCTURE.getReasonPhrase()+"[integrationAnonData is null]");
+        }
+
         LOG.info("Handle integrationData for cspId: " + integrationAnonData.getCspId() + " and " + " dataType " + integrationAnonData.getDataType());
         String cspId = integrationAnonData.getCspId();
         IntegrationDataType dataType = integrationAnonData.getDataType();
@@ -79,6 +83,7 @@ public class ApiDataHandler {
         }
 
         Rules rules = rulesService.getRule(dataType, cspId);
+
         if (rules == null){
             LOG.debug("Ruleset mapping not found, using default.");
             throw new MappingNotFoundForGivenTupleException(HttpStatusResponseType.MAPPING_NOT_FOUND_FOR_GIVEN_TUPLE.getReasonPhrase()
