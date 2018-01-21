@@ -161,108 +161,89 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler{
 
         if (jsonNode.get(EVENT.toString()).has("Object")) {
             for (JsonNode jn : jsonNode.get(EVENT.toString()).get("Object")){
-                //LOG.info(jn.toString());
-                //LOG.info(jn.get("name").toString());
-                //LOG.info(MispContextUrl.RTIREntity.RTIR_NAME.toString());
-                if (jn.get("name").toString().toLowerCase().equals(MispContextUrl.RTIREntity.RTIR_NAME.toString().toLowerCase())){
+                if (jn.get("name").textValue().toLowerCase().equals(MispContextUrl.RTIREntity.RTIR_NAME.toString().toLowerCase())){
                     for (JsonNode ja : jn.get("Attribute")){
-                        //LOG.info(ja.toString());
-                        //LOG.info(ja.get("object_relation").toString().toLowerCase());
-                        //LOG.info(MispContextUrl.RTIREntity.TITLE_RELATION.toString().toLowerCase());
-                        if (ja.get("object_relation").toString().toLowerCase().equals(MispContextUrl.RTIREntity.MAP_CSP_FIELDS.toString().toLowerCase()) &&
-                                ja.get("value").toString().toLowerCase().equals(MispContextUrl.RTIREntity.MAP_CSP_URL_VALUE.toString().toLowerCase()) &&
+                        if (ja.get("object_relation").textValue().toLowerCase().equals(MispContextUrl.RTIREntity.MAP_CSP_URL_VALUE.toString().toLowerCase()) &&
                                 url.length() == 0) {
-                            url = ja.get("comment").toString();
-                            //LOG.info("============RTIR title: " + title);
+                            url = ja.get("value").textValue();
+                            LOG.debug("============RTIR url: " + url);
                         }
-                        if (ja.get("object_relation").toString().toLowerCase().equals(MispContextUrl.RTIREntity.MAP_CSP_FIELDS.toString().toLowerCase()) &&
-                                ja.get("value").toString().toLowerCase().equals(MispContextUrl.RTIREntity.MAP_ORIGIN_CSP_ID_VALUE.toString().toLowerCase()) &&
+                        if (ja.get("object_relation").textValue().toLowerCase().equals(MispContextUrl.RTIREntity.MAP_ORIGIN_CSP_ID_VALUE.toString().toLowerCase()) &&
                                 originCspId.length() == 0) {
-                            originCspId = ja.get("comment").toString();
-                            //LOG.info("============RTIR url: " + url);
+                            originCspId = ja.get("value").textValue();
+                            LOG.debug("============RTIR originCspId: " + originCspId);
                         }
-                        if (ja.get("object_relation").toString().toLowerCase().equals(MispContextUrl.RTIREntity.MAP_CSP_FIELDS.toString().toLowerCase()) &&
-                                ja.get("value").toString().toLowerCase().equals(MispContextUrl.RTIREntity.MAP_ORIGIN_RECORD_ID_VALUE.toString().toLowerCase()) &&
+                        if (ja.get("object_relation").textValue().toLowerCase().equals(MispContextUrl.RTIREntity.MAP_ORIGIN_RECORD_ID_VALUE.toString().toLowerCase()) &&
                                 originRecordId.length() == 0) {
-                            originRecordId = ja.get("comment").toString();
-                            //LOG.info("============RTIR url: " + url);
+                            originRecordId = ja.get("value").textValue();
+                            LOG.debug("============RTIR originRecordId: " + originRecordId);
                         }
-                        if (ja.get("object_relation").toString().toLowerCase().equals(MispContextUrl.RTIREntity.MAP_TITLE.toString().toLowerCase()) &&
+                        if (ja.get("object_relation").textValue().toLowerCase().equals(MispContextUrl.RTIREntity.MAP_TITLE.toString().toLowerCase()) &&
                                 title.length() == 0) {
-                            title = ja.get("value").toString();
+                            title = ja.get("value").textValue();
+                            LOG.debug("============RTIR title: " + title);
                         }
-                        if (ja.get("object_relation").toString().toLowerCase().equals(MispContextUrl.RTIREntity.MAP_TICKET_NO.toString().toLowerCase()) &&
+                        if (ja.get("object_relation").textValue().toLowerCase().equals(MispContextUrl.RTIREntity.MAP_TICKET_NO.toString().toLowerCase()) &&
                                 recordId.length() == 0) {
-                            recordId = ja.get("value").toString();
+                            recordId = ja.get("value").textValue();
+                            LOG.debug("============RTIR recordId: " + recordId);
                         }
                     }
-                }
 
-                /**
-                 1. The adapter queries ES for the existence of an "incident" with the given origin cspid/appid/id
-                 2. If it finds such incidence, it rewrites the incidence url inside the RTIR object with the url that this incidence has in ES
-                 3. If not It deletes the url field
-                 4. It pushes the event with the rewriten RTIR fields to misp
-                 */
-                String newURL = "";
-                String newTickerNumber = "";
-                try {
-                    IntegrationData searchData = new IntegrationData();
-                    DataParams searchParams = new DataParams();
-                    searchParams.setOriginRecordId(originRecordId);
-                    searchParams.setOriginApplicationId(applicationId);
-                    searchParams.setOriginCspId(originCspId);
 
-                    searchData.setDataParams(searchParams);
-                    searchData.setDataType(IntegrationDataType.INCIDENT);
+                    /**
+                     1. The adapter queries ES for the existence of an "incident" with the given origin cspid/appid/id
+                     2. If it finds such incidence, it rewrites the incidence url inside the RTIR object with the url that this incidence has in ES
+                     3. If not It deletes the url field
+                     4. It pushes the event with the rewriten RTIR fields to misp
+                     */
+                    String newURL = "";
+                    String newTickerNumber = "";
+                    try {
+                        IntegrationData searchData = new IntegrationData();
+                        DataParams searchParams = new DataParams();
+                        searchParams.setOriginRecordId(originRecordId);
+                        searchParams.setOriginApplicationId(applicationId);
+                        searchParams.setOriginCspId(originCspId);
 
-                    JsonNode esObject = elasticClient.getESobjectFromOrigin(searchData);
-                    if (esObject != null) {
-                        LOG.info("FOUND TRUE");
-                        newURL = esObject.get("dataParams").get("url").toString();
-                        newURL = newURL.replaceAll("\"", "");
-                        /**
-                         * SXCSP-386
-                         */
-                        newTickerNumber = esObject.get("dataObject").get("id").toString();
-                        newTickerNumber = newTickerNumber.replaceAll("\"", "");
-                    }
-                    else {
-                        LOG.info("NOT FOUND");
-                    }
-                    //replace
-                    for (JsonNode ja : jn.get("Attribute")){
-                        if (ja.get("object_relation").toString().toLowerCase().equals(MispContextUrl.RTIREntity.MAP_CSP_FIELDS.toString().toLowerCase()) &&
-                                ja.get("value").toString().toLowerCase().equals(MispContextUrl.RTIREntity.MAP_CSP_URL_VALUE.toString().toLowerCase()) ) {
-                            ((ObjectNode)ja).put("comment",  newURL);
+                        searchData.setDataParams(searchParams);
+                        searchData.setDataType(IntegrationDataType.INCIDENT);
+
+                        JsonNode esObject = elasticClient.getESobjectFromOrigin(searchData);
+                        if (esObject != null) {
+                            LOG.info("FOUND TRUE");
+                            newURL = esObject.get("dataParams").get("url").textValue();
+
+                            /**
+                             * SXCSP-386
+                             */
+                            newTickerNumber = esObject.get("dataObject").get("id").textValue();
                         }
-                        if (ja.get("object_relation").toString().toLowerCase().equals(MispContextUrl.RTIREntity.MAP_TICKET_NO.toString().toLowerCase()) ) {
-                            ((ObjectNode)ja).put("value",  newTickerNumber);
+                        else {
+                            LOG.info("NOT FOUND");
+                        }
+                        //replace
+                        for (JsonNode ja : jn.get("Attribute")){
+                            if (ja.get("object_relation").textValue().toLowerCase().equals(MispContextUrl.RTIREntity.MAP_CSP_URL_VALUE.toString().toLowerCase())) {
+                                ((ObjectNode)ja).put("value",  newURL);
+                            }
+                            if (ja.get("object_relation").textValue().toLowerCase().equals(MispContextUrl.RTIREntity.MAP_TICKET_NO.toString().toLowerCase()) ) {
+                                ((ObjectNode)ja).put("value",  newTickerNumber);
+                            }
                         }
                     }
+                    catch (Exception e){
+                        LOG.info(e.getMessage());
+                    }
+                    LOG.info("RTIR new URL: " + newURL);
+
                 }
-                catch (Exception e){
-                    LOG.info(e.getMessage());
-                }
-                LOG.info("RTIR new URL: " + newURL);
             }
         }
 
         //update IntegrationData
         modifiedIlData.setDataObject(jsonNode);
-
-
-        title = title.replaceAll("\"", "");
-        url = url.replaceAll("\"", "");
-        recordId = recordId.replaceAll("\"", "");
-        originCspId = originCspId.replaceAll("\"", "");
-        originRecordId = originRecordId.replaceAll("\"", "");
-        LOG.info("RTIR title: " + title);
-        LOG.info("RTIR url: " + url);
-        LOG.info("RTIR recordId: " + recordId);
-        LOG.info("RTIR originCspId: " + originCspId);
-        LOG.info("RTIR originRecordId: " + originRecordId);
-        LOG.info("MODIFIED IL DATA: " + modifiedIlData.toString());
+        LOG.debug("MODIFIED IL DATA: " + modifiedIlData.toString());
 
         return modifiedIlData;
     }
@@ -285,94 +266,84 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler{
 
         if (jsonNode.get(EVENT.toString()).has("Object")) {
             for (JsonNode jn : jsonNode.get(EVENT.toString()).get("Object")){
-                if (jn.get("name").toString().toLowerCase().equals(MispContextUrl.VULNERABILITYEntity.VULNERABILITY_NAME.toString().toLowerCase())){
+                if (jn.get("name").textValue().toLowerCase().equals(MispContextUrl.VULNERABILITYEntity.VULNERABILITY_NAME.toString().toLowerCase())){
                     for (JsonNode ja : jn.get("Attribute")){
-                        if (ja.get("object_relation").toString().toLowerCase().equals(MispContextUrl.VULNERABILITYEntity.MAP_CSP_FIELDS.toString().toLowerCase()) &&
-                                ja.get("value").toString().toLowerCase().equals(MispContextUrl.VULNERABILITYEntity.MAP_CSP_URL_VALUE.toString().toLowerCase()) &&
+                        if (ja.get("object_relation").textValue().toLowerCase().equals(MispContextUrl.VULNERABILITYEntity.MAP_CSP_URL_VALUE.toString().toLowerCase()) &&
                                 url.length() == 0) {
-                            url = ja.get("comment").toString();
-                            url = url.replaceAll("\"", "");
-                            LOG.info("============VULNERABILITY url: " + url);
+                            url = ja.get("value").textValue();
+                            LOG.debug("============VULNERABILITY url: " + url);
                         }
-                        if (ja.get("object_relation").toString().toLowerCase().equals(MispContextUrl.VULNERABILITYEntity.MAP_CSP_FIELDS.toString().toLowerCase()) &&
-                                ja.get("value").toString().toLowerCase().equals(MispContextUrl.VULNERABILITYEntity.MAP_ORIGIN_CSP_ID_VALUE.toString().toLowerCase()) &&
+                        if (ja.get("object_relation").textValue().toLowerCase().equals(MispContextUrl.VULNERABILITYEntity.MAP_ORIGIN_CSP_ID_VALUE.toString().toLowerCase()) &&
                                 originCspId.length() == 0) {
-                            originCspId = ja.get("comment").toString();
-                            originCspId = originCspId.replaceAll("\"", "");
-                            LOG.info("============VULNERABILITY originCspId: " + originCspId);
+                            originCspId = ja.get("value").textValue();
+                            LOG.debug("============VULNERABILITY originCspId: " + originCspId);
                         }
-                        if (ja.get("object_relation").toString().toLowerCase().equals(MispContextUrl.VULNERABILITYEntity.MAP_CSP_FIELDS.toString().toLowerCase()) &&
-                                ja.get("value").toString().toLowerCase().equals(MispContextUrl.VULNERABILITYEntity.MAP_ORIGIN_RECORD_ID_VALUE.toString().toLowerCase()) &&
+                        if (ja.get("object_relation").textValue().toLowerCase().equals(MispContextUrl.VULNERABILITYEntity.MAP_ORIGIN_RECORD_ID_VALUE.toString().toLowerCase()) &&
                                 originRecordId.length() == 0) {
-                            originRecordId = ja.get("comment").toString();
-                            originRecordId = originRecordId.replaceAll("\"", "");
-                            LOG.info("============VULNERABILITY originRecordId: " + originRecordId);
+                            originRecordId = ja.get("value").textValue();
+                            LOG.debug("============VULNERABILITY originRecordId: " + originRecordId);
                         }
-                        if (ja.get("object_relation").toString().toLowerCase().equals(MispContextUrl.VULNERABILITYEntity.MAP_TITLE_RELATION.toString().toLowerCase()) &&
+                        if (ja.get("object_relation").textValue().toLowerCase().equals(MispContextUrl.VULNERABILITYEntity.MAP_TITLE_RELATION.toString().toLowerCase()) &&
                                 ja.get("category").toString().toLowerCase().equals(MispContextUrl.VULNERABILITYEntity.MAP_TITLE_CATEGORY.toString().toLowerCase()) &&
                                 title.length() == 0) {
-                            title = ja.get("value").toString();
-                            title = title.replaceAll("\"", "");
-                            LOG.info("============VULNERABILITY title: " + title);
+                            title = ja.get("value").textValue();
+                            LOG.debug("============VULNERABILITY title: " + title);
                         }
-                        if (ja.get("object_relation").toString().toLowerCase().equals(MispContextUrl.VULNERABILITYEntity.MAP_RECORD_RELATION.toString().toLowerCase()) &&
+                        if (ja.get("object_relation").textValue().toLowerCase().equals(MispContextUrl.VULNERABILITYEntity.MAP_RECORD_RELATION.toString().toLowerCase()) &&
                                 ja.get("category").toString().toLowerCase().equals(MispContextUrl.VULNERABILITYEntity.MAP_RECORD_CATEGORY.toString().toLowerCase()) &&
                                 recordId.length() == 0) {
-                            recordId = ja.get("value").toString();
-                            recordId = recordId.replaceAll("\"", "");
-                            LOG.info("============VULNERABILITY recordId: " + recordId);
+                            recordId = ja.get("value").textValue();
+                            LOG.debug("============VULNERABILITY recordId: " + recordId);
                         }
                     }
-                }
 
-                /**
-                 1. The adapter queries ES for the existence of an "incident" with the given origin cspid/appid/id
-                 2. If it finds such incidence, it rewrites the incidence url inside the RTIR object with the url that this incidence has in ES
-                 3. If not It deletes the url field
-                 4. It pushes the event with the rewriten RTIR fields to misp
-                 */
-                String newURL = "";
-                String newTickerNumber = "";
-                try {
-                    IntegrationData searchData = new IntegrationData();
-                    DataParams searchParams = new DataParams();
-                    searchParams.setOriginRecordId(originRecordId);
-                    searchParams.setOriginApplicationId(applicationId);
-                    searchParams.setOriginCspId(originCspId);
+                    /**
+                     1. The adapter queries ES for the existence of an "incident" with the given origin cspid/appid/id
+                     2. If it finds such incidence, it rewrites the incidence url inside the RTIR object with the url that this incidence has in ES
+                     3. If not It deletes the url field
+                     4. It pushes the event with the rewriten RTIR fields to misp
+                     */
+                    String newURL = "";
+                    String newTickerNumber = "";
+                    try {
+                        IntegrationData searchData = new IntegrationData();
+                        DataParams searchParams = new DataParams();
+                        searchParams.setOriginRecordId(originRecordId);
+                        searchParams.setOriginApplicationId(applicationId);
+                        searchParams.setOriginCspId(originCspId);
 
-                    searchData.setDataParams(searchParams);
-                    searchData.setDataType(IntegrationDataType.VULNERABILITY);
+                        searchData.setDataParams(searchParams);
+                        searchData.setDataType(IntegrationDataType.VULNERABILITY);
 
-                    JsonNode esObject = elasticClient.getESobjectFromOrigin(searchData);
-                    if (esObject != null) {
-                        LOG.info("FOUND TRUE");
-                        newURL = esObject.get("dataParams").get("url").toString();
-                        newTickerNumber = esObject.get("dataObject").get("id").toString();
-                        newURL = newURL.replaceAll("\"", "");
-                        newTickerNumber = newTickerNumber.replaceAll("\"", "");
-                    }
-                    else {
-                        LOG.info("NOT FOUND");
-                    }
-                    //replace
-                    for (JsonNode ja : jn.get("Attribute")){
-                        if (ja.get("object_relation").toString().toLowerCase().equals(MispContextUrl.VULNERABILITYEntity.MAP_CSP_FIELDS.toString().toLowerCase()) &&
-                                ja.get("value").toString().toLowerCase().equals(MispContextUrl.VULNERABILITYEntity.MAP_CSP_URL_VALUE.toString().toLowerCase()) ) {
-                            ((ObjectNode)ja).put("comment",  newURL);
+                        JsonNode esObject = elasticClient.getESobjectFromOrigin(searchData);
+                        if (esObject != null) {
+                            LOG.info("FOUND TRUE");
+                            newURL = esObject.get("dataParams").get("url").textValue();
+                            newTickerNumber = esObject.get("dataObject").get("id").textValue();
                         }
+                        else {
+                            LOG.info("NOT FOUND");
+                        }
+                        //replace
+                        for (JsonNode ja : jn.get("Attribute")){
+                            if (ja.get("object_relation").textValue().toLowerCase().equals(MispContextUrl.VULNERABILITYEntity.MAP_CSP_URL_VALUE.toString().toLowerCase()) ) {
+                                ((ObjectNode)ja).put("value",  newURL);
+                            }
                         /*
                         if (ja.get("object_relation").toString().toLowerCase().equals(MispContextUrl.VULNERABILITYEntity.MAP_RECORD_RELATION.toString().toLowerCase()) &&
                                 ja.get("category").toString().toLowerCase().equals(MispContextUrl.VULNERABILITYEntity.MAP_RECORD_CATEGORY.toString().toLowerCase()) ) {
                             ((ObjectNode)ja).put("value",  newTickerNumber);
                         }
                         */
+                        }
                     }
+                    catch (Exception e){
+                        LOG.info(e.getMessage());
+                    }
+                    LOG.info("VULNERABILITY new URL: " + newURL);
+                    LOG.info("VULNERABILITY new ID: " + newTickerNumber);
+
                 }
-                catch (Exception e){
-                    LOG.info(e.getMessage());
-                }
-                LOG.info("VULNERABILITY new URL: " + newURL);
-                LOG.info("VULNERABILITY new ID: " + newTickerNumber);
             }
         }
 
