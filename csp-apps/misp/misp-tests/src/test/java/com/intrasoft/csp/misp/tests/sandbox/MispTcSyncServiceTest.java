@@ -5,6 +5,7 @@ import com.intrasoft.csp.client.config.TrustCirclesClientConfig;
 import com.intrasoft.csp.libraries.restclient.service.RetryRestTemplate;
 import com.intrasoft.csp.misp.client.MispAppClient;
 import com.intrasoft.csp.misp.client.config.MispAppClientConfig;
+import com.intrasoft.csp.misp.commons.models.OrganisationDTO;
 import com.intrasoft.csp.misp.commons.models.generated.SharingGroup;
 import com.intrasoft.csp.misp.service.MispTcSyncService;
 import com.intrasoft.csp.misp.service.impl.MispTcSyncServiceImpl;
@@ -75,6 +76,7 @@ public class MispTcSyncServiceTest {
     URL twoTeams = getClass().getClassLoader().getResource("json/twoTeams.json");
     URL allTrustCircles = getClass().getClassLoader().getResource("json/allTrustCircles.json");
     URL twoTrustCircles = getClass().getClassLoader().getResource("json/twoTrustCircles.json");
+    URL twoTrustCirclesUpdated = getClass().getClassLoader().getResource("json/twoTrustCirclesUpdated.json");
     URL sharingGroup = getClass().getClassLoader().getResource("json/sharingGroup.json");
     URL allSharingGroups = getClass().getClassLoader().getResource("json/allSharingGroups.json");
     URL organisation = getClass().getClassLoader().getResource("json/organisation.json");
@@ -162,29 +164,85 @@ public class MispTcSyncServiceTest {
             assertTrue(sharingGroups.stream().anyMatch(sharingGroup -> sharingGroup.getUuid().equals(uuid)));
         });
 
-        // Assert that the Sharing Groups Organisation content matches the Trust Circles Team content.
+        // The Sharing Groups Organisation content should match the Trust Circles Team content.
         // Sharing Group A should be empty, while Sharing Group B should reference 2 Organisations
         SharingGroup sharingGroupA = sharingGroups.stream().filter(sg -> sg.getUuid().equals(tcUuids.get(0))).findFirst().get();
         SharingGroup sharingGroupB = sharingGroups.stream().filter(sg -> sg.getUuid().equals(tcUuids.get(1))).findFirst().get();
-        assertThat(sharingGroupA.getSharingGroupOrg().size(), is(0));
+        assertThat(sharingGroupA.getSharingGroupOrg().size()-1, is(0));  // -1: (adds user's Organisation by default)
         assertThat(sharingGroupB.getSharingGroupOrg().size(), is(2));
 
-        // TODO: Server adds MISP Organisation by default upon Sharing Group creation without Organisations.
-        // Therefore, the assertion for sharingGroupA fails. Find a way to override this behavior.
 
-        // TODO: Assert Organisation content on Sharing Group B
+        // Organisation content on Sharing Group B
+        assertTrue(sharingGroupB.getSharingGroupOrg().stream().anyMatch(sharingGroupOrgItem ->
+            sharingGroupOrgItem.getOrganisation().getName().equals("CSP::demo1-csp")));
+        assertTrue(sharingGroupB.getSharingGroupOrg().stream().anyMatch(sharingGroupOrgItem ->
+                sharingGroupOrgItem.getOrganisation().getName().equals("CSP::demo2-csp")));
 
         tcMockServer.verify();
 //      mispMockServer.verify();
     }
 
     // TODO: The scenario where some of the TC' Trust Circles already exist in MISP and need to be updated.
+    // Since we're not currently able to update the Sharing Group's Organisations content via the API,
+    // a temporary solution is deleting and re-creating the Sharing Group with the updated Organisation content.
     @Test
     public void syncSharingGroupsExistingSharingGroupsTest() throws URISyntaxException, IOException {
+        String tcCirclesURI = tcConfig.getTcCirclesURI();
+        String mispGroupsURI = "http://192.168.56.50:80/sharing_groups";
+        String mispAddGroupURI = "http://192.168.56.50:80/sharing_groups/add";
+        String sharingGroupUuid = "a36c31f4-dad3-4f49-b443-e6d6333649b1";
+
+        // We first need to mock TC server's getAllTrustCircles response
+        MockRestServiceServer tcMockServer = MockRestServiceServer.bindTo(tcRetryRestTemplate).build();
+        tcMockServer.expect(requestTo(tcCirclesURI))
+                .andRespond(MockRestResponseCreators
+                        .withSuccess(FileUtils.readFileToString(new File(twoTrustCirclesUpdated.toURI()),
+                                Charset.forName("UTF-8")).getBytes(), MediaType.APPLICATION_JSON_UTF8));
+
+        // create the existing organisation here manually
+        String newOrgUuid = "9a74c807-e6c4-4a19-9c77-37457e3285df";
+        List<String> tcUuids = Arrays.asList("2883f242-3e07-4378-9091-0d198e4886ba", "61ee0197-587f-43ce-afcf-310b36b5bfe9");
+        String[] orgUuids = {newOrgUuid, "578c0e4e-ebaf-455b-a2a1-faffb14be9e1", newOrgUuid};
+        OrganisationDTO organisationDTO = new OrganisationDTO();
+        organisationDTO.setName("DELETE ME");
+        organisationDTO.setUuid(newOrgUuid);
+        mispAppClient.addMispOrganisation(organisationDTO);
+
+        mispTcSyncService.syncSharingGroups();
+
+        // Assert that the Trust Circles corresponding Sharing Groups exist.
+        List<SharingGroup> sharingGroups = mispAppClient.getAllMispSharingGroups();
+        // Temporary fix for unknown Sharing Group UUIDs API issue; making extra GET calls to fetch them
+        sharingGroups.forEach(sharingGroup ->  {
+            sharingGroup.setUuid(mispAppClient.getMispSharingGroup(sharingGroup.getId()).getUuid());
+        });
+
+        // The Sharing Groups Organisation content should match the Trust Circles Team content.
+        // Sharing Group A should have one Organisation defined, while Sharing Group B should have two.
+        SharingGroup sharingGroupA = sharingGroups.stream().filter(sg -> sg.getUuid().equals(tcUuids.get(0))).findFirst().get();
+        SharingGroup sharingGroupB = sharingGroups.stream().filter(sg -> sg.getUuid().equals(tcUuids.get(1))).findFirst().get();
+        assertThat(sharingGroupA.getSharingGroupOrg().size(), is(0));
+        assertThat(sharingGroupB.getSharingGroupOrg().size(), is(2));
+
+        // Organisation content verification
+        assertTrue(sharingGroupB.getSharingGroupOrg().stream().anyMatch(sharingGroupOrgItem ->
+                sharingGroupOrgItem.getOrganisation().getName().equals("DELETE ME")));
+        assertTrue(sharingGroupB.getSharingGroupOrg().stream().anyMatch(sharingGroupOrgItem ->
+                sharingGroupOrgItem.getOrganisation().getName().equals("CSP::demo1-csp")));
+        assertTrue(sharingGroupB.getSharingGroupOrg().stream().anyMatch(sharingGroupOrgItem ->
+                sharingGroupOrgItem.getOrganisation().getName().equals("DELETE ME")));
+
+
+
+        tcMockServer.verify();
 
 
     }
-    //Description
+    // TODO: The scenario where some Sharing Groups in MISP have no corresponding Trust Circles.
+    // Should all be deleted
+    public void syncSharingGroupsMarkOrphansPassiveTest() {
+
+    }
     @Test
     public void syncAllScenarioATest() {
 

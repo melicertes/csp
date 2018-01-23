@@ -135,12 +135,7 @@ public class MispTcSyncServiceImpl implements MispTcSyncService {
     public void syncSharingGroups() {
 
         List<TrustCircle> tcList = trustCirclesClient.getAllTrustCircles();
-        List<SharingGroup> sgList = mispAppClient.getAllMispSharingGroups();
-
-//      Temporary fix for unknown Sharing Group UUIDs; extra calls on server
-        sgList.forEach(sharingGroup ->  {
-            sharingGroup.setUuid(mispAppClient.getMispSharingGroup(sharingGroup.getId()).getUuid());
-        });
+        List<SharingGroup> sgList = getAllSharingGroupsWithUuids();
 
         SharingGroup sharingGroup = null;
 
@@ -165,11 +160,34 @@ public class MispTcSyncServiceImpl implements MispTcSyncService {
             mispAppClient.addMispSharingGroup(sharingGroup);
         }
 
+        // SXCSP-435 Setting Sharing Groups as inactive instead of deleting them
+        sgList = getAllSharingGroupsWithUuids(); // refresh list
+
+        boolean exists;
+        for (SharingGroup sg : sgList) {
+            exists = tcList.stream().anyMatch(tc -> tc.getId().equals(sg.getUuid()));
+            if (!exists) { // if Sharing Group's UUID doesn't exist anywhere in Trust Circles
+                sg.setActive(false);
+                mispAppClient.updateMispSharingGroup(sg);
+            }
+        }
+
     }
 
     private void mapTeamToOrganisation(Team team, OrganisationDTO organisation) {
 
         organisation.setUuid(team.getId());
+        // SXCSP-436 Mapping Teams NIS Sectors to Organisations Sector
+        List<String> teamSectors = team.getNisSectors();
+        String orgSectors = new String();
+        if (teamSectors.size()>0) {
+            for (String sector : teamSectors) {
+                orgSectors+=sector+", ";
+            }
+            orgSectors = orgSectors.substring(0, orgSectors.lastIndexOf(", "));
+        }
+        organisation.setSector(orgSectors);
+
         // Modifying the name field to differentiate synchronized organisations.
         if (!organisation.getName().startsWith(prefix))  // prevents from adding the prefix each and every time
             organisation.setName(prefix + team.getName());
@@ -206,6 +224,9 @@ public class MispTcSyncServiceImpl implements MispTcSyncService {
             sGroupOrgCheckMap.put(uuid, (mispAppClient.getMispOrganisation(uuid)!=null));
         });
 
+        // TODO: Update SharingGroupOrg to contain only the organisations referenced in tCircleTeamsUuids.
+
+
         sGroupOrgCheckMap.forEach((k,v)-> {
             if (v) { // If the Organisation already exists assign it to the Sharing Group
                 OrganisationDTO organisationDTO = mispAppClient.getMispOrganisation(k);
@@ -233,6 +254,17 @@ public class MispTcSyncServiceImpl implements MispTcSyncService {
         sgoi.setExtend(false);
         sgoi.setOrgId(organisationDTO.getId());
         return sgoi;
+    }
+
+    // Using this private method until API GET call for All Sharing Groups includes their UUIDs.
+    private List<SharingGroup> getAllSharingGroupsWithUuids() {
+        List<SharingGroup> sgList = mispAppClient.getAllMispSharingGroups();
+
+//      Temporary fix for unknown Sharing Group UUIDs; extra calls on server
+        sgList.forEach(sharingGroup ->  {
+            sharingGroup.setUuid(mispAppClient.getMispSharingGroup(sharingGroup.getId()).getUuid());
+        });
+        return sgList;
     }
 
 }
