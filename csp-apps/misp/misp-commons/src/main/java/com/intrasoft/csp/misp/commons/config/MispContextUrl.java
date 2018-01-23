@@ -47,15 +47,24 @@ public interface MispContextUrl {
 
     public static enum RTIREntity {
         APPLICATION_ID("rt"),
-        RTIR_NAME("\"rtir\""),
+        RTIR_NAME("csp-rtir"),
 
-        MAP_CSP_FIELDS("\"classification\""),
-        MAP_CSP_URL_VALUE("\"csp::url\""),
-        MAP_ORIGIN_CSP_ID_VALUE("\"csp::originCspId\""),
-        MAP_ORIGIN_RECORD_ID_VALUE("\"csp::originRecordId\""),
+        /*
+        CSP fields to look for in "object_relation" node
+         */
+        MAP_CSP_URL_VALUE("csp-url"),
+        MAP_ORIGIN_CSP_ID_VALUE("csp-originCspId"),
+        MAP_ORIGIN_RECORD_ID_VALUE("csp-originRecordId"),
 
-        MAP_TITLE("\"subject\""),
-        MAP_TICKET_NO("\"ticket-number\"");
+        /*
+        TITLE
+         */
+        MAP_TITLE("subject"),
+
+        /*
+        Ticket Number
+         */
+        MAP_TICKET_NO("ticket-number");
 
         private final String value;
 
@@ -70,18 +79,26 @@ public interface MispContextUrl {
 
     public static enum VULNERABILITYEntity {
         APPLICATION_ID("taranis"),
-        VULNERABILITY_NAME("\"vulnerability\""),
+        VULNERABILITY_NAME("csp-vulnerability"),
 
-        MAP_CSP_FIELDS("\"vulnerable_configuration\""),
-        MAP_CSP_URL_VALUE("\"csp::url\""),
-        MAP_ORIGIN_CSP_ID_VALUE("\"csp::originCspId\""),
-        MAP_ORIGIN_RECORD_ID_VALUE("\"csp::originRecordId\""),
+        /*
+        CSP fields to look for in "object_relation" node
+         */
+        MAP_CSP_URL_VALUE("csp-url"),
+        MAP_ORIGIN_CSP_ID_VALUE("csp-originCspId"),
+        MAP_ORIGIN_RECORD_ID_VALUE("csp-originRecordId"),
 
-        MAP_TITLE_RELATION("\"text\""),
-        MAP_TITLE_CATEGORY("\"Other\""),
+        /*
+        Title
+         */
+        MAP_TITLE_RELATION("text"),
+        MAP_TITLE_CATEGORY("Other"),
 
-        MAP_RECORD_RELATION("\"id\""),
-        MAP_RECORD_CATEGORY("\"External analysis\"");
+        /*
+        ID
+         */
+        MAP_RECORD_RELATION("id"),
+        MAP_RECORD_CATEGORY("External analysis");
 
         private final String value;
 
