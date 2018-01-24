@@ -241,12 +241,15 @@ public class MispTcSyncServiceImpl implements MispTcSyncService {
                     organisationDTO.setName(prefix+organisationDTO.getName());
                 mispAppClient.updateMispOrganisation(organisationDTO);
                 sharingGroupOrg.add(addOrgAsSGOI(organisationDTO));
-            } else if (!v) {  // otherwise, create it now
+            } else if (!v) {  // otherwise, create it now?
+                LOG.warn("Organisation with UUID " + k + " has not been synchronized yet");
+/*
                 Team team = trustCirclesClient.getTeamByUuid(k);
                 OrganisationDTO organisationDTO = new OrganisationDTO();
                 mapTeamToOrganisation(team,organisationDTO);
                 mispAppClient.addMispOrganisation(organisationDTO);
                 sharingGroupOrg.add(addOrgAsSGOI(organisationDTO));
+*/
             }
         });
         if (!(tCircleTeamsUuids.size()>0))
