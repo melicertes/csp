@@ -30,7 +30,7 @@
     "created": "string",
     "tlp": "amber",
     "teams": [
-      "578c0e4e-ebaf-455b-a2a1-faffb14be9e1"
+      "55f6ea5e-2c60-40e5-964f-47a8950d210f"
     ],
     "team_contacts": [
       "string"
@@ -50,7 +50,9 @@
     "created": "string",
     "tlp": "green",
     "teams": [
-      "578c0e4e-ebaf-455b-a2a1-faffb14be9e1"
+      "578c0e4e-ebaf-455b-a2a1-faffb14be9e1",
+      "af9d06ac-d7be-4684-86a3-808fe4f4d17c",
+      "88557939-db1c-4411-831a-9b6226ef4819"
     ],
     "team_contacts": [
       "string"

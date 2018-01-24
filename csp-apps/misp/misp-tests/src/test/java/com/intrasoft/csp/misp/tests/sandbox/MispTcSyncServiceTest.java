@@ -82,6 +82,7 @@ public class MispTcSyncServiceTest {
     URL sharingGroup = getClass().getClassLoader().getResource("json/sharingGroup.json");
     URL allSharingGroups = getClass().getClassLoader().getResource("json/allSharingGroups.json");
     URL organisation = getClass().getClassLoader().getResource("json/organisation.json");
+    String prefix = "CSP::";
 
     // Service should synchronize Trust Circles' Teams with MISP's Organisations.
     // TODO: Organisations in MISP can't be deleted when tied with users or events. UI Response Message:
@@ -241,6 +242,7 @@ public class MispTcSyncServiceTest {
 
     }
 
+    // Creates 5 Sharing Groups in MISP when synchronizing both with Trust Circle Client's CTCs and LTCs
     @Test
     public void syncSharingGroupsLocalTrustCirclesTest() throws URISyntaxException, IOException {
 
@@ -265,21 +267,21 @@ public class MispTcSyncServiceTest {
 
         // assert ltcs are now on misp as sharing groups
         String[] uuids = {"7703853d-1c32-4556-b34b-c666f212cdc9", "31146113-d53d-4738-877d-2405ea18edf8", "5b2af720-e192-4cd5-8e5d-db3181c8a475"};
-        String[] names = {"LTC shortname A", "LTC shortname B", "LTC shortname C"};
+        String[] names = {"LTC name A", "LTC name B", "LTC name C"};
+        List<SharingGroup> sharingGroups = getAllSharingGroupsWithUuids();
 
-        // assert uuid and name for ltcA
-        SharingGroup sharingGroupA = mispAppClient.getMispSharingGroup(uuids[0]);
+        // assert uuids and names (now with sync prefix) for each of the three Local Trust Circles
+        SharingGroup sharingGroupA = sharingGroups.stream().filter(sg -> sg.getUuid().equals(uuids[0])).findFirst().get();
         assertThat(sharingGroupA.getUuid(), is(uuids[0]));
-        assertThat(sharingGroupA.getName(), is(names[0]));
+        assertThat(sharingGroupA.getName(), is(prefix+names[0]));
 
-        // assert uuid and name for ltcB
-        SharingGroup sharingGroupB = mispAppClient.getMispSharingGroup(uuids[1]);
+        SharingGroup sharingGroupB = sharingGroups.stream().filter(sg -> sg.getUuid().equals(uuids[1])).findFirst().get();
         assertThat(sharingGroupB.getUuid(), is(uuids[1]));
-        assertThat(sharingGroupB.getName(), is(names[1]));
-        // assert uuid and name for ltcC
-        SharingGroup sharingGroupC = mispAppClient.getMispSharingGroup(uuids[2]);
+        assertThat(sharingGroupB.getName(), is(prefix+names[1]));
+
+        SharingGroup sharingGroupC = sharingGroups.stream().filter(sg -> sg.getUuid().equals(uuids[2])).findFirst().get();
         assertThat(sharingGroupC.getUuid(), is(uuids[2]));
-        assertThat(sharingGroupC.getName(), is(names[2]));
+        assertThat(sharingGroupC.getName(), is(prefix+names[2]));
 
         tcMockServer.verify();
     }
@@ -300,6 +302,16 @@ public class MispTcSyncServiceTest {
     @Test
     public void syncAllScenarioBTest() {
 
+    }
+
+    private List<SharingGroup> getAllSharingGroupsWithUuids() {
+        // Assert that the Trust Circles corresponding Sharing Groups exist.
+        List<SharingGroup> sharingGroups = mispAppClient.getAllMispSharingGroups();
+        // Temporary fix for unknown Sharing Group UUIDs API issue; making extra GET calls to fetch them
+        sharingGroups.forEach(sharingGroup ->  {
+            sharingGroup.setUuid(mispAppClient.getMispSharingGroup(sharingGroup.getId()).getUuid());
+        });
+        return sharingGroups;
     }
 
 
