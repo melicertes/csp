@@ -40,6 +40,12 @@ public class TrustCirclesClientConfig implements ContextUrl {
     @Value("${tc.path.circles}")
     String tcPathCircles;
 
+    @Value("${tc.path.localcircles}")
+    String tcPathLocalCircles;
+
+    @Value("${tc.path.localcircle}")
+    String tcPathLocalCircle;
+
     @Value("${tc.path.teams}")
     String tcPathTeams;
 
@@ -71,7 +77,7 @@ public class TrustCirclesClientConfig implements ContextUrl {
 
     @Bean(name = "TcClient")
     public TrustCirclesClient tcClient(){
-        return new TrustCirclesClientImpl(getTcBaseContext(),getTcPathCircles(),getTcPathTeams());
+        return new TrustCirclesClientImpl(getTcBaseContext(),getTcPathCircles(),getTcPathTeams(),getTcPathLocalCircles(),getTcPathLocalCircle());
     }
 
     @Autowired
@@ -91,6 +97,22 @@ public class TrustCirclesClientConfig implements ContextUrl {
 
     public void setTcPathCircles(String tcPathCircles) {
         this.tcPathCircles = tcPathCircles;
+    }
+
+    public String getTcPathLocalCircles() {
+        return tcPathLocalCircles;
+    }
+
+    public void setTcPathLocalCircles(String tcPathLocalCircles) {
+        this.tcPathLocalCircles = tcPathLocalCircles;
+    }
+
+    public String getTcPathLocalCircle() {
+        return tcPathLocalCircle;
+    }
+
+    public void setTcPathLocalCircle(String tcPathLocalCircle) {
+        this.tcPathLocalCircle = tcPathLocalCircle;
     }
 
     public String getTcPathTeams() {

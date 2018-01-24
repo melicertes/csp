@@ -128,6 +128,14 @@ public class MispTcSyncServiceImpl implements MispTcSyncService {
     public void syncSharingGroups() {
 
         List<TrustCircle> tcList = trustCirclesClient.getAllTrustCircles();
+
+        // Adding Local Trust Circles to existing Central Trust Circles list for synchronization;
+        List<TrustCircle> localTcList = trustCirclesClient.getAllLocalTrustCircles();
+        List<TrustCircle> combinedList = new ArrayList<>();
+        combinedList.addAll(tcList);
+        combinedList.addAll(localTcList);
+        tcList = combinedList;
+
         List<SharingGroup> sgList = mispAppClient.getAllMispSharingGroups();
         SharingGroup sharingGroup = null;
 

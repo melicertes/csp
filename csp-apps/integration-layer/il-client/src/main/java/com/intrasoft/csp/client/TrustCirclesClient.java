@@ -21,4 +21,9 @@ public interface TrustCirclesClient {
     TrustCircle getTrustCircleByUuid(String uuid);
 
     Team getTeamByUuid(String uuid);
+
+    List<TrustCircle> getAllLocalTrustCircles();
+
+    TrustCircle getLocalTrustCircleByUuid(String uuid);
+
 }

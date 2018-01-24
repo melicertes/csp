@@ -5,6 +5,7 @@ import com.intrasoft.csp.client.config.TrustCirclesClientConfig;
 import com.intrasoft.csp.libraries.restclient.service.RetryRestTemplate;
 import com.intrasoft.csp.misp.client.MispAppClient;
 import com.intrasoft.csp.misp.client.config.MispAppClientConfig;
+import com.intrasoft.csp.misp.commons.models.generated.SharingGroup;
 import com.intrasoft.csp.misp.service.MispTcSyncService;
 import com.intrasoft.csp.misp.service.impl.MispTcSyncServiceImpl;
 import com.intrasoft.csp.misp.tests.sandbox.util.MispMockUtil;
@@ -26,6 +27,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -72,6 +74,7 @@ public class MispTcSyncServiceTest {
     URL allTeams = getClass().getClassLoader().getResource("json/allTeams.json");
     URL twoTeams = getClass().getClassLoader().getResource("json/twoTeams.json");
     URL allTrustCircles = getClass().getClassLoader().getResource("json/allTrustCircles.json");
+    URL allLocalTrustCircles = getClass().getClassLoader().getResource("json/allLocalTrustCircles.json");
     URL twoTrustCircles = getClass().getClassLoader().getResource("json/twoTrustCircles.json");
     URL sharingGroup = getClass().getClassLoader().getResource("json/sharingGroup.json");
     URL allSharingGroups = getClass().getClassLoader().getResource("json/allSharingGroups.json");
@@ -169,11 +172,56 @@ public class MispTcSyncServiceTest {
         tcMockServer.verify();
         mispMockServer.verify();
     }
+
+    @Test
+    public void syncSharingGroupsLocalTrustCirclesTest() throws URISyntaxException, IOException {
+
+        String tcCirclesURI = tcConfig.getTcCirclesURI();
+        String tcLocalCirclesURI = tcConfig.getTcLocalCirclesURI();
+        String mispGroupsURI = "http://192.168.56.50:80/sharing_groups";
+
+        // We first need to mock TC server's getAllTrustCircles response
+        MockRestServiceServer tcMockServer = MockRestServiceServer.bindTo(tcRetryRestTemplate).build();
+        tcMockServer.expect(requestTo(tcCirclesURI))
+                .andRespond(MockRestResponseCreators
+                        .withSuccess(FileUtils.readFileToString(new File(twoTrustCircles.toURI()),
+                                Charset.forName("UTF-8")).getBytes(), MediaType.APPLICATION_JSON_UTF8));
+
+        // Then mock TC server's getAllLocalTrustCircles response
+        tcMockServer.expect(requestTo(tcLocalCirclesURI))
+                .andRespond(MockRestResponseCreators
+                        .withSuccess(FileUtils.readFileToString(new File(allLocalTrustCircles.toURI()),
+                                Charset.forName("UTF-8")).getBytes(), MediaType.APPLICATION_JSON_UTF8));
+
+        mispTcSyncService.syncSharingGroups();
+
+        // assert ltcs are now on misp as sharing groups
+        String[] uuids = {"7703853d-1c32-4556-b34b-c666f212cdc9", "31146113-d53d-4738-877d-2405ea18edf8", "5b2af720-e192-4cd5-8e5d-db3181c8a475"};
+        String[] names = {"LTC shortname A", "LTC shortname B", "LTC shortname C"};
+
+        // assert uuid and name for ltcA
+        SharingGroup sharingGroupA = mispAppClient.getMispSharingGroup(uuids[0]);
+        assertThat(sharingGroupA.getUuid(), is(uuids[0]));
+        assertThat(sharingGroupA.getName(), is(names[0]));
+
+        // assert uuid and name for ltcB
+        SharingGroup sharingGroupB = mispAppClient.getMispSharingGroup(uuids[1]);
+        assertThat(sharingGroupB.getUuid(), is(uuids[1]));
+        assertThat(sharingGroupB.getName(), is(names[1]));
+        // assert uuid and name for ltcC
+        SharingGroup sharingGroupC = mispAppClient.getMispSharingGroup(uuids[2]);
+        assertThat(sharingGroupC.getUuid(), is(uuids[2]));
+        assertThat(sharingGroupC.getName(), is(names[2]));
+
+        tcMockServer.verify();
+    }
+
     ////This is the scenario where some of the TC' Trust Circles already exist in MISP and need to be updated.
     @Test
     public void syncSharingGroupsExistingSharingGroupsTest() {
 
     }
+
     //Description
     @Test
     public void syncAllScenarioATest() {
