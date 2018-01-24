@@ -1,26 +1,28 @@
 package com.intrasoft.csp.misp.commons.models.generated;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.intrasoft.csp.misp.commons.models.OrganisationDTO;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class SharingGroup{
 
-	@JsonProperty("releasability")
-	private String releasability;
+    @JsonProperty("id")
+    private String id;
 
-	@JsonProperty("name")
+    @JsonProperty("name")
 	private String name;
 
-	@JsonProperty("description")
+    @JsonProperty("releasability")
+    private String releasability;
+
+    @JsonProperty("description")
 	private String description;
 
 	@JsonProperty("active")
 	private boolean active;
-
-	@JsonProperty("id")
-	private String id;
 
 	@JsonProperty("uuid")
 	private String uuid;
@@ -32,13 +34,35 @@ public class SharingGroup{
 	private boolean editable;
 
 	@JsonProperty("Organisation")
-    private OrganisationDTO createdBy;
+    private OrganisationDTO organisation;
 
     @JsonProperty("SharingGroupOrg")
     private List<SharingGroupOrgItem> sharingGroupOrg;
 
     @JsonProperty("SharingGroupServer")
     private List<SharingGroupServerItem> sharingGroupServer;
+
+    @JsonProperty("created")
+    private String created;
+
+    @JsonProperty("modified")
+    private String modified;
+
+    @JsonProperty("organisation_uuid")
+    private String organisationUuid;
+
+    @JsonProperty("org_id")
+    private String orgId;
+
+    @JsonProperty("sync_user_id")
+    private String syncUserId;
+
+    @JsonProperty("roaming")
+    private boolean roaming;
+
+    @JsonProperty("sync_org_name")
+    private String syncOrgName;
+
 
 	public void setReleasability(String releasability){
 		this.releasability = releasability;
@@ -104,12 +128,12 @@ public class SharingGroup{
 		this.editable = editable;
 	}
 
-    public OrganisationDTO getCreatedBy() {
-        return createdBy;
+    public OrganisationDTO getOrganisation() {
+        return organisation;
     }
 
-    public void setCreatedBy(OrganisationDTO createdBy) {
-        this.createdBy = createdBy;
+    public void setOrganisation(OrganisationDTO organisation) {
+        this.organisation = organisation;
     }
 
     public List<SharingGroupOrgItem> getSharingGroupOrg() {
@@ -132,20 +156,92 @@ public class SharingGroup{
         this.sharingGroupServer = sharingGroupServer;
     }
 
-	@Override
-	public String toString() {
-		return "SharingGroup{" +
-				"releasability='" + releasability + '\'' +
-				", name='" + name + '\'' +
-				", description='" + description + '\'' +
-				", active=" + active +
-				", id='" + id + '\'' +
-				", uuid='" + uuid + '\'' +
-				", local=" + local +
-				", editable=" + editable +
-				", createdBy=" + createdBy +
-				", sharingGroupOrg=" + sharingGroupOrg +
-				", sharingGroupServer=" + sharingGroupServer +
-				'}';
-	}
+    public String getCreated() {
+        return created;
+    }
+
+    public void setCreated(String created) {
+        this.created = created;
+    }
+
+    public String getModified() {
+        return modified;
+    }
+
+    public void setModified(String modified) {
+        this.modified = modified;
+    }
+
+    public String getOrganisationUuid() {
+        return organisationUuid;
+    }
+
+    public void setOrganisationUuid(String organisationUuid) {
+        this.organisationUuid = organisationUuid;
+    }
+
+    public String getOrgId() {
+        return orgId;
+    }
+
+    public void setOrgId(String orgId) {
+        this.orgId = orgId;
+    }
+
+    public String getSyncUserId() {
+        return syncUserId;
+    }
+
+    public void setSyncUserId(String syncUserId) {
+        this.syncUserId = syncUserId;
+    }
+
+    public boolean isRoaming() {
+        return roaming;
+    }
+
+    public void setRoaming(boolean roaming) {
+        this.roaming = roaming;
+    }
+
+    public String getSyncOrgName() {
+        return syncOrgName;
+    }
+
+    public void setSyncOrgName(String syncOrgName) {
+        this.syncOrgName = syncOrgName;
+    }
+
+    @JsonIgnore
+    public List<OrganisationDTO> getAllOrganisations() {
+	    List<OrganisationDTO> orgList = new ArrayList<>();
+	    sharingGroupOrg.forEach(sgoi -> orgList.add(sgoi.getOrganisation()));
+	    return orgList;
+    }
+
+    @Override
+    public String toString() {
+        return "SharingGroup{" +
+                "releasability='" + releasability + '\'' +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", active=" + active +
+                ", id='" + id + '\'' +
+                ", uuid='" + uuid + '\'' +
+                ", local=" + local +
+                ", editable=" + editable +
+                ", organisation=" + organisation +
+                ", sharingGroupOrg=" + sharingGroupOrg +
+                ", sharingGroupServer=" + sharingGroupServer +
+                ", created='" + created + '\'' +
+                ", modified='" + modified + '\'' +
+                ", organisationUuid='" + organisationUuid + '\'' +
+                ", orgId='" + orgId + '\'' +
+                ", syncUserId='" + syncUserId + '\'' +
+                ", roaming=" + roaming +
+                ", syncOrgName='" + syncOrgName + '\'' +
+                '}';
+    }
+
+
 }

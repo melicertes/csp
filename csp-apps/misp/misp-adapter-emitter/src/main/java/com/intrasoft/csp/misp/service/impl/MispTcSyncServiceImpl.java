@@ -32,6 +32,9 @@ public class MispTcSyncServiceImpl implements MispTcSyncService {
     @Autowired
     MispAppClient mispAppClient;
 
+    @Value("${server.name}")
+    String cspId;
+
     @Value("${misp.sync.enabled}")
     Boolean syncEnabled;
 
@@ -40,6 +43,9 @@ public class MispTcSyncServiceImpl implements MispTcSyncService {
 
     @Value("${misp.sync.initial.delay}")
     Long initialDelay;
+
+    @Value("${misp.sync.prefix}")
+    String prefix;
 
 //  TODO: Investigate which additional fields can be mapped
 
@@ -61,7 +67,6 @@ public class MispTcSyncServiceImpl implements MispTcSyncService {
     }
 
 //  TODO: Add name validation (name duplicates not allowed)
-//  TODO: Organisations can't be deleted when they reference users or are referenced themselves by misp events
 //    Team objects with new Uuids also need to have unique names (case-sensitive) in order to be created in MISP.
     public void syncOrganisations() {
         List<Team> teamList = trustCirclesClient.getAllTeams();
@@ -99,8 +104,7 @@ public class MispTcSyncServiceImpl implements MispTcSyncService {
             mispAppClient.addMispOrganisation(newOrg);
         }
 
-        // Delete any MISP Organisations that don't exist in Trust Circles.
-        // (Organisation references are removed automatically from any sharing groups when deleted. Tested in MISP UI)
+        // Finding orphan MISP organisations
 
         // Refreshing our lists first
         orgList = mispAppClient.getAllMispOrganisations();
@@ -121,10 +125,13 @@ public class MispTcSyncServiceImpl implements MispTcSyncService {
         }
 
         LOG.info("Found " + teamIdList.size() + " orphan organisations in MISP");
-        teamIdList.forEach(id -> mispAppClient.deleteMispOrganisation(id));
+        // TODO: What is the action to be taken when a MISP organisation does not have a corresponding team in TC? (deletion is not an option for now)
+        // teamIdList.forEach(id -> mispAppClient.deleteMispOrganisation(id));
 
     }
 
+//  TODO: Sharing Groups API response on GET calls for all Sharing Groups does not include their UUIDs.
+//  This could be an overkill considering all the extra GET calls.
     public void syncSharingGroups() {
 
         List<TrustCircle> tcList = trustCirclesClient.getAllTrustCircles();
@@ -136,7 +143,7 @@ public class MispTcSyncServiceImpl implements MispTcSyncService {
         combinedList.addAll(localTcList);
         tcList = combinedList;
 
-        List<SharingGroup> sgList = mispAppClient.getAllMispSharingGroups();
+        List<SharingGroup> sgList = getAllSharingGroupsWithUuids();
         SharingGroup sharingGroup = null;
 
         boolean loopBreak;
@@ -160,58 +167,111 @@ public class MispTcSyncServiceImpl implements MispTcSyncService {
             mispAppClient.addMispSharingGroup(sharingGroup);
         }
 
+        // SXCSP-435 Setting Sharing Groups as inactive instead of deleting them
+        sgList = getAllSharingGroupsWithUuids(); // refresh list
+
+        boolean exists;
+        for (SharingGroup sg : sgList) {
+            exists = tcList.stream().anyMatch(tc -> tc.getId().equals(sg.getUuid()));
+            if (!exists) { // if Sharing Group's UUID doesn't exist anywhere in Trust Circles
+                sg.setActive(false);
+                mispAppClient.updateMispSharingGroup(sg);
+            }
+        }
+
     }
 
     private void mapTeamToOrganisation(Team team, OrganisationDTO organisation) {
 
         organisation.setUuid(team.getId());
-        organisation.setName(team.getName());
+        // SXCSP-436 Mapping Teams NIS Sectors to Organisations Sector
+        List<String> teamSectors = team.getNisSectors();
+        String orgSectors = new String();
+        if (teamSectors.size()>0) {
+            for (String sector : teamSectors) {
+                orgSectors+=sector+", ";
+            }
+            orgSectors = orgSectors.substring(0, orgSectors.lastIndexOf(", "));
+        }
+        organisation.setSector(orgSectors);
+
+        // Modifying the name field to differentiate synchronized organisations.
+        if (!organisation.getName().startsWith(prefix))  // prevents from adding the prefix each and every time
+            organisation.setName(prefix + team.getName());
         organisation.setDescription(team.getDescription());
         organisation.setNationality(team.getCountry());
-        organisation.setLocal(true); // What's the deal with this?
-
+        // SXCSP-420: "The team with the csp-id that is equal to this csp-id should be imported as local org."
+        if (team.getCspId().equals(cspId))  // case-sensitivity?
+            organisation.setLocal(true);
+        else
+            organisation.setLocal(false);
     }
 
     private void mapTrustCircleToSharingGroup(TrustCircle tCircle, SharingGroup sGroup) {
 
         sGroup.setUuid(tCircle.getId());
-        sGroup.setName(tCircle.getName());
+        // Modifying the name field to differentiate synchronized sharing groups.
+        try {
+            if (!sGroup.getName().startsWith(prefix))  // prevents from adding the prefix each and every time
+                sGroup.setName(prefix + tCircle.getName());
+        } catch (NullPointerException e) {
+            sGroup.setName(prefix + tCircle.getName());
+        }
         sGroup.setDescription(tCircle.getDescription());
+        sGroup.setReleasability(""); // informational but mandatory;
+        sGroup.setActive(true);
 
         List<String> tCircleTeamsUuids = tCircle.getTeams();
-        List<SharingGroupOrgItem> sharingGroupOrgItemList = (sGroup.getSharingGroupOrg() == null) ?
+        List<SharingGroupOrgItem> sharingGroupOrg = (sGroup.getSharingGroupOrg() == null) ?
                 new ArrayList<>() : sGroup.getSharingGroupOrg();
 
+        // Mapping existing/non-existing Organisations UUIDs to true/false
         Map<String, Boolean> sGroupOrgCheckMap = new HashMap<>();
-
-        // If it's not a new sharing group, check which of the team uuids already exist as orgs in the MISP sh. group.
-        if (sharingGroupOrgItemList.size()>0) {
-            tCircleTeamsUuids.forEach( uuid -> {
-                sharingGroupOrgItemList.forEach(sgoi -> {
-                    // If the uuid is found, just update the hashmap in order to know what team is already there
-                    if (uuid.equals(sgoi.getOrganisation().getUuid()))
-                        sGroupOrgCheckMap.put(uuid,true);
-                });
-            });
-        } else {
-            sGroup.setSharingGroupOrg(new ArrayList<SharingGroupOrgItem>());
-            tCircleTeamsUuids.forEach(uuid ->sGroupOrgCheckMap.put(uuid, false));
-        }
-
-        // For any false value in the map, get the corresponding keys' organisations in MISP and add it in the sharing
-        // group's list of organisations (list of SharingGroupOrgItems).
-        sGroupOrgCheckMap.forEach((k,v)-> {
-            if (v == false) {
-                // Sharing Group method for adding a sharingGroupOrgItem which contains an organisation with this uuid.
-                SharingGroupOrgItem newSgOrgItem = new SharingGroupOrgItem();
-                // Since organisations are synchronized first, the organisation in MISP with this UUID key should exist;
-                // we just need to fetch it and assign it to the current sharing group.
-                OrganisationDTO newOrg = mispAppClient.getMispOrganisation(k);
-                newSgOrgItem.setOrganisation(newOrg);
-                sGroup.addSharingGroupOrgItem(newSgOrgItem);
-            }
+        tCircleTeamsUuids.forEach( uuid -> {
+            sGroupOrgCheckMap.put(uuid, (mispAppClient.getMispOrganisation(uuid)!=null));
         });
 
+        // TODO: Update SharingGroupOrg to contain only the organisations referenced in tCircleTeamsUuids.
+
+
+        sGroupOrgCheckMap.forEach((k,v)-> {
+            if (v) { // If the Organisation already exists assign it to the Sharing Group
+                OrganisationDTO organisationDTO = mispAppClient.getMispOrganisation(k);
+                if (!organisationDTO.getName().startsWith(prefix))
+                    organisationDTO.setName(prefix+organisationDTO.getName());
+                mispAppClient.updateMispOrganisation(organisationDTO);
+                sharingGroupOrg.add(addOrgAsSGOI(organisationDTO));
+            } else if (!v) {  // otherwise, create it now
+                Team team = trustCirclesClient.getTeamByUuid(k);
+                OrganisationDTO organisationDTO = new OrganisationDTO();
+                mapTeamToOrganisation(team,organisationDTO);
+                mispAppClient.addMispOrganisation(organisationDTO);
+                sharingGroupOrg.add(addOrgAsSGOI(organisationDTO));
+            }
+        });
+        if (!(tCircleTeamsUuids.size()>0))
+            sGroup.setSharingGroupOrg(null);
+        else
+            sGroup.setSharingGroupOrg(sharingGroupOrg);
+    }
+
+    private SharingGroupOrgItem addOrgAsSGOI(OrganisationDTO organisationDTO) {
+        SharingGroupOrgItem sgoi = new SharingGroupOrgItem();
+        sgoi.setOrganisation(organisationDTO);
+        sgoi.setExtend(false);
+        sgoi.setOrgId(organisationDTO.getId());
+        return sgoi;
+    }
+
+    // Using this private method until API GET call for All Sharing Groups includes their UUIDs.
+    private List<SharingGroup> getAllSharingGroupsWithUuids() {
+        List<SharingGroup> sgList = mispAppClient.getAllMispSharingGroups();
+
+//      Temporary fix for unknown Sharing Group UUIDs; extra calls on server
+        sgList.forEach(sharingGroup ->  {
+            sharingGroup.setUuid(mispAppClient.getMispSharingGroup(sharingGroup.getId()).getUuid());
+        });
+        return sgList;
     }
 
 }
