@@ -58,6 +58,12 @@
 			<artifactId>misp-client</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+        <!--https://mvnrepository.com/artifact/org.apache.camel/camel-jsonpath-->
+        <dependency>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-jsonpath</artifactId>
+            <version>2.19.2</version>
+        </dependency>
     </dependencies>
 
 	<build>

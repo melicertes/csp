@@ -14,6 +14,12 @@ import com.intrasoft.csp.misp.commons.config.MispContextUrl;
 import com.intrasoft.csp.misp.domain.model.Origin;
 import com.intrasoft.csp.misp.domain.service.impl.OriginServiceImpl;
 import com.intrasoft.csp.misp.service.EmitterDataHandler;
+import com.jayway.jsonpath.Configuration;
+import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.Option;
+import com.jayway.jsonpath.ReadContext;
+import com.jayway.jsonpath.spi.json.JacksonJsonNodeJsonProvider;
+import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +29,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import static com.intrasoft.csp.misp.commons.config.MispContextUrl.MispEntity.ACTION;
@@ -30,6 +37,8 @@ import static com.intrasoft.csp.misp.commons.config.MispContextUrl.MispEntity.EV
 
 @Service
 public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUrl {
+
+    final Logger LOG = LoggerFactory.getLogger(EmitterDataHandlerImpl.class);
 
     @Value("${misp.app.protocol}")
     String protocol;
@@ -76,9 +85,14 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
 
     private JsonNode jsonNode;
 
+    private static final Configuration configuration = Configuration.builder()
+            .options(Option.ALWAYS_RETURN_LIST, Option.AS_PATH_LIST, Option.SUPPRESS_EXCEPTIONS)
+            .jsonProvider(new JacksonJsonNodeJsonProvider())
+            .mappingProvider(new JacksonMappingProvider())
+            .build();
+
     @Override
     public void handleMispData(Object object, MispEntity mispEntity, boolean isReEmittion) {
-        final Logger LOG = LoggerFactory.getLogger(EmitterDataHandlerImpl.class);
 
         jsonNode = new ObjectMapper().convertValue(object, JsonNode.class);
 
@@ -86,18 +100,17 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
 
         LOG.info("Received from emmiter: " + jsonNode.toString());
 
-        switch (mispEntity) {
-            case EVENT:
-                uuid = jsonNode.get(EVENT.toString()).get("uuid").textValue();
-                try{
-                    object = mispAppClient.getMispEvent(uuid).getBody();
-                }
-                catch (Exception e){
-                    LOG.error("Get Event from MISP API Failed: ", e);
-                    return;
-                }
-                jsonNode = updateTimestamp(new ObjectMapper().convertValue(object, JsonNode.class));
-                break;
+        if (mispEntity.equals(EVENT)) {
+            uuid = jsonNode.get(EVENT.toString()).get("uuid").textValue();
+            try{
+                object = mispAppClient.getMispEvent(uuid).getBody();
+            }
+            catch (Exception e){
+                LOG.error("Get Event from MISP API Failed: ", e);
+                return;
+            }
+            jsonNode = updateTimestamp(new ObjectMapper().convertValue(object, JsonNode.class));
+            LOG.info(jsonNode.toString());
         }
 
         DataParams dataParams = new DataParams();
@@ -131,7 +144,7 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
         /** @FIXME setUrl: FIXED
          * get base url from application.properties
          * how does the url update from emitter of source to adapter of destination*/
-        dataParams.setUrl(protocol + "://" + uiHost + ":" + port + "/events/" + uuid.replace("\"", ""));
+        dataParams.setUrl(protocol + "://" + uiHost + ":" + port + "/events/" + uuid);
 
         SharingParams sharingParams = new SharingParams();
         sharingParams.setIsExternal(false);
@@ -172,7 +185,7 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
         IntegrationDataType integrationDataType = IntegrationDataType.EVENT;
         if (jsonNode.get(EVENT.toString()).has("Tag")){
             for (JsonNode jn : jsonNode.get(EVENT.toString()).get("Tag")){
-                if (jn.get("name").toString().equals("\"threat\"")){
+                if (jn.get("name").textValue().equals("threat")){
                     LOG.info("THREAT");
                     integrationDataType = IntegrationDataType.THREAT;
                 }
@@ -220,20 +233,11 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
     }
 
     private JsonNode updateTimestamp(JsonNode rootNode) {
-
-        if (rootNode.has(EVENT.toString())) {
-            ((ObjectNode) rootNode.get(EVENT.toString())).put("timestamp", String.valueOf(Instant.now().getEpochSecond()));
-
-            if (rootNode.get(EVENT.toString()).has("Object") && rootNode.get(EVENT.toString()).get("Object").isArray()) {
-                for (JsonNode jn : rootNode.get(EVENT.toString()).get("Object")) {
-                    ((ObjectNode) jn).put("timestamp", String.valueOf(Instant.now().getEpochSecond()));
-                    if (jn.has("Attribute") && jn.get("Attribute").isArray()) {
-                        for (JsonNode jn2 : jn.get("Attribute")) {
-                            ((ObjectNode) jn2).put("timestamp", String.valueOf(Instant.now().getEpochSecond()));
-                        }
-                    }
-                }
-            }
+        ReadContext ctx = JsonPath.using(configuration).parse(rootNode);
+        List<String> timestampPaths = ctx.read("$..timestamp", List.class);
+        LOG.info(timestampPaths.toString());
+        for (String path : timestampPaths){
+            rootNode = JsonPath.using(configuration).parse(rootNode).set(path, String.valueOf(Instant.now().getEpochSecond())).json();
         }
         return rootNode;
     }
