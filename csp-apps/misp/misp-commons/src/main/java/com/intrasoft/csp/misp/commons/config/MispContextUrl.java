@@ -77,8 +77,7 @@ public interface MispContextUrl {
     }
 
     public static enum VULNERABILITYEntity {
-        //APPLICATION_ID("taranis"),
-        APPLICATION_ID("Number8"),
+        APPLICATION_ID("taranis"),
         VULNERABILITY_NAME("csp-vulnerability"),
 
         /*
