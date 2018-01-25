@@ -319,7 +319,7 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler{
                         if (esObject != null) {
                             LOG.info("FOUND TRUE");
                             newURL = esObject.get("dataParams").get("url").textValue();
-                            newTickerNumber = esObject.get("dataObject").get("id").textValue();
+                            //newTickerNumber = esObject.get("dataObject").get("id").textValue();
                         }
                         else {
                             LOG.info("NOT FOUND");
@@ -341,7 +341,7 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler{
                         LOG.info(e.getMessage());
                     }
                     LOG.info("VULNERABILITY new URL: " + newURL);
-                    LOG.info("VULNERABILITY new ID: " + newTickerNumber);
+                    //LOG.info("VULNERABILITY new ID: " + newTickerNumber);
 
                 }
             }
