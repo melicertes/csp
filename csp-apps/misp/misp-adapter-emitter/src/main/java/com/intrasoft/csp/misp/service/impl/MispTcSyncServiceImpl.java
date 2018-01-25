@@ -196,8 +196,12 @@ public class MispTcSyncServiceImpl implements MispTcSyncService {
         organisation.setSector(orgSectors);
 
         // Modifying the name field to differentiate synchronized organisations.
-        if (!organisation.getName().startsWith(prefix))  // prevents from adding the prefix each and every time
+        try {
+            if (!organisation.getName().startsWith(prefix))  // prevents from adding the prefix each and every time
+                organisation.setName(prefix + team.getName());
+        } catch (NullPointerException e) {
             organisation.setName(prefix + team.getName());
+        }
         organisation.setDescription(team.getDescription());
         organisation.setNationality(team.getCountry());
         // SXCSP-420: "The team with the csp-id that is equal to this csp-id should be imported as local org."
@@ -254,7 +258,7 @@ public class MispTcSyncServiceImpl implements MispTcSyncService {
         });
         if (!(tCircleTeamsUuids.size()>0))
             sGroup.setSharingGroupOrg(null);
-        else
+        else if (sharingGroupOrg.size() > 0)
             sGroup.setSharingGroupOrg(sharingGroupOrg);
     }
 
