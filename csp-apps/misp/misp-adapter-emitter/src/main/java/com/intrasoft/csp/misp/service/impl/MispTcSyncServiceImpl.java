@@ -199,6 +199,8 @@ public class MispTcSyncServiceImpl implements MispTcSyncService {
         try {
             if (!organisation.getName().startsWith(prefix))  // prevents from adding the prefix each and every time
                 organisation.setName(prefix + team.getName());
+            else  // prevent name from never getting updated when containing the sync prefix
+                organisation.setName(prefix + team.getName());
         } catch (NullPointerException e) {
             organisation.setName(prefix + team.getName());
         }
@@ -217,6 +219,8 @@ public class MispTcSyncServiceImpl implements MispTcSyncService {
         // Modifying the name field to differentiate synchronized sharing groups.
         try {
             if (!sGroup.getName().startsWith(prefix))  // prevents from adding the prefix each and every time
+                sGroup.setName(prefix + tCircle.getName());
+            else
                 sGroup.setName(prefix + tCircle.getName());
         } catch (NullPointerException e) {
             sGroup.setName(prefix + tCircle.getName());

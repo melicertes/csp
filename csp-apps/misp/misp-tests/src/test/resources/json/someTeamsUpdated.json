@@ -1,0 +1,45 @@
+[
+  {
+    "id": "306de7b8-5e8c-4a5e-9de2-1f837713bfc1",
+    "short_name": "central-csp",
+    "name": "central-csp updated",
+    "host_organisation": "CERT-EU",
+    "description": "CERT-EU fat 888 updated",
+    "country": "European Union",
+    "additional_countries": [],
+    "established": "2010-01-27",
+    "nis_team_types": [],
+    "nis_sectors": [
+      "Transport",
+      "Energy"
+    ],
+    "created": "2017-04-25T14:07:24.537000Z",
+    "csp_installed": true,
+    "csp_id": "central-csp",
+    "csp_domain": "central-csp.athens.intrasoft-intl.private",
+    "status": "Active"
+  },
+  {
+    "id": "974b5557-9aca-468c-90cc-961b31df0ef6",
+    "short_name": "delete me",
+    "name": "delete me updated",
+    "host_organisation": "delete me",
+    "description": "delete me",
+    "country": "Germany",
+    "additional_countries": [
+      "European Union",
+      "Greece"
+    ],
+    "established": "2010-01-27",
+    "nis_team_types": [
+      "MS Competent Authority",
+      "MS National SPoC"
+    ],
+    "nis_sectors": [],
+    "created": "2017-10-02T21:29:03.544000Z",
+    "csp_installed": true,
+    "csp_id": "delete me",
+    "csp_domain": "delete me",
+    "status": "Known"
+  }
+]

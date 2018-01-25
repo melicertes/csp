@@ -75,6 +75,7 @@ public class MispTcSyncServiceTest {
     // Necessary mock response files
     URL allTeams = getClass().getClassLoader().getResource("json/allTeams.json");
     URL twoTeams = getClass().getClassLoader().getResource("json/twoTeams.json");
+    URL someTeamsUpdated = getClass().getClassLoader().getResource("json/someTeamsUpdated.json");
     URL allTrustCircles = getClass().getClassLoader().getResource("json/allTrustCircles.json");
     URL allLocalTrustCircles = getClass().getClassLoader().getResource("json/allLocalTrustCircles.json");
     URL twoTrustCircles = getClass().getClassLoader().getResource("json/twoTrustCircles.json");
@@ -132,6 +133,39 @@ public class MispTcSyncServiceTest {
         mispTcSyncService.syncOrganisations();
 
         assertThat(mispAppClient.getAllMispOrganisations().size(), is(2));
+        mockServer.verify();
+
+    }
+
+    // Should update the corresponding Organisations in the Teams mock file.
+    // This test fails because the MISP Organisations API has limited updating support (the only modifiable field is name)
+    @Test
+    public void syncOrganisationsExistingOrgsShouldBeUpdated() throws URISyntaxException, IOException {
+
+        String apiUrl = tcConfig.getTcTeamsURI();
+        String prefix = "CSP::";
+
+        MockRestServiceServer mockServer = MockRestServiceServer.bindTo(tcRetryRestTemplate).build();
+        mockServer.expect(requestTo(apiUrl))
+                .andRespond(MockRestResponseCreators
+                        .withSuccess(FileUtils.readFileToString(new File(someTeamsUpdated.toURI()), Charset.forName("UTF-8"))
+                                .getBytes(), MediaType.APPLICATION_JSON_UTF8));
+
+        mispTcSyncService.syncOrganisations();
+
+        OrganisationDTO orgA = mispAppClient.getMispOrganisation("306de7b8-5e8c-4a5e-9de2-1f837713bfc1");
+        OrganisationDTO orgB = mispAppClient.getMispOrganisation("974b5557-9aca-468c-90cc-961b31df0ef6");
+
+        // Organisation A changes
+        assertThat(orgA.getName(), is(prefix + "central-csp updated"));
+        assertTrue(orgA.getDescription().contains("updated"));
+        assertTrue(orgA.getSector().contains("Energy"));
+
+        // Organisation B changes
+        assertThat(orgB.getName(), is(prefix + "delete me updated"));
+        assertThat(orgB.getNationality(), is("Germany"));
+        assertTrue(orgB.getSector().isEmpty());
+
         mockServer.verify();
 
     }
