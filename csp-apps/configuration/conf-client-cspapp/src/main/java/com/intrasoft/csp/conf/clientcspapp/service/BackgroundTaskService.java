@@ -10,6 +10,7 @@ import com.intrasoft.csp.conf.clientcspapp.util.FileHelper;
 import com.intrasoft.csp.conf.clientcspapp.util.TimeHelper;
 import com.intrasoft.csp.conf.commons.model.api.*;
 import com.intrasoft.csp.conf.commons.utils.VersionParser;
+import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.LocalDateTime;
@@ -39,6 +40,20 @@ import java.util.stream.Collectors;
 @Service
 @Slf4j
 public class BackgroundTaskService {
+
+    @Getter
+    enum ControlScript {
+        FIRST_TIME("exec_first-time.sh", "FIRST_TIME_SH"),
+        LAST_TIME("exec_last-time.sh", "LAST_TIME_SH");
+
+        private final String wrapper;
+        private final String envVar;
+
+        ControlScript(String wrapper, String envVar) {
+            this.wrapper = wrapper;
+            this.envVar = envVar;
+        }
+    }
 
     public static final String INTERNAL_CERTS_SH = "internalCerts.sh";
 
@@ -303,8 +318,7 @@ public class BackgroundTaskService {
                         moduleDir.getAbsolutePath());
                 // check to see if manifest.json exists (mandatory!)
                 if (installationService.moduleContains(installingModule, "manifest.json") ) {
-                    File manifestFile = new File(moduleInstallDirectory, "manifest.json");
-                    manifest = jacksonObjectMapper.readValue(manifestFile, Manifest.class);
+                    manifest = getManifest(moduleInstallDirectory);
                     if (manifest.getFormat() == 1.0) {
                         log.warn("Manifest version 1.0 detected! LEGACY MODE = ON");
                         isLegacy = true;
@@ -341,24 +355,14 @@ public class BackgroundTaskService {
 
                 createCustomEnv(customEnv, installingModule);
                 // c. execute any first-time.sh found
-                // TODO 1.1 change "first-time.sh" to defined name for first time file
+                String ftime = "first-time.sh"; //compliant with 1.0 manifest
+                if (manifest.getFormat() > 1.0) {
+                    ftime = manifest.getShFirst();
+                }
 
-                if (installationService.moduleContains(installingModule, "first-time.sh")) {
-                    log.info("First time init script detected. Will launch for module {}",installingModule.getName());
-                    File firstTime = new File(moduleInstallDirectory, "first-time.sh");
-                    if (firstTime.exists()) {
-                        firstTime.setExecutable(true,true);
-                    } else {
-                        log.error("First time file {}  was not found although present in module {} !",
-                                firstTime.getAbsolutePath(), installingModule.getName());
-                    }
-
-                    Map<String,String> env = new HashMap<>();
-                    env.put("DIR", moduleInstallDirectory);
-                    final BackgroundTaskResult<Boolean, Integer> result = executeScriptSimple("exec_first-time.sh", env);
-                    if (result.getSuccess() == false) {
-                        log.error("Failed execution detected on first-time.sh script - *WILL PROCEED* WITH INSTALLATION!");
-                    }
+                if (ftime != null && installationService.moduleContains(installingModule, ftime)) {
+                    log.info("First time init script {} detected. Will launch for module {}",ftime, installingModule.getName());
+                    executeShScript(installingModule, moduleInstallDirectory, ftime, ControlScript.FIRST_TIME);
                 }
 
                 // d. set module to INSTALLED + ACTIVE = TRUE
@@ -381,6 +385,32 @@ public class BackgroundTaskService {
                 return new BackgroundTaskResult<>(false, -1);
             }
         });
+    }
+
+    private boolean executeShScript(SystemModule module, String moduleInstallDirectory, String scriptName, ControlScript type) throws IOException {
+        File firstTime = new File(moduleInstallDirectory, scriptName);
+        if (firstTime.exists()) {
+            firstTime.setExecutable(true,true);
+
+            Map<String,String> env = new HashMap<>();
+            env.put("DIR", moduleInstallDirectory);
+            env.put(type.getEnvVar(), scriptName);
+            final BackgroundTaskResult<Boolean, Integer> result = executeScriptSimple(type.getWrapper(), env);
+            if (result.getSuccess() != false) {
+                return true;
+            }
+            log.error("Failed execution detected on {} script - *WILL PROCEED* WITH INSTALLATION!",type);
+        } else {
+            log.error("First time file {}  was not found although present in module {} !",
+                    firstTime.getAbsolutePath(), module.getName());
+        }
+        return false;
+    }
+
+    private Manifest getManifest(String moduleInstallDirectory) throws IOException {
+        Manifest manifest;File manifestFile = new File(moduleInstallDirectory, "manifest.json");
+        manifest = jacksonObjectMapper.readValue(manifestFile, Manifest.class);
+        return manifest;
     }
 
     private void createCustomEnv(Environment customEnv, SystemModule installingModule) {
@@ -440,16 +470,22 @@ public class BackgroundTaskService {
 
     public void scheduleDelete(SystemModule module) {
         addTask(() -> {
-            // TODO check if module is running before delete
+            final SystemService service = installationService.queryService(module);
+            if (service.getServiceState() == ServiceState.RUNNING) {
+                log.error("Service is running and cannot be deleted! STOP first and then delete.");
+                return new BackgroundTaskResult<>(false, -1000);
+            }
 
             try {
-                // execute any last-time.sh found
-                // TODO 1.1 execute "last-time.sh" as defined name for last time file, JSON is in module entity
+                Manifest manifest = getManifest(module.getModulePath());
+                if (manifest.getFormat() > 1.0 && manifest.getShLast() != null
+                        &&  installationService.moduleContains(module, manifest.getShLast())) { //last-time is only 1.1+
+                    executeShScript(module, module.getModulePath(), manifest.getShLast(), ControlScript.LAST_TIME);
+                }
 
                 storageService.deleteDirectoryAndContents(module.getModulePath());
                 module.setModuleState(ModuleState.DOWNLOADED);
                 module.setActive(false);
-                final SystemService service = installationService.queryService(module);
                 installationService.removeService(service);
                 log.info("Module {} has been removed and service deleted", module.getName());
                 return new BackgroundTaskResult<>(true, 0);
