@@ -28,34 +28,34 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @Configuration
 public class TrustCirclesClientConfig implements ContextUrl {
-    @Value("${tc.protocol:http}")
+    @Value("${app.tc.protocol:http}")
     private String protocol;
 
-    @Value("${tc.host:localhost}")
+    @Value("${app.tc.host:localhost}")
     private String host;
 
-    @Value("${tc.port:9000}")
+    @Value("${app.tc.port:9000}")
     private String port;
 
-    @Value("${tc.path.circles}")
+    @Value("${app.tc.path.circles}")
     String tcPathCircles;
 
-    @Value("${tc.path.teams}")
+    @Value("${app.tc.path.teams}")
     String tcPathTeams;
 
-    @Value("${tc.retry.backOffPeriod:5000}")
+    @Value("${app.tc.retry.backOffPeriod:5000}")
     private String backOffPeriod;
 
-    @Value("${tc.retry.maxAttempts:3}")
+    @Value("${app.tc.retry.maxAttempts:3}")
     private String maxAttempts;
 
-    @Value("${tc.client.ssl.enabled:false}")
+    @Value("${app.tc.client.ssl.enabled:false}")
     Boolean tcClientSslEnabled;
 
-    @Value("${tc.client.ssl.jks.keystore:path}")
+    @Value("${app.tc.client.ssl.jks.keystore:path}")
     String tcClientSslJksKeystore;
 
-    @Value("${tc.client.ssl.jks.keystore.password:securedPass}")
+    @Value("${app.tc.client.ssl.jks.keystore.password:securedPass}")
     String tcClientSslJksKeystorePassword;
 
     @Autowired
