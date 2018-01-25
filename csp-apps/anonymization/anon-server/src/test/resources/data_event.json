@@ -48,7 +48,7 @@
       },
       "Attribute": [
         {
-          "id": "2",
+          "id": "1",
           "type": "ip-src",
           "category": "Network activity",
           "to_ids": false,
@@ -64,6 +64,50 @@
           "object_relation": null,
           "value": "10.10.0.20",
           "ShadowAttribute": [
+          ]
+        },
+        {
+          "id": "2",
+          "type": "ip-dst",
+          "category": "Network activity",
+          "to_ids": false,
+          "uuid": "5a60de8f-d85c-44de-b282-024e0a000200",
+          "event_id": "8",
+          "distribution": "5",
+          "timestamp": "1516297871",
+          "comment": "",
+          "sharing_group_id": "0",
+          "deleted": false,
+          "disable_correlation": false,
+          "object_id": "0",
+          "object_relation": null,
+          "value": "10.10.0.10",
+          "ShadowAttribute": [
+          ]
+        },
+        {
+          "id": "3",
+          "type": "ip-dst",
+          "category": "Network activity",
+          "to_ids": false,
+          "uuid": "5a60de8f-d85c-44de-b282-024e0a000200",
+          "event_id": "8",
+          "distribution": "5",
+          "timestamp": "1516297871",
+          "comment": "",
+          "sharing_group_id": "0",
+          "deleted": false,
+          "disable_correlation": false,
+          "object_id": "0",
+          "object_relation": null,
+          "value": "10.10.0.0",
+          "ShadowAttribute": [
+            {
+              "shadowman": "christos"
+            },
+            {
+              "shadowman": "kiriakos"
+            }
           ]
         }
       ],

@@ -2,6 +2,8 @@ package com.intrasoft.csp.anon.server.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.intrasoft.csp.anon.commons.exceptions.AnonException;
 import com.intrasoft.csp.anon.commons.exceptions.InvalidDataTypeException;
 import com.intrasoft.csp.anon.commons.exceptions.MappingNotFoundForGivenTupleException;
@@ -11,13 +13,11 @@ import com.intrasoft.csp.anon.server.model.Rules;
 import com.intrasoft.csp.anon.server.utils.HMAC;
 import com.intrasoft.csp.commons.apiHttpStatusResponse.HttpStatusResponseType;
 import com.intrasoft.csp.commons.model.IntegrationDataType;
-import com.jayway.jsonpath.Configuration;
-import com.jayway.jsonpath.JsonPath;
-import com.jayway.jsonpath.Option;
-import com.jayway.jsonpath.TypeRef;
+import com.jayway.jsonpath.*;
 import com.jayway.jsonpath.spi.json.JacksonJsonNodeJsonProvider;
 import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
 import org.apache.tomcat.util.codec.binary.Base64;
+import org.omg.CORBA.Object;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,8 +28,13 @@ import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
+
+import static com.jayway.jsonpath.Criteria.where;
+import static com.jayway.jsonpath.Filter.filter;
 
 @Service
 public class ApiDataHandler {
@@ -51,7 +56,7 @@ public class ApiDataHandler {
     private static ObjectMapper mapper = new ObjectMapper();
 
     private static final Configuration configuration = Configuration.builder()
-            .options(Option.DEFAULT_PATH_LEAF_TO_NULL)
+            .options(Option.ALWAYS_RETURN_LIST, Option.SUPPRESS_EXCEPTIONS)
             .jsonProvider(new JacksonJsonNodeJsonProvider())
             .mappingProvider(new JacksonMappingProvider())
             .build();
@@ -95,42 +100,13 @@ public class ApiDataHandler {
         }
 
         JsonNode out = mapper.valueToTree(integrationAnonData.getDataObject());
+        ReadContext ctx = JsonPath.using(configuration).parse(out);
 
         for (Rule rule : rules.getRules()){
-            if (rule.getField().contains("[*]")){
-                List<String> vals = JsonPath.using(configuration).parse(out).read(rule.getField(), new TypeRef<List<String>>(){});
-                for (int i = 0; i < vals.size() ; i++){
-                    String jpointer = rule.getField().replace("*",String.valueOf(i));
-                    String value = null;
-                    if (rule.getValue() != null){
-                        value = rule.getValue().replace("*",String.valueOf(i));
-                    }
-                    String action = rule.getAction();
-                    String fieldType = rule.getFieldType();
-                    String fieldValue = null;
-                    if (value != null){
-                        fieldValue = JsonPath.using(configuration).parse(out).read(value, String.class);
-                        out = JsonPath.using(configuration).parse(out).set(value, updateField(action, fieldType, fieldValue)).json();
-                    } else {
-                        fieldValue = JsonPath.using(configuration).parse(out).read(jpointer, String.class);
-                        out = JsonPath.using(configuration).parse(out).set(jpointer, updateField(action, fieldType, fieldValue)).json();
-                    }
-
-                }
-            }
-            else {
-                String jpointer = rule.getField();
-                String value = rule.getValue();
-                String action = rule.getAction();
-                String fieldType = rule.getFieldType();
-                String fieldValue = null;
-                if (value != null){
-                    fieldValue = JsonPath.using(configuration).parse(out).read(value, String.class);
-                    out = JsonPath.using(configuration).parse(out).set(value, updateField(action, fieldType, fieldValue)).json();
-                } else {
-                    fieldValue = JsonPath.using(configuration).parse(out).read(jpointer, String.class);
-                    out = JsonPath.using(configuration).parse(out).set(jpointer, updateField(action, fieldType, fieldValue)).json();
-                }
+            List<LinkedHashMap> tmp = ctx.read(rule.getCondition(), List.class);
+            for (LinkedHashMap jn : tmp){
+                JsonNode jjn = new ObjectMapper().valueToTree(jn);
+                out = JsonPath.using(configuration).parse(out).set(rule.getCondition(), ((ObjectNode)jjn).put(rule.getField(),updateField(rule.getAction(), rule.getField(), jjn.get(rule.getField()).textValue()))).json();
             }
         }
 
