@@ -1,15 +1,22 @@
 {
   "rules": [
     {
-      "field": "['Event'].['Attribute'][*].['ip-src']",
-      "value": "['Event'].['Attribute'][*].['value']",
+      "condition": "$.Event",
+      "field": "event_creator_email",
+      "action": "anon",
+      "fieldtype": "email"
+    },
+    {
+      "condition": "$.Event.Attribute[?(@.type == \"ip-dst\" && @.id == \"3\")]",
+      "field": "value",
       "action": "anon",
       "fieldtype": "ip"
     },
     {
-      "field": "['Event'].['event_creator_email']",
+      "condition": "$.Event.Attribute[?(@.type == \"ip-dst\" && @.id == \"3\")].ShadowAttribute[?(@.shadowman == \"christos\")]",
+      "field": "shadowman",
       "action": "anon",
-      "fieldtype": "email"
+      "fieldtype": "string"
     }
   ]
 }
