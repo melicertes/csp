@@ -2,11 +2,11 @@ package com.intrasoft.csp.misp.tests.sandbox;
 
 import com.intrasoft.csp.client.TrustCirclesClient;
 import com.intrasoft.csp.client.config.TrustCirclesClientConfig;
+import com.intrasoft.csp.commons.model.Team;
 import com.intrasoft.csp.libraries.restclient.service.RetryRestTemplate;
 import com.intrasoft.csp.misp.client.MispAppClient;
 import com.intrasoft.csp.misp.client.config.MispAppClientConfig;
 import com.intrasoft.csp.misp.commons.models.OrganisationDTO;
-import com.intrasoft.csp.misp.commons.models.generated.SharingGroup;
 import com.intrasoft.csp.misp.commons.models.generated.SharingGroup;
 import com.intrasoft.csp.misp.service.MispTcSyncService;
 import com.intrasoft.csp.misp.service.impl.MispTcSyncServiceImpl;
@@ -39,7 +39,7 @@ import static org.springframework.test.web.client.match.MockRestRequestMatchers.
 
 @RunWith(SpringJUnit4ClassRunner.class)
 
-@SpringBootTest( classes = {MispTcSyncServiceImpl.class, TrustCirclesClient.class,
+@SpringBootTest( classes = {MispTcSyncServiceImpl.class,
                             TrustCirclesClientConfig.class, MispAppClient.class, MispAppClientConfig.class},
         properties = {
                 "misp.app.protocol:http",
@@ -63,6 +63,9 @@ public class MispTcSyncServiceTest {
 
     @Autowired
     TrustCirclesClientConfig tcConfig;
+
+    @Autowired
+    TrustCirclesClient tcClient;
 
     @Autowired
     @Qualifier("TcRestTemplate")
@@ -321,10 +324,43 @@ public class MispTcSyncServiceTest {
     }
 
     // TODO: The scenario where some Sharing Groups in MISP have no corresponding Trust Circles.
-    // Should all be deleted
+    // Should all be deleted / set to inactive
     @Test
     public void syncSharingGroupsMarkOrphansPassiveGroupsTest() {
 
+    }
+
+    @Test
+    public void mapTeamToOrganisationShouldMapUuidNameWithPrefixDescriptionSectorsTest() throws URISyntaxException, IOException {
+
+        String apiUrl = tcConfig.getTcTeamsURI();
+        String prefix = "CSP::";
+        MockRestServiceServer mockServer = MockRestServiceServer.bindTo(tcRetryRestTemplate).build();
+        mockServer.expect(requestTo(apiUrl))
+                .andRespond(MockRestResponseCreators
+                        .withSuccess(FileUtils.readFileToString(new File(twoTeams.toURI()), Charset.forName("UTF-8"))
+                                .getBytes(), MediaType.APPLICATION_JSON_UTF8));
+
+        OrganisationDTO org = new OrganisationDTO();
+
+        Team team = tcClient.getAllTeams().get(1);
+
+        org = mispTcSyncService.mapTeamToOrganisation(team, org);
+
+        // Uuid mapped
+        assertTrue(org.getUuid().equals(team.getId()));
+
+        // Name mapped with synchronization prefix
+        assertTrue(org.getName().startsWith(prefix));
+        assertTrue(org.getName().equals(prefix+team.getName()));
+
+        // Description
+        assertTrue(org.getDescription().equals(team.getDescription()));
+
+        // Sectors
+        assertTrue(org.getSector().equals(team.getNisSectors().get(0) + ", " + team.getNisSectors().get(1)));
+
+        mockServer.verify();
     }
 
     //Description

@@ -82,26 +82,15 @@ public class MispTcSyncServiceImpl implements MispTcSyncService {
                 // Uuid Match
                 if (teamList.get(i).getId().equals(organisation.getUuid())) {
                     // Updating the MISP organisation with the TC team data.
-                    mapTeamToOrganisation(teamList.get(i), organisation);
-                    mispAppClient.updateMispOrganisation(organisation);
-                    loopBreak = true;
-                    break;
-                // Name match
-                } else if (teamList.get(i).getName().equals(organisation.getName())){
-//                    TODO: What should the default behavior be? Update the organisation when found only by name?
-                    LOG.info("*** Found the same organisation name with a different UUID; updating to match TC... "
-                            + organisation.getUuid());
-                    mapTeamToOrganisation(teamList.get(i), organisation);
-                    mispAppClient.updateMispOrganisation(organisation);
+                    mispAppClient.updateMispOrganisation(mapTeamToOrganisation(teamList.get(i), organisation));
                     loopBreak = true;
                     break;
                 }
             }
             if (loopBreak) continue;
             // No match; create this team as an organisation in MISP.
-            OrganisationDTO newOrg = new OrganisationDTO();
-            mapTeamToOrganisation(teamList.get(i), newOrg);
-            mispAppClient.addMispOrganisation(newOrg);
+            organisation = new OrganisationDTO();
+            mispAppClient.addMispOrganisation(mapTeamToOrganisation(teamList.get(i), organisation));
         }
 
         // Finding orphan MISP organisations
@@ -181,7 +170,8 @@ public class MispTcSyncServiceImpl implements MispTcSyncService {
 
     }
 
-    private void mapTeamToOrganisation(Team team, OrganisationDTO organisation) {
+
+    public OrganisationDTO mapTeamToOrganisation(Team team, OrganisationDTO organisation) {
 
         organisation.setUuid(team.getId());
         // SXCSP-436 Mapping Teams NIS Sectors to Organisations Sector
@@ -211,6 +201,8 @@ public class MispTcSyncServiceImpl implements MispTcSyncService {
             organisation.setLocal(true);
         else
             organisation.setLocal(false);
+
+        return organisation;
     }
 
     private void mapTrustCircleToSharingGroup(TrustCircle tCircle, SharingGroup sGroup) {
@@ -239,9 +231,6 @@ public class MispTcSyncServiceImpl implements MispTcSyncService {
             sGroupOrgCheckMap.put(uuid, (mispAppClient.getMispOrganisation(uuid)!=null));
         });
 
-        // TODO: Update SharingGroupOrg to contain only the organisations referenced in tCircleTeamsUuids.
-
-
         sGroupOrgCheckMap.forEach((k,v)-> {
             if (v) { // If the Organisation already exists assign it to the Sharing Group
                 OrganisationDTO organisationDTO = mispAppClient.getMispOrganisation(k);
@@ -249,15 +238,8 @@ public class MispTcSyncServiceImpl implements MispTcSyncService {
                     organisationDTO.setName(prefix+organisationDTO.getName());
                 mispAppClient.updateMispOrganisation(organisationDTO);
                 sharingGroupOrg.add(addOrgAsSGOI(organisationDTO));
-            } else if (!v) {  // otherwise, create it now?
+            } else if (!v) {
                 LOG.warn("Organisation with UUID " + k + " has not been synchronized yet");
-/*
-                Team team = trustCirclesClient.getTeamByUuid(k);
-                OrganisationDTO organisationDTO = new OrganisationDTO();
-                mapTeamToOrganisation(team,organisationDTO);
-                mispAppClient.addMispOrganisation(organisationDTO);
-                sharingGroupOrg.add(addOrgAsSGOI(organisationDTO));
-*/
             }
         });
         if (!(tCircleTeamsUuids.size()>0))
