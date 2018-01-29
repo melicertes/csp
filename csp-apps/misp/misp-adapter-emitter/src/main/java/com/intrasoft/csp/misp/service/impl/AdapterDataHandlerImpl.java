@@ -117,7 +117,7 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler{
                 if (!e.getHttpHeaders().get("location").isEmpty()) {
                     String location = e.getHttpHeaders().get("location").get(0);
                     LOG.info("" + location);
-                    jsonNode = ((ObjectNode) jsonNode.get("Event")).put("timestamp", String.valueOf(Instant.now().getEpochSecond() + 1));
+//                    jsonNode = ((ObjectNode) jsonNode.get("Event")).put("timestamp", String.valueOf(Instant.now().getEpochSecond() + 1));
                     LOG.info(jsonNode.toString());
                     ResponseEntity<String> responseEntity = mispAppClient.updateMispEvent(location, jsonNode.toString());
                     status = responseEntity.getStatusCode();
@@ -319,7 +319,7 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler{
                         if (esObject != null) {
                             LOG.info("FOUND TRUE");
                             newURL = esObject.get("dataParams").get("url").textValue();
-                            newTickerNumber = esObject.get("dataObject").get("id").textValue();
+                            //newTickerNumber = esObject.get("dataObject").get("id").textValue();
                         }
                         else {
                             LOG.info("NOT FOUND");
@@ -341,7 +341,7 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler{
                         LOG.info(e.getMessage());
                     }
                     LOG.info("VULNERABILITY new URL: " + newURL);
-                    LOG.info("VULNERABILITY new ID: " + newTickerNumber);
+                    //LOG.info("VULNERABILITY new ID: " + newTickerNumber);
 
                 }
             }

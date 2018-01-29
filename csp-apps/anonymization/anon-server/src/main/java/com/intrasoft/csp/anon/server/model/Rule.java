@@ -13,6 +13,9 @@ public class Rule {
     @JsonProperty("field")
     private String field;
 
+    @JsonProperty("condition")
+    private String condition;
+
     @JsonProperty("value")
     private String value;
 
@@ -28,6 +31,14 @@ public class Rule {
 
     public void setValue(String value) {
         this.value = value;
+    }
+
+    public Rule(String field, String condition, String value, String action, String fieldType) {
+        this.field = field;
+        this.condition = condition;
+        this.value = value;
+        this.action = action;
+        this.fieldType = fieldType;
     }
 
     public Rule() {
@@ -71,10 +82,19 @@ public class Rule {
         this.fieldType = fieldType;
     }
 
+    public String getCondition() {
+        return condition;
+    }
+
+    public void setCondition(String condition) {
+        this.condition = condition;
+    }
+
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("Rule{");
         sb.append("field='").append(field).append('\'');
+        sb.append(", condition='").append(condition).append('\'');
         sb.append(", value='").append(value).append('\'');
         sb.append(", action='").append(action).append('\'');
         sb.append(", fieldType='").append(fieldType).append('\'');
