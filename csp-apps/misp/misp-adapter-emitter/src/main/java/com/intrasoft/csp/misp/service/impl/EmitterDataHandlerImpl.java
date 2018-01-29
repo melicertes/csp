@@ -109,7 +109,7 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
                 LOG.error("Get Event from MISP API Failed: ", e);
                 return;
             }
-            jsonNode = updateTimestamp(new ObjectMapper().convertValue(object, JsonNode.class));
+//            jsonNode = updateTimestamp(new ObjectMapper().convertValue(object, JsonNode.class));
             LOG.info(jsonNode.toString());
         }
 
@@ -236,8 +236,9 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
         ReadContext ctx = JsonPath.using(configuration).parse(rootNode);
         List<String> timestampPaths = ctx.read("$..timestamp", List.class);
         LOG.info(timestampPaths.toString());
+        Long timestamp = Instant.now().getEpochSecond();
         for (String path : timestampPaths){
-            rootNode = JsonPath.using(configuration).parse(rootNode).set(path, String.valueOf(Instant.now().getEpochSecond())).json();
+            rootNode = JsonPath.using(configuration).parse(rootNode).set(path, String.valueOf(timestamp)).json();
         }
         return rootNode;
     }
