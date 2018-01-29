@@ -3,6 +3,7 @@ package com.intrasoft.csp.misp.tests.sandbox;
 import com.intrasoft.csp.client.TrustCirclesClient;
 import com.intrasoft.csp.client.config.TrustCirclesClientConfig;
 import com.intrasoft.csp.commons.model.Team;
+import com.intrasoft.csp.commons.model.TrustCircle;
 import com.intrasoft.csp.libraries.restclient.service.RetryRestTemplate;
 import com.intrasoft.csp.misp.client.MispAppClient;
 import com.intrasoft.csp.misp.client.config.MispAppClientConfig;
@@ -79,13 +80,9 @@ public class MispTcSyncServiceTest {
     URL allTeams = getClass().getClassLoader().getResource("json/allTeams.json");
     URL twoTeams = getClass().getClassLoader().getResource("json/twoTeams.json");
     URL someTeamsUpdated = getClass().getClassLoader().getResource("json/someTeamsUpdated.json");
-    URL allTrustCircles = getClass().getClassLoader().getResource("json/allTrustCircles.json");
     URL allLocalTrustCircles = getClass().getClassLoader().getResource("json/allLocalTrustCircles.json");
     URL twoTrustCircles = getClass().getClassLoader().getResource("json/twoTrustCircles.json");
     URL twoTrustCirclesUpdated = getClass().getClassLoader().getResource("json/twoTrustCirclesUpdated.json");
-    URL sharingGroup = getClass().getClassLoader().getResource("json/sharingGroup.json");
-    URL allSharingGroups = getClass().getClassLoader().getResource("json/allSharingGroups.json");
-    URL organisation = getClass().getClassLoader().getResource("json/organisation.json");
     String prefix = "CSP::";
 
     // Service should synchronize Trust Circles' Teams with MISP's Organisations.
@@ -272,8 +269,6 @@ public class MispTcSyncServiceTest {
         assertTrue(sharingGroupB.getSharingGroupOrg().stream().anyMatch(sharingGroupOrgItem ->
                 sharingGroupOrgItem.getOrganisation().getName().equals("DELETE ME")));
 
-
-
         tcMockServer.verify();
 
 
@@ -323,15 +318,8 @@ public class MispTcSyncServiceTest {
         tcMockServer.verify();
     }
 
-    // TODO: The scenario where some Sharing Groups in MISP have no corresponding Trust Circles.
-    // Should all be deleted / set to inactive
     @Test
-    public void syncSharingGroupsMarkOrphansPassiveGroupsTest() {
-
-    }
-
-    @Test
-    public void mapTeamToOrganisationShouldMapUuidNameWithPrefixDescriptionSectorsTest() throws URISyntaxException, IOException {
+    public void mapTeamToOrganisationShouldMapUuidNameWithPrefixDescriptionNationalitySectorsTest() throws URISyntaxException, IOException {
 
         String apiUrl = tcConfig.getTcTeamsURI();
         String prefix = "CSP::";
@@ -357,18 +345,48 @@ public class MispTcSyncServiceTest {
         // Description
         assertTrue(org.getDescription().equals(team.getDescription()));
 
+        // Nationality
+        assertTrue(org.getNationality().equals(team.getCountry()));
+
         // Sectors
         assertTrue(org.getSector().equals(team.getNisSectors().get(0) + ", " + team.getNisSectors().get(1)));
 
         mockServer.verify();
     }
 
-    //Description
+    // Testing if the Trust Circle's state is correctly mapped to the Sharing Group.
     @Test
-    public void syncAllScenarioATest() {
+    public void mapTrustCircleToSharingGroupShouldMapUuidNameWithPrefixDescriptionActiveTest() throws URISyntaxException, IOException {
 
+        String tcCirclesURI = tcConfig.getTcCirclesURI();
+        String prefix = "CSP::";
+
+        MockRestServiceServer tcMockServer = MockRestServiceServer.bindTo(tcRetryRestTemplate).build();
+        tcMockServer.expect(requestTo(tcCirclesURI))
+                .andRespond(MockRestResponseCreators
+                        .withSuccess(FileUtils.readFileToString(new File(twoTrustCircles.toURI()),
+                                Charset.forName("UTF-8")).getBytes(), MediaType.APPLICATION_JSON_UTF8));
+
+        SharingGroup sg = new SharingGroup();
+        TrustCircle tc = tcClient.getAllTrustCircles().get(1);
+
+        sg = mispTcSyncService.mapTrustCircleToSharingGroup(tc, sg);
+
+        // Uuid
+        assertTrue(sg.getUuid().equals(tc.getId()));
+
+        // Name with sync prefix
+        assertTrue(sg.getName().equals(prefix+tc.getName()));
+
+        // Description
+        assertTrue(sg.getDescription().equals(tc.getDescription()));
+
+        // Active
+        assertTrue(sg.isActive());
+
+        tcMockServer.verify();
     }
-    //Description
+
     @Test
     public void syncAllScenarioBTest() {
 

@@ -143,8 +143,7 @@ public class MispTcSyncServiceImpl implements MispTcSyncService {
                 // Uuid Match
                 if (tcList.get(i).getId().equals(sharingGroup.getUuid())) {
                     // Populating this MISP sharing group with the matching TC trust circle data and updating MISP.
-                    mapTrustCircleToSharingGroup(tcList.get(i), sharingGroup);
-                    mispAppClient.updateMispSharingGroup(sharingGroup);
+                    mispAppClient.updateMispSharingGroup(mapTrustCircleToSharingGroup(tcList.get(i), sharingGroup));
                     loopBreak=true;
                     break;
                 }
@@ -152,8 +151,7 @@ public class MispTcSyncServiceImpl implements MispTcSyncService {
             if (loopBreak) continue;
             // No match; create this Trust Circle as a Sharing Group in MISP.
             sharingGroup = new SharingGroup();
-            mapTrustCircleToSharingGroup(tcList.get(i), sharingGroup);
-            mispAppClient.addMispSharingGroup(sharingGroup);
+            mispAppClient.addMispSharingGroup(mapTrustCircleToSharingGroup(tcList.get(i), sharingGroup));
         }
 
         // SXCSP-435 Setting Sharing Groups as inactive instead of deleting them
@@ -205,7 +203,7 @@ public class MispTcSyncServiceImpl implements MispTcSyncService {
         return organisation;
     }
 
-    private void mapTrustCircleToSharingGroup(TrustCircle tCircle, SharingGroup sGroup) {
+    public SharingGroup mapTrustCircleToSharingGroup(TrustCircle tCircle, SharingGroup sGroup) {
 
         sGroup.setUuid(tCircle.getId());
         // Modifying the name field to differentiate synchronized sharing groups.
@@ -246,6 +244,8 @@ public class MispTcSyncServiceImpl implements MispTcSyncService {
             sGroup.setSharingGroupOrg(null);
         else if (sharingGroupOrg.size() > 0)
             sGroup.setSharingGroupOrg(sharingGroupOrg);
+
+        return sGroup;
     }
 
     private SharingGroupOrgItem addOrgAsSGOI(OrganisationDTO organisationDTO) {
