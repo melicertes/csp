@@ -188,15 +188,15 @@ public class MispTcSyncServiceImpl implements MispTcSyncService {
         organisation.setSector(orgSectors);
 
         // Modifying the name field to differentiate synchronized organisations.
-        try {
-            if (!StringUtils.isEmpty(organisation.getName()) && !organisation.getName().startsWith(prefix)) {  // prevents from adding the prefix each and every time
+        //try {
+            //if (!StringUtils.isEmpty(organisation.getName()) && !organisation.getName().startsWith(prefix)) {  // prevents from adding the prefix each and every time
                 organisation.setName(prefix + team.getShortName());
-            }else{  // prevent name from never getting updated when containing the sync prefix
-                organisation.setName(prefix + team.getShortName());
-            }
-        } catch (NullPointerException e) {
-            organisation.setName(prefix + team.getName());
-        }
+            //}else{  // prevent name from never getting updated when containing the sync prefix
+             //   organisation.setName(prefix + team.getShortName());
+            //}
+        //} catch (NullPointerException e) {
+         //   organisation.setName(prefix + team.getShortName());
+        //}
         organisation.setDescription(team.getDescription());
         organisation.setNationality(team.getCountry());
         // SXCSP-420: "The team with the csp-id that is equal to this csp-id should be imported as local org."
@@ -215,14 +215,14 @@ public class MispTcSyncServiceImpl implements MispTcSyncService {
         }
         sGroup.setUuid(tCircle.getId());
         // Modifying the name field to differentiate synchronized sharing groups.
-        try {
-            if (!StringUtils.isEmpty(sGroup.getName()) && !sGroup.getName().startsWith(prefix))  // prevents from adding the prefix each and every time
+        //try {
+            //if (!StringUtils.isEmpty(sGroup.getName()) && !sGroup.getName().startsWith(prefix))  // prevents from adding the prefix each and every time
                 sGroup.setName(prefix + tCircle.getShortName());
-            else
-                sGroup.setName(prefix + tCircle.getShortName());
-        } catch (NullPointerException e) {
-            sGroup.setName(prefix + tCircle.getShortName());
-        }
+            //else
+                //sGroup.setName(prefix + tCircle.getShortName());
+        //} catch (NullPointerException e) {
+            //sGroup.setName(prefix + tCircle.getShortName());
+        ///}
         sGroup.setDescription(tCircle.getDescription());
         sGroup.setReleasability(""); // informational but mandatory;
         sGroup.setActive(true);
