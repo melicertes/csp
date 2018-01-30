@@ -345,6 +345,54 @@ public class CspServerInternalBusinessTestFlow1dataTypes implements CamelRoutes 
         assertFlows("trustcircle",IntegrationDataType.TRUSTCIRCLE, 1);
     }
 
+    /**
+     * Testing Contact data type
+     * */
+
+    @DirtiesContext
+    @Test
+    public void dslFlow1PostDataTypeContactTest() throws Exception {
+        mockUtils.sendFlow1Data(mvc, serverName, "trustcircle",false, true, IntegrationDataType.CONTACT, HttpMethods.POST.name());
+        assertFlows("trustcircle",IntegrationDataType.CONTACT, tcProcessor.getTcTeamsFlow1(IntegrationDataType.CONTACT).size());
+    }
+
+    @DirtiesContext
+    @Test
+    public void dslFlow1PosTcIdContactTest() throws Exception {
+        mockUtils.sendFlow1Data(mvc, serverName, "trustcircle",tcId,null,false, true, IntegrationDataType.CONTACT, HttpMethods.POST.name());
+        assertFlows("trustcircle",IntegrationDataType.CONTACT, tcProcessor.getTeamsByTrustCircleIdFlow1(tcId).size());
+    }
+
+    @DirtiesContext
+    @Test
+    public void dslFlow1PostTeamIdContactTest() throws Exception {
+        mockUtils.sendFlow1Data(mvc, serverName, "trustcircle",null,teamId,false, true, IntegrationDataType.CONTACT, HttpMethods.POST.name());
+        assertFlows("trustcircle",IntegrationDataType.CONTACT, 1);
+    }
+
+    @DirtiesContext
+    @Test
+    public void dslFlow1PutDataTypeContactTest() throws Exception {
+        mockUtils.sendFlow1Data(mvc,serverName, "trustcircle",false, true, IntegrationDataType.CONTACT, HttpMethods.PUT.name());
+        assertFlows("trustcircle",IntegrationDataType.CONTACT, tcProcessor.getTcTeamsFlow1(IntegrationDataType.CONTACT).size());
+    }
+
+    @DirtiesContext
+    @Test
+    public void dslFlow1PutTcIdContactTest() throws Exception {
+        mockUtils.sendFlow1Data(mvc,serverName, "trustcircle",tcId,null,false, true, IntegrationDataType.CONTACT, HttpMethods.PUT.name());
+        assertFlows("trustcircle",IntegrationDataType.CONTACT, tcProcessor.getTeamsByTrustCircleIdFlow1(tcId).size());
+    }
+
+    @DirtiesContext
+    @Test
+    public void dslFlow1PutTeamIdContactTest() throws Exception {
+        mockUtils.sendFlow1Data(mvc,serverName, "trustcircle",null,teamId,false, true, IntegrationDataType.CONTACT, HttpMethods.PUT.name());
+        assertFlows("trustcircle",IntegrationDataType.CONTACT, 1);
+    }
+
+
+
     private void assertFlows(String applicationId, IntegrationDataType dataType, Integer expectedEscpMessages) throws Exception {
        /*
         DSL
@@ -426,7 +474,7 @@ public class CspServerInternalBusinessTestFlow1dataTypes implements CamelRoutes 
         }
 
         //ELASTIC
-        if(IntegrationDataType.TRUSTCIRCLE.equals(dataType)){
+        if(IntegrationDataType.TRUSTCIRCLE.equals(dataType) || IntegrationDataType.CONTACT.equals(dataType)){
             mockedElastic.expectedMessageCount(0);
         }else {
             mockedElastic.expectedMessageCount(1);
