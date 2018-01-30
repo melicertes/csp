@@ -46,6 +46,12 @@ public class TrustCircle implements Serializable{
     private List<String> teams = null;
     @JsonProperty("created")
     private String created;
+    @JsonProperty("tlp")
+    private List<String> tlp;
+    @JsonProperty("team_contacts")
+    private List<String> teamContacts;
+    @JsonProperty("person_contacts")
+    private List<String> personContacts;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
@@ -137,6 +143,36 @@ public class TrustCircle implements Serializable{
     @JsonProperty("created")
     public void setCreated(String created) {
         this.created = created;
+    }
+
+    @JsonProperty("tlp")
+    public List<String> getTlp() {
+        return tlp;
+    }
+
+    @JsonProperty("tlp")
+    public void setTlp(List<String> tlp) {
+        this.tlp = tlp;
+    }
+
+    @JsonProperty("team_contacts")
+    public List<String> getTeamContacts() {
+        return teamContacts;
+    }
+
+    @JsonProperty("team_contacts")
+    public void setTeamContacts(List<String> teamContacts) {
+        this.teamContacts = teamContacts;
+    }
+
+    @JsonProperty("person_contacts")
+    public List<String> getPersonContacts() {
+        return personContacts;
+    }
+
+    @JsonProperty("person_contacts")
+    public void setPersonContacts(List<String> personContacts) {
+        this.personContacts = personContacts;
     }
 
     @JsonAnyGetter
