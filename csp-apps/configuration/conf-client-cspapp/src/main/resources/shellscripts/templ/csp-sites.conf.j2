@@ -14,9 +14,7 @@
         <VirtualHost *:443>
 
               ServerName {{ service.internal_name }}.local.{{ csp_name }}.{{ domain }}
-              {% for path in service.skip_reverse_proxy_paths -%}
-              ProxyPass {{ path }} !
-              {% endfor %}
+
               {% if service.docr_name == 'tc'-%}
               Alias /static/ /opt/tc/var/static/
               ProxyPass /static/ !
@@ -35,6 +33,10 @@
               {% if internalSSLCACertificateFile is defined %}
               SSLCACertificateFile {{ internalSSLCACertificateFile }}
               {% endif %}
+              {% endif -%}
+
+              {% if ( (service.docr_name == 'kibana') or (service.docr_name == 'kibana_logs') ) -%}
+              ProxyTimeout 1200
               {% endif -%}
 
               {% set docr_name = service.docr_name.split('-')[0] %}
@@ -84,6 +86,10 @@
               {% endif -%}
               {% endif -%}
 
+              {% if ( (service.docr_name == 'kibana') or (service.docr_name == 'kibana_logs') ) -%}
+              ProxyTimeout 1200
+              {% endif -%}
+
               {% set docr_name = service.docr_name.split('-')[0] %}
               ProxyPass / {{ service.protocol }}://csp-{{ docr_name }}:{{ service.docr_port }}{{ service.base_path }}
               ProxyPassReverse / {{ service.protocol }}://csp-{{ docr_name }}:{{ service.docr_port }}{{ service.base_path }}
@@ -117,9 +123,6 @@
         <VirtualHost *:443>
 
               ServerName {{ service.internal_name }}.local.{{ csp_name }}.{{ domain }}
-              {% for path in service.skip_reverse_proxy_paths -%}
-              ProxyPass {{ path }} !
-              {% endfor %}
               SSLEngine on
               SSLCertificateFile    {{ internalSSLCertificateFile }}
               SSLCertificateKeyFile {{ internalSSLCertificateKeyFile }}
@@ -131,11 +134,14 @@
               {% endif -%}
               {% endif -%}
 
-             # ProxyPass / {{ service.protocol }}://csp-{{ service.docr_name }}:{{ service.docr_port }}{{ service.base_path }}
-             # ProxyPassReverse / {{ service.protocol }}://csp-{{ service.docr_name }}:{{ service.docr_port }}{{ service.base_path }}
-             # mocked
+              {% if ( (service.docr_name == 'misp') or (service.docr_name == 'misp-adapter') or (service.docr_name == 'rt') or (service.docr_name == 'rt-adapter')) -%}
+              ProxyPass / {{ service.protocol }}://csp-{{ service.docr_name }}:{{ service.docr_port }}{{ service.base_path }}
+              ProxyPassReverse / {{ service.protocol }}://csp-{{ service.docr_name }}:{{ service.docr_port }}{{ service.base_path }}
+              {% else -%}
+              # mocked
               ProxyPass / {{ service.protocol }}://csp-mock:3002/
               ProxyPassReverse / {{ service.protocol }}://csp-mock:3002/
+              {% endif -%}
 
         </VirtualHost>
         {% endif -%}

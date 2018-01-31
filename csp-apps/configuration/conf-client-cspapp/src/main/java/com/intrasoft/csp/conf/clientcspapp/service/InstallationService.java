@@ -109,12 +109,30 @@ public class InstallationService {
         return moduleRepository.save(module);
     }
 
+
+    public SystemModule queryModuleByName(String name, boolean active) {
+        List<SystemModule> module = moduleRepository.findByNameAndActiveOrderByIdDesc(name, active);
+        if (module != null && module.size()==1) {
+            log.info("Module {} retrieved!", module);
+            return module.get(0);
+        } else {
+            log.error("System error: {} Modules cannot have same name and active=true more than once!!!", module);
+            return null;
+        }
+    }
+
     public SystemModule queryModuleByHash(String hash) {
         SystemModule module = moduleRepository.findOneByHash(hash);
         if (module != null) {
             log.info("Module {} retrieved!", module);
         }
         return module;
+    }
+
+
+    @Transactional
+    public SystemService updateSystemService(SystemService service) {
+        return serviceRepository.save(service);
     }
 
     @Transactional

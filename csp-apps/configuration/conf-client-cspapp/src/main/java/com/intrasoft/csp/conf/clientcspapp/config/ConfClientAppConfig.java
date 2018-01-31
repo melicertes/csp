@@ -4,6 +4,8 @@ package com.intrasoft.csp.conf.clientcspapp.config;
 import com.intrasoft.csp.commons.exceptions.InvalidDataTypeException;
 import com.intrasoft.csp.conf.client.ConfClient;
 import com.intrasoft.csp.conf.client.impl.ConfClientImpl;
+import com.intrasoft.csp.conf.clientcspapp.service.CSPPreStartSetupActions;
+import com.intrasoft.csp.conf.clientcspapp.service.PreStartSetupActions;
 import com.intrasoft.csp.conf.commons.context.ApiContextUrl;
 
 import com.intrasoft.csp.conf.commons.exceptions.*;
@@ -92,5 +94,13 @@ public class ConfClientAppConfig implements ApiContextUrl {
     public ApiVersionClient getApiVersionClient() throws Exception {
         return new ApiVersionClientImpl(protocol, host, port, REST_API_V1, retryRestTemplate);
     }
+
+
+    @Bean
+    public PreStartSetupActions preStartSetup(@Value("${custom.prestart.oam.name:csp-oam}") String oamServiceName,
+                                              @Value("${custom.prestart.apache.name:csp-apache}") String apacheServiceName) {
+        return new CSPPreStartSetupActions(oamServiceName,apacheServiceName);
+    }
+
 
 }
