@@ -47,7 +47,7 @@ public class TrustCircle implements Serializable{
     @JsonProperty("created")
     private String created;
     @JsonProperty("tlp")
-    private List<String> tlp;
+    private String tlp;
     @JsonProperty("team_contacts")
     private List<String> teamContacts;
     @JsonProperty("person_contacts")
@@ -146,12 +146,12 @@ public class TrustCircle implements Serializable{
     }
 
     @JsonProperty("tlp")
-    public List<String> getTlp() {
+    public String getTlp() {
         return tlp;
     }
 
     @JsonProperty("tlp")
-    public void setTlp(List<String> tlp) {
+    public void setTlp(String tlp) {
         this.tlp = tlp;
     }
 

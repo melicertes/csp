@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
+import com.intrasoft.csp.commons.model.Contact;
 import com.intrasoft.csp.commons.model.Team;
 import com.intrasoft.csp.commons.model.TrustCircle;
 import org.apache.commons.io.FileUtils;
@@ -55,5 +56,14 @@ public class TcMockUtil {
         List<Team> list = Arrays.asList(arr);
         Team team = list.stream().filter(t->t.getId().equals(uuid)).findAny().get();
         return mapper.writeValueAsBytes(team);
+    }
+
+    public static byte[] getJsonBytesForContactById(URL url, String id) throws URISyntaxException, IOException {
+        String json = FileUtils.readFileToString(new File(url.toURI()), Charset.forName("UTF-8"));
+        ObjectMapper mapper = new ObjectMapper();
+        Contact[] arr = mapper.readValue(json, Contact[].class);
+        List<Contact> list = Arrays.asList(arr);
+        Contact contact = list.stream().filter(c->c.getId().equals(id)).findAny().get();
+        return mapper.writeValueAsBytes(contact);
     }
 }

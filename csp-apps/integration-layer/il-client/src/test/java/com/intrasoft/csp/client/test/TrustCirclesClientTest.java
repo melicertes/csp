@@ -3,6 +3,7 @@ package com.intrasoft.csp.client.test;
 import com.intrasoft.csp.client.TrustCirclesClient;
 import com.intrasoft.csp.client.config.TrustCirclesClientConfig;
 import com.intrasoft.csp.client.test.util.TcMockUtil;
+import com.intrasoft.csp.commons.model.Contact;
 import com.intrasoft.csp.commons.model.Team;
 import com.intrasoft.csp.commons.model.TrustCircle;
 import com.intrasoft.csp.libraries.restclient.service.RetryRestTemplate;
@@ -55,6 +56,7 @@ public class TrustCirclesClientTest {
     URL allTeams = getClass().getClassLoader().getResource("json/tc/allTeams.json");
     URL allTrustCircles = getClass().getClassLoader().getResource("json/tc/allTrustCircles.json");
     URL allLocalTrustCircles = getClass().getClassLoader().getResource("json/tc/allLocalTrustCircles.json");
+    URL allContacts = getClass().getClassLoader().getResource("json/tc/allContacts.json");
 
 
     @Test
@@ -154,6 +156,28 @@ public class TrustCirclesClientTest {
         //test client
         TrustCircle tc = tcClient.getLocalTrustCircleByUuid(uuid);
         assertThat(tc.getId(),is(uuid));
+        mockServer.verify();
+    }
+
+    @Test
+    public void getContactByIdTest() throws IOException, URISyntaxException {
+        String id = "a1a2876b-cbb2-4cbd-b99d-340e6e4ffb34";
+        String shortName = "Mocked B";
+        String email = "userB@example.com";
+
+        //mock the TC server using json based on LTC Specifications document
+        String apiUrl = tcConfig.getTcContactsURI();
+        MockRestServiceServer mockServer = MockRestServiceServer.bindTo(retryRestTemplate).build();
+        mockServer.expect(requestTo(apiUrl+"/"+id))
+                .andRespond(MockRestResponseCreators
+                        .withSuccess(TcMockUtil.getJsonBytesForContactById(allContacts,id),TestUtil.APPLICATION_JSON_UTF8));
+
+        // test client
+        Contact contact = tcClient.getContactById(id);
+        assertThat(contact.getId(), is(id));
+        assertThat(contact.getShortName(), is(shortName));
+        assertThat(contact.getEmail(), is(email));
+
         mockServer.verify();
     }
 
