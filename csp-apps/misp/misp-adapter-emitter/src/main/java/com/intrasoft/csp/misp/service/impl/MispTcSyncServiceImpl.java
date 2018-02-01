@@ -71,14 +71,13 @@ public class MispTcSyncServiceImpl implements MispTcSyncService {
     public void syncOrganisations() {
         List<Team> teamList = trustCirclesClient.getAllTeams();
         List<OrganisationDTO> orgList = mispAppClient.getAllMispOrganisations();
-        OrganisationDTO organisation = null;
 
         // Making the necessary calls to MISP, depending on TC's Teams content.
         boolean loopBreak;
         for (int i=0; i<teamList.size(); i++) {
             loopBreak = false;
             for (int j=0; j<orgList.size(); j++) {
-                organisation = orgList.get(j);
+                OrganisationDTO organisation = orgList.get(j);
                 // Uuid Match
                 if (teamList.get(i).getId().equals(organisation.getUuid())) {
                     // Updating the MISP organisation with the TC team data.
@@ -89,8 +88,8 @@ public class MispTcSyncServiceImpl implements MispTcSyncService {
             }
             if (loopBreak) continue;
             // No match; create this team as an organisation in MISP.
-            organisation = new OrganisationDTO();
-            mispAppClient.addMispOrganisation(mapTeamToOrganisation(teamList.get(i), organisation));
+
+            mispAppClient.addMispOrganisation(mapTeamToOrganisation(teamList.get(i), null));
         }
 
         // Finding orphan MISP organisations
@@ -126,20 +125,19 @@ public class MispTcSyncServiceImpl implements MispTcSyncService {
         List<TrustCircle> tcList = trustCirclesClient.getAllTrustCircles();
 
         // Adding Local Trust Circles to existing Central Trust Circles list for synchronization;
-        List<TrustCircle> localTcList = trustCirclesClient.getAllLocalTrustCircles();
+        //TODO: uncomment when CMM is ready and deployed: List<TrustCircle> localTcList = trustCirclesClient.getAllLocalTrustCircles();
         List<TrustCircle> combinedList = new ArrayList<>();
         combinedList.addAll(tcList);
-        combinedList.addAll(localTcList);
+        //TODO: uncomment when CMM is ready and deployed: combinedList.addAll(localTcList);
         tcList = combinedList;
 
         List<SharingGroup> sgList = getAllSharingGroupsWithUuids();
-        SharingGroup sharingGroup = null;
 
         boolean loopBreak;
         for (int i=0; i<tcList.size(); i++) {
             loopBreak=false;
             for (int j=0; j<sgList.size(); j++) {
-                sharingGroup = sgList.get(j);
+                SharingGroup sharingGroup = sgList.get(j);
                 // Uuid Match
                 if (tcList.get(i).getId().equals(sharingGroup.getUuid())) {
                     // Populating this MISP sharing group with the matching TC trust circle data and updating MISP.
@@ -150,8 +148,8 @@ public class MispTcSyncServiceImpl implements MispTcSyncService {
             }
             if (loopBreak) continue;
             // No match; create this Trust Circle as a Sharing Group in MISP.
-            sharingGroup = new SharingGroup();
-            mispAppClient.addMispSharingGroup(mapTrustCircleToSharingGroup(tcList.get(i), sharingGroup));
+
+            mispAppClient.addMispSharingGroup(mapTrustCircleToSharingGroup(tcList.get(i), null));
         }
 
         // SXCSP-435 Setting Sharing Groups as inactive instead of deleting them
@@ -171,6 +169,11 @@ public class MispTcSyncServiceImpl implements MispTcSyncService {
 
     public OrganisationDTO mapTeamToOrganisation(Team team, OrganisationDTO organisation) {
 
+        if(organisation == null){
+            //Organization will be created from scratch
+            organisation = new OrganisationDTO();
+        }
+
         organisation.setUuid(team.getId());
         // SXCSP-436 Mapping Teams NIS Sectors to Organisations Sector
         List<String> teamSectors = team.getNisSectors();
@@ -182,16 +185,8 @@ public class MispTcSyncServiceImpl implements MispTcSyncService {
             orgSectors = orgSectors.substring(0, orgSectors.lastIndexOf(", "));
         }
         organisation.setSector(orgSectors);
-
         // Modifying the name field to differentiate synchronized organisations.
-        try {
-            if (!organisation.getName().startsWith(prefix))  // prevents from adding the prefix each and every time
-                organisation.setName(prefix + team.getName());
-            else  // prevent name from never getting updated when containing the sync prefix
-                organisation.setName(prefix + team.getName());
-        } catch (NullPointerException e) {
-            organisation.setName(prefix + team.getName());
-        }
+        organisation.setName(prefix + team.getShortName());
         organisation.setDescription(team.getDescription());
         organisation.setNationality(team.getCountry());
         // SXCSP-420: "The team with the csp-id that is equal to this csp-id should be imported as local org."
@@ -204,17 +199,13 @@ public class MispTcSyncServiceImpl implements MispTcSyncService {
     }
 
     public SharingGroup mapTrustCircleToSharingGroup(TrustCircle tCircle, SharingGroup sGroup) {
-
+        if(sGroup == null){
+            //SharingGroup will be created from scratch
+            sGroup = new SharingGroup();
+        }
         sGroup.setUuid(tCircle.getId());
         // Modifying the name field to differentiate synchronized sharing groups.
-        try {
-            if (!sGroup.getName().startsWith(prefix))  // prevents from adding the prefix each and every time
-                sGroup.setName(prefix + tCircle.getName());
-            else
-                sGroup.setName(prefix + tCircle.getName());
-        } catch (NullPointerException e) {
-            sGroup.setName(prefix + tCircle.getName());
-        }
+        sGroup.setName(prefix + tCircle.getShortName());
         sGroup.setDescription(tCircle.getDescription());
         sGroup.setReleasability(""); // informational but mandatory;
         sGroup.setActive(true);
