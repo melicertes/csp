@@ -1,0 +1,29 @@
+[
+  {
+    "id": "2883f242-3e07-4378-9091-0d198e4886ba",
+    "short_name": "CTC::EU NIS:Basic",
+    "name": "NIS Basic",
+    "description": "NIS Basic Circle",
+    "auth_source": "ENISA",
+    "info_url": "",
+    "membership_url": "",
+    "teams": [
+      "9a74c807-e6c4-4a19-9c77-37457e3285df"
+    ],
+    "created": "2017-04-25T14:07:24.547000Z"
+  },
+  {
+    "id": "61ee0197-587f-43ce-afcf-310b36b5bfe9",
+    "short_name": "CTC::SHARING_DATA_CHAT",
+    "name": "CTC::SHARING_DATA_CHAT",
+    "description": "CTC::SHARING_DATA_CHAT",
+    "auth_source": "ENISA",
+    "info_url": "",
+    "membership_url": "",
+    "teams": [
+      "578c0e4e-ebaf-455b-a2a1-faffb14be9e1",
+      "9a74c807-e6c4-4a19-9c77-37457e3285df"
+    ],
+    "created": "2017-06-12T10:54:56.126000Z"
+  }
+]

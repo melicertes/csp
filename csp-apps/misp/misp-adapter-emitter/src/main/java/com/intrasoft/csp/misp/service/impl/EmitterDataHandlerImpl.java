@@ -2,6 +2,7 @@ package com.intrasoft.csp.misp.service.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.intrasoft.csp.client.CspClient;
 import com.intrasoft.csp.client.ElasticClient;
@@ -31,6 +32,7 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.*;
 
 import static com.intrasoft.csp.misp.commons.config.MispContextUrl.MispEntity.ACTION;
 import static com.intrasoft.csp.misp.commons.config.MispContextUrl.MispEntity.EVENT;
@@ -57,6 +59,12 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
 
     @Value("${misp.app.events.path}")
     String eventsPath;
+
+    @Value("${misp.sync.prefix}")
+    String prefix;
+
+    @Value("${misp.sync.type}")
+    String syncType;
 
     @Value("${server.name}")
     String cspId;
@@ -97,11 +105,13 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
         jsonNode = new ObjectMapper().convertValue(object, JsonNode.class);
 
         String uuid = "";
+        Map<String, List<String>> eventValidationMap = new HashMap<>();
 
         LOG.info("Received from emmiter: " + jsonNode.toString());
 
         if (mispEntity.equals(EVENT)) {
             uuid = jsonNode.get(EVENT.toString()).get("uuid").textValue();
+            eventValidationMap = eventValidation(jsonNode, LOG);
             try{
                 object = mispAppClient.getMispEvent(uuid).getBody();
             }
@@ -173,6 +183,11 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
          * find out how to differentiate our custom shared groups from the normal ones
          * use custom sharing groups uuids as tcid, use custom organizations(?) uuids as team id.
          * harvest only from the dataobject part which dictates which organization or sharing group should get this event*/
+        if (eventValidationMap.containsKey("org")) { // Valid Sharing Group with valid Organisations
+            sharingParams.setTeamId(eventValidationMap.get("org"));
+        } else if (eventValidationMap.containsKey("sg")) { // Valid Sharing Group without any valid organisations
+            sharingParams.setTcId(eventValidationMap.get("sg"));
+        }
         IntegrationData integrationData = new IntegrationData();
         integrationData.setDataParams(dataParams);
         integrationData.setSharingParams(sharingParams);
@@ -225,6 +240,48 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
         catch (Exception e){
             LOG.error("Forward to IL failed with: ", e);
         }
+    }
+
+    private Map<String, List<String>> eventValidation(JsonNode jsonNode, Logger LOG) {
+        Map<String, List<String>> result = new HashMap<>();
+        String sharingGroupUuid = "";
+        List<String> syncedOrgsUuids = new ArrayList<>();
+        String sharingGroupName = new String();
+        // Sharing Group / Organisations synchronization validation for use with Sharing Params
+        try { // handling the case when there's no sharing group specified in the event's distribution setting.
+            sharingGroupName = jsonNode.get(EVENT.toString()).get("SharingGroup").get("name").toString().replace("\"","");
+        } catch (NullPointerException e) {
+            LOG.info("No sharing group distribution set for this event");
+            result.put("", new ArrayList<>());
+            return result; // returns empty map on sharing group absence
+        }
+        // Retrieving any synchronized Organisations in the Sharing Group even if it has no synchronization prefix.
+        sharingGroupUuid = jsonNode.get(EVENT.toString()).get("SharingGroup").get("uuid").toString().replace("\"","");
+        // Get any organisations found in the sharing group node.
+        ArrayNode sGroupOrgs = (ArrayNode) jsonNode.get(EVENT.toString()).get("SharingGroup").get("SharingGroupOrg");
+        // Catch the exception in case the sharing group has no organisations at all.
+        boolean proceed = false;
+        try {
+            sGroupOrgs.isNull();
+            proceed = true;
+        } catch (NullPointerException e) {
+            LOG.info("No organisations found in the sharing group");
+            return result;
+        }
+        if (proceed) {
+            sGroupOrgs.forEach(o -> {
+                // For each valid (synchronized) organisation, add its uuid in the list for use with sharing params.
+                // Currently checking for both synchronization indications (name prefix OR organisation type)
+                if (o.get("Organisation").get("name").toString().replace("\"","").startsWith(prefix)
+                        || o.get("Organisation").get("type").toString().replace("\"","").equals(syncType)) {
+                    syncedOrgsUuids.add(o.get("Organisation").get("uuid").toString().replace("\"",""));
+                }
+            });
+            result.put("org", syncedOrgsUuids);
+            return result; // When Sharing Group is valid, method returns its valid Organisations UUIDs along with a key indication.
+        }
+        result.put("sg", Arrays.asList(sharingGroupUuid));
+        return result; // When Sharing Group is valid but has no Organisations, method returns its UUID along with a key indication.
     }
 
     @Override
