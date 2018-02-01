@@ -1,82 +1,82 @@
 {
-  "SharingGroup": {
-    "id": "1",
-    "name": "CTC::CSP_ALL",
-    "description": "",
-    "uuid": "a36c31f4-dad3-4f49-b443-e6d6333649b1",
-    "releasability": "",
-    "local": true,
-    "active": true
-  },
-  "Organisation": {
-    "id": "1",
-    "name": "MISP",
-    "uuid": "56ef3277-1ad4-42f6-b90b-04e5c0a83832"
-  },
-  "SharingGroupOrg": [
-    {
-      "id": "1",
-      "sharing_group_id": "1",
-      "org_id": "1",
-      "extend": true,
-      "Organisation": {
-        "name": "MISP",
-        "id": "1",
-        "uuid": "56ef3277-1ad4-42f6-b90b-04e5c0a83832"
-      }
-    },
-    {
-      "id": "2",
-      "sharing_group_id": "1",
-      "org_id": "13",
-      "extend": false,
-      "Organisation": {
-        "name": "demo1-csp",
-        "id": "13",
-        "uuid": "578c0e4e-ebaf-455b-a2a1-faffb14be9e1"
-      }
-    },
-    {
-      "id": "3",
-      "sharing_group_id": "1",
-      "org_id": "12",
-      "extend": false,
-      "Organisation": {
-        "name": "LUKE-CSP",
-        "id": "12",
-        "uuid": "5a1c2c9a-f788-46d1-8729-0606c0a83832"
-      }
-    },
-    {
-      "id": "4",
-      "sharing_group_id": "1",
-      "org_id": "11",
-      "extend": false,
-      "Organisation": {
-        "name": "YODA-CSPer",
+    "SharingGroup": {
         "id": "11",
-        "uuid": "c48936df-d718-4994-95e9-d4062def9f6c"
-      }
+        "name": "APIGroup",
+        "releasability": "",
+        "description": "DELETE ME",
+        "uuid": "5a536fe6-0884-42b6-ab63-05a8c0a83832",
+        "organisation_uuid": "56ef3277-1ad4-42f6-b90b-04e5c0a83832",
+        "org_id": "1",
+        "sync_user_id": "1",
+        "active": true,
+        "created": "2018-01-08 14:19:34",
+        "modified": "2018-01-08 14:33:46",
+        "local": false,
+        "roaming": false,
+        "sync_org_name": "MISP"
     },
-    {
-      "id": "5",
-      "sharing_group_id": "1",
-      "org_id": "3",
-      "extend": false,
-      "Organisation": {
-        "name": "CthulhuSPRL.be",
-        "id": "3",
-        "uuid": "55f6ea5f-fd34-43b8-ac1d-40cb950d210f"
-      }
-    }
-  ],
-  "SharingGroupServer": [
-    {
-      "all_orgs": false,
-      "server_id": "0",
-      "sharing_group_id": "1",
-      "Server": []
-    }
-  ],
-  "editable": true
+    "Organisation": {
+        "id": "1",
+        "name": "MISP",
+        "date_created": "2016-03-21 00:30:44",
+        "date_modified": "2018-01-08 14:18:29",
+        "description": "Host organisation for the training instance",
+        "type": "",
+        "nationality": "International",
+        "sector": "",
+        "created_by": "0",
+        "uuid": "56ef3277-1ad4-42f6-b90b-04e5c0a83832",
+        "contacts": "",
+        "local": true,
+        "landingpage": null,
+        "restricted_to_domain": ""
+    },
+    "SharingGroupOrg": [
+        {
+            "id": "14",
+            "sharing_group_id": "11",
+            "org_id": "1",
+            "extend": true,
+            "Organisation": {
+                "id": "1",
+                "name": "MISP",
+                "uuid": "56ef3277-1ad4-42f6-b90b-04e5c0a83832"
+            }
+        },
+        {
+            "id": "15",
+            "sharing_group_id": "11",
+            "org_id": "2",
+            "extend": false,
+            "Organisation": {
+                "id": "2",
+                "name": "CIRCL",
+                "uuid": "55f6ea5e-2c60-40e5-964f-47a8950d210f"
+            }
+        },
+        {
+            "id": "16",
+            "sharing_group_id": "11",
+            "org_id": "7",
+            "extend": false,
+            "Organisation": {
+                "id": "7",
+                "name": "CiviCERT",
+                "uuid": "56743359-c860-4361-b1dc-7b65d56c6cd2"
+            }
+        }
+    ],
+    "SharingGroupServer": [
+        {
+            "id": "6",
+            "sharing_group_id": "11",
+            "server_id": "0",
+            "all_orgs": true,
+            "Server": {
+                "id": "0",
+                "name": "Local instance",
+                "url": "http://192.168.56.50"
+            }
+        }
+    ]
 }

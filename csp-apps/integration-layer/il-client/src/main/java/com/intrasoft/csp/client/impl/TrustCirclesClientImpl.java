@@ -30,11 +30,15 @@ public class TrustCirclesClientImpl implements TrustCirclesClient {
     String baseContextPath;
     String pathCircles;
     String pathTeams;
+    String pathLocalCircles;
+    String pathLocalCircle;
 
-    public TrustCirclesClientImpl(String baseContextPath, String pathCircles, String pathTeams) {
+    public TrustCirclesClientImpl(String baseContextPath, String pathCircles, String pathTeams, String pathLocalCircles, String pathLocalCircle) {
         this.baseContextPath = baseContextPath;
         this.pathCircles = pathCircles;
         this.pathTeams = pathTeams;
+        this.pathLocalCircles = pathLocalCircles;
+        this.pathLocalCircle = pathLocalCircle;
     }
 
     @PostConstruct
@@ -78,6 +82,22 @@ public class TrustCirclesClientImpl implements TrustCirclesClient {
         LOG.debug("API call [post]: " + url);
         Team team = retryRestTemplate.getForObject(url, Team.class);
         return team;
+    }
+
+    @Override
+    public List<TrustCircle> getAllLocalTrustCircles() {
+        String url = context + pathLocalCircles;
+        LOG.debug("API call [get]: " + url);
+        List<TrustCircle> list = Arrays.asList(retryRestTemplate.getForObject(url, TrustCircle[].class));
+        return list;
+    }
+
+    @Override
+    public TrustCircle getLocalTrustCircleByUuid(String uuid) {
+        String url = context + pathLocalCircle +"/"+uuid;
+        LOG.debug("API call [get]: " + url);
+        TrustCircle trustCircle = retryRestTemplate.getForObject(url, TrustCircle.class);
+        return trustCircle;
     }
 
     @Override
