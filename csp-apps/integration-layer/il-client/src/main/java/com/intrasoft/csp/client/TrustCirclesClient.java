@@ -27,6 +27,8 @@ public interface TrustCirclesClient {
 
     TrustCircle getLocalTrustCircleByUuid(String uuid);
 
+    TrustCircle getLocalTrustCircleByShortName(String shortName);
+
     Contact getContactById(String id);
 
 }

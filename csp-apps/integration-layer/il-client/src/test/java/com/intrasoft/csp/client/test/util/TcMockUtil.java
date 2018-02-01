@@ -46,6 +46,18 @@ public class TcMockUtil {
         return mapper.writeValueAsBytes(tc);
     }
 
+    public static byte[] getJsonBytesForLTCByShortName(URL url, String shortName) throws URISyntaxException, IOException {
+        String json = FileUtils.readFileToString(new File(url.toURI()), Charset.forName("UTF-8"));
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        mapper.registerModule(new JodaModule());
+        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        TrustCircle[] arr = mapper.readValue(json,TrustCircle[].class);
+        List<TrustCircle> list = Arrays.asList(arr);
+        TrustCircle tc = list.stream().filter(t->t.getShortName().equals(shortName)).findAny().get();
+        return mapper.writeValueAsBytes(tc);
+    }
+
     public static byte[] getJsonBytesForTeamByUuid(URL url, String uuid) throws URISyntaxException, IOException {
         String json = FileUtils.readFileToString(new File(url.toURI()), Charset.forName("UTF-8"));
         ObjectMapper mapper = new ObjectMapper();

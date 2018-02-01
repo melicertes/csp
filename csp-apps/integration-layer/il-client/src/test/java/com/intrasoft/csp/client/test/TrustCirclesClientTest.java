@@ -21,6 +21,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.test.web.client.response.MockRestResponseCreators;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.File;
 import java.io.IOException;
@@ -152,10 +153,27 @@ public class TrustCirclesClientTest {
                 .andRespond(MockRestResponseCreators
                         .withSuccess(TcMockUtil.getJsonBytesForTrustCircleByUuid(allLocalTrustCircles,uuid),TestUtil.APPLICATION_JSON_UTF8));
 
-
         //test client
         TrustCircle tc = tcClient.getLocalTrustCircleByUuid(uuid);
         assertThat(tc.getId(),is(uuid));
+        mockServer.verify();
+    }
+
+    @Test
+    public void getLocalTrustcircleByShortNameTest() throws IOException, URISyntaxException {
+        String shortName = "LTC shortname B";
+        String queryParam = "short_name";
+        String apiUrl = tcConfig.getTcLocalCircleURI();
+        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(apiUrl).queryParam(queryParam, shortName);
+        apiUrl = builder.toUriString();
+        MockRestServiceServer mockServer = MockRestServiceServer.bindTo(retryRestTemplate).build();
+        mockServer.expect(requestTo(apiUrl))
+                .andRespond(MockRestResponseCreators
+                        .withSuccess(TcMockUtil.getJsonBytesForLTCByShortName(allLocalTrustCircles, shortName),TestUtil.APPLICATION_JSON_UTF8));
+
+        //test client
+        TrustCircle tc = tcClient.getLocalTrustCircleByShortName(shortName);
+        assertThat(tc.getShortName(), is(shortName));
         mockServer.verify();
     }
 
