@@ -23,6 +23,7 @@ public interface MispAppClient {
 //	TODO: Implementation of updating MISP Organisations is partially working until REST API problem is solved.
 //  MISP's Organisation API updates only the "name" field and it has been reported; waiting for feedback.
 	OrganisationDTO updateMispOrganisation(OrganisationDTO organisationDTO);
+	// Organisations can't be deleted when they reference users or are referenced themselves by misp events
 	// Returns true when organisation is successfully deleted
 	boolean deleteMispOrganisation(String id);
 
@@ -31,8 +32,5 @@ public interface MispAppClient {
     SharingGroup getMispSharingGroup(String uuid);
     SharingGroup addMispSharingGroup(SharingGroup sharingGroup);
     SharingGroup updateMispSharingGroup(SharingGroup sharingGroup);
-    boolean deleteMispSharingGroup(String id);
-
-
-
+    Boolean deleteMispSharingGroup(String id);
 }

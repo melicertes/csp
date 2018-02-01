@@ -1,0 +1,65 @@
+[
+  {
+    "id": "7703853d-1c32-4556-b34b-c666f212cdc9",
+    "short_name": "LTC shortname A",
+    "name": "LTC name A",
+    "description": "LTC description",
+    "auth_source": "LTC auth_source",
+    "info_url": "LTC info_url",
+    "membership_url": "LTC membership_url",
+    "created": "string",
+    "tlp": "red",
+    "teams": [
+      "578c0e4e-ebaf-455b-a2a1-faffb14be9e1"
+    ],
+    "team_contacts": [
+      "string"
+    ],
+    "person_contacts": [
+      "string"
+    ]
+  },
+  {
+    "id": "31146113-d53d-4738-877d-2405ea18edf8",
+    "short_name": "LTC shortname B",
+    "name": "LTC name B",
+    "description": "LTC description",
+    "auth_source": "LTC auth_source",
+    "info_url": "LTC info_url",
+    "membership_url": "LTC membership_url",
+    "created": "string",
+    "tlp": "amber",
+    "teams": [
+      "55f6ea5e-2c60-40e5-964f-47a8950d210f"
+    ],
+    "team_contacts": [
+      "string"
+    ],
+    "person_contacts": [
+      "string"
+    ]
+  },
+  {
+    "id": "5b2af720-e192-4cd5-8e5d-db3181c8a475",
+    "short_name": "LTC shortname C",
+    "name": "LTC name C",
+    "description": "LTC description",
+    "auth_source": "LTC auth_source",
+    "info_url": "LTC info_url",
+    "membership_url": "LTC membership_url",
+    "created": "string",
+    "tlp": "green",
+    "teams": [
+      "578c0e4e-ebaf-455b-a2a1-faffb14be9e1",
+      "af9d06ac-d7be-4684-86a3-808fe4f4d17c",
+      "88557939-db1c-4411-831a-9b6226ef4819"
+    ],
+    "team_contacts": [
+      "string"
+    ],
+    "person_contacts": [
+      "string"
+    ]
+  }
+
+]

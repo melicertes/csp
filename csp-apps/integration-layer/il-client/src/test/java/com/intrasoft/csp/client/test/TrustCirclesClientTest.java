@@ -54,6 +54,7 @@ public class TrustCirclesClientTest {
 
     URL allTeams = getClass().getClassLoader().getResource("json/tc/allTeams.json");
     URL allTrustCircles = getClass().getClassLoader().getResource("json/tc/allTrustCircles.json");
+    URL allLocalTrustCircles = getClass().getClassLoader().getResource("json/tc/allLocalTrustCircles.json");
 
 
     @Test
@@ -122,4 +123,38 @@ public class TrustCirclesClientTest {
         assertThat(team.getHostOrganisation(),is("delete me"));
         mockServer.verify();
     }
+
+    @Test
+    public void getAllLocalTrustCirclesTest() throws IOException, URISyntaxException {
+        //mock the TC server using json based on LTC Specifications document
+        String apiUrl = tcConfig.getTcLocalCirclesURI();
+        MockRestServiceServer mockServer = MockRestServiceServer.bindTo(retryRestTemplate).build();
+        mockServer.expect(requestTo(apiUrl))
+                .andRespond(MockRestResponseCreators
+                        .withSuccess(TcMockUtil.getJsonBytesFromUrl(allLocalTrustCircles),TestUtil.APPLICATION_JSON_UTF8));
+
+
+        //test client
+        List<TrustCircle> list = tcClient.getAllLocalTrustCircles();
+        assertThat(list.size(),is(3));
+        mockServer.verify();
+    }
+
+    @Test
+    public void getLocalTrustCircleByUuidTest() throws IOException, URISyntaxException {
+        String uuid = "31146113-d53d-4738-877d-2405ea18edf8";
+        //mock the TC server using json based on LTC Specifications document
+        String apiUrl = tcConfig.getTcLocalCircleURI();
+        MockRestServiceServer mockServer = MockRestServiceServer.bindTo(retryRestTemplate).build();
+        mockServer.expect(requestTo(apiUrl+"/"+uuid))
+                .andRespond(MockRestResponseCreators
+                        .withSuccess(TcMockUtil.getJsonBytesForTrustCircleByUuid(allLocalTrustCircles,uuid),TestUtil.APPLICATION_JSON_UTF8));
+
+
+        //test client
+        TrustCircle tc = tcClient.getLocalTrustCircleByUuid(uuid);
+        assertThat(tc.getId(),is(uuid));
+        mockServer.verify();
+    }
+
 }
