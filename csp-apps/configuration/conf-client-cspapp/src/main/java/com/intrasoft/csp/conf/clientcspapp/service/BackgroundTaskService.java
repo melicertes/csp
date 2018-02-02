@@ -641,7 +641,6 @@ public class BackgroundTaskService {
     }
 
     private void checkVHostCreation(SystemModule module, SystemService service) {
-        //TODO 1.1 Check if VHost is required and CREATE IT
         //we copy the vhost configuration from the $HOME folder to the apache folders
         if (service.getVHostNecessary() && service.getVhostCreated() == null) {
             String confFileName = "csp-sites." + module.getName() + "." + module.getStartPriority() + ".conf";
@@ -667,8 +666,6 @@ public class BackgroundTaskService {
     }
 
     private void checkOAMAgentCreation(SystemModule module, SystemService service) throws IOException {
-        // TODO 1.1 check OAM agent and create it.
-
         final SystemModule moduleOAM = installationService.queryModuleByName(moduleOAMname, true);
         final SystemModule moduleAPC = installationService.queryModuleByName(moduleAPCname, true);
         BackgroundTaskResult<Boolean, Integer> oamStarted = null;
@@ -696,29 +693,48 @@ public class BackgroundTaskService {
                     log.info("3: OAM - registering other web agent, running already");
                 }
             }
+            BackgroundTaskResult<Boolean, Integer> rOAM = null;
+            BackgroundTaskResult<Boolean, Integer> rAPC = null;
 
-            // so lets register the agent now
-            Map<String,String> env = new HashMap<>();
-            env.put("C_NAME", "csp-"+moduleOAMname);
-            env.put("C_SCRIPT","create-agent.sh");
-            env.put("C_EXTNAME",service.getModule().getExternalName());
+            // lets query oam is running now
+            if (installationService.queryService(moduleOAM).getServiceState()==ServiceState.RUNNING) {
+                // so lets register the agent now
+                Map<String, String> env = new HashMap<>();
+                env.put("C_NAME", "csp-" + moduleOAMname);
+                env.put("C_SCRIPT", "create-agent.sh");
+                env.put("C_EXTNAME", service.getModule().getExternalName());
 
-            final BackgroundTaskResult<Boolean, Integer> result = executeScriptSimple(EXEC_CONT_SCRIPT_SH, env);
-            //TODO do something with result, do we care if oam is left running at the end?
+                rOAM = executeScriptSimple(EXEC_CONT_SCRIPT_SH, env);
+                //TODO do something with result, do we care if oam is left running at the end?
+
+                //start apache if not started
+                boolean apacheStarted = true; //assume it is already started.
+                if (installationService.queryService(moduleAPC).getServiceState()==ServiceState.NOT_RUNNING) {
+                    apacheStarted = startSingleService(moduleAPC, installationService.queryService(moduleAPC)).getSuccess();
+                }
+
+                if (apacheStarted) {
+                    Map<String, String> apc = new HashMap<>();
+                    env.put("C_NAME", "csp-" + moduleAPCname);
+                    env.put("C_SCRIPT", "create-agent.sh");
+                    env.put("C_EXTNAME", service.getModule().getExternalName());
+                    rAPC = executeScriptSimple(EXEC_CONT_SCRIPT_SH, apc);
+
+                    stopSingleService(moduleAPC, installationService.queryService(moduleAPC));
+
+                } else {
+                    log.error("Apache is not running? failure!!!");
+                }
+
+            } else {
+                log.error("OAM IS NOT RUNNING - failure!");
+            }
+
+            log.info("ACTIONS COMPLETED: OAM : {} - APC : {}",
+                    rOAM != null ? rOAM.getSuccess() : false,
+                    rAPC != null ? rAPC.getSuccess() : false);
 
 
-            //TODO start apache / execute / stop apache
-            /*
-
-docker exec -it csp-oam create-agent.sh {EXTERNAL_NAME}
-docker exec -it csp-apache create-agent.sh {EXTERNAL_NAME}
-
-1. Prwta 8a kaneis create olous tous agents ston OAM
-2. Create olou tous agents ston APACHE
-3. COPY *sites.conf to /opt/csp/apache2/csp-sites*
-
-
- */
         } else {
             log.info("No action - either already created or not needed");
         }
@@ -745,31 +761,35 @@ docker exec -it csp-apache create-agent.sh {EXTERNAL_NAME}
             // for every active module, sort by priority
             installationService.queryAllModulesInstalled(false).forEach(module -> {
                 SystemService service = installationService.queryService(module);
-                if (service.getStartable() == true) {
-                    if (service.getServiceState() == ServiceState.RUNNING) {
-                        log.info("About to stop service {} with start priority {}", service.getName(), module.getStartPriority());
-                        Map<String,String> env = new HashMap<String, String>();
-                        env.put("SERVICE_NAME", module.getName());
-                        env.put("SERVICE_DIR", module.getModulePath());
-                        env.put("SERVICE_PRIO", module.getStartPriority().toString());
-                        try {
-                            executeScriptSimple("stopService.sh", env);
-                            service = installationService.updateServiceState(service,ServiceState.NOT_RUNNING);
-                        } catch (IOException e) {
-                            log.error("Failed to start {} with start priority {}", service.getName(), module.getStartPriority());
-                            log.error("Exception was {}",e.getMessage(),e);
-                            service = installationService.updateServiceState(service,ServiceState.RUNNING);
-                        }
-                    } else {
-                        log.warn("Service {} is marked NOT running!???", service.getName());
-                    }
-                    log.info("Service {} state {}", service.getName(), service.getServiceState());
-                } else {
-                    log.info("Service {} is not a startable service, moving on");
-                }
+                stopSingleService(module, service);
             });
             return new BackgroundTaskResult<>(true, 0);
         });
+    }
+
+    private void stopSingleService(SystemModule module, SystemService service) {
+        if (service.getStartable() == true) {
+            if (service.getServiceState() == ServiceState.RUNNING) {
+                log.info("About to stop service {} with start priority {}", service.getName(), module.getStartPriority());
+                Map<String, String> env = new HashMap<String, String>();
+                env.put("SERVICE_NAME", module.getName());
+                env.put("SERVICE_DIR", module.getModulePath());
+                env.put("SERVICE_PRIO", module.getStartPriority().toString());
+                try {
+                    executeScriptSimple("stopService.sh", env);
+                    service = installationService.updateServiceState(service, ServiceState.NOT_RUNNING);
+                } catch (IOException e) {
+                    log.error("Failed to start {} with start priority {}", service.getName(), module.getStartPriority());
+                    log.error("Exception was {}", e.getMessage(), e);
+                    service = installationService.updateServiceState(service, ServiceState.RUNNING);
+                }
+            } else {
+                log.warn("Service {} is marked NOT running!???", service.getName());
+            }
+            log.info("Service {} state {}", service.getName(), service.getServiceState());
+        } else {
+            log.info("Service {} is not a startable service, moving on");
+        }
     }
 
 
