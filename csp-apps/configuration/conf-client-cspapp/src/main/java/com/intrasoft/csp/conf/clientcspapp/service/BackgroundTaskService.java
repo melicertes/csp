@@ -380,7 +380,7 @@ public class BackgroundTaskService {
                 }
                 // c. execute any first-time.sh found
                 String ftime = "first-time.sh"; //compliant with 1.0 manifest
-                if (manifest.getFormat() > 1.0) {
+                if (manifest.getFormat() > 1.0 && manifest.getShFirst() != null) {
                     ftime = manifest.getShFirst();
                 }
 
@@ -584,7 +584,9 @@ public class BackgroundTaskService {
 
             final List<BackgroundTaskResult<Boolean, Integer>> results = installationService.queryAllModulesInstalled(true).stream().map(module -> {
                 SystemService service = installationService.queryService(module);
-                if (service.getStartable() == true) {
+                if (service == null) {
+                    log.error("Module {} has no service!",module.getName());
+                } else if (service.getStartable() == true) {
 
                     //copy the environment again before starting
                     try {
@@ -685,9 +687,16 @@ public class BackgroundTaskService {
 
     private String writeDomainsToJson(List<String> domains, String modulePath) throws IOException {
         File f = new File(modulePath, "j2data"+Long.toHexString(System.currentTimeMillis())+".json");
-        String formatted = " { \"local_domains\" : %s  } ";
+        StringBuilder formatted = new StringBuilder(" { \"local_domains\" : [");
 
-        Files.write(f.toPath(), String.format(formatted, domains).getBytes(Charset.forName("UTF-8")));
+        domains.forEach( d -> {
+            formatted.append("\"").append(d).append("\",");
+        });
+        formatted.setLength(formatted.length()-1); //leave the last ,
+        formatted.append(" ] } ");
+
+
+        Files.write(f.toPath(), formatted.toString().getBytes(Charset.forName("UTF-8")));
         return f.getAbsolutePath();
 
     }
@@ -699,7 +708,7 @@ public class BackgroundTaskService {
         try {
             domains.addAll(Files.readAllLines(envFile.toPath()).stream()
                     .filter(line -> line.contains("_LOCAL"))
-                    .map(line -> line.split(Pattern.quote("="))[1])
+                    .map(line -> line.split(Pattern.quote("="))[0])
                     .collect(Collectors.toList()));
             log.info("Domains discovered: {}",domains);
         } catch (IOException e) {
@@ -751,7 +760,7 @@ public class BackgroundTaskService {
             if (service.getName().contentEquals(moduleOAMname)) { // case 1
                 log.info("1: OAM - registering own web agent");
                 //we need to start OAM to register OWN agent.
-                oamStarted = startSingleService(moduleOAM, installationService.queryService(moduleOAM));
+                oamStarted = startSingleService(module, installationService.queryService(moduleOAM));
             } else if (!service.getName().contentEquals(moduleOAMname)) {
                 boolean oamRunning = installationService.queryService(moduleOAM).getServiceState()==ServiceState.RUNNING;
                 if (!oamRunning) { // 2
@@ -836,27 +845,29 @@ public class BackgroundTaskService {
     }
 
     private void stopSingleService(SystemModule module, SystemService service) {
-        if (service.getStartable() == true) {
-            if (service.getServiceState() == ServiceState.RUNNING) {
-                log.info("About to stop service {} with start priority {}", service.getName(), module.getStartPriority());
-                Map<String, String> env = new HashMap<String, String>();
-                env.put("SERVICE_NAME", module.getName());
-                env.put("SERVICE_DIR", module.getModulePath());
-                env.put("SERVICE_PRIO", module.getStartPriority().toString());
-                try {
-                    executeScriptSimple("stopService.sh", env);
-                    service = installationService.updateServiceState(service, ServiceState.NOT_RUNNING);
-                } catch (IOException e) {
-                    log.error("Failed to start {} with start priority {}", service.getName(), module.getStartPriority());
-                    log.error("Exception was {}", e.getMessage(), e);
-                    service = installationService.updateServiceState(service, ServiceState.RUNNING);
+        if (service != null) {
+            if (service.getStartable() == true) {
+                if (service.getServiceState() == ServiceState.RUNNING) {
+                    log.info("About to stop service {} with start priority {}", service.getName(), module.getStartPriority());
+                    Map<String, String> env = new HashMap<String, String>();
+                    env.put("SERVICE_NAME", module.getName());
+                    env.put("SERVICE_DIR", module.getModulePath());
+                    env.put("SERVICE_PRIO", module.getStartPriority().toString());
+                    try {
+                        executeScriptSimple("stopService.sh", env);
+                        service = installationService.updateServiceState(service, ServiceState.NOT_RUNNING);
+                    } catch (IOException e) {
+                        log.error("Failed to start {} with start priority {}", service.getName(), module.getStartPriority());
+                        log.error("Exception was {}", e.getMessage(), e);
+                        service = installationService.updateServiceState(service, ServiceState.RUNNING);
+                    }
+                } else {
+                    log.warn("Service {} is marked NOT running!???", service.getName());
                 }
+                log.info("Service {} state {}", service.getName(), service.getServiceState());
             } else {
-                log.warn("Service {} is marked NOT running!???", service.getName());
+                log.info("Service {} is not a startable service, moving on", service.getName());
             }
-            log.info("Service {} state {}", service.getName(), service.getServiceState());
-        } else {
-            log.info("Service {} is not a startable service, moving on");
         }
     }
 
