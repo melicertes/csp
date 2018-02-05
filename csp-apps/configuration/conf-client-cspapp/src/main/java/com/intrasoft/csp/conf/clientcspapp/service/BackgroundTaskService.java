@@ -29,6 +29,8 @@ import java.io.*;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -42,6 +44,8 @@ import java.util.stream.Collectors;
 @Service
 @Slf4j
 public class BackgroundTaskService {
+
+    public static final String DOCKERCOMPOSE_YML_TEMPLATE = "docker-compose.yml.j2";
 
     @Getter
     enum ControlScript {
@@ -393,6 +397,17 @@ public class BackgroundTaskService {
                 installationService.saveSystemModuleService(installingModule, isLegacy, needsAgent(customEnv),
                         needsVhost(customEnv));
 
+                //fix previous module version, if any
+                final String moduleName = installingModule.getName();
+                final String moduleHash = installingModule.getHash();
+                installationService.queryAllModulesInstalled(true).stream()
+                        .filter( m -> m.getName().contentEquals(moduleName)) //only same name
+                        .filter( m -> !m.getHash().contentEquals(moduleHash)) // only not ours
+                        .forEach( m -> {
+                            m.setActive(false);
+                            installationService.saveSystemModule(m);
+                        });
+
                 return new BackgroundTaskResult<>(true, 0);
 
 
@@ -614,6 +629,13 @@ public class BackgroundTaskService {
             log.warn("Service {} is already running! - did not start it",service.getName());
             return new BackgroundTaskResult<>(true, 0, module.getName());
         }
+
+        if (installationService.moduleContains(module, DOCKERCOMPOSE_YML_TEMPLATE)) {
+            List<String> domains = parseDomainsFromEnv(module);
+            log.info("Module {} has a j2 template, now will populate with {}", module.getName(), domains);
+            fixComposeWithDomains(module, domains);
+        }
+
         Map<String, String> env = new HashMap<String, String>();
         env.put("SERVICE_NAME", module.getName());
         env.put("SERVICE_DIR", module.getModulePath());
@@ -641,6 +663,49 @@ public class BackgroundTaskService {
         }
 
         return new BackgroundTaskResult<Boolean, Integer>(false, -100, module.getName());
+    }
+
+    private void fixComposeWithDomains(SystemModule module, List<String> domains) {
+
+        try {
+            Map<String,String> env = new HashMap<>();
+            env.put("J2_TEMPLATE", DOCKERCOMPOSE_YML_TEMPLATE);
+            env.put("DATA_JSON",writeDomainsToJson(domains,module.getModulePath()));
+            env.put("J2_OUTPUT","docker-compose.yml");
+            env.put("WORK_DIR",module.getModulePath());
+
+            if (!executeScriptSimple("execComposeJ2.sh", env).getSuccess()) {
+                throw new IOException("Failed to complete J2 template execution for this docker-compose.yml template! module "+module);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private String writeDomainsToJson(List<String> domains, String modulePath) throws IOException {
+        File f = new File(modulePath, "j2data"+Long.toHexString(System.currentTimeMillis())+".json");
+        String formatted = " { \"local_domains\" : %s  } ";
+
+        Files.write(f.toPath(), String.format(formatted, domains).getBytes(Charset.forName("UTF-8")));
+        return f.getAbsolutePath();
+
+    }
+
+    private List<String> parseDomainsFromEnv(SystemModule module) {
+        List<String> domains = new ArrayList<>();
+        File envFile = new File(module.getModulePath(), ".env");
+
+        try {
+            domains.addAll(Files.readAllLines(envFile.toPath()).stream()
+                    .filter(line -> line.contains("_LOCAL"))
+                    .map(line -> line.split(Pattern.quote("="))[1])
+                    .collect(Collectors.toList()));
+            log.info("Domains discovered: {}",domains);
+        } catch (IOException e) {
+            log.error("Unable to parse domains from list, error {}",e.getMessage(),e);
+        }
+        return domains;
     }
 
     private void checkVHostCreation(SystemModule module, SystemService service) {
