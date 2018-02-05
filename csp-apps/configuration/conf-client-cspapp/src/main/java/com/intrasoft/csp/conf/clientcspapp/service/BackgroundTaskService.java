@@ -29,6 +29,7 @@ import java.io.*;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.nio.file.StandardCopyOption;
 import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -370,7 +371,7 @@ public class BackgroundTaskService {
                 // b. copy .env from homedir to the module dir
                 copyEnvironment(moduleInstallDirectory);
 
-                if (manifest.getFormat() > 1.0) {
+                if (manifest.getFormat() > 1.0 && customEnv != null) { // env.json is not mandatory
                     createCustomEnv(customEnv, installingModule);
                 }
                 // c. execute any first-time.sh found
@@ -433,7 +434,7 @@ public class BackgroundTaskService {
     }
 
     private void createCustomEnv(Environment customEnv, SystemModule installingModule) throws IOException {
-        final String envJsonFile = extractResource("shellscripts/templ/module.env.j2", modulesDirectory);
+        final String envTemplateFile = extractResource("shellscripts/templ/module.env.j2", modulesDirectory);
         final String cspSitesFile = extractResource("shellscripts/templ/csp-sites.conf.j2", modulesDirectory);
         String modulePrefix = installingModule.getName() + "." + installingModule.getStartPriority();
         final SystemInstallationState state = installationService.getState();
@@ -442,8 +443,8 @@ public class BackgroundTaskService {
         mergeEnvironment(customEnv, installingModule.getModulePath());
 
         Map<String,String> env = new HashMap<String, String>();
-        env.put("ENVJSON", envJsonFile);
-        env.put("J2ENV", installingModule.getModulePath() + "/env.json.merged");
+        env.put("ENVJSON", installingModule.getModulePath() + "/env.merged.json");
+        env.put("J2ENV",  envTemplateFile);
         env.put("SITESC", cspSitesFile);
         env.put("MODULE_PREFIX", modulePrefix);
         env.put("INT_IP", state.getCspRegistration().getInternalIPs().get(0));
@@ -468,8 +469,10 @@ public class BackgroundTaskService {
     private void mergeEnvironment(Environment customEnv, String modulePath) throws IOException {
         final String commonEnv = extractResource("shellscripts/templ/common.env.json", modulesDirectory);
         Environment global = jackson.readValue(new File(commonEnv), Environment.class);
-        global.setServices(customEnv.getServices());
-        jackson.writeValue(new File(modulePath, "env.json.merged"), global);//we write the merged one.
+        if (customEnv!= null) {
+            global.setServices(customEnv.getServices());
+        }
+        jackson.writeValue(new File(modulePath, "env.merged.json"), global);//we write the merged one.
     }
 
     private boolean needsVhost(Environment customEnv) {
@@ -503,10 +506,10 @@ public class BackgroundTaskService {
         StringBuilder allText = new StringBuilder();
         envMap.values().forEach( fileName -> {
             try {
-                allText.append("# file: ").append(fileName).append("\n");
+                allText.append("# file: ").append(fileName).append(" start\n");
                 IOUtils.readLines(new FileInputStream(new File(rootEnvDir,fileName)), "UTF8")
                         .forEach( l -> allText.append(l).append("\n"));
-                allText.append("# file: ").append(fileName).append("complete").append("\n");
+                allText.append("# file: ").append(fileName).append(" end\n");
             } catch (IOException e) {
                 log.error("Unable to read file {}/{}",rootEnvDir,fileName);
             }
@@ -736,7 +739,7 @@ public class BackgroundTaskService {
 
 
         } else {
-            log.info("No action - either already created or not needed");
+            log.info("Service {}. No action - either already created or not needed",service);
         }
     }
 
@@ -835,8 +838,7 @@ public class BackgroundTaskService {
         }
         log.info("Extracting {} to {}",scriptName, targetFile.getAbsolutePath());
 
-        //long total = FileHelper.copy(script.getInputStream(), targetFile.toPath(), null, StandardCopyOption.REPLACE_EXISTING);
-        FileHelper.copy(script.getFile().toPath(), targetFile.toPath());
+        long total = FileHelper.copy(script.getInputStream(), targetFile.toPath(), null, StandardCopyOption.REPLACE_EXISTING);
         return targetFile.getAbsolutePath();
     }
 }

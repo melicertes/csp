@@ -60,6 +60,13 @@
 			<artifactId>conf-commons</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/com.esotericsoftware.yamlbeans/yamlbeans -->
+		<dependency>
+			<groupId>com.esotericsoftware.yamlbeans</groupId>
+			<artifactId>yamlbeans</artifactId>
+			<version>1.08</version>
+		</dependency>
+
 
 
 		<!-- https://mvnrepository.com/artifact/commons-io/commons-io -->
