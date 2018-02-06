@@ -46,6 +46,9 @@ public class TrustCircle implements Serializable{
     private List<String> teams = null;
     @JsonProperty("created")
     private String created;
+
+    //TODO add two more fields used in local TC
+
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 

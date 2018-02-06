@@ -7,6 +7,7 @@ import com.intrasoft.csp.server.policy.domain.model.EvaluatedPolicyDTO;
 import com.intrasoft.csp.server.policy.domain.model.PolicyDTO;
 import com.intrasoft.csp.server.policy.domain.model.SharingPolicyAction;
 import com.intrasoft.csp.server.policy.service.SharingPolicyService;
+import com.intrasoft.csp.server.processors.TcProcessor;
 import com.intrasoft.csp.server.routes.RouteUtils;
 import com.intrasoft.csp.server.service.CamelRestService;
 import com.intrasoft.csp.server.utils.MockUtils;
@@ -17,6 +18,7 @@ import org.apache.camel.spring.SpringCamelContext;
 import org.apache.camel.test.spring.CamelSpringBootRunner;
 import org.apache.camel.test.spring.MockEndpointsAndSkip;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.*;
@@ -25,6 +27,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.rule.OutputCapture;
 import org.springframework.core.env.Environment;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
@@ -36,6 +39,7 @@ import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.anyString;
@@ -55,9 +59,10 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
                 "csp.retry.maxAttempts:1",
                 "embedded.activemq.start:false",
                 "apache.camel.use.activemq:false",
-                "internal.vulnerability.apps:taranis, misp"
+                "internal.vulnerability.apps:taranis, misp",
+                "server.camel.rest.service.is.async:false" //make it sync for better handling in tests (gracefull shutdown etc.)
         })
-@MockEndpointsAndSkip("http:*")
+@MockEndpointsAndSkip("http:*|https4-in://csp.*")
 public class CspServerInternalSandboxTestFlow1verbs implements CamelRoutes {
     private static final Logger LOG = LoggerFactory.getLogger(CspServerInternalSandboxTest.class);
 
@@ -108,6 +113,12 @@ public class CspServerInternalSandboxTestFlow1verbs implements CamelRoutes {
     @Autowired
     Environment env;
 
+    @Autowired
+    TcProcessor tcProcessor;
+
+    @Rule
+    public OutputCapture outputCapture = new OutputCapture();
+
     String elasticUri;
 
     private Integer numOfCspsToTest = 3;
@@ -118,9 +129,11 @@ public class CspServerInternalSandboxTestFlow1verbs implements CamelRoutes {
 
     protected String tcId = "tcId";
     protected String teamId = "teamId";
+    String tcShortNameToTest = IntegrationDataType.CTC_CSP_SHARING;//default
 
     @Before
     public void init() throws Exception {
+        this.outputCapture.flush();
         String tcIdArg = env.getProperty("extTcId");
         if(!StringUtils.isEmpty(tcIdArg)){
             tcId = tcIdArg;
@@ -129,6 +142,11 @@ public class CspServerInternalSandboxTestFlow1verbs implements CamelRoutes {
         String teamIdArg = env.getProperty("extTeamId");
         if(!StringUtils.isEmpty(teamIdArg)){
             teamId = teamIdArg;
+        }
+
+        String tcShortNameToTestArg = env.getProperty("tcShortNameToTest");
+        if(!StringUtils.isEmpty(tcShortNameToTestArg)){
+            tcShortNameToTest = tcShortNameToTestArg;
         }
 
         String dataObjectArg = env.getProperty("dataObject");
@@ -155,11 +173,21 @@ public class CspServerInternalSandboxTestFlow1verbs implements CamelRoutes {
         mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX, routes.apply(APP), mockedApp.getEndpointUri());
         mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX, routes.apply(DCL), mockedDcl.getEndpointUri());
 
-        Mockito.when(camelRestService.sendAndGetList(anyString(), anyObject(), eq("GET"), eq(TrustCircle.class), anyObject()))
+        /*Mockito.when(camelRestService.sendAndGetList(anyString(), anyObject(), eq("GET"), eq(TrustCircle.class), anyObject()))
                 .thenReturn(mockUtils.getAllMockedTrustCircles(this.numOfCspsToTest, IntegrationDataType.tcNamingConventionForShortName.get(this.dataTypeToTest)));
 
         Mockito.when(camelRestService.send(anyString(), anyObject(), eq("GET"), eq(TrustCircle.class)))
                 .thenReturn(mockUtils.getMockedTrustCircle(this.numOfCspsToTest, IntegrationDataType.tcNamingConventionForShortName.get(this.dataTypeToTest)));
+        */
+        String urlShouldContain = tcProcessor.getTcCirclesURI();
+        if(tcShortNameToTest.equalsIgnoreCase(IntegrationDataType.LTC_CSP_SHARING)){
+            urlShouldContain = tcProcessor.getLocalCirclesURI();
+        }
+        Mockito.when(camelRestService.sendAndGetList(Matchers.contains(urlShouldContain), anyObject(), eq("GET"), eq(TrustCircle.class), anyObject()))
+                .thenReturn(mockUtils.getAllMockedTrustCircles(this.numOfCspsToTest, tcShortNameToTest));
+
+        Mockito.when(camelRestService.send(Matchers.contains(urlShouldContain), anyObject(), eq("GET"), eq(TrustCircle.class)))
+                .thenReturn(mockUtils.getMockedTrustCircle(this.numOfCspsToTest, tcShortNameToTest));
 
         Mockito.when(camelRestService.send(anyString(), anyObject(), eq("GET"), eq(Team.class)))
                 .thenReturn(mockUtils.getMockedTeam(1, "http://external.csp%s.com"))
@@ -180,42 +208,42 @@ public class CspServerInternalSandboxTestFlow1verbs implements CamelRoutes {
     @Test
     public void dslFlow1DataTypePostToShareTest() throws Exception {
         mockUtils.sendFlow1Data(mvc,serverName, applicationId,false, true, this.dataTypeToTest, HttpMethods.POST.name());
-        assertPostPutFlow(3);
+        assertPostPutFlow(3,true);
     }
 
     @DirtiesContext
     @Test
     public void dslFlow1TcIdPostToShareTest() throws Exception {
         mockUtils.sendFlow1Data(mvc,serverName, applicationId,tcId,null,false, true, this.dataTypeToTest, HttpMethods.POST.name());
-        assertPostPutFlow(3);
+        assertPostPutFlow(3,false);
     }
 
     @DirtiesContext
     @Test
     public void dslFlow1TeamIdPostToShareTest() throws Exception {
         mockUtils.sendFlow1Data(mvc,serverName, applicationId,null,teamId,false, true, this.dataTypeToTest, HttpMethods.POST.name());
-        assertPostPutFlow(1);
+        assertPostPutFlow(1,false);
     }
 
     @DirtiesContext
     @Test
     public void dslFlow1DataTypePutToShareTest() throws Exception {
         mockUtils.sendFlow1Data(mvc, serverName,applicationId,false, true, this.dataTypeToTest, HttpMethods.PUT.name());
-        assertPostPutFlow(3);
+        assertPostPutFlow(3,true);
     }
 
     @DirtiesContext
     @Test
     public void dslFlow1TcIdPutToShareTest() throws Exception {
         mockUtils.sendFlow1Data(mvc, serverName,applicationId,tcId, null,false, true, this.dataTypeToTest, HttpMethods.PUT.name());
-        assertPostPutFlow(3);
+        assertPostPutFlow(3,false);
     }
 
     @DirtiesContext
     @Test
     public void dslFlow1TeamIdPutToShareTest() throws Exception {
         mockUtils.sendFlow1Data(mvc, serverName,applicationId,null,teamId,false, true, this.dataTypeToTest, HttpMethods.PUT.name());
-        assertPostPutFlow(1);
+        assertPostPutFlow(1,false);
     }
 
     @DirtiesContext
@@ -247,7 +275,7 @@ public class CspServerInternalSandboxTestFlow1verbs implements CamelRoutes {
     }
 
 
-    private void assertPostPutFlow(Integer expectedEcspMessages) throws Exception {
+    private void assertPostPutFlow(Integer expectedEcspMessages,boolean assertTcShortName) throws Exception {
        /*
         DSL
          */
@@ -335,6 +363,12 @@ public class CspServerInternalSandboxTestFlow1verbs implements CamelRoutes {
             Message in = exchange.getIn();
             IntegrationData data = in.getBody(IntegrationData.class);
             assertThat(data.getDataType(), is(this.dataTypeToTest));
+        }
+
+        if(assertTcShortName) {
+            String output = this.outputCapture.toString();
+            //assertTrue( output, output.contains("Using "+tcShortNameToTest+".."));
+            assertThat(output, containsString("Using " + tcShortNameToTest + ".."));
         }
     }
 

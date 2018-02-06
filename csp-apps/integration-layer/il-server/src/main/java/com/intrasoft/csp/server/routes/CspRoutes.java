@@ -1,9 +1,11 @@
 package com.intrasoft.csp.server.routes;
 
 import com.intrasoft.csp.commons.exceptions.ErrorLogException;
+import com.intrasoft.csp.commons.exceptions.InvalidDataTypeException;
 import com.intrasoft.csp.commons.exceptions.InvalidSharingParamsException;
 import com.intrasoft.csp.commons.routes.CamelRoutes;
 import com.intrasoft.csp.server.processors.*;
+import com.sun.media.sound.InvalidDataException;
 import org.apache.camel.ExchangePattern;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.builder.RouteBuilder;
@@ -77,6 +79,7 @@ public class CspRoutes extends RouteBuilder implements CamelRoutes{
         //just handle the specific exception without any redelivery, just let the exceptionProcessor log the error
         onException(ErrorLogException.class).process(exceptionProcessor).handled(true);
         onException(InvalidSharingParamsException.class).process(exceptionProcessor).handled(true);
+        onException(InvalidDataException.class).process(exceptionProcessor).handled(true);
 
         from(endpoint.apply(DSL))
                 .setExchangePattern(ExchangePattern.InOnly)

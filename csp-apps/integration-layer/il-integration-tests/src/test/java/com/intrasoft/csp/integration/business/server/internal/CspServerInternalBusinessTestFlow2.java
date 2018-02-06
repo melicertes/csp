@@ -41,6 +41,7 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
         properties = {
                 "spring.datasource.url:jdbc:h2:mem:csp_policy",
                 "flyway.enabled:false",
+                "server.camel.rest.service.is.async:false" //make it sync for better handling in tests (gracefull shutdown etc.)
         /*
         //added in application-dangerduck.properties
                 "consume.errorq.on.interval:false",
@@ -124,6 +125,7 @@ public class CspServerInternalBusinessTestFlow2 implements CamelRoutes {
     private String cspId = "CERT-GR";
     String tcId = "tcId";
     String teamId = "teamId";
+    String tcShortNameToTest = IntegrationDataType.CTC_CSP_SHARING;//default
 
     @Before
     public void init() throws Exception {
@@ -147,6 +149,12 @@ public class CspServerInternalBusinessTestFlow2 implements CamelRoutes {
         if(!StringUtils.isEmpty(teamIdArg)){
             teamId = teamIdArg;
         }
+
+        String tcShortNameToTestArg = env.getProperty("tcShortNameToTest");
+        if(!StringUtils.isEmpty(tcShortNameToTestArg)){
+            tcShortNameToTest = tcShortNameToTestArg;
+        }
+
         //cspId = env.getProperty("server.name");
         mvc = webAppContextSetup(webApplicationContext).build();
         mockUtils.setSpringCamelContext(springCamelContext);
