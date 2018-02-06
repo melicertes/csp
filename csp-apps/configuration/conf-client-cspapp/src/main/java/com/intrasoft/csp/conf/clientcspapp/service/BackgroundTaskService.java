@@ -783,7 +783,6 @@ public class BackgroundTaskService {
 
                 rOAM = executeScriptSimple(EXEC_CONT_SCRIPT_SH, env);
                 //TODO do something with result, do we care if oam is left running at the end?
-
                 //start apache if not started
                 boolean apacheStarted = true; //assume it is already started.
                 if (installationService.queryService(moduleAPC).getServiceState()==ServiceState.NOT_RUNNING) {
@@ -802,18 +801,22 @@ public class BackgroundTaskService {
                 } else {
                     log.error("Apache is not running? failure!!!");
                 }
-
+                if (rOAM.getSuccess() && rAPC.getSuccess()) {
+                    log.info("Saving OAM creation date for service {}",service.getName());
+                    service.setOamAgentCreated(LocalDateTime.now());
+                    service = installationService.updateSystemService(service);
+                }
             } else {
-                log.error("OAM IS NOT RUNNING - failure!");
+                log.error("OAM IS NOT RUNNING - failure! for service {}",service.getName());
             }
 
-            log.info("ACTIONS COMPLETED: OAM : {} - APC : {}",
+            log.info("ACTIONS COMPLETED: OAM : {} - APC : {} for service {}",
                     rOAM != null ? rOAM.getSuccess() : false,
-                    rAPC != null ? rAPC.getSuccess() : false);
+                    rAPC != null ? rAPC.getSuccess() : false, service.getName());
 
 
         } else {
-            log.info("Service {}. No action - either already created or not needed",service);
+            log.info("Service {}. No action - either already created or not needed",service.getName());
         }
     }
 
