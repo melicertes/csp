@@ -593,10 +593,10 @@ public class BackgroundTaskService {
                         copyEnvironment(module.getModulePath());
                         log.info("Environment merged");
 
-                        checkOAMAgentCreation(module,service);
+                        service = checkOAMAgentCreation(module,service);
                         log.info("OAM agent completed");
 
-                        checkVHostCreation(module,service);
+                        service = checkVHostCreation(module,service);
                         log.info("Apache agent completed");
 
                     } catch (IOException e) {
@@ -717,7 +717,7 @@ public class BackgroundTaskService {
         return domains;
     }
 
-    private void checkVHostCreation(SystemModule module, SystemService service) {
+    private SystemService checkVHostCreation(SystemModule module, SystemService service) {
         //we copy the vhost configuration from the $HOME folder to the apache folders
         if (service.getVHostNecessary() && service.getVhostCreated() == null) {
             String confFileName = "csp-sites." + module.getName() + "." + module.getStartPriority() + ".conf";
@@ -729,7 +729,7 @@ public class BackgroundTaskService {
                     IOUtils.copy(input, output);
 
                     service.setVhostCreated(LocalDateTime.now());
-                    installationService.updateSystemService(service);
+                    service = installationService.updateSystemService(service);
                     log.info("Service {} updated",service);
                 } catch (IOException ioe) {
                     log.error("Failed to copy {}",ioe.getMessage(),ioe);
@@ -739,10 +739,10 @@ public class BackgroundTaskService {
                         module.getName(), confFile.getAbsolutePath());
             }
         }
-
+        return service;
     }
 
-    private void checkOAMAgentCreation(SystemModule module, SystemService service) throws IOException {
+    private SystemService checkOAMAgentCreation(SystemModule module, SystemService service) throws IOException {
         final SystemModule moduleOAM = installationService.queryModuleByName(moduleOAMname, true);
         final SystemModule moduleAPC = installationService.queryModuleByName(moduleAPCname, true);
         BackgroundTaskResult<Boolean, Integer> oamStarted = null;
@@ -818,6 +818,7 @@ public class BackgroundTaskService {
         } else {
             log.info("Service {}. No action - either already created or not needed",service.getName());
         }
+        return service;
     }
 
     /**
