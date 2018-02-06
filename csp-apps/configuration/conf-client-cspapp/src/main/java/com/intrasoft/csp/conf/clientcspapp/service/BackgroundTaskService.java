@@ -594,10 +594,8 @@ public class BackgroundTaskService {
                         log.info("Environment merged");
 
                         service = checkOAMAgentCreation(module,service);
-                        log.info("OAM agent completed");
 
                         service = checkVHostCreation(module,service);
-                        log.info("Apache agent completed");
 
                     } catch (IOException e) {
                         log.error("Failed to copy ENVIRONMENT! {}", e.getMessage(),e);

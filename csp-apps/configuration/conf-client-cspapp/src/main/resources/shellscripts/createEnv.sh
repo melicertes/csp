@@ -13,8 +13,17 @@ function createEnvironment() {
 	sed -i.bak13 "s#XXXMAILUSERNAMEXXX#${MAIL_USERNAME}#g" "${ENVJSON}"
 	sed -i.bak14 "s#XXXMAILPASSWORDXXX#${MAIL_PASSWORD}#g" "${ENVJSON}"
 
+    echo ""
+    echo ""
+    echo ""
+    echo "${ENVJSON}"
+    cat ${ENVJSON}
 
-        ### verify j2 presence
+    echo ""
+    echo ""
+    echo ""
+
+    ### verify j2 presence
 	local J2=$(which j2)
 	local CLI=$( $J2 -v 2>&1 >/dev/null |  grep j2cli|wc -l )
 
@@ -27,9 +36,15 @@ function createEnvironment() {
 	fi
 
     echo "User home is set to $HOME"
+    echo "--------------"
 
     ### generate env file (common has priority 0)
+    echo "executing : $J2 $J2ENV $ENVJSON "
 	$J2 $J2ENV $ENVJSON > $HOME/common.0.env
+
+    echo "Env created in $HOME"
+    ls -la $HOME | grep env
+    echo "--------------"
 
     ## generate sites conf
 	## $J2 $SITESC $ENVJSON  > $HOME/csp-sites.conf
