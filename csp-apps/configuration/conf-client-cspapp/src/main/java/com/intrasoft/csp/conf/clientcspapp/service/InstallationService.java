@@ -146,18 +146,17 @@ public class InstallationService {
                     .module(savedModule)
                     .serviceState(ServiceState.NOT_RUNNING)
                     .name(module.getName())
-                    .startable(moduleContains(module,"docker-compose.yml"))
                     .build();
         } else {
             systemService.setModule(savedModule);
-            systemService.setStartable(
-                    moduleContains(module,"docker-compose.yml") ||
-                    moduleContains(module, "docker-compose.yml.j2"));
         }
         systemService.setLegacy(legacyMode);
         systemService.setOamAgentNecessary(needsAgent);
         systemService.setVHostNecessary(needsVhost);
-
+        systemService.setStartable(
+                moduleContains(module,"docker-compose.yml") ||
+                moduleContains(module, "docker-compose.yml.j2"));
+        log.info("Created service {}",systemService);
         return serviceRepository.save(systemService);
 
     }
