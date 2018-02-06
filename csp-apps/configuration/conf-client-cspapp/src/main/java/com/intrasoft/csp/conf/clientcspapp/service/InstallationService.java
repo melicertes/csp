@@ -113,7 +113,7 @@ public class InstallationService {
     public SystemModule queryModuleByName(String name, boolean active) {
         List<SystemModule> module = moduleRepository.findByNameAndActiveOrderByIdDesc(name, active);
         if (module != null && module.size()==1) {
-            log.info("Module {} retrieved!", module);
+            log.info("Module list size : {} retrieved!", module.size());
             return module.get(0);
         } else {
             log.error("System error: {} Modules cannot have same name and active=true more than once!!!", module);
@@ -124,7 +124,7 @@ public class InstallationService {
     public SystemModule queryModuleByHash(String hash) {
         SystemModule module = moduleRepository.findOneByHash(hash);
         if (module != null) {
-            log.info("Module {} retrieved!", module);
+            log.debug("Module {} retrieved!", module.getName());
         }
         return module;
     }

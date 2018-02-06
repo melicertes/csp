@@ -774,12 +774,12 @@ public class BackgroundTaskService {
             // lets query oam is running now
             if (installationService.queryService(moduleOAM).getServiceState()==ServiceState.RUNNING) {
                 // so lets register the agent now
-                Map<String, String> env = new HashMap<>();
-                env.put("C_NAME", "csp-" + moduleOAMname);
-                env.put("C_SCRIPT", "create-agent.sh");
-                env.put("C_EXTNAME", service.getModule().getExternalName());
+                Map<String, String> envOAM = new HashMap<>();
+                envOAM.put("C_NAME", "csp-" + moduleOAMname);
+                envOAM.put("C_SCRIPT", "create-agent.sh");
+                envOAM.put("C_EXTNAME", service.getModule().getExternalName());
 
-                rOAM = executeScriptSimple(EXEC_CONT_SCRIPT_SH, env);
+                rOAM = executeScriptSimple(EXEC_CONT_SCRIPT_SH, envOAM);
                 //TODO do something with result, do we care if oam is left running at the end?
                 //start apache if not started
                 boolean apacheStarted = true; //assume it is already started.
@@ -788,11 +788,11 @@ public class BackgroundTaskService {
                 }
 
                 if (apacheStarted) {
-                    Map<String, String> apc = new HashMap<>();
-                    env.put("C_NAME", "csp-" + moduleAPCname);
-                    env.put("C_SCRIPT", "create-agent.sh");
-                    env.put("C_EXTNAME", service.getModule().getExternalName());
-                    rAPC = executeScriptSimple(EXEC_CONT_SCRIPT_SH, apc);
+                    Map<String, String> envAPC = new HashMap<>();
+                    envAPC.put("C_NAME", "csp-" + moduleAPCname);
+                    envAPC.put("C_SCRIPT", "create-agent.sh");
+                    envAPC.put("C_EXTNAME", service.getModule().getExternalName());
+                    rAPC = executeScriptSimple(EXEC_CONT_SCRIPT_SH, envAPC);
 
                     stopSingleService(moduleAPC, installationService.queryService(moduleAPC));
 
@@ -889,7 +889,7 @@ public class BackgroundTaskService {
         if (env != null) {
             envVars.putAll(env);
         }
-
+        log.info("Environment for execution: {}", envVars);
         //execute script
         int exitCode = externalProcessService.executeExternalProcess(modulesDirectory, Optional.of(envVars),
                 "sh", "-c", "./"+ scriptName);
