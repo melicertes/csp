@@ -150,7 +150,9 @@ public class InstallationService {
                     .build();
         } else {
             systemService.setModule(savedModule);
-            systemService.setStartable(moduleContains(module,"docker-compose.yml"));
+            systemService.setStartable(
+                    moduleContains(module,"docker-compose.yml") ||
+                    moduleContains(module, "docker-compose.yml.j2"));
         }
         systemService.setLegacy(legacyMode);
         systemService.setOamAgentNecessary(needsAgent);
