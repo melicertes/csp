@@ -290,7 +290,6 @@ public class BackgroundTaskService {
                 //extract resources needed
                 final String envJsonFile = extractResource("shellscripts/templ/common.env.json", modulesDirectory);
                 final String envFile = extractResource("shellscripts/templ/common.env.j2", modulesDirectory);
-                //final String cspSitesFile = extractResource("shellscripts/templ/csp-sites.conf.j2", modulesDirectory);
 
 
                 Map<String,String> env = new HashMap<String, String>();
@@ -449,13 +448,28 @@ public class BackgroundTaskService {
     }
 
     private void createCustomEnv(Environment customEnv, SystemModule installingModule) throws IOException {
-        final String envTemplateFile = extractResource("shellscripts/templ/module.env.j2", modulesDirectory);
-        final String cspSitesFile = extractResource("shellscripts/templ/csp-sites.conf.j2", modulesDirectory);
+        //not final; it may be overwritten by module
+        String cspSitesFile = extractResource("shellscripts/templ/csp-sites.conf.j2", modulesDirectory);
         String modulePrefix = installingModule.getName() + "." + installingModule.getStartPriority();
+
+        final String envTemplateFile = extractResource("shellscripts/templ/module.env.j2", modulesDirectory);
         final SystemInstallationState state = installationService.getState();
         final SmtpDetails smtp = state.getSmtpDetails();
 
         mergeEnvironment(customEnv, installingModule.getModulePath());
+
+        //custom file for csp-sites.conf.j2
+        File customSitesConf = new File(installingModule.getModulePath(), "site-config");
+        if (customSitesConf.exists() && customSitesConf.isDirectory()) {
+            File customSiteConfiguration = customSitesConf.listFiles()[0];
+            if (customSiteConfiguration.exists() && customSiteConfiguration.isFile()) {
+                log.info("Custom SITE CONFIGURATION (vhosts) has been detected: {}", customSiteConfiguration.getAbsolutePath());
+                cspSitesFile = customSiteConfiguration.getAbsolutePath();
+            }
+
+        }
+
+
 
         Map<String,String> env = new HashMap<String, String>();
         env.put("ENVJSON", installingModule.getModulePath() + "/env.merged.json");
@@ -470,7 +484,7 @@ public class BackgroundTaskService {
             env.put("MAIL_USERNAME", smtp.getUserName());
             env.put("MAIL_PASSWORD", smtp.getPassword());
         }
-        log.debug("Configured environment variables: {}",env);
+        log.info("Configured environment variables: {}",env);
 
         executeScriptSimple(ENV_MODULE_CREATION_SH, env);
 
