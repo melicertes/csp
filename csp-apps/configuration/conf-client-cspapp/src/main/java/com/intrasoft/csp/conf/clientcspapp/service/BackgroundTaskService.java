@@ -345,8 +345,15 @@ public class BackgroundTaskService {
                         log.warn("Manifest version 1.1 detected!");
                         if (installationService.moduleContains(installingModule, "env.json") ) {
                             customEnv = jackson.readValue(new File(moduleInstallDirectory, "env.json"), Environment.class);
-                            installingModule.setExternalName(customEnv.getServices().get(0).getExternalName());
-                            log.info("Service {} external name is {}", installingModule.getName(), installingModule.getExternalName());
+                            if (customEnv.getServices().size() == 1) {
+                                installingModule.setExternalName(customEnv.getServices().get(0).getExternalName());
+
+                            } else {
+                                List<String> names = customEnv.getServices().stream().map( s -> s.getExternalName()).collect(Collectors.toList());
+                                String namesjoined = String.join("|", names);
+                                installingModule.setExternalName(namesjoined);
+                            }
+                            log.info("Service {} external names found {}", installingModule.getName(), installingModule.getExternalName().split(Pattern.quote("|")));
                         }
                     } else {
                         log.error("Unsupported manifest.json !!! Rejected!!");
@@ -785,41 +792,50 @@ public class BackgroundTaskService {
             BackgroundTaskResult<Boolean, Integer> rOAM = null;
             BackgroundTaskResult<Boolean, Integer> rAPC = null;
 
-            // lets query oam is running now
-            if (installationService.queryService(moduleOAM).getServiceState()==ServiceState.RUNNING) {
-                // so lets register the agent now
-                Map<String, String> envOAM = new HashMap<>();
-                envOAM.put("C_NAME", "csp-" + moduleOAMname);
-                envOAM.put("C_SCRIPT", "create-agent.sh");
-                envOAM.put("C_EXTNAME", service.getModule().getExternalName());
+            // multiple agents and apache registrations are needed?
+            boolean totalSuccess = true;
+            String[] serviceNames = service.getModule().getExternalName().split(Pattern.quote("|"));
+            for (String serviceName : serviceNames) {
+                if (installationService.queryService(moduleOAM).getServiceState()==ServiceState.RUNNING) {
+                    // so lets register the agent now
+                    Map<String, String> envOAM = new HashMap<>();
+                    envOAM.put("C_NAME", "csp-" + moduleOAMname);
+                    envOAM.put("C_SCRIPT", "create-agent.sh");
+                    envOAM.put("C_EXTNAME", serviceName);
 
-                rOAM = executeScriptSimple(EXEC_CONT_SCRIPT_SH, envOAM);
-                //TODO do something with result, do we care if oam is left running at the end?
-                //start apache if not started
-                boolean apacheStarted = true; //assume it is already started.
-                if (installationService.queryService(moduleAPC).getServiceState()==ServiceState.NOT_RUNNING) {
-                    apacheStarted = startSingleService(moduleAPC, installationService.queryService(moduleAPC)).getSuccess();
-                }
+                    rOAM = executeScriptSimple(EXEC_CONT_SCRIPT_SH, envOAM);
+                    //TODO do something with result, do we care if oam is left running at the end?
+                    //start apache if not started
+                    boolean apacheStarted = true; //assume it is already started.
+                    if (installationService.queryService(moduleAPC).getServiceState()==ServiceState.NOT_RUNNING) {
+                        apacheStarted = startSingleService(moduleAPC, installationService.queryService(moduleAPC)).getSuccess();
+                    }
 
-                if (apacheStarted) {
-                    Map<String, String> envAPC = new HashMap<>();
-                    envAPC.put("C_NAME", "csp-" + moduleAPCname);
-                    envAPC.put("C_SCRIPT", "create-agent.sh");
-                    envAPC.put("C_EXTNAME", service.getModule().getExternalName());
-                    rAPC = executeScriptSimple(EXEC_CONT_SCRIPT_SH, envAPC);
+                    if (apacheStarted) {
+                        Map<String, String> envAPC = new HashMap<>();
+                        envAPC.put("C_NAME", "csp-" + moduleAPCname);
+                        envAPC.put("C_SCRIPT", "create-agent.sh");
+                        envAPC.put("C_EXTNAME", serviceName);
+                        rAPC = executeScriptSimple(EXEC_CONT_SCRIPT_SH, envAPC);
 
-                    stopSingleService(moduleAPC, installationService.queryService(moduleAPC));
+                        stopSingleService(moduleAPC, installationService.queryService(moduleAPC));
 
+                    } else {
+                        log.error("Apache is not running? failure!!!");
+                    }
+                    if (rOAM.getSuccess() && rAPC.getSuccess()) {
+                        totalSuccess &= rOAM.getSuccess();
+                    } else {
+                        totalSuccess = false;
+                    }
                 } else {
-                    log.error("Apache is not running? failure!!!");
+                    log.error("OAM IS NOT RUNNING - failure! for service {}",service.getName());
                 }
-                if (rOAM.getSuccess() && rAPC.getSuccess()) {
-                    log.info("Saving OAM creation date for service {}",service.getName());
-                    service.setOamAgentCreated(LocalDateTime.now());
-                    service = installationService.updateSystemService(service);
-                }
-            } else {
-                log.error("OAM IS NOT RUNNING - failure! for service {}",service.getName());
+            }
+            if (totalSuccess) {
+                log.info("Saving OAM creation date for service {}",service.getName());
+                service.setOamAgentCreated(LocalDateTime.now());
+                service = installationService.updateSystemService(service);
             }
 
             log.info("ACTIONS COMPLETED: OAM : {} - APC : {} for service {}",

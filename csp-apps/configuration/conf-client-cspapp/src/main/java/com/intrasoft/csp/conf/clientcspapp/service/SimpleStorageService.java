@@ -21,6 +21,7 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Stream;
 
 /**
@@ -42,7 +43,20 @@ public class SimpleStorageService {
             target.delete();
         }
 
-        FileHelper.copy(stream, target.toPath(), (input, output) -> log.info("Downloaded : {} ", FileHelper.bytesToKB(output.getBytesWritten())));
+        AtomicLong count = new AtomicLong(0);
+        AtomicLong timeMs = new AtomicLong(System.currentTimeMillis());
+
+        FileHelper.copy(stream, target.toPath(), (input, output) -> {
+            long now = System.currentTimeMillis();
+            final long totalWritten = output.getBytesWritten();
+            double currentBytes = (totalWritten - count.get())*1.0/1024;
+            double currentSec = (now - timeMs.get())*1.0/1000;
+            count.set(totalWritten);
+            timeMs.set(now);
+
+            log.info("Downloaded : {} - link speed: {} KB/sec", FileHelper.bytesToKB(totalWritten),
+                    Math.floor(currentBytes/currentSec));
+        });
 
         log.info("Saved {} (size: {} bytes)", target.getName(), target.length());
         return target.getAbsolutePath();
