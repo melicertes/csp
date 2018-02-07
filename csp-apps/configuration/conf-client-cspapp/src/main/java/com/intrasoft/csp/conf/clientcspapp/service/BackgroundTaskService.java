@@ -593,11 +593,9 @@ public class BackgroundTaskService {
                         copyEnvironment(module.getModulePath());
                         log.info("Environment merged");
 
-                        checkOAMAgentCreation(module,service);
-                        log.info("OAM agent completed");
+                        service = checkOAMAgentCreation(module,service);
 
-                        checkVHostCreation(module,service);
-                        log.info("Apache agent completed");
+                        service = checkVHostCreation(module,service);
 
                     } catch (IOException e) {
                         log.error("Failed to copy ENVIRONMENT! {}", e.getMessage(),e);
@@ -717,7 +715,7 @@ public class BackgroundTaskService {
         return domains;
     }
 
-    private void checkVHostCreation(SystemModule module, SystemService service) {
+    private SystemService checkVHostCreation(SystemModule module, SystemService service) {
         //we copy the vhost configuration from the $HOME folder to the apache folders
         if (service.getVHostNecessary() && service.getVhostCreated() == null) {
             String confFileName = "csp-sites." + module.getName() + "." + module.getStartPriority() + ".conf";
@@ -729,7 +727,7 @@ public class BackgroundTaskService {
                     IOUtils.copy(input, output);
 
                     service.setVhostCreated(LocalDateTime.now());
-                    installationService.updateSystemService(service);
+                    service = installationService.updateSystemService(service);
                     log.info("Service {} updated",service);
                 } catch (IOException ioe) {
                     log.error("Failed to copy {}",ioe.getMessage(),ioe);
@@ -739,10 +737,10 @@ public class BackgroundTaskService {
                         module.getName(), confFile.getAbsolutePath());
             }
         }
-
+        return service;
     }
 
-    private void checkOAMAgentCreation(SystemModule module, SystemService service) throws IOException {
+    private SystemService checkOAMAgentCreation(SystemModule module, SystemService service) throws IOException {
         final SystemModule moduleOAM = installationService.queryModuleByName(moduleOAMname, true);
         final SystemModule moduleAPC = installationService.queryModuleByName(moduleAPCname, true);
         BackgroundTaskResult<Boolean, Integer> oamStarted = null;
@@ -776,14 +774,13 @@ public class BackgroundTaskService {
             // lets query oam is running now
             if (installationService.queryService(moduleOAM).getServiceState()==ServiceState.RUNNING) {
                 // so lets register the agent now
-                Map<String, String> env = new HashMap<>();
-                env.put("C_NAME", "csp-" + moduleOAMname);
-                env.put("C_SCRIPT", "create-agent.sh");
-                env.put("C_EXTNAME", service.getModule().getExternalName());
+                Map<String, String> envOAM = new HashMap<>();
+                envOAM.put("C_NAME", "csp-" + moduleOAMname);
+                envOAM.put("C_SCRIPT", "create-agent.sh");
+                envOAM.put("C_EXTNAME", service.getModule().getExternalName());
 
-                rOAM = executeScriptSimple(EXEC_CONT_SCRIPT_SH, env);
+                rOAM = executeScriptSimple(EXEC_CONT_SCRIPT_SH, envOAM);
                 //TODO do something with result, do we care if oam is left running at the end?
-
                 //start apache if not started
                 boolean apacheStarted = true; //assume it is already started.
                 if (installationService.queryService(moduleAPC).getServiceState()==ServiceState.NOT_RUNNING) {
@@ -791,30 +788,35 @@ public class BackgroundTaskService {
                 }
 
                 if (apacheStarted) {
-                    Map<String, String> apc = new HashMap<>();
-                    env.put("C_NAME", "csp-" + moduleAPCname);
-                    env.put("C_SCRIPT", "create-agent.sh");
-                    env.put("C_EXTNAME", service.getModule().getExternalName());
-                    rAPC = executeScriptSimple(EXEC_CONT_SCRIPT_SH, apc);
+                    Map<String, String> envAPC = new HashMap<>();
+                    envAPC.put("C_NAME", "csp-" + moduleAPCname);
+                    envAPC.put("C_SCRIPT", "create-agent.sh");
+                    envAPC.put("C_EXTNAME", service.getModule().getExternalName());
+                    rAPC = executeScriptSimple(EXEC_CONT_SCRIPT_SH, envAPC);
 
                     stopSingleService(moduleAPC, installationService.queryService(moduleAPC));
 
                 } else {
                     log.error("Apache is not running? failure!!!");
                 }
-
+                if (rOAM.getSuccess() && rAPC.getSuccess()) {
+                    log.info("Saving OAM creation date for service {}",service.getName());
+                    service.setOamAgentCreated(LocalDateTime.now());
+                    service = installationService.updateSystemService(service);
+                }
             } else {
-                log.error("OAM IS NOT RUNNING - failure!");
+                log.error("OAM IS NOT RUNNING - failure! for service {}",service.getName());
             }
 
-            log.info("ACTIONS COMPLETED: OAM : {} - APC : {}",
+            log.info("ACTIONS COMPLETED: OAM : {} - APC : {} for service {}",
                     rOAM != null ? rOAM.getSuccess() : false,
-                    rAPC != null ? rAPC.getSuccess() : false);
+                    rAPC != null ? rAPC.getSuccess() : false, service.getName());
 
 
         } else {
-            log.info("Service {}. No action - either already created or not needed",service);
+            log.info("Service {}. No action - either already created or not needed",service.getName());
         }
+        return service;
     }
 
     /**
@@ -887,7 +889,7 @@ public class BackgroundTaskService {
         if (env != null) {
             envVars.putAll(env);
         }
-
+        log.info("Environment for execution: {}", envVars);
         //execute script
         int exitCode = externalProcessService.executeExternalProcess(modulesDirectory, Optional.of(envVars),
                 "sh", "-c", "./"+ scriptName);
