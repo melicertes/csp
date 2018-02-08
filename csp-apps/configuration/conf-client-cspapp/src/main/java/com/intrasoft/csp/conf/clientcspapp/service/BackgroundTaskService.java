@@ -6,6 +6,7 @@ import com.intrasoft.csp.conf.client.ConfClient;
 import com.intrasoft.csp.conf.clientcspapp.model.*;
 import com.intrasoft.csp.conf.clientcspapp.model.json.Environment;
 import com.intrasoft.csp.conf.clientcspapp.model.json.Manifest;
+import com.intrasoft.csp.conf.clientcspapp.model.json.Service;
 import com.intrasoft.csp.conf.clientcspapp.util.FileHelper;
 import com.intrasoft.csp.conf.clientcspapp.util.TimeHelper;
 import com.intrasoft.csp.conf.commons.model.api.*;
@@ -22,7 +23,8 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Service;
+
+import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.io.*;
@@ -41,7 +43,7 @@ import java.util.stream.Collectors;
 /**
  * Created by tangelatos on 06/09/2017.
  */
-@Service
+@Component
 @Slf4j
 public class BackgroundTaskService {
 
@@ -515,14 +517,15 @@ public class BackgroundTaskService {
         if (customEnv == null) {
             return false;
         }
-        com.intrasoft.csp.conf.clientcspapp.model.json.Service srv = customEnv.getServices().get(0);
-        return !StringUtils.isEmpty(srv.getInternalName()) ||
-                !StringUtils.isEmpty(srv.getExternalName());
+        long vHostCounter = customEnv.getServices().stream()
+                .filter( s -> !StringUtils.isEmpty(s.getExternalName()) || !StringUtils.isEmpty(s.getInternalName()))
+                .count();
+        return vHostCounter >= 1;
 
     }
 
     private boolean needsAgent(Environment customEnv) {
-        return customEnv == null ? false : customEnv.getServices().get(0).isAgent();
+        return customEnv != null && customEnv.getServices().stream().filter(Service::isAgent).count() >= 1;
     }
 
     private void copyEnvironment(String targetDirectory) throws IOException{
@@ -587,14 +590,27 @@ public class BackgroundTaskService {
 
                 storageService.deleteDirectoryAndContents(module.getModulePath());
                 module.setModuleState(ModuleState.DOWNLOADED);
+
                 module.setActive(false);
                 installationService.removeService(service);
+
+                File vHostDir = new File(vhostDirectory);
+                final File[] files = vHostDir.listFiles(file -> file.getName().contains(module.getName() + "." + module.getStartPriority()));
+
+                for (File file : files) {
+                    log.info("Deleting {} from vhost directory",file);
+                    boolean d = file.delete();
+                    if (!d) {
+                        log.error("Failed to delete file: {} - problem in installation and re-install",file);
+                    }
+                }
+
                 log.info("Module {} has been removed and service deleted", module.getName());
-                return new BackgroundTaskResult<>(true, 0);
+                return new BackgroundTaskResult<>(true, 0, module.getName());
             } catch (IOException e) {
                 log.error("Exception removing module {} with error {}",module.getName(), e.getMessage(),e);
             }
-            return new BackgroundTaskResult<>(false, -1);
+            return new BackgroundTaskResult<>(false, -1, module.getName());
         });
     }
 
@@ -746,10 +762,9 @@ public class BackgroundTaskService {
             if (confFile.exists()) {
                 try (Reader input = new FileReader(confFile); Writer output = new FileWriter(outFile)) {
                     IOUtils.copy(input, output);
-
                     service.setVhostCreated(LocalDateTime.now());
                     service = installationService.updateSystemService(service);
-                    log.info("Service {} updated",service);
+                    log.info("Service {} vHost configuration copied to apache", service.getName());
                 } catch (IOException ioe) {
                     log.error("Failed to copy {}",ioe.getMessage(),ioe);
                 }
