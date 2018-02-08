@@ -10,7 +10,6 @@ import com.intrasoft.csp.commons.exceptions.ErrorLogException;
 import com.intrasoft.csp.commons.exceptions.InvalidSharingParamsException;
 import com.intrasoft.csp.commons.model.*;
 import com.intrasoft.csp.commons.routes.CamelRoutes;
-import com.intrasoft.csp.libraries.restclient.exceptions.CspBusinessException;
 import com.intrasoft.csp.server.policy.domain.model.EvaluatedPolicyDTO;
 import com.intrasoft.csp.server.policy.domain.model.SharingPolicyAction;
 import com.intrasoft.csp.server.policy.service.SharingPolicyService;
@@ -26,7 +25,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.PostConstruct;
-import javax.script.ScriptException;
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -392,7 +390,10 @@ public class TcProcessor implements Processor,CamelRoutes{
     }
 
     // flow2
-    private void handleExternalDclFlowAndSendToDSL(Exchange exchange,String httpMethod,List<Team> teams, IntegrationData integrationData){
+    private void handleExternalDclFlowAndSendToDSL(Exchange exchange,String httpMethod,List<Team> teams, IntegrationData coreIntegrationData) throws IOException {
+
+        String jsonIntegrationData = objectMapper.writeValueAsString(coreIntegrationData);
+        IntegrationData integrationData = objectMapper.readValue(jsonIntegrationData, IntegrationData.class);
 
         //SXCSP-255. Using cspId and not shortName
         //should have all teams regardless of any teamId provided in sharingParams
