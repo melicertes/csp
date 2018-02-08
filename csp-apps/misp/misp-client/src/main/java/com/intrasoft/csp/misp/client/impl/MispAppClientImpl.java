@@ -338,9 +338,44 @@ public class MispAppClientImpl implements MispAppClient, MispContextUrl {
             return null;
         }
 
-//      TODO: Temporary fix; the sharing group should have the organisations
+//      TODO: Temporary fix (fix all SG update methods); the sharing group should have the organisations
         response.getBody().get(0).getSharingGroup().setSharingGroupOrg(response.getBody().get(0).getSharingGroupOrg());
         return response.getBody().get(0).getSharingGroup();
+    }
+
+    @Override
+    public boolean updateMispSharingGroupAddOrganisation(String sharingGroupUuid, String organisationUuid) {
+        String url = context + "/" + MISP_SHARINGGROUPS_ADD_ORGANISATION + "/" + sharingGroupUuid + "/" + organisationUuid;
+        HttpEntity<?> request = new HttpEntity<>(headers);
+
+        ResponseEntity<String> response;  // = new ResponseEntity<String>(HttpStatus.OK);
+
+        LOG.info("API call [POST]: " + url);
+        try {
+            response = retryRestTemplate.exchange(url, HttpMethod.POST, request, String.class);
+        } catch (Exception e) {
+            LOG.error(e.getMessage());
+            return false;
+        }
+        LOG.info("Organisation("+ organisationUuid + ") is added to Sharing Group(" + sharingGroupUuid+")");
+        return true;
+    }
+
+    @Override
+    public boolean updateMispSharingGroupRemoveOrganisation(String sharingGroupUuid, String organisationUuid) {
+        String url = context + "/" + MISP_SHARINGGROUPS_REMOVE_ORGANISATION + "/" + sharingGroupUuid + "/" + organisationUuid;
+        HttpEntity<?> request = new HttpEntity<>(headers);
+
+        ResponseEntity<String> response;
+        LOG.info("API call [POST]: " + url);
+        try {
+            response = retryRestTemplate.exchange(url, HttpMethod.POST, request, String.class);
+        } catch (Exception e) {
+            LOG.error(e.getMessage());
+            return false;
+        }
+        LOG.info("Organisation("+ organisationUuid + ") is removed from Sharing Group(" + sharingGroupUuid+")");
+        return true;
     }
 
     @Override
