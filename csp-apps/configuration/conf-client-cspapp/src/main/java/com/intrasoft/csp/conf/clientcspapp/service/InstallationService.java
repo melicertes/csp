@@ -200,6 +200,11 @@ public class InstallationService {
         return 95;
     }
 
+    public SystemInstallationState updateSystemInstallationState(SystemInstallationState state) {
+        return repo.save(state);
+    }
+
+
     public boolean canDownload() {
         return isInstallationComplete() || isInstallationOngoing();
     }

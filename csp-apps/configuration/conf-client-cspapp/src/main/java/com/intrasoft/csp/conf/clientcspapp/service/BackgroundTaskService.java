@@ -617,7 +617,11 @@ public class BackgroundTaskService {
 
     public void scheduleStartActiveModules() {
         addTask(() -> {
-            // for every active module, sort by priority
+
+            //we assume that following the guide, start is pressed after installation is complete.
+            SystemInstallationState state = installationService.getState();
+            state.setInstallationState(InstallationState.COMPLETED);
+            state = installationService.updateSystemInstallationState(state);
 
             final List<BackgroundTaskResult<Boolean, Integer>> results = installationService.queryAllModulesInstalled(true).stream().map(module -> {
                 SystemService service = installationService.queryService(module);
@@ -650,9 +654,9 @@ public class BackgroundTaskService {
             }).distinct().collect(Collectors.toList());
 
             final BackgroundTaskResult<Boolean,Integer> finalResult = new BackgroundTaskResult<Boolean, Integer>(true,0,"all");
-            results.stream().filter( r -> r.getSuccess() == false).forEach(failed -> {
+            results.stream().filter( r -> !r.getSuccess()).forEach(failed -> {
                 log.error("Service {} failed to start, error code {}", failed.getModuleName(), failed.getErrorCode());
-                if (finalResult.getSuccess() == true) {
+                if (finalResult.getSuccess()) {
                     finalResult.setSuccess(false);
                 }
             });
@@ -692,7 +696,7 @@ public class BackgroundTaskService {
             // set the name
             result.setModuleName(module.getName());
 
-            return result == null ? new BackgroundTaskResult<>(false, -1000, module.getName()) : result;
+            return result;
         } catch (IOException e) {
             log.error("Failed to start {} with start priority {}", service.getName(), module.getStartPriority());
             log.error("Exception was {}", e.getMessage(), e);
