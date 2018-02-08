@@ -62,7 +62,7 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
                 "internal.vulnerability.apps:taranis, misp",
                 "server.camel.rest.service.is.async:false" //make it sync for better handling in tests (gracefull shutdown etc.)
         })
-@MockEndpointsAndSkip("http:*|https4-in://csp.*")
+@MockEndpointsAndSkip("http:*")
 public class CspServerInternalSandboxTestFlow1verbs implements CamelRoutes {
     private static final Logger LOG = LoggerFactory.getLogger(CspServerInternalSandboxTest.class);
 

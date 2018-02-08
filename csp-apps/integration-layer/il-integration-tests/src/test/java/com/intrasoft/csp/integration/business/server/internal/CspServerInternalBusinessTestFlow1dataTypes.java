@@ -368,42 +368,42 @@ public class CspServerInternalBusinessTestFlow1dataTypes implements CamelRoutes 
     @Test
     public void dslFlow1PostDataTypeContactTest() throws Exception {
         mockUtils.sendFlow1Data(mvc, serverName, "trustcircle",false, true, IntegrationDataType.CONTACT, HttpMethods.POST.name());
-        assertFlows("trustcircle",IntegrationDataType.CONTACT, tcProcessor.getTcTeamsFlow1(IntegrationDataType.CONTACT).size());
+        assertFlows("trustcircle",IntegrationDataType.CONTACT, tcProcessor.getTcTeamsFlow1(IntegrationDataType.CONTACT).size(),true);
     }
 
     @DirtiesContext
     @Test
     public void dslFlow1PosTcIdContactTest() throws Exception {
         mockUtils.sendFlow1Data(mvc, serverName, "trustcircle",tcId,null,false, true, IntegrationDataType.CONTACT, HttpMethods.POST.name());
-        assertFlows("trustcircle",IntegrationDataType.CONTACT, tcProcessor.getTeamsByTrustCircleIdFlow1(tcId).size());
+        assertFlows("trustcircle",IntegrationDataType.CONTACT, tcProcessor.getTeamsByTrustCircleIdFlow1(tcId).size(),false);
     }
 
     @DirtiesContext
     @Test
     public void dslFlow1PostTeamIdContactTest() throws Exception {
         mockUtils.sendFlow1Data(mvc, serverName, "trustcircle",null,teamId,false, true, IntegrationDataType.CONTACT, HttpMethods.POST.name());
-        assertFlows("trustcircle",IntegrationDataType.CONTACT, 1);
+        assertFlows("trustcircle",IntegrationDataType.CONTACT, 1,false);
     }
 
     @DirtiesContext
     @Test
     public void dslFlow1PutDataTypeContactTest() throws Exception {
         mockUtils.sendFlow1Data(mvc,serverName, "trustcircle",false, true, IntegrationDataType.CONTACT, HttpMethods.PUT.name());
-        assertFlows("trustcircle",IntegrationDataType.CONTACT, tcProcessor.getTcTeamsFlow1(IntegrationDataType.CONTACT).size());
+        assertFlows("trustcircle",IntegrationDataType.CONTACT, tcProcessor.getTcTeamsFlow1(IntegrationDataType.CONTACT).size(),true);
     }
 
     @DirtiesContext
     @Test
     public void dslFlow1PutTcIdContactTest() throws Exception {
         mockUtils.sendFlow1Data(mvc,serverName, "trustcircle",tcId,null,false, true, IntegrationDataType.CONTACT, HttpMethods.PUT.name());
-        assertFlows("trustcircle",IntegrationDataType.CONTACT, tcProcessor.getTeamsByTrustCircleIdFlow1(tcId).size());
+        assertFlows("trustcircle",IntegrationDataType.CONTACT, tcProcessor.getTeamsByTrustCircleIdFlow1(tcId).size(),false);
     }
 
     @DirtiesContext
     @Test
     public void dslFlow1PutTeamIdContactTest() throws Exception {
         mockUtils.sendFlow1Data(mvc,serverName, "trustcircle",null,teamId,false, true, IntegrationDataType.CONTACT, HttpMethods.PUT.name());
-        assertFlows("trustcircle",IntegrationDataType.CONTACT, 1);
+        assertFlows("trustcircle",IntegrationDataType.CONTACT, 1,false);
     }
 
     private void assertFlows(String applicationId, IntegrationDataType dataType, Integer expectedEscpMessages, boolean assertTcShortName) throws Exception {
