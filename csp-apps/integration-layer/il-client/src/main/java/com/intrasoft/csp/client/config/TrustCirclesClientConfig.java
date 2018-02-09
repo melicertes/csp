@@ -47,9 +47,6 @@ public class TrustCirclesClientConfig implements ContextUrl {
     @Value("${tc.path.teams}")
     String tcPathTeams;
 
-    @Value("${tc.path.localcircles}")
-    String tcPathLocalCircles;
-
     @Value("${tc.path.localcircle}")
     String tcPathLocalCircle;
 
@@ -82,7 +79,7 @@ public class TrustCirclesClientConfig implements ContextUrl {
 
     @Bean(name = "TcClient")
     public TrustCirclesClient tcClient(){
-        return new TrustCirclesClientImpl(getTcBaseContext(),getTcPathCircles(),getTcPathTeams(), getTcPathLocalCircles(), getTcPathLocalCircle(), getTcPathContacts());
+        return new TrustCirclesClientImpl(getTcBaseContext(),getTcPathCircles(),getTcPathTeams(), getTcPathLocalCircle(), getTcPathContacts());
     }
 
     @Autowired
@@ -112,14 +109,6 @@ public class TrustCirclesClientConfig implements ContextUrl {
         this.tcPathTeams = tcPathTeams;
     }
 
-    public String getTcPathLocalCircles() {
-        return tcPathLocalCircles;
-    }
-
-    public void setTcPathLocalCircles(String tcPathLocalCircles) {
-        this.tcPathLocalCircles = tcPathLocalCircles;
-    }
-
     public String getTcPathLocalCircle() {
         return tcPathLocalCircle;
     }
@@ -146,10 +135,6 @@ public class TrustCirclesClientConfig implements ContextUrl {
 
     public String getTcTeamsURI() {
         return protocol + "://" + host + ":" + port + tcPathTeams;
-    }
-
-    public String getTcLocalCirclesURI() {
-        return protocol + "://" + host + ":" + port + tcPathLocalCircles;
     }
 
     public String getTcLocalCircleURI() {

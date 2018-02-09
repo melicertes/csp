@@ -130,7 +130,7 @@ public class TrustCirclesClientTest {
     @Test
     public void getAllLocalTrustCirclesTest() throws IOException, URISyntaxException {
         //mock the TC server using json based on LTC Specifications document
-        String apiUrl = tcConfig.getTcLocalCirclesURI();
+        String apiUrl = tcConfig.getTcLocalCircleURI();
         MockRestServiceServer mockServer = MockRestServiceServer.bindTo(retryRestTemplate).build();
         mockServer.expect(requestTo(apiUrl))
                 .andRespond(MockRestResponseCreators
