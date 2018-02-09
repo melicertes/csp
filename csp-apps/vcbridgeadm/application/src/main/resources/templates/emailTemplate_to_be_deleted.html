@@ -1,0 +1,128 @@
+<!--
+ * CoreUI - Open Source Bootstrap Admin Template
+ * @version v1.0.0-alpha.4
+ * @link http://coreui.io
+ * Copyright (c) 2017 creativeLabs Łukasz Holeczek
+ * @license MIT
+ -->
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" th:include="layout :: page">
+<head th:fragment="header">
+<link href="http://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.3/summernote.css" rel="stylesheet">
+</head>
+<div th:fragment="content">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        &nbsp;<br /> <br /> <br /> <br />
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-8">
+        <form action="#" th:action="@{/saveEmailTemplates}" th:object="${emailTemplates}" method="post" class="form-horizontal ">
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <strong>Meeting invitation email</strong>
+            </div>
+
+            <div class="panel-body">
+              <div>
+                <div class="form-group" th:classappend="${#fields.hasErrors('invitation.subject')} ? has-danger">
+                  <label class="control-label col-sm-2" for="invitation.subject">Subject</label>
+                  <div class="col-sm-10">
+                    <input type="text" th:field="*{invitation.subject}" class="form-control" placeholder="Enter invitation subject.." />
+                  </div>
+                </div>
+                <div class="form-group" th:classappend="${#fields.hasErrors('invitation.content')} ? has-danger">
+                  <div class="col-md-12">
+                    <textarea id="invitation-input" th:field="*{invitation.content}" class="form-control" placeholder="Enter invitation content.."></textarea>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <strong>Meeting cancellation email</strong>
+            </div>
+            <div class="panel-body">
+              <div>
+
+                <div class="form-group" th:classappend="${#fields.hasErrors('cancellation.subject')} ? has-danger">
+                  <label class="control-label col-sm-2" for="cancellation.subject">Subject</label>
+                  <div class="col-sm-10">
+                    <input type="text" th:field="*{cancellation.subject}" class="form-control" placeholder="Enter cancellation subject.." />
+                  </div>
+                </div>
+                <div class="form-group row" th:classappend="${#fields.hasErrors('cancellation.content')} ? has-danger">
+                  <div class="col-md-12">
+                    <textarea id="cancellation-input" th:field="*{cancellation.content}" class="form-control" placeholder="Enter cancellation content"></textarea>
+                  </div>
+                </div>
+
+
+              </div>
+
+            </div>
+          </div>
+          <div class="form-group pull-right">
+            <div class="col-md-12">
+              <button type="submit" name="reset" class="btn btn-danger">Reset</button>
+              <button type="submit" class="btn btn-primary">Save Changes</button>
+              <a th:href="@{/listMeeting}" class="btn btn-default">Cancel</a>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="col-md-4">
+        <div class="card p-6">
+          <div class="card-header">
+            <strong>Variables allowed in templates</strong>
+          </div>
+          <div class="card-block">
+            <div>
+              <ul>
+                <li><b>{email}</b> - user email</li>
+                <li><b>{meeting_date}</b> - date in dd/MM/yyyy format</li>
+                <li><b>{meeting_time}</b> - time in HH:mm ZZZ (timezone) format</li>
+                <li><b>{meeting_duration_str}</b> - Meeting duration e.g., 2 hour(s) and 10 minutes</li>
+              </ul>
+              <ul>
+                <li><b>{meeting_username}</b> - the generated/unique username for the participant</li>
+                <li><b>{meeting_password}</b> - the generated/unique password for the participant</li>
+                <li><b>{user_first}</b> - user first name</li>
+                <li><b>{user_lastname}</b> - user last name</li>
+              </ul>
+
+
+
+            </div>
+
+          </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div th:fragment="scripts">
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.3/summernote.js"></script>
+  <script>
+      $(document).ready(function() {
+        $('#invitation-input').summernote({
+          onKeyup : function(e) {
+            $("#lawsContent").val($("#summernote").code());
+          }
+        });
+        $('#cancellation-input').summernote({
+          onKeyup : function(e) {
+            $("#lawsContent").val($("#summernote").code());
+          }
+        });
+      });
+    </script>
+</div>
+</html>
