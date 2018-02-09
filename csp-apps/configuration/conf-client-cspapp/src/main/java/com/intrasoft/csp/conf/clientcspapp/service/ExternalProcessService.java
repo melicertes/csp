@@ -105,8 +105,10 @@ public class ExternalProcessService {
 
         @Override
         public void run() {
+            log.debug("StreamGobler started");
             new BufferedReader(new InputStreamReader(inputStream)).lines()
                     .forEach(consumer);
+            log.debug("StreamGobler complete");
         }
     }
 }

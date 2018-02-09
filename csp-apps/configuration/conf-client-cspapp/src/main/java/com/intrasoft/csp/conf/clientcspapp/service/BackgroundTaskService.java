@@ -6,6 +6,7 @@ import com.intrasoft.csp.conf.client.ConfClient;
 import com.intrasoft.csp.conf.clientcspapp.model.*;
 import com.intrasoft.csp.conf.clientcspapp.model.json.Environment;
 import com.intrasoft.csp.conf.clientcspapp.model.json.Manifest;
+import com.intrasoft.csp.conf.clientcspapp.model.json.Service;
 import com.intrasoft.csp.conf.clientcspapp.util.FileHelper;
 import com.intrasoft.csp.conf.clientcspapp.util.TimeHelper;
 import com.intrasoft.csp.conf.commons.model.api.*;
@@ -22,7 +23,8 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Service;
+
+import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.io.*;
@@ -41,7 +43,7 @@ import java.util.stream.Collectors;
 /**
  * Created by tangelatos on 06/09/2017.
  */
-@Service
+@Component
 @Slf4j
 public class BackgroundTaskService {
 
@@ -290,7 +292,6 @@ public class BackgroundTaskService {
                 //extract resources needed
                 final String envJsonFile = extractResource("shellscripts/templ/common.env.json", modulesDirectory);
                 final String envFile = extractResource("shellscripts/templ/common.env.j2", modulesDirectory);
-                //final String cspSitesFile = extractResource("shellscripts/templ/csp-sites.conf.j2", modulesDirectory);
 
 
                 Map<String,String> env = new HashMap<String, String>();
@@ -346,8 +347,15 @@ public class BackgroundTaskService {
                         log.warn("Manifest version 1.1 detected!");
                         if (installationService.moduleContains(installingModule, "env.json") ) {
                             customEnv = jackson.readValue(new File(moduleInstallDirectory, "env.json"), Environment.class);
-                            installingModule.setExternalName(customEnv.getServices().get(0).getExternalName());
-                            log.info("Service {} external name is {}", installingModule.getName(), installingModule.getExternalName());
+                            if (customEnv.getServices().size() == 1) {
+                                installingModule.setExternalName(customEnv.getServices().get(0).getExternalName());
+
+                            } else {
+                                List<String> names = customEnv.getServices().stream().map( s -> s.getExternalName()).collect(Collectors.toList());
+                                String namesjoined = String.join("|", names);
+                                installingModule.setExternalName(namesjoined);
+                            }
+                            log.info("Service {} external names found {}", installingModule.getName(), installingModule.getExternalName().split(Pattern.quote("|")));
                         }
                     } else {
                         log.error("Unsupported manifest.json !!! Rejected!!");
@@ -449,13 +457,28 @@ public class BackgroundTaskService {
     }
 
     private void createCustomEnv(Environment customEnv, SystemModule installingModule) throws IOException {
-        final String envTemplateFile = extractResource("shellscripts/templ/module.env.j2", modulesDirectory);
-        final String cspSitesFile = extractResource("shellscripts/templ/csp-sites.conf.j2", modulesDirectory);
+        //not final; it may be overwritten by module
+        String cspSitesFile = extractResource("shellscripts/templ/csp-sites.conf.j2", modulesDirectory);
         String modulePrefix = installingModule.getName() + "." + installingModule.getStartPriority();
+
+        final String envTemplateFile = extractResource("shellscripts/templ/module.env.j2", modulesDirectory);
         final SystemInstallationState state = installationService.getState();
         final SmtpDetails smtp = state.getSmtpDetails();
 
         mergeEnvironment(customEnv, installingModule.getModulePath());
+
+        //custom file for csp-sites.conf.j2
+        File customSitesConf = new File(installingModule.getModulePath(), "site-config");
+        if (customSitesConf.exists() && customSitesConf.isDirectory()) {
+            File customSiteConfiguration = customSitesConf.listFiles()[0];
+            if (customSiteConfiguration.exists() && customSiteConfiguration.isFile()) {
+                log.info("Custom SITE CONFIGURATION (vhosts) has been detected: {}", customSiteConfiguration.getAbsolutePath());
+                cspSitesFile = customSiteConfiguration.getAbsolutePath();
+            }
+
+        }
+
+
 
         Map<String,String> env = new HashMap<String, String>();
         env.put("ENVJSON", installingModule.getModulePath() + "/env.merged.json");
@@ -470,7 +493,7 @@ public class BackgroundTaskService {
             env.put("MAIL_USERNAME", smtp.getUserName());
             env.put("MAIL_PASSWORD", smtp.getPassword());
         }
-        log.debug("Configured environment variables: {}",env);
+        log.info("Configured environment variables: {}",env);
 
         executeScriptSimple(ENV_MODULE_CREATION_SH, env);
 
@@ -494,14 +517,15 @@ public class BackgroundTaskService {
         if (customEnv == null) {
             return false;
         }
-        com.intrasoft.csp.conf.clientcspapp.model.json.Service srv = customEnv.getServices().get(0);
-        return !StringUtils.isEmpty(srv.getInternalName()) ||
-                !StringUtils.isEmpty(srv.getExternalName());
+        long vHostCounter = customEnv.getServices().stream()
+                .filter( s -> !StringUtils.isEmpty(s.getExternalName()) || !StringUtils.isEmpty(s.getInternalName()))
+                .count();
+        return vHostCounter >= 1;
 
     }
 
     private boolean needsAgent(Environment customEnv) {
-        return customEnv == null ? false : customEnv.getServices().get(0).isAgent();
+        return customEnv != null && customEnv.getServices().stream().filter(Service::isAgent).count() >= 1;
     }
 
     private void copyEnvironment(String targetDirectory) throws IOException{
@@ -566,21 +590,38 @@ public class BackgroundTaskService {
 
                 storageService.deleteDirectoryAndContents(module.getModulePath());
                 module.setModuleState(ModuleState.DOWNLOADED);
+
                 module.setActive(false);
                 installationService.removeService(service);
+
+                File vHostDir = new File(vhostDirectory);
+                final File[] files = vHostDir.listFiles(file -> file.getName().contains(module.getName() + "." + module.getStartPriority()));
+
+                for (File file : files) {
+                    log.info("Deleting {} from vhost directory",file);
+                    boolean d = file.delete();
+                    if (!d) {
+                        log.error("Failed to delete file: {} - problem in installation and re-install",file);
+                    }
+                }
+
                 log.info("Module {} has been removed and service deleted", module.getName());
-                return new BackgroundTaskResult<>(true, 0);
+                return new BackgroundTaskResult<>(true, 0, module.getName());
             } catch (IOException e) {
                 log.error("Exception removing module {} with error {}",module.getName(), e.getMessage(),e);
             }
-            return new BackgroundTaskResult<>(false, -1);
+            return new BackgroundTaskResult<>(false, -1, module.getName());
         });
     }
 
 
     public void scheduleStartActiveModules() {
         addTask(() -> {
-            // for every active module, sort by priority
+
+            //we assume that following the guide, start is pressed after installation is complete.
+            SystemInstallationState state = installationService.getState();
+            state.setInstallationState(InstallationState.COMPLETED);
+            state = installationService.updateSystemInstallationState(state);
 
             final List<BackgroundTaskResult<Boolean, Integer>> results = installationService.queryAllModulesInstalled(true).stream().map(module -> {
                 SystemService service = installationService.queryService(module);
@@ -613,9 +654,9 @@ public class BackgroundTaskService {
             }).distinct().collect(Collectors.toList());
 
             final BackgroundTaskResult<Boolean,Integer> finalResult = new BackgroundTaskResult<Boolean, Integer>(true,0,"all");
-            results.stream().filter( r -> r.getSuccess() == false).forEach(failed -> {
+            results.stream().filter( r -> !r.getSuccess()).forEach(failed -> {
                 log.error("Service {} failed to start, error code {}", failed.getModuleName(), failed.getErrorCode());
-                if (finalResult.getSuccess() == true) {
+                if (finalResult.getSuccess()) {
                     finalResult.setSuccess(false);
                 }
             });
@@ -655,7 +696,7 @@ public class BackgroundTaskService {
             // set the name
             result.setModuleName(module.getName());
 
-            return result == null ? new BackgroundTaskResult<>(false, -1000, module.getName()) : result;
+            return result;
         } catch (IOException e) {
             log.error("Failed to start {} with start priority {}", service.getName(), module.getStartPriority());
             log.error("Exception was {}", e.getMessage(), e);
@@ -725,10 +766,9 @@ public class BackgroundTaskService {
             if (confFile.exists()) {
                 try (Reader input = new FileReader(confFile); Writer output = new FileWriter(outFile)) {
                     IOUtils.copy(input, output);
-
                     service.setVhostCreated(LocalDateTime.now());
                     service = installationService.updateSystemService(service);
-                    log.info("Service {} updated",service);
+                    log.info("Service {} vHost configuration copied to apache", service.getName());
                 } catch (IOException ioe) {
                     log.error("Failed to copy {}",ioe.getMessage(),ioe);
                 }
@@ -771,41 +811,50 @@ public class BackgroundTaskService {
             BackgroundTaskResult<Boolean, Integer> rOAM = null;
             BackgroundTaskResult<Boolean, Integer> rAPC = null;
 
-            // lets query oam is running now
-            if (installationService.queryService(moduleOAM).getServiceState()==ServiceState.RUNNING) {
-                // so lets register the agent now
-                Map<String, String> envOAM = new HashMap<>();
-                envOAM.put("C_NAME", "csp-" + moduleOAMname);
-                envOAM.put("C_SCRIPT", "create-agent.sh");
-                envOAM.put("C_EXTNAME", service.getModule().getExternalName());
+            // multiple agents and apache registrations are needed?
+            boolean totalSuccess = true;
+            String[] serviceNames = service.getModule().getExternalName().split(Pattern.quote("|"));
+            for (String serviceName : serviceNames) {
+                if (installationService.queryService(moduleOAM).getServiceState()==ServiceState.RUNNING) {
+                    // so lets register the agent now
+                    Map<String, String> envOAM = new HashMap<>();
+                    envOAM.put("C_NAME", "csp-" + moduleOAMname);
+                    envOAM.put("C_SCRIPT", "create-agent.sh");
+                    envOAM.put("C_EXTNAME", serviceName);
 
-                rOAM = executeScriptSimple(EXEC_CONT_SCRIPT_SH, envOAM);
-                //TODO do something with result, do we care if oam is left running at the end?
-                //start apache if not started
-                boolean apacheStarted = true; //assume it is already started.
-                if (installationService.queryService(moduleAPC).getServiceState()==ServiceState.NOT_RUNNING) {
-                    apacheStarted = startSingleService(moduleAPC, installationService.queryService(moduleAPC)).getSuccess();
-                }
+                    rOAM = executeScriptSimple(EXEC_CONT_SCRIPT_SH, envOAM);
+                    //TODO do something with result, do we care if oam is left running at the end?
+                    //start apache if not started
+                    boolean apacheStarted = true; //assume it is already started.
+                    if (installationService.queryService(moduleAPC).getServiceState()==ServiceState.NOT_RUNNING) {
+                        apacheStarted = startSingleService(moduleAPC, installationService.queryService(moduleAPC)).getSuccess();
+                    }
 
-                if (apacheStarted) {
-                    Map<String, String> envAPC = new HashMap<>();
-                    envAPC.put("C_NAME", "csp-" + moduleAPCname);
-                    envAPC.put("C_SCRIPT", "create-agent.sh");
-                    envAPC.put("C_EXTNAME", service.getModule().getExternalName());
-                    rAPC = executeScriptSimple(EXEC_CONT_SCRIPT_SH, envAPC);
+                    if (apacheStarted) {
+                        Map<String, String> envAPC = new HashMap<>();
+                        envAPC.put("C_NAME", "csp-" + moduleAPCname);
+                        envAPC.put("C_SCRIPT", "create-agent.sh");
+                        envAPC.put("C_EXTNAME", serviceName);
+                        rAPC = executeScriptSimple(EXEC_CONT_SCRIPT_SH, envAPC);
 
-                    stopSingleService(moduleAPC, installationService.queryService(moduleAPC));
+                        stopSingleService(moduleAPC, installationService.queryService(moduleAPC));
 
+                    } else {
+                        log.error("Apache is not running? failure!!!");
+                    }
+                    if (rOAM.getSuccess() && rAPC.getSuccess()) {
+                        totalSuccess &= rOAM.getSuccess();
+                    } else {
+                        totalSuccess = false;
+                    }
                 } else {
-                    log.error("Apache is not running? failure!!!");
+                    log.error("OAM IS NOT RUNNING - failure! for service {}",service.getName());
                 }
-                if (rOAM.getSuccess() && rAPC.getSuccess()) {
-                    log.info("Saving OAM creation date for service {}",service.getName());
-                    service.setOamAgentCreated(LocalDateTime.now());
-                    service = installationService.updateSystemService(service);
-                }
-            } else {
-                log.error("OAM IS NOT RUNNING - failure! for service {}",service.getName());
+            }
+            if (totalSuccess) {
+                log.info("Saving OAM creation date for service {}",service.getName());
+                service.setOamAgentCreated(LocalDateTime.now());
+                service = installationService.updateSystemService(service);
             }
 
             log.info("ACTIONS COMPLETED: OAM : {} - APC : {} for service {}",
