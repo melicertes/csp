@@ -54,8 +54,9 @@ public class TcMockUtil {
         mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         TrustCircle[] arr = mapper.readValue(json,TrustCircle[].class);
         List<TrustCircle> list = Arrays.asList(arr);
-        TrustCircle tc = list.stream().filter(t->t.getShortName().equals(shortName)).findAny().get();
-        return mapper.writeValueAsBytes(tc);
+
+        //TrustCircle tc = list.stream().filter(t->t.getShortName().equals(shortName)).findAny().get();
+        return mapper.writeValueAsBytes(list);
     }
 
     public static byte[] getJsonBytesForTeamByUuid(URL url, String uuid) throws URISyntaxException, IOException {

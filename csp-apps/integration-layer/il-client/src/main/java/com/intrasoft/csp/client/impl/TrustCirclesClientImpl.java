@@ -1,7 +1,6 @@
 package com.intrasoft.csp.client.impl;
 
 import com.intrasoft.csp.client.TrustCirclesClient;
-import com.intrasoft.csp.client.config.TrustCirclesClientConfig;
 import com.intrasoft.csp.commons.model.Contact;
 import com.intrasoft.csp.commons.model.Team;
 import com.intrasoft.csp.commons.model.TrustCircle;
@@ -102,11 +101,11 @@ public class TrustCirclesClientImpl implements TrustCirclesClient {
     }
 
     @Override
-    public TrustCircle getLocalTrustCircleByShortName(String shortName) {
+    public List<TrustCircle> getLocalTrustCircleByShortName(String shortName) {
         String queryParam = "short_name";
         String url = context + pathLocalCircle + "?" + queryParam+ "=" + shortName;
-        TrustCircle tc = retryRestTemplate.getForObject(url, TrustCircle.class);
-        return tc;
+        List<TrustCircle> list = Arrays.asList(retryRestTemplate.getForObject(url, TrustCircle[].class));
+        return list;
     }
 
     @Override

@@ -161,7 +161,7 @@ public class TrustCirclesClientTest {
 
     @Test
     public void getLocalTrustcircleByShortNameTest() throws IOException, URISyntaxException {
-        String shortName = "LTC shortname B";
+        String shortName = "LTC";
         String queryParam = "short_name";
         String apiUrl = tcConfig.getTcLocalCircleURI();
         UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(apiUrl).queryParam(queryParam, shortName);
@@ -172,8 +172,9 @@ public class TrustCirclesClientTest {
                         .withSuccess(TcMockUtil.getJsonBytesForLTCByShortName(allLocalTrustCircles, shortName),TestUtil.APPLICATION_JSON_UTF8));
 
         //test client
-        TrustCircle tc = tcClient.getLocalTrustCircleByShortName(shortName);
-        assertThat(tc.getShortName(), is(shortName));
+        List<TrustCircle> list = tcClient.getLocalTrustCircleByShortName(shortName);
+        // Items containing the shortName string in their name should be 3.
+        assertThat(list.size(), is(3));
         mockServer.verify();
     }
 
