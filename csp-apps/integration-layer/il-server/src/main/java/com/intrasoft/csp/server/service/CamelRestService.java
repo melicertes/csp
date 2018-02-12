@@ -3,6 +3,7 @@ package com.intrasoft.csp.server.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.intrasoft.csp.libraries.restclient.exceptions.CspBusinessException;
+import com.sun.media.sound.InvalidDataException;
 import org.apache.camel.*;
 import org.apache.camel.http.common.HttpOperationFailedException;
 import org.slf4j.Logger;
@@ -37,17 +38,64 @@ public class CamelRestService {
 
     public <T> List<T> sendAndGetList(String uri, Object obj , String httpMethod, Class<T> tClass, Map<String,Object> headers) throws IOException {
         String out = sendBodyAndHeaders(uri,obj, httpMethod,headers);
-        return objectMapper.readValue(out, objectMapper.getTypeFactory().constructCollectionType(List.class,tClass));
+        //in case of deserialization exception GDelivery kicks in - we should find a workaround to just log the error. GDelivery SHOULD NOT kick in
+        try {
+            return objectMapper.readValue(out, objectMapper.getTypeFactory().constructCollectionType(List.class,tClass));
+        } catch (IOException e) {
+            throw new InvalidDataException(String.format("While parsing the response from this uri %s we got an exception. Response was: %s " +
+                    "\n\n" +
+                    "Initial exception message: %s",uri,out,e.getMessage()));
+        }
+    }
+
+    public <T> List<T> sendAndGetList(String uri, Object obj, String httpMethod, Class<T> tClass, Map<String, Object> headers, boolean checkForHttp4xxFailedOperationAndJustLogWithNoGRedelivery) throws IOException {
+        String out = sendBodyAndHeaders(uri, obj, httpMethod, headers, checkForHttp4xxFailedOperationAndJustLogWithNoGRedelivery);
+        if (out == null) {
+            return null;
+        }
+        try {
+            return objectMapper.readValue(out, objectMapper.getTypeFactory().constructCollectionType(List.class, tClass));
+        } catch (IOException e) {
+            throw new InvalidDataException(String.format("While parsing the response from this uri %s we got an exception. Response was: %s " +
+                    "\n\n" +
+                    "Initial exception message: %s", uri, out, e.getMessage()));
+        }
     }
 
     public <T> T send(String uri, Object obj ,String httpMethod, Class<T> tClass) throws IOException {
         String out = send(uri,obj, httpMethod);
-        return objectMapper.readValue(out, tClass);
+        try {
+            return objectMapper.readValue(out, tClass);
+        } catch (IOException e) {
+            throw new InvalidDataException(String.format("While parsing the response from this uri %s we got an exception. Response was: %s " +
+                    "\n\n" +
+                    "Initial exception message: %s", uri, out, e.getMessage()));
+        }
+    }
+
+    public <T> T send(String uri, Object obj ,String httpMethod, Class<T> tClass,boolean checkForHttp4xxFailedOperationAndJustLogWithNoGRedelivery) throws IOException {
+        String out = send(uri,obj, httpMethod,checkForHttp4xxFailedOperationAndJustLogWithNoGRedelivery);
+        if(out == null){
+            return null;
+        }
+        try {
+            return objectMapper.readValue(out, tClass);
+        } catch (IOException e) {
+            throw new InvalidDataException(String.format("While parsing the response from this uri %s we got an exception. Response was: %s " +
+                    "\n\n" +
+                    "Initial exception message: %s",uri,out,e.getMessage()));
+        }
     }
 
     public <T> T send(String uri, Object obj ,String httpMethod, Class<T> tClass,Map<String,Object> headers) throws IOException {
         String out = sendBodyAndHeaders(uri,obj, httpMethod,headers);
-        return objectMapper.readValue(out, tClass);
+        try{
+            return objectMapper.readValue(out, tClass);
+        } catch (IOException e) {
+            throw new InvalidDataException(String.format("While parsing the response from this uri %s we got an exception. Response was: %s " +
+                    "\n\n" +
+                    "Initial exception message: %s",uri,out,e.getMessage()));
+        }
     }
 
     public String send(String uri, Object obj, String httpMethod) throws IOException {

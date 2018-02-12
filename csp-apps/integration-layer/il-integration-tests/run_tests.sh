@@ -1,3 +1,10 @@
+Notes:
+------
+New argument added to test CTC or LTC
+-DtcShortNameToTest=<CTC::CSP_SHARING (default if not provided) or LTC::CSP_SHARING>
+
+Important: Old tc uuids for short name like CSP::ALL should be replaced with CTC::CSP_SHARING uuid
+
 Central:
 --------
 

@@ -23,6 +23,7 @@ import org.apache.camel.spring.SpringCamelContext;
 import org.apache.camel.test.spring.CamelSpringBootRunner;
 import org.apache.camel.test.spring.MockEndpointsAndSkip;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -32,6 +33,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.rule.OutputCapture;
 import org.springframework.core.env.Environment;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
@@ -43,6 +45,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.eq;
@@ -53,6 +56,7 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
         properties = {
                 "spring.datasource.url:jdbc:h2:mem:csp_policy",
                 "flyway.enabled:false",
+                "server.camel.rest.service.is.async:false" //make it sync for better handling in tests (gracefull shutdown etc.)
         /*
         //added in application-dangerduck.properties
                 "consume.errorq.on.interval:false",
@@ -154,6 +158,9 @@ public class CspServerInternalBusinessTestFlow1dataTypes implements CamelRoutes 
     @Autowired
     Environment env;
 
+    @Rule
+    public OutputCapture outputCapture = new OutputCapture();
+
     private Integer numOfCspsToTest = 3;
     private Integer currentCspId = 0;
     private HashMap<IntegrationDataType, Integer> internalApps = new HashMap<>();
@@ -168,8 +175,11 @@ public class CspServerInternalBusinessTestFlow1dataTypes implements CamelRoutes 
     String applicationId = "taranis";
     String tcId = "tcId";
     String teamId = "teamId";
+    String tcShortNameToTest = IntegrationDataType.CTC_CSP_SHARING;//default
+
     @Before
     public void init() throws Exception {
+        this.outputCapture.flush();
         String tcIdArg = env.getProperty("extTcId");
         if(!StringUtils.isEmpty(tcIdArg)){
             tcId = tcIdArg;
@@ -178,6 +188,11 @@ public class CspServerInternalBusinessTestFlow1dataTypes implements CamelRoutes 
         String teamIdArg = env.getProperty("extTeamId");
         if(!StringUtils.isEmpty(teamIdArg)){
             teamId = teamIdArg;
+        }
+
+        String tcShortNameToTestArg = env.getProperty("tcShortNameToTest");
+        if(!StringUtils.isEmpty(tcShortNameToTestArg)){
+            tcShortNameToTest = tcShortNameToTestArg;
         }
 
         String dataObjectArg = env.getProperty("dataObject");
@@ -223,129 +238,175 @@ public class CspServerInternalBusinessTestFlow1dataTypes implements CamelRoutes 
     @Test
     public void dslFlow1PostDataTypeThreatTest() throws Exception {
         mockUtils.sendFlow1Data(mvc, serverName,"misp",false, true, IntegrationDataType.THREAT, HttpMethods.POST.name());
-        assertFlows("misp",IntegrationDataType.THREAT, tcProcessor.getTcTeamsFlow1(IntegrationDataType.THREAT).size());
+        assertFlows("misp",IntegrationDataType.THREAT, tcProcessor.getTcTeamsFlow1(IntegrationDataType.THREAT).size(),true);
     }
 
     @DirtiesContext
     @Test
     public void dslFlow1PostTcIdThreatTest() throws Exception {
         mockUtils.sendFlow1Data(mvc, serverName,"misp",tcId,null,false, true, IntegrationDataType.THREAT, HttpMethods.POST.name());
-        assertFlows("misp",IntegrationDataType.THREAT, tcProcessor.getTeamsByTrustCircleIdFlow1(tcId).size());
+        assertFlows("misp",IntegrationDataType.THREAT, tcProcessor.getTeamsByTrustCircleIdFlow1(tcId).size(),false);
     }
 
     @DirtiesContext
     @Test
     public void dslFlow1PostTeamIdThreatTest() throws Exception {
         mockUtils.sendFlow1Data(mvc, serverName,"misp",null,teamId,false, true, IntegrationDataType.THREAT, HttpMethods.POST.name());
-        assertFlows("misp",IntegrationDataType.THREAT, 1);
+        assertFlows("misp",IntegrationDataType.THREAT, 1,false);
     }
 
     @DirtiesContext
     @Test
     public void dslFlow1PutDataTypeThreatTest() throws Exception {
         mockUtils.sendFlow1Data(mvc, serverName,"misp",false, true, IntegrationDataType.THREAT, HttpMethods.PUT.name());
-        assertFlows("misp",IntegrationDataType.THREAT, tcProcessor.getTcTeamsFlow1(IntegrationDataType.THREAT).size());
+        assertFlows("misp",IntegrationDataType.THREAT, tcProcessor.getTcTeamsFlow1(IntegrationDataType.THREAT).size(),true);
     }
 
     @DirtiesContext
     @Test
     public void dslFlow1PutTcIdThreatTest() throws Exception {
         mockUtils.sendFlow1Data(mvc, serverName,"misp",tcId,null,false, true, IntegrationDataType.THREAT, HttpMethods.PUT.name());
-        assertFlows("misp",IntegrationDataType.THREAT, tcProcessor.getTeamsByTrustCircleIdFlow1(tcId).size());
+        assertFlows("misp",IntegrationDataType.THREAT, tcProcessor.getTeamsByTrustCircleIdFlow1(tcId).size(),false);
     }
 
     @DirtiesContext
     @Test
     public void dslFlow1PutTeamIdThreatTest() throws Exception {
         mockUtils.sendFlow1Data(mvc, serverName,"misp",null,teamId,false, true, IntegrationDataType.THREAT, HttpMethods.PUT.name());
-        assertFlows("misp",IntegrationDataType.THREAT, 1);
+        assertFlows("misp",IntegrationDataType.THREAT, 1,false);
     }
 
     @DirtiesContext
     @Test
     public void dslFlow1PostDataTypeArtefactTest() throws Exception {
         mockUtils.sendFlow1Data(mvc, serverName, "viper",false, true, IntegrationDataType.ARTEFACT, HttpMethods.POST.name());
-        assertFlows("viper",IntegrationDataType.ARTEFACT, tcProcessor.getTcTeamsFlow1(IntegrationDataType.ARTEFACT).size());
+        assertFlows("viper",IntegrationDataType.ARTEFACT, tcProcessor.getTcTeamsFlow1(IntegrationDataType.ARTEFACT).size(),true);
     }
 
     @DirtiesContext
     @Test
     public void dslFlow1PosTcIdArtefactTest() throws Exception {
         mockUtils.sendFlow1Data(mvc, serverName, "viper",tcId,null,false, true, IntegrationDataType.ARTEFACT, HttpMethods.POST.name());
-        assertFlows("viper",IntegrationDataType.ARTEFACT, tcProcessor.getTeamsByTrustCircleIdFlow1(tcId).size());
+        assertFlows("viper",IntegrationDataType.ARTEFACT, tcProcessor.getTeamsByTrustCircleIdFlow1(tcId).size(),false);
     }
 
     @DirtiesContext
     @Test
     public void dslFlow1PostTeamIdArtefactTest() throws Exception {
         mockUtils.sendFlow1Data(mvc, serverName, "viper",null,teamId,false, true, IntegrationDataType.ARTEFACT, HttpMethods.POST.name());
-        assertFlows("viper",IntegrationDataType.ARTEFACT, 1);
+        assertFlows("viper",IntegrationDataType.ARTEFACT, 1,false);
     }
 
     @DirtiesContext
     @Test
     public void dslFlow1PutDataTypeArtefactTest() throws Exception {
         mockUtils.sendFlow1Data(mvc, serverName, "viper",false, true, IntegrationDataType.ARTEFACT, HttpMethods.PUT.name());
-        assertFlows("viper",IntegrationDataType.ARTEFACT, tcProcessor.getTcTeamsFlow1(IntegrationDataType.ARTEFACT).size());
+        assertFlows("viper",IntegrationDataType.ARTEFACT, tcProcessor.getTcTeamsFlow1(IntegrationDataType.ARTEFACT).size(),true);
     }
 
     @DirtiesContext
     @Test
     public void dslFlow1PutTcIdArtefactTest() throws Exception {
         mockUtils.sendFlow1Data(mvc, serverName, "viper",tcId,null,false, true, IntegrationDataType.ARTEFACT, HttpMethods.PUT.name());
-        assertFlows("viper",IntegrationDataType.ARTEFACT, tcProcessor.getTeamsByTrustCircleIdFlow1(tcId).size());
+        assertFlows("viper",IntegrationDataType.ARTEFACT, tcProcessor.getTeamsByTrustCircleIdFlow1(tcId).size(),false);
     }
 
     @DirtiesContext
     @Test
     public void dslFlow1PutTeamIdArtefactTest() throws Exception {
         mockUtils.sendFlow1Data(mvc, serverName, "viper",null,teamId,false, true, IntegrationDataType.ARTEFACT, HttpMethods.PUT.name());
-        assertFlows("viper",IntegrationDataType.ARTEFACT, 1);
+        assertFlows("viper",IntegrationDataType.ARTEFACT, 1,false);
     }
 
     @DirtiesContext
     @Test
     public void dslFlow1PostDataTypeTrustcircleTest() throws Exception {
         mockUtils.sendFlow1Data(mvc, serverName, "trustcircle",false, true, IntegrationDataType.TRUSTCIRCLE, HttpMethods.POST.name());
-        assertFlows("trustcircle",IntegrationDataType.TRUSTCIRCLE, tcProcessor.getTcTeamsFlow1(IntegrationDataType.TRUSTCIRCLE).size());
+        assertFlows("trustcircle",IntegrationDataType.TRUSTCIRCLE, tcProcessor.getTcTeamsFlow1(IntegrationDataType.TRUSTCIRCLE).size(),true);
     }
 
     @DirtiesContext
     @Test
     public void dslFlow1PosTcIdTrustcircleTest() throws Exception {
         mockUtils.sendFlow1Data(mvc, serverName, "trustcircle",tcId,null,false, true, IntegrationDataType.TRUSTCIRCLE, HttpMethods.POST.name());
-        assertFlows("trustcircle",IntegrationDataType.TRUSTCIRCLE, tcProcessor.getTeamsByTrustCircleIdFlow1(tcId).size());
+        assertFlows("trustcircle",IntegrationDataType.TRUSTCIRCLE, tcProcessor.getTeamsByTrustCircleIdFlow1(tcId).size(),false);
     }
 
     @DirtiesContext
     @Test
     public void dslFlow1PostTeamIdTrustcircleTest() throws Exception {
         mockUtils.sendFlow1Data(mvc, serverName, "trustcircle",null,teamId,false, true, IntegrationDataType.TRUSTCIRCLE, HttpMethods.POST.name());
-        assertFlows("trustcircle",IntegrationDataType.TRUSTCIRCLE, 1);
+        assertFlows("trustcircle",IntegrationDataType.TRUSTCIRCLE, 1,false);
     }
 
     @DirtiesContext
     @Test
     public void dslFlow1PutDataTypeTrustcircleTest() throws Exception {
         mockUtils.sendFlow1Data(mvc,serverName, "trustcircle",false, true, IntegrationDataType.TRUSTCIRCLE, HttpMethods.PUT.name());
-        assertFlows("trustcircle",IntegrationDataType.TRUSTCIRCLE, tcProcessor.getTcTeamsFlow1(IntegrationDataType.TRUSTCIRCLE).size());
+        assertFlows("trustcircle",IntegrationDataType.TRUSTCIRCLE, tcProcessor.getTcTeamsFlow1(IntegrationDataType.TRUSTCIRCLE).size(),true);
     }
 
     @DirtiesContext
     @Test
     public void dslFlow1PutTcIdTrustcircleTest() throws Exception {
         mockUtils.sendFlow1Data(mvc,serverName, "trustcircle",tcId,null,false, true, IntegrationDataType.TRUSTCIRCLE, HttpMethods.PUT.name());
-        assertFlows("trustcircle",IntegrationDataType.TRUSTCIRCLE, tcProcessor.getTeamsByTrustCircleIdFlow1(tcId).size());
+        assertFlows("trustcircle",IntegrationDataType.TRUSTCIRCLE, tcProcessor.getTeamsByTrustCircleIdFlow1(tcId).size(),false);
     }
 
     @DirtiesContext
     @Test
     public void dslFlow1PutTeamIdTrustcircleTest() throws Exception {
         mockUtils.sendFlow1Data(mvc,serverName, "trustcircle",null,teamId,false, true, IntegrationDataType.TRUSTCIRCLE, HttpMethods.PUT.name());
-        assertFlows("trustcircle",IntegrationDataType.TRUSTCIRCLE, 1);
+        assertFlows("trustcircle",IntegrationDataType.TRUSTCIRCLE, 1,false);
     }
 
-    private void assertFlows(String applicationId, IntegrationDataType dataType, Integer expectedEscpMessages) throws Exception {
+    /**
+     * Testing Contact data type
+     * */
+
+    @DirtiesContext
+    @Test
+    public void dslFlow1PostDataTypeContactTest() throws Exception {
+        mockUtils.sendFlow1Data(mvc, serverName, "trustcircle",false, true, IntegrationDataType.CONTACT, HttpMethods.POST.name());
+        assertFlows("trustcircle",IntegrationDataType.CONTACT, tcProcessor.getTcTeamsFlow1(IntegrationDataType.CONTACT).size(),true);
+    }
+
+    @DirtiesContext
+    @Test
+    public void dslFlow1PosTcIdContactTest() throws Exception {
+        mockUtils.sendFlow1Data(mvc, serverName, "trustcircle",tcId,null,false, true, IntegrationDataType.CONTACT, HttpMethods.POST.name());
+        assertFlows("trustcircle",IntegrationDataType.CONTACT, tcProcessor.getTeamsByTrustCircleIdFlow1(tcId).size(),false);
+    }
+
+    @DirtiesContext
+    @Test
+    public void dslFlow1PostTeamIdContactTest() throws Exception {
+        mockUtils.sendFlow1Data(mvc, serverName, "trustcircle",null,teamId,false, true, IntegrationDataType.CONTACT, HttpMethods.POST.name());
+        assertFlows("trustcircle",IntegrationDataType.CONTACT, 1,false);
+    }
+
+    @DirtiesContext
+    @Test
+    public void dslFlow1PutDataTypeContactTest() throws Exception {
+        mockUtils.sendFlow1Data(mvc,serverName, "trustcircle",false, true, IntegrationDataType.CONTACT, HttpMethods.PUT.name());
+        assertFlows("trustcircle",IntegrationDataType.CONTACT, tcProcessor.getTcTeamsFlow1(IntegrationDataType.CONTACT).size(),true);
+    }
+
+    @DirtiesContext
+    @Test
+    public void dslFlow1PutTcIdContactTest() throws Exception {
+        mockUtils.sendFlow1Data(mvc,serverName, "trustcircle",tcId,null,false, true, IntegrationDataType.CONTACT, HttpMethods.PUT.name());
+        assertFlows("trustcircle",IntegrationDataType.CONTACT, tcProcessor.getTeamsByTrustCircleIdFlow1(tcId).size(),false);
+    }
+
+    @DirtiesContext
+    @Test
+    public void dslFlow1PutTeamIdContactTest() throws Exception {
+        mockUtils.sendFlow1Data(mvc,serverName, "trustcircle",null,teamId,false, true, IntegrationDataType.CONTACT, HttpMethods.PUT.name());
+        assertFlows("trustcircle",IntegrationDataType.CONTACT, 1,false);
+    }
+
+    private void assertFlows(String applicationId, IntegrationDataType dataType, Integer expectedEscpMessages, boolean assertTcShortName) throws Exception {
        /*
         DSL
          */
@@ -426,7 +487,7 @@ public class CspServerInternalBusinessTestFlow1dataTypes implements CamelRoutes 
         }
 
         //ELASTIC
-        if(IntegrationDataType.TRUSTCIRCLE.equals(dataType)){
+        if(IntegrationDataType.TRUSTCIRCLE.equals(dataType) || IntegrationDataType.CONTACT.equals(dataType)){
             mockedElastic.expectedMessageCount(0);
         }else {
             mockedElastic.expectedMessageCount(1);
@@ -438,6 +499,12 @@ public class CspServerInternalBusinessTestFlow1dataTypes implements CamelRoutes 
             Message in = exchange.getIn();
             IntegrationData data = in.getBody(IntegrationData.class);
             assertThat(data.getDataType(), is(dataType));
+        }
+
+        if(assertTcShortName) {
+            String output = this.outputCapture.toString();
+            //assertTrue( output, output.contains("Using "+tcShortNameToTest+".."));
+            assertThat(output, containsString("Using " + tcShortNameToTest + ".."));
         }
     }
 

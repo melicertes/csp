@@ -279,7 +279,7 @@ public class MispTcSyncServiceTest {
     public void syncSharingGroupsLocalTrustCirclesTest() throws URISyntaxException, IOException {
 
         String tcCirclesURI = tcConfig.getTcCirclesURI();
-        String tcLocalCirclesURI = tcConfig.getTcLocalCirclesURI();
+        String tcLocalCirclesURI = tcConfig.getTcLocalCircleURI();
         String mispGroupsURI = "http://192.168.56.50:80/sharing_groups";
 
         // We first need to mock TC server's getAllTrustCircles response
