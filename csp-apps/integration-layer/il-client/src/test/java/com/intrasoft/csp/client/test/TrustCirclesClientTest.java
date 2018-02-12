@@ -3,20 +3,16 @@ package com.intrasoft.csp.client.test;
 import com.intrasoft.csp.client.TrustCirclesClient;
 import com.intrasoft.csp.client.config.TrustCirclesClientConfig;
 import com.intrasoft.csp.client.test.util.TcMockUtil;
+import com.intrasoft.csp.client.test.util.TestUtil;
 import com.intrasoft.csp.commons.model.Team;
 import com.intrasoft.csp.commons.model.TrustCircle;
 import com.intrasoft.csp.libraries.restclient.service.RetryRestTemplate;
-import com.intrasoft.csp.server.utils.TestUtil;
-import org.apache.commons.io.FileUtils;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.test.web.client.response.MockRestResponseCreators;
@@ -25,7 +21,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.charset.Charset;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -64,7 +59,7 @@ public class TrustCirclesClientTest {
         MockRestServiceServer mockServer = MockRestServiceServer.bindTo(retryRestTemplate).build();
         mockServer.expect(requestTo(apiUrl))
                 .andRespond(MockRestResponseCreators
-                        .withSuccess(TcMockUtil.getJsonBytesFromUrl(allTrustCircles),TestUtil.APPLICATION_JSON_UTF8));
+                        .withSuccess(TcMockUtil.getJsonBytesFromUrl(allTrustCircles), TestUtil.APPLICATION_JSON_UTF8));
 
 
         //test client
