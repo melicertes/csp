@@ -14,12 +14,16 @@ hardcoced values will be used ("teamId","tcId"). In order to pass the values you
 -DextTcId=<REPLACE-WITH-TC-UUID>
 -DextTeamId=<REPLACE-WITH-TEAM-UUID>
 
+UPDATE:
+After implementing SXCSP-309, old tc uuids for short name like CSP::ALL should be replaced with CTC::CSP_SHARING uuid
+
 
 iTest1:
 -------
 
 java -jar -Dspring.profiles.active=docker -Dapache.camel.use.activemq=false -Dembedded.activemq.start=false -Dserver.ssl.enabled=false \
 -DextTcId=<REPLACE-WITH-TC-UUID> -DextTeamId=<REPLACE-WITH-TEAM-UUID> \
+-DtcShortNameToTest=<CTC::CSP_SHARING (default if not provided) or LTC::CSP_SHARING> \
 itests.jar \
 com.intrasoft.csp.integration.business.server.internal.CspServerInternalBusinessTestFlow1dataTypes
 
@@ -29,6 +33,7 @@ iTest2:
 
 java -jar -Dspring.profiles.active=docker -Dapache.camel.use.activemq=false -Dembedded.activemq.start=false -Dserver.ssl.enabled=false \
 -DextTcId=<REPLACE-WITH-TC-UUID> -DextTeamId=<REPLACE-WITH-TEAM-UUID> \
+-DtcShortNameToTest=<CTC::CSP_SHARING (default if not provided) or LTC::CSP_SHARING> \
 itests.jar \
 com.intrasoft.csp.integration.business.server.internal.CspServerInternalBusinessTestFlow1verbs
 

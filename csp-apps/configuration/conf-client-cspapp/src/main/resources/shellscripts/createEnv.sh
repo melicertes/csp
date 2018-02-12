@@ -3,7 +3,7 @@
 function createEnvironment() {
 
     echo "$(fgrep XXXDOMAINXXX $ENVJSON)"
-	echo "environment found: $ENVJSON $J2ENV $SITESC"
+	echo "environment found: $ENVJSON $J2ENV " # $SITESC
 	echo "About to replace $CSPNAME $CSPDOMAIN $INT_IP inside the configuration..."
 	sed -i.bak "s/XXXDOMAINXXX/$CSPDOMAIN/" $ENVJSON
 	sed -i.bak2 "s/XXXNAMEXXX/$CSPNAME/" $ENVJSON
@@ -13,8 +13,17 @@ function createEnvironment() {
 	sed -i.bak13 "s#XXXMAILUSERNAMEXXX#${MAIL_USERNAME}#g" "${ENVJSON}"
 	sed -i.bak14 "s#XXXMAILPASSWORDXXX#${MAIL_PASSWORD}#g" "${ENVJSON}"
 
+    echo ""
+    echo ""
+    echo ""
+    echo "${ENVJSON}"
+    cat ${ENVJSON}
 
-        ### verify j2 presence
+    echo ""
+    echo ""
+    echo ""
+
+    ### verify j2 presence
 	local J2=$(which j2)
 	local CLI=$( $J2 -v 2>&1 >/dev/null |  grep j2cli|wc -l )
 
@@ -27,14 +36,20 @@ function createEnvironment() {
 	fi
 
     echo "User home is set to $HOME"
+    echo "--------------"
 
-    ### generate env file
-	$J2 $J2ENV $ENVJSON > $HOME/.env
-	cp $HOME/.env $HOME/env
+    ### generate env file (common has priority 0)
+    echo "executing : $J2 $J2ENV $ENVJSON "
+	$J2 $J2ENV $ENVJSON > $HOME/common.0.env
+
+    echo "Env created in $HOME"
+    ls -la $HOME | grep env
+    echo "--------------"
+
     ## generate sites conf
-	$J2 $SITESC $ENVJSON  > $HOME/csp-sites.conf
+	## $J2 $SITESC $ENVJSON  > $HOME/csp-sites.conf
 
-        ### create docker network
+    ### create docker network
 	local DN=$(docker network ls |grep local.$CSPNAME.$CSPDOMAIN|wc -l)
 	if [ "$DN" == "0" ]; then
 		echo "Creating docker network local.$CSPNAME.$CSPDOMAIN"
@@ -47,8 +62,7 @@ function createEnvironment() {
 	rm -fr /opt/csp/apache2/csp-sites
     mkdir -p /opt/csp/apache2/csp-sites
 
-    cp $HOME/csp-sites.conf /opt/csp/apache2/csp-sites
-    echo "Site configuration copied"
+
     ls -l /opt/csp/apache2/csp-sites
 
 	return 0

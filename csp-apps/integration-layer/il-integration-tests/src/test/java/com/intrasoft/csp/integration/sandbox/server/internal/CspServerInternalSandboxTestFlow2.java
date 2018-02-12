@@ -54,6 +54,7 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
                 "csp.retry.maxAttempts:1",
                 "embedded.activemq.start:false",
                 "apache.camel.use.activemq:false",
+                "server.camel.rest.service.is.async:false" //make it sync for better handling in tests (gracefull shutdown etc.)
         })
 @MockEndpointsAndSkip("http:*")
 public class CspServerInternalSandboxTestFlow2 {
@@ -273,7 +274,7 @@ public class CspServerInternalSandboxTestFlow2 {
             Message in = exchange.getIn();
             IntegrationData data = in.getBody(IntegrationData.class);
             assertThat(data.getDataType(), is(this.dataTypeToTest));
-            assertThat(data.getSharingParams().getIsExternal(), is(true));
+            assertThat(data.getSharingParams().getIsExternal(), is(false));//this was true once uppon a time, due to the fact that the connection from the controller was synchromized, thus resulting in a synced blocking camel exchange. Since we changed to async, this flag is false, as it supposed to be
             assertThat(data.getSharingParams().getToShare(), is(true));
         }
 

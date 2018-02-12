@@ -10,12 +10,12 @@ CWD=$(pwd)
 cd "$SERVICE_DIR"
 
 #make sure the existing container is stopped.
-/usr/local/bin/docker-compose stop &> /dev/null
+docker-compose stop &> /dev/null
 RET=$?
 
 if [[ $RET -gt 0 ]];
 then
-    /usr/local/bin/docker-compose kill
+    docker-compose kill
     RET=$?
 fi
 

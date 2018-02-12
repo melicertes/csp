@@ -6,12 +6,15 @@ import com.intrasoft.csp.conf.client.ConfClient;
 import com.intrasoft.csp.conf.clientcspapp.model.*;
 import com.intrasoft.csp.conf.clientcspapp.model.json.Environment;
 import com.intrasoft.csp.conf.clientcspapp.model.json.Manifest;
+import com.intrasoft.csp.conf.clientcspapp.model.json.Service;
 import com.intrasoft.csp.conf.clientcspapp.util.FileHelper;
 import com.intrasoft.csp.conf.clientcspapp.util.TimeHelper;
 import com.intrasoft.csp.conf.commons.model.api.*;
 import com.intrasoft.csp.conf.commons.utils.VersionParser;
+import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.IOUtils;
 import org.joda.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,25 +23,45 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Service;
+
+import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
  * Created by tangelatos on 06/09/2017.
  */
-@Service
+@Component
 @Slf4j
 public class BackgroundTaskService {
+
+    public static final String DOCKERCOMPOSE_YML_TEMPLATE = "docker-compose.yml.j2";
+
+    @Getter
+    enum ControlScript {
+        FIRST_TIME("exec_first-time.sh", "FIRST_TIME_SH"),
+        LAST_TIME("exec_last-time.sh", "LAST_TIME_SH");
+
+        private final String wrapper;
+        private final String envVar;
+
+        ControlScript(String wrapper, String envVar) {
+            this.wrapper = wrapper;
+            this.envVar = envVar;
+        }
+    }
 
     public static final String INTERNAL_CERTS_SH = "internalCerts.sh";
 
@@ -46,12 +69,20 @@ public class BackgroundTaskService {
 
     public static final String ENV_CREATION_SH = "createEnv.sh";
 
+
+    public static final String ENV_MODULE_CREATION_SH = "createModuleEnv.sh";
+
+    public static final String EXEC_CONT_SCRIPT_SH = "exec_contained_script.sh";
+
     private ArrayBlockingQueue<BackgroundTask> backgroundTasks =
             new ArrayBlockingQueue<>(200);
 
     private Map<BackgroundTask, BackgroundTaskResult> completedTasks = new HashMap<>();
 
     private Boolean internetAvailable = false;
+
+    @Value("${installation.vhost.directory}")
+    String vhostDirectory;
 
     @Value("${conf.server.host}")
     String host;
@@ -64,6 +95,12 @@ public class BackgroundTaskService {
 
     @Value("${installation.temp.directory}")
     String tempDirectory;
+
+    @Value("${installation.oam.name:oam}")
+    String moduleOAMname;
+    @Value("${installation.apache.name:apache}")
+    String moduleAPCname;
+
 
     private AtomicInteger countTasks = new AtomicInteger(0);
 
@@ -83,7 +120,7 @@ public class BackgroundTaskService {
     ExternalProcessService externalProcessService;
 
     @Autowired
-    ObjectMapper jacksonObjectMapper;
+    ObjectMapper jackson;
 
 
     @Scheduled(initialDelay = 10000, fixedRate = 600000)
@@ -123,7 +160,7 @@ public class BackgroundTaskService {
                 log.info("HEARTBEAT sent to CENTRAL, response was {} - {}", resp.getResponseText(), resp.getResponseCode());
             } catch (Exception e) {
                 try {
-                    log.info("/api/appinfo JSON Payload {}", new ObjectMapper().writeValueAsString(appInfo));
+                    log.info("/api/appinfo JSON Payload {}", jackson.writeValueAsString(appInfo));
                 } catch (JsonProcessingException e1) {
                     //e1.printStackTrace();
                 }
@@ -253,15 +290,14 @@ public class BackgroundTaskService {
                 final SmtpDetails smtp = state.getSmtpDetails();
 
                 //extract resources needed
-                final String envJsonFile = extractResource("shellscripts/templ/env.json", modulesDirectory);
-                final String envFile = extractResource("shellscripts/templ/env.j2", modulesDirectory);
-                final String cspSitesFile = extractResource("shellscripts/templ/csp-sites.conf.j2", modulesDirectory);
+                final String envJsonFile = extractResource("shellscripts/templ/common.env.json", modulesDirectory);
+                final String envFile = extractResource("shellscripts/templ/common.env.j2", modulesDirectory);
 
 
                 Map<String,String> env = new HashMap<String, String>();
                 env.put("ENVJSON", envJsonFile);
                 env.put("J2ENV", envFile);
-                env.put("SITESC", cspSitesFile);
+                //env.put("SITESC", cspSitesFile);
                 env.put("INT_IP", state.getCspRegistration().getInternalIPs().get(0));
 
                 if (smtp != null && smtp.getPort()!=null) {
@@ -303,15 +339,23 @@ public class BackgroundTaskService {
                         moduleDir.getAbsolutePath());
                 // check to see if manifest.json exists (mandatory!)
                 if (installationService.moduleContains(installingModule, "manifest.json") ) {
-                    File manifestFile = new File(moduleInstallDirectory, "manifest.json");
-                    manifest = jacksonObjectMapper.readValue(manifestFile, Manifest.class);
+                    manifest = getManifest(moduleInstallDirectory);
                     if (manifest.getFormat() == 1.0) {
                         log.warn("Manifest version 1.0 detected! LEGACY MODE = ON");
                         isLegacy = true;
                     } else if (manifest.getFormat() == 1.1) {
                         log.warn("Manifest version 1.1 detected!");
                         if (installationService.moduleContains(installingModule, "env.json") ) {
-                            customEnv = jacksonObjectMapper.readValue(new File(moduleInstallDirectory, "env.json"), Environment.class);
+                            customEnv = jackson.readValue(new File(moduleInstallDirectory, "env.json"), Environment.class);
+                            if (customEnv.getServices().size() == 1) {
+                                installingModule.setExternalName(customEnv.getServices().get(0).getExternalName());
+
+                            } else {
+                                List<String> names = customEnv.getServices().stream().map( s -> s.getExternalName()).collect(Collectors.toList());
+                                String namesjoined = String.join("|", names);
+                                installingModule.setExternalName(namesjoined);
+                            }
+                            log.info("Service {} external names found {}", installingModule.getName(), installingModule.getExternalName().split(Pattern.quote("|")));
                         }
                     } else {
                         log.error("Unsupported manifest.json !!! Rejected!!");
@@ -319,7 +363,7 @@ public class BackgroundTaskService {
 
                     }
 
-                    installingModule.setManifestJsonAsText(jacksonObjectMapper.writeValueAsString(manifest));
+                    installingModule.setManifestJsonAsText(jackson.writeValueAsString(manifest));
                 } else {
                     log.error("Module does not contain a manifest.json description! Rejected!");
                     return new BackgroundTaskResult<>(false, -1);
@@ -339,26 +383,18 @@ public class BackgroundTaskService {
                 // b. copy .env from homedir to the module dir
                 copyEnvironment(moduleInstallDirectory);
 
-                createCustomEnv(customEnv, installingModule);
+                if (manifest.getFormat() > 1.0 && customEnv != null) { // env.json is not mandatory
+                    createCustomEnv(customEnv, installingModule);
+                }
                 // c. execute any first-time.sh found
-                // TODO 1.1 change "first-time.sh" to defined name for first time file
+                String ftime = "first-time.sh"; //compliant with 1.0 manifest
+                if (manifest.getFormat() > 1.0 && manifest.getShFirst() != null) {
+                    ftime = manifest.getShFirst();
+                }
 
-                if (installationService.moduleContains(installingModule, "first-time.sh")) {
-                    log.info("First time init script detected. Will launch for module {}",installingModule.getName());
-                    File firstTime = new File(moduleInstallDirectory, "first-time.sh");
-                    if (firstTime.exists()) {
-                        firstTime.setExecutable(true,true);
-                    } else {
-                        log.error("First time file {}  was not found although present in module {} !",
-                                firstTime.getAbsolutePath(), installingModule.getName());
-                    }
-
-                    Map<String,String> env = new HashMap<>();
-                    env.put("DIR", moduleInstallDirectory);
-                    final BackgroundTaskResult<Boolean, Integer> result = executeScriptSimple("exec_first-time.sh", env);
-                    if (result.getSuccess() == false) {
-                        log.error("Failed execution detected on first-time.sh script - *WILL PROCEED* WITH INSTALLATION!");
-                    }
+                if (ftime != null && installationService.moduleContains(installingModule, ftime)) {
+                    log.info("First time init script {} detected. Will launch for module {}",ftime, installingModule.getName());
+                    executeShScript(installingModule, moduleInstallDirectory, ftime, ControlScript.FIRST_TIME);
                 }
 
                 // d. set module to INSTALLED + ACTIVE = TRUE
@@ -368,6 +404,17 @@ public class BackgroundTaskService {
                 installingModule.setModulePath(moduleDir.getPath());
                 installationService.saveSystemModuleService(installingModule, isLegacy, needsAgent(customEnv),
                         needsVhost(customEnv));
+
+                //fix previous module version, if any
+                final String moduleName = installingModule.getName();
+                final String moduleHash = installingModule.getHash();
+                installationService.queryAllModulesInstalled(true).stream()
+                        .filter( m -> m.getName().contentEquals(moduleName)) //only same name
+                        .filter( m -> !m.getHash().contentEquals(moduleHash)) // only not ours
+                        .forEach( m -> {
+                            m.setActive(false);
+                            installationService.saveSystemModule(m);
+                        });
 
                 return new BackgroundTaskResult<>(true, 0);
 
@@ -383,46 +430,134 @@ public class BackgroundTaskService {
         });
     }
 
-    private void createCustomEnv(Environment customEnv, SystemModule installingModule) {
-        // TODO 1.1 create env.modulename from j2 env.json
-        // we execute j2 on the env.json and relevant conf template to create additional environment variables here
-        // we save the env as env.startpriority.modulename here and in /root
-        // we append this env to the ".env" found here
-        // we save the vhost and overwrite (to vhost configured location)
+    private boolean executeShScript(SystemModule module, String moduleInstallDirectory, String scriptName, ControlScript type) throws IOException {
+        File firstTime = new File(moduleInstallDirectory, scriptName);
+        if (firstTime.exists()) {
+            firstTime.setExecutable(true,true);
+
+            Map<String,String> env = new HashMap<>();
+            env.put("DIR", moduleInstallDirectory);
+            env.put(type.getEnvVar(), scriptName);
+            final BackgroundTaskResult<Boolean, Integer> result = executeScriptSimple(type.getWrapper(), env);
+            if (result.getSuccess() != false) {
+                return true;
+            }
+            log.error("Failed execution detected on {} script - *WILL PROCEED* WITH INSTALLATION!",type);
+        } else {
+            log.error("First time file {}  was not found although present in module {} !",
+                    firstTime.getAbsolutePath(), module.getName());
+        }
+        return false;
+    }
+
+    private Manifest getManifest(String moduleInstallDirectory) throws IOException {
+        Manifest manifest;File manifestFile = new File(moduleInstallDirectory, "manifest.json");
+        manifest = jackson.readValue(manifestFile, Manifest.class);
+        return manifest;
+    }
+
+    private void createCustomEnv(Environment customEnv, SystemModule installingModule) throws IOException {
+        //not final; it may be overwritten by module
+        String cspSitesFile = extractResource("shellscripts/templ/csp-sites.conf.j2", modulesDirectory);
+        String modulePrefix = installingModule.getName() + "." + installingModule.getStartPriority();
+
+        final String envTemplateFile = extractResource("shellscripts/templ/module.env.j2", modulesDirectory);
+        final SystemInstallationState state = installationService.getState();
+        final SmtpDetails smtp = state.getSmtpDetails();
+
+        mergeEnvironment(customEnv, installingModule.getModulePath());
+
+        //custom file for csp-sites.conf.j2
+        File customSitesConf = new File(installingModule.getModulePath(), "site-config");
+        if (customSitesConf.exists() && customSitesConf.isDirectory()) {
+            File customSiteConfiguration = customSitesConf.listFiles()[0];
+            if (customSiteConfiguration.exists() && customSiteConfiguration.isFile()) {
+                log.info("Custom SITE CONFIGURATION (vhosts) has been detected: {}", customSiteConfiguration.getAbsolutePath());
+                cspSitesFile = customSiteConfiguration.getAbsolutePath();
+            }
+
+        }
+
+
+
+        Map<String,String> env = new HashMap<String, String>();
+        env.put("ENVJSON", installingModule.getModulePath() + "/env.merged.json");
+        env.put("J2ENV",  envTemplateFile);
+        env.put("SITESC", cspSitesFile);
+        env.put("MODULE_PREFIX", modulePrefix);
+        env.put("INT_IP", state.getCspRegistration().getInternalIPs().get(0));
+
+        if (smtp != null && smtp.getPort()!=null) {
+            env.put("MAIL_HOST", smtp.getHost());
+            env.put("MAIL_PORT", smtp.getPort().toString());
+            env.put("MAIL_USERNAME", smtp.getUserName());
+            env.put("MAIL_PASSWORD", smtp.getPassword());
+        }
+        log.info("Configured environment variables: {}",env);
+
+        executeScriptSimple(ENV_MODULE_CREATION_SH, env);
+
+    }
+
+    /**
+     * read the default environment from the classpath and merge it into this custom one.
+     * @param customEnv
+     * @param modulePath
+     */
+    private void mergeEnvironment(Environment customEnv, String modulePath) throws IOException {
+        final String commonEnv = extractResource("shellscripts/templ/common.env.json", modulesDirectory);
+        Environment global = jackson.readValue(new File(commonEnv), Environment.class);
+        if (customEnv!= null) {
+            global.setServices(customEnv.getServices());
+        }
+        jackson.writeValue(new File(modulePath, "env.merged.json"), global);//we write the merged one.
     }
 
     private boolean needsVhost(Environment customEnv) {
         if (customEnv == null) {
             return false;
         }
-        com.intrasoft.csp.conf.clientcspapp.model.json.Service srv = customEnv.getServices().get(0);
-        return !StringUtils.isEmpty(srv.getInternalName()) ||
-                !StringUtils.isEmpty(srv.getExternalName());
+        long vHostCounter = customEnv.getServices().stream()
+                .filter( s -> !StringUtils.isEmpty(s.getExternalName()) || !StringUtils.isEmpty(s.getInternalName()))
+                .count();
+        return vHostCounter >= 1;
 
     }
 
     private boolean needsAgent(Environment customEnv) {
-        return customEnv == null ? false : customEnv.getServices().get(0).isAgent();
+        return customEnv != null && customEnv.getServices().stream().filter(Service::isAgent).count() >= 1;
     }
 
     private void copyEnvironment(String targetDirectory) throws IOException{
         //by now we expect environment to be prepared.
-        File rootEnv = new File(System.getProperty("user.home"), "env");
+        File rootEnvDir = new File(System.getProperty("user.home"));
+        TreeMap<Integer,String> envMap = new TreeMap<>();
+        for (File envFile : rootEnvDir.listFiles((dir, name) -> name.endsWith("env"))) {
+            String[] parts = envFile.getName().split(Pattern.quote("."));
+            if (parts.length != 3) {
+                log.warn("env file {} is not valid", envFile);
+                continue;
+            }
+            envMap.put(Integer.parseInt(parts[1]), envFile.getName());
+        }
+        log.info("Module ENV variables: {} ", envMap);
 
-        // TODO 1.1 concatenate all "env.<modulename>" files to a global .env file here
-        // we re-copy all env files in proper order, to this directory using START_PRIORITY
-        // split them with new lines! on concatenation
-
-
-        // split filename on "." - e.g. env.800.rt = String[] { "env", "800", "rt" }
-        // we use the 2nd arg to add to a TreeMap<Double,"filename">
-        // we read them ascending and concatenate to a global "new" env (this gets copied BUT NOT SAVED)
-
-
-        if (rootEnv.exists()) {
-            FileHelper.copy(rootEnv.toPath(), new File(targetDirectory, ".env").toPath());
-        } else {
-            log.error("Root environment (env) not detected, cause of installation problems!");
+        StringBuilder allText = new StringBuilder();
+        envMap.values().forEach( fileName -> {
+            try {
+                allText.append("# file: ").append(fileName).append(" start\n");
+                IOUtils.readLines(new FileInputStream(new File(rootEnvDir,fileName)), "UTF8")
+                        .forEach( l -> allText.append(l).append("\n"));
+                allText.append("# file: ").append(fileName).append(" end\n");
+            } catch (IOException e) {
+                log.error("Unable to read file {}/{}",rootEnvDir,fileName);
+            }
+        });
+        File targetFile = new File(targetDirectory, ".env");
+        try (FileWriter writer = new FileWriter(targetFile) ) {
+            IOUtils.write(allText.toString(), writer);
+        } catch (Exception e) {
+            log.error("Failed to write to {}",targetFile);
         }
 
     }
@@ -440,74 +575,74 @@ public class BackgroundTaskService {
 
     public void scheduleDelete(SystemModule module) {
         addTask(() -> {
-            // TODO check if module is running before delete
+            final SystemService service = installationService.queryService(module);
+            if (service.getServiceState() == ServiceState.RUNNING) {
+                log.error("Service is running and cannot be deleted! STOP first and then delete.");
+                return new BackgroundTaskResult<>(false, -1000);
+            }
 
             try {
-                // execute any last-time.sh found
-                // TODO 1.1 execute "last-time.sh" as defined name for last time file, JSON is in module entity
+                Manifest manifest = getManifest(module.getModulePath());
+                if (manifest.getFormat() > 1.0 && manifest.getShLast() != null
+                        &&  installationService.moduleContains(module, manifest.getShLast())) { //last-time is only 1.1+
+                    executeShScript(module, module.getModulePath(), manifest.getShLast(), ControlScript.LAST_TIME);
+                }
 
                 storageService.deleteDirectoryAndContents(module.getModulePath());
                 module.setModuleState(ModuleState.DOWNLOADED);
+
                 module.setActive(false);
-                final SystemService service = installationService.queryService(module);
                 installationService.removeService(service);
+
+                File vHostDir = new File(vhostDirectory);
+                final File[] files = vHostDir.listFiles(file -> file.getName().contains(module.getName() + "." + module.getStartPriority()));
+
+                for (File file : files) {
+                    log.info("Deleting {} from vhost directory",file);
+                    boolean d = file.delete();
+                    if (!d) {
+                        log.error("Failed to delete file: {} - problem in installation and re-install",file);
+                    }
+                }
+
                 log.info("Module {} has been removed and service deleted", module.getName());
-                return new BackgroundTaskResult<>(true, 0);
+                return new BackgroundTaskResult<>(true, 0, module.getName());
             } catch (IOException e) {
                 log.error("Exception removing module {} with error {}",module.getName(), e.getMessage(),e);
             }
-            return new BackgroundTaskResult<>(false, -1);
+            return new BackgroundTaskResult<>(false, -1, module.getName());
         });
     }
 
 
     public void scheduleStartActiveModules() {
         addTask(() -> {
-            // for every active module, sort by priority
+
+            //we assume that following the guide, start is pressed after installation is complete.
+            SystemInstallationState state = installationService.getState();
+            state.setInstallationState(InstallationState.COMPLETED);
+            state = installationService.updateSystemInstallationState(state);
 
             final List<BackgroundTaskResult<Boolean, Integer>> results = installationService.queryAllModulesInstalled(true).stream().map(module -> {
                 SystemService service = installationService.queryService(module);
-                if (service.getStartable() == true) {
+                if (service == null) {
+                    log.error("Module {} has no service!",module.getName());
+                } else if (service.getStartable() == true) {
 
                     //copy the environment again before starting
                     try {
                         copyEnvironment(module.getModulePath());
+                        log.info("Environment merged");
+
+                        service = checkOAMAgentCreation(module,service);
+
+                        service = checkVHostCreation(module,service);
+
                     } catch (IOException e) {
                         log.error("Failed to copy ENVIRONMENT! {}", e.getMessage(),e);
                     }
-
-                    checkOAMAgentCreation(module,service);
-                    checkVHostCreation(module,service);
-
                     if (service.getServiceState() == ServiceState.NOT_RUNNING) {
-                        log.info("About to start service {} with start priority {}", service.getName(), module.getStartPriority());
-                        Map<String, String> env = new HashMap<String, String>();
-                        env.put("SERVICE_NAME", module.getName());
-                        env.put("SERVICE_DIR", module.getModulePath());
-                        env.put("SERVICE_PRIO", module.getStartPriority().toString());
-                        try {
-                            BackgroundTaskResult<Boolean, Integer> result = executeScriptSimple("startService.sh", env);
-                            if (result.getSuccess() == true) {
-                                if (installationService.moduleContains(module, "proc_ready.source")) {
-                                    result = executeAdvancedStartMonitor(module);
-                                }
-                                service = installationService.updateServiceState(service, ServiceState.RUNNING);
-
-                            } else {
-                                log.error("Executing the start script was not successful for service {}", module.getName());
-                            }
-
-                            // set the name
-                            result.setModuleName(module.getName());
-
-                            return result == null ? new BackgroundTaskResult<>(false, -1000, module.getName()) : result;
-                        } catch (IOException e) {
-                            log.error("Failed to start {} with start priority {}", service.getName(), module.getStartPriority());
-                            log.error("Exception was {}", e.getMessage(), e);
-                            service = installationService.updateServiceState(service, ServiceState.NOT_RUNNING);
-                        }
-
-                        return new BackgroundTaskResult<Boolean, Integer>(false, -100, module.getName());
+                        return startSingleService(module, service);
                     } else {
                         log.warn("Service {} is marked running!??? No action", service.getName());
                     }
@@ -519,9 +654,9 @@ public class BackgroundTaskService {
             }).distinct().collect(Collectors.toList());
 
             final BackgroundTaskResult<Boolean,Integer> finalResult = new BackgroundTaskResult<Boolean, Integer>(true,0,"all");
-            results.stream().filter( r -> r.getSuccess() == false).forEach(failed -> {
+            results.stream().filter( r -> !r.getSuccess()).forEach(failed -> {
                 log.error("Service {} failed to start, error code {}", failed.getModuleName(), failed.getErrorCode());
-                if (finalResult.getSuccess() == true) {
+                if (finalResult.getSuccess()) {
                     finalResult.setSuccess(false);
                 }
             });
@@ -529,21 +664,208 @@ public class BackgroundTaskService {
         });
     }
 
-    private void checkVHostCreation(SystemModule module, SystemService service) {
-        //TODO 1.1 Check if VHost is required and CREATE IT
-        if (service.getVHostNecessary() && service.getVhostCreated() == null) {
-            //do it here
+    private BackgroundTaskResult<Boolean, Integer> startSingleService(SystemModule module, SystemService service) {
+        log.info("About to start service {} with start priority {}", service.getName(), module.getStartPriority());
+        if (service.getServiceState()==ServiceState.RUNNING) {
+            log.warn("Service {} is already running! - did not start it",service.getName());
+            return new BackgroundTaskResult<>(true, 0, module.getName());
+        }
+
+        if (installationService.moduleContains(module, DOCKERCOMPOSE_YML_TEMPLATE)) {
+            List<String> domains = parseDomainsFromEnv(module);
+            log.info("Module {} has a j2 template, now will populate with {}", module.getName(), domains);
+            fixComposeWithDomains(module, domains);
+        }
+
+        Map<String, String> env = new HashMap<String, String>();
+        env.put("SERVICE_NAME", module.getName());
+        env.put("SERVICE_DIR", module.getModulePath());
+        env.put("SERVICE_PRIO", module.getStartPriority().toString());
+        try {
+            BackgroundTaskResult<Boolean, Integer> result = executeScriptSimple("startService.sh", env);
+            if (result.getSuccess() == true) {
+                if (installationService.moduleContains(module, "proc_ready.source")) {
+                    result = executeAdvancedStartMonitor(module);
+                }
+                installationService.updateServiceState(service, ServiceState.RUNNING);
+
+            } else {
+                log.error("Executing the start script was not successful for service {}", module.getName());
+            }
+
+            // set the name
+            result.setModuleName(module.getName());
+
+            return result;
+        } catch (IOException e) {
+            log.error("Failed to start {} with start priority {}", service.getName(), module.getStartPriority());
+            log.error("Exception was {}", e.getMessage(), e);
+            installationService.updateServiceState(service, ServiceState.NOT_RUNNING);
+        }
+
+        return new BackgroundTaskResult<Boolean, Integer>(false, -100, module.getName());
+    }
+
+    private void fixComposeWithDomains(SystemModule module, List<String> domains) {
+
+        try {
+            Map<String,String> env = new HashMap<>();
+            env.put("J2_TEMPLATE", DOCKERCOMPOSE_YML_TEMPLATE);
+            env.put("DATA_JSON",writeDomainsToJson(domains,module.getModulePath()));
+            env.put("J2_OUTPUT","docker-compose.yml");
+            env.put("WORK_DIR",module.getModulePath());
+
+            if (!executeScriptSimple("execComposeJ2.sh", env).getSuccess()) {
+                throw new IOException("Failed to complete J2 template execution for this docker-compose.yml template! module "+module);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
     }
 
-    private void checkOAMAgentCreation(SystemModule module, SystemService service) {
-        //TODO 1.1 Check if OAM agent is required and CREATE IT
+    private String writeDomainsToJson(List<String> domains, String modulePath) throws IOException {
+        File f = new File(modulePath, "j2data"+Long.toHexString(System.currentTimeMillis())+".json");
+        StringBuilder formatted = new StringBuilder(" { \"local_domains\" : [");
 
-        if (service.getOamAgentNecessary() && service.getOamAgentCreated() == null) {
-            //do it here
+        domains.forEach( d -> {
+            formatted.append("\"").append(d).append("\",");
+        });
+        formatted.setLength(formatted.length()-1); //leave the last ,
+        formatted.append(" ] } ");
 
+
+        Files.write(f.toPath(), formatted.toString().getBytes(Charset.forName("UTF-8")));
+        return f.getAbsolutePath();
+
+    }
+
+    private List<String> parseDomainsFromEnv(SystemModule module) {
+        List<String> domains = new ArrayList<>();
+        File envFile = new File(module.getModulePath(), ".env");
+
+        try {
+            domains.addAll(Files.readAllLines(envFile.toPath()).stream()
+                    .filter(line -> line.contains("_LOCAL"))
+                    .map(line -> line.split(Pattern.quote("="))[0])
+                    .collect(Collectors.toList()));
+            log.info("Domains discovered: {}",domains);
+        } catch (IOException e) {
+            log.error("Unable to parse domains from list, error {}",e.getMessage(),e);
         }
+        return domains;
+    }
+
+    private SystemService checkVHostCreation(SystemModule module, SystemService service) {
+        //we copy the vhost configuration from the $HOME folder to the apache folders
+        if (service.getVHostNecessary() && service.getVhostCreated() == null) {
+            String confFileName = "csp-sites." + module.getName() + "." + module.getStartPriority() + ".conf";
+            File rootEnvDir = new File(System.getProperty("user.home"));
+            File confFile = new File(rootEnvDir, confFileName);
+            File outFile = new File(vhostDirectory, confFileName);
+            if (confFile.exists()) {
+                try (Reader input = new FileReader(confFile); Writer output = new FileWriter(outFile)) {
+                    IOUtils.copy(input, output);
+                    service.setVhostCreated(LocalDateTime.now());
+                    service = installationService.updateSystemService(service);
+                    log.info("Service {} vHost configuration copied to apache", service.getName());
+                } catch (IOException ioe) {
+                    log.error("Failed to copy {}",ioe.getMessage(),ioe);
+                }
+            } else {
+                log.error("Module {}: site configuration (vhost) does not exist in location {}",
+                        module.getName(), confFile.getAbsolutePath());
+            }
+        }
+        return service;
+    }
+
+    private SystemService checkOAMAgentCreation(SystemModule module, SystemService service) throws IOException {
+        final SystemModule moduleOAM = installationService.queryModuleByName(moduleOAMname, true);
+        final SystemModule moduleAPC = installationService.queryModuleByName(moduleAPCname, true);
+        BackgroundTaskResult<Boolean, Integer> oamStarted = null;
+        if (service.getOamAgentNecessary() && service.getOamAgentCreated() == null) {
+            // we need to have OAM running and APACHE for this.
+            // due to start priority there are the following cases:
+            // 1. this is OAM now - needs an agent and it has not started
+            //    ->> we need to start it and proceed
+            // 2. this is NOT OAM but OAM has not yet started
+            //    ->> we need to start it and proceed
+            // 3. this is NOT OAM and OAM is running
+            //    ->> happy path do nothing :D
+            // same for apache - to create the registration for the agent,
+            // we need to have apache running. This is simpler, it is an "on-off"
+            if (service.getName().contentEquals(moduleOAMname)) { // case 1
+                log.info("1: OAM - registering own web agent");
+                //we need to start OAM to register OWN agent.
+                oamStarted = startSingleService(module, installationService.queryService(moduleOAM));
+            } else if (!service.getName().contentEquals(moduleOAMname)) {
+                boolean oamRunning = installationService.queryService(moduleOAM).getServiceState()==ServiceState.RUNNING;
+                if (!oamRunning) { // 2
+                    log.info("2: OAM - registering other web agent, but not yet running");
+                    oamStarted = startSingleService(moduleOAM, installationService.queryService(moduleOAM));
+                } else { //3
+                    log.info("3: OAM - registering other web agent, running already");
+                }
+            }
+            BackgroundTaskResult<Boolean, Integer> rOAM = null;
+            BackgroundTaskResult<Boolean, Integer> rAPC = null;
+
+            // multiple agents and apache registrations are needed?
+            boolean totalSuccess = true;
+            String[] serviceNames = service.getModule().getExternalName().split(Pattern.quote("|"));
+            for (String serviceName : serviceNames) {
+                if (installationService.queryService(moduleOAM).getServiceState()==ServiceState.RUNNING) {
+                    // so lets register the agent now
+                    Map<String, String> envOAM = new HashMap<>();
+                    envOAM.put("C_NAME", "csp-" + moduleOAMname);
+                    envOAM.put("C_SCRIPT", "create-agent.sh");
+                    envOAM.put("C_EXTNAME", serviceName);
+
+                    rOAM = executeScriptSimple(EXEC_CONT_SCRIPT_SH, envOAM);
+                    //TODO do something with result, do we care if oam is left running at the end?
+                    //start apache if not started
+                    boolean apacheStarted = true; //assume it is already started.
+                    if (installationService.queryService(moduleAPC).getServiceState()==ServiceState.NOT_RUNNING) {
+                        apacheStarted = startSingleService(moduleAPC, installationService.queryService(moduleAPC)).getSuccess();
+                    }
+
+                    if (apacheStarted) {
+                        Map<String, String> envAPC = new HashMap<>();
+                        envAPC.put("C_NAME", "csp-" + moduleAPCname);
+                        envAPC.put("C_SCRIPT", "create-agent.sh");
+                        envAPC.put("C_EXTNAME", serviceName);
+                        rAPC = executeScriptSimple(EXEC_CONT_SCRIPT_SH, envAPC);
+
+                        stopSingleService(moduleAPC, installationService.queryService(moduleAPC));
+
+                    } else {
+                        log.error("Apache is not running? failure!!!");
+                    }
+                    if (rOAM.getSuccess() && rAPC.getSuccess()) {
+                        totalSuccess &= rOAM.getSuccess();
+                    } else {
+                        totalSuccess = false;
+                    }
+                } else {
+                    log.error("OAM IS NOT RUNNING - failure! for service {}",service.getName());
+                }
+            }
+            if (totalSuccess) {
+                log.info("Saving OAM creation date for service {}",service.getName());
+                service.setOamAgentCreated(LocalDateTime.now());
+                service = installationService.updateSystemService(service);
+            }
+
+            log.info("ACTIONS COMPLETED: OAM : {} - APC : {} for service {}",
+                    rOAM != null ? rOAM.getSuccess() : false,
+                    rAPC != null ? rAPC.getSuccess() : false, service.getName());
+
+
+        } else {
+            log.info("Service {}. No action - either already created or not needed",service.getName());
+        }
+        return service;
     }
 
     /**
@@ -567,32 +889,37 @@ public class BackgroundTaskService {
             // for every active module, sort by priority
             installationService.queryAllModulesInstalled(false).forEach(module -> {
                 SystemService service = installationService.queryService(module);
-                if (service.getStartable() == true) {
-                    if (service.getServiceState() == ServiceState.RUNNING) {
-                        log.info("About to stop service {} with start priority {}", service.getName(), module.getStartPriority());
-                        Map<String,String> env = new HashMap<String, String>();
-                        env.put("SERVICE_NAME", module.getName());
-                        env.put("SERVICE_DIR", module.getModulePath());
-                        env.put("SERVICE_PRIO", module.getStartPriority().toString());
-                        try {
-                            //TODO handle stop return value
-                            executeScriptSimple("stopService.sh", env);
-                            service = installationService.updateServiceState(service,ServiceState.NOT_RUNNING);
-                        } catch (IOException e) {
-                            log.error("Failed to start {} with start priority {}", service.getName(), module.getStartPriority());
-                            log.error("Exception was {}",e.getMessage(),e);
-                            service = installationService.updateServiceState(service,ServiceState.RUNNING);
-                        }
-                    } else {
-                        log.warn("Service {} is marked NOT running!???", service.getName());
-                    }
-                    log.info("Service {} state {}", service.getName(), service.getServiceState());
-                } else {
-                    log.info("Service {} is not a startable service, moving on");
-                }
+                stopSingleService(module, service);
             });
             return new BackgroundTaskResult<>(true, 0);
         });
+    }
+
+    private void stopSingleService(SystemModule module, SystemService service) {
+        if (service != null) {
+            if (service.getStartable() == true) {
+                if (service.getServiceState() == ServiceState.RUNNING) {
+                    log.info("About to stop service {} with start priority {}", service.getName(), module.getStartPriority());
+                    Map<String, String> env = new HashMap<String, String>();
+                    env.put("SERVICE_NAME", module.getName());
+                    env.put("SERVICE_DIR", module.getModulePath());
+                    env.put("SERVICE_PRIO", module.getStartPriority().toString());
+                    try {
+                        executeScriptSimple("stopService.sh", env);
+                        service = installationService.updateServiceState(service, ServiceState.NOT_RUNNING);
+                    } catch (IOException e) {
+                        log.error("Failed to start {} with start priority {}", service.getName(), module.getStartPriority());
+                        log.error("Exception was {}", e.getMessage(), e);
+                        service = installationService.updateServiceState(service, ServiceState.RUNNING);
+                    }
+                } else {
+                    log.warn("Service {} is marked NOT running!???", service.getName());
+                }
+                log.info("Service {} state {}", service.getName(), service.getServiceState());
+            } else {
+                log.info("Service {} is not a startable service, moving on", service.getName());
+            }
+        }
     }
 
 
@@ -611,7 +938,7 @@ public class BackgroundTaskService {
         if (env != null) {
             envVars.putAll(env);
         }
-
+        log.info("Environment for execution: {}", envVars);
         //execute script
         int exitCode = externalProcessService.executeExternalProcess(modulesDirectory, Optional.of(envVars),
                 "sh", "-c", "./"+ scriptName);
@@ -638,8 +965,7 @@ public class BackgroundTaskService {
         }
         log.info("Extracting {} to {}",scriptName, targetFile.getAbsolutePath());
 
-        //long total = FileHelper.copy(script.getInputStream(), targetFile.toPath(), null, StandardCopyOption.REPLACE_EXISTING);
-        FileHelper.copy(script.getFile().toPath(), targetFile.toPath());
+        long total = FileHelper.copy(script.getInputStream(), targetFile.toPath(), null, StandardCopyOption.REPLACE_EXISTING);
         return targetFile.getAbsolutePath();
     }
 }
