@@ -53,4 +53,8 @@ public class SystemModule implements Serializable {
     @Column(columnDefinition = "VARCHAR(2000)")
     String manifestJsonAsText;
 
+    @Column(columnDefinition = "VARCHAR(200)")
+    String externalName;
+
+
 }

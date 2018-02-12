@@ -61,10 +61,11 @@ public class ExternalProcessService {
         builder.command(processAndArguments);
 
         if (environment.isPresent()) {
+            final Map<String, String> envFinal = environment.orElse(new HashMap<>());
+            log.info("EXEC: Additional environment variables defined: "+ envFinal);
             final Map<String, String> env = builder.environment();
-            env.putAll(environment.get());
+            env.putAll(envFinal);
         }
-        log.info("EXEC: Additional environment variables defined: "+environment.orElse(new HashMap<>()));
 
         final Process proc;
         try {
@@ -104,8 +105,10 @@ public class ExternalProcessService {
 
         @Override
         public void run() {
+            log.debug("StreamGobler started");
             new BufferedReader(new InputStreamReader(inputStream)).lines()
                     .forEach(consumer);
+            log.debug("StreamGobler complete");
         }
     }
 }

@@ -53,6 +53,7 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
         properties = {
                 "spring.datasource.url:jdbc:h2:mem:csp_policy",
                 "flyway.enabled:false",
+                "server.camel.rest.service.is.async:false" //make it sync for better handling in tests (gracefull shutdown etc.)
                 /*
                 //added in application-demo.properties
                 "csp.retry.backOffPeriod:10",
@@ -116,6 +117,7 @@ public class CspServerInternalBusinessTcTest implements CamelRoutes {
 
     @Before
     public void init() throws Exception {
+        Mockito.reset(sharingPolicyService);
         mvc = webAppContextSetup(webApplicationContext).build();
         mockUtils.setSpringCamelContext(springCamelContext);
         mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX,routes.apply(DSL),mockedDsl.getEndpointUri());

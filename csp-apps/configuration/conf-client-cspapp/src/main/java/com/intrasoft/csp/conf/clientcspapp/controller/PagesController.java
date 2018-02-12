@@ -129,7 +129,8 @@ public class PagesController implements ContextUrl {
     public ModelAndView getPageLinks(Model model) {
         model = this.init(model);
 
-        //TODO if installation is complete, add the links here
+        //TODO if installation is complete, add the links here but when is it complete?
+
 
         return new ModelAndView("fragments :: links", "links", model);
     }

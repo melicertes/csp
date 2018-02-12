@@ -109,12 +109,30 @@ public class InstallationService {
         return moduleRepository.save(module);
     }
 
+
+    public SystemModule queryModuleByName(String name, boolean active) {
+        List<SystemModule> module = moduleRepository.findByNameAndActiveOrderByIdDesc(name, active);
+        if (module != null && module.size()==1) {
+            log.info("Module list size : {} retrieved!", module.size());
+            return module.get(0);
+        } else {
+            log.error("System error: {} Modules cannot have same name and active=true more than once!!!", module);
+            return null;
+        }
+    }
+
     public SystemModule queryModuleByHash(String hash) {
         SystemModule module = moduleRepository.findOneByHash(hash);
         if (module != null) {
-            log.info("Module {} retrieved!", module);
+            log.debug("Module {} retrieved!", module.getName());
         }
         return module;
+    }
+
+
+    @Transactional
+    public SystemService updateSystemService(SystemService service) {
+        return serviceRepository.save(service);
     }
 
     @Transactional
@@ -128,16 +146,17 @@ public class InstallationService {
                     .module(savedModule)
                     .serviceState(ServiceState.NOT_RUNNING)
                     .name(module.getName())
-                    .startable(moduleContains(module,"docker-compose.yml"))
                     .build();
         } else {
             systemService.setModule(savedModule);
-            systemService.setStartable(moduleContains(module,"docker-compose.yml"));
         }
         systemService.setLegacy(legacyMode);
         systemService.setOamAgentNecessary(needsAgent);
         systemService.setVHostNecessary(needsVhost);
-
+        systemService.setStartable(
+                moduleContains(module,"docker-compose.yml") ||
+                moduleContains(module, "docker-compose.yml.j2"));
+        log.info("Created service {}",systemService);
         return serviceRepository.save(systemService);
 
     }
@@ -180,6 +199,11 @@ public class InstallationService {
         }
         return 95;
     }
+
+    public SystemInstallationState updateSystemInstallationState(SystemInstallationState state) {
+        return repo.save(state);
+    }
+
 
     public boolean canDownload() {
         return isInstallationComplete() || isInstallationOngoing();

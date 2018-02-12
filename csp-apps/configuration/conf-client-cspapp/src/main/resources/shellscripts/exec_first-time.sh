@@ -7,6 +7,7 @@ echo "FIRST_TIME_SH=$FIRST_TIME_SH"
 if [ "xx$FIRST_TIME_SH" == "xx" ];
 then
   FIRST_TIME_SH="./first-time.sh"
+  echo "Fallback to 'first-time.sh' - configuration issue"
 else
   FIRST_TIME_SH="./$FIRST_TIME_SH"
 fi

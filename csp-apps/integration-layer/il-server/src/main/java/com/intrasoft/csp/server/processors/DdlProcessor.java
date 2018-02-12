@@ -58,7 +58,8 @@ public class DdlProcessor implements Processor,CamelRoutes {
             }
         }
 
-        if (enableElastic && !integrationData.getDataType().equals(IntegrationDataType.TRUSTCIRCLE)){
+        if (enableElastic && !integrationData.getDataType().equals(IntegrationDataType.TRUSTCIRCLE)
+                && !integrationData.getDataType().equals(IntegrationDataType.CONTACT)){
             //recipients.add(routes.apply(ELASTIC));//Do not use this, because it share the exchange and will cause the bug described in SXCSP-430
             //Instead, use a copy of IntegrationData and send it using producer and HTTP
             //sync version
