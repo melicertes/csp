@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.support.ResourcePatternResolver;
-import org.springframework.http.HttpStatus;
 
 import java.io.IOException;
 import java.security.KeyManagementException;
@@ -28,56 +27,54 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @Configuration
 public class TrustCirclesClientConfig implements ContextUrl {
-    @Value("${app.tc.protocol:http}")
+    @Value("${tc.protocol:http}")
     private String protocol;
 
-    @Value("${app.tc.host:localhost}")
+    @Value("${tc.host:localhost}")
     private String host;
 
-    @Value("${app.tc.port:9000}")
+    @Value("${tc.port:8081}")
     private String port;
 
-    @Value("${app.tc.path.circles}")
+    @Value("${tc.path.circles}")
     String tcPathCircles;
 
-    @Value("${app.tc.path.localcircle}")
-    String tcPathLocalCircle;
-
-    @Value("${app.tc.path.teams}")
+    @Value("${tc.path.teams}")
     String tcPathTeams;
 
-    @Value("${app.tc.path.contacts}")
+    @Value("${tc.path.localcircle}")
+    String tcPathLocalCircle;
+
+    @Value("${tc.path.contacts}")
     String tcPathContacts;
 
-    @Value("${app.tc.retry.backOffPeriod:5000}")
+    @Value("${tc.retry.backOffPeriod:5000}")
     private String backOffPeriod;
 
-    @Value("${app.tc.retry.maxAttempts:3}")
+    @Value("${tc.retry.maxAttempts:3}")
     private String maxAttempts;
 
-    @Value("${app.tc.client.ssl.enabled:false}")
+    @Value("${tc.client.ssl.enabled:false}")
     Boolean tcClientSslEnabled;
 
-    @Value("${app.tc.client.ssl.jks.keystore:path}")
+    @Value("${tc.client.ssl.jks.keystore:path}")
     String tcClientSslJksKeystore;
 
-    @Value("${app.tc.client.ssl.jks.keystore.password:securedPass}")
+    @Value("${tc.client.ssl.jks.keystore.password:securedPass}")
     String tcClientSslJksKeystorePassword;
 
     @Autowired
     ResourcePatternResolver resourcePatternResolver;
 
     private static final ConcurrentHashMap<String, ExceptionHandler> SUPPORTED_EXCEPTIONS = new ConcurrentHashMap<>();
-    private static final ConcurrentHashMap<Integer, String> AVOID_RETRY_ON_STATUS_CODE = new ConcurrentHashMap<>();
 
     static {
         SUPPORTED_EXCEPTIONS.put(CspGeneralException.class.getName(), CspGeneralException::new);
-        AVOID_RETRY_ON_STATUS_CODE.put(HttpStatus.NOT_FOUND.value(), "TC server responded with 404");
     }
 
     @Bean(name = "TcClient")
     public TrustCirclesClient tcClient(){
-        return new TrustCirclesClientImpl(getTcBaseContext(),getTcPathCircles(),getTcPathTeams(), getTcPathLocalCircles(), getTcPathLocalCircle(), getTcPathContacts());
+        return new TrustCirclesClientImpl(getTcBaseContext(),getTcPathCircles(),getTcPathTeams(), getTcPathLocalCircle(), getTcPathContacts());
     }
 
     @Autowired
@@ -88,7 +85,7 @@ public class TrustCirclesClientConfig implements ContextUrl {
     public RetryRestTemplate getRetryRestTemplate() throws CertificateException, UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException, KeyManagementException, IOException {
         RestTemplateConfiguration restTemplateConfiguration = new RestTemplateConfiguration(backOffPeriod, maxAttempts,
                 tcClientSslEnabled, tcClientSslJksKeystore, tcClientSslJksKeystorePassword, resourcePatternResolver);
-        return restTemplateConfiguration.getRestTemplateWithOptions(SUPPORTED_EXCEPTIONS,AVOID_RETRY_ON_STATUS_CODE);
+        return restTemplateConfiguration.getRestTemplateWithSupportedExceptions(SUPPORTED_EXCEPTIONS);
     }
 
     public String getTcPathCircles() {
@@ -99,20 +96,20 @@ public class TrustCirclesClientConfig implements ContextUrl {
         this.tcPathCircles = tcPathCircles;
     }
 
-    public String getTcPathLocalCircle() {
-        return tcPathLocalCircle;
-    }
-
-    public void setTcPathLocalCircle(String tcPathLocalCircle) {
-        this.tcPathLocalCircle = tcPathLocalCircle;
-    }
-
     public String getTcPathTeams() {
         return tcPathTeams;
     }
 
     public void setTcPathTeams(String tcPathTeams) {
         this.tcPathTeams = tcPathTeams;
+    }
+
+    public String getTcPathLocalCircle() {
+        return tcPathLocalCircle;
+    }
+
+    public void setTcPathLocalCircle(String tcPathLocalCircle) {
+        this.tcPathLocalCircle = tcPathLocalCircle;
     }
 
     public String getTcPathContacts() {
@@ -133,10 +130,6 @@ public class TrustCirclesClientConfig implements ContextUrl {
 
     public String getTcTeamsURI() {
         return protocol + "://" + host + ":" + port + tcPathTeams;
-    }
-
-    public String getTcLocalCirclesURI() {
-        return protocol + "://" + host + ":" + port + tcPathLocalCircles;
     }
 
     public String getTcLocalCircleURI() {
