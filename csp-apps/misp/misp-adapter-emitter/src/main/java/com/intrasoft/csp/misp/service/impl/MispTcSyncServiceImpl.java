@@ -125,10 +125,10 @@ public class MispTcSyncServiceImpl implements MispTcSyncService {
         List<TrustCircle> tcList = trustCirclesClient.getAllTrustCircles();
 
         // Adding Local Trust Circles to existing Central Trust Circles list for synchronization;
-        //TODO: uncomment when CMM is ready and deployed: List<TrustCircle> localTcList = trustCirclesClient.getAllLocalTrustCircles();
+        List<TrustCircle> localTcList = trustCirclesClient.getAllLocalTrustCircles();
         List<TrustCircle> combinedList = new ArrayList<>();
         combinedList.addAll(tcList);
-        //TODO: uncomment when CMM is ready and deployed: combinedList.addAll(localTcList);
+        combinedList.addAll(localTcList);
         tcList = combinedList;
 
         List<SharingGroup> sgList = getAllSharingGroupsWithUuids();
