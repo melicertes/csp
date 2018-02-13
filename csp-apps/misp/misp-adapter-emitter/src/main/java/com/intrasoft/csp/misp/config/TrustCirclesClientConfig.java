@@ -40,11 +40,14 @@ public class TrustCirclesClientConfig implements ContextUrl {
     @Value("${app.tc.path.circles}")
     String tcPathCircles;
 
+    @Value("${app.tc.path.teams}")
+    String tcPathTeams;
+
     @Value("${app.tc.path.localcircle}")
     String tcPathLocalCircle;
 
-    @Value("${app.tc.path.teams}")
-    String tcPathTeams;
+    @Value("${app.tc.path.contacts}")
+    String tcPathContacts;
 
     @Value("${app.tc.retry.backOffPeriod:5000}")
     private String backOffPeriod;
@@ -74,7 +77,7 @@ public class TrustCirclesClientConfig implements ContextUrl {
 
     @Bean(name = "TcClient")
     public TrustCirclesClient tcClient(){
-        return new TrustCirclesClientImpl(getTcBaseContext(),getTcPathCircles(),getTcPathTeams(),getTcPathLocalCircle());
+        return new TrustCirclesClientImpl(getTcBaseContext(),getTcPathCircles(),getTcPathTeams(), getTcPathLocalCircle(), getTcPathContacts());
     }
 
     @Autowired
@@ -96,14 +99,6 @@ public class TrustCirclesClientConfig implements ContextUrl {
         this.tcPathCircles = tcPathCircles;
     }
 
-    public String getTcPathLocalCircle() {
-        return tcPathLocalCircle;
-    }
-
-    public void setTcPathLocalCircle(String tcPathLocalCircle) {
-        this.tcPathLocalCircle = tcPathLocalCircle;
-    }
-
     public String getTcPathTeams() {
         return tcPathTeams;
     }
@@ -112,14 +107,41 @@ public class TrustCirclesClientConfig implements ContextUrl {
         this.tcPathTeams = tcPathTeams;
     }
 
+    public String getTcPathLocalCircle() {
+        return tcPathLocalCircle;
+    }
+
+    public void setTcPathLocalCircle(String tcPathLocalCircle) {
+        this.tcPathLocalCircle = tcPathLocalCircle;
+    }
+
+    public String getTcPathContacts() {
+        return tcPathContacts;
+    }
+
+    public void setTcPathContacts(String tcPathContacts) {
+        this.tcPathContacts = tcPathContacts;
+    }
+
     public String getTcBaseContext(){
         return protocol + "://" + host + ":" + port;
     }
+
     public String getTcCirclesURI() {
         return protocol + "://" + host + ":" + port + tcPathCircles;
     }
+
     public String getTcTeamsURI() {
         return protocol + "://" + host + ":" + port + tcPathTeams;
     }
+
+    public String getTcLocalCircleURI() {
+        return protocol + "://" + host + ":" + port + tcPathLocalCircle;
+    }
+
+    public String getTcContactsURI() {
+        return protocol + "://" + host + ":" + port + tcPathContacts;
+    }
+
 
 }

@@ -50,6 +50,9 @@ public class TrustCirclesClientConfig implements ContextUrl {
     @Value("${tc.path.localcircle}")
     String tcPathLocalCircle;
 
+    @Value("${tc.path.contacts}")
+    String tcPathContacts;
+
     @Value("${tc.retry.backOffPeriod:5000}")
     private String backOffPeriod;
 
@@ -76,7 +79,7 @@ public class TrustCirclesClientConfig implements ContextUrl {
 
     @Bean(name = "TcClient")
     public TrustCirclesClient tcClient(){
-        return new TrustCirclesClientImpl(getTcBaseContext(),getTcPathCircles(),getTcPathTeams(), getTcPathLocalCircle());
+        return new TrustCirclesClientImpl(getTcBaseContext(),getTcPathCircles(),getTcPathTeams(), getTcPathLocalCircle(), getTcPathContacts());
     }
 
     @Autowired
@@ -114,6 +117,14 @@ public class TrustCirclesClientConfig implements ContextUrl {
         this.tcPathLocalCircle = tcPathLocalCircle;
     }
 
+    public String getTcPathContacts() {
+        return tcPathContacts;
+    }
+
+    public void setTcPathContacts(String tcPathContacts) {
+        this.tcPathContacts = tcPathContacts;
+    }
+
     public String getTcBaseContext(){
         return protocol + "://" + host + ":" + port;
     }
@@ -129,5 +140,10 @@ public class TrustCirclesClientConfig implements ContextUrl {
     public String getTcLocalCircleURI() {
         return protocol + "://" + host + ":" + port + tcPathLocalCircle;
     }
+
+    public String getTcContactsURI() {
+        return protocol + "://" + host + ":" + port + tcPathContacts;
+    }
+
 
 }

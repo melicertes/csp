@@ -2,6 +2,7 @@ package com.intrasoft.csp.client.impl;
 
 import com.intrasoft.csp.client.TrustCirclesClient;
 import com.intrasoft.csp.client.config.TrustCirclesClientConfig;
+import com.intrasoft.csp.commons.model.Contact;
 import com.intrasoft.csp.commons.model.Team;
 import com.intrasoft.csp.commons.model.TrustCircle;
 import com.intrasoft.csp.libraries.restclient.service.RetryRestTemplate;
@@ -31,12 +32,14 @@ public class TrustCirclesClientImpl implements TrustCirclesClient {
     String pathCircles;
     String pathTeams;
     String pathLocalCircle;
+    String pathContacts;
 
-    public TrustCirclesClientImpl(String baseContextPath, String pathCircles, String pathTeams, String pathLocalCircle) {
+    public TrustCirclesClientImpl(String baseContextPath, String pathCircles, String pathTeams, String pathLocalCircle, String pathContacts) {
         this.baseContextPath = baseContextPath;
         this.pathCircles = pathCircles;
         this.pathTeams = pathTeams;
         this.pathLocalCircle = pathLocalCircle;
+        this.pathContacts = pathContacts;
     }
 
     @PostConstruct
@@ -96,6 +99,22 @@ public class TrustCirclesClientImpl implements TrustCirclesClient {
         LOG.debug("API call [get]: " + url);
         TrustCircle trustCircle = retryRestTemplate.getForObject(url, TrustCircle.class);
         return trustCircle;
+    }
+
+    @Override
+    public List<TrustCircle> getLocalTrustCircleByShortName(String shortName) {
+        String queryParam = "short_name";
+        String url = context + pathLocalCircle + "?" + queryParam+ "=" + shortName;
+        List<TrustCircle> list = Arrays.asList(retryRestTemplate.getForObject(url, TrustCircle[].class));
+        return list;
+    }
+
+    @Override
+    public Contact getContactById(String id) {
+        String url = context + pathContacts + "/" + id;
+        LOG.debug("API call [get]: " + url);
+        Contact contact = retryRestTemplate.getForObject(url, Contact.class);
+        return contact;
     }
 
     @Override

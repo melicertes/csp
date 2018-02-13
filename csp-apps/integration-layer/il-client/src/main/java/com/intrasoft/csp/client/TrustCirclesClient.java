@@ -1,5 +1,6 @@
 package com.intrasoft.csp.client;
 
+import com.intrasoft.csp.commons.model.Contact;
 import com.intrasoft.csp.commons.model.Team;
 import com.intrasoft.csp.commons.model.TrustCircle;
 
@@ -25,5 +26,9 @@ public interface TrustCirclesClient {
     List<TrustCircle> getAllLocalTrustCircles();
 
     TrustCircle getLocalTrustCircleByUuid(String uuid);
+
+    List<TrustCircle> getLocalTrustCircleByShortName(String shortName);
+
+    Contact getContactById(String id);
 
 }
