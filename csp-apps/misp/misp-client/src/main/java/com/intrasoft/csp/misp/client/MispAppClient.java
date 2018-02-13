@@ -27,10 +27,12 @@ public interface MispAppClient {
 	// Returns true when organisation is successfully deleted
 	boolean deleteMispOrganisation(String id);
 
-//	TODO: There isn't any MISP REST API support for full CRUD operations on Sharing Groups yet.
 	List<SharingGroup> getAllMispSharingGroups();
     SharingGroup getMispSharingGroup(String uuid);
     SharingGroup addMispSharingGroup(SharingGroup sharingGroup);
     SharingGroup updateMispSharingGroup(SharingGroup sharingGroup);
+    // The use of ids instead of uuids is supported by the API when adding/removing Organisations to/from the Sharing Groups
+    boolean updateMispSharingGroupAddOrganisation(String sharingGroupUuid, String organisationUuid);
+    boolean updateMispSharingGroupRemoveOrganisation(String sharingGroupUuid, String organisationUuid);
     Boolean deleteMispSharingGroup(String id);
 }

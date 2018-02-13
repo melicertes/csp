@@ -24,6 +24,10 @@ public interface MispContextUrl {
     public static String MISP_SHARINGGROUPS_ADD = "sharing_groups/add";
     public static String MISP_SHARINGGROUPS_EDIT = "sharing_groups/edit";
     public static String MISP_SHARINGGROUPS_DELETE = "sharing_groups/delete";
+    public static String MISP_SHARINGGROUPS_ADD_ORGANISATION = "/sharingGroups/addOrg";
+    public static String MISP_SHARINGGROUPS_REMOVE_ORGANISATION = "/sharingGroups/removeOrg";
+    public static String MISP_SHARINGGROUPS_ADD_SERVER = "/sharingGroups/addServer";
+    public static String MISP_SHARINGGROUPS_REMOVE_SERVER = "/sharingGroups/removeServer";
 
 
 
