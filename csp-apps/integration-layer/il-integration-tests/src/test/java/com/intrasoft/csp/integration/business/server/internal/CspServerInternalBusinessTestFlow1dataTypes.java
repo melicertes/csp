@@ -504,7 +504,8 @@ public class CspServerInternalBusinessTestFlow1dataTypes implements CamelRoutes 
         if(assertTcShortName) {
             String output = this.outputCapture.toString();
             //assertTrue( output, output.contains("Using "+tcShortNameToTest+".."));
-            assertThat(output, containsString("Using " + tcShortNameToTest + ".."));
+            assertThat(output, containsString("Using " +
+                    (dataType.equals(IntegrationDataType.TRUSTCIRCLE)?IntegrationDataType.CTC_CSP_ALL:tcShortNameToTest) + ".."));
         }
     }
 

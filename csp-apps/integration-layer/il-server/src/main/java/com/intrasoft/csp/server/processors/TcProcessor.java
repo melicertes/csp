@@ -149,17 +149,25 @@ public class TcProcessor implements Processor,CamelRoutes{
 
     private void sendByDataType(IntegrationData integrationData, Exchange exchange, String originEndpoint, String httpMethod) throws IOException, NoSuchAlgorithmException, InvalidKeyException {
         Optional<TrustCircle> optionalTc;
-        //first make an LTC call and if available use that, instead of CTC.
-        String getAllLocalTcUri = this.getLocalCirclesURI()+"/"+IntegrationDataType.LTC_CSP_SHARING;
-        List<TrustCircle> tcList = camelRestService.sendAndGetList(getAllLocalTcUri, null,  HttpMethod.GET.name(), TrustCircle.class,null,true);
+        List<TrustCircle> tcList = null;
+        String tcShortNameMapping = IntegrationDataType.CTC_CSP_SHARING;
+
+        if(!integrationData.getDataType().equals(IntegrationDataType.TRUSTCIRCLE)) {
+            //first make an LTC call and if available use that, instead of CTC.
+            String getAllLocalTcUri = this.getLocalCirclesURI() + "/" + IntegrationDataType.LTC_CSP_SHARING;
+            tcList = camelRestService.sendAndGetList(getAllLocalTcUri, null, HttpMethod.GET.name(), TrustCircle.class, null, true);
+        }else{
+            tcShortNameMapping = IntegrationDataType.CTC_CSP_ALL;
+        }
+
         boolean useLTC = false;
         if(tcList == null || tcList.isEmpty()) {
-            LOG.info("Did not find any LTC by dataType.Using "+IntegrationDataType.CTC_CSP_SHARING+"..");
+            LOG.info("Using "+tcShortNameMapping+"..");
             //make all-TCs call
             String getAllTcUri = this.getTcCirclesURI();
             //TODO we can get a TC by short name. It is already supported!
             //eg.
-            tcList = camelRestService.sendAndGetList(getAllTcUri+"/"+IntegrationDataType.CTC_CSP_SHARING, null, HttpMethod.GET.name(), TrustCircle.class, null);
+            tcList = camelRestService.sendAndGetList(getAllTcUri+"/"+tcShortNameMapping, null, HttpMethod.GET.name(), TrustCircle.class, null);
             optionalTc  = tcList.stream().findAny();
             //tcList = camelRestService.sendAndGetList(getAllTcUri, null, HttpMethod.GET.name(), TrustCircle.class, null);
             //optionalTc  = tcList.stream().filter(t->t.getShortName().toLowerCase().contains(IntegrationDataType.tcNamingConventionForShortName.get(integrationData.getDataType()).toString().toLowerCase())).findAny();
@@ -264,16 +272,23 @@ public class TcProcessor implements Processor,CamelRoutes{
     public String getTcUri(IntegrationDataType integrationDataType) throws IOException {
         Optional<TrustCircle> optionalTc;
         String uri;
+        List<TrustCircle> tcList = null;
+        String tcShortNameMapping = IntegrationDataType.CTC_CSP_SHARING;
 
-        String getAllLocalTcUri = this.getLocalCirclesURI()+"/"+IntegrationDataType.LTC_CSP_SHARING;
-        List<TrustCircle> tcList = camelRestService.sendAndGetList(getAllLocalTcUri, null,  HttpMethod.GET.name(), TrustCircle.class,null);
+        if(!integrationDataType.equals(IntegrationDataType.TRUSTCIRCLE)) {
+            //if trustCircle, do not check LTC
+            String getAllLocalTcUri = this.getLocalCirclesURI() + "/" + IntegrationDataType.LTC_CSP_SHARING;
+            tcList = camelRestService.sendAndGetList(getAllLocalTcUri, null, HttpMethod.GET.name(), TrustCircle.class, null);
+        }else{
+            tcShortNameMapping = IntegrationDataType.CTC_CSP_ALL;
+        }
 
         if(tcList == null || tcList.isEmpty()) {
-            LOG.info("Did not find any LTC by dataType.Using "+IntegrationDataType.CTC_CSP_SHARING+"..");
+            LOG.info("Using "+tcShortNameMapping+"..");
             String getAllTcUri = this.getTcCirclesURI();
-            //TODO we can get a TC by short name. It is already supported!
+            //we can get a TC by short name. It is already supported!
             //eg.
-            tcList = camelRestService.sendAndGetList(getAllTcUri+"/"+IntegrationDataType.CTC_CSP_SHARING, null, HttpMethod.GET.name(), TrustCircle.class, null);
+            tcList = camelRestService.sendAndGetList(getAllTcUri+"/"+tcShortNameMapping, null, HttpMethod.GET.name(), TrustCircle.class, null);
             optionalTc  = tcList.stream().findAny();
             //tcList = camelRestService.sendAndGetList(getAllTcUri, null,  HttpMethod.GET.name(), TrustCircle.class,null);
             //optionalTc = tcList.stream().filter(t->t.getShortName().toLowerCase().contains(IntegrationDataType.tcNamingConventionForShortName.get(integrationDataType).toString().toLowerCase())).findAny();

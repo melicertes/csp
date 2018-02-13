@@ -33,6 +33,7 @@ public enum IntegrationDataType {
   private String value;
 
   public static final String CTC_CSP_SHARING= "CTC::CSP_SHARING";
+  public static final String CTC_CSP_ALL= "CTC::CSP_ALL";
   public static final String LTC_CSP_SHARING= "LTC::CSP_SHARING";
 
   IntegrationDataType(String value) {
