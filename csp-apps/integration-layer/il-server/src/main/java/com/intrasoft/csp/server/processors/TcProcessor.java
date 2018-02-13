@@ -154,7 +154,7 @@ public class TcProcessor implements Processor,CamelRoutes{
 
         if(!integrationData.getDataType().equals(IntegrationDataType.TRUSTCIRCLE)) {
             //first make an LTC call and if available use that, instead of CTC.
-            String getAllLocalTcUri = this.getLocalCirclesURI() + "/" + IntegrationDataType.LTC_CSP_SHARING;
+            String getAllLocalTcUri = this.getLocalCirclesURI() + "?short_name=" + IntegrationDataType.LTC_CSP_SHARING;
             tcList = camelRestService.sendAndGetList(getAllLocalTcUri, null, HttpMethod.GET.name(), TrustCircle.class, null, true);
         }else{
             tcShortNameMapping = IntegrationDataType.CTC_CSP_ALL;
@@ -277,7 +277,7 @@ public class TcProcessor implements Processor,CamelRoutes{
 
         if(!integrationDataType.equals(IntegrationDataType.TRUSTCIRCLE)) {
             //if trustCircle, do not check LTC
-            String getAllLocalTcUri = this.getLocalCirclesURI() + "/" + IntegrationDataType.LTC_CSP_SHARING;
+            String getAllLocalTcUri = this.getLocalCirclesURI() + "?short_name=" + IntegrationDataType.LTC_CSP_SHARING;
             tcList = camelRestService.sendAndGetList(getAllLocalTcUri, null, HttpMethod.GET.name(), TrustCircle.class, null);
         }else{
             tcShortNameMapping = IntegrationDataType.CTC_CSP_ALL;
