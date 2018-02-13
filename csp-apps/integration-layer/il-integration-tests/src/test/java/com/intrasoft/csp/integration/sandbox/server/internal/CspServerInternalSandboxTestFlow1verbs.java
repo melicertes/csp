@@ -183,8 +183,8 @@ public class CspServerInternalSandboxTestFlow1verbs implements CamelRoutes {
         if(tcShortNameToTest.equalsIgnoreCase(IntegrationDataType.LTC_CSP_SHARING)){
             urlShouldContain = tcProcessor.getLocalCirclesURI();
         }
-        Mockito.when(camelRestService.sendAndGetList(Matchers.contains(urlShouldContain), anyObject(), eq("GET"), eq(TrustCircle.class), anyObject()))
-                .thenReturn(mockUtils.getAllMockedTrustCircles(this.numOfCspsToTest, tcShortNameToTest));
+        Mockito.when(camelRestService.send(Matchers.contains(urlShouldContain), anyObject(), eq("GET"), eq(TrustCircle.class), anyObject()))
+                .thenReturn(mockUtils.getMockedTrustCircle(this.numOfCspsToTest, tcShortNameToTest));
 
         Mockito.when(camelRestService.send(Matchers.contains(urlShouldContain), anyObject(), eq("GET"), eq(TrustCircle.class)))
                 .thenReturn(mockUtils.getMockedTrustCircle(this.numOfCspsToTest, tcShortNameToTest));

@@ -167,8 +167,10 @@ public class TcProcessor implements Processor,CamelRoutes{
             String getAllTcUri = this.getTcCirclesURI();
             //TODO we can get a TC by short name. It is already supported!
             //eg.
-            tcList = camelRestService.sendAndGetList(getAllTcUri+"/"+tcShortNameMapping, null, HttpMethod.GET.name(), TrustCircle.class, null);
-            optionalTc  = tcList.stream().findAny();
+            //tcList = camelRestService.sendAndGetList(getAllTcUri+"/"+tcShortNameMapping, null, HttpMethod.GET.name(), TrustCircle.class, null);
+            //optionalTc  = tcList.stream().findAny();
+            TrustCircle tc = camelRestService.send(getAllTcUri+"/"+tcShortNameMapping, null, HttpMethod.GET.name(), TrustCircle.class, null);
+            optionalTc = Optional.of(tc);
             //tcList = camelRestService.sendAndGetList(getAllTcUri, null, HttpMethod.GET.name(), TrustCircle.class, null);
             //optionalTc  = tcList.stream().filter(t->t.getShortName().toLowerCase().contains(IntegrationDataType.tcNamingConventionForShortName.get(integrationData.getDataType()).toString().toLowerCase())).findAny();
         }else{
@@ -288,8 +290,10 @@ public class TcProcessor implements Processor,CamelRoutes{
             String getAllTcUri = this.getTcCirclesURI();
             //we can get a TC by short name. It is already supported!
             //eg.
-            tcList = camelRestService.sendAndGetList(getAllTcUri+"/"+tcShortNameMapping, null, HttpMethod.GET.name(), TrustCircle.class, null);
-            optionalTc  = tcList.stream().findAny();
+            //tcList = camelRestService.sendAndGetList(getAllTcUri+"/"+tcShortNameMapping, null, HttpMethod.GET.name(), TrustCircle.class, null);
+            //optionalTc  = tcList.stream().findAny();
+            TrustCircle tc = camelRestService.send(getAllTcUri+"/"+tcShortNameMapping, null, HttpMethod.GET.name(), TrustCircle.class, null);
+            optionalTc = Optional.of(tc);
             //tcList = camelRestService.sendAndGetList(getAllTcUri, null,  HttpMethod.GET.name(), TrustCircle.class,null);
             //optionalTc = tcList.stream().filter(t->t.getShortName().toLowerCase().contains(IntegrationDataType.tcNamingConventionForShortName.get(integrationDataType).toString().toLowerCase())).findAny();
             uri = this.getTcCirclesURI();

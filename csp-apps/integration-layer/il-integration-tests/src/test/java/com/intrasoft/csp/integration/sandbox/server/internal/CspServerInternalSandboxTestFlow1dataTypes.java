@@ -349,7 +349,7 @@ public class CspServerInternalSandboxTestFlow1dataTypes implements CamelRoutes {
     @DirtiesContext
     @Test
     public void dslFlow1PostDataTypeContactTest() throws Exception {
-        mockitoWhen(HttpMethod.GET.name(),TrustCircle.class,IntegrationDataType.CONTACT);
+        mockitoWhen(HttpMethod.GET.name(),TrustCircle.class);
         mockUtils.sendFlow1Data(mvc, serverName,"trustcircle",false, true, IntegrationDataType.CONTACT, HttpMethods.POST.name());
         assertFlows("trustcircle",IntegrationDataType.CONTACT, 3,true);
     }
@@ -357,7 +357,7 @@ public class CspServerInternalSandboxTestFlow1dataTypes implements CamelRoutes {
     @DirtiesContext
     @Test
     public void dslFlow1TcIdTypeContactTest() throws Exception {
-        mockitoWhen(HttpMethod.GET.name(),TrustCircle.class,IntegrationDataType.CONTACT);
+        mockitoWhen(HttpMethod.GET.name(),TrustCircle.class);
         mockUtils.sendFlow1Data(mvc, serverName,"trustcircle",tcId,null,false, true, IntegrationDataType.CONTACT, HttpMethods.POST.name());
         assertFlows("trustcircle",IntegrationDataType.CONTACT, 3,false);
     }
@@ -365,7 +365,7 @@ public class CspServerInternalSandboxTestFlow1dataTypes implements CamelRoutes {
     @DirtiesContext
     @Test
     public void dslFlow1PostTeamIdContactTest() throws Exception {
-        mockitoWhen(HttpMethod.GET.name(),TrustCircle.class,IntegrationDataType.CONTACT);
+        mockitoWhen(HttpMethod.GET.name(),TrustCircle.class);
         mockUtils.sendFlow1Data(mvc, serverName,"trustcircle",null,teamId,false, true, IntegrationDataType.CONTACT, HttpMethods.POST.name());
         assertFlows("trustcircle",IntegrationDataType.CONTACT, 1,false);
     }
@@ -373,7 +373,7 @@ public class CspServerInternalSandboxTestFlow1dataTypes implements CamelRoutes {
     @DirtiesContext
     @Test
     public void dslFlow1PutDataTypeContactTest() throws Exception {
-        mockitoWhen(HttpMethod.GET.name(),TrustCircle.class,IntegrationDataType.CONTACT);
+        mockitoWhen(HttpMethod.GET.name(),TrustCircle.class);
         mockUtils.sendFlow1Data(mvc, serverName,"trustcircle",false, true, IntegrationDataType.CONTACT, HttpMethods.PUT.name());
         assertFlows("trustcircle",IntegrationDataType.CONTACT, 3,true);
     }
@@ -381,7 +381,7 @@ public class CspServerInternalSandboxTestFlow1dataTypes implements CamelRoutes {
     @DirtiesContext
     @Test
     public void dslFlow1PutTcIdContactTest() throws Exception {
-        mockitoWhen(HttpMethod.GET.name(),TrustCircle.class,IntegrationDataType.CONTACT);
+        mockitoWhen(HttpMethod.GET.name(),TrustCircle.class);
         mockUtils.sendFlow1Data(mvc, serverName,"trustcircle",tcId,null,false, true, IntegrationDataType.CONTACT, HttpMethods.PUT.name());
         assertFlows("trustcircle",IntegrationDataType.CONTACT, 3,false);
     }
@@ -389,7 +389,7 @@ public class CspServerInternalSandboxTestFlow1dataTypes implements CamelRoutes {
     @DirtiesContext
     @Test
     public void dslFlow1PutTeamIdContactTest() throws Exception {
-        mockitoWhen(HttpMethod.GET.name(),TrustCircle.class,IntegrationDataType.CONTACT);
+        mockitoWhen(HttpMethod.GET.name(),TrustCircle.class);
         mockUtils.sendFlow1Data(mvc, serverName,"trustcircle",null,teamId,false, true, IntegrationDataType.CONTACT, HttpMethods.PUT.name());
         assertFlows("trustcircle",IntegrationDataType.CONTACT, 1,false);
     }
@@ -399,21 +399,21 @@ public class CspServerInternalSandboxTestFlow1dataTypes implements CamelRoutes {
 
 
     @Deprecated
-    void mockitoWhen(String httpMethod, Class aClass, IntegrationDataType integrationDataType) throws IOException {
-        Mockito.when(camelRestService.sendAndGetList(anyString(), anyObject(), eq(httpMethod), eq(aClass), anyObject()))
-                .thenReturn(mockUtils.getAllMockedTrustCircles(this.numOfCspsToTest, IntegrationDataType.tcNamingConventionForShortName.get(integrationDataType)));
-
-        Mockito.when(camelRestService.send(anyString(), anyObject(), eq(httpMethod), eq(aClass)))
-                .thenReturn(mockUtils.getMockedTrustCircle(this.numOfCspsToTest, IntegrationDataType.tcNamingConventionForShortName.get(integrationDataType)));
-    }
+//    void mockitoWhen(String httpMethod, Class aClass, IntegrationDataType integrationDataType) throws IOException {
+//        Mockito.when(camelRestService.sendAndGetList(anyString(), anyObject(), eq(httpMethod), eq(aClass), anyObject()))
+//                .thenReturn(mockUtils.getAllMockedTrustCircles(this.numOfCspsToTest, IntegrationDataType.tcNamingConventionForShortName.get(integrationDataType)));
+//
+//        Mockito.when(camelRestService.send(anyString(), anyObject(), eq(httpMethod), eq(aClass)))
+//                .thenReturn(mockUtils.getMockedTrustCircle(this.numOfCspsToTest, IntegrationDataType.tcNamingConventionForShortName.get(integrationDataType)));
+//    }
 
     void mockitoWhen(String httpMethod, Class aClass) throws IOException {
         String urlShouldContain = tcProcessor.getTcCirclesURI();
         if(tcShortNameToTest.equalsIgnoreCase(IntegrationDataType.LTC_CSP_SHARING)){
             urlShouldContain = tcProcessor.getLocalCirclesURI();
         }
-        Mockito.when(camelRestService.sendAndGetList(contains(urlShouldContain), anyObject(), eq(httpMethod), eq(aClass), anyObject()))
-                .thenReturn(mockUtils.getAllMockedTrustCircles(this.numOfCspsToTest, tcShortNameToTest));
+        Mockito.when(camelRestService.send(contains(urlShouldContain), anyObject(), eq(httpMethod), eq(aClass), anyObject()))
+                .thenReturn(mockUtils.getMockedTrustCircle(this.numOfCspsToTest, tcShortNameToTest));
 
         Mockito.when(camelRestService.send(contains(urlShouldContain), anyObject(), eq(httpMethod), eq(aClass)))
                 .thenReturn(mockUtils.getMockedTrustCircle(this.numOfCspsToTest, tcShortNameToTest));
