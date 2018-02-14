@@ -62,7 +62,7 @@ pipeline {
 //        stage("Run SonarQube analysis") {
 //            steps {
 //                sh "mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent test"
-//                sh "mvn sonar:sonar -Dsonar.host.url=http://sonar:9000 -Dsonar.login=f2ee7bb2a156b53244bf01f10704eb5321f0a2df"
+//                sh "mvn sonar:sonar -Dsonar.host.url=http://sonar:9000 -Dsonar.login=acfa03872fbc02f58468cb05c21242ef4f8d5486"
 //            }
 //        }
     }
