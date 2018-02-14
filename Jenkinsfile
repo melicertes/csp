@@ -21,6 +21,50 @@ pipeline {
                 sh "mvn -version"
             }
         }
+
+        stage('Build') {
+            steps {
+                dir("csp-apps") {
+                    maven_build("-DskipTests clean package")
+                }
+            }
+        }
+
+        stage('Unit Tests and Sonar') {
+            steps {
+                dir("csp-apps") {
+                    maven_build("clean test")
+                }
+            }
+
+            post {
+                always {
+                    junit '**/target/surefire-reports/TEST-*.xml'
+                    jacoco(execPattern: '**/*.exec')
+                }
+            }
+        }
+
+        stage('Acceptance Tests') {
+            steps {
+                dir("csp-apps") {
+                    maven_build("clean verify")
+                }
+            }
+
+            post {
+                always {
+                    junit '**/target/failsafe-reports/TEST-*.xml'
+                }
+            }
+        }
+
+//        stage("Run SonarQube analysis") {
+//            steps {
+//                sh "mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent test"
+//                sh "mvn sonar:sonar -Dsonar.host.url=http://sonar:9000 -Dsonar.login=f2ee7bb2a156b53244bf01f10704eb5321f0a2df"
+//            }
+//        }
     }
 
     post {
@@ -34,7 +78,7 @@ pipeline {
 
 def maven_build(lifecycle) {
     configFileProvider(
-            [configFile(fileId: 'sparks-setting.xml', variable: 'MAVEN_SETTINGS')]) {
+            [configFile(fileId: 'sastix-setting.xml', variable: 'MAVEN_SETTINGS')]) {
         sh """mvn -s $MAVEN_SETTINGS ${lifecycle}"""
     }
 }
