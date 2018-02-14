@@ -21,5 +21,5 @@ public interface MispTcSyncService {
 
       SharingGroup mapTrustCircleToSharingGroup(TrustCircle tCircle, SharingGroup sGroup);
 
-      List<TrustCircle> excludeTeamsFromSyncByShortName(List<TrustCircle> tcList);
+      List<TrustCircle> excludeTrustCirclesFromSyncByShortName(List<TrustCircle> tcList);
 }

@@ -135,7 +135,7 @@ public class MispTcSyncServiceImpl implements MispTcSyncService {
         combinedList.addAll(localTcList);
         tcList = combinedList;
 
-        tcList = excludeTeamsFromSyncByShortName(tcList);
+        tcList = excludeTrustCirclesFromSyncByShortName(tcList);
 
         List<SharingGroup> sgList = getAllSharingGroupsWithUuids();
 
@@ -245,7 +245,7 @@ public class MispTcSyncServiceImpl implements MispTcSyncService {
         return sGroup;
     }
 
-    public List<TrustCircle> excludeTeamsFromSyncByShortName(List<TrustCircle> tcList) {
+    public List<TrustCircle> excludeTrustCirclesFromSyncByShortName(List<TrustCircle> tcList) {
         Predicate<TrustCircle> tcPredicate;
         for (String shortName : trustCircleNamesExcluded) {
             tcPredicate = tc -> tc.getShortName().equals(shortName);

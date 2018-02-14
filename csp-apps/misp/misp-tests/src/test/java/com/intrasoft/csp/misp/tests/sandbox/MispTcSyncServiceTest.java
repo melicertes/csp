@@ -391,7 +391,7 @@ public class MispTcSyncServiceTest {
     }
 
     @Test
-    public void excludeTeamsFromSyncByShortNameTest() {
+    public void excludeTrustCirclesFromSyncByShortNameTest() {
         String[] trustCircleNamesExcluded = { "CTC::CSP_ALL", "CTC::CSP_SHARING", "LTC::CSP_SHARING" };
         List<TrustCircle> unfilteredList = new ArrayList<>();
         int size = 7;
@@ -406,7 +406,7 @@ public class MispTcSyncServiceTest {
         unfilteredList.get(3).setShortName(trustCircleNamesExcluded[1]);
         unfilteredList.get(6).setShortName(trustCircleNamesExcluded[0]);
 
-        List<TrustCircle> filteredList = mispTcSyncService.excludeTeamsFromSyncByShortName(unfilteredList);
+        List<TrustCircle> filteredList = mispTcSyncService.excludeTrustCirclesFromSyncByShortName(unfilteredList);
 
         // TrustCircles with those names should have been removed and list size is smaller
         for (String shortName : trustCircleNamesExcluded) {
