@@ -89,7 +89,12 @@ public class MispTcSyncServiceImpl implements MispTcSyncService {
             if (loopBreak) continue;
             // No match; create this team as an organisation in MISP.
 
-            mispAppClient.addMispOrganisation(mapTeamToOrganisation(teamList.get(i), null));
+            OrganisationDTO organisationDTO = mapTeamToOrganisation(teamList.get(i),null);
+            try {
+                mispAppClient.addMispOrganisation(organisationDTO);
+            }catch (Exception e){
+                LOG.error(String.format("Error while adding misp org: %s. Logging the error and continue",organisationDTO.getName()),e);
+            }
         }
 
         // Finding orphan MISP organisations
