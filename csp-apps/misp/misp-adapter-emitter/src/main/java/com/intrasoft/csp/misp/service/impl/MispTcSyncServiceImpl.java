@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 
 @Service
 public class MispTcSyncServiceImpl implements MispTcSyncService {
@@ -46,6 +47,9 @@ public class MispTcSyncServiceImpl implements MispTcSyncService {
 
     @Value("${misp.sync.prefix}")
     String prefix;
+
+    // Trust Circles (either LTCs or CTCs) having these strings as their short name will not synchronize in MISP.
+    String[] trustCircleNamesExcluded = { "CTC::CSP_ALL", "CTC::CSP_SHARING", "LTC::CSP_SHARING" };
 
 //  TODO: Investigate which additional fields can be mapped
 
@@ -135,6 +139,8 @@ public class MispTcSyncServiceImpl implements MispTcSyncService {
         combinedList.addAll(tcList);
         combinedList.addAll(localTcList);
         tcList = combinedList;
+
+        tcList = excludeTrustCirclesFromSyncByShortName(tcList);
 
         List<SharingGroup> sgList = getAllSharingGroupsWithUuids();
 
@@ -242,6 +248,15 @@ public class MispTcSyncServiceImpl implements MispTcSyncService {
             sGroup.setSharingGroupOrg(sharingGroupOrg);
 
         return sGroup;
+    }
+
+    public List<TrustCircle> excludeTrustCirclesFromSyncByShortName(List<TrustCircle> tcList) {
+        Predicate<TrustCircle> tcPredicate;
+        for (String shortName : trustCircleNamesExcluded) {
+            tcPredicate = tc -> tc.getShortName().equals(shortName);
+            tcList.removeIf(tcPredicate);
+        }
+        return tcList;
     }
 
     private SharingGroupOrgItem addOrgAsSGOI(OrganisationDTO organisationDTO) {
