@@ -1,5 +1,10 @@
 pipeline {
     agent { label 'prod' }
+    parameters {
+        booleanParam(name: 'BUILD', defaultValue: true, description: '')
+        booleanParam(name: 'TEST', defaultValue: true, description: '')
+        booleanParam(name: 'MAVEN_DEPLOY', defaultValue: false, description: 'Deploy JAR artifacts to Maven')
+    }
 
     tools {
         maven 'M3'
@@ -23,6 +28,11 @@ pipeline {
         }
 
         stage('Build') {
+            when {
+                expression {
+                    params.BUILD
+                }
+            }
             steps {
                 dir("csp-apps") {
                     maven_build("-DskipTests clean package")
@@ -31,6 +41,11 @@ pipeline {
         }
 
         stage('Unit Tests and Sonar') {
+            when {
+                expression {
+                    params.TEST
+                }
+            }
             steps {
                 dir("csp-apps") {
                     maven_build("clean test")
@@ -39,13 +54,18 @@ pipeline {
 
             post {
                 always {
-                    junit '**/target/surefire-reports/TEST-*.xml'
+                    junit allowEmptyResults: true, testResults: '**/target/surefire-reports/TEST-*.xml'
                     jacoco(execPattern: '**/*.exec')
                 }
             }
         }
 
         stage('Acceptance Tests') {
+            when {
+                expression {
+                    params.TEST
+                }
+            }
             steps {
                 dir("csp-apps") {
                     maven_build("clean verify")
@@ -54,17 +74,33 @@ pipeline {
 
             post {
                 always {
-                    junit '**/target/failsafe-reports/TEST-*.xml'
+                    junit allowEmptyResults: true, testResults: '**/target/failsafe-reports/TEST-*.xml'
                 }
             }
         }
 
-//        stage("Run SonarQube analysis") {
-//            steps {
-//                sh "mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent test"
-//                sh "mvn sonar:sonar -Dsonar.host.url=http://sonar:9000 -Dsonar.login=acfa03872fbc02f58468cb05c21242ef4f8d5486"
-//            }
-//        }
+        stage("Run SonarQube analysis") {
+            when {
+                expression {
+                    params.TEST
+                }
+            }
+            steps {
+                sh "mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent test"
+                sh "mvn sonar:sonar -Dsonar.host.url=http://sonar:9000 -Dsonar.login=acfa03872fbc02f58468cb05c21242ef4f8d5486"
+            }
+        }
+
+        stage('Deploy maven artifact') {
+            when {
+                expression {
+                    params.MAVEN_DEPLOY
+                }
+            }
+            steps {
+                maven_build("-DskipTests -DskipITs clean deploy")
+            }
+        }
     }
 
     post {
@@ -74,7 +110,6 @@ pipeline {
         }
     }
 }
-
 
 def maven_build(lifecycle) {
     configFileProvider(
