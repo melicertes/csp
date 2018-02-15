@@ -107,11 +107,13 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
         String uuid = "";
         Map<String, List<String>> eventValidationMap = new HashMap<>();
 
-        LOG.info("Received from emmiter: " + jsonNode.toString());
+        LOG.debug("Received from emmiter: " + jsonNode.toString());
 
         if (mispEntity.equals(EVENT)) {
             uuid = jsonNode.get(EVENT.toString()).get("uuid").textValue();
+            LOG.info("Received from emmiter event with uuid: " + uuid);
             eventValidationMap = eventValidation(jsonNode, LOG);
+            // @TODO check for potential bug
             try{
                 object = mispAppClient.getMispEvent(uuid).getBody();
             }
@@ -119,8 +121,7 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
                 LOG.error("Get Event from MISP API Failed: ", e);
                 return;
             }
-//            jsonNode = updateTimestamp(new ObjectMapper().convertValue(object, JsonNode.class));
-            LOG.info(jsonNode.toString());
+            LOG.debug(jsonNode.toString());
         }
 
         DataParams dataParams = new DataParams();
@@ -132,7 +133,7 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
          * check local mapping table, if not found use our own values*/
         List<Origin> origins = originService.findByOriginRecordId(uuid);
         if (origins.isEmpty()){
-            LOG.info("Origin not found");
+            LOG.debug("Origin not found");
             dataParams.setOriginCspId(cspId);
             dataParams.setOriginApplicationId("misp");
             dataParams.setOriginRecordId(uuid);
@@ -141,7 +142,7 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
             dataParams.setRecordId(uuid);
         }
         else {
-            LOG.info("Origin found" + origins.toString());
+            LOG.debug("Origin found" + origins.toString());
             dataParams.setOriginCspId(origins.get(0).getOriginCspId());
             dataParams.setOriginApplicationId(origins.get(0).getOriginApplicationId());
             dataParams.setOriginRecordId(origins.get(0).getOriginRecordId());
@@ -164,7 +165,7 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
          * When the adapter receives data from an external CSP (the “isExternal” flag is set to TRUE)
          * the operation should trigger an emitter response. The emitter should emit this record (for indexing) and
          * set the “toShare” flag to FALSE (rest on conluence https://confluence.sastix.com/display/SXCSP/Integration+Layer+Flows).*/
-        LOG.info("Is Reemittion: " + isReEmittion);
+        LOG.debug("Is Reemittion: " + isReEmittion);
         if (isReEmittion){
             sharingParams.setToShare(false);
         }
@@ -174,7 +175,7 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
              */
             Boolean eventPublished = Boolean.parseBoolean(jsonNode.get(EVENT.toString()).get("published").toString());
             sharingParams.setToShare(eventPublished);
-            LOG.info("Is event published: " + eventPublished);
+            LOG.debug("Is event published: " + eventPublished);
         }
 
         /** issue: SXCSP-337
@@ -201,13 +202,12 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
         if (jsonNode.get(EVENT.toString()).has("Tag")){
             for (JsonNode jn : jsonNode.get(EVENT.toString()).get("Tag")){
                 if (jn.get("name").textValue().equals("threat")){
-                    LOG.info("THREAT");
                     integrationDataType = IntegrationDataType.THREAT;
                 }
             }
         }
         else {
-            LOG.info("Object has no assigned tags");
+            LOG.debug("Object has no assigned tags");
         }
 
         integrationData.setDataType(integrationDataType);
@@ -217,7 +217,7 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
          * should search in ES to see if this uuid exists
          * query the index based on datatype (event/threat), if found send put else send post */
 
-        LOG.info("Integration Data Forwarded to IL: " + integrationData);
+        LOG.debug("Integration Data Forwarded to IL: " + integrationData);
 
         boolean objextExists = false;
         try {
@@ -227,7 +227,7 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
             LOG.error("Elastic query failed, " + e.getMessage());
         }
 
-        LOG.info("Object exists: " + objextExists);
+        LOG.debug("Object exists: " + objextExists);
 
         try {
             if (objextExists){
@@ -251,7 +251,7 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
         try { // handling the case when there's no sharing group specified in the event's distribution setting.
             sharingGroupName = jsonNode.get(EVENT.toString()).get("SharingGroup").get("name").toString().replace("\"","");
         } catch (NullPointerException e) {
-            LOG.info("No sharing group distribution set for this event");
+            LOG.debug("No sharing group distribution set for this event");
             result.put("", new ArrayList<>());
             return result; // returns empty map on sharing group absence
         }
@@ -265,7 +265,7 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
             sGroupOrgs.isNull();
             proceed = true;
         } catch (NullPointerException e) {
-            LOG.info("No organisations found in the sharing group");
+            LOG.debug("No organisations found in the sharing group");
             return result;
         }
         if (proceed) {
@@ -292,7 +292,7 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
     private JsonNode updateTimestamp(JsonNode rootNode) {
         ReadContext ctx = JsonPath.using(configuration).parse(rootNode);
         List<String> timestampPaths = ctx.read("$..timestamp", List.class);
-        LOG.info(timestampPaths.toString());
+        LOG.debug(timestampPaths.toString());
         Long timestamp = Instant.now().getEpochSecond();
         for (String path : timestampPaths){
             rootNode = JsonPath.using(configuration).parse(rootNode).set(path, String.valueOf(timestamp)).json();

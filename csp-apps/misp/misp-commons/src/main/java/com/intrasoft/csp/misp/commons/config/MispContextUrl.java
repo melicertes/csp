@@ -10,6 +10,8 @@ public interface MispContextUrl {
     public static String MISP_DELETE = "delete";
     public static String MISP_HEARTBEAT = "misp_json_self";
     public static String MISP_EVENTS = "events";
+    public static String MISP_ATTRIBUTES = "attributes";
+    public static String MISP_SHADOW_ATTRIBUTES = "shadow_attributes";
     public static String MISP_ORGANISATIONS_VIEW = "organisations/view";
     public static String MISP_ORGANISATIONS_VIEW_ALL_ON_INSTANCE = "organisations/index";
     public static String MISP_ORGANISATIONS_VIEW_ALL_LOCAL = "organisations/index/scope:local";

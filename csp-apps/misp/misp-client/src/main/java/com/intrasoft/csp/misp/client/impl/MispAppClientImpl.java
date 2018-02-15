@@ -120,6 +120,49 @@ public class MispAppClientImpl implements MispAppClient, MispContextUrl {
         return response;
     }
 
+    @Override
+    public ResponseEntity<String> addMispProposal(String eventId, String body) {
+        String url = context  + "/" + MISP_SHADOW_ATTRIBUTES + "/" + "add" + "/" + eventId;
+        LOG.info("API call [post]: " + url);
+        HttpEntity<?> request = new HttpEntity<>(body, headers);
+        ResponseEntity<String> response = retryRestTemplate.exchange(url, HttpMethod.POST, request, String.class);
+        LOG.debug(response.toString());
+
+        return response;
+    }
+
+    @Override
+    public ResponseEntity<String> updateMispProposal(String attrId) {
+        String url = context  + "/" + MISP_SHADOW_ATTRIBUTES + "/" + "edit" + "/" + attrId;
+        LOG.info("API call [put]: " + url);
+        HttpEntity<?> request = new HttpEntity<>(headers);
+        ResponseEntity<String> response = retryRestTemplate.exchange(url, HttpMethod.PUT, request, String.class);
+        LOG.debug(response.toString());
+
+        return response;
+    }
+
+    @Override
+    public ResponseEntity<String> updateMispProposal(String attrId, String body) {
+        String url = context  + "/" + MISP_SHADOW_ATTRIBUTES + "/" + "edit" + "/" + attrId;
+        LOG.info("API call [put]: " + url);
+        HttpEntity<?> request = new HttpEntity<>(body, headers);
+        ResponseEntity<String> response = retryRestTemplate.exchange(url, HttpMethod.PUT, request, String.class);
+        LOG.debug(response.toString());
+        return response;
+    }
+
+    @Override
+    public ResponseEntity<String> getMispAttribute(String uuid) {
+        String url = context  + "/" + MISP_ATTRIBUTES + "/" + uuid;
+
+        LOG.info("API call [get]: " + url);
+        HttpEntity<String> request = new HttpEntity<>(headers);
+        ResponseEntity<String> response;
+        response = retryRestTemplate.exchange(url, HttpMethod.GET, request, String.class);
+        return response;
+    }
+
     /*
     * Organisations API management
     * */

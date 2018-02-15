@@ -11,10 +11,17 @@ import com.intrasoft.csp.commons.model.IntegrationDataType;
 import com.intrasoft.csp.libraries.restclient.exceptions.StatusCodeException;
 import com.intrasoft.csp.misp.client.MispAppClient;
 import com.intrasoft.csp.misp.commons.config.MispContextUrl;
+import com.intrasoft.csp.misp.commons.models.ShadowAttributeRequestDTO;
 import com.intrasoft.csp.misp.domain.model.Origin;
 import com.intrasoft.csp.misp.domain.service.impl.OriginServiceImpl;
 import com.intrasoft.csp.misp.service.AdapterDataHandler;
 import com.intrasoft.csp.misp.service.EmitterDataHandler;
+import com.jayway.jsonpath.Configuration;
+import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.Option;
+import com.jayway.jsonpath.ReadContext;
+import com.jayway.jsonpath.spi.json.JacksonJsonNodeJsonProvider;
+import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +31,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import static com.intrasoft.csp.misp.commons.config.MispContextUrl.MispEntity.EVENT;
@@ -51,25 +61,30 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler{
 
     HttpStatus status;
 
+    private static final Configuration configuration = Configuration.builder()
+            .options(Option.ALWAYS_RETURN_LIST, Option.SUPPRESS_EXCEPTIONS)
+            .jsonProvider(new JacksonJsonNodeJsonProvider())
+            .mappingProvider(new JacksonMappingProvider())
+            .build();
 
     @Override
     public ResponseEntity<String> handleIntegrationData(IntegrationData integrationData, String requestMethod) {
 
-        LOG.info(integrationData.getDataObject().toString());
+        LOG.debug(integrationData.getDataObject().toString());
         String uuid = integrationData.getDataParams().getOriginRecordId();
 
         JsonNode jsonNode = null;
         jsonNode = new ObjectMapper().convertValue(integrationData.getDataObject(), JsonNode.class);
-        LOG.info(jsonNode.toString());
+        LOG.debug(jsonNode.toString());
         try {
-            LOG.info(new ObjectMapper().writeValueAsString(integrationData.getDataObject()));
+            LOG.debug(new ObjectMapper().writeValueAsString(integrationData.getDataObject()));
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
 
         List<Origin> origins = originService.findByOriginRecordId(uuid);
         if (origins.isEmpty()){
-            LOG.info("Entry for " + uuid + " not found.");
+            LOG.debug("Entry for " + uuid + " not found.");
             Origin origin = new Origin();
             origin.setOriginCspId(integrationData.getDataParams().getOriginCspId());
             origin.setOriginApplicationId(integrationData.getDataParams().getOriginApplicationId());
@@ -78,7 +93,7 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler{
             origin.setApplicationId("misp");
             origin.setRecordId(integrationData.getDataParams().getOriginRecordId());
             Origin org = originService.saveOrUpdate(origin);
-            LOG.info("Origin inserted: " + org);
+            LOG.debug("Origin inserted: " + org);
         }
         else {
             LOG.debug("Origin params already found in table");
@@ -94,37 +109,53 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler{
         Remake jsonNode
          */
         jsonNode = new ObjectMapper().convertValue(integrationData.getDataObject(), JsonNode.class);
-
+        JsonNode eventCreatedUpdated = new ObjectMapper().createObjectNode();
 
         integrationData.getSharingParams().setToShare(false);
 
-
-
-
-        LOG.info("requestMethod: " + requestMethod);
-        if (requestMethod.equals("DELETE")) {
-            LOG.info("Delete event with uuid: " + uuid);
-            mispAppClient.deleteMispEvent(uuid);
-        } else {
+        LOG.debug("requestMethod: " + requestMethod);
+        if (!requestMethod.equals("DELETE")) {
             try {
-                LOG.info(integrationData.getDataObject().toString());
-
+                LOG.debug(integrationData.getDataObject().toString());
                 ResponseEntity<String> responseEntity = mispAppClient.addMispEvent(jsonNode.toString());
+                try {
+                    eventCreatedUpdated = new ObjectMapper().readTree(responseEntity.getBody());
+                    eventCreatedUpdated = new ObjectMapper().readValue(responseEntity.getBody(), JsonNode.class);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 status = responseEntity.getStatusCode();
-                LOG.info(responseEntity.toString());
+                LOG.debug(responseEntity.toString());
             } catch (StatusCodeException e) {
                 LOG.error(e.getMessage());
                 if (!e.getHttpHeaders().get("location").isEmpty()) {
                     String location = e.getHttpHeaders().get("location").get(0);
-                    LOG.info("" + location);
+                    LOG.debug("" + location);
 //                    jsonNode = ((ObjectNode) jsonNode.get("Event")).put("timestamp", String.valueOf(Instant.now().getEpochSecond() + 1));
-                    LOG.info(jsonNode.toString());
+                    LOG.debug(jsonNode.toString());
                     ResponseEntity<String> responseEntity = mispAppClient.updateMispEvent(location, jsonNode.toString());
                     status = responseEntity.getStatusCode();
-                    LOG.info(responseEntity.toString());
+                    eventCreatedUpdated = new ObjectMapper().convertValue(responseEntity.getBody(), JsonNode.class);
+                    LOG.debug(responseEntity.toString());
                 }
             }
         }
+
+
+        /**
+         * Handle Proposals
+         */
+        ReadContext ctx = JsonPath.using(configuration).parse(jsonNode);
+
+        // Add New Attribute Proposals
+        String eventId = String.valueOf(eventCreatedUpdated.get("Event").get("id").textValue());
+        List<LinkedHashMap> eventShadowAttributes = ctx.read("$.Event.ShadowAttribute[*]", List.class);
+        handleShadowAttributeAdd(eventShadowAttributes, eventId);
+
+        // Edit Existing Attribute Proposals
+        List<LinkedHashMap> attributeShadowAttributes = ctx.read("$.Event.Attribute[*].ShadowAttribute[*]", List.class);
+        handleShadowAttributeEdit(attributeShadowAttributes);
+
 
         /**
          * issue: SXCSP-339
@@ -141,6 +172,66 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler{
         return new ResponseEntity<String>(status);
     }
 
+    private void handleShadowAttributeAdd(List<LinkedHashMap> eventShadowAttributes, String eventId){
+
+        LOG.debug(eventShadowAttributes.toString());
+
+        eventShadowAttributes.forEach(shadowAttribute -> {
+            LOG.debug(shadowAttribute.toString());
+            String shadowAttributeJsonString = null;
+            try {
+                shadowAttributeJsonString = (new ObjectMapper()).writeValueAsString(shadowAttribute);
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
+            try {
+                mispAppClient.addMispProposal(eventId ,shadowAttributeJsonString);
+            } catch (StatusCodeException e) {
+                LOG.error(e.getMessage());
+                String location = e.getHttpHeaders().get("location").get(0);
+                LOG.debug("" + location);
+                mispAppClient.updateMispProposal(location, shadowAttributeJsonString);
+            }
+        });
+    }
+
+    private void handleShadowAttributeEdit(List<LinkedHashMap> attributeShadowAttributes){
+
+        attributeShadowAttributes.forEach(shadowAttribute -> {
+            LOG.debug(shadowAttribute.toString());
+
+            // Get Attribute by UUID
+            String attrUuid = String.valueOf(shadowAttribute.get("uuid"));
+            JsonNode attribute = new ObjectMapper().createObjectNode();
+            try {
+                attribute = new ObjectMapper().readValue(mispAppClient.getMispAttribute(attrUuid).getBody(), JsonNode.class);
+            } catch (IOException e) {
+                LOG.error(e.getMessage());
+            }
+            String attrId = attribute.get("Attribute").get("id").textValue();
+            LOG.debug("Attribute id: "  + attrId);
+            ObjectNode shadowAttributeRequestNode = new ObjectMapper().createObjectNode();
+                        String shadowAttributeJsonString = null;
+            try {
+                shadowAttributeJsonString = (new ObjectMapper()).writeValueAsString(shadowAttribute);
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
+            try {
+                ShadowAttributeRequestDTO shadowAttributeRequest = new ShadowAttributeRequestDTO(new ShadowAttributeRequestDTO.AttributeRequest(shadowAttribute));
+                String attrRequestStr = new ObjectMapper().writeValueAsString(shadowAttributeRequest);
+                mispAppClient.updateMispProposal(attrId , attrRequestStr);
+            } catch (StatusCodeException e) {
+                LOG.error(e.getMessage());
+                String location = e.getHttpHeaders().get("location").get(0);
+                LOG.debug("" + location);
+                mispAppClient.updateMispProposal(location, shadowAttributeJsonString);
+            } catch (JsonProcessingException e) {
+                LOG.error(e.getMessage());
+            }
+        });
+
+    }
 
     private IntegrationData handleRTIR(IntegrationData ilData) {
         IntegrationData modifiedIlData = ilData;
