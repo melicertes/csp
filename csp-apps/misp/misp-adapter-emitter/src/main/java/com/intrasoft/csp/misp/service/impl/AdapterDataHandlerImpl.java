@@ -61,6 +61,9 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler{
 
     HttpStatus status;
 
+    JsonNode jsonNode;
+    JsonNode eventCreatedUpdated;
+
     private static final Configuration configuration = Configuration.builder()
             .options(Option.ALWAYS_RETURN_LIST, Option.SUPPRESS_EXCEPTIONS)
             .jsonProvider(new JacksonJsonNodeJsonProvider())
@@ -73,7 +76,6 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler{
         LOG.debug(integrationData.getDataObject().toString());
         String uuid = integrationData.getDataParams().getOriginRecordId();
 
-        JsonNode jsonNode = null;
         jsonNode = new ObjectMapper().convertValue(integrationData.getDataObject(), JsonNode.class);
         LOG.debug(jsonNode.toString());
         try {
@@ -109,35 +111,16 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler{
         Remake jsonNode
          */
         jsonNode = new ObjectMapper().convertValue(integrationData.getDataObject(), JsonNode.class);
-        JsonNode eventCreatedUpdated = new ObjectMapper().createObjectNode();
+        eventCreatedUpdated = new ObjectMapper().createObjectNode();
 
         integrationData.getSharingParams().setToShare(false);
 
         LOG.debug("requestMethod: " + requestMethod);
         if (!requestMethod.equals("DELETE")) {
             try {
-                LOG.debug(integrationData.getDataObject().toString());
-                ResponseEntity<String> responseEntity = mispAppClient.addMispEvent(jsonNode.toString());
-                try {
-                    eventCreatedUpdated = new ObjectMapper().readTree(responseEntity.getBody());
-                    eventCreatedUpdated = new ObjectMapper().readValue(responseEntity.getBody(), JsonNode.class);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                status = responseEntity.getStatusCode();
-                LOG.debug(responseEntity.toString());
-            } catch (StatusCodeException e) {
+                handleEventAddEdit();
+            } catch (IOException e) {
                 LOG.error(e.getMessage());
-                if (!e.getHttpHeaders().get("location").isEmpty()) {
-                    String location = e.getHttpHeaders().get("location").get(0);
-                    LOG.debug("" + location);
-//                    jsonNode = ((ObjectNode) jsonNode.get("Event")).put("timestamp", String.valueOf(Instant.now().getEpochSecond() + 1));
-                    LOG.debug(jsonNode.toString());
-                    ResponseEntity<String> responseEntity = mispAppClient.updateMispEvent(location, jsonNode.toString());
-                    status = responseEntity.getStatusCode();
-                    eventCreatedUpdated = new ObjectMapper().convertValue(responseEntity.getBody(), JsonNode.class);
-                    LOG.debug(responseEntity.toString());
-                }
             }
         }
 
@@ -172,6 +155,29 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler{
         return new ResponseEntity<String>(status);
     }
 
+    private void handleEventAddEdit() throws IOException {
+        try {
+            ResponseEntity<String> responseEntity = mispAppClient.addMispEvent(jsonNode.toString());
+            eventCreatedUpdated = new ObjectMapper().readValue(responseEntity.getBody(), JsonNode.class);
+            status = responseEntity.getStatusCode();
+            LOG.debug(responseEntity.toString());
+        } catch (StatusCodeException e) {
+            LOG.error(e.getMessage());
+            if (!e.getHttpHeaders().get("location").isEmpty()) {
+                String location = e.getHttpHeaders().get("location").get(0);
+                LOG.debug("" + location);
+//                    jsonNode = ((ObjectNode) jsonNode.get("Event")).put("timestamp", String.valueOf(Instant.now().getEpochSecond() + 1));
+                LOG.debug(jsonNode.toString());
+                ResponseEntity<String> responseEntity = mispAppClient.updateMispEvent(location, jsonNode.toString());
+                status = responseEntity.getStatusCode();
+                eventCreatedUpdated = new ObjectMapper().readValue(responseEntity.getBody(), JsonNode.class);
+                if (eventCreatedUpdated.get("message") != null && eventCreatedUpdated.get("message").textValue().toLowerCase().equals("error")){
+                    LOG.error(eventCreatedUpdated.toString());
+                    eventCreatedUpdated = jsonNode;
+                }
+            }
+        }
+    }
     private void handleShadowAttributeAdd(List<LinkedHashMap> eventShadowAttributes, String eventId){
 
         LOG.debug(eventShadowAttributes.toString());
@@ -211,7 +217,7 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler{
             String attrId = attribute.get("Attribute").get("id").textValue();
             LOG.debug("Attribute id: "  + attrId);
             ObjectNode shadowAttributeRequestNode = new ObjectMapper().createObjectNode();
-                        String shadowAttributeJsonString = null;
+            String shadowAttributeJsonString = null;
             try {
                 shadowAttributeJsonString = (new ObjectMapper()).writeValueAsString(shadowAttribute);
             } catch (JsonProcessingException e) {
