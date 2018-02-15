@@ -1,7 +1,7 @@
 package com.intrasoft.csp.misp.tests.sandbox;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.intrasoft.csp.client.TrustCirclesClient;
-import com.intrasoft.csp.client.config.TrustCirclesClientConfig;
 import com.intrasoft.csp.commons.model.Team;
 import com.intrasoft.csp.commons.model.TrustCircle;
 import com.intrasoft.csp.libraries.restclient.service.RetryRestTemplate;
@@ -9,6 +9,7 @@ import com.intrasoft.csp.misp.client.MispAppClient;
 import com.intrasoft.csp.misp.client.config.MispAppClientConfig;
 import com.intrasoft.csp.misp.commons.models.OrganisationDTO;
 import com.intrasoft.csp.misp.commons.models.generated.SharingGroup;
+import com.intrasoft.csp.misp.config.TrustCirclesClientConfig;
 import com.intrasoft.csp.misp.service.MispTcSyncService;
 import com.intrasoft.csp.misp.service.impl.MispTcSyncServiceImpl;
 import org.apache.commons.io.FileUtils;
@@ -41,7 +42,7 @@ import static org.springframework.test.web.client.match.MockRestRequestMatchers.
 @RunWith(SpringJUnit4ClassRunner.class)
 
 @SpringBootTest( classes = {MispTcSyncServiceImpl.class,
-                            TrustCirclesClientConfig.class, MispAppClient.class, MispAppClientConfig.class},
+                            TrustCirclesClientConfig.class, ObjectMapper.class, MispAppClient.class, MispAppClientConfig.class},
         properties = {
                 "misp.app.protocol:http",
                 "misp.app.host:192.168.56.50",
