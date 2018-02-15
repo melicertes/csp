@@ -152,7 +152,7 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
         }
 
 
-        /** @FIXME setUrl: FIXED
+        /** Issue setUrl
          * get base url from application.properties
          * how does the url update from emitter of source to adapter of destination*/
         dataParams.setUrl(protocol + "://" + uiHost + ":" + port + "/events/" + uuid);
@@ -160,12 +160,12 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
         SharingParams sharingParams = new SharingParams();
         sharingParams.setIsExternal(false);
 
-        /** @FIXME issue: SXCSP-339
+        /** Issue: SXCSP-339 and SXCSP-452
          * setToShare
          * When the adapter receives data from an external CSP (the “isExternal” flag is set to TRUE)
          * the operation should trigger an emitter response. The emitter should emit this record (for indexing) and
-         * set the “toShare” flag to FALSE (rest on conluence https://confluence.sastix.com/display/SXCSP/Integration+Layer+Flows).*/
-        LOG.debug("Is Reemittion: " + isReEmittion);
+         * set the “toShare” flag to FALSE (rest on conluence https://confluence.sastix.com/display/SXCSP/Integration+Layer+Flows).
+         * set toShare flag to false when distribution is "This organization only"*/
         if (isReEmittion){
             sharingParams.setToShare(false);
         }
@@ -175,7 +175,9 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
              */
             Boolean eventPublished = Boolean.parseBoolean(jsonNode.get(EVENT.toString()).get("published").toString());
             sharingParams.setToShare(eventPublished);
-            LOG.debug("Is event published: " + eventPublished);
+            if (jsonNode.get(EVENT.toString()).get("distribution").textValue().equals("0")){
+                sharingParams.setToShare(false);
+            }
         }
 
         /** issue: SXCSP-337

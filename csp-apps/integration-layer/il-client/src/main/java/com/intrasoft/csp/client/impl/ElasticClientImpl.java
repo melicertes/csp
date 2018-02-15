@@ -57,14 +57,14 @@ public class ElasticClientImpl implements ElasticClient {
         IntegrationDataType dataType = integrationData.getDataType();
 
 //        String response = camelRestService.send(this.getElasticURI() + "/" + dataType.toString().toLowerCase() + "/_search?pretty&_source=false", elasticSearchRequest, HttpMethods.POST.name());
-        LOG.info(this.getElasticURI() + dataType.toString().toLowerCase() + "/_search?pretty&_source=false");
-        LOG.info(elasticSearchRequest.toString());
+        LOG.debug(this.getElasticURI() + dataType.toString().toLowerCase() + "/_search?pretty&_source=false");
+        LOG.debug(elasticSearchRequest.toString());
         ResponseEntity<String> response = retryRestTemplate.postForEntity(this.getElasticURI() + "/" + dataType.toString().toLowerCase() + "/_search?pretty&_source=false", elasticSearchRequest,String.class);
-        LOG.info("Elastic - ES Search response: " + response);
+        LOG.debug("Elastic - ES Search response: " + response);
 
         if(response == null){
             //TODO: What do we want here
-            LOG.info("Response from ES is null");
+            LOG.debug("Response from ES is null");
 //            throw new CspBusinessException("No response from Elastic (null). Processor will fail and should send message to DeadLetterQ");
         }
 
