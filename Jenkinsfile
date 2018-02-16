@@ -2,8 +2,7 @@ pipeline {
     agent { label 'prod' }
     parameters {
         booleanParam(name: 'BUILD', defaultValue: true, description: '')
-        booleanParam(name: 'TEST', defaultValue: false, description: '')
-        booleanParam(name: 'SONAR', defaultValue: true, description: '')
+        booleanParam(name: 'TEST', defaultValue: true, description: '')
         booleanParam(name: 'MAVEN_DEPLOY', defaultValue: false, description: 'Deploy JAR artifacts to Maven')
     }
 
@@ -83,7 +82,7 @@ pipeline {
         stage("Run SonarQube analysis") {
             when {
                 expression {
-                    params.SONAR
+                    params.TEST
                 }
             }
             steps {
