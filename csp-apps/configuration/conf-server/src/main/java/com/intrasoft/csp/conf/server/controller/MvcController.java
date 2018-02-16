@@ -7,9 +7,11 @@ import com.intrasoft.csp.conf.server.context.PagesContextUrl;
 import com.intrasoft.csp.conf.server.domain.data.ManagementRow;
 import com.intrasoft.csp.conf.server.domain.entities.*;
 import com.intrasoft.csp.conf.server.repository.*;
+import com.intrasoft.csp.libraries.headersauth.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -17,8 +19,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
-import org.thymeleaf.templateresolver.ITemplateResolver;
-import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +29,10 @@ public class MvcController implements PagesContextUrl, DataContextUrl {
 
     private static final Logger LOG = LoggerFactory.getLogger(MvcController.class);
 
+    @ModelAttribute("user")
+    public User getUser(@AuthenticationPrincipal final User user){
+        return user;
+    }
 
     @Autowired
     CspRepository cspRepository;
@@ -311,7 +315,6 @@ public class MvcController implements PagesContextUrl, DataContextUrl {
         m.addAttribute("cspListUrl", PAGES_CSP_LIST);
         m.addAttribute("moduleListUrl", PAGES_MODULE_LIST);
 
-        m.addAttribute("user", "admin");
         return m;
     }
 }

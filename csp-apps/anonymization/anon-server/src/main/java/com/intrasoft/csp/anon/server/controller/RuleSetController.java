@@ -3,6 +3,7 @@ package com.intrasoft.csp.anon.server.controller;
 import com.intrasoft.csp.anon.commons.model.RuleSetDTO;
 import com.intrasoft.csp.anon.server.model.RuleSet;
 import com.intrasoft.csp.anon.server.service.AnonService;
+import com.intrasoft.csp.libraries.headersauth.User;
 import org.apache.catalina.webresources.FileResource;
 import org.apache.commons.io.FileUtils;
 import org.hibernate.exception.ConstraintViolationException;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -39,6 +41,12 @@ public class RuleSetController {
 
     @Autowired
     AnonService anonService;
+
+    @ModelAttribute("user")
+    public User getUser(@AuthenticationPrincipal final User user){
+        return user;
+    }
+
 
     @GetMapping("/rulesets")
     public String showRulesets(RuleSet ruleset, Model model) {

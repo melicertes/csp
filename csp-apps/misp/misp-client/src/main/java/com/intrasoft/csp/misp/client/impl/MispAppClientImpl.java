@@ -1,9 +1,11 @@
 package com.intrasoft.csp.misp.client.impl;
 
 //import com.intrasoft.csp.libraries.restclient.service.RetryRestTemplate;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.intrasoft.csp.libraries.restclient.exceptions.CspCommonException;
 import com.intrasoft.csp.libraries.restclient.service.RetryRestTemplate;
 import com.intrasoft.csp.misp.client.MispAppClient;
 import com.intrasoft.csp.misp.commons.config.MispContextUrl;
@@ -38,6 +40,9 @@ public class MispAppClientImpl implements MispAppClient, MispContextUrl {
     @Autowired
     @Qualifier("MispAppRestTemplate")
     RetryRestTemplate retryRestTemplate;
+
+    @Autowired
+    ObjectMapper objectMapper;
 
     @Override
     public void setProtocolHostPortHeaders(String protocol, String host, String port, String authorizationKey) {
@@ -174,6 +179,14 @@ public class MispAppClientImpl implements MispAppClient, MispContextUrl {
 
         OrganisationWrapper tempWrapper = new OrganisationWrapper();
         tempWrapper.setOrganisationDTO(organisationDTO);
+
+        String jsonOrganisationWrapper = null;
+        try {
+            jsonOrganisationWrapper = objectMapper.writeValueAsString(tempWrapper);
+        } catch (JsonProcessingException e) {
+            LOG.error("Parse error while adding misp org",e);
+        }
+        LOG.trace("Adding organisation: "+jsonOrganisationWrapper);
 
         HttpEntity<OrganisationWrapper> request = new HttpEntity<>(tempWrapper, headers);
 
