@@ -623,8 +623,11 @@ public class BackgroundTaskService {
             state.setInstallationState(InstallationState.COMPLETED);
             state = installationService.updateSystemInstallationState(state);
 
-            final List<BackgroundTaskResult<Boolean, Integer>> results = installationService.queryAllModulesInstalled(true).stream().map(module -> {
+            final List<BackgroundTaskResult<Boolean, Integer>> results = installationService.queryAllModulesInstalled(true).stream()
+                    .filter(m -> m.getActive())
+                    .map(module -> {
                 SystemService service = installationService.queryService(module);
+                log.info("Starting Service id {} [linked to id {}] from Module id {}", service.getId(), service.getModule().getId(), module.getId());
                 if (service == null) {
                     log.error("Module {} has no service!",module.getName());
                 } else if (service.getStartable() == true) {
