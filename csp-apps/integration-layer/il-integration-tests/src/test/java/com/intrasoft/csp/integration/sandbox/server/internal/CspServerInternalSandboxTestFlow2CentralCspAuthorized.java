@@ -2,7 +2,6 @@ package com.intrasoft.csp.integration.sandbox.server.internal;
 
 import com.intrasoft.csp.commons.model.IntegrationData;
 import com.intrasoft.csp.commons.model.IntegrationDataType;
-
 import com.intrasoft.csp.commons.model.Team;
 import com.intrasoft.csp.commons.model.TrustCircle;
 import com.intrasoft.csp.commons.routes.CamelRoutes;
@@ -20,6 +19,7 @@ import org.apache.camel.spring.SpringCamelContext;
 import org.apache.camel.test.spring.CamelSpringBootRunner;
 import org.apache.camel.test.spring.MockEndpointsAndSkip;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Matchers;
@@ -30,20 +30,22 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.rule.OutputCapture;
 import org.springframework.core.env.Environment;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.util.StringUtils;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
-import static org.mockito.Matchers.*;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
 @RunWith(CamelSpringBootRunner.class)
@@ -59,9 +61,8 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
                 "server.camel.rest.service.is.async:false" //make it sync for better handling in tests (gracefull shutdown etc.)
         })
 @MockEndpointsAndSkip("http:*")
-public class CspServerInternalSandboxTestFlow2 {
-
-    private static final Logger LOG = LoggerFactory.getLogger(CspServerInternalSandboxTestFlow2.class);
+public class CspServerInternalSandboxTestFlow2CentralCspAuthorized {
+    private static final Logger LOG = LoggerFactory.getLogger(CspServerInternalSandboxTestFlow2CentralCspAuthorized.class);
 
     private MockMvc mvc;
     @Autowired
@@ -94,21 +95,23 @@ public class CspServerInternalSandboxTestFlow2 {
     @Autowired
     TcProcessor tcProcessor;
 
+    @Rule
+    public OutputCapture outputCapture = new OutputCapture();
+
     @Autowired
     Environment env;
 
     private Integer numOfCspsToTest = 3;
+    String tcShortNameToTest = IntegrationDataType.CTC_CSP_SHARING;//default
     private Integer currentCspId = 0;
-    private final IntegrationDataType dataTypeToTest = IntegrationDataType.VULNERABILITY;
     private final String applicationId = "taranis";
     private String cspId = "CERT-GR";
     private String tcId = "tcId";
     private String teamId = "teamId";
-    String tcShortNameToTest = IntegrationDataType.CTC_CSP_SHARING;//default
-
 
     @Before
     public void init() throws Exception {
+        this.outputCapture.flush();
         String cspIdArg = env.getProperty("extCspId");
         if(!StringUtils.isEmpty(cspIdArg)){
             cspId = cspIdArg;
@@ -149,116 +152,31 @@ public class CspServerInternalSandboxTestFlow2 {
                 .thenReturn(mockUtils.getMockedTrustCircle(this.numOfCspsToTest, tcShortNameToTest));
 
         Mockito.when(camelRestService.send(anyString(), anyObject(), eq("GET"), eq(Team.class)))
-                .thenReturn(mockUtils.getMockedTeam(1, "http://external.csp%s.com", "CERT-GR"))
-                .thenReturn(mockUtils.getMockedTeam(2, "http://external.csp%s.com", "CERT-DE"))
-                .thenReturn(mockUtils.getMockedTeam(3, "http://external.csp%s.com", "CERT-FR"));
+                .thenReturn(mockUtils.getMockedTeam(1, "http://external.csp%s.com", "demo1-csp"))
+                .thenReturn(mockUtils.getMockedTeam(2, "http://external.csp%s.com", "demo2-csp"))
+                .thenReturn(mockUtils.getMockedTeam(3, "http://external.csp%s.com", "central-csp"));
     }
-
-    /**
-     * isExternal will be false in Flow 2, and TcProcessor will set it to true
-     * toShare will be true in Flow 2
-     */
 
     @DirtiesContext
     @Test
-    public void dslFlow2DataTypePostAuthorizedTest() throws Exception {
+    public void dslFlow2DataTypePostAuthorizedTCNotCentralTest() throws Exception {
         //For authorized flow, set cspId to have a value from the initialized in Mockito (CERT-GR, CERT-DE or CERT-FR)
-        mockUtils.sendFlow2Data(mvc, applicationId, false, true, this.cspId, this.dataTypeToTest, HttpMethods.POST.name());
-        assertAuthorizedFlow();
+        mockUtils.sendFlow2Data(mvc, applicationId, false, true, "demo1-csp", IntegrationDataType.TRUSTCIRCLE, HttpMethods.POST.name());
+        assertAuthorizedFlow(IntegrationDataType.TRUSTCIRCLE);
     }
 
     @DirtiesContext
     @Test
-    public void dslFlow2TcIdPostAuthorizedTest() throws Exception {
+    public void dslFlow2DataTypePostAuthorizedTCCentralTest() throws Exception {
         //For authorized flow, set cspId to have a value from the initialized in Mockito (CERT-GR, CERT-DE or CERT-FR)
-        mockUtils.sendFlow2Data(mvc, applicationId,tcId,null, false, true, this.cspId, this.dataTypeToTest, HttpMethods.POST.name());
-        assertAuthorizedFlow();
+        mockUtils.sendFlow2Data(mvc, applicationId, false, true, "central-csp", IntegrationDataType.TRUSTCIRCLE, HttpMethods.POST.name());
+        assertAuthorizedFlow(IntegrationDataType.TRUSTCIRCLE);
     }
 
-    @DirtiesContext
-    @Test
-    public void dslFlow2TeamIdPostAuthorizedTest() throws Exception {
-        //For authorized flow, set cspId to have a value from the initialized in Mockito (CERT-GR, CERT-DE or CERT-FR)
-        mockUtils.sendFlow2Data(mvc, applicationId,null,teamId, false, true, this.cspId, this.dataTypeToTest, HttpMethods.POST.name());
-        assertAuthorizedFlow();
-    }
+    private void assertAuthorizedFlow(IntegrationDataType integrationDataType) throws Exception {
 
-    @DirtiesContext
-    @Test
-    public void dslFlow2DataTypePutAuthorizedTest() throws Exception {
-        //For authorized flow, set cspId to have a value from the initialized in Mockito (CERT-GR, CERT-DE or CERT-FR)
-        mockUtils.sendFlow2Data(mvc, applicationId, false, true, this.cspId, this.dataTypeToTest, HttpMethods.PUT.name());
-        assertAuthorizedFlow();
-    }
 
-    @DirtiesContext
-    @Test
-    public void dslFlow2TcIdPutAuthorizedTest() throws Exception {
-        //For authorized flow, set cspId to have a value from the initialized in Mockito (CERT-GR, CERT-DE or CERT-FR)
-        mockUtils.sendFlow2Data(mvc, applicationId,tcId,null, false, true, this.cspId, this.dataTypeToTest, HttpMethods.PUT.name());
-        assertAuthorizedFlow();
-    }
-
-    @DirtiesContext
-    @Test
-    public void dslFlow2TeamIdPutAuthorizedTest() throws Exception {
-        //For authorized flow, set cspId to have a value from the initialized in Mockito (CERT-GR, CERT-DE or CERT-FR)
-        mockUtils.sendFlow2Data(mvc, applicationId,null,teamId, false, true, this.cspId, this.dataTypeToTest, HttpMethods.PUT.name());
-        assertAuthorizedFlow();
-    }
-
-    @DirtiesContext
-    @Test
-    public void dslFlow2DataTypePostNotAuthorizedTest() throws Exception {
-        //For NOT authorized flow, set cspId to have a value different than the ones initialized in Mockito (CERT-GR, CERT-DE or CERT-FR)
-        mockUtils.sendFlow2Data(mvc, applicationId, false, true, "CERT-DUMMY-GR", this.dataTypeToTest, HttpMethods.POST.name());
-        assertNotAuthorizedFlow();
-    }
-
-    @DirtiesContext
-    @Test
-    public void dslFlow2TcIdPostNotAuthorizedTest() throws Exception {
-        //For NOT authorized flow, set cspId to have a value different than the ones initialized in Mockito (CERT-GR, CERT-DE or CERT-FR)
-        mockUtils.sendFlow2Data(mvc, applicationId, tcId, null,false, true, "CERT-DUMMY-GR", this.dataTypeToTest, HttpMethods.POST.name());
-        assertNotAuthorizedFlow();
-    }
-
-    @DirtiesContext
-    @Test
-    public void dslFlow2TeamIdPostNotAuthorizedTest() throws Exception {
-        //For NOT authorized flow, set cspId to have a value different than the ones initialized in Mockito (CERT-GR, CERT-DE or CERT-FR)
-        mockUtils.sendFlow2Data(mvc, applicationId,null,teamId, false, true, "CERT-DUMMY-GR", this.dataTypeToTest, HttpMethods.POST.name());
-        assertNotAuthorizedFlow();
-    }
-
-    @DirtiesContext
-    @Test
-    public void dslFlow2DataTypePutNotAuthorizedTest() throws Exception {
-        //For NOT authorized flow, set cspId to have a value different than the ones initialized in Mockito (CERT-GR, CERT-DE or CERT-FR)
-        mockUtils.sendFlow2Data(mvc, applicationId, false, true, "CERT-DUMMY-GR", this.dataTypeToTest, HttpMethods.PUT.name());
-        assertNotAuthorizedFlow();
-    }
-
-    @DirtiesContext
-    @Test
-    public void dslFlow2TcIdPutNotAuthorizedTest() throws Exception {
-        //For NOT authorized flow, set cspId to have a value different than the ones initialized in Mockito (CERT-GR, CERT-DE or CERT-FR)
-        mockUtils.sendFlow2Data(mvc, applicationId,tcId,null, false, true, "CERT-DUMMY-GR", this.dataTypeToTest, HttpMethods.PUT.name());
-        assertNotAuthorizedFlow();
-    }
-
-    @DirtiesContext
-    @Test
-    public void dslFlow2TeamIdPutNotAuthorizedTest() throws Exception {
-        //For NOT authorized flow, set cspId to have a value different than the ones initialized in Mockito (CERT-GR, CERT-DE or CERT-FR)
-        mockUtils.sendFlow2Data(mvc, applicationId,null,teamId, false, true, "CERT-DUMMY-GR", this.dataTypeToTest, HttpMethods.PUT.name());
-        assertNotAuthorizedFlow();
-    }
-
-    private void assertAuthorizedFlow() throws Exception {
-                /*
-        External DCL: expect 1-message
-         */
+        String cspIdFound = null;
         mockedEDcl.expectedMessageCount(1);
         mockedEDcl.assertIsSatisfied();
 
@@ -267,12 +185,16 @@ public class CspServerInternalSandboxTestFlow2 {
         for (Exchange exchange : list) {
             Message in = exchange.getIn();
             IntegrationData data = in.getBody(IntegrationData.class);
-            assertThat(data.getDataType(), is(this.dataTypeToTest));
+            cspIdFound = data.getDataParams().getCspId();
+            assertThat(data.getDataType(), is(integrationDataType));
             //assertThat(data.getSharingParams().getIsExternal(), is(false));
             assertThat(data.getSharingParams().getToShare(), is(true));
         }
 
-
+        List<String> authorizedCentralCspIdsList = Arrays.asList(IntegrationDataType.authorizedCentralCspIds);
+        String finalCspIdFound = cspIdFound;
+        boolean notCentralTc = integrationDataType.equals(IntegrationDataType.TRUSTCIRCLE)
+                && !authorizedCentralCspIdsList.stream().anyMatch(c->c.equalsIgnoreCase(finalCspIdFound));
         /*
         TC: expect 1-message for authorized calls
          */
@@ -284,7 +206,7 @@ public class CspServerInternalSandboxTestFlow2 {
         for (Exchange exchange : list) {
             Message in = exchange.getIn();
             IntegrationData data = in.getBody(IntegrationData.class);
-            assertThat(data.getDataType(), is(this.dataTypeToTest));
+            assertThat(data.getDataType(), is(integrationDataType));
             assertThat(data.getSharingParams().getIsExternal(), is(false));//this was true once uppon a time, due to the fact that the connection from the controller was synchromized, thus resulting in a synced blocking camel exchange. Since we changed to async, this flag is false, as it supposed to be
             assertThat(data.getSharingParams().getToShare(), is(true));
         }
@@ -292,7 +214,7 @@ public class CspServerInternalSandboxTestFlow2 {
        /*
         DSL: expect 1-message
          */
-        mockedDsl.expectedMessageCount(1);
+        mockedDsl.expectedMessageCount(notCentralTc?0:1);
         mockedDsl.assertIsSatisfied();
 
 
@@ -300,7 +222,7 @@ public class CspServerInternalSandboxTestFlow2 {
         for (Exchange exchange : list) {
             Message in = exchange.getIn();
             IntegrationData data = in.getBody(IntegrationData.class);
-            assertThat(data.getDataType(), is(this.dataTypeToTest));
+            assertThat(data.getDataType(), is(integrationDataType));
             assertThat(data.getSharingParams().getIsExternal(), is(true));
             assertThat(data.getSharingParams().getToShare(), is(true));
         }
@@ -311,65 +233,24 @@ public class CspServerInternalSandboxTestFlow2 {
         // The data type to test is defined in class -> private IntegrationDataType dataTypeToTest = IntegrationDataType.VULNERABILITY;
         // The application id is "taranis"
         // Expect 1-messages according to application.properties (external.vulnerability.apps:taranis)
-        mockedApp.expectedMessageCount(1);
+        mockedApp.expectedMessageCount(notCentralTc?0:1);
         mockedApp.assertIsSatisfied();
 
         list = mockedApp.getReceivedExchanges();
         for (Exchange exchange : list) {
             Message in = exchange.getIn();
             IntegrationData data = in.getBody(IntegrationData.class);
-            assertThat(data.getDataType(), is(this.dataTypeToTest));
+            assertThat(data.getDataType(), is(integrationDataType));
             assertThat(data.getSharingParams().getIsExternal(), is(true));
             assertThat(data.getSharingParams().getToShare(), is(true));
         }
-    }
 
-    private void assertNotAuthorizedFlow() throws Exception {
-        /*
-        External DCL: expect 1-message
-         */
-        mockedEDcl.expectedMessageCount(1);
-        mockedEDcl.assertIsSatisfied();
-
-        //assert datatype, isExternal (?), toShare
-        List<Exchange> list = mockedEDcl.getReceivedExchanges();
-        for (Exchange exchange : list) {
-            Message in = exchange.getIn();
-            IntegrationData data = in.getBody(IntegrationData.class);
-            assertThat(data.getDataType(), is(this.dataTypeToTest));
-            //assertThat(data.getSharingParams().getIsExternal(), is(false));
-            assertThat(data.getSharingParams().getToShare(), is(true));
+        if(notCentralTc) {
+            String output = this.outputCapture.toString();
+            assertThat(output, containsString(
+                    String.format("TC dataType change request received from external CSP (flow2) and is not %s. Csp tried to do this is: %s"
+                            ,authorizedCentralCspIdsList.toString(),cspIdFound)
+            ));
         }
-
-
-        /*
-        TC: expect 1-message for non authorized calls
-         */
-        mockedTC.expectedMessageCount(1);
-        mockedTC.assertIsSatisfied();
-
-        //assert datatype, isExternal (not changed for NOT authorized), toShare
-        list = mockedTC.getReceivedExchanges();
-        for (Exchange exchange : list) {
-            Message in = exchange.getIn();
-            IntegrationData data = in.getBody(IntegrationData.class);
-            assertThat(data.getDataType(), is(this.dataTypeToTest));
-            assertThat(data.getSharingParams().getIsExternal(), is(false));
-            assertThat(data.getSharingParams().getToShare(), is(true));
-        }
-
-
-       /*
-        DSL: expect no message, flow has ended
-         */
-        mockedDsl.expectedMessageCount(0);
-        mockedDsl.assertIsSatisfied();
-
-
-        /*
-        APP: expect no message, flow has ended
-         */
-        mockedApp.expectedMessageCount(0);
-        mockedApp.assertIsSatisfied();
     }
 }

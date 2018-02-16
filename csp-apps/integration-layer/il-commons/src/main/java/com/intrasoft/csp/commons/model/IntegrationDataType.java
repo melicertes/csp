@@ -36,6 +36,8 @@ public enum IntegrationDataType {
   public static final String CTC_CSP_ALL= "CTC::CSP_ALL";
   public static final String LTC_CSP_SHARING= "LTC::CSP_SHARING";
 
+  public static final String[] authorizedCentralCspIds = {"central", "central-csp"};
+
   IntegrationDataType(String value) {
     this.value = value;
   }

@@ -420,12 +420,25 @@ public class TcProcessor implements Processor,CamelRoutes{
         LOG.info("Authorized (cspId or shortName="+integrationData.getDataParams().getCspId().toLowerCase()+"): "+authorized);
         if (authorized){
             integrationData.getSharingParams().setIsExternal(true);
+            boolean shouldSend = true;
 
-            //exchange.getIn().setBody(integrationData); //replace with producer
-            //exchange.getIn().setHeader("recipients", routes.apply(DSL));//replace with producer
-            Map<String, Object> headers = new HashMap<>();
-            headers.put(Exchange.HTTP_METHOD, httpMethod);
-            producer.sendBodyAndHeaders(routes.apply(DSL),ExchangePattern.InOut,integrationData,headers);
+            String cspId = integrationData.getDataParams().getCspId();
+            List<String> authorizedCentralCspIdsList = Arrays.asList(IntegrationDataType.authorizedCentralCspIds);
+
+            if(integrationData.getDataType().equals(IntegrationDataType.TRUSTCIRCLE)
+                    && !authorizedCentralCspIdsList.stream().anyMatch(c->c.equalsIgnoreCase(cspId))){
+                shouldSend = false;
+                LOG.warn(String.format("TC dataType change request received from external CSP (flow2) and is not %s. Csp tried to do this is: %s"
+                        ,authorizedCentralCspIdsList.toString(),cspId));
+            }
+
+            if(shouldSend) {
+                //exchange.getIn().setBody(integrationData); //replace with producer
+                //exchange.getIn().setHeader("recipients", routes.apply(DSL));//replace with producer
+                Map<String, Object> headers = new HashMap<>();
+                headers.put(Exchange.HTTP_METHOD, httpMethod);
+                producer.sendBodyAndHeaders(routes.apply(DSL), ExchangePattern.InOut, integrationData, headers);
+            }
         }
     }
 
