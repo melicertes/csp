@@ -100,7 +100,9 @@ pipeline {
                 }
             }
             steps {
-                maven_build("-DskipTests -DskipITs clean deploy")
+                dir("csp-apps") {
+                    maven_build("-DskipTests -DskipITs clean deploy")
+                }
             }
         }
     }
