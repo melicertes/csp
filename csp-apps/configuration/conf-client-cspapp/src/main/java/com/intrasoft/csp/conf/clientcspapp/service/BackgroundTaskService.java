@@ -383,6 +383,13 @@ public class BackgroundTaskService {
                 // b. copy .env from homedir to the module dir
                 copyEnvironment(moduleInstallDirectory);
 
+                // b1 make sure there are no previous containers with the same name!
+                Map<String,String> env = new HashMap<>();
+                env.put("SERVICE_DIR", moduleInstallDirectory);
+                env.put("SERVICE_NAME", installingModule.getName());
+                executeScriptSimple("installService.sh", env);
+
+                // create custom environment
                 if (manifest.getFormat() > 1.0 && customEnv != null) { // env.json is not mandatory
                     createCustomEnv(customEnv, installingModule);
                 }
@@ -394,7 +401,7 @@ public class BackgroundTaskService {
 
                 if (ftime != null && installationService.moduleContains(installingModule, ftime)) {
                     log.info("First time init script {} detected. Will launch for module {}",ftime, installingModule.getName());
-                    executeShScript(installingModule, moduleInstallDirectory, ftime, ControlScript.FIRST_TIME);
+                    executeModuleShScript(installingModule, moduleInstallDirectory, ftime, ControlScript.FIRST_TIME);
                 }
 
                 // d. set module to INSTALLED + ACTIVE = TRUE
@@ -430,10 +437,10 @@ public class BackgroundTaskService {
         });
     }
 
-    private boolean executeShScript(SystemModule module, String moduleInstallDirectory, String scriptName, ControlScript type) throws IOException {
-        File firstTime = new File(moduleInstallDirectory, scriptName);
-        if (firstTime.exists()) {
-            firstTime.setExecutable(true,true);
+    private boolean executeModuleShScript(SystemModule module, String moduleInstallDirectory, String scriptName, ControlScript type) throws IOException {
+        File scriptInModule = new File(moduleInstallDirectory, scriptName);
+        if (scriptInModule.exists()) {
+            scriptInModule.setExecutable(true,true);
 
             Map<String,String> env = new HashMap<>();
             env.put("DIR", moduleInstallDirectory);
@@ -445,7 +452,7 @@ public class BackgroundTaskService {
             log.error("Failed execution detected on {} script - *WILL PROCEED* WITH INSTALLATION!",type);
         } else {
             log.error("First time file {}  was not found although present in module {} !",
-                    firstTime.getAbsolutePath(), module.getName());
+                    scriptInModule.getAbsolutePath(), module.getName());
         }
         return false;
     }
@@ -585,7 +592,7 @@ public class BackgroundTaskService {
                 Manifest manifest = getManifest(module.getModulePath());
                 if (manifest.getFormat() > 1.0 && manifest.getShLast() != null
                         &&  installationService.moduleContains(module, manifest.getShLast())) { //last-time is only 1.1+
-                    executeShScript(module, module.getModulePath(), manifest.getShLast(), ControlScript.LAST_TIME);
+                    executeModuleShScript(module, module.getModulePath(), manifest.getShLast(), ControlScript.LAST_TIME);
                 }
 
                 storageService.deleteDirectoryAndContents(module.getModulePath());
