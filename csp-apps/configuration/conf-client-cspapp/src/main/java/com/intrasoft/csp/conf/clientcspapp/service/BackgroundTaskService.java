@@ -627,7 +627,8 @@ public class BackgroundTaskService {
                     .filter(m -> m.getActive())
                     .map(module -> {
                 SystemService service = installationService.queryService(module);
-                log.info("Starting Service id {} [linked to id {}] from Module id {}", service.getId(), service.getModule().getId(), module.getId());
+                log.info("Starting service {} id {} [linked to id {}, active {}] from Module id {}",
+                        service.getName(), service.getId(), service.getModule().getId(), service.getModule().getActive(), module.getId());
                 if (service == null) {
                     log.error("Module {} has no service!",module.getName());
                 } else if (service.getStartable() == true) {
