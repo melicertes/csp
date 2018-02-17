@@ -398,7 +398,7 @@ public class CspServerInternalSandboxTestFlow1dataTypes implements CamelRoutes {
 
 
 
-    @Deprecated
+//    @Deprecated
 //    void mockitoWhen(String httpMethod, Class aClass, IntegrationDataType integrationDataType) throws IOException {
 //        Mockito.when(camelRestService.sendAndGetList(anyString(), anyObject(), eq(httpMethod), eq(aClass), anyObject()))
 //                .thenReturn(mockUtils.getAllMockedTrustCircles(this.numOfCspsToTest, IntegrationDataType.tcNamingConventionForShortName.get(integrationDataType)));
