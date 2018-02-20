@@ -54,11 +54,23 @@
             <groupId>com.intrasoft.csp</groupId>
             <artifactId>conf-client</artifactId>
             <version>${version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>com.intrasoft.csp</groupId>
+					<artifactId>libraries-headersauth</artifactId>
+				</exclusion>
+			</exclusions>
         </dependency>
 		<dependency>
 			<groupId>com.intrasoft.csp</groupId>
 			<artifactId>conf-commons</artifactId>
 			<version>${project.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>com.intrasoft.csp</groupId>
+					<artifactId>libraries-headersauth</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 

@@ -351,7 +351,9 @@ public class BackgroundTaskService {
                                 installingModule.setExternalName(customEnv.getServices().get(0).getExternalName());
 
                             } else {
-                                List<String> names = customEnv.getServices().stream().map( s -> s.getExternalName()).collect(Collectors.toList());
+                                List<String> names = customEnv.getServices().stream()
+                                        .filter( s -> s.isAgent())
+                                        .map( s -> s.getExternalName()).collect(Collectors.toList());
                                 String namesjoined = String.join("|", names);
                                 installingModule.setExternalName(namesjoined);
                             }
