@@ -263,8 +263,14 @@ public class InstallationService {
     }
 
     public SystemService queryService(SystemModule module) {
-        return serviceRepository.findByName(module.getName());
-
+        SystemService service = serviceRepository.findByName(module.getName());
+        if (service.getModule().getId().longValue() == module.getId().longValue()) {
+            log.debug("Service id {} linked to Module id {}, CORRECT", service.getId(), module.getId());
+        } else {
+            log.warn("Service id {} linked to Module id {}, but module requested id {}",
+                    service.getId(), service.getModule().getId(), module.getId());
+        }
+        return service;
     }
 
     public SystemService updateServiceState(SystemService service, ServiceState state) {

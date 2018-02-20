@@ -40,7 +40,7 @@ pipeline {
             }
         }
 
-        stage('Unit Tests and Sonar') {
+        stage('Unit Tests') {
             when {
                 expression {
                     params.TEST
@@ -86,8 +86,10 @@ pipeline {
                 }
             }
             steps {
-                sh "mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent test"
-                sh "mvn sonar:sonar -Dsonar.host.url=http://sonar:9000 -Dsonar.login=acfa03872fbc02f58468cb05c21242ef4f8d5486"
+                dir("csp-apps") {
+                    sh "mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent test"
+                    sh "mvn sonar:sonar -Dsonar.host.url=http://sonar:9000 -Dsonar.login=acfa03872fbc02f58468cb05c21242ef4f8d5486"
+                }
             }
         }
 
@@ -98,7 +100,9 @@ pipeline {
                 }
             }
             steps {
-                maven_build("-DskipTests -DskipITs clean deploy")
+                dir("csp-apps") {
+                    maven_build("-DskipTests -DskipITs clean deploy")
+                }
             }
         }
     }
