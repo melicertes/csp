@@ -16,10 +16,8 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.function.Predicate;
 
 @Service
@@ -163,12 +161,16 @@ public class MispTcSyncServiceImpl implements MispTcSyncService {
         }
 
         // SXCSP-435 Setting Sharing Groups as inactive instead of deleting them
+        // SXCSP-455 Adding date suffix to the passive Sharing Groups
+
         sgList = getAllSharingGroupsWithUuids(); // refresh list
 
         boolean exists;
         for (SharingGroup sg : sgList) {
             exists = tcList.stream().anyMatch(tc -> tc.getId().equals(sg.getUuid()));
             if (!exists) { // if Sharing Group's UUID doesn't exist anywhere in Trust Circles
+                if (sg.isActive())  // prevents suffix from being added multiple times
+                    sg.setName(addDateSuffix(sg.getName())); // SXCSP-455
                 sg.setActive(false);
                 mispAppClient.updateMispSharingGroup(sg);
             }
@@ -332,6 +334,14 @@ public class MispTcSyncServiceImpl implements MispTcSyncService {
             }
         });
         return orgUuidsToRemove;
+    }
+
+    // SXCSP-455 Adding date suffix to the passive Sharing Groups
+    private String addDateSuffix(String name) {
+        Date date = Calendar.getInstance().getTime();
+        String mispDatePattern = "yyyy-MM-dd";
+        SimpleDateFormat sdf = new SimpleDateFormat(mispDatePattern);
+        return name + "_" + sdf.format(date);
     }
 
 }
