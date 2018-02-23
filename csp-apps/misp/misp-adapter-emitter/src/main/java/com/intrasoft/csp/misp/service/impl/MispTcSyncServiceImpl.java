@@ -287,7 +287,11 @@ public class MispTcSyncServiceImpl implements MispTcSyncService {
 
             sGroup.setSharingGroupOrg(sharingGroupOrg);
         }
-
+        // Prevents MISP error 403 when including an empty organisations array; MISP accepts null instead
+        if (isNew && sGroup.getSharingGroupOrg() != null) {
+            if (sGroup.getSharingGroupOrg().isEmpty())
+                sGroup.setSharingGroupOrg(null);
+        }
         return sGroup;
     }
 
