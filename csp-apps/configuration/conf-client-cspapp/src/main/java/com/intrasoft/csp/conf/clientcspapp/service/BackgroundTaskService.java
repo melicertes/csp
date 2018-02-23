@@ -385,12 +385,6 @@ public class BackgroundTaskService {
                 // b. copy .env from homedir to the module dir
                 copyEnvironment(moduleInstallDirectory);
 
-                // b1 make sure there are no previous containers with the same name!
-                Map<String,String> env = new HashMap<>();
-                env.put("SERVICE_DIR", moduleInstallDirectory);
-                env.put("SERVICE_NAME", installingModule.getName());
-                executeScriptSimple("rmContainers.sh", env);
-
                 // create custom environment
                 if (manifest.getFormat() > 1.0 && customEnv != null) { // env.json is not mandatory
                     createCustomEnv(customEnv, installingModule);
@@ -423,6 +417,7 @@ public class BackgroundTaskService {
                         .filter( m -> !m.getHash().contentEquals(moduleHash)) // only not ours
                         .forEach( m -> {
                             m.setActive(false);
+                            log.info("Module {} with path {} is now set inactive",m.getModulePath(), m.getName());
                             installationService.saveSystemModule(m);
 
 
@@ -432,6 +427,8 @@ public class BackgroundTaskService {
                             params.put("SERVICE_NAME", m.getName());
                             try {
                                 executeScriptSimple("rmContainers.sh", params);
+                                log.info("Containers for module {} are now removed / path {} / active {}",
+                                        m.getName(), m.getModulePath(), m.getActive());
                             } catch (IOException e) {
                                 log.error("PROBLEM!!!! Failed to clear containers for module {} id {}", m.getName(), m.getId());
                             }
