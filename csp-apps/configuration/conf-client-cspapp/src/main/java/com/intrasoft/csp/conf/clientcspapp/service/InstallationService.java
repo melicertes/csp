@@ -115,10 +115,13 @@ public class InstallationService {
         if (module != null && module.size()==1) {
             log.info("Module list size : {} retrieved!", module.size());
             return module.get(0);
-        } else {
-            log.error("System error: {} Modules cannot have same name and active=true more than once!!!", module);
-            return null;
+        } else if (module.size() > 0){
+            log.error("SYSTEM ERROR; Modules are active: {} cannot have same name and active=true more than once!!!", module);
+        } else if (module.size() <= 0) {
+            log.error("SYSTEM ERROR; Module with name {} and active {} is not found?",
+                    name, active);
         }
+        return null;
     }
 
     public SystemModule queryModuleByHash(String hash) {

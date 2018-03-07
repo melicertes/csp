@@ -806,7 +806,13 @@ public class BackgroundTaskService {
 
     private SystemService checkOAMAgentCreation(SystemModule module, SystemService service) throws IOException {
         final SystemModule moduleOAM = installationService.queryModuleByName(moduleOAMname, true);
+        if (moduleOAM == null) {
+            log.error("SYSTEM ERROR; Module with name {} is not present in this installation!",moduleOAMname);
+        }
         final SystemModule moduleAPC = installationService.queryModuleByName(moduleAPCname, true);
+        if (moduleAPC == null) {
+            log.error("SYSTEM ERROR; Module with name {} is not present in this installation!",moduleAPCname);
+        }
         BackgroundTaskResult<Boolean, Integer> oamStarted = null;
         if (service.getOamAgentNecessary() && service.getOamAgentCreated() == null) {
             // we need to have OAM running and APACHE for this.
