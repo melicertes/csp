@@ -159,7 +159,6 @@ public class MispTcSyncServiceImpl implements MispTcSyncService {
             }
             if (loopBreak) continue;
             // No match; create this Trust Circle as a Sharing Group in MISP.
-
             mispAppClient.addMispSharingGroup(mapTrustCircleToSharingGroup(tcList.get(i), null));
         }
 
@@ -210,6 +209,7 @@ public class MispTcSyncServiceImpl implements MispTcSyncService {
     }
 
     public SharingGroup mapTrustCircleToSharingGroup(TrustCircle tCircle, SharingGroup sGroup) {
+        final boolean isNew = (sGroup == null) ? true : false;
         if(sGroup == null){
             //SharingGroup will be created from scratch
             sGroup = new SharingGroup();
@@ -231,22 +231,67 @@ public class MispTcSyncServiceImpl implements MispTcSyncService {
             sGroupOrgCheckMap.put(uuid, (mispAppClient.getMispOrganisation(uuid)!=null));
         });
 
+        List<String> sGroupOrgsUuids = new ArrayList<>();
+        sGroup.setSharingGroupOrg(sharingGroupOrg);  // TODO: May introduce bug; check
+        sGroup.getAllOrganisations().forEach(orgDTO -> {
+            sGroupOrgsUuids.add(orgDTO.getUuid());
+        });
+        String sGroupUuid = sGroup.getUuid();
+
+        // Synchronize the corresponding Sharing Group's Organisation content with the given Trust Circle's Team content.
+        // The Organisations themselves should have already been synchronized in MISP.
         sGroupOrgCheckMap.forEach((k,v)-> {
-            if (v) { // If the Organisation already exists assign it to the Sharing Group
+            if (v) { // If the Organisation already exists in MISP
                 OrganisationDTO organisationDTO = mispAppClient.getMispOrganisation(k);
-                if (!organisationDTO.getName().startsWith(prefix))
-                    organisationDTO.setName(prefix+organisationDTO.getName());
-                mispAppClient.updateMispOrganisation(organisationDTO);
-                sharingGroupOrg.add(addOrgAsSGOI(organisationDTO));
+                // SXCSP-454 (Add Organisation to Sharing Group)
+                // If not already referenced in the Sharing Group,
+                if (!sGroupOrgsUuids.stream().filter(uuid -> uuid.equals(k)).findFirst().isPresent()) {
+                    if (!isNew) { // This API operation requires the Sharing Group to already exist in MISP
+                        mispAppClient.updateMispSharingGroupAddOrganisation(sGroupUuid, k);
+                    }
+                    sharingGroupOrg.add(addOrgAsSGOI(organisationDTO));
+                }
             } else if (!v) {
                 LOG.warn("Organisation with UUID " + k + " has not been synchronized yet");
             }
         });
-        if (!(tCircleTeamsUuids.size()>0))
+        if (!(tCircleTeamsUuids.size()>0)) {
+            sGroupOrgsUuids.forEach(orgUuid -> {
+                if (mispAppClient.updateMispSharingGroupRemoveOrganisation(sGroupUuid, orgUuid)) {
+                    // log info after successful operation?
+                } else {
+                    LOG.warn("Organisation(%s) could not be removed from Sharing Group(%s)", orgUuid, sGroupUuid);
+                }
+            });
             sGroup.setSharingGroupOrg(null);
-        else if (sharingGroupOrg.size() > 0)
-            sGroup.setSharingGroupOrg(sharingGroupOrg);
+        }
+        else if (sharingGroupOrg.size() > 0) {
+            // Remove any Organisations from the Sharing Group that don't match the given Trust Circle's Team UUID content.
+            List<String> orgsToRemoveFromSG = removeUnlistedOrgs(tCircleTeamsUuids, sGroupOrgsUuids);
+            orgsToRemoveFromSG.forEach(orgUuid -> {
+                if (mispAppClient.updateMispSharingGroupRemoveOrganisation(sGroupUuid, orgUuid)) {
+                    // log info after successful operation?
+                } else {
+                    LOG.warn("Organisation(%s) could not be removed from Sharing Group(%s)", orgUuid, sGroupUuid);
+                }
+            });
+            // Can't use UUID when getting a Sharing Group; use id instead. Otherwise, MISP returns "500 internal error".
+            if (!isNew) {
+                SharingGroup updatedSharingGroup = mispAppClient.getMispSharingGroup(sGroup.getId());
+                List<OrganisationDTO> updatedOrgList = updatedSharingGroup.getAllOrganisations();
+                sharingGroupOrg.clear();
+                updatedOrgList.forEach(orgDTO -> {
+                    sharingGroupOrg.add(addOrgAsSGOI(orgDTO));
+                });
+            }
 
+            sGroup.setSharingGroupOrg(sharingGroupOrg);
+        }
+        // Prevents MISP error 403 when including an empty organisations array; MISP accepts null instead
+        if (isNew && sGroup.getSharingGroupOrg() != null) {
+            if (sGroup.getSharingGroupOrg().isEmpty())
+                sGroup.setSharingGroupOrg(null);
+        }
         return sGroup;
     }
 
@@ -276,6 +321,17 @@ public class MispTcSyncServiceImpl implements MispTcSyncService {
             sharingGroup.setUuid(mispAppClient.getMispSharingGroup(sharingGroup.getId()).getUuid());
         });
         return sgList;
+    }
+
+    // Filters out any Organisation UUIDs from the Sharing Group that don't exist in the corresponding Trust Circle.
+    private List<String> removeUnlistedOrgs(List<String> teamUuids, List<String> orgUuids) {
+        List<String> orgUuidsToRemove = new ArrayList<>();
+        orgUuids.forEach( orgUuid -> {
+            if (!teamUuids.stream().anyMatch(teamUuid -> teamUuid.equals(orgUuid))) {
+                orgUuidsToRemove.add(orgUuid);
+            }
+        });
+        return orgUuidsToRemove;
     }
 
 }
