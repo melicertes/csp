@@ -325,14 +325,6 @@ public class MispTcSyncServiceImpl implements MispTcSyncService {
         return sgList;
     }
 
-    // SXCSP-455 Adding date suffix to the passive Sharing Groups
-    private String addDateSuffix(String name) {
-        Date date = Calendar.getInstance().getTime();
-        String mispDatePattern = "yyyy-MM-dd";
-        SimpleDateFormat sdf = new SimpleDateFormat(mispDatePattern);
-        return name + "_" + sdf.format(date);
-    }
-
     // Filters out any Organisation UUIDs from the Sharing Group that don't exist in the corresponding Trust Circle.
     private List<String> removeUnlistedOrgs(List<String> teamUuids, List<String> orgUuids) {
         List<String> orgUuidsToRemove = new ArrayList<>();
