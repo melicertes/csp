@@ -228,17 +228,28 @@ public class MispTcSyncServiceTest {
     // a temporary solution is deleting and re-creating the Sharing Group with the updated Organisation content.
     @Test
     public void syncSharingGroupsExistingSharingGroupsTest() throws URISyntaxException, IOException {
-        String tcCirclesURI = tcConfig.getTcCirclesURI();
+
         String mispGroupsURI = "http://192.168.56.50:80/sharing_groups";
         String mispAddGroupURI = "http://192.168.56.50:80/sharing_groups/add";
         String sharingGroupUuid = "a36c31f4-dad3-4f49-b443-e6d6333649b1";
 
+        MockRestServiceServer tcMockServer;
+
         // We first need to mock TC server's getAllTrustCircles response
-        MockRestServiceServer tcMockServer = MockRestServiceServer.bindTo(tcRetryRestTemplate).build();
+        String tcCirclesURI = tcConfig.getTcCirclesURI();
+        tcMockServer = MockRestServiceServer.bindTo(tcRetryRestTemplate).build();
         tcMockServer.expect(requestTo(tcCirclesURI))
                 .andRespond(MockRestResponseCreators
                         .withSuccess(FileUtils.readFileToString(new File(twoTrustCirclesUpdated.toURI()),
                                 Charset.forName("UTF-8")).getBytes(), MediaType.APPLICATION_JSON_UTF8));
+
+        // Then mock TC server's getAllLocalTrustCircles response
+        String tcLocalCirclesURI = tcConfig.getTcLocalCircleURI(); // Mock file's path containing response of LTCs
+        tcMockServer.expect(requestTo(tcLocalCirclesURI))
+                .andRespond(MockRestResponseCreators
+                        .withSuccess(FileUtils.readFileToString(new File(allLocalTrustCircles.toURI()),
+                                Charset.forName("UTF-8")).getBytes(), MediaType.APPLICATION_JSON_UTF8));
+
 
         // create the existing organisation here manually
         String newOrgUuid = "9a74c807-e6c4-4a19-9c77-37457e3285df";
@@ -247,7 +258,7 @@ public class MispTcSyncServiceTest {
         OrganisationDTO organisationDTO = new OrganisationDTO();
         organisationDTO.setName("DELETE ME");
         organisationDTO.setUuid(newOrgUuid);
-        mispAppClient.addMispOrganisation(organisationDTO);
+//        mispAppClient.addMispOrganisation(organisationDTO);
 
         mispTcSyncService.syncSharingGroups();
 
