@@ -2,12 +2,13 @@ package com.intrasoft.csp.client.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sastix.regrep.client.CspDataMappingType;
-import com.sastix.regrep.client.ElasticSearchClient;
-import com.sastix.regrep.client.routes.ContextUrl;
+import com.intrasoft.csp.client.CspDataMappingType;
+import com.intrasoft.csp.client.ElasticSearchClient;
+import com.intrasoft.csp.client.routes.ContextUrl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.PostConstruct;
