@@ -17,8 +17,9 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>es-client</module>
-        <module>emailer</module>
+        <module>regrep-es-client</module>
+        <module>regrep-emailer</module>
+        <module>regrep-commons</module>
     </modules>
 
     
