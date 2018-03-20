@@ -193,7 +193,7 @@ public class MispAppClientImpl implements MispAppClient, MispContextUrl {
         ResponseEntity<OrganisationWrapper> organisationWrapper = new ResponseEntity<>(HttpStatus.OK);
 
         organisationWrapper = retryRestTemplate.exchange(url, HttpMethod.POST, request, OrganisationWrapper.class);
-        LOG.info(organisationWrapper.getStatusCode().toString() + " " + organisationWrapper.getStatusCode().getReasonPhrase());
+        LOG.debug(organisationWrapper.getStatusCode().toString() + " " + organisationWrapper.getStatusCode().getReasonPhrase());
         return organisationWrapper.getBody().getOrganisation();
 
     }
@@ -235,7 +235,7 @@ public class MispAppClientImpl implements MispAppClient, MispContextUrl {
             LOG.error(e.getMessage());
             return false;
         }
-        LOG.info(organisationWrapper.getStatusCode().getReasonPhrase());
+        LOG.debug(organisationWrapper.getStatusCode().getReasonPhrase());
 
         if (organisationWrapper.getStatusCode().value() == 200)
             return true;
@@ -276,7 +276,7 @@ public class MispAppClientImpl implements MispAppClient, MispContextUrl {
             sgList.add(tempSg);
         }
 
-        LOG.info(response.getStatusCode().toString());
+        LOG.debug(response.getStatusCode().toString());
         return sgList;
     }
 
@@ -323,7 +323,7 @@ public class MispAppClientImpl implements MispAppClient, MispContextUrl {
             LOG.error(e.getMessage());
             return null;
         }
-        LOG.info(response.getStatusCode().toString());
+        LOG.debug(response.getStatusCode().toString());
 
 //      TODO: Is the Sharing Groups API supposed to respond with an array when adding a Sharing Group? Investigate.
 //      SharingGroupOrg is not embedded in the response's Sharing Group object; mapping it manually
@@ -370,7 +370,7 @@ public class MispAppClientImpl implements MispAppClient, MispContextUrl {
             LOG.error(e.getMessage());
             return false;
         }
-        LOG.info("Organisation("+ organisationUuid + ") is added to Sharing Group(" + sharingGroupUuid+")");
+        LOG.trace("Organisation("+ organisationUuid + ") is added to Sharing Group(" + sharingGroupUuid+")");
         return true;
     }
 
@@ -387,7 +387,7 @@ public class MispAppClientImpl implements MispAppClient, MispContextUrl {
             LOG.error(e.getMessage());
             return false;
         }
-        LOG.info("Organisation("+ organisationUuid + ") is removed from Sharing Group(" + sharingGroupUuid+")");
+        LOG.trace("Organisation("+ organisationUuid + ") is removed from Sharing Group(" + sharingGroupUuid+")");
         return true;
     }
 
@@ -407,7 +407,7 @@ public class MispAppClientImpl implements MispAppClient, MispContextUrl {
             return false;
         }
 
-        LOG.info(response.getStatusCode() + " " + response.getStatusCode().getReasonPhrase());
+        LOG.debug(response.getStatusCode() + " " + response.getStatusCode().getReasonPhrase());
         return true;
     }
 }

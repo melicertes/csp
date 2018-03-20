@@ -60,7 +60,7 @@ public class MispTcSyncServiceImpl implements MispTcSyncService {
     @Override
     public void syncAll() {
         if(syncEnabled) {
-            LOG.info("Misp sync triggered. Will sync all.");
+            LOG.debug("Misp sync triggered. Will sync all.");
             // It would be wise to have organisations synchronized first, before synchronizing sharing groups.
             syncOrganisations();
             syncSharingGroups();
@@ -119,7 +119,7 @@ public class MispTcSyncServiceImpl implements MispTcSyncService {
             teamIdList.add(org.getId());
         }
 
-        LOG.info("Found " + teamIdList.size() + " orphan organisations in MISP");
+        LOG.trace("Found " + teamIdList.size() + " orphan organisations in MISP");
         // TODO: What is the action to be taken when a MISP organisation does not have a corresponding team in TC? (deletion is not an option for now)
         // teamIdList.forEach(id -> mispAppClient.deleteMispOrganisation(id));
 
@@ -254,7 +254,7 @@ public class MispTcSyncServiceImpl implements MispTcSyncService {
                     sharingGroupOrg.add(addOrgAsSGOI(organisationDTO));
                 }
             } else if (!v) {
-                LOG.warn("Organisation with UUID " + k + " has not been synchronized yet");
+                LOG.debug("Organisation with UUID " + k + " has not been synchronized yet");
             }
         });
         if (!(tCircleTeamsUuids.size()>0)) {
@@ -262,7 +262,7 @@ public class MispTcSyncServiceImpl implements MispTcSyncService {
                 if (mispAppClient.updateMispSharingGroupRemoveOrganisation(sGroupUuid, orgUuid)) {
                     // log info after successful operation?
                 } else {
-                    LOG.warn("Organisation(%s) could not be removed from Sharing Group(%s)", orgUuid, sGroupUuid);
+                    LOG.debug("Organisation(%s) could not be removed from Sharing Group(%s)", orgUuid, sGroupUuid);
                 }
             });
             sGroup.setSharingGroupOrg(null);
@@ -274,7 +274,7 @@ public class MispTcSyncServiceImpl implements MispTcSyncService {
                 if (mispAppClient.updateMispSharingGroupRemoveOrganisation(sGroupUuid, orgUuid)) {
                     // log info after successful operation?
                 } else {
-                    LOG.warn("Organisation(%s) could not be removed from Sharing Group(%s)", orgUuid, sGroupUuid);
+                    LOG.debug("Organisation(%s) could not be removed from Sharing Group(%s)", orgUuid, sGroupUuid);
                 }
             });
             // Can't use UUID when getting a Sharing Group; use id instead. Otherwise, MISP returns "500 internal error".
