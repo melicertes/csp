@@ -57,6 +57,16 @@ public class ElasticSearchClientImpl implements ElasticSearchClient {
     @Override
     public int getNdocsByType(CspDataMappingType type, String requestBody) {
         String url = context + "/" + DATA_INDEX + "/" + type + "/" + ContextUrl.Api.COUNT;
+        return getCount(requestBody, url);
+    }
+
+    @Override
+    public int getNlogs(String requestBody) {
+        String url = context + "/" + LOGS_INDEX + "/" + ContextUrl.Api.COUNT;
+        return getCount(requestBody, url);
+    }
+
+    private int getCount(String requestBody, String url) {
         LOG.info("API call [GET]: " + url);
         HttpEntity<String> request = new HttpEntity<>(requestBody, headers);
         ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, request, String.class);

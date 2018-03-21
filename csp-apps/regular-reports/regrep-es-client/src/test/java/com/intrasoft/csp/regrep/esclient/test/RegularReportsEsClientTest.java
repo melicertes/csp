@@ -52,6 +52,18 @@ public class RegularReportsEsClientTest {
         mockRestServiceServer.verify();
     }
 
+    @Test
+    public void getNlogsTest() throws URISyntaxException, IOException {
+        String apiUrl = "http://docker.containers:9200/logstash*/_count";
+        MockRestServiceServer mockRestServiceServer = MockRestServiceServer.bindTo(restTemplate).build();
+        mockRestServiceServer.expect(requestTo(apiUrl))
+                .andRespond(MockRestResponseCreators.withSuccess(FileUtils.readFileToString(new File(elasticResponse.toURI()), Charset.forName("UTF-8"))
+                        .getBytes(), MediaType.APPLICATION_JSON_UTF8));
+        int response = elasticSearchClient.getNlogs("test" );
+        assertTrue(response==9);
+        mockRestServiceServer.verify();
+    }
+
 
 
 }
