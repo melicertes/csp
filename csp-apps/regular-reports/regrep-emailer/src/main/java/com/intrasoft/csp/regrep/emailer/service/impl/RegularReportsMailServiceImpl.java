@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.mail.MailAuthenticationException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -76,6 +77,11 @@ public class RegularReportsMailServiceImpl implements RegularReportsMailService 
         helper.setText(html, true);
         helper.setSubject(mail.getSubject());
         helper.setFrom(mail.getFrom());
-        javaMailSender.send(message);
+        try {
+            javaMailSender.send(message);
+        } catch (MailAuthenticationException e) {
+            LOG.error(e.getMessage());
+        }
+
     }
 }
