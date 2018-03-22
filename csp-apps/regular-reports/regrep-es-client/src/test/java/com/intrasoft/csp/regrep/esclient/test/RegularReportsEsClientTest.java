@@ -1,9 +1,12 @@
 package com.intrasoft.csp.regrep.esclient.test;
 
 import com.intrasoft.csp.client.CspDataMappingType;
+import com.intrasoft.csp.client.DateMath;
 import com.intrasoft.csp.client.ElasticSearchClient;
 import com.intrasoft.csp.client.config.ElasticSearchClientConfig;
-import com.intrasoft.csp.client.impl.ElasticSearchClientImpl;
+import com.intrasoft.csp.client.service.RequestBodyService;
+import com.intrasoft.csp.client.service.impl.RequestBodyServiceImpl;
+import com.intrasoft.csp.regrep.commons.model.query.ElasticQuery;
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -27,7 +30,7 @@ import static org.junit.Assert.assertTrue;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringBootTest(classes = {ElasticSearchClient.class, ElasticSearchClientConfig.class})
+@SpringBootTest(classes = {ElasticSearchClient.class, ElasticSearchClientConfig.class, RequestBodyServiceImpl.class})
 public class RegularReportsEsClientTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(RegularReportsEsClientTest.class);
@@ -39,6 +42,9 @@ public class RegularReportsEsClientTest {
 
     @Autowired
     ElasticSearchClient elasticSearchClient;
+
+    @Autowired
+    RequestBodyService requestBodyService;
 
     @Test
     public void getNdocsByTypeTest() throws URISyntaxException, IOException {
@@ -64,6 +70,13 @@ public class RegularReportsEsClientTest {
         mockRestServiceServer.verify();
     }
 
+    @Test
+    public void getNlogsWithRequestBodyTest() {
+        String apiUrl = "http://docker.containers:9200/logstash*/_count";
+        ElasticQuery elasticQuery = requestBodyService.constructQuery(DateMath.ONE_YEAR, DateMath.NOW);
+        LOG.info(elasticQuery.getQuery().toString());
+        int count = elasticSearchClient.getNlogs(elasticQuery);
+    }
 
 
 }

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.intrasoft.csp.client.CspDataMappingType;
 import com.intrasoft.csp.client.ElasticSearchClient;
 import com.intrasoft.csp.client.routes.ContextUrl;
+import com.intrasoft.csp.regrep.commons.model.query.ElasticQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,6 +67,21 @@ public class ElasticSearchClientImpl implements ElasticSearchClient {
         return getCount(requestBody, url);
     }
 
+    @Override
+    public int getNlogs(ElasticQuery requestBody) {
+        String url = context + "/" + LOGS_INDEX + "/" + ContextUrl.Api.COUNT;
+        HttpEntity<ElasticQuery> request = new HttpEntity<>(requestBody, headers);
+        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, request, String.class);
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode obj = null;
+        try {
+            obj = mapper.readTree(response.getBody());
+        } catch (IOException e) {
+            LOG.error(e.getMessage());
+        }
+        return Integer.parseInt(obj.get("count").toString());
+    }
+
     private int getCount(String requestBody, String url) {
         LOG.info("API call [GET]: " + url);
         HttpEntity<String> request = new HttpEntity<>(requestBody, headers);
@@ -79,4 +95,5 @@ public class ElasticSearchClientImpl implements ElasticSearchClient {
         }
         return Integer.parseInt(obj.get("count").toString());
     }
+
 }

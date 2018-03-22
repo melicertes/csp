@@ -3,6 +3,7 @@ package com.intrasoft.csp.client;
 public enum DateMath {
     NOW("now"),
     ONE_DAY("1d"),
+    ONE_WEEK("1w"),
     ONE_MONTH("1m"),
     ONE_YEAR("1y");
 
