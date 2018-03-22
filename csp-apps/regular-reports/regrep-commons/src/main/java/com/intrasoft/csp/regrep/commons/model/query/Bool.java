@@ -2,9 +2,7 @@ package com.intrasoft.csp.regrep.commons.model.query;
 
 import java.util.List;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import javax.annotation.Generated;
 
-@Generated("com.robohorse.robopojogenerator")
 public class Bool{
 
 	@JsonProperty("must")
