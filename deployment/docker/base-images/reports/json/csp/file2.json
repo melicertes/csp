@@ -1,0 +1,10 @@
+{
+    "query": {
+        "range" : {
+            "dataParams.dateTime" : {
+                "gte" : "now-1M",
+                "lt" :  "now"
+            }
+        }
+    }
+}

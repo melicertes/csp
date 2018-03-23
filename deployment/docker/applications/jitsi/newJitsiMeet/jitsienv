@@ -1,0 +1,7 @@
+#configuration environment variables
+
+DOMAIN=vc.sastix.com
+STUN=stun.viva.gr
+BRIDGE_IP=173.212.214.30
+BRIDGE_TCP_PORT=4443
+BRIDGE_UDP_PORT=10000

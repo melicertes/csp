@@ -1,0 +1,25 @@
+version: '3'
+services:
+
+  postgresql:
+    image: csp-postgres:1.0
+    container_name: csp-postgres
+    domainname: ${LOCAL_DOMAIN}
+    hostname: csp-postgres
+    env_file:
+      - .env
+    # we will expose the postgres port so JITSI can also use it. It will be on localhost level.
+    ports:
+      - 127.0.0.1:${POSTGRES_DOCR_PORT}:${POSTGRES_DOCR_PORT}
+    volumes:
+      - PostgresDataVolume:/var/lib/postgresql/data
+      - ./migrations:/docker-entrypoint-initdb.d/
+
+volumes:
+    PostgresDataVolume:
+        external: true
+
+networks:
+  default:
+    external:
+      name: ${LOCAL_DOMAIN}

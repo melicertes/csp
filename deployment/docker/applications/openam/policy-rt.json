@@ -1,0 +1,20 @@
+{
+    "name" : "RTPolicy",
+    "active" : true,
+    "description" : "Authorization policy for RT application",
+    "applicationName" : "RTPolicySet",
+    "actionValues" : {
+      "HEAD" : true,
+      "DELETE" : true,
+      "POST" : true,
+      "GET" : true,
+      "OPTIONS" : true,
+      "PUT" : true
+    },
+    "resources" : [ "*://*:*/*", "*://*:*/*?*" ],
+    "subject" : {
+      "type" : "Identity",
+      "subjectValues" : [ "id=rt-admin,ou=group,dc=openam,dc=forgerock,dc=org", "id=rt_user,ou=group,dc=openam,dc=forgerock,dc=org" ]
+    },
+    "resourceTypeUuid" : "__RES_TYPE_ID_TO_BE_INSERTED__"
+}

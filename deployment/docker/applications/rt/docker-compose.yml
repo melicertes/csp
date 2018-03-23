@@ -1,0 +1,51 @@
+version: '3'
+services:
+
+  rt:
+    env_file:
+      - .env
+    image: csp-rt:1.0
+    container_name: csp-rt
+    domainname: ${LOCAL_DOMAIN}
+    hostname: csp-rt
+    command: sh /scripts/run.sh   
+    volumes:
+      - SSLDatavolume:/opt/ssl/
+      - RTStateDatavolume:/scripts/rt
+      - RTDatavolume:/opt/rt4
+      - /opt/csp/logs:/opt/rt4/var/log
+    expose:
+      - ${RT_DOCR_PORT}
+
+  rt-adapter:
+    depends_on:
+        - rt
+    image: csp-java8:1.0
+    container_name: csp-rt_adapter
+    domainname: ${LOCAL_DOMAIN}
+    hostname: csp-rt_adapter
+    env_file:
+        - .env
+    command: java -Xmx512m -Dspring.profiles.active=docker -jar server.jar
+    working_dir: /opt/csp
+    volumes:
+        - ./rt-emitter-adapter-0.4.0-SNAPSHOT-exec.jar:/opt/csp/server.jar
+        - SSLDatavolume:/opt/ssl/
+        - RTAdapterDBDatavolume:/opt/csp/RTuuidRepositoryDB
+    expose:
+        - ${RT_ADAPTER_DOCR_PORT}
+
+volumes:
+    SSLDatavolume:
+        external: true
+    RTStateDatavolume:
+        external: true
+    RTDatavolume:
+        external: true
+    RTAdapterDBDatavolume:
+        external: true
+
+networks:
+  default:
+    external:
+     name: ${LOCAL_DOMAIN}

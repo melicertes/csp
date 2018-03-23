@@ -1,0 +1,41 @@
+vcl 4.0;
+
+import am;
+
+backend default {
+     .host = "127.0.0.1";
+     .port = "80";
+}
+
+##
+# OpenAM Varnish Web Policy Agent configuration
+# Do not modify below this line
+##
+
+sub vcl_init {
+    am.init("AM_AGENT_CONF_PATH");
+}
+
+sub vcl_recv {
+    if(!am.authenticate()) {
+        return (synth(800));
+    }
+    return (hash);
+}
+
+sub vcl_synth {
+    if(resp.status == 800) {
+        am.done();
+        return (deliver);
+    }
+}
+
+sub vcl_deliver {
+    am.ok();
+    return (deliver);
+}
+
+sub vcl_fini {
+    am.cleanup();
+    return (ok);
+}
