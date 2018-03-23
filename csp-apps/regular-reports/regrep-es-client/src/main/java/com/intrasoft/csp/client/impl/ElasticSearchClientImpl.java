@@ -86,7 +86,6 @@ public class ElasticSearchClientImpl implements ElasticSearchClient {
         LOG.info("API call [GET]: " + url);
         HttpEntity<String> request = new HttpEntity<>(requestBody, headers);
         ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, request, String.class);
-        ObjectMapper mapper = new ObjectMapper();
         JsonNode obj = null;
         try {
             obj = objectMapper.readTree(response.getBody());
