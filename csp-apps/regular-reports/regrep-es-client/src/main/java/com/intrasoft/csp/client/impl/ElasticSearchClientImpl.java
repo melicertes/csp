@@ -2,14 +2,13 @@ package com.intrasoft.csp.client.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.intrasoft.csp.client.CspDataMappingType;
 import com.intrasoft.csp.client.ElasticSearchClient;
 import com.intrasoft.csp.client.routes.ContextUrl;
-import com.intrasoft.csp.regrep.commons.model.query.ElasticQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.PostConstruct;
@@ -56,30 +55,31 @@ public class ElasticSearchClientImpl implements ElasticSearchClient {
     }
 
     @Override
-    public int getNdocsByType(CspDataMappingType type, String requestBody) {
-        String url = context + "/" + DATA_INDEX + "/" + type + "/" + ContextUrl.Api.COUNT;
-        return getCount(requestBody, url);
-    }
-
-    @Override
     public int getNlogs(String requestBody) {
         String url = context + "/" + LOGS_INDEX + "/" + ContextUrl.Api.COUNT;
-        return getCount(requestBody, url);
+        int count = 0;
+        try {
+            count = getCount(requestBody, url);
+        } catch (HttpClientErrorException e) {
+            LOG.error(e.getMessage());
+        } catch (Exception e) {
+            LOG.error(e.getMessage());
+        }
+        return count;
     }
 
     @Override
-    public int getNlogs(ElasticQuery requestBody) {
-        String url = context + "/" + LOGS_INDEX + "/" + ContextUrl.Api.COUNT;
-        HttpEntity<ElasticQuery> request = new HttpEntity<>(requestBody, headers);
-        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, request, String.class);
-        ObjectMapper mapper = new ObjectMapper();
-        JsonNode obj = null;
+    public int getNdocs(String requestBody) {
+        String url = context + "/" + DATA_INDEX + "/" + ContextUrl.Api.COUNT;
+        int count = 0;
         try {
-            obj = mapper.readTree(response.getBody());
-        } catch (IOException e) {
+            count = getCount(requestBody, url);
+        } catch (HttpClientErrorException e) {
+            LOG.error(e.getMessage());
+        } catch (Exception e) {
             LOG.error(e.getMessage());
         }
-        return Integer.parseInt(obj.get("count").toString());
+        return count;
     }
 
     private int getCount(String requestBody, String url) {
@@ -89,7 +89,7 @@ public class ElasticSearchClientImpl implements ElasticSearchClient {
         ObjectMapper mapper = new ObjectMapper();
         JsonNode obj = null;
         try {
-            obj = mapper.readTree(response.getBody());
+            obj = objectMapper.readTree(response.getBody());
         } catch (IOException e) {
             LOG.error(e.getMessage());
         }

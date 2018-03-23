@@ -4,7 +4,7 @@
 	  "must": [{
         "range" : {
             "@timestamp" : {
-                "gte" : "now-1y",
+                "gte" : "now-3y",
                 "lt" :  "now"
             }
         }

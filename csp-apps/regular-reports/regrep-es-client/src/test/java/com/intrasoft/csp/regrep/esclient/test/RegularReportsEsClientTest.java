@@ -1,12 +1,13 @@
 package com.intrasoft.csp.regrep.esclient.test;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.intrasoft.csp.client.CspDataMappingType;
 import com.intrasoft.csp.client.DateMath;
 import com.intrasoft.csp.client.ElasticSearchClient;
+import com.intrasoft.csp.client.LogstashMappingType;
 import com.intrasoft.csp.client.config.ElasticSearchClientConfig;
 import com.intrasoft.csp.client.service.RequestBodyService;
 import com.intrasoft.csp.client.service.impl.RequestBodyServiceImpl;
-import com.intrasoft.csp.regrep.commons.model.query.ElasticQuery;
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -46,17 +47,9 @@ public class RegularReportsEsClientTest {
     @Autowired
     RequestBodyService requestBodyService;
 
-    @Test
-    public void getNdocsByTypeTest() throws URISyntaxException, IOException {
-        String apiUrl = "http://docker.containers:9200/cspdata/artefact/_count";
-        MockRestServiceServer mockRestServiceServer = MockRestServiceServer.bindTo(restTemplate).build();
-        mockRestServiceServer.expect(requestTo(apiUrl))
-                .andRespond(MockRestResponseCreators.withSuccess(FileUtils.readFileToString(new File(elasticResponse.toURI()), Charset.forName("UTF-8"))
-                        .getBytes(), MediaType.APPLICATION_JSON_UTF8));
-        int response = elasticSearchClient.getNdocsByType(CspDataMappingType.ARTEFACT, "test" );
-        assertTrue(response==9);
-        mockRestServiceServer.verify();
-    }
+    @Autowired
+    ObjectMapper objectMapper;
+
 
     @Test
     public void getNlogsTest() throws URISyntaxException, IOException {
@@ -71,11 +64,21 @@ public class RegularReportsEsClientTest {
     }
 
     @Test
-    public void getNlogsWithRequestBodyTest() {
+    public void getNlogsByTypeTest() {
         String apiUrl = "http://docker.containers:9200/logstash*/_count";
-        ElasticQuery elasticQuery = requestBodyService.constructQuery(DateMath.ONE_YEAR, DateMath.NOW);
-        LOG.info(elasticQuery.getQuery().toString());
-        int count = elasticSearchClient.getNlogs(elasticQuery);
+        String requestBody = new String();
+        requestBody = requestBodyService.requestBodyBuilder(DateMath.ONE_YEAR, DateMath.NOW, LogstashMappingType.EXCEPTION);
+        LOG.info(requestBody);
+        int count = elasticSearchClient.getNlogs(requestBody);
+    }
+
+    @Test
+    public void getNdocsByTypeTest() {
+        String apiUrl = "http://docker.containers:9200/cspdata/_count";
+        String requestBody = new String();
+        requestBody = requestBodyService.requestBodyBuilder(DateMath.ONE_YEAR, DateMath.NOW, CspDataMappingType.ALL);
+        LOG.info(requestBody);
+        int count = elasticSearchClient.getNdocs(requestBody);
     }
 
 

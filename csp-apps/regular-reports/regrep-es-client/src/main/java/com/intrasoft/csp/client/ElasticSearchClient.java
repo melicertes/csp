@@ -1,7 +1,5 @@
 package com.intrasoft.csp.client;
 
-import com.intrasoft.csp.regrep.commons.model.query.ElasticQuery;
-
 public interface ElasticSearchClient {
 
     String DATA_INDEX = "cspdata";
@@ -11,12 +9,8 @@ public interface ElasticSearchClient {
 
     String getContext();
 
-    // TODO Add date math enum to signature
-    int getNdocsByType(CspDataMappingType type, String requestBody);
-
     int getNlogs(String requestBody);
 
-    int getNlogs(ElasticQuery requestBody);
-
+    int getNdocs(String requestBody);
 
 }

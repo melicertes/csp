@@ -6,7 +6,8 @@ public enum CspDataMappingType {
     THREAT("threat"),
     VULNERABILITY("vulnerability"),
     INCIDENT("incident"),
-    ARTEFACT("artefact");
+    ARTEFACT("artefact"),
+    ALL("all");
 
     private final String  value;
 

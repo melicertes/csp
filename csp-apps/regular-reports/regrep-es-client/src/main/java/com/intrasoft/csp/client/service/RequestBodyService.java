@@ -1,10 +1,13 @@
 package com.intrasoft.csp.client.service;
 
+import com.intrasoft.csp.client.CspDataMappingType;
 import com.intrasoft.csp.client.DateMath;
-import com.intrasoft.csp.regrep.commons.model.query.ElasticQuery;
+import com.intrasoft.csp.client.LogstashMappingType;
 
 public interface RequestBodyService {
 
-    ElasticQuery constructQuery(DateMath gte, DateMath lt);
+    String requestBodyBuilder(DateMath gte, DateMath lt, LogstashMappingType type);
+
+    String requestBodyBuilder(DateMath gte, DateMath lt, CspDataMappingType type);
 
 }

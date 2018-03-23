@@ -3,7 +3,8 @@ package com.intrasoft.csp.client;
 public enum LogstashMappingType {
 
     AUDIT("aud"),
-    EXCEPTION("exc");
+    EXCEPTION("exc"),
+    ALL("all");  // Simply removes "match" node from query
 
     private final String value;
 

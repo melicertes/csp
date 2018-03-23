@@ -1,38 +1,91 @@
 package com.intrasoft.csp.client.service.impl;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.intrasoft.csp.client.CspDataMappingType;
 import com.intrasoft.csp.client.DateMath;
+import com.intrasoft.csp.client.LogstashMappingType;
 import com.intrasoft.csp.client.service.RequestBodyService;
-import com.intrasoft.csp.regrep.commons.model.query.*;
+import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.charset.Charset;
 
 @Service
-public class RequestBodyServiceImpl implements RequestBodyService{
+public class RequestBodyServiceImpl implements RequestBodyService {
+
+    private static Logger LOG = LoggerFactory.getLogger(RequestBodyServiceImpl.class);
+
+    @Autowired
+    ObjectMapper objectMapper;
+
+    URL nLogsByType = getClass().getClassLoader().getResource("json.payloads/nlogs-by-type.json");
+    URL nDocsByType = getClass().getClassLoader().getResource("json.payloads/ndocs-by-type.json");
 
     @Override
-    public ElasticQuery constructQuery(DateMath gte, DateMath lt) {
+    public String requestBodyBuilder(DateMath gte, DateMath lt, LogstashMappingType type) {
 
-        // Use the timestamp setters for the query time boundaries.
-        ElasticQuery elasticQuery = new ElasticQuery();
-        Query query = new Query();
-        Bool bool = new Bool();
-        List<MustItem> mustItemList = new ArrayList<>();
-        MustItem mustItem = new MustItem();
-        Range range = new Range();
-        Timestamp timestamp = new Timestamp();
+        String payload = null;
+        try {
+            payload = FileUtils.readFileToString(new File(nLogsByType.toURI()), Charset.forName("UTF-8"));
+        } catch (IOException e) {
+            LOG.error(e.getMessage());
+        } catch (URISyntaxException e) {
+            LOG.error(e.getMessage());
+        }
 
-        // Time boundaries
-        timestamp.setGte("now-" + gte.toString());
-        timestamp.setLt(lt.toString());
+        JsonNode jsonNode = null;
+        try {
+            jsonNode = objectMapper.readTree(payload);
+        } catch (IOException e) {
+            LOG.error(e.getMessage());
+        }
 
-        elasticQuery.setQuery(query);
-        query.setBool(bool);
-        mustItem.setRange(range);
-        range.setTimestamp(timestamp);
-        mustItemList.add(mustItem);
-        bool.setMust(mustItemList);
-        return elasticQuery;
+        ( (ObjectNode) jsonNode).findParent("gte").put("gte", "now-" + gte.toString());
+        ( (ObjectNode) jsonNode).findParent("lt").put("lt", lt.toString());
+        if (type.equals(LogstashMappingType.ALL))
+            ((ObjectNode) jsonNode).findParent("match").remove("match");
+        else
+            ( (ObjectNode) jsonNode).findParent("logtype").put("logtype", type.toString());
+        payload = jsonNode.toString();
+        return payload;
     }
+
+    @Override
+    public String requestBodyBuilder(DateMath gte, DateMath lt, CspDataMappingType type) {
+        String payload = null;
+        try {
+            payload = FileUtils.readFileToString(new File(nDocsByType.toURI()), Charset.forName("UTF-8"));
+        } catch (IOException e) {
+            LOG.error(e.getMessage());
+        } catch (URISyntaxException e) {
+            LOG.error(e.getMessage());
+        }
+
+        JsonNode jsonNode = null;
+        try {
+            jsonNode = objectMapper.readTree(payload);
+        } catch (IOException e) {
+            LOG.error(e.getMessage());
+        }
+
+        ( (ObjectNode) jsonNode).findParent("gte").put("gte", "now-" + gte.toString());
+        ( (ObjectNode) jsonNode).findParent("lt").put("lt", lt.toString());
+        if (type.equals(CspDataMappingType.ALL))
+            ((ObjectNode) jsonNode).findParent("match").remove("match");
+        else
+            ( (ObjectNode) jsonNode).findParent("_type").put("_type", type.toString());
+        payload = jsonNode.toString();
+        return payload;
+    }
+
+
 }
