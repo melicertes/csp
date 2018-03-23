@@ -1,0 +1,34 @@
+version: '3'
+services:
+
+  il:
+    image: csp-java8:1.0
+    container_name: csp-il
+    domainname: ${LOCAL_DOMAIN}
+    hostname: csp-il
+    env_file:
+        - .env
+    command: java -Xmx512m -Dserver.ssl.enabled=false -Dapache.camel.use.activemq=false -Dspring.profiles.active=docker -jar server.jar
+    working_dir: /opt/csp
+    volumes:
+        - ./il-server-0.4.0-SNAPSHOT-exec.jar:/opt/csp/server.jar
+        - ./integration-tests-0.4.0-SNAPSHOT.jar:/opt/csp/itests.jar
+        - /opt/csp/logs/:/opt/csplogs
+        - SSLDatavolume:/opt/ssl/
+        - ILDatavolume:/opt/data/activemq
+        - ILDBDatavolume:/opt/csp/sharing_policy/
+    expose:
+        - ${IL_DOCR_PORT}
+
+volumes:
+    ILDatavolume:
+        external: true
+    SSLDatavolume:
+        external: true
+    ILDBDatavolume:
+        external: true
+
+networks:
+  default:
+    external:
+      name: ${LOCAL_DOMAIN}

@@ -1,0 +1,265 @@
+Attaching to csp-oam
+[36mcsp-oam |[0m Initializing OpenAM!!
+[36mcsp-oam |[0m Tomcat started.
+[36mcsp-oam |[0m Running Configurator...
+[36mcsp-oam |[0m Waiting for OpenAM server at http://csp-oam:8080/openam/config/options.htm 
+[36mcsp-oam |[0m About to begin configuration in 30 seconds
+[36mcsp-oam |[0m Checking license acceptance...License terms accepted.
+[36mcsp-oam |[0m Checking configuration directory /root/openam....Success.
+[36mcsp-oam |[0m Installing OpenAM configuration store...Success RSA/ECB/OAEPWithSHA1AndMGF1Padding.
+[36mcsp-oam |[0m Extracting OpenDJ, please wait...Complete
+[36mcsp-oam |[0m Running OpenDJ setupSetup command: --cli --adminConnectorPort 4444 --baseDN dc=openam,dc=forgerock,dc=org --rootUserDN cn=Directory Manager --ldapPort 50389 --skipPortCheck --rootUserPassword xxxxxxx --jmxPort 1689 --no-prompt --doNotStart --hostname csp-oam --noPropertiesFile %0ASee+%2Fusr%2Flocal%2Ftomcat%2Ftemp%2Fopendj-setup-6207666213334959862.log+for+a+detailed%0Alog+of+this+operation.%0A%0AConfiguring+Directory+Server+.....+Done.%0A%0ATo+see+basic+server+configuration+status+and+configuration+you+can+launch%0A%2Froot%2Fopenam%2Fopends%2Fbin%2Fstatus%0A%0A...Success.
+[36mcsp-oam |[0m ...Success
+[36mcsp-oam |[0m Installing OpenAM configuration store in /root/openam/opends...Success.
+[36mcsp-oam |[0m Creating OpenAM suffixImport+task+20171025064830048+scheduled+to+start+immediately%0AImport+task+20171025064830048+has+been+successfully+completed%0A...Success
+[36mcsp-oam |[0m Tag swapping schema files....Success.
+[36mcsp-oam |[0m Loading Schema opendj_config_schema.ldif...Success.
+[36mcsp-oam |[0m Loading Schema opendj_user_schema.ldif...Success.
+[36mcsp-oam |[0m Loading Schema opendj_embinit.ldif...Success.
+[36mcsp-oam |[0m Loading Schema opendj_user_index.ldif...Success.
+[36mcsp-oam |[0m Loading Schema cts-container.ldif...Success.
+[36mcsp-oam |[0m Loading Schema cts-add-schema.ldif...Success.
+[36mcsp-oam |[0m Loading Schema cts-indices.ldif...Success.
+[36mcsp-oam |[0m Loading Schema opendj_dashboard.ldif...Success.
+[36mcsp-oam |[0m Loading Schema opendj_deviceprint.ldif...Success.
+[36mcsp-oam |[0m Loading Schema opendj_kba.ldif...Success.
+[36mcsp-oam |[0m Loading Schema opendj_uma_audit.ldif...Success.
+[36mcsp-oam |[0m Loading Schema opendj_uma_resource_sets.ldif...Success.
+[36mcsp-oam |[0m Loading Schema opendj_uma_labels_schema.ldif...Success.
+[36mcsp-oam |[0m Loading Schema opendj_uma_resource_set_labels.ldif...Success.
+[36mcsp-oam |[0m Loading Schema opendj_uma_pending_requests.ldif...Success.
+[36mcsp-oam |[0m Loading Schema opendj_oathdevices.ldif...Success.
+[36mcsp-oam |[0m ...Success.
+[36mcsp-oam |[0m Reinitializing system properties....Done
+[36mcsp-oam |[0m Registering service dashboardService.xml...Success.
+[36mcsp-oam |[0m Registering service amEntrySpecific.xml...Success.
+[36mcsp-oam |[0m Registering service amAuthConfig.xml...Success.
+[36mcsp-oam |[0m Registering service amAuthHTTPBasic.xml...Success.
+[36mcsp-oam |[0m Registering service amAdminConsole.xml...Success.
+[36mcsp-oam |[0m Registering service idRepoService.xml...Success.
+[36mcsp-oam |[0m Registering service amAuth.xml...Success.
+[36mcsp-oam |[0m Registering service amAuthAD.xml...Success.
+[36mcsp-oam |[0m Registering service amAuthAdaptive.xml...Success.
+[36mcsp-oam |[0m Registering service amAuthAnonymous.xml...Success.
+[36mcsp-oam |[0m Registering service amAuthCert.xml...Success.
+[36mcsp-oam |[0m Registering service amAuthDataStore.xml...Success.
+[36mcsp-oam |[0m Registering service amAuthPersistentCookie.xml...Success.
+[36mcsp-oam |[0m Registering service amAuthDevicePrintModule.xml...Success.
+[36mcsp-oam |[0m Registering service amAuthJDBC.xml...Success.
+[36mcsp-oam |[0m Registering service amAuthLDAP.xml...Success.
+[36mcsp-oam |[0m Registering service amAuthMSISDN.xml...Success.
+[36mcsp-oam |[0m Registering service amAuthMembership.xml...Success.
+[36mcsp-oam |[0m Registering service amAuthNT.xml...Success.
+[36mcsp-oam |[0m Registering service amAuthOAuth.xml...Success.
+[36mcsp-oam |[0m Registering service amAuthWindowsDesktopSSO.xml...Success.
+[36mcsp-oam |[0m Registering service amAuthOpenIdConnect.xml...Success.
+[36mcsp-oam |[0m Registering service amClientData.xml...Success.
+[36mcsp-oam |[0m Registering service amClientDetection.xml...Success.
+[36mcsp-oam |[0m Registering service amDelegation.xml...Success.
+[36mcsp-oam |[0m Registering service amFilteredRole.xml...Success.
+[36mcsp-oam |[0m Registering service amG11NSettings.xml...Success.
+[36mcsp-oam |[0m Registering service amLogging.xml...Success.
+[36mcsp-oam |[0m Registering service amNaming.xml...Success.
+[36mcsp-oam |[0m Registering service amPlatform.xml...Success.
+[36mcsp-oam |[0m Registering service amPolicy.xml...Success.
+[36mcsp-oam |[0m Registering service amPolicyConfig.xml...Success.
+[36mcsp-oam |[0m Registering service amRealmService.xml...Success.
+[36mcsp-oam |[0m Registering service amSession.xml...Success.
+[36mcsp-oam |[0m Registering service amWebAgent.xml...Success.
+[36mcsp-oam |[0m Registering service crestPolicyService.xml...Success.
+[36mcsp-oam |[0m Registering service amUser.xml...Success.
+[36mcsp-oam |[0m Registering service identityLocaleService.xml...Success.
+[36mcsp-oam |[0m Registering service amAgent70.xml...Success.
+[36mcsp-oam |[0m Registering service amPasswordReset.xml...Success.
+[36mcsp-oam |[0m Registering service amAuthRadius.xml...Success.
+[36mcsp-oam |[0m Registering service amAuthHOTP.xml...Success.
+[36mcsp-oam |[0m Registering service amMonitoring.xml...Success.
+[36mcsp-oam |[0m Registering service AgentService.xml...Success.
+[36mcsp-oam |[0m Registering service policyIndex.xml...Success.
+[36mcsp-oam |[0m Registering service entitlement.xml...Success.
+[36mcsp-oam |[0m Registering service openProvisioning.xml...Success.
+[36mcsp-oam |[0m Registering service banking.xml...Success.
+[36mcsp-oam |[0m Registering service CoreTokenConfig.xml...Success.
+[36mcsp-oam |[0m Registering service CoreTokenStore.xml...Success.
+[36mcsp-oam |[0m Registering service amAuthAuthenticatorOATH.xml...Success.
+[36mcsp-oam |[0m Registering service AuthenticatorOATH.xml...Success.
+[36mcsp-oam |[0m Registering service fmAuthFederation.xml...Success.
+[36mcsp-oam |[0m Registering service fmAuthSAE.xml...Success.
+[36mcsp-oam |[0m Registering service fmAuthnSvc.xml...Success.
+[36mcsp-oam |[0m Registering service fmDisco.xml...Success.
+[36mcsp-oam |[0m Registering service fmIDFF.xml...Success.
+[36mcsp-oam |[0m Registering service fmLibertyPersonalProfile.xml...Success.
+[36mcsp-oam |[0m Registering service fmCOTConfig.xml...Success.
+[36mcsp-oam |[0m Registering service fmSAML2.xml...Success.
+[36mcsp-oam |[0m Registering service fmSAML.xml...Success.
+[36mcsp-oam |[0m Registering service fmSOAPBinding.xml...Success.
+[36mcsp-oam |[0m Registering service fmSAML2SOAPBinding.xml...Success.
+[36mcsp-oam |[0m Registering service fmWSFederation.xml...Success.
+[36mcsp-oam |[0m Registering service fmMultiProtocol.xml...Success.
+[36mcsp-oam |[0m Registering service famFederationCommon.xml...Success.
+[36mcsp-oam |[0m Registering service famIDFFConfig.xml...Success.
+[36mcsp-oam |[0m Registering service famSAML2Config.xml...Success.
+[36mcsp-oam |[0m Registering service OAuth2Provider.xml...Success.
+[36mcsp-oam |[0m Registering service UmaProvider.xml...Success.
+[36mcsp-oam |[0m Registering service MailServer.xml...Success.
+[36mcsp-oam |[0m Registering service RestSecurity.xml...Success.
+[36mcsp-oam |[0m Registering service amAuthScripted.xml...Success.
+[36mcsp-oam |[0m Registering service amAuthDeviceIdMatch.xml...Success.
+[36mcsp-oam |[0m Registering service amAuthDeviceIdSave.xml...Success.
+[36mcsp-oam |[0m Registering service restSTS.xml...Success.
+[36mcsp-oam |[0m Registering service soapSTS.xml...Success.
+[36mcsp-oam |[0m Registering service validationService.xml...Success.
+[36mcsp-oam |[0m Registering service RestApis.xml...Success.
+[36mcsp-oam |[0m Registering service socialAuthN.xml...Success.
+[36mcsp-oam |[0m Registering service amBaseURL.xml...Success.
+[36mcsp-oam |[0m Registering service scripting.xml...Success.
+[36mcsp-oam |[0m Registering service amAuthOATH.xml...Success.
+[36mcsp-oam |[0m Registering service amAuthSAML2.xml...Success.
+[36mcsp-oam |[0m Registering service audit.xml...Success.
+[36mcsp-oam |[0m Registering service RadiusServerService.xml...Success.
+[36mcsp-oam |[0m Registering service amSessionPropertyWhitelist.xml...Success.
+[36mcsp-oam |[0m Registering service selfService.xml...Success.
+[36mcsp-oam |[0m Configuring system....Done
+[36mcsp-oam |[0m Configuring server instance....Done
+[36mcsp-oam |[0m Creating demo user....Done
+[36mcsp-oam |[0m Setting up monitoring authentication file.
+[36mcsp-oam |[0m Configuration complete!
+[36mcsp-oam |[0m Post config openam done.
+[36mcsp-oam |[0m Setting up ssoadm for the first time
+[36mcsp-oam |[0m The scripts are properly setup under directory: /opt/ssoadm/openam
+[36mcsp-oam |[0m Debug directory is /opt/ssoadm/debug.
+[36mcsp-oam |[0m Log directory is /opt/ssoadm/log.
+[36mcsp-oam |[0m The version of this tools.zip is: OpenAM 13.0.0
+[36mcsp-oam |[0m The version of your server instance is: OpenAM 13.0.0 Build 5d4589530d (2016-January-14 21:15)
+[36mcsp-oam |[0m 
+[36mcsp-oam |[0m Schema attribute defaults were set.
+[36mcsp-oam |[0m Exception in thread "SystemTimer" java.lang.Error: java.lang.ExceptionInInitializerError
+[36mcsp-oam |[0m 	at com.sun.identity.common.TimerPool$WorkerThread.run(TimerPool.java:542)
+[36mcsp-oam |[0m Caused by: java.lang.ExceptionInInitializerError
+[36mcsp-oam |[0m 	at com.sun.identity.idm.IdRepoListener.getChangedIds(IdRepoListener.java:278)
+[36mcsp-oam |[0m 	at com.sun.identity.idm.IdRepoListener.objectChanged(IdRepoListener.java:174)
+[36mcsp-oam |[0m 	at com.sun.identity.idm.remote.IdRemoteEventListener.sendIdRepoNotification(IdRemoteEventListener.java:315)
+[36mcsp-oam |[0m 	at com.sun.identity.idm.remote.IdRemoteEventListener$NotificationRunnable.run(IdRemoteEventListener.java:398)
+[36mcsp-oam |[0m 	at com.sun.identity.common.TimerPool$WorkerThread.run(TimerPool.java:434)
+[36mcsp-oam |[0m Caused by: java.lang.IllegalStateException: CachedConnectionPool is already closed
+[36mcsp-oam |[0m 	at org.forgerock.opendj.ldap.CachedConnectionPool.getConnectionAsync(CachedConnectionPool.java:802)
+[36mcsp-oam |[0m 	at org.forgerock.opendj.ldap.CachedConnectionPool.getConnection(CachedConnectionPool.java:789)
+[36mcsp-oam |[0m 	at com.sun.identity.sm.ldap.SMDataLayer.getConnection(SMDataLayer.java:107)
+[36mcsp-oam |[0m 	at com.sun.identity.sm.ldap.SMSLdapObject.getConnection(SMSLdapObject.java:574)
+[36mcsp-oam |[0m 	at com.sun.identity.sm.ldap.SMSLdapObject.read(SMSLdapObject.java:274)
+[36mcsp-oam |[0m 	at com.sun.identity.sm.SMSEntry.read(SMSEntry.java:699)
+[36mcsp-oam |[0m 	at com.sun.identity.sm.SMSEntry.read(SMSEntry.java:676)
+[36mcsp-oam |[0m 	at com.sun.identity.sm.SMSEntry.<init>(SMSEntry.java:469)
+[36mcsp-oam |[0m 	at com.sun.identity.sm.CachedSMSEntry.getInstance(CachedSMSEntry.java:397)
+[36mcsp-oam |[0m 	at com.sun.identity.sm.ServiceConfigImpl.checkAndUpdatePermission(ServiceConfigImpl.java:646)
+[36mcsp-oam |[0m 	at com.sun.identity.sm.ServiceConfigImpl.getFromCache(ServiceConfigImpl.java:637)
+[36mcsp-oam |[0m 	at com.sun.identity.sm.ServiceConfigImpl.getInstance(ServiceConfigImpl.java:506)
+[36mcsp-oam |[0m 	at com.sun.identity.sm.ServiceConfigImpl.getInstance(ServiceConfigImpl.java:484)
+[36mcsp-oam |[0m 	at com.sun.identity.sm.ServiceConfigManagerImpl.getGlobalConfig(ServiceConfigManagerImpl.java:204)
+[36mcsp-oam |[0m 	at com.sun.identity.sm.ServiceConfigManager.getGlobalConfig(ServiceConfigManager.java:253)
+[36mcsp-oam |[0m 	at com.sun.identity.idm.IdUtils.initialize(IdUtils.java:128)
+[36mcsp-oam |[0m 	at com.sun.identity.idm.IdUtils.<clinit>(IdUtils.java:116)
+[36mcsp-oam |[0m 	... 5 more
+[36mcsp-oam |[0m Cookie domain update done.
+[36mcsp-oam |[0m 0=>search
+[36mcsp-oam |[0m Using default
+[36mcsp-oam |[0m 
+[36mcsp-oam |[0m Agent configuration was created.
+[36mcsp-oam |[0m Create Agent_0 for search done.
+[36mcsp-oam |[0m 1=>tc
+[36mcsp-oam |[0m Found template agent-config.tmpl.tc
+[36mcsp-oam |[0m 
+[36mcsp-oam |[0m Agent configuration was created.
+[36mcsp-oam |[0m Create Agent_1 for tc done.
+[36mcsp-oam |[0m 2=>files
+[36mcsp-oam |[0m Using default
+[36mcsp-oam |[0m 
+[36mcsp-oam |[0m Agent configuration was created.
+[36mcsp-oam |[0m Create Agent_2 for files done.
+[36mcsp-oam |[0m 
+[36mcsp-oam |[0m Datastore profile was updated.
+[36mcsp-oam |[0m Update embedded datastore done.
+[36mcsp-oam |[0m 
+[36mcsp-oam |[0m Authentication Instance was created.
+[36mcsp-oam |[0m Create Authentication Instance Certs done.
+[36mcsp-oam |[0m Try to log in and get the TOKEN.....
+[36mcsp-oam |[0m   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+[36mcsp-oam |[0m                                  Dload  Upload   Total   Spent    Left  Speed
+[36mcsp-oam |[0m   0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0100   149  100   147  100     2   1458     19 --:--:-- --:--:-- --:--:--  1470
+[36mcsp-oam |[0m   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+[36mcsp-oam |[0m                                  Dload  Upload   Total   Spent    Left  Speed
+[36mcsp-oam |[0m   0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0100  1734    0   764  100   970   3338   4238 --:--:-- --:--:-- --:--:--  4254
+[36mcsp-oam |[0m {"name":"ApacheReversProxyPolicy","active":true,"description":"An url driven policy to control the access on the apache reverse proxy","applicationName":"iPlanetAMWebAgentService","actionValues":{"DELETE":true,"POST":true,"GET":true},"resources":["*://*:*/*","*://*:*/*?*"],"subject":{"type":"AND","subjects":[{"type":"Identity","subjectValues":["id=csp-user,ou=group,dc=openam,dc=forgerock,dc=org","id=csp-admin,ou=group,dc=openam,dc=forgerock,dc=org"]},{"type":"AuthenticatedUsers"}]},"resourceTypeUuid":"76656a38-5f8e-401b-83aa-4ccb74ce88d2","lastModifiedBy":"id=amadmin,ou=user,dc=openam,dc=forgerock,dc=org","lastModifiedDate":"2017-10-25T06:49:24.545Z","createdBy":"id=amadmin,ou=user,dc=openam,dc=forgerock,dc=org","creationDate":"2017-10-25T06:49:24.545Z"}
+[36mcsp-oam |[0m Create policy done.
+[36mcsp-oam |[0m 
+[36mcsp-oam |[0m Identity, csp-admin of type Group was created in realm, /.
+[36mcsp-oam |[0m 
+[36mcsp-oam |[0m Identity, csp-user of type Group was created in realm, /.
+[36mcsp-oam |[0m 
+[36mcsp-oam |[0m Identity, tc-admin of type Group was created in realm, /.
+[36mcsp-oam |[0m 
+[36mcsp-oam |[0m Identity, rt-admin of type Group was created in realm, /.
+[36mcsp-oam |[0m 
+[36mcsp-oam |[0m demo was added to csp-admin.
+[36mcsp-oam |[0m Create Users and Groups done.
+[36mcsp-oam |[0m 
+[36mcsp-oam |[0m Authentication Instance was updated.
+[36mcsp-oam |[0m Update Authentication Instance Certs done.
+[36mcsp-oam |[0m 
+[36mcsp-oam |[0m !!!!Post Configuration complete!!!!
+[36mcsp-oam |[0m Tomcat did not stop in time.
+[36mcsp-oam |[0m To aid diagnostics a thread dump has been written to standard out.
+[36mcsp-oam |[0m Killing Tomcat with the PID: 16
+[36mcsp-oam |[0m The Tomcat process has been killed.
+[36mcsp-oam |[0m Waiting for 30 sec before restarting tomcat
+[36mcsp-oam |[0m 25-Oct-2017 06:50:42.249 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Server version:        Apache Tomcat/8.0.44
+[36mcsp-oam |[0m 25-Oct-2017 06:50:42.252 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Server built:          May 10 2017 17:21:09 UTC
+[36mcsp-oam |[0m 25-Oct-2017 06:50:42.253 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Server number:         8.0.44.0
+[36mcsp-oam |[0m 25-Oct-2017 06:50:42.253 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log OS Name:               Linux
+[36mcsp-oam |[0m 25-Oct-2017 06:50:42.253 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log OS Version:            4.10.0-37-generic
+[36mcsp-oam |[0m 25-Oct-2017 06:50:42.254 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Architecture:          amd64
+[36mcsp-oam |[0m 25-Oct-2017 06:50:42.254 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Java Home:             /usr/lib/jvm/java-8-oracle/jre
+[36mcsp-oam |[0m 25-Oct-2017 06:50:42.254 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log JVM Version:           1.8.0_131-b11
+[36mcsp-oam |[0m 25-Oct-2017 06:50:42.255 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log JVM Vendor:            Oracle Corporation
+[36mcsp-oam |[0m 25-Oct-2017 06:50:42.255 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log CATALINA_BASE:         /usr/local/tomcat
+[36mcsp-oam |[0m 25-Oct-2017 06:50:42.256 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log CATALINA_HOME:         /usr/local/tomcat
+[36mcsp-oam |[0m 25-Oct-2017 06:50:42.257 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Djava.util.logging.config.file=/usr/local/tomcat/conf/logging.properties
+[36mcsp-oam |[0m 25-Oct-2017 06:50:42.257 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager
+[36mcsp-oam |[0m 25-Oct-2017 06:50:42.257 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Djavax.net.ssl.trustStore=/usr/local/tomcat/conf/proxy-ca-truststore.jks
+[36mcsp-oam |[0m 25-Oct-2017 06:50:42.257 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Djavax.net.ssl.trustStorePassword=123456
+[36mcsp-oam |[0m 25-Oct-2017 06:50:42.259 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Djdk.tls.ephemeralDHKeySize=2048
+[36mcsp-oam |[0m 25-Oct-2017 06:50:42.260 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Djava.protocol.handler.pkgs=org.apache.catalina.webresources
+[36mcsp-oam |[0m 25-Oct-2017 06:50:42.260 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Xmx2g
+[36mcsp-oam |[0m 25-Oct-2017 06:50:42.261 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Xms2g
+[36mcsp-oam |[0m 25-Oct-2017 06:50:42.262 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Djava.endorsed.dirs=/usr/local/tomcat/endorsed
+[36mcsp-oam |[0m 25-Oct-2017 06:50:42.262 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Dcatalina.base=/usr/local/tomcat
+[36mcsp-oam |[0m 25-Oct-2017 06:50:42.263 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Dcatalina.home=/usr/local/tomcat
+[36mcsp-oam |[0m 25-Oct-2017 06:50:42.263 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Djava.io.tmpdir=/usr/local/tomcat/temp
+[36mcsp-oam |[0m 25-Oct-2017 06:50:42.263 INFO [main] org.apache.catalina.core.AprLifecycleListener.lifecycleEvent The APR based Apache Tomcat Native library which allows optimal performance in production environments was not found on the java.library.path: /usr/java/packages/lib/amd64:/usr/lib64:/lib64:/lib:/usr/lib
+[36mcsp-oam |[0m 25-Oct-2017 06:50:42.457 INFO [main] org.apache.coyote.AbstractProtocol.init Initializing ProtocolHandler ["http-nio-8080"]
+[36mcsp-oam |[0m 25-Oct-2017 06:50:42.493 INFO [main] org.apache.tomcat.util.net.NioSelectorPool.getSharedSelector Using a shared selector for servlet write/read
+[36mcsp-oam |[0m 25-Oct-2017 06:50:42.524 INFO [main] org.apache.coyote.AbstractProtocol.init Initializing ProtocolHandler ["ajp-nio-8009"]
+[36mcsp-oam |[0m 25-Oct-2017 06:50:42.545 INFO [main] org.apache.tomcat.util.net.NioSelectorPool.getSharedSelector Using a shared selector for servlet write/read
+[36mcsp-oam |[0m 25-Oct-2017 06:50:42.545 INFO [main] org.apache.catalina.startup.Catalina.load Initialization processed in 671 ms
+[36mcsp-oam |[0m 25-Oct-2017 06:50:42.619 INFO [main] org.apache.catalina.core.StandardService.startInternal Starting service Catalina
+[36mcsp-oam |[0m 25-Oct-2017 06:50:42.620 INFO [main] org.apache.catalina.core.StandardEngine.startInternal Starting Servlet Engine: Apache Tomcat/8.0.44
+[36mcsp-oam |[0m 25-Oct-2017 06:50:42.696 INFO [localhost-startStop-1] org.apache.catalina.startup.HostConfig.deployWAR Deploying web application archive /usr/local/tomcat/webapps/openam.war
+[36mcsp-oam |[0m 25-Oct-2017 06:50:42.721 WARNING [localhost-startStop-1] org.apache.catalina.startup.SetContextPropertiesRule.begin [SetContextPropertiesRule]{Context} Setting property 'antiJARLocking' to 'true' did not find a matching property.
+[36mcsp-oam |[0m 25-Oct-2017 06:50:51.197 INFO [localhost-startStop-1] org.apache.jasper.servlet.TldScanner.scanJars At least one JAR was scanned for TLDs yet contained no TLDs. Enable debug logging for this logger for a complete list of JARs that were scanned but no TLDs were found in them. Skipping unneeded JARs during scanning can improve startup time and JSP compilation time.
+[36mcsp-oam |[0m 25-Oct-2017 06:50:54.492 INFO [localhost-startStop-1] com.sun.jersey.server.impl.application.WebApplicationImpl.initiate Initiating Jersey application, version 'Jersey: 1.1.1-ea 07/14/2009 07:18 PM'
+[36mcsp-oam |[0m 25-Oct-2017 06:50:54.980 INFO [localhost-startStop-1] com.sun.jersey.server.impl.application.WebApplicationImpl.initiate Initiating Jersey application, version 'Jersey: 1.1.1-ea 07/14/2009 07:18 PM'
+[36mcsp-oam |[0m 25-Oct-2017 06:50:55.059 INFO [localhost-startStop-1] com.sun.jersey.server.impl.application.WebApplicationImpl.initiate Initiating Jersey application, version 'Jersey: 1.1.1-ea 07/14/2009 07:18 PM'
+[36mcsp-oam |[0m 25-Oct-2017 06:51:05.857 INFO [localhost-startStop-1] org.apache.catalina.startup.HostConfig.deployWAR Deployment of web application archive /usr/local/tomcat/webapps/openam.war has finished in 23,160 ms
+[36mcsp-oam |[0m 25-Oct-2017 06:51:05.858 INFO [localhost-startStop-1] org.apache.catalina.startup.HostConfig.deployDirectory Deploying web application directory /usr/local/tomcat/webapps/manager
+[36mcsp-oam |[0m 25-Oct-2017 06:51:05.918 INFO [localhost-startStop-1] org.apache.catalina.startup.HostConfig.deployDirectory Deployment of web application directory /usr/local/tomcat/webapps/manager has finished in 60 ms
+[36mcsp-oam |[0m 25-Oct-2017 06:51:05.922 INFO [localhost-startStop-1] org.apache.catalina.startup.HostConfig.deployDirectory Deploying web application directory /usr/local/tomcat/webapps/examples
+[36mcsp-oam |[0m 25-Oct-2017 06:51:06.174 INFO [localhost-startStop-1] org.apache.catalina.startup.HostConfig.deployDirectory Deployment of web application directory /usr/local/tomcat/webapps/examples has finished in 252 ms
+[36mcsp-oam |[0m 25-Oct-2017 06:51:06.174 INFO [localhost-startStop-1] org.apache.catalina.startup.HostConfig.deployDirectory Deploying web application directory /usr/local/tomcat/webapps/docs
+[36mcsp-oam |[0m 25-Oct-2017 06:51:06.207 INFO [localhost-startStop-1] org.apache.catalina.startup.HostConfig.deployDirectory Deployment of web application directory /usr/local/tomcat/webapps/docs has finished in 33 ms
+[36mcsp-oam |[0m 25-Oct-2017 06:51:06.209 INFO [localhost-startStop-1] org.apache.catalina.startup.HostConfig.deployDirectory Deploying web application directory /usr/local/tomcat/webapps/ROOT
+[36mcsp-oam |[0m 25-Oct-2017 06:51:06.266 INFO [localhost-startStop-1] org.apache.catalina.startup.HostConfig.deployDirectory Deployment of web application directory /usr/local/tomcat/webapps/ROOT has finished in 49 ms
+[36mcsp-oam |[0m 25-Oct-2017 06:51:06.267 INFO [localhost-startStop-1] org.apache.catalina.startup.HostConfig.deployDirectory Deploying web application directory /usr/local/tomcat/webapps/host-manager
+[36mcsp-oam |[0m 25-Oct-2017 06:51:06.296 INFO [localhost-startStop-1] org.apache.catalina.startup.HostConfig.deployDirectory Deployment of web application directory /usr/local/tomcat/webapps/host-manager has finished in 29 ms
+[36mcsp-oam |[0m 25-Oct-2017 06:51:06.314 INFO [main] org.apache.coyote.AbstractProtocol.start Starting ProtocolHandler ["http-nio-8080"]
+[36mcsp-oam |[0m 25-Oct-2017 06:51:06.356 INFO [main] org.apache.coyote.AbstractProtocol.start Starting ProtocolHandler ["ajp-nio-8009"]
+[36mcsp-oam |[0m 25-Oct-2017 06:51:06.377 INFO [main] org.apache.catalina.startup.Catalina.start Server startup in 23831 ms

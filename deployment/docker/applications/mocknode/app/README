@@ -1,0 +1,12 @@
+First install express node package:
+npm install express
+npm install body-parser
+
+Run example:
+node server.js
+
+Run example with port:
+PORT=3001 node server.js
+
+Run example with port and appName:
+APP_NAME=adapter PORT=3001 node server.js

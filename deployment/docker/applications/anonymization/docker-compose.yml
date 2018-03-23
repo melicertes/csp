@@ -1,0 +1,26 @@
+version: '3'
+services:
+
+  anon:
+    image: csp-java8:1.0
+    container_name: csp-anon
+    domainname: ${LOCAL_DOMAIN}
+    hostname: csp-anon
+    env_file:
+        - .env
+    command: java -Xmx512m -Dspring.profiles.active=docker -jar server.jar
+    working_dir: /opt/csp
+    volumes:
+        - ./anon-server-0.4.0-SNAPSHOT-exec.jar:/opt/csp/server.jar
+        - /opt/csp/logs/:/opt/csplogs
+        - AnonDatavolume:/opt/anon/data
+    expose:
+        - ${ANON_DOCR_PORT}
+volumes:
+    AnonDatavolume:
+        external: true
+
+networks:
+  default:
+    external:
+      name: ${LOCAL_DOMAIN}

@@ -1,0 +1,81 @@
+version: '3'
+
+services:
+    misp-web:
+        depends_on:
+            - mysql-db
+        container_name: csp-misp
+        domainname: ${LOCAL_DOMAIN}
+        hostname: csp-misp
+        image: csp-misp:1.0
+        env_file:
+            - .env
+        expose:
+            - 800
+            - 50000
+        volumes:
+            - /dev/urandom:/dev/random
+            - MISPSharedDatavolume:/run/secrets
+            - MISPDatavolume:/var/www/MISP
+            - /opt/csp/logs/:/var/www/MISP/app/tmp/logs/
+        environment:
+            - MYSQL_ROOT_PASSWORD=changeit
+            - MYSQL_MISP_PASSWORD=changeit
+            - MYSQL_HOST=csp-mysql
+            - MISP_ADMIN_EMAIL=admin@admin.test
+            - MISP_ADMIN_PASSPHRASE=NewP@ssword1234
+            - MISP_BASEURL=https://${MISP_DOMAIN}
+            - TIMEZONE=Europe/Brussels
+
+    misp-adapter:
+        depends_on:
+            - misp-web
+        image: csp-java8:1.0
+        container_name: csp-misp_adapter
+        domainname: ${LOCAL_DOMAIN}
+        hostname: csp-misp_adapter
+        env_file:
+            - .env
+        command: sh -c "while [ ! -f /run/secrets/authkey ]; do echo "Waiting..." ; sleep 1 ; done && java -Xmx512m -Dspring.profiles.active=docker -Dmisp.app.authorization.key=$$(cat /run/secrets/authkey) -jar server.jar"
+        working_dir: /opt/csp
+        volumes:
+            - ./misp-server-0.4.0-SNAPSHOT-exec.jar:/opt/csp/server.jar
+            - /opt/csp/logs/:/opt/csplogs
+            - SSLDatavolume:/opt/ssl/
+            - MISPAdapterDatavolume:${MISP_ADAPTER_PATH_REPO}
+            - MISPSharedDatavolume:/run/secrets
+        expose:
+            - ${MISP_ADAPTER_DOCR_PORT}
+
+
+    mysql-db:
+        container_name: csp-mysql
+        domainname: ${LOCAL_DOMAIN}
+        hostname: csp-mysql
+        env_file:
+            - .env
+        image: mariadb
+        expose:
+            - 3306
+        volumes:
+            - MYSQLDatavolume:/var/lib/mysql
+        environment:
+            - MYSQL_ROOT_PASSWORD=changeit
+
+
+volumes:
+    MISPAdapterDatavolume:
+        external: true
+    MISPDatavolume:
+        external: true
+    MYSQLDatavolume:
+        external: true
+    MISPSharedDatavolume:
+        external: true
+    SSLDatavolume:
+        external: true
+
+networks:
+  default:
+    external:
+      name: ${LOCAL_DOMAIN}
