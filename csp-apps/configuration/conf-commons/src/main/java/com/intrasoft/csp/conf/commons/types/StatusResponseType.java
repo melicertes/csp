@@ -7,7 +7,7 @@ public enum StatusResponseType {
     COMMON ERROR CODES
      */
     OK(0, "Successful transaction"),
-    FAILURE(999, "Transaction failure; Systemic failure"),
+    FAILURE(999, "Transactio failure; Systemic failure"),
 
     /*
     API ERROR CODES

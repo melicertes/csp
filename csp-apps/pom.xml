@@ -22,7 +22,7 @@
 		<module>integration-layer</module>
 		<module>anonymization</module>
 		<module>configuration</module>
-		<module>vcbridgeadm</module>
+		<module>vcbridge</module>
 		<module>misp</module>
 		<module>libraries</module>
     </modules>
