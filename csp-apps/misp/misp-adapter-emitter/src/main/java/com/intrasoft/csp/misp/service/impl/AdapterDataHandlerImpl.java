@@ -74,6 +74,7 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler{
     public ResponseEntity<String> handleIntegrationData(IntegrationData integrationData, String requestMethod) {
 
         LOG.debug(integrationData.getDataObject().toString());
+        LOG.debug(integrationData.getDataParams().toString());
         String uuid = integrationData.getDataParams().getOriginRecordId();
 
         jsonNode = new ObjectMapper().convertValue(integrationData.getDataObject(), JsonNode.class);
@@ -156,6 +157,9 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler{
     }
 
     private void handleEventAddEdit() throws IOException {
+        // set "published":false
+        ((ObjectNode) jsonNode.get("Event")).put("published", false);
+
         try {
             ResponseEntity<String> responseEntity = mispAppClient.addMispEvent(jsonNode.toString());
             eventCreatedUpdated = new ObjectMapper().readValue(responseEntity.getBody(), JsonNode.class);
