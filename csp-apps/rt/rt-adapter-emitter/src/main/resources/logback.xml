@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+
+    <!--<springProperty scope="context" name="appName" source="spring.application.name"/>-->
+
+    <!--Basic configuration-->
+    <property name="APP_NAME" value="CSP.RT-ADAPTER"/>
+    <property name="RT_APP_NAME" value="CSP.RT"/>
+    <property name="LOGS_HOME" value="/opt/csplogs/"/>
+    <property name="TYPE_EXC" value="exc"/>
+    <property name="TYPE_AUD" value="aud"/>
+    <property name="TYPE_RT_AUD" value="aud"/>
+    <property name="HISTORY_EXC" value="1"/>
+    <property name="HISTORY_AUD" value="1"/>
+    <property name="HISTORY_RT_AUD" value="1"/>
+
+    <!--Patterns for console, log files, log format and rolling files-->
+    <property name="CONSOLE_LOG_PATTERN"
+              value="%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}"/>
+    <property name="FILE_EXC_LOG_PATTERN" value="${LOGS_HOME}${APP_NAME}-${TYPE_EXC}.log"></property>
+    <property name="FILE_AUD_LOG_PATTERN" value="${LOGS_HOME}${APP_NAME}-${TYPE_AUD}.log"></property>
+    <property name="FILE_RT_AUD_LOG_PATTERN" value="${LOGS_HOME}${RT_APP_NAME}-${TYPE_RT_AUD}.log"></property>
+    <property name="LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss} ${HOSTNAME} ${APP_NAME:-}[${PID:-}]: %replace(%msg){'\n',' '}%n"></property>
+    <property name="RT_LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss} ${HOSTNAME} ${RT_APP_NAME:-}[${PID:-}]: %replace(%msg){'\n',' '}%n"></property>
+    <property name="FILE_EXC_ROLL_PATTERN" value="${LOGS_HOME}${APP_NAME}-${TYPE_EXC}.%d{yyyy-MM-dd}.log"></property>
+    <property name="FILE_AUD_ROLL_PATTERN" value="${LOGS_HOME}${APP_NAME}-${TYPE_AUD}.%d{yyyy-MM-dd}.log"></property>
+    <property name="FILE_RT_AUD_ROLL_PATTERN" value="${LOGS_HOME}${RT_APP_NAME}-${TYPE_RT_AUD}.%d{yyyy-MM-dd}.log"></property>
+
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+        </layout>
+    </appender>
+
+    <appender name="FILE-EXCEPTION" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${FILE_EXC_LOG_PATTERN}</file>
+
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <Pattern>${LOG_PATTERN}</Pattern>
+        </encoder>
+
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${FILE_EXC_ROLL_PATTERN}</fileNamePattern>
+            <maxHistory>${HISTORY_EXC}</maxHistory>
+        </rollingPolicy>
+    </appender>
+
+    <appender name="FILE-AUDIT" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${FILE_AUD_LOG_PATTERN}</file>
+
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <Pattern>${LOG_PATTERN}</Pattern>
+        </encoder>
+
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>INFO</level>
+            <onMatch>ACCEPT</onMatch>
+        </filter>
+
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>WARN</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${FILE_AUD_ROLL_PATTERN}</fileNamePattern>
+            <maxHistory>${HISTORY_AUD}</maxHistory>
+        </rollingPolicy>
+    </appender>
+
+    <appender name="RT-FILE-AUDIT" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${FILE_RT_AUD_LOG_PATTERN}</file>
+
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <Pattern>${RT_LOG_PATTERN}</Pattern>
+        </encoder>
+
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>INFO</level>
+            <onMatch>ACCEPT</onMatch>
+        </filter>
+
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>WARN</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${FILE_RT_AUD_ROLL_PATTERN}</fileNamePattern>
+            <maxHistory>${HISTORY_RT_AUD}</maxHistory>
+        </rollingPolicy>
+    </appender>
+
+    <logger name="root" level="info" additivity="false">
+        <appender-ref ref="FILE-AUDIT"/>
+        <appender-ref ref="FILE-EXCEPTION"/>
+        <appender-ref ref="STDOUT"/>
+    </logger>
+
+    <logger name="rt-audit-log" level="info" additivity="false">
+        <appender-ref ref="RT-FILE-AUDIT"/>
+        <appender-ref ref="STDOUT" />
+    </logger>
+
+    <root level="info">
+        <appender-ref ref="STDOUT"/>
+    </root>
+</configuration>

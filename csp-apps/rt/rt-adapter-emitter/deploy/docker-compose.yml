@@ -1,0 +1,32 @@
+version: '3'
+services:
+
+  rt-emitter:
+    image: csp-java8:1.0
+    container_name: csp-rt-adapter
+    domainname: ${LOCAL_DOMAIN}
+    hostname: csp-rtemitter
+    env_file:
+        - .env
+    command: java -Xmx512m -Dspring.profiles.active=docker -Dapp.tc.client.ssl.jks.keystore.password=changeme -Dcsp.client.ssl.jks.keystore.password=changeme   -jar server.jar
+    restart: on-failure
+    working_dir: /opt/csp
+    ports:
+        - ${RT_ADAPTER_DOCR_PORT}
+    volumes:
+        - ./rt-emitter-adapter-0.4.0-SNAPSHOT-exec.jar:/opt/csp/server.jar
+        - /opt/csp/logs/:/opt/csplogs
+        - SSLDatavolume:/opt/ssl/
+        - RTEMITTERDBDatavolume:/opt/csp/RTuuidRepositoryDB
+
+
+volumes:
+    SSLDatavolume:
+        external: true
+    RTEMITTERDBDatavolume:
+        external: true
+
+networks:
+  default:
+    external:
+      name: ${LOCAL_DOMAIN}
