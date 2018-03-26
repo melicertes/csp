@@ -24,6 +24,8 @@
 		<module>configuration</module>
 		<module>vcbridge</module>
 		<module>misp</module>
+		<module>rt</module>
+		<module>intelmq</module>
 		<module>libraries</module>
     </modules>
 
