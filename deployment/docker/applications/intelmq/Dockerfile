@@ -1,24 +1,65 @@
 FROM csp-python3:1.0
-#FROM python:3.4-alpine
-WORKDIR /tmp/intelmq
 
-#clone first
-RUN apk --no-cache add curl git && git clone https://github.com/certtools/intelmq.git\
- /tmp/intelmq && apk del git
-#in one layer, add compilation stuff, compile and remove (so layer remains small)
-RUN apk --no-cache add python3-dev gcc alpine-sdk linux-headers\
-  && rm CONTRIBUTING.md && pip3 install -r REQUIREMENTS\
-  && pip3 install .\
-  && mv /opt/intelmq/etc/examples/*.conf /opt/intelmq/etc/\
-  && apk del gcc alpine-sdk linux-headers build-base && rm -rf /var/cache/apk/*
+MAINTAINER tku
+MAINTAINER msg
 
-RUN adduser -D -h /opt/intelmq -s /bin/bash intelmq && \
-    chmod -R 0770 /opt/intelmq && \
-    chown -R intelmq.intelmq /opt/intelmq
-COPY intelmq_docker /usr/local/bin/
-COPY config/* /opt/intelmq/etc/
+ENV INTELMQ_VERSION=1.0.1
+ENV INTELMQ_MGR_VERSION=0.3.1
+ENV INTELMQ_HOSTNAME=csp-intelmq
+ENV REDIS_HOSTNAME=csp-redis
 
-USER intelmq
-WORKDIR /opt/intelmq
-CMD ["sh", "/usr/local/bin/intelmq_docker"]
+RUN apk update && \
+  apk upgrade && \
+  apk add wget vim php5-apache2 php5-curl php5-cli php5-json python3-dev \
+    alpine-sdk linux-headers postgresql-dev libffi-dev shadow && \
+  wget https://github.com/certtools/intelmq/archive/${INTELMQ_VERSION}.tar.gz \
+    -O /tmp/intelmq-${INTELMQ_VERSION}.tar.gz && \
+  wget https://github.com/certtools/intelmq-manager/archive/${INTELMQ_MGR_VERSION}.tar.gz \
+    -O /tmp/intelmq-manager-${INTELMQ_MGR_VERSION}.tar.gz && \
+  cd /tmp && \
+  tar -xzf intelmq-${INTELMQ_VERSION}.tar.gz && \
+  tar -xzf intelmq-manager-${INTELMQ_MGR_VERSION}.tar.gz && \
+  rm -f intelmq-${INTELMQ_VERSION}.tar.gz && \
+  rm -f intelmq-manager-${INTELMQ_MGR_VERSION}.tar.gz && \
+  cd intelmq-${INTELMQ_VERSION} && \
+  pip3 install . && \
+  find . -name REQUIREMENTS.txt -exec pip3 install -q -r {} \; && \
+  adduser -D -h /opt/intelmq -s /bin/sh intelmq && \
+  chmod -R 0770 /opt/intelmq && \
+  chown -R intelmq.intelmq /opt/intelmq && \
+  cd /opt/intelmq/etc && \
+  cp -a examples/* . && \
+  sed -i "s/\"destination_pipeline_host\": \"127.0.0.1\"/\"destination_pipeline_host\": \"${REDIS_HOSTNAME}\"/g" defaults.conf && \
+  sed -i "s/\"source_pipeline_host\": \"127.0.0.1\"/\"source_pipeline_host\": \"${REDIS_HOSTNAME}\"/g" defaults.conf && \
+  sed -i "s/\"redis_cache_host\": \"127.0.0.1\",/\"redis_cache_host\": \"${REDIS_HOSTNAME}\",/g" runtime.conf && \
+  cd /tmp/intelmq-manager-${INTELMQ_MGR_VERSION} && \
+  sed -i "s/#ServerName www.example.com:80/ServerName ${INTELMQ_HOSTNAME}/g" /etc/apache2/httpd.conf && \
+  cp -R /tmp/intelmq-manager-${INTELMQ_MGR_VERSION}/intelmq-manager/* /var/www/localhost/htdocs/ && \
+  chown -R apache:apache /var/www/localhost/htdocs/ && \
+  usermod -a -G intelmq apache && \
+  mkdir /opt/intelmq/etc/manager/ && \
+  touch /opt/intelmq/etc/manager/positions.conf && \
+  chgrp apache /opt/intelmq/etc/*.conf /opt/intelmq/etc/manager/positions.conf && \
+  chmod g+w /opt/intelmq/etc/*.conf /opt/intelmq/etc/manager/positions.conf && \
+  echo "apache ALL=(intelmq) NOPASSWD: /usr/bin/intelmqctl" >> /etc/sudoers && \
+  sed -i "s/\/usr\/local\/bin\/intelmqctl/\/usr\/bin\/intelmqctl/g" /var/www/localhost/htdocs/php/config.php && \
+  echo "root ALL=(intelmq) NOPASSWD: /usr/bin/intelmqctl" >> /etc/sudoers && \
+  mkdir /scripts && \
+  mkdir /run/apache2 && \
+  echo "DONE SUCCESSFULLY!"
+
+ADD scripts/run.sh /scripts/run.sh
+
+ADD csp-config/runtime.conf /opt/intelmq/etc/runtime.conf
+ADD csp-config/pipeline.conf /opt/intelmq/etc/pipeline.conf
+RUN chmod -R 0770 /opt/intelmq/etc/ && \
+    chown -R intelmq.intelmq /opt/intelmq/etc/ && \
+    echo "Added CSP custom runtime done"
+
+RUN chmod u+x /scripts/run.sh
+
+ENTRYPOINT ["scripts/run.sh"]  
+
+
+
 

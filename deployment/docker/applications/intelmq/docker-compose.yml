@@ -1,0 +1,62 @@
+version: '3'
+services:
+  csp-redis:
+    image: csp-redis:1.0
+    container_name: csp-redis
+    domainname: ${LOCAL_DOMAIN}
+    hostname: csp-intelmq
+    env_file:
+      - .env
+    ports:
+      - 80
+    volumes:
+      - rdb:/data
+  
+  csp-intelmq:
+    build: .
+    env_file:
+      - .env
+    image: csp-intelmq:1.0
+    container_name: csp-intelmq
+    domainname: ${LOCAL_DOMAIN}
+    hostname: csp-intelmq
+    command: sh /scripts/run.sh
+    ports:
+      - 80
+    links:
+      - csp-redis
+    depends_on:
+      - "csp-redis"
+    volumes:
+       - /opt/csp/intelmq-fileinput/:/tmp/intelmq-fileinput
+
+
+  
+  intelmq-emitter:
+    depends_on:
+        - csp-intelmq
+    image: csp-java8:1.0
+    container_name: csp-intelmq_emitter
+    domainname: ${LOCAL_DOMAIN}
+    hostname: csp-intelmq_emitter
+    env_file:
+        - .env
+    command: java -Xmx512m -Dspring.profiles.active=docker -jar server.jar
+    working_dir: /opt/csp
+    volumes:
+        - ./intelmq-emitter-0.4.0-SNAPSHOT-exec.jar:/opt/csp/server.jar
+        - SSLDatavolume:/opt/ssl/
+    expose:
+        - ${INTELMQ_ADAPTER_DOCR_PORT}
+volumes:
+   SSLDatavolume:
+        external: true
+   rdb:
+    driver: local
+ 
+
+networks:
+  default:
+    external:
+     name: ${LOCAL_DOMAIN}
+
