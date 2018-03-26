@@ -14,14 +14,14 @@ $ cd csp-apps/integration-tests/target
 
 3. Run one or more test-classes by providing the package+classnames as arguments
 --------------------------------------------------------------------------------
-$ java -jar integration-tests-0.4.0-SNAPSHOT.jar com.intrasoft.csp.integration.sandbox.server.internal.CspServerInternalSandboxTest
+$ java -jar integration-tests-3.5.0-SNAPSHOT.jar com.intrasoft.csp.integration.sandbox.server.internal.CspServerInternalSandboxTest
 
 APPENDIX
 --------
 
 Sample with docker profile and env vars
 
-java -jar -Dspring.profiles.active=docker -DES_PATH_BASE=/pathbse -DES_PORT=9000 -DES_LOCAL_DOMAIN=es.local -DIL_SSL_KEYSTORE_PASS=123456 -DIL_SSL_KEY_PASS=12345 -DIL_CSP_SUBDOMAIN_PREFIX=pref -DTC_PATH_TEAMS=/teams  -DTC_PATH_CIRCLES=/circles -DCSP_NAME -DTC_LOCAL_DOMAIN=tc.local  integration-tests-0.4.0-SNAPSHOT.jar com.intrasoft.csp.integration.business.server.internal.CspServerInternalBusinessTcTest
+java -jar -Dspring.profiles.active=docker -DES_PATH_BASE=/pathbse -DES_PORT=9000 -DES_LOCAL_DOMAIN=es.local -DIL_SSL_KEYSTORE_PASS=123456 -DIL_SSL_KEY_PASS=12345 -DIL_CSP_SUBDOMAIN_PREFIX=pref -DTC_PATH_TEAMS=/teams  -DTC_PATH_CIRCLES=/circles -DCSP_NAME -DTC_LOCAL_DOMAIN=tc.local  integration-tests-3.5.0-SNAPSHOT.jar com.intrasoft.csp.integration.business.server.internal.CspServerInternalBusinessTcTest
 
 
 USEFUL Docker commands
@@ -42,10 +42,10 @@ curl -v -s -k --key /opt/ssl/server/csp-internal.key --cert /opt/ssl/server/csp-
 curl -v -s -k --key /opt/ssl/server/csp-internal.key --cert /opt/ssl/server/csp-internal.crt https://anon.local.demo1-csp.athens.intrasoft-intl.private/v1/ruleset/getAll
 
 
-scp csp@central-csp:/opt/csp/anon/anon-server-0.4.0-SNAPSHOT-exec.jar anon-server-0.4.0-SNAPSHOT-exec.jar
+scp csp@central-csp:/opt/csp/anon/anon-server-3.5.0-SNAPSHOT-exec.jar anon-server-3.5.0-SNAPSHOT-exec.jar
 
-scp csp@central-csp:/opt/csp/il/il-server-0.4.0-SNAPSHOT-exec.jar il-server-0.4.0-SNAPSHOT-exec.jar
-scp csp@central-csp:/opt/csp/il/integration-tests-0.4.0-SNAPSHOT.jar integration-tests-0.4.0-SNAPSHOT.jar
+scp csp@central-csp:/opt/csp/il/il-server-3.5.0-SNAPSHOT-exec.jar il-server-3.5.0-SNAPSHOT-exec.jar
+scp csp@central-csp:/opt/csp/il/integration-tests-3.5.0-SNAPSHOT.jar integration-tests-3.5.0-SNAPSHOT.jar
 
 
 Get the TC data using curl:
