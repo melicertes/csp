@@ -9,8 +9,7 @@
       "GET":true
    },
    "resources":[
-      "*://*:*/*",
-      "*://*:*/*?*"
+      "*://*:*/*"
    ],
    "subject":{
       "type":"AND",
@@ -21,15 +20,15 @@
          {
             "type":"Identity",
             "subjectValues":[
-               "id=csp-user,ou=group,dc=openam,dc=forgerock,dc=org",
-               "id=csp-admin,ou=group,dc=openam,dc=forgerock,dc=org"
+               "id=csp-user,ou=group,__ROOT_SUFFIX_TO_BE_REPLACE__",
+               "id=csp-admin,ou=group,__ROOT_SUFFIX_TO_BE_REPLACE__"
             ]
          }
       ]
    },
    "resourceTypeUuid":"76656a38-5f8e-401b-83aa-4ccb74ce88d2",
-   "lastModifiedBy":"id=amadmin,ou=user,dc=openam,dc=forgerock,dc=org",
+   "lastModifiedBy":"id=amadmin,ou=user,__ROOT_SUFFIX_TO_BE_REPLACE__",
    "lastModifiedDate":"2017-06-01T12:40:03.22Z",
-   "createdBy":"id=amadmin,ou=user,dc=openam,dc=forgerock,dc=org",
+   "createdBy":"id=amadmin,ou=user,__ROOT_SUFFIX_TO_BE_REPLACE__",
    "creationDate":"2017-06-01T12:37:33.909Z"
 }

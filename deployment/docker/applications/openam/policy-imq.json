@@ -14,7 +14,7 @@
     "resources" : [ "*://*:*/*", "*://*:*/*?*" ],
     "subject" : {
       "type" : "Identity",
-      "subjectValues" : [ "id=rt-admin,ou=group,dc=openam,dc=forgerock,dc=org", "id=rt_user,ou=group,dc=openam,dc=forgerock,dc=org" ]
+      "subjectValues" : [ "imq-admin,ou=group,__ROOT_SUFFIX_TO_BE_REPLACE__" ]
     },
     "resourceTypeUuid" : "__RES_TYPE_ID_TO_BE_INSERTED__"
 }
