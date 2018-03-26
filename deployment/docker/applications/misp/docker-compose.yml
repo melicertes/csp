@@ -39,7 +39,7 @@ services:
         command: sh -c "while [ ! -f /run/secrets/authkey ]; do echo "Waiting..." ; sleep 1 ; done && java -Xmx512m -Dspring.profiles.active=docker -Dmisp.app.authorization.key=$$(cat /run/secrets/authkey) -jar server.jar"
         working_dir: /opt/csp
         volumes:
-            - ./misp-server-0.4.0-SNAPSHOT-exec.jar:/opt/csp/server.jar
+            - ./misp-server-3.5.0-SNAPSHOT-exec.jar:/opt/csp/server.jar
             - /opt/csp/logs/:/opt/csplogs
             - SSLDatavolume:/opt/ssl/
             - MISPAdapterDatavolume:${MISP_ADAPTER_PATH_REPO}
