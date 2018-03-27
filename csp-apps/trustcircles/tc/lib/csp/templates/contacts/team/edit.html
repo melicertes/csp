@@ -1,0 +1,683 @@
+{% extends "base.html" %}
+{% load staticfiles form_utils %}
+
+{% block title %} | {% if team.id %}Team '{{ team.short_name }}'{% else %}Add New Team{% endif %}{% endblock %}
+
+{% block page-header %}
+    <i class="fa fa-group "></i>
+    {% if team.id %}
+        Edit Team '{{ team.short_name }}'{% if incoming %} with incoming changes{% endif %}
+    {% else %}
+        Add New Team
+    {% endif %}
+    <div class="pull-right">
+        {% if team.id %}
+            <a href="{% url 'teamcontact_view' id=team.id %}" class="save btn btn-default">Cancel</a>
+        {% else %}
+            <a href="{% url 'teamcontact_list' %}" class="save btn btn-default">Cancel</a>
+        {% endif %}
+        <button type="submit" class="save btn btn-success" onclick="document.forms[1].submit()">Save</button>
+    </div>
+{% endblock %}
+
+{% block content %}
+    {% if incoming %}
+        <div class="row">
+            <div class="col-md-2"></div>
+            <div class="col-md-8">
+                <div class="panel panel-info">
+                    <div class="panel-heading">Update Details <a class="" onclick="$('.applyalldiff').click(); return false;">(Set to Incoming)</a></div>
+                    <div class="panel-body">
+                        {% field_value incoming 'created' %}
+                        {% field_value incoming 'csp_id' %}
+                        {% field_value incoming 'target_circle_id' %}
+                        {% field_value incoming 'target_team_id' %}
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2"></div>
+        </div>
+    {% endif %}
+
+
+    <form method="POST" {% if incoming %} action="{% if team.id %}{% url 'teamcontact_edit' id=team.id %}{% else %}{% url 'teamcontact_new' %}{% endif %}" {% endif %} class="contact-form" id="contact-form">{% csrf_token %}
+        {{ form.non_field_errors }}
+
+        {% if 'csp_team' in show_blocks %}
+            <h2>CSP / Melicertes Team</h2>
+            {% if incoming %}
+            <div class="row">
+                <div class="col-md-6">
+            {% endif %}
+            <div class="row">
+                <div class="col-md-6">
+                    {% form_field form.csp_id %}
+                    {% form_field form.csp_domain %}
+                    {% form_field form.csp_installed %}
+                </div>
+
+                <div class="col-md-6">
+                    {% form_field form.nis_team_types %}
+                    {% form_field form.nis_sectors %}
+                    {% form_field form.status %}
+                </div>
+            </div>
+            {% if incoming %}
+                </div>
+                <div class="col-md-6">
+                    {% include "contacts/includes/team_details_diffview.html" with show_block="csp_team" form=form team=team incoming=incoming.deserialized %}
+                </div></div>
+            {% endif %}
+        {% endif %}
+
+        {% if 'team' in show_blocks %}
+            <h2>Team</h2>
+            {% if incoming %}
+            <div class="row">
+                <div class="col-md-6">
+            {% endif %}
+            <div class="row">
+                <div class="col-md-6">
+                    {% form_field form.short_name %}
+                    {% form_field form.name %}
+                    {% form_field form.host_organisation %}
+                    {% form_field form.description %}
+                </div>
+                <div class="col-md-6">
+                    {% form_field form.country %}
+                    {% form_field form.additional_countries %}
+                    {% form_field form.established %}
+                </div>
+            </div>
+            {% if incoming %}
+                </div>
+                <div class="col-md-6">
+                    {% include "contacts/includes/team_details_diffview.html" with show_block="team" form=form team=team incoming=incoming.deserialized %}
+                </div></div>
+            {% endif %}
+        {% endif %}
+
+        {% if 'constituency' in show_blocks %}
+            <h2>Constituency</h2>
+            {% if incoming %}
+            <div class="row">
+                <div class="col-md-6">
+            {% endif %}
+            <div class="row">
+                <div class="col-md-6">
+                    {% form_field form.constituency_types %}
+                    {% form_field form.constituency_description %}
+                </div>
+                <div class="col-md-6">
+                    {% form_field form.member_locations %}
+                </div>
+            </div>
+            {% if incoming %}
+                </div>
+                <div class="col-md-6">
+                    {% include "contacts/includes/team_details_diffview.html" with show_block="constituency" form=form team=team incoming=incoming.deserialized %}
+                </div></div>
+            {% endif %}
+        {% endif %}
+
+        {% if 'constituency_network' in show_blocks %}
+            <h2>Constituency Network</h2>
+            {% if incoming %}
+            <div class="row">
+                <div class="col-md-6">
+            {% endif %}
+            <div class="row">
+                <div class="col-md-6">
+                    {% form_field form.constituency_asns %}
+                    {% form_field form.constituency_domains %}
+                </div>
+                <div class="col-md-6">
+                    {% form_field form.constituency_ipranges %}
+                </div>
+            </div>
+            {% if incoming %}
+                </div>
+                <div class="col-md-6">
+                    {% include "contacts/includes/team_details_diffview.html" with show_block="constituency_network" form=form team=team incoming=incoming.deserialized %}
+                </div></div>
+            {% endif %}
+        {% endif %}
+
+        {% if 'security_notification_scope' in show_blocks %}
+            <h2>Security Notification Scope</h2>
+            {% if incoming %}
+            <div class="row">
+                <div class="col-md-6">
+            {% endif %}
+            <div class="row">
+                <div class="col-md-6">
+                    {% form_field form.scope_asns %}
+                    {% form_field form.scope_ipranges %}
+                </div>
+                <div class="col-md-6">
+                    {% form_field form.scope_email %}
+                </div>
+            </div>
+            {% if incoming %}
+                </div>
+                <div class="col-md-6">
+                    {% include "contacts/includes/team_details_diffview.html" with show_block="security_notification_scope" form=form team=team incoming=incoming.deserialized %}
+                </div></div>
+            {% endif %}
+        {% endif %}
+
+        {% if 'contact_information' in show_blocks %}
+            <h2>Contact Information</h2>
+            {% if incoming %}
+            <div class="row">
+                <div class="col-md-6">
+            {% endif %}
+            <div class="row">
+                <div class="col-md-6">
+                    {% form_field form.contact_postal_address %}
+                </div>
+                <div class="col-md-6">
+                    {% form_field form.contact_postal_country %}
+                </div>
+            </div>
+            {% if incoming %}
+                </div>
+                <div class="col-md-6">
+                    {% include "contacts/includes/team_details_diffview.html" with show_block="contact_information" form=form team=team incoming=incoming.deserialized %}
+                </div></div>
+            {% endif %}
+        {% endif %}
+
+        {% if 'phone_numbers' in show_blocks %}
+            {% if incoming %}
+                {% include "contacts/includes/team_details_diffview.html" with show_block="phone_numbers" incoming=incoming formset=formsets.phone_numbers %}
+            {% else %}
+                {% include "contacts/includes/formset.html" with formset=formsets.phone_numbers title_single="Phone Number" title_all="Phone Numbers" %}
+            {% endif %}
+        {% endif %}
+
+        {% if 'team_email_address' in show_blocks %}
+            <h2>Team Email Address</h2>
+            {% if incoming %}
+            <div class="row">
+                <div class="col-md-6">
+            {% endif %}
+            <div class="row">
+                <div class="col-md-6">
+                    {% form_field form.main_email %}
+                    {% form_field form.public_email %}
+                </div>
+                <div class="col-md-6">
+                    {% form_field form.automated_email %}
+                    {% form_field form.automated_email_format %}
+                </div>
+            </div>
+            {% if incoming %}
+                </div>
+                <div class="col-md-6">
+                    {% include "contacts/includes/team_details_diffview.html" with show_block="team_email_address" form=form team=team incoming=incoming.deserialized %}
+                </div></div>
+            {% endif %}
+        {% endif %}
+
+        {% if 'certificates' in show_blocks %}
+            {% if incoming %}
+                {% include "contacts/includes/team_details_diffview.html" with show_block="certificates" incoming=incoming formset=formsets.certificates %}
+            {% else %}
+                {% include "contacts/includes/formset.html" with formset=formsets.certificates title_single="PGP Key X.509 Certificate" title_all="PGP Key X.509 Certificates" %}
+            {% endif %}
+        {% endif %}
+
+        {% if 'public_information_resources' in show_blocks %}
+            <h2>Public Information Resources</h2>
+            {% if incoming %}
+            <div class="row">
+                <div class="col-md-6">
+            {% endif %}
+            <div class="row">
+                <div class="col-md-6">
+                    {% form_field form.public_www %}
+                    {% form_field form.public_ftp %}
+                </div>
+                <div class="col-md-6">
+                    {% form_field form.public_mailinglist %}
+                    {% form_field form.public_usenet %}
+                </div>
+            </div>
+            {% if incoming %}
+                </div>
+                <div class="col-md-6">
+                    {% include "contacts/includes/team_details_diffview.html" with show_block="public_information_resources" form=form team=team incoming=incoming.deserialized %}
+                </div></div>
+            {% endif %}
+        {% endif %}
+
+        {% if 'business_hours' in show_blocks %}
+            <h2>Business Hours</h2>
+            {% if incoming %}
+            <div class="row">
+                <div class="col-md-6">
+            {% endif %}
+            <div class="row">
+                <div class="col-md-6">
+                    {% form_field form.business_hours %}
+                    {% form_field form.outside_business_hours %}
+                </div>
+                <div class="col-md-6">
+                    {% form_field form.business_hours_timezone %}
+                </div>
+            </div>
+            {% if incoming %}
+                </div>
+                <div class="col-md-6">
+                    {% include "contacts/includes/team_details_diffview.html" with show_block="business_hours" form=form team=team incoming=incoming.deserialized %}
+                </div></div>
+            {% endif %}
+        {% endif %}
+
+        {% if 'billing_information' in show_blocks %}
+            <h2>Billing Information</h2>
+            {% if incoming %}
+            <div class="row">
+                <div class="col-md-6">
+            {% endif %}
+            <div class="row">
+                <div class="col-md-6">
+                    {% form_field form.billing_postal_address %}
+                    {% form_field form.billing_postal_country %}
+                </div>
+
+                <div class="col-md-6">
+                    {% form_field form.vat_number %}
+                </div>
+            </div>
+            {% if incoming %}
+                </div>
+                <div class="col-md-6">
+                    {% include "contacts/includes/team_details_diffview.html" with show_block="billing_information" form=form team=team incoming=incoming.deserialized %}
+                </div></div>
+            {% endif %}
+        {% endif %}
+
+        {% if 'policies' in show_blocks %}
+            <h2>Policies</h2>
+            {% if incoming %}
+            <div class="row">
+                <div class="col-md-6">
+            {% endif %}
+            <div class="row">
+                <div class="col-md-6">
+                    {% form_field form.classification_policy %}
+                    {% form_field form.exclusivity_policy %}
+                    {% form_field form.disclosure_policy %}
+                </div>
+                <div class="col-md-6">
+                    {% form_field form.legal_considerations %}
+                    {% form_field form.cryptography_policy %}
+                </div>
+            </div>
+            {% if incoming %}
+                </div>
+                <div class="col-md-6">
+                    {% include "contacts/includes/team_details_diffview.html" with show_block="policies" form=form team=team incoming=incoming.deserialized %}
+                </div></div>
+            {% endif %}
+        {% endif %}
+
+        {% if 'rfc2350' in show_blocks %}
+            <h2>RFC 2350</h2>
+            {% if incoming %}
+            <div class="row">
+                <div class="col-md-6">
+            {% endif %}
+            <div class="row">
+                <div class="col-md-12">
+                    {% form_field form.url_rfc2350 %}
+                </div>
+            </div>
+            {% if incoming %}
+                </div>
+                <div class="col-md-6">
+                    {% include "contacts/includes/team_details_diffview.html" with show_block="rfc2350" form=form team=team incoming=incoming.deserialized %}
+                </div></div>
+            {% endif %}
+        {% endif %}
+
+        {% if 'memberships' in show_blocks %}
+            {% if incoming %}
+                {% include "contacts/includes/team_details_diffview.html" with show_block="memberships" incoming=incoming formset=formsets.memberships %}
+            {% else %}
+                {% include "contacts/includes/formset.html" with formset=formsets.memberships title_single="Membership" title_all="Memberships" %}
+            {% endif %}
+        {% endif %}
+
+        {% if 'services_provided' in show_blocks %}
+            <h2>Services Provided to the Constituency</h2>
+            {% if incoming %}
+            <div class="row">
+                <div class="col-md-6">
+            {% endif %}
+            <div class="row">
+                <div class="col-md-4">
+                    {% form_field form.reactive_services %}
+                    {% form_field form.reactive_services_comment %}
+                </div>
+                <div class="col-md-4">
+                    {% form_field form.proactive_services %}
+                    {% form_field form.proactive_services_comment %}
+                </div>
+
+                <div class="col-md-4">
+                    {% form_field form.quality_management %}
+                    {% form_field form.quality_management_comment %}
+                </div>
+            </div>
+            {% if incoming %}
+                </div>
+                <div class="col-md-6">
+                    {% include "contacts/includes/team_details_diffview.html" with show_block="services_provided" form=form team=team incoming=incoming.deserialized %}
+                </div></div>
+            {% endif %}
+        {% endif %}
+
+        {% if 'tools_and_expertise' in show_blocks %}
+            <h2>Tools and Expertise</h2>
+            {% if incoming %}
+            <div class="row">
+                <div class="col-md-6">
+            {% endif %}
+            <div class="row">
+                <div class="col-md-6">
+                    {% form_field form.process_tool %}
+                    {% form_field form.related_software %}
+                    {% form_field form.generic %}
+                    {% form_field form.os %}
+                </div>
+                <div class="col-md-6">
+                    {% form_field form.platform %}
+                    {% form_field form.network %}
+                    {% form_field form.other %}
+                    {% form_field form.references %}
+                </div>
+            </div>
+            {% if incoming %}
+                </div>
+                <div class="col-md-6">
+                    {% include "contacts/includes/team_details_diffview.html" with show_block="tools_and_expertise" form=form team=team incoming=incoming.deserialized %}
+                </div></div>
+            {% endif %}
+        {% endif %}
+
+        {% if 'process_information' in show_blocks %}
+            <h2>Process Information</h2>
+            {% if incoming %}
+            <div class="row">
+                <div class="col-md-6">
+            {% endif %}
+            <div class="row">
+                <div class="col-md-6">
+                    {% form_field form.accreditations %}
+                    {% form_field form.projects %}
+                </div>
+                <div class="col-md-6">
+                    {% form_field form.reporting_structure %}
+                </div>
+            </div>
+            {% if incoming %}
+                </div>
+                <div class="col-md-6">
+                    {% include "contacts/includes/team_details_diffview.html" with show_block="process_information" form=form team=team incoming=incoming.deserialized %}
+                </div></div>
+            {% endif %}
+        {% endif %}
+
+        {% if 'staff_information' in show_blocks %}
+            <h2>Staff Information</h2>
+            {% if incoming %}
+            <div class="row">
+                <div class="col-md-6">
+            {% endif %}
+            <div class="row">
+                <div class="col-md-6">
+                    {% form_field form.education %}
+                    {% form_field form.headcount_normal %}
+                    {% form_field form.headcount_backup %}
+                </div>
+                <div class="col-md-6">
+                    {% form_field form.fte_normal %}
+                    {% form_field form.fte_backup %}
+                </div>
+            </div>
+            {% if incoming %}
+                </div>
+                <div class="col-md-6">
+                    {% include "contacts/includes/team_details_diffview.html" with show_block="staff_information" form=form team=team incoming=incoming.deserialized %}
+                </div></div>
+            {% endif %}
+        {% endif %}
+
+        {% if 'csirt_support' in show_blocks %}
+            <h2>Statement of CSIRT-Support</h2>
+            {% if incoming %}
+            <div class="row">
+                <div class="col-md-6">
+            {% endif %}
+            <div class="row">
+                <div class="col-md-6">
+                    {% form_field form.provide_team_description %}
+                    {% form_field form.provide_team_description_comment %}
+
+                    {% form_field form.access_of_accredited_teams %}
+                    {% form_field form.access_of_accredited_teams_comment %}
+
+                    {% form_field form.public_access %}
+                    {% form_field form.public_access_comment %}
+
+                    {% form_field form.external_services_rfc2350 %}
+                    {% form_field form.external_services_rfc2350_comment %}
+
+                    {% form_field form.adhere_to_tlp %}
+                    {% form_field form.adhere_to_tlp_comment %}
+
+                    {% form_field form.allow_ti_gpg_key %}
+                    {% form_field form.allow_ti_gpg_key_comment %}
+
+                    {% form_field form.commitment_updates %}
+                    {% form_field form.commitment_updates_comment %}
+
+                    {% form_field form.protect_information_received %}
+                    {% form_field form.protect_information_received_comment %}
+                </div>
+
+                <div class="col-md-6">
+                    {% form_field form.provide_feedback %}
+                    {% form_field form.provide_feedback_comment %}
+
+                    {% form_field form.allow_site_visits %}
+                    {% form_field form.allow_site_visits_comment %}
+
+                    {% form_field form.payment_of_fees %}
+                    {% form_field form.payment_of_fees_comment %}
+
+                    {% form_field form.registration_two_teams %}
+                    {% form_field form.registration_two_teams_comment %}
+
+                    {% form_field form.sim3_support %}
+                    {% form_field form.sim3_support_comment %}
+
+                    {% form_field form.meetings_attendance %}
+                    {% form_field form.meetings_attendance_comment %}
+
+                    {% form_field form.csirt_code_of_practice %}
+                    {% form_field form.csirt_code_of_practice_comment %}
+
+                    {% form_field form.reaction_texts_particiation %}
+                    {% form_field form.reaction_texts_particiation_comment %}
+                </div>
+            </div>
+            {% if incoming %}
+                </div>
+                <div class="col-md-6">
+                    {% include "contacts/includes/team_details_diffview.html" with show_block="csirt_support" form=form team=team incoming=incoming.deserialized %}
+                </div></div>
+            {% endif %}
+        {% endif %}
+
+        {% if 'irt_object' in show_blocks %}
+            <h2>IRT Object</h2>
+            {% if incoming %}
+            <div class="row">
+                <div class="col-md-6">
+            {% endif %}
+            <div class="row">
+                <div class="col-md-6">
+                    {% form_field form.managed_by_ti %}
+                    {% form_field form.irt_encryption_keys %}
+                    {% form_field form.irt_signature_keys %}
+                    {% form_field form.irt_authentication_keys %}
+                    {% form_field form.irt_emails %}
+                    {% form_field form.irt_abuse_emails %}
+                    {% form_field form.irt_notify_emails %}
+                    {% form_field form.irt_phone_numbers %}
+                    {% form_field form.irt_fax_numbers %}
+                    {% form_field form.irt_emergency_numbers %}
+                </div>
+
+                <div class="col-md-6">
+                    {% form_field form.irt_rfc2350 %}
+                    {% form_field form.irt_address %}
+                    {% form_field form.irt_additional_remarks %}
+                </div>
+            </div>
+            {% if incoming %}
+                </div>
+                <div class="col-md-6">
+                    {% include "contacts/includes/team_details_diffview.html" with show_block="irt_object" form=form team=team incoming=incoming.deserialized %}
+                </div></div>
+            {% endif %}
+        {% endif %}
+
+        {% if 'outband_alerting' in show_blocks %}
+            <h2>Outband Alerting</h2>
+            {% if incoming %}
+            <div class="row">
+                <div class="col-md-6">
+            {% endif %}
+            <div class="row">
+                <div class="col-md-12">
+                    {% form_field form.outband_alerting_id %}
+                </div>
+            </div>
+            {% if incoming %}
+                </div>
+                <div class="col-md-6">
+                    {% include "contacts/includes/team_details_diffview.html" with show_block="outband_alerting" form=form team=team incoming=incoming.deserialized %}
+                </div></div>
+            {% endif %}
+        {% endif %}
+
+        {% if 'outband_alerting_contacts' in show_blocks %}
+            {% if incoming %}
+                {% include "contacts/includes/team_details_diffview.html" with show_block="outband_alerting_contacts" incoming=incoming formset=formsets.outband_alerting_contacts %}
+            {% else %}
+                {% include "contacts/includes/formset.html" with formset=formsets.utband_alerting_contacts title_single="Outband Alerting Contact" title_all="Outband Alerting Contacts" %}
+            {% endif %}
+        {% endif %}
+
+        {% if 'outband_alerting_accesses' in show_blocks %}
+            {% if incoming %}
+                {% include "contacts/includes/team_details_diffview.html" with show_block="outband_alerting_accesses" incoming=incoming formset=formsets.outband_alerting_accesses %}
+            {% else %}
+                {% include "contacts/includes/formset.html" with formset=formsets.outband_alerting_accesses title_single="Outband Alerting Access" title_all="Outband Alerting Accesss" %}
+            {% endif %}
+        {% endif %}
+
+        {% if 'team_members' in show_blocks %}
+            {% if incoming %}
+                {% include "contacts/includes/team_details_diffview.html" with show_block="team_members" incoming=incoming formset=formsets.team_members %}
+            {% else %}
+                {% include "contacts/includes/formset_teammember.html" with formset=formsets.team_members title_single="Team Member" title_all="Team Members" %}
+            {% endif %}
+
+        {% endif %}
+    </form>
+{% endblock %}
+
+{% block javascriptcontent %}
+    <script src="{% static 'js/jquery.formset.js' %}"></script>
+
+    <script>
+        $(function() {
+            var formsets = [
+                'certificates',
+                'phone_numbers',
+                'memberships',
+                'outband_alerting_accesses',
+                'outband_alerting_contacts',
+            ];
+
+            for (var name of formsets) {
+                $('[data-formset-prefix="' + name + '"]')
+                    .formset()
+                    .on('formAdded', show_form)
+                    .on('formDeleted', hide_form);
+            }
+
+            // Special case for the team_members subform as it contains
+            // nested formsets. Need to ensure that the outer formset only
+            // selects it's own elements (hence the checking for preset name
+            // in all selectors and that the nested formset gets initialized
+            // after a new outer form has been added.
+            $('[data-formset-prefix="team_members"]')
+                .formset({
+                    form: '[data-formset-form="team_members"]',
+                    emptyForm: '[data-formset-empty-form="team_members"]',
+                    body: '[data-formset-body="team_members"]',
+                    add: '[data-formset-add="team_members"]',
+                    deleteButton: '[data-formset-delete-button="team_members"]',
+                })
+                .on('formAdded', show_form_with_nested_formsets)
+                .on('formDeleted', hide_form);
+
+            $('#{{ contact.established.id_for_label }}').datepicker({
+                format: "yyyy-mm-dd",
+                orientation: 'bottom',
+                weekStart: 1,
+                autoclose: true,
+                startView: 2,
+                todayBtn: true,
+                todayHighlight: true
+            });
+
+            // Highlight changes
+            $('.diff-indicator').each(function() {
+                if ($(this).find('.diff-has-changes').length > 0) {$(this).addClass('panel-success')};
+            });
+        });
+
+        function show_form_with_nested_formsets(evt) {
+            var form = $(evt.target);
+
+            // initialize all child formsets
+            form.find('[data-formset-prefix]')
+                .formset({prefixPlaceholder: '__nestedprefix__'})
+                .on('formAdded', show_form)
+                .on('formDeleted', hide_form);
+
+            form.slideDown(function() {
+                initialize_select2_fields(form);
+            });
+        }
+
+        function show_form(evt) {
+            var form = $(evt.target);
+            form.slideDown(function() {
+                initialize_select2_fields(form);
+            });
+        }
+
+        function hide_form(evt) {
+            $(evt.target).slideUp();
+        }
+    </script>
+{% endblock %}

@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% load form_utils %}
+
+{% block title %} | {{ ltc.short_name }}{% endblock %}
+
+{% block page-header %}
+    <i class="fa fa-circle-o-notch "></i> {{ ltc.short_name }}
+    <div class="pull-right">
+        <a href="{% url 'ltc_new' %}" type="button" class="btn btn-success">
+            <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+        </a>
+        <form action="{% url 'ltc_delete' %}" id="delete-contact" method="post" class="delete-form">{% csrf_token %}
+            <input type="hidden" name="id" value="{{ ltc.id }}">
+            <button name="delete-it" type="button"
+                class="btn btn-danger confirm" type="submit" data-placement="bottom">
+                <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+            </button>
+        </form>
+        <a href="{% url 'ltc_edit' id=ltc.id %}" type="button" class="btn btn-warning">
+            <span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit LTC
+        </a>
+    </div>
+{% endblock %}
+
+{% block content %}
+<h2>Details</h2>
+<div class="row">
+    <div class="col-md-6">{% field_value ltc 'short_name' %}</div>
+    <div class="col-md-6">{% field_value ltc 'name' %}</div>
+    <div class="col-md-6">{% field_value ltc 'description' %}</div>
+    <div class="col-md-6">{% field_value ltc 'info_url' %}</div>
+    <div class="col-md-6">{% field_value ltc 'membership_url' %}</div>
+    <div class="col-md-6">{% field_value ltc 'created' %}</div>
+</div>
+<h2>Members</h2>
+<div class="row">
+    <div class="col-md-6">{% field_value ltc 'trustcircles' %}</div>
+    <div class="col-md-6">{% field_value ltc 'teams' %}</div>
+    <div class="col-md-6">{% field_value ltc 'team_contacts' %}</div>
+    <div class="col-md-6">{% field_value ltc 'person_contacts' %}</div>
+</div>
+{% endblock %}
+
+{% block javascriptcontent %}
+<script>
+    $('.confirm').confirmation({
+        onConfirm: function (event) {
+            $("#delete-contact").submit();
+        }
+    });
+</script>
+{% endblock %}

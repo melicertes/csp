@@ -1,0 +1,21 @@
+{% load form_utils %}
+
+{% if related_objects %}
+<div class="formset">
+    <h2>{{ title_all }}</h2>
+    {% for obj in related_objects %}
+    <div>
+        <h3>{{ title_single }}</h3>
+        <div class="row">
+            {% for field in fields %}
+            {% if field.editable and not field.primary_key %}
+            <div class="col-md-6">
+                {% field_value obj field.name %}
+            </div>
+            {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}

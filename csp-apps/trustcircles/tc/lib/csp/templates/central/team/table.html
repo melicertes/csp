@@ -1,0 +1,38 @@
+<table data-toggle="table" data-page-size="20" data-pagination="true" data-sortable="true">
+    <thead>
+    <tr>
+        <th data-align="center"></th>
+
+        <th data-sortable="true" data-sort-name="TeamName_sort">Name</th>
+        <th data-visible="false" data-field="TeamName_sort">[Column for sorting] Team Name</th>
+
+        <th data-sortable="true">Country</th>
+
+        <th data-align="right" data-sort-name="Num_CTC_sort" data-sortable="true">#CTC</th>
+        <th data-visible="false" data-field="Num_CTC_sort">[Column for sorting] #CTC</th>
+
+        <th data-align="right" data-sortable="true">Created</th>
+        <th data-align="right" data-sortable="true">CSP Installed</th>
+        <th data-align="right" data-sortable="true">Status</th>
+    </tr>
+    </thead>
+
+    {% for team in teams %}
+        <tr>
+            <td><i class="fa fa-user-circle "></i></td>
+
+            <td><a href="{% url 'team_view'  team.id %}"> {{ team.name }}</a></td>
+            <td>{{ team.name }}</td>
+
+            <td><a href="{% url 'search_view' %}?c={{ team.country }}">{{ team.country }}</a></td>
+
+            <td><a href="{% url 'team_view' team.id %}">{{ team.circles.all|length }}</a></td>
+            <td>{{ team.circles.all|length }}</td>
+
+            <td>{{ team.created|date }}</td>
+            <td>{% if team.csp_installed %} Yes {% else %} No {% endif %}</td>
+            <td><a href="{% url 'search_view' %}?s={{ team.status }}">{{ team.status }}</a></td>
+        </tr>
+    {% endfor %}
+
+</table>

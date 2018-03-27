@@ -1,0 +1,2381 @@
+[
+{
+  "model": "common.country",
+  "pk": "0",
+  "fields": {
+    "name": "*World Wide"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "1",
+  "fields": {
+    "name": "*Europe"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "10",
+  "fields": {
+    "name": "Scandinavia"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "20",
+  "fields": {
+    "name": "*EMEA"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "3",
+  "fields": {
+    "name": "*Africa"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "4",
+  "fields": {
+    "name": "*Asia"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "5",
+  "fields": {
+    "name": "*Australia"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "6",
+  "fields": {
+    "name": "*North America"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "7",
+  "fields": {
+    "name": "*South America"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "AD",
+  "fields": {
+    "name": "Andorra"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "AE",
+  "fields": {
+    "name": "United Arab Emirates"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "AF",
+  "fields": {
+    "name": "Afghanistan"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "AG",
+  "fields": {
+    "name": "Antigua And Barbuda"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "AI",
+  "fields": {
+    "name": "Anguilla"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "AL",
+  "fields": {
+    "name": "Albania"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "AM",
+  "fields": {
+    "name": "Armenia"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "AN",
+  "fields": {
+    "name": "Netherlands Antilles"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "AO",
+  "fields": {
+    "name": "Angola"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "AQ",
+  "fields": {
+    "name": "Antarctica"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "AR",
+  "fields": {
+    "name": "Argentina"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "AS",
+  "fields": {
+    "name": "American Samoa"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "AT",
+  "fields": {
+    "name": "Austria"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "AU",
+  "fields": {
+    "name": "Australia"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "AW",
+  "fields": {
+    "name": "Aruba"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "AX",
+  "fields": {
+    "name": "Aland Islands"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "AZ",
+  "fields": {
+    "name": "Azerbaijan"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "BA",
+  "fields": {
+    "name": "Bosnia Hercegovina"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "BB",
+  "fields": {
+    "name": "Barbados"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "BD",
+  "fields": {
+    "name": "Bangladesh"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "BE",
+  "fields": {
+    "name": "Belgium"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "BF",
+  "fields": {
+    "name": "Burkina Faso"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "BG",
+  "fields": {
+    "name": "Bulgaria"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "BH",
+  "fields": {
+    "name": "Bahrain"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "BI",
+  "fields": {
+    "name": "Burundi"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "BJ",
+  "fields": {
+    "name": "Benin"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "BM",
+  "fields": {
+    "name": "Bermuda"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "BN",
+  "fields": {
+    "name": "Brunei Darussalam"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "BO",
+  "fields": {
+    "name": "Bolivia"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "BR",
+  "fields": {
+    "name": "Brazil"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "BS",
+  "fields": {
+    "name": "Bahamas"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "BT",
+  "fields": {
+    "name": "Bhutan"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "BV",
+  "fields": {
+    "name": "Bouvet Island"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "BW",
+  "fields": {
+    "name": "Botswana"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "BY",
+  "fields": {
+    "name": "Belarus"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "BZ",
+  "fields": {
+    "name": "Belize"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "CA",
+  "fields": {
+    "name": "Canada"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "CC",
+  "fields": {
+    "name": "Cocos (Keeling) Islands"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "CF",
+  "fields": {
+    "name": "Central African Republic"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "CG",
+  "fields": {
+    "name": "Congo"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "CH",
+  "fields": {
+    "name": "Switzerland"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "CI",
+  "fields": {
+    "name": "Cote D'Ivoire"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "CK",
+  "fields": {
+    "name": "Cook Islands"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "CL",
+  "fields": {
+    "name": "Chile"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "CM",
+  "fields": {
+    "name": "Cameroon"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "CN",
+  "fields": {
+    "name": "China"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "CO",
+  "fields": {
+    "name": "Colombia"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "CR",
+  "fields": {
+    "name": "Costa Rica"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "CS",
+  "fields": {
+    "name": "Czechoslovakia"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "CU",
+  "fields": {
+    "name": "Cuba"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "CV",
+  "fields": {
+    "name": "Cape Verde"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "CW",
+  "fields": {
+    "name": "Curacao"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "CX",
+  "fields": {
+    "name": "Christmas Island"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "CY",
+  "fields": {
+    "name": "Cyprus"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "CZ",
+  "fields": {
+    "name": "Czech Republic"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "DE",
+  "fields": {
+    "name": "Germany"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "DJ",
+  "fields": {
+    "name": "Djibouti"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "DK",
+  "fields": {
+    "name": "Denmark"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "DM",
+  "fields": {
+    "name": "Dominica"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "DO",
+  "fields": {
+    "name": "Dominican Republic"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "DZ",
+  "fields": {
+    "name": "Algeria"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "EC",
+  "fields": {
+    "name": "Ecuador"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "EE",
+  "fields": {
+    "name": "Estonia"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "EG",
+  "fields": {
+    "name": "Egypt"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "EH",
+  "fields": {
+    "name": "Western Sahara"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "ES",
+  "fields": {
+    "name": "Spain"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "ET",
+  "fields": {
+    "name": "Ethiopia"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "EU",
+  "fields": {
+    "name": "*European Union"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "FI",
+  "fields": {
+    "name": "Finland"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "FJ",
+  "fields": {
+    "name": "Fiji"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "FK",
+  "fields": {
+    "name": "Falkland Islands (Malvinas)"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "FM",
+  "fields": {
+    "name": "Micronesia"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "FO",
+  "fields": {
+    "name": "Faroe Islands"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "FR",
+  "fields": {
+    "name": "France"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "GA",
+  "fields": {
+    "name": "Gabon"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "GB",
+  "fields": {
+    "name": "United Kingdom, 2nd top level"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "GD",
+  "fields": {
+    "name": "Grenada"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "GE",
+  "fields": {
+    "name": "Georgia"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "GF",
+  "fields": {
+    "name": "French Guiana"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "GH",
+  "fields": {
+    "name": "Ghana"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "GI",
+  "fields": {
+    "name": "Gibraltar"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "GL",
+  "fields": {
+    "name": "Greenland"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "GM",
+  "fields": {
+    "name": "Gambia"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "GN",
+  "fields": {
+    "name": "Guinea"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "GP",
+  "fields": {
+    "name": "Guadeloupe"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "GQ",
+  "fields": {
+    "name": "Equatorial Guinea"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "GR",
+  "fields": {
+    "name": "Greece"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "GT",
+  "fields": {
+    "name": "Guatemala"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "GU",
+  "fields": {
+    "name": "Guam"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "GW",
+  "fields": {
+    "name": "Guinea-Bissau"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "GY",
+  "fields": {
+    "name": "Guyana"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "HK",
+  "fields": {
+    "name": "Hong Kong"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "HM",
+  "fields": {
+    "name": "Heard And Mc Donald Islands"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "HN",
+  "fields": {
+    "name": "Honduras"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "HR",
+  "fields": {
+    "name": "Croatia"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "HT",
+  "fields": {
+    "name": "Haiti"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "HU",
+  "fields": {
+    "name": "Hungary"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "ID",
+  "fields": {
+    "name": "Indonesia"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "IE",
+  "fields": {
+    "name": "Ireland"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "IL",
+  "fields": {
+    "name": "Israel"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "IN",
+  "fields": {
+    "name": "India"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "IO",
+  "fields": {
+    "name": "British Indian Ocean Territory"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "IQ",
+  "fields": {
+    "name": "Iraq"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "IR",
+  "fields": {
+    "name": "Iran (Islamic Republic Of)"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "IS",
+  "fields": {
+    "name": "Iceland"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "IT",
+  "fields": {
+    "name": "Italy"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "JM",
+  "fields": {
+    "name": "Jamaica"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "JO",
+  "fields": {
+    "name": "Jordan"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "JP",
+  "fields": {
+    "name": "Japan"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "KE",
+  "fields": {
+    "name": "Kenya"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "KG",
+  "fields": {
+    "name": "Kyrgyzstan"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "KH",
+  "fields": {
+    "name": "Cambodia"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "KI",
+  "fields": {
+    "name": "Kiribati"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "KM",
+  "fields": {
+    "name": "Comoros"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "KN",
+  "fields": {
+    "name": "Saint Kitts And Nevis"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "KP",
+  "fields": {
+    "name": "Korea, Democratic People's Republic Of"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "KR",
+  "fields": {
+    "name": "Korea, Republic Of"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "KW",
+  "fields": {
+    "name": "Kuwait"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "KY",
+  "fields": {
+    "name": "Cayman Islands"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "KZ",
+  "fields": {
+    "name": "Kazakhstan"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "LA",
+  "fields": {
+    "name": "Lao People's Democratic Republic"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "LB",
+  "fields": {
+    "name": "Lebanon"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "LC",
+  "fields": {
+    "name": "Saint Lucia"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "LI",
+  "fields": {
+    "name": "Liechtenstein"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "LK",
+  "fields": {
+    "name": "Sri Lanka"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "LR",
+  "fields": {
+    "name": "Liberia"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "LS",
+  "fields": {
+    "name": "Lesotho"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "LT",
+  "fields": {
+    "name": "Lithuania"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "LU",
+  "fields": {
+    "name": "Luxembourg"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "LV",
+  "fields": {
+    "name": "Latvia"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "LY",
+  "fields": {
+    "name": "Libyan Arab Jamahiriya"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "MA",
+  "fields": {
+    "name": "Morocco"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "MC",
+  "fields": {
+    "name": "Monaco"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "MD",
+  "fields": {
+    "name": "Moldova, Republic Of"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "ME",
+  "fields": {
+    "name": "Montenegro"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "MG",
+  "fields": {
+    "name": "Madagascar"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "MH",
+  "fields": {
+    "name": "Marshall Islands"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "MK",
+  "fields": {
+    "name": "Macedonia, Former Yugoslav Republic"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "ML",
+  "fields": {
+    "name": "Mali"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "MM",
+  "fields": {
+    "name": "Burma (Myanmar)"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "MN",
+  "fields": {
+    "name": "Mongolia"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "MO",
+  "fields": {
+    "name": "Macau"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "MP",
+  "fields": {
+    "name": "Northern Mariana Islands"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "MQ",
+  "fields": {
+    "name": "Martinique"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "MR",
+  "fields": {
+    "name": "Mauritania"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "MS",
+  "fields": {
+    "name": "Montserrat"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "MT",
+  "fields": {
+    "name": "Malta"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "MU",
+  "fields": {
+    "name": "Mauritius"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "MV",
+  "fields": {
+    "name": "Maldives"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "MW",
+  "fields": {
+    "name": "Malawi"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "MX",
+  "fields": {
+    "name": "Mexico"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "MY",
+  "fields": {
+    "name": "Malaysia"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "MZ",
+  "fields": {
+    "name": "Mozambique"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "NA",
+  "fields": {
+    "name": "Namibia"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "NC",
+  "fields": {
+    "name": "New Caledonia"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "NE",
+  "fields": {
+    "name": "Niger"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "NF",
+  "fields": {
+    "name": "Norfolk Island"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "NG",
+  "fields": {
+    "name": "Nigeria"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "NI",
+  "fields": {
+    "name": "Nicaragua"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "NL",
+  "fields": {
+    "name": "Netherlands"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "NO",
+  "fields": {
+    "name": "Norway"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "NP",
+  "fields": {
+    "name": "Nepal"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "NR",
+  "fields": {
+    "name": "Nauru"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "NT",
+  "fields": {
+    "name": "Neutral Zone"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "NU",
+  "fields": {
+    "name": "Niue"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "NZ",
+  "fields": {
+    "name": "New Zealand"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "OM",
+  "fields": {
+    "name": "Oman"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "PA",
+  "fields": {
+    "name": "Panama"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "PE",
+  "fields": {
+    "name": "Peru"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "PF",
+  "fields": {
+    "name": "French Polynesia"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "PG",
+  "fields": {
+    "name": "Papua New Guinea"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "PH",
+  "fields": {
+    "name": "Philippines"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "PK",
+  "fields": {
+    "name": "Pakistan"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "PL",
+  "fields": {
+    "name": "Poland"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "PM",
+  "fields": {
+    "name": "St. Pierre And Miquelon"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "PN",
+  "fields": {
+    "name": "Pitcairn"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "PR",
+  "fields": {
+    "name": "Puerto Rico"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "PT",
+  "fields": {
+    "name": "Portugal"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "PW",
+  "fields": {
+    "name": "Palau"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "PY",
+  "fields": {
+    "name": "Paraguay"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "QA",
+  "fields": {
+    "name": "Qatar"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "RE",
+  "fields": {
+    "name": "Reunion"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "RO",
+  "fields": {
+    "name": "Romania"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "RS",
+  "fields": {
+    "name": "Serbia"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "RU",
+  "fields": {
+    "name": "Russian Federation"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "RW",
+  "fields": {
+    "name": "Rwanda"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "SA",
+  "fields": {
+    "name": "Saudi Arabia"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "SB",
+  "fields": {
+    "name": "Solomon Islands"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "SC",
+  "fields": {
+    "name": "Seychelles"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "SD",
+  "fields": {
+    "name": "Sudan"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "SE",
+  "fields": {
+    "name": "Sweden"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "SG",
+  "fields": {
+    "name": "Singapore"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "SH",
+  "fields": {
+    "name": "St. Helena"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "SI",
+  "fields": {
+    "name": "Slovenia"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "SJ",
+  "fields": {
+    "name": "Svalbard And Jan Mayen Islands"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "SK",
+  "fields": {
+    "name": "Slovakia"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "SL",
+  "fields": {
+    "name": "Sierra Leone"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "SM",
+  "fields": {
+    "name": "San Marino"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "SN",
+  "fields": {
+    "name": "Senegal"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "SO",
+  "fields": {
+    "name": "Somalia"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "SR",
+  "fields": {
+    "name": "Suriname"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "ST",
+  "fields": {
+    "name": "Sao Tome And Principe"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "SU",
+  "fields": {
+    "name": "USSR"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "SV",
+  "fields": {
+    "name": "El Salvador"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "SY",
+  "fields": {
+    "name": "Syrian Arab Republic"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "SZ",
+  "fields": {
+    "name": "Swaziland"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "TC",
+  "fields": {
+    "name": "Turks And Caicos Islands"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "TD",
+  "fields": {
+    "name": "Chad"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "TF",
+  "fields": {
+    "name": "French Southern Territories"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "TG",
+  "fields": {
+    "name": "Togo"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "TH",
+  "fields": {
+    "name": "Thailand"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "TJ",
+  "fields": {
+    "name": "Tajikistan"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "TK",
+  "fields": {
+    "name": "Tokelau"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "TM",
+  "fields": {
+    "name": "Turkmenistan"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "TN",
+  "fields": {
+    "name": "Tunisia"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "TO",
+  "fields": {
+    "name": "Tonga"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "TP",
+  "fields": {
+    "name": "East Timor"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "TR",
+  "fields": {
+    "name": "Turkey"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "TT",
+  "fields": {
+    "name": "Trinidad And Tobago"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "TV",
+  "fields": {
+    "name": "Tuvalu"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "TW",
+  "fields": {
+    "name": "Taiwan"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "TZ",
+  "fields": {
+    "name": "Tanzania, United Republic Of"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "UA",
+  "fields": {
+    "name": "Ukraine"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "UG",
+  "fields": {
+    "name": "Uganda"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "UK",
+  "fields": {
+    "name": "United Kingdom"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "UM",
+  "fields": {
+    "name": "United States Minor Outlying Islands"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "US",
+  "fields": {
+    "name": "United States"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "UY",
+  "fields": {
+    "name": "Uruguay"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "UZ",
+  "fields": {
+    "name": "Uzbekistan"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "VA",
+  "fields": {
+    "name": "Vatican City State (Holy See)"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "VC",
+  "fields": {
+    "name": "Saint Vincent And The Grenadines"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "VE",
+  "fields": {
+    "name": "Venezuela"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "VG",
+  "fields": {
+    "name": "Virgin Islands (British)"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "VI",
+  "fields": {
+    "name": "Virgin Islands (U.S.)"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "VN",
+  "fields": {
+    "name": "Viet Nam"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "VU",
+  "fields": {
+    "name": "Vanuatu"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "WF",
+  "fields": {
+    "name": "Wallis And Futuna Islands"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "WS",
+  "fields": {
+    "name": "Samoa"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "YE",
+  "fields": {
+    "name": "Yemen, Republic Of"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "YU",
+  "fields": {
+    "name": "Yugoslavia"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "ZA",
+  "fields": {
+    "name": "South Africa"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "ZM",
+  "fields": {
+    "name": "Zambia"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "ZR",
+  "fields": {
+    "name": "Zaire"
+  }
+},
+{
+  "model": "common.country",
+  "pk": "ZW",
+  "fields": {
+    "name": "Zimbabwe"
+  }
+},
+{
+  "model": "common.suggestion",
+  "pk": 1,
+  "fields": {
+    "name": "reactive_service",
+    "value": "Alerts and Warnings"
+  }
+},
+{
+  "model": "common.suggestion",
+  "pk": 2,
+  "fields": {
+    "name": "reactive_service",
+    "value": "Artifact analysis"
+  }
+},
+{
+  "model": "common.suggestion",
+  "pk": 3,
+  "fields": {
+    "name": "reactive_service",
+    "value": "Artifact response"
+  }
+},
+{
+  "model": "common.suggestion",
+  "pk": 4,
+  "fields": {
+    "name": "reactive_service",
+    "value": "Artifact response coordination"
+  }
+},
+{
+  "model": "common.suggestion",
+  "pk": 5,
+  "fields": {
+    "name": "reactive_service",
+    "value": "Forensic analysis"
+  }
+},
+{
+  "model": "common.suggestion",
+  "pk": 6,
+  "fields": {
+    "name": "reactive_service",
+    "value": "Incident analysis"
+  }
+},
+{
+  "model": "common.suggestion",
+  "pk": 7,
+  "fields": {
+    "name": "reactive_service",
+    "value": "Incident response"
+  }
+},
+{
+  "model": "common.suggestion",
+  "pk": 8,
+  "fields": {
+    "name": "reactive_service",
+    "value": "Incident response coordination"
+  }
+},
+{
+  "model": "common.suggestion",
+  "pk": 9,
+  "fields": {
+    "name": "reactive_service",
+    "value": "Incident response on site"
+  }
+},
+{
+  "model": "common.suggestion",
+  "pk": 10,
+  "fields": {
+    "name": "reactive_service",
+    "value": "Incident response support"
+  }
+},
+{
+  "model": "common.suggestion",
+  "pk": 11,
+  "fields": {
+    "name": "reactive_service",
+    "value": "N/A"
+  }
+},
+{
+  "model": "common.suggestion",
+  "pk": 12,
+  "fields": {
+    "name": "reactive_service",
+    "value": "Vulnerability analysis"
+  }
+},
+{
+  "model": "common.suggestion",
+  "pk": 13,
+  "fields": {
+    "name": "reactive_service",
+    "value": "Vulnerability response"
+  }
+},
+{
+  "model": "common.suggestion",
+  "pk": 14,
+  "fields": {
+    "name": "reactive_service",
+    "value": "Vulnerability response coordination"
+  }
+},
+{
+  "model": "common.suggestion",
+  "pk": 15,
+  "fields": {
+    "name": "proactive_service",
+    "value": "Announcements"
+  }
+},
+{
+  "model": "common.suggestion",
+  "pk": 16,
+  "fields": {
+    "name": "proactive_service",
+    "value": "Configuration and maintenance of security tools, applications and infrastructures"
+  }
+},
+{
+  "model": "common.suggestion",
+  "pk": 17,
+  "fields": {
+    "name": "proactive_service",
+    "value": "Development of security tools"
+  }
+},
+{
+  "model": "common.suggestion",
+  "pk": 18,
+  "fields": {
+    "name": "proactive_service",
+    "value": "Intrusion detection services"
+  }
+},
+{
+  "model": "common.suggestion",
+  "pk": 19,
+  "fields": {
+    "name": "proactive_service",
+    "value": "N/A"
+  }
+},
+{
+  "model": "common.suggestion",
+  "pk": 20,
+  "fields": {
+    "name": "proactive_service",
+    "value": "Security audits or assessments"
+  }
+},
+{
+  "model": "common.suggestion",
+  "pk": 21,
+  "fields": {
+    "name": "proactive_service",
+    "value": "Security-related information dissemination"
+  }
+},
+{
+  "model": "common.suggestion",
+  "pk": 22,
+  "fields": {
+    "name": "proactive_service",
+    "value": "Technology watch"
+  }
+},
+{
+  "model": "common.suggestion",
+  "pk": 23,
+  "fields": {
+    "name": "proactive_service",
+    "value": "Trend and neighborhood watch"
+  }
+},
+{
+  "model": "common.suggestion",
+  "pk": 24,
+  "fields": {
+    "name": "quality_management",
+    "value": "Awareness building"
+  }
+},
+{
+  "model": "common.suggestion",
+  "pk": 25,
+  "fields": {
+    "name": "quality_management",
+    "value": "Business continuity and disaster recovery planning"
+  }
+},
+{
+  "model": "common.suggestion",
+  "pk": 26,
+  "fields": {
+    "name": "quality_management",
+    "value": "Education/Training"
+  }
+},
+{
+  "model": "common.suggestion",
+  "pk": 27,
+  "fields": {
+    "name": "quality_management",
+    "value": "N/A"
+  }
+},
+{
+  "model": "common.suggestion",
+  "pk": 28,
+  "fields": {
+    "name": "quality_management",
+    "value": "Product evaluation or certification"
+  }
+},
+{
+  "model": "common.suggestion",
+  "pk": 29,
+  "fields": {
+    "name": "quality_management",
+    "value": "Risk analysis"
+  }
+},
+{
+  "model": "common.suggestion",
+  "pk": 30,
+  "fields": {
+    "name": "quality_management",
+    "value": "Security consulting"
+  }
+},
+{
+  "model": "common.suggestion",
+  "pk": 31,
+  "fields": {
+    "name": "membership_state",
+    "value": "Full Member"
+  }
+},
+{
+  "model": "common.suggestion",
+  "pk": 32,
+  "fields": {
+    "name": "membership_state",
+    "value": "Liaison"
+  }
+},
+{
+  "model": "common.suggestion",
+  "pk": 33,
+  "fields": {
+    "name": "membership_state",
+    "value": "No Member"
+  }
+},
+{
+  "model": "common.suggestion",
+  "pk": 34,
+  "fields": {
+    "name": "constituency_type",
+    "value": "CIIP"
+  }
+},
+{
+  "model": "common.suggestion",
+  "pk": 35,
+  "fields": {
+    "name": "constituency_type",
+    "value": "Commercial Organisation"
+  }
+},
+{
+  "model": "common.suggestion",
+  "pk": 36,
+  "fields": {
+    "name": "constituency_type",
+    "value": "Financial Sector"
+  }
+},
+{
+  "model": "common.suggestion",
+  "pk": 37,
+  "fields": {
+    "name": "constituency_type",
+    "value": "Government"
+  }
+},
+{
+  "model": "common.suggestion",
+  "pk": 38,
+  "fields": {
+    "name": "constituency_type",
+    "value": "International Body"
+  }
+},
+{
+  "model": "common.suggestion",
+  "pk": 39,
+  "fields": {
+    "name": "constituency_type",
+    "value": "ISP Customer Base"
+  }
+},
+{
+  "model": "common.suggestion",
+  "pk": 40,
+  "fields": {
+    "name": "constituency_type",
+    "value": "Law Enforcement"
+  }
+},
+{
+  "model": "common.suggestion",
+  "pk": 41,
+  "fields": {
+    "name": "constituency_type",
+    "value": "Military"
+  }
+},
+{
+  "model": "common.suggestion",
+  "pk": 42,
+  "fields": {
+    "name": "constituency_type",
+    "value": "National"
+  }
+},
+{
+  "model": "common.suggestion",
+  "pk": 43,
+  "fields": {
+    "name": "constituency_type",
+    "value": "Non-Commercial Organisation"
+  }
+},
+{
+  "model": "common.suggestion",
+  "pk": 44,
+  "fields": {
+    "name": "constituency_type",
+    "value": "Research & Education"
+  }
+},
+{
+  "model": "common.suggestion",
+  "pk": 45,
+  "fields": {
+    "name": "constituency_type",
+    "value": "Service Provider Customer Base"
+  }
+},
+{
+  "model": "common.suggestion",
+  "pk": 46,
+  "fields": {
+    "name": "constituency_type",
+    "value": "Vendor Customer Base"
+  }
+},
+{
+  "model": "common.suggestion",
+  "pk": 47,
+  "fields": {
+    "name": "nis_sector",
+    "value": "Health"
+  }
+},
+{
+  "model": "common.suggestion",
+  "pk": 48,
+  "fields": {
+    "name": "nis_sector",
+    "value": "Banking"
+  }
+},
+{
+  "model": "common.suggestion",
+  "pk": 49,
+  "fields": {
+    "name": "nis_sector",
+    "value": "Transport"
+  }
+},
+{
+  "model": "common.suggestion",
+  "pk": 50,
+  "fields": {
+    "name": "nis_sector",
+    "value": "Energy"
+  }
+},
+{
+  "model": "common.suggestion",
+  "pk": 51,
+  "fields": {
+    "name": "nis_team_type",
+    "value": "EU CSIRT"
+  }
+},
+{
+  "model": "common.suggestion",
+  "pk": 52,
+  "fields": {
+    "name": "nis_team_type",
+    "value": "MS CSIRT"
+  }
+},
+{
+  "model": "common.suggestion",
+  "pk": 53,
+  "fields": {
+    "name": "nis_team_type",
+    "value": "MS National SPoC"
+  }
+},
+{
+  "model": "common.suggestion",
+  "pk": 54,
+  "fields": {
+    "name": "nis_team_type",
+    "value": "MS Competent Authority"
+  }
+},
+{
+  "model": "common.suggestion",
+  "pk": 55,
+  "fields": {
+    "name": "team_status",
+    "value": "Active"
+  }
+},
+{
+  "model": "common.suggestion",
+  "pk": 56,
+  "fields": {
+    "name": "team_status",
+    "value": "Known"
+  }
+},
+{
+  "model": "common.suggestion",
+  "pk": 57,
+  "fields": {
+    "name": "team_status",
+    "value": "Other"
+  }
+},
+{
+  "model": "common.suggestion",
+  "pk": 58,
+  "fields": {
+    "name": "email_visibility",
+    "value": "public"
+  }
+},
+{
+  "model": "common.suggestion",
+  "pk": 59,
+  "fields": {
+    "name": "email_visibility",
+    "value": "restricted"
+  }
+},
+{
+  "model": "common.suggestion",
+  "pk": 60,
+  "fields": {
+    "name": "email_visibility",
+    "value": "private"
+  }
+},
+{
+  "model": "common.suggestion",
+  "pk": 61,
+  "fields": {
+    "name": "team_role",
+    "value": "1st Rep"
+  }
+},
+{
+  "model": "common.suggestion",
+  "pk": 62,
+  "fields": {
+    "name": "team_role",
+    "value": "2nd Rep"
+  }
+},
+{
+  "model": "common.suggestion",
+  "pk": 63,
+  "fields": {
+    "name": "team_role",
+    "value": "Member"
+  }
+},
+{
+  "model": "common.suggestion",
+  "pk": 64,
+  "fields": {
+    "name": "phone_tag",
+    "value": "main"
+  }
+},
+{
+  "model": "common.suggestion",
+  "pk": 65,
+  "fields": {
+    "name": "phone_tag",
+    "value": "emergency"
+  }
+},
+{
+  "model": "common.suggestion",
+  "pk": 66,
+  "fields": {
+    "name": "phone_tag",
+    "value": "fax"
+  }
+},
+{
+  "model": "common.suggestion",
+  "pk": 67,
+  "fields": {
+    "name": "phone_visibility",
+    "value": "public"
+  }
+},
+{
+  "model": "common.suggestion",
+  "pk": 68,
+  "fields": {
+    "name": "phone_visibility",
+    "value": "restricted"
+  }
+},
+{
+  "model": "common.suggestion",
+  "pk": 69,
+  "fields": {
+    "name": "phone_visibility",
+    "value": "private"
+  }
+},
+{
+  "model": "common.suggestion",
+  "pk": 70,
+  "fields": {
+    "name": "key_tag",
+    "value": "main"
+  }
+},
+{
+  "model": "common.suggestion",
+  "pk": 71,
+  "fields": {
+    "name": "key_tag",
+    "value": "additional"
+  }
+},
+{
+  "model": "common.suggestion",
+  "pk": 72,
+  "fields": {
+    "name": "key_method",
+    "value": "X.509 Certificate"
+  }
+},
+{
+  "model": "common.suggestion",
+  "pk": 73,
+  "fields": {
+    "name": "key_method",
+    "value": "PGP Key"
+  }
+},
+{
+  "model": "common.suggestion",
+  "pk": 74,
+  "fields": {
+    "name": "key_visibility",
+    "value": "public"
+  }
+},
+{
+  "model": "common.suggestion",
+  "pk": 75,
+  "fields": {
+    "name": "key_visibility",
+    "value": "restricted"
+  }
+},
+{
+  "model": "common.suggestion",
+  "pk": 76,
+  "fields": {
+    "name": "key_visibility",
+    "value": "private"
+  }
+}
+]
