@@ -10,7 +10,7 @@ ENV REDIS_HOSTNAME=csp-redis
 
 RUN apk update && \
   apk upgrade && \
-  apk add wget vim php5-apache2 php5-curl php5-cli php5-json python3-dev \
+  apk add wget vim sudo php5-apache2 php5-curl php5-cli php5-json python3-dev \
     alpine-sdk linux-headers postgresql-dev libffi-dev shadow && \
   wget https://github.com/certtools/intelmq/archive/${INTELMQ_VERSION}.tar.gz \
     -O /tmp/intelmq-${INTELMQ_VERSION}.tar.gz && \
@@ -58,6 +58,8 @@ RUN chmod -R 0770 /opt/intelmq/etc/ && \
     echo "Added CSP custom runtime done"
 
 RUN chmod u+x /scripts/run.sh
+
+#USER intelmq
 
 ENTRYPOINT ["scripts/run.sh"]  
 
