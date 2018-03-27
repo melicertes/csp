@@ -1,19 +1,7 @@
 version: '3'
 services:
-  csp-redis:
-    image: csp-redis:1.0
-    container_name: csp-redis
-    domainname: ${LOCAL_DOMAIN}
-    hostname: csp-intelmq
-    env_file:
-      - .env
-    ports:
-      - 80
-    volumes:
-      - rdb:/data
   
-  csp-intelmq:
-    build: .
+  intelmq:
     env_file:
       - .env
     image: csp-intelmq:1.0
@@ -21,20 +9,16 @@ services:
     domainname: ${LOCAL_DOMAIN}
     hostname: csp-intelmq
     command: sh /scripts/run.sh
-    ports:
-      - 80
-    links:
-      - csp-redis
-    depends_on:
-      - "csp-redis"
     volumes:
        - /opt/csp/intelmq-fileinput/:/tmp/intelmq-fileinput
-
+       - /opt/csp/logs/imq:/opt/intelmq/var/log
+    expose:
+       - ${INTELMQ_DOCR_PORT}
 
   
   intelmq-emitter:
     depends_on:
-        - csp-intelmq
+       - intelmq
     image: csp-java8:1.0
     container_name: csp-intelmq_emitter
     domainname: ${LOCAL_DOMAIN}
@@ -51,9 +35,6 @@ services:
 volumes:
    SSLDatavolume:
         external: true
-   rdb:
-    driver: local
- 
 
 networks:
   default:

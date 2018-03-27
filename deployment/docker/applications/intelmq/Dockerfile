@@ -25,6 +25,7 @@ RUN apk update && \
   pip3 install . && \
   find . -name REQUIREMENTS.txt -exec pip3 install -q -r {} \; && \
   adduser -D -h /opt/intelmq -s /bin/sh intelmq && \
+  mkdir -p /opt/intelmq/var/log && \
   chmod -R 0770 /opt/intelmq && \
   chown -R intelmq.intelmq /opt/intelmq && \
   cd /opt/intelmq/etc && \
