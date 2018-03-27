@@ -16,22 +16,22 @@ services:
        - ${INTELMQ_DOCR_PORT}
 
   
-#  intelmq-emitter:
-#    depends_on:
-#       - intelmq
-#    image: csp-java8:1.0
-#    container_name: csp-intelmq_emitter
-#    domainname: ${LOCAL_DOMAIN}
-#    hostname: csp-intelmq_emitter
-#    env_file:
-#        - .env
-#    command: java -Xmx512m -Dspring.profiles.active=docker -jar server.jar
-#    working_dir: /opt/csp
-#    volumes:
-#        - ./intelmq-emitter-0.4.0-SNAPSHOT-exec.jar:/opt/csp/server.jar
-#        - SSLDatavolume:/opt/ssl/
-#    expose:
-#        - ${INTELMQ_ADAPTER_DOCR_PORT}
+  intelmq-emitter:
+    depends_on:
+       - intelmq
+    image: csp-java8:1.0
+    container_name: csp-intelmq_emitter
+    domainname: ${LOCAL_DOMAIN}
+    hostname: csp-intelmq_emitter
+    env_file:
+        - .env
+    command: java -Xmx512m -Dspring.profiles.active=docker -jar server.jar
+    working_dir: /opt/csp
+    volumes:
+        - ./intelmq-emitter-3.5.0-SNAPSHOT-exec.jar:/opt/csp/server.jar
+        - SSLDatavolume:/opt/ssl/
+    expose:
+        - ${INTELMQ_ADAPTER_DOCR_PORT}
 volumes:
    SSLDatavolume:
         external: true
