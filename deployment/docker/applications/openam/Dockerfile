@@ -56,11 +56,11 @@ ADD Cert.properties $TOOLS_HOME/Cert.properties
 ADD setenv.sh /usr/local/tomcat/bin/setenv.sh
 ADD proxy-ca-truststore.jks /usr/local/tomcat/conf/proxy-ca-truststore.jks
 ADD CSP-Cert.properties $TOOLS_HOME/CSP-Cert.properties
-ADD site-config/DataStore.xml $TOOLS_HOME/DataStore.xml
-ADD site-config/login-logo.png $TOOLS_HOME/login-logo.png
-ADD site-config/logo-horizontal.png $TOOLS_HOME/logo-horizontal.png
-ADD site-config/ThemeConfiguration.js $TOOLS_HOME/ThemeConfiguration.js
-ADD site-config/DataStore1.html $TOOLS_HOME/DataStore1.html
+ADD web-page/DataStore.xml $TOOLS_HOME/DataStore.xml
+ADD web-page/login-logo.png $TOOLS_HOME/login-logo.png
+ADD web-page/logo-horizontal.png $TOOLS_HOME/logo-horizontal.png
+ADD web-page/ThemeConfiguration.js $TOOLS_HOME/ThemeConfiguration.js
+ADD web-page/DataStore1.html $TOOLS_HOME/DataStore1.html
 
 
 RUN chmod +x /usr/local/tomcat/bin/setenv.sh
