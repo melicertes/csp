@@ -27,7 +27,7 @@ services:
     command: java  -Xmx512m -Dspring.profiles.active=docker -Dcsp.client.ssl.jks.keystore.password=123456   -jar server.jar
     working_dir: /opt/csp
     ports:
-        - ${INTELMQ_ADAPTER_DOCR_PORT}
+        - ${INTELMQ_EMITTER_DOCR_PORT}
     volumes:
         - ./intelmq-emitter-3.5.0-SNAPSHOT-exec.jar:/opt/csp/server.jar
         - SSLDatavolume:/opt/ssl/
