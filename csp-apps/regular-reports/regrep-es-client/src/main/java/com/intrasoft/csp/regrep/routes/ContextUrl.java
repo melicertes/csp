@@ -1,4 +1,4 @@
-package com.intrasoft.csp.client.routes;
+package com.intrasoft.csp.regrep.routes;
 
 public interface ContextUrl {
 

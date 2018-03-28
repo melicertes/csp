@@ -1,9 +1,9 @@
-package com.intrasoft.csp.client.config;
+package com.intrasoft.csp.regrep.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.intrasoft.csp.client.ElasticSearchClient;
-import com.intrasoft.csp.client.impl.ElasticSearchClientImpl;
-import com.intrasoft.csp.client.routes.ContextUrl;
+import com.intrasoft.csp.regrep.ElasticSearchClient;
+import com.intrasoft.csp.regrep.impl.ElasticSearchClientImpl;
+import com.intrasoft.csp.regrep.routes.ContextUrl;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

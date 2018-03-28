@@ -1,8 +1,8 @@
-package com.intrasoft.csp.client.service;
+package com.intrasoft.csp.regrep.service;
 
-import com.intrasoft.csp.client.CspDataMappingType;
-import com.intrasoft.csp.client.DateMath;
-import com.intrasoft.csp.client.LogstashMappingType;
+import com.intrasoft.csp.regrep.CspDataMappingType;
+import com.intrasoft.csp.regrep.DateMath;
+import com.intrasoft.csp.regrep.LogstashMappingType;
 
 public interface RequestBodyService {
 

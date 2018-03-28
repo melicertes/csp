@@ -1,12 +1,12 @@
-package com.intrasoft.csp.client.service.impl;
+package com.intrasoft.csp.regrep.service.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.intrasoft.csp.client.CspDataMappingType;
-import com.intrasoft.csp.client.DateMath;
-import com.intrasoft.csp.client.LogstashMappingType;
-import com.intrasoft.csp.client.service.RequestBodyService;
+import com.intrasoft.csp.regrep.CspDataMappingType;
+import com.intrasoft.csp.regrep.DateMath;
+import com.intrasoft.csp.regrep.LogstashMappingType;
+import com.intrasoft.csp.regrep.service.RequestBodyService;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -1,4 +1,4 @@
-package com.intrasoft.csp.client;
+package com.intrasoft.csp.regrep;
 
 public interface ElasticSearchClient {
 

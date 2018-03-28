@@ -1,9 +1,9 @@
-package com.intrasoft.csp.client.impl;
+package com.intrasoft.csp.regrep.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.intrasoft.csp.client.ElasticSearchClient;
-import com.intrasoft.csp.client.routes.ContextUrl;
+import com.intrasoft.csp.regrep.ElasticSearchClient;
+import com.intrasoft.csp.regrep.routes.ContextUrl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +29,8 @@ public class ElasticSearchClientImpl implements ElasticSearchClient {
     HttpHeaders headers;
 
     private Logger LOG = LoggerFactory.getLogger(ElasticSearchClientImpl.class);
+
+    public ElasticSearchClientImpl() {}
 
     public ElasticSearchClientImpl(String baseContextPath) {
         this.baseContextPath = baseContextPath;

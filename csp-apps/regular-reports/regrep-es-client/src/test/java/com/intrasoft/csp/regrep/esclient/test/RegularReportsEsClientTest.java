@@ -1,13 +1,13 @@
 package com.intrasoft.csp.regrep.esclient.test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.intrasoft.csp.client.CspDataMappingType;
-import com.intrasoft.csp.client.DateMath;
-import com.intrasoft.csp.client.ElasticSearchClient;
-import com.intrasoft.csp.client.LogstashMappingType;
-import com.intrasoft.csp.client.config.ElasticSearchClientConfig;
-import com.intrasoft.csp.client.service.RequestBodyService;
-import com.intrasoft.csp.client.service.impl.RequestBodyServiceImpl;
+import com.intrasoft.csp.regrep.CspDataMappingType;
+import com.intrasoft.csp.regrep.DateMath;
+import com.intrasoft.csp.regrep.ElasticSearchClient;
+import com.intrasoft.csp.regrep.LogstashMappingType;
+import com.intrasoft.csp.regrep.config.ElasticSearchClientConfig;
+import com.intrasoft.csp.regrep.service.RequestBodyService;
+import com.intrasoft.csp.regrep.service.impl.RequestBodyServiceImpl;
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -80,6 +80,5 @@ public class RegularReportsEsClientTest {
         LOG.info(requestBody);
         int count = elasticSearchClient.getNdocs(requestBody);
     }
-
 
 }
