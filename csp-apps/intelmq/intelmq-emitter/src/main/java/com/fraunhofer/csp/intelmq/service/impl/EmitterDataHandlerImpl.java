@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fraunhofer.csp.intelmq.service.EmitterDataHandler;
 import com.intrasoft.csp.client.CspClient;
 import com.intrasoft.csp.commons.model.DataParams;
@@ -25,6 +26,8 @@ import com.intrasoft.csp.commons.model.SharingParams;
 
 @Service
 public class EmitterDataHandlerImpl implements EmitterDataHandler {
+
+	private static final String EVENT_NODE = "Event";
 
 	private static final String APPLICATION_ID = "intelmq";
 
@@ -59,9 +62,18 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler {
 		LOG.debug("intelmqEventData:json:" + intelmqEventData);
 
 		ObjectMapper mapper = new ObjectMapper();
+		JsonNode dataObjectRaw = null;
 		JsonNode dataObject = null;
 		try {
-			dataObject = mapper.readTree(intelmqEventData);
+			dataObjectRaw = mapper.readTree(intelmqEventData);
+			LOG.info("Received from Intelmq emmiter: " + dataObjectRaw.toString());
+			JsonNode jsonNodeRaw = dataObjectRaw.get("raw");
+			LOG.debug("intelmqEventData:raw" + prettyPrintJsonString(jsonNodeRaw));
+			byte[] byteArray = Base64.decodeBase64(jsonNodeRaw.toString().getBytes());
+			String decodedString = new String(byteArray);
+			LOG.debug("intelmqEventData:decodedString" + decodedString);
+
+			dataObject = mapper.readTree(decodedString);
 		} catch (IOException e1) {
 			LOG.error("Event json object mapping failed with: ", e1.getMessage());
 			e1.printStackTrace();
@@ -69,27 +81,43 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler {
 					HttpStatus.CONFLICT);
 			return responseEntity;
 		}
-		LOG.info("Received from Intelmq emmiter: " + dataObject.toString());
-
-		JsonNode jsonNodeRaw = dataObject.get("raw");
-
-		LOG.debug("intelmqEventData:raw" + prettyPrintJsonString(jsonNodeRaw));
-		byte[] byteArray = Base64.decodeBase64(jsonNodeRaw.toString().getBytes());
-		String decodedString = new String(byteArray);
-		LOG.debug("intelmqEventData:decodedString" + decodedString);
 
 		DataParams dataParams = new DataParams();
 		dataParams.setDateTime(new DateTime());
-		UUID uuid = UUID.randomUUID();
+
 		dataParams.setOriginCspId(cspId);
 		dataParams.setOriginApplicationId(APPLICATION_ID);
-		dataParams.setOriginRecordId(uuid.toString());
 		dataParams.setCspId(cspId);
 		dataParams.setApplicationId(APPLICATION_ID);
-		dataParams.setRecordId(uuid.toString());
 
-		// TODO OK?
-		String dataparamURL = dataObject.get("feed.url").toString();
+		String event_uuid = "";
+		try {
+			event_uuid = dataObject.get(EVENT_NODE).get("uuid").textValue();
+		} catch (Exception e2) {
+			LOG.debug("Got no uuid node in dataobject Event node.");
+			e2.printStackTrace();
+		}
+		LOG.debug("Received from IMQ emitter event with event_uuid: " + event_uuid);
+
+		if (event_uuid == null || event_uuid.isEmpty()) {
+			UUID uuid = UUID.randomUUID();
+			LOG.debug("Create new uuid from IMQ emitter: " + uuid.toString());
+			dataParams.setRecordId(uuid.toString());
+			dataParams.setOriginRecordId(uuid.toString());
+			
+			//dataObject = ((ObjectNode) dataObject.get(EVENT_NODE)).put("uuid", uuid.toString());
+
+		} else {
+			dataParams.setRecordId(event_uuid);
+			dataParams.setOriginRecordId(event_uuid);
+		}
+
+		/**
+		 * TODO Issue setUrl how does the url update from emitter
+		 */
+		// dataParams.setUrl(protocol + "://" + uiHost + ":" + port + "/events/" +
+		// uuid);
+		String dataparamURL = dataObjectRaw.get("feed.url").toString();
 		// String dataparamURL = "";
 		LOG.debug("Integration data:dataParams:feed.url: " + dataparamURL);
 		dataParams.setUrl(dataparamURL);
@@ -102,19 +130,42 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler {
 		sharingParams.setTcId(null);
 		sharingParams.setTeamId(null);
 		sharingParams.setIsExternal(false);
-		// TODO OK?
-		sharingParams.setToShare(true);
-		LOG.debug("setToShare: " + true);
+		sharingParams.setToShare(false);
+		/**
+		 * TODO Issue setToShare how does the setToShare from emitter
+		 */
+		/*try {
+			Boolean eventPublished = Boolean.parseBoolean(dataObject.get(EVENT_NODE).get("published").toString());
+			LOG.debug("eventPublished: " + eventPublished);
+			sharingParams.setToShare(eventPublished);
+			if (dataObject.get(EVENT_NODE).get("distribution").textValue().equals("0")) {
+				sharingParams.setToShare(false);
+				LOG.debug("Integration data setToShare false(distribution=0)");
+			}
+		} catch (Exception e1) {
+			sharingParams.setToShare(false);
+			LOG.debug("Integration data setToShare false.");
+		}*/
 
 		integrationData.setSharingParams(sharingParams);
-		// TODO OK?
 		integrationData.setDataObject(dataObject);
 
-		// if (LOG.isDebugEnabled())
-		// log2File(dataObject, uuid);
-
 		IntegrationDataType integrationDataType = IntegrationDataType.EVENT;
-
+		try {
+			if (dataObject.get(EVENT_NODE).has("Tag")) {
+				for (JsonNode jn : dataObject.get(EVENT_NODE).get("Tag")) {
+					if (jn.get("name").textValue().equals("threat")) {
+						integrationDataType = IntegrationDataType.THREAT;
+						
+					}
+				}
+			}
+		} catch (Exception e1) {
+			LOG.error("Intelmq emitter cannot get Event->Tag node.");
+			e1.printStackTrace();
+		}
+		
+		LOG.debug("Intelmq emitter we have IntegrationDataType:"+integrationDataType);
 		integrationData.setDataType(integrationDataType);
 		LOG.debug("Integration data: " + integrationData.toString());
 
