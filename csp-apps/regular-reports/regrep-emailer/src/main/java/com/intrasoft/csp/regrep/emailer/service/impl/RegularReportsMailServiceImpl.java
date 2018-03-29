@@ -45,6 +45,10 @@ public class RegularReportsMailServiceImpl implements RegularReportsMailService 
 
     private static final Logger LOG = LoggerFactory.getLogger(RegularReportsMailServiceImpl.class);
 
+    public RegularReportsMailServiceImpl() {
+
+    }
+
     @PostConstruct
     private void init() {
         context = new Context();
