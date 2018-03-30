@@ -24,7 +24,7 @@ public class RegularReportsServiceTest {
 
     @Test
     public void firstTest() {
-        regularReportsService.start();
+
     }
 
 }
