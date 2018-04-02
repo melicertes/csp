@@ -3,7 +3,9 @@ package com.intrasoft.csp.regrep;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.intrasoft.csp.regrep.impl.ElasticSearchClientImpl;
 import com.intrasoft.csp.regrep.service.RegularReportsService;
+import com.intrasoft.csp.regrep.service.RequestBodyService;
 import com.intrasoft.csp.regrep.service.impl.RegularReportsServiceImpl;
+import com.intrasoft.csp.regrep.service.impl.RequestBodyServiceImpl;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -14,7 +16,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.web.client.RestTemplate;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringBootTest(classes = {RegularReportsServiceImpl.class, ElasticSearchClientImpl.class, RestTemplate.class, ObjectMapper.class})
+@SpringBootTest(classes = {RegularReportsServiceImpl.class, ElasticSearchClientImpl.class, RequestBodyServiceImpl.class, RestTemplate.class, ObjectMapper.class})
 public class RegularReportsServiceTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(RegularReportsService.class);

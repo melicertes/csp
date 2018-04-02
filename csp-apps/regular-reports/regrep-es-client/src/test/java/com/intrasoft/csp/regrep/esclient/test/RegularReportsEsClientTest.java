@@ -67,7 +67,7 @@ public class RegularReportsEsClientTest {
     public void getNlogsByTypeTest() {
         String apiUrl = "http://docker.containers:9200/logstash*/_count";
         String requestBody = new String();
-        requestBody = requestBodyService.requestBodyBuilder(DateMath.ONE_YEAR, DateMath.NOW, LogstashMappingType.EXCEPTION);
+        requestBody = requestBodyService.buildRequestBody(DateMath.ONE_YEAR, DateMath.NOW, LogstashMappingType.EXCEPTION);
         LOG.info(requestBody);
         int count = elasticSearchClient.getNlogs(requestBody);
     }
@@ -76,7 +76,7 @@ public class RegularReportsEsClientTest {
     public void getNdocsByTypeTest() {
         String apiUrl = "http://docker.containers:9200/cspdata/_count";
         String requestBody = new String();
-        requestBody = requestBodyService.requestBodyBuilder(DateMath.ONE_YEAR, DateMath.NOW, CspDataMappingType.ALL);
+        requestBody = requestBodyService.buildRequestBody(DateMath.ONE_YEAR, DateMath.NOW, CspDataMappingType.ALL);
         LOG.info(requestBody);
         int count = elasticSearchClient.getNdocs(requestBody);
     }

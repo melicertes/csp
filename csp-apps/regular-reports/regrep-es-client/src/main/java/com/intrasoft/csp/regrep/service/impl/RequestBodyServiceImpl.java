@@ -31,7 +31,7 @@ public class RequestBodyServiceImpl implements RequestBodyService {
     URL nDocsByType = getClass().getClassLoader().getResource("json.payloads/ndocs-by-type.json");
 
     @Override
-    public String requestBodyBuilder(DateMath gte, DateMath lt, LogstashMappingType type) {
+    public String buildRequestBody(DateMath gte, DateMath lt, LogstashMappingType type) {
 
         String payload = null;
         try {
@@ -60,7 +60,7 @@ public class RequestBodyServiceImpl implements RequestBodyService {
     }
 
     @Override
-    public String requestBodyBuilder(DateMath gte, DateMath lt, CspDataMappingType type) {
+    public String buildRequestBody(DateMath gte, DateMath lt, CspDataMappingType type) {
         String payload = null;
         try {
             payload = FileUtils.readFileToString(new File(nDocsByType.toURI()), Charset.forName("UTF-8"));

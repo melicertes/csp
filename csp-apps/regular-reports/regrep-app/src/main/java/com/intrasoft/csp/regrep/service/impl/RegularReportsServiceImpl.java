@@ -1,8 +1,13 @@
 package com.intrasoft.csp.regrep.service.impl;
 
+
+import com.intrasoft.csp.regrep.CspDataMappingType;
+import com.intrasoft.csp.regrep.DateMath;
 import com.intrasoft.csp.regrep.ElasticSearchClient;
+import com.intrasoft.csp.regrep.LogstashMappingType;
 import com.intrasoft.csp.regrep.service.Basis;
 import com.intrasoft.csp.regrep.service.RegularReportsService;
+import com.intrasoft.csp.regrep.service.RequestBodyService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,9 +17,14 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import static com.intrasoft.csp.regrep.CspDataMappingType.*;
+import static com.intrasoft.csp.regrep.DateMath.*;
 import static com.intrasoft.csp.regrep.service.Basis.*;
+
 
 @Service
 public class RegularReportsServiceImpl implements RegularReportsService {
@@ -28,6 +38,9 @@ public class RegularReportsServiceImpl implements RegularReportsService {
 
     @Autowired
     ElasticSearchClient elasticSearchClient;
+
+    @Autowired
+    RequestBodyService requestBodyService;
 
     @Value("${regrep.basis.daily}")
     boolean daily;
@@ -105,8 +118,43 @@ public class RegularReportsServiceImpl implements RegularReportsService {
 
     @Override
     public void report(Basis basis) {
+        LOG.info(String.format("Sending %s Report...", basis));
+        DateMath dateMath = null;
+        String requestBody = new String();
+        Map<CspDataMappingType, Integer> cspDataResults = new HashMap<>();
+        Map<LogstashMappingType, Integer> logstashResults = new HashMap<>();
 
-        LOG.info(String.format("%s Report", basis));
+        // DateMath Mapping
+        switch (basis) {
+            case DAILY: {
+                dateMath = ONE_DAY;
+            }
+            case WEEKLY: {
+                dateMath = ONE_WEEK;
+            }
+            case MONTHLY: {
+                dateMath = ONE_MONTH;
+            }
+            case QUARTERLY: {
+                dateMath = THREE_MONTHS;
+            }
+            case YEARLY: {
+                dateMath = ONE_YEAR;
+            }
+
+            // Should be agnostic about the request-body/query content
+            default: {
+                for (CspDataMappingType cdmt : CspDataMappingType.values()) {
+                    requestBody = requestBodyService.buildRequestBody(dateMath, NOW, cdmt);
+                    cspDataResults.put(cdmt, elasticSearchClient.getNdocs(requestBody));
+                }
+                for (LogstashMappingType lmt : LogstashMappingType.values()) {
+                    requestBody = requestBodyService.buildRequestBody(dateMath, NOW, lmt);
+                    logstashResults.put(lmt, elasticSearchClient.getNlogs(requestBody));
+                }
+            }
+        }
+
 
     }
 }
