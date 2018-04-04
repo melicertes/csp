@@ -149,12 +149,27 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler {
 			LOG.debug("Build ids for TCs and Teams:" + sharing);
 			sharingParams.setToShare(true);
 			List<String> tcsandTeams = buildSharingTCsandTeamsList(sharing);
+			LOG.debug("All TCs and Teams size:" + tcsandTeams.size());
 			List<String> tcsIdlist = null;
 			List<String> teamsIdlist = null;
+			
+			List<TrustCircle> ltcs = tcClient.getAllLocalTrustCircles();
+			LOG.debug("All LocalTrustCircles size:" +ltcs.size());
+			for (TrustCircle trustCircle : ltcs) {
+				LOG.debug("All LocalTrustCircles:id" + trustCircle.getId() +" Name:"+ trustCircle.getName()+" ShortName:"+ trustCircle.getShortName());
+			}
+			
+			List<TrustCircle> tcs = tcClient.getAllTrustCircles();
+			LOG.debug("All LocalTrustCircles size:" +tcs.size());
+			for (TrustCircle trustCircle : tcs) {
+				LOG.debug("All TrustCircles:id" + trustCircle.getId() +" Name:"+ trustCircle.getName()+" ShortName:"+ trustCircle.getShortName());
+			}
+			
 			if (tcsandTeams != null && tcsandTeams.size() > 0) {
 				try {
-					tcsIdlist = tcClient.getAllLocalTrustCircles().stream()
-							.filter(tc -> tcsandTeams.contains(tc.getName())).map(TrustCircle::getId)
+					//UAT FIX UAT FIX 4.4.2018 tcsIdlist = tcClient.getAllLocalTrustCircles().stream()
+					tcsIdlist = tcClient.getAllTrustCircles().stream()
+							.filter(tc -> tcsandTeams.contains(tc.getShortName())).map(TrustCircle::getId)
 							.collect(Collectors.toList());
 				} catch (Exception e) {
 					LOG.error("getAllTrustCircle from TC failed with: ", e);
@@ -172,8 +187,15 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler {
 				}
 				sharingParams.setTcId(tcsIdlist);
 
+				List<Team> teams = tcClient.getAllTeams();
+				LOG.debug("All Teams size:" +teams.size());
+				for (Team team : teams) {
+					LOG.debug("All Teams:id" + team.getId() +" Name:"+ team.getName()+" ShortName:"+ team.getShortName());
+				}
+				
 				try {
-					teamsIdlist = tcClient.getAllTeams().stream().filter(team -> tcsandTeams.contains(team.getName()))
+					//UAT FIX 4.4.2018 teamsIdlist = tcClient.getAllTeams().stream().filter(team -> tcsandTeams.contains(team.getName()))
+					teamsIdlist = tcClient.getAllTeams().stream().filter(team -> tcsandTeams.contains(team.getShortName()))
 							.map(Team::getId).collect(Collectors.toList());
 				} catch (Exception e) {
 					LOG.error("getAllTeams from TC failed with: ", e);
