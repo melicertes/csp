@@ -5,7 +5,9 @@ import com.intrasoft.csp.regrep.CspDataMappingType;
 import com.intrasoft.csp.regrep.DateMath;
 import com.intrasoft.csp.regrep.ElasticSearchClient;
 import com.intrasoft.csp.regrep.LogstashMappingType;
+import com.intrasoft.csp.regrep.commons.model.Mail;
 import com.intrasoft.csp.regrep.service.Basis;
+import com.intrasoft.csp.regrep.service.RegularReportsMailService;
 import com.intrasoft.csp.regrep.service.RegularReportsService;
 import com.intrasoft.csp.regrep.service.RequestBodyService;
 import org.slf4j.Logger;
@@ -16,12 +18,12 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import javax.mail.MessagingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.intrasoft.csp.regrep.CspDataMappingType.*;
 import static com.intrasoft.csp.regrep.DateMath.*;
 import static com.intrasoft.csp.regrep.service.Basis.*;
 
@@ -31,10 +33,8 @@ public class RegularReportsServiceImpl implements RegularReportsService {
 
     private static final Logger LOG = LoggerFactory.getLogger(RegularReportsServiceImpl.class);
 
-/*
     @Autowired
     RegularReportsMailService regularReportsMailService;
-*/
 
     @Autowired
     ElasticSearchClient elasticSearchClient;
@@ -154,7 +154,17 @@ public class RegularReportsServiceImpl implements RegularReportsService {
                 }
             }
         }
-
+        // TODO: For testing purposes (remove)
+        Mail newMail = new Mail();
+        newMail.setFrom("giorgosbg@boulougaris.com");
+        newMail.setContent("Content");
+        newMail.setSubject("Regular Reports");
+        newMail.setTo("giorgosbg@outlook.com.gr");
+        try {
+            regularReportsMailService.sendEmail(newMail);
+        } catch (MessagingException e) {
+            LOG.error(e.getLocalizedMessage());
+        }
 
     }
 }

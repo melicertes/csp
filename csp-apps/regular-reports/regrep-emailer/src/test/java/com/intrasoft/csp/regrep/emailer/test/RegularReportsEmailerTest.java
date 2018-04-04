@@ -1,8 +1,8 @@
 package com.intrasoft.csp.regrep.emailer.test;
 
 import com.intrasoft.csp.regrep.commons.model.Mail;
-import com.intrasoft.csp.regrep.emailer.service.RegularReportsMailService;
-import com.intrasoft.csp.regrep.emailer.service.impl.RegularReportsMailServiceImpl;
+import com.intrasoft.csp.regrep.service.RegularReportsMailService;
+import com.intrasoft.csp.regrep.service.impl.RegularReportsMailServiceImpl;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -11,12 +11,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.thymeleaf.TemplateEngine;
 
 import javax.mail.MessagingException;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringBootTest(classes = {RegularReportsMailServiceImpl.class, JavaMailSenderImpl.class, TemplateEngine.class})
+@SpringBootTest(classes = {RegularReportsMailServiceImpl.class, JavaMailSenderImpl.class})
 public class RegularReportsEmailerTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(RegularReportsEmailerTest.class);

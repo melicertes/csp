@@ -1,8 +1,8 @@
-package com.intrasoft.csp.regrep.emailer.service.impl;
+package com.intrasoft.csp.regrep.service.impl;
 
 
 import com.intrasoft.csp.regrep.commons.model.Mail;
-import com.intrasoft.csp.regrep.emailer.service.RegularReportsMailService;
+import com.intrasoft.csp.regrep.service.RegularReportsMailService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.MailAuthenticationException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
@@ -21,7 +21,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
-@Service
+@Component
 public class RegularReportsMailServiceImpl implements RegularReportsMailService {
 
     @Autowired
@@ -29,8 +29,6 @@ public class RegularReportsMailServiceImpl implements RegularReportsMailService 
 
     @Autowired
     TemplateEngine templateEngine;
-
-    Context context;
 
     @Value("${th.email.template}")
     String emailTemplate;
@@ -51,12 +49,13 @@ public class RegularReportsMailServiceImpl implements RegularReportsMailService 
 
     @PostConstruct
     private void init() {
-        context = new Context();
+        LOG.info("**** Initializing Regular Reports Mail Service ****");
     }
 
     @Override
     public void sendEmail(Mail mail) throws MessagingException {
         LOG.info("sending email...");
+        Context context = new Context();
         MimeMessage message = javaMailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper
                 (message, false, StandardCharsets.UTF_8.name());
@@ -73,7 +72,6 @@ public class RegularReportsMailServiceImpl implements RegularReportsMailService 
 
         context.setVariables(mail.getModel());
         final String html = templateEngine.process(emailTemplate, context);
-        //String html = "<!DOCTYPE html><html><head><title>titler</title></head><body><h1>hello world!</h1></body></html>";
 
         helper.setTo(mail.getTo());
         helper.setText(html, true);

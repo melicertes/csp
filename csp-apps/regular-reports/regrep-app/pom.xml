@@ -37,6 +37,11 @@
             <artifactId>regrep-commons</artifactId>
             <version>0.4.0-SNAPSHOT</version>
         </dependency>
+        <dependency>
+            <groupId>com.intrasoft.csp</groupId>
+            <artifactId>regrep-emailer</artifactId>
+            <version>0.4.0-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 
 

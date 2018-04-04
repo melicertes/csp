@@ -10,7 +10,7 @@
         <version>0.4.0-SNAPSHOT</version>
     </parent>
 
-    <name>regular-reports</name>
+    <name>Regular Reports</name>
     <groupId>com.intrasoft.csp</groupId>
     <artifactId>regular-reports</artifactId>
     <version>0.4.0-SNAPSHOT</version>

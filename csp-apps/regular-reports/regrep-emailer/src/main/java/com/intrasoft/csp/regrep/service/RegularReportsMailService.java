@@ -1,4 +1,4 @@
-package com.intrasoft.csp.regrep.emailer.service;
+package com.intrasoft.csp.regrep.service;
 
 import com.intrasoft.csp.regrep.commons.model.Mail;
 import javax.mail.MessagingException;
