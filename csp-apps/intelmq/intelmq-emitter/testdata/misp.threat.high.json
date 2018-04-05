@@ -1,0 +1,46 @@
+{
+    "Event": {
+        "id": "305",
+        "orgc_id": "25",
+        "org_id": "23",
+        "date": "2018-02-27",
+        "threat_level_id": "1",
+        "info": "THREAT HIGH FROM INTELMQ PIPELINE ADPATER",
+        "published": true,
+        "uuid": "5a953ff8-b648-4e98-983e-01e4ac120047",
+        "attribute_count": "0",
+        "analysis": "0",
+        "timestamp": "1519730690",
+        "distribution": "1",
+        "proposal_email_lock": false,
+        "locked": false,
+        "publish_timestamp": "1519730703",
+        "sharing_group_id": "0",
+        "disable_correlation": false,
+        "Org": {
+            "id": "23",
+            "name": "CSP::demo1-csp",
+            "uuid": "68067af3-2ec3-45b4-8c77-bf001e397482"
+        },
+        "Orgc": {
+            "id": "25",
+            "name": "CSP::demo3-csp",
+            "uuid": "3bea60b7-1f86-4c57-9656-05d18135b736"
+        },
+        "Attribute": [],
+        "ShadowAttribute": [],
+        "RelatedEvent": [],
+        "Galaxy": [],
+        "Object": [],
+        "Tag": [
+            {
+                "id": "1",
+                "name": "threat",
+                "colour": "#000000",
+                "exportable": true,
+                "hide_tag": false,
+                "user_id": "0"
+            }
+        ]
+    }
+}
