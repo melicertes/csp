@@ -137,8 +137,11 @@ public class Cert2 extends AMLoginModule {
 	private String amAuthCert_chkAttrCertInLDAP = null;
 	// this is what appears in the user selectable choice field.
 	private String amAuthCert_emailAddrTag;
-	// tku
+	// the name of the organisation to be matched
 	private String amAuthCert_orgName = null;
+	// the certificate field name holding the organisation name
+	private String amAuthCert_orgProfileMapper = null;
+
 	private int amAuthCert_serverPort = 389;
 	private boolean portal_gw_cert_auth_enabled = false;
 	private Set portalGateways = null;
@@ -259,11 +262,25 @@ public class Cert2 extends AMLoginModule {
 			}
 			amAuthCert_validateCA = CollectionHelper.getMapAttr(options, "sunAMValidateCACert");
 
-			amAuthCert_orgName = CollectionHelper.getMapAttr(options, "iplanet-am-auth-cert2-organisation-name");
-			if (null == amAuthCert_orgName || 0 == amAuthCert_orgName.trim().length()) {
-				throw new AuthLoginException(amAuthCert, "noOrgName", null);
+			amAuthCert_orgProfileMapper = CollectionHelper.getMapAttr(options,
+					"iplanet-am-auth-cert2-orga-profile-mapper");
+			if (null == amAuthCert_orgProfileMapper || 0 == amAuthCert_orgProfileMapper.trim().length()
+					|| amAuthCert_orgProfileMapper.equals("none")) {
+				if (debug.messageEnabled()) {
+					debug.message("iplanet-am-auth-cert2-orga-profile-mapper = " + amAuthCert_orgProfileMapper);
+				}
+			} else {
+				if (debug.messageEnabled()) {
+					debug.message("iplanet-am-auth-cert2-orga-profile-mapper = " + amAuthCert_orgProfileMapper);
+				}
+				amAuthCert_orgName = CollectionHelper.getMapAttr(options, "iplanet-am-auth-cert2-organisation-name");
+				if (null == amAuthCert_orgName || 0 == amAuthCert_orgName.trim().length()) {
+					throw new AuthLoginException(amAuthCert, "noOrgName", null);
+				}
+				if (debug.messageEnabled()) {
+					debug.message("iplanet-am-auth-cert2-organisation-name = " + amAuthCert_orgName);
+				}
 			}
-
 			amAuthCert_uriParamsCRL = CollectionHelper.getMapAttr(options, "iplanet-am-auth-cert2-param-get-crl");
 			amAuthCert_chkCertInLDAP = CollectionHelper.getMapAttr(options, "iplanet-am-auth-cert2-check-cert-in-ldap");
 			if (amAuthCert_chkCertInLDAP.equalsIgnoreCase("true")) {
@@ -356,8 +373,9 @@ public class Cert2 extends AMLoginModule {
 						+ amAuthCert_chkAttrCRL + "\n\tchkAttributesCRL=" + Arrays.toString(amAuthCert_chkAttributesCRL)
 						+ "\n\tcacheCRL=" + doCRLCaching + "\n\tupdateCRLs=" + doCRLUpdate + "\n\tchkCertInLDAP="
 						+ amAuthCert_chkCertInLDAP + "\n\tchkAttrCertInLDAP=" + amAuthCert_chkAttrCertInLDAP
-						+ "\n\torgaName=" + amAuthCert_orgName + "\n\temailAddr=" + amAuthCert_emailAddrTag
-						+ "\n\tgw-cert-auth-enabled=" + portal_gw_cert_auth_enabled + "\n\tclient=" + client);
+						+ "\n\torgaMapper=" + amAuthCert_orgProfileMapper + "\n\torgaName=" + amAuthCert_orgName
+						+ "\n\temailAddr=" + amAuthCert_emailAddrTag + "\n\tgw-cert-auth-enabled="
+						+ portal_gw_cert_auth_enabled + "\n\tclient=" + client);
 			}
 		} else {
 			debug.error("options is null");
@@ -659,33 +677,63 @@ public class Cert2 extends AMLoginModule {
 				userTokenId = CertUtils.getAttributeValue(subjectPrincipal, amAuthCert_altUserProfileMapper);
 			}
 
-			// obtaining organisation from certificate
-			Map<String, String> _oidMap = new HashMap<String, String>(1);
-			_oidMap.put("2.5.4.10", "o");
-			try {
-				LdapName ldapName = new LdapName(subjectPrincipal.getName(X500Principal.RFC2253, _oidMap));
-				for (Rdn rdn : ldapName.getRdns()) {
-					Attributes attrs = rdn.toAttributes();
-					NamingEnumeration<? extends Attribute> values = attrs.getAll();
-					while (values.hasMoreElements()) {
-						Attribute attr = values.next();
-						if ("o".equalsIgnoreCase(attr.getID())) {
-							orgaToken = attr.get() == null ? null : attr.get().toString();
+			// should check the organisation name?
+			if (null != amAuthCert_orgProfileMapper && 0 != amAuthCert_orgProfileMapper.trim().length()
+					&& !amAuthCert_orgProfileMapper.equals("none")) {
+				if (debug.messageEnabled()) {
+					debug.message(
+							"getTokenFromCert: working with orgProfileMapperValue: " + amAuthCert_orgProfileMapper);
+				}
+				// obtaining organisation from certificate
+				String strMapperName = "";
+				Map<String, String> _oidMap = new HashMap<String, String>(1);
+				if (amAuthCert_orgProfileMapper.equals("subject O")) {
+					if (debug.messageEnabled()) {
+						debug.message("getTokenFromCert: working with \"subject O\"");
+					}
+					_oidMap.put("2.5.4.10", "o");
+					strMapperName = "o";
+				} else if (amAuthCert_orgProfileMapper.equals("subject OU")) {
+					if (debug.messageEnabled()) {
+						debug.message("getTokenFromCert: working with \"subject OU\"");
+					}
+					_oidMap.put("2.5.4.11", "ou");
+					strMapperName = "ou";
+				} else {
+					debug.error("getTokenFromCert: unknown orgProfileMapper: " + amAuthCert_orgProfileMapper);
+					throw new AuthLoginException(amAuthCert, "orgProfileMapperUnkown", null);
+				}
+				try {
+					LdapName ldapName = new LdapName(subjectPrincipal.getName(X500Principal.RFC2253, _oidMap));
+					for (Rdn rdn : ldapName.getRdns()) {
+						Attributes attrs = rdn.toAttributes();
+						NamingEnumeration<? extends Attribute> values = attrs.getAll();
+						while (values.hasMoreElements()) {
+							Attribute attr = values.next();
+							if (strMapperName.equalsIgnoreCase(attr.getID())) {
+								orgaToken = attr.get() == null ? null : attr.get().toString();
+							}
 						}
 					}
+				} catch (NamingException ex) {
+					debug.error(
+							"A naming error occurred while trying to retrieve o from principal: " + subjectPrincipal,
+							ex);
 				}
-			} catch (NamingException ex) {
-				debug.error("A naming error occurred while trying to retrieve o from principal: " + subjectPrincipal,
-						ex);
-			}
 
-			if (!amAuthCert_orgName.trim().equalsIgnoreCase(orgaToken)) {
-				debug.error("Organisation didn't match: user: " + orgaToken + ", defined: " + amAuthCert_orgName);
-				throw new AuthLoginException(amAuthCert, "orgaInvalid", null);
+				if (debug.messageEnabled()) {
+					debug.message("getTokenFromCert: checking the orga name: got=" + orgaToken + "  defined="
+							+ amAuthCert_orgName);
+				}
+				if (!amAuthCert_orgName.trim().equalsIgnoreCase(orgaToken)) {
+					debug.error("getTokenFromCert: Organisation didn't match: user: " + orgaToken + ", defined: "
+							+ amAuthCert_orgName);
+					throw new AuthLoginException(amAuthCert, "orgNameInvalid", null);
+				}
 			}
 
 			if (debug.messageEnabled()) {
-				debug.message("getTokenFromCert: " + amAuthCert_userProfileMapper + userTokenId);
+				debug.message("getTokenFromCert: " + amAuthCert_userProfileMapper + " - " + userTokenId);
 			}
 		} catch (Exception e) {
 			if (debug.messageEnabled()) {
