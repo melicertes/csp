@@ -194,6 +194,21 @@
                         <Value>subject CN</Value>
                     </DefaultValues>
                 </AttributeSchema>
+                <AttributeSchema name="iplanet-am-auth-cert2-orga-profile-mapper"
+                    type="single_choice"
+                    syntax="string"
+                    i18nKey="a5011"
+                    validator="no"
+                    resourceName="orgaAttributeToProfileMapping">
+                    <ChoiceValues>
+                        <ChoiceValue i18nKey="choiceSubjectO">subject O</ChoiceValue>
+                        <ChoiceValue i18nKey="choiceSubjectOU">subject OU</ChoiceValue>
+                        <ChoiceValue i18nKey="choiceNone">none</ChoiceValue>
+                    </ChoiceValues>
+                    <DefaultValues>
+                        <Value>subject OU</Value>
+                    </DefaultValues>
+                </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-cert2-organisation-name"
                     type="single"
                     syntax="string"
@@ -400,6 +415,21 @@
                             <Value>subject CN</Value>
                         </DefaultValues>
                     </AttributeSchema>
+                    <AttributeSchema name="iplanet-am-auth-cert2-orga-profile-mapper"
+	                    type="single_choice"
+	                    syntax="string"
+	                    i18nKey="a5011"
+	                    validator="no"
+	                    resourceName="orgaAttributeToProfileMapping">
+	                    <ChoiceValues>
+	                        <ChoiceValue i18nKey="choiceSubjectO">subject O</ChoiceValue>
+	                        <ChoiceValue i18nKey="choiceSubjectOU">subject OU</ChoiceValue>
+	                        <ChoiceValue i18nKey="choiceNone">none</ChoiceValue>
+	                    </ChoiceValues>
+	                    <DefaultValues>
+	                        <Value>subject OU</Value>
+	                    </DefaultValues>
+	                </AttributeSchema>
                     <AttributeSchema name="iplanet-am-auth-cert2-organisation-name"
                     	type="single"
                     	syntax="string"
