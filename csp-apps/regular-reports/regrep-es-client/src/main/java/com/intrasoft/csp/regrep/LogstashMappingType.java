@@ -16,4 +16,9 @@ public enum LogstashMappingType {
     public String toString() {
         return this.value;
     }
+
+    public String beautify() {
+        String name = this.name();
+        return name.substring(0,1) + name.substring(1,name.length()).toLowerCase();
+    }
 }

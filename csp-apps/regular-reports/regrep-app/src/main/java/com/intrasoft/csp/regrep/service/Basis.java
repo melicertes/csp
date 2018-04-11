@@ -8,4 +8,15 @@ public enum Basis {
         String name = this.name();
         return name.substring(0,1) + name.substring(1,name.length()).toLowerCase();
     }
+
+    public String getDescription() {
+        switch (this) {
+            case DAILY: return "yesterday";
+            case WEEKLY: return "last week";
+            case MONTHLY: return "last month";
+            case QUARTERLY: return "last 3 months";
+            case YEARLY: return "last year";
+        }
+        return null;
+    }
 }

@@ -57,6 +57,12 @@ public class RegularReportsServiceImpl implements RegularReportsService {
     @Value("${regrep.basis.yearly}")
     boolean yearly;
 
+    @Value("${regrep.from}")
+    String from;
+
+    @Value("${regrep.to}")
+    String to;
+
     private List<Basis> basisList;
 
     @PostConstruct
@@ -81,6 +87,7 @@ public class RegularReportsServiceImpl implements RegularReportsService {
 
     }
 
+//    @Scheduled(cron="0/12 * * * * ?") // executes every 12 seconds (for testing purposes)
     @Scheduled(cron="${regrep.cron.daily}")
     @Override
     public void reportDaily() {
@@ -118,13 +125,13 @@ public class RegularReportsServiceImpl implements RegularReportsService {
 
     @Override
     public void report(Basis basis) {
-        LOG.info(String.format("Sending %s Report...", basis));
+        String reportType = basis + " Report";
+        LOG.info(String.format("Preparing %s...", reportType));
         DateMath dateMath = null;
         String requestBody = new String();
-        Map<CspDataMappingType, Integer> cspDataResults = new HashMap<>();
-        Map<LogstashMappingType, Integer> logstashResults = new HashMap<>();
+        Map<String, Integer> cspDataResults = new HashMap<>();
+        Map<String, Integer> logstashResults = new HashMap<>();
 
-        // DateMath Mapping
         switch (basis) {
             case DAILY: {
                 dateMath = ONE_DAY;
@@ -142,24 +149,40 @@ public class RegularReportsServiceImpl implements RegularReportsService {
                 dateMath = ONE_YEAR;
             }
 
-            // Should be agnostic about the request-body/query content
             default: {
                 for (CspDataMappingType cdmt : CspDataMappingType.values()) {
-                    requestBody = requestBodyService.buildRequestBody(dateMath, NOW, cdmt);
-                    cspDataResults.put(cdmt, elasticSearchClient.getNdocs(requestBody));
+                    if (cdmt != CspDataMappingType.ALL) {  // "all" used for query construction only
+                        requestBody = requestBodyService.buildRequestBody(dateMath, NOW, cdmt);
+                        cspDataResults.put(cdmt.beautify(), elasticSearchClient.getNdocs(requestBody));
+                    }
                 }
                 for (LogstashMappingType lmt : LogstashMappingType.values()) {
-                    requestBody = requestBodyService.buildRequestBody(dateMath, NOW, lmt);
-                    logstashResults.put(lmt, elasticSearchClient.getNlogs(requestBody));
+                    if (lmt != LogstashMappingType.ALL) {  // "all" used for query construction only
+                        requestBody = requestBodyService.buildRequestBody(dateMath, NOW, lmt);
+                        logstashResults.put(lmt.beautify() + " Logs", elasticSearchClient.getNlogs(requestBody));
+                    }
                 }
             }
         }
-        // TODO: For testing purposes (remove)
+
+
         Mail newMail = new Mail();
-        newMail.setFrom("giorgosbg@boulougaris.com");
-        newMail.setContent("Content");
-        newMail.setSubject("Regular Reports");
-        newMail.setTo("giorgosbg@outlook.com.gr");
+        newMail.setFrom(from);
+        newMail.setSubject(reportType);
+        newMail.setTo(to);
+        Map valuesMap = new HashMap();
+
+        valuesMap.put("thymeleafTypeDescription", "DOCUMENT TYPE");
+        valuesMap.put("thymeleafNumberDescription", "CREATED");
+        valuesMap.put("recipient", "Administrator");
+        valuesMap.put("signature", "Regular Reports Service");
+        valuesMap.put("subject", reportType);
+        valuesMap.put("message", String.format("Here is the %s for the number of documents created %s.", reportType, basis.getDescription()));
+        valuesMap.put("thymeleafMapA", cspDataResults);
+        valuesMap.put("thymeleafMapB", logstashResults);
+        newMail.setModel(valuesMap);
+
+
         try {
             regularReportsMailService.sendEmail(newMail);
         } catch (MessagingException e) {
