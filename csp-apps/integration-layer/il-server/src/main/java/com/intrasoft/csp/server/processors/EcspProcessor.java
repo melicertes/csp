@@ -39,7 +39,7 @@ public class EcspProcessor implements Processor{
         //TODO: versioning in context path below should be extracted dynamically from the header
 
         String externalSslPort = StringUtils.isEmpty(cspSslConfiguration.getExternalSslPort())?"":
-                ":"+cspSslConfiguration.getExternalSslPort()+"/";
+                ":"+cspSslConfiguration.getExternalSslPort();
 
         String uri = enhancedTeamDTO.getTeam().getUrl()+externalSslPort + "/v"+ContextUrl.REST_API_V1+ContextUrl.DCL_INTEGRATION_DATA;
         //external certificate
