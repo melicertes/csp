@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 import javax.validation.Valid;
 import javax.validation.constraints.Size;
 
-import com.intrasoft.csp.vcb.admin.config.OpenfireProperties;
+import com.intrasoft.csp.vcb.admin.config.TeleconfProperties;
 import com.intrasoft.csp.vcb.admin.config.VcbadminProperties;
 import com.intrasoft.csp.vcb.admin.config.editors.DurationEditor;
 import com.intrasoft.csp.vcb.admin.config.editors.ZoneDateTimeEditor;
@@ -67,7 +67,8 @@ public class MeetingController {
 	@Autowired
 	UserRepository userRepository;
 
-	private OpenfireProperties openFireProperties;
+	@Autowired
+	TeleconfProperties jitsiProperties;
 
 	@Autowired
 	VcbadminProperties vcbadminProperties;
@@ -75,10 +76,7 @@ public class MeetingController {
 	@Value(value = "${event.show.timezone.default:Europe/Athens}")
 	String tz_default;
 
-	@Autowired
-	public MeetingController(OpenfireProperties properties) {
-		this.openFireProperties = properties;
-	}
+
 
 	@InitBinder("meetingForm")
 	public void dataBinding(WebDataBinder binder) {
@@ -160,8 +158,7 @@ public class MeetingController {
 
 		Optional<User> user = userRepository.findByEmail(auth.getName());
 		Meeting m = MeetingForm.createMeetingFromForm(meetingForm, user.get());
-		String url = String.format("%s:%s/ofmeet/?r=%s", openFireProperties.getVideobridgeHost(),
-				openFireProperties.getVideobridgeEndpointPort(), m.getRoom());
+		String url = String.format("%s?uid=%s", jitsiProperties.buildURI(), m.getUid());
 		m.setUrl(url);
 		log.info("Start of meeting: {}", m.getStart());
 		log.info("Now - 30 min: {}", ZonedDateTime.now().minusMinutes(30));

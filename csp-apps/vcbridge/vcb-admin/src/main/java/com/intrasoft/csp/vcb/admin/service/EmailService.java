@@ -5,6 +5,7 @@ import com.intrasoft.csp.vcb.commons.constants.EmailTemplateType;
 import com.intrasoft.csp.vcb.commons.model.EmailTemplate;
 import com.intrasoft.csp.vcb.commons.model.Meeting;
 import com.intrasoft.csp.vcb.commons.model.Participant;
+import org.hibernate.validator.constraints.Email;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.safety.Whitelist;
@@ -14,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.mail.MailException;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.mail.javamail.MimeMessagePreparator;
@@ -22,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import javax.mail.util.ByteArrayDataSource;
 import java.io.BufferedReader;
@@ -42,6 +45,8 @@ public class EmailService {
     MailContentBuilder mailContentBuilder;
     @Value(value = "classpath:templates/icalendar/meeting.ics")
     private Resource meetingTemplate;
+
+
 
     public static String br2nl(String html) {
         if (html == null)
@@ -79,7 +84,8 @@ public class EmailService {
             MimeMessagePreparator messagePreparator = mimeMessage -> {
                 MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage, true);
                 // messageHelper.setFrom(meeting.getUser().getEmail());
-                messageHelper.setFrom("do-not-reply@sastix.com");
+                //messageHelper.setFrom("do-not-reply@sastix.com");
+                messageHelper.setFrom("deploy@dimitris.biz");
                 messageHelper.setTo(p.getEmail());
 
                 m.put("email", p.getEmail());
@@ -186,8 +192,9 @@ public class EmailService {
         public void prepare(MimeMessage mimeMessage) throws Exception {
             Map<String, Object> m = new HashMap<>();
             MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage, true);
-            // messageHelper.setFrom(meeting.getUser().getEmail());
-            messageHelper.setFrom("do-not-reply@sastix.com");
+            //messageHelper.setFrom(meeting.getUser().getEmail());
+            //messageHelper.setFrom("do-not-reply@sastix.com");
+            messageHelper.setFrom("deploy@dimitris.biz");
             messageHelper.setTo(p.getEmail());
 
             m.put("email", p.getEmail());
