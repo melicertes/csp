@@ -35,7 +35,11 @@
     #--------------------------------------------------------#
     #        External
     #--------------------------------------------------------#
-     <VirtualHost *:443>
+     {% if "apache" in docr_name %}
+        <VirtualHost *:443>
+     {% else %}
+        <VirtualHost *:8443>
+     {% endif %}
 
           ServerName {{ service.external_name }}.{{ csp_name }}.{{ domain }}
           Alias /static/ /opt/tc/var/static/
