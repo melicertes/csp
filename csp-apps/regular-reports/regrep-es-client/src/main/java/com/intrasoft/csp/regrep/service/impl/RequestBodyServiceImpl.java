@@ -30,6 +30,8 @@ public class RequestBodyServiceImpl implements RequestBodyService {
     URL nLogsByType = getClass().getClassLoader().getResource("json.payloads/nlogs-by-type.json");
     URL nDocsByType = getClass().getClassLoader().getResource("json.payloads/ndocs-by-type.json");
 
+    final String TIME_DIF = "-9h";
+
     @Override
     public String buildRequestBody(DateMath gte, DateMath lt, LogstashMappingType type) {
 
@@ -49,8 +51,8 @@ public class RequestBodyServiceImpl implements RequestBodyService {
             LOG.error(e.getMessage());
         }
 
-        ( (ObjectNode) jsonNode).findParent("gte").put("gte", "now-" + gte.toString());
-        ( (ObjectNode) jsonNode).findParent("lt").put("lt", lt.toString());
+        ( (ObjectNode) jsonNode).findParent("gte").put("gte", "now-" + gte.toString() + TIME_DIF);
+        ( (ObjectNode) jsonNode).findParent("lt").put("lt", lt.toString() + TIME_DIF);
         if (type.equals(LogstashMappingType.ALL))
             ((ObjectNode) jsonNode).findParent("match").remove("match");
         else
@@ -77,8 +79,8 @@ public class RequestBodyServiceImpl implements RequestBodyService {
             LOG.error(e.getMessage());
         }
 
-        ( (ObjectNode) jsonNode).findParent("gte").put("gte", "now-" + gte.toString());
-        ( (ObjectNode) jsonNode).findParent("lt").put("lt", lt.toString());
+        ( (ObjectNode) jsonNode).findParent("gte").put("gte", "now-" + gte.toString() + TIME_DIF);
+        ( (ObjectNode) jsonNode).findParent("lt").put("lt", lt.toString() + TIME_DIF);
         if (type.equals(CspDataMappingType.ALL))
             ((ObjectNode) jsonNode).findParent("match").remove("match");
         else
