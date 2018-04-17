@@ -1,14 +1,68 @@
 version: '3'
-
 services:
   csp-jitsi:
-    image: csp-jitsi:1.0
+    image: csp-jitsiopenfire:1.0p2
+    domainname: ${LOCAL_DOMAIN}
+    hostname: csp-jitsi
     container_name: csp-jitsi
-    dns:
-      - 8.8.8.8
     env_file:
-      - jitsienv
+      - .env
+    volumes:
+      - JitsiDataVolume:/usr/share/openfire
+    network_mode: "host"
     ports:
-      - 18080:80
-      - 4443:4443
-      - 10000:10000/udp
+      - "7777:7777"
+      - "7443:7443"
+      - "5222:5222"
+      - "5223:5223"
+      - "9090:9090"
+      - "9091:9091"
+      - "5269:5269"
+      - "5000-5020:5000-5020/tcp"
+      - "5000-5020:5000-5020/udp"
+
+  csp-vcb-admin:
+    image: csp-java8:1.0
+    container_name: csp-vcb-admin
+    domainname: ${LOCAL_DOMAIN}
+    hostname: csp-vcb-admin
+    env_file:
+        - .env
+    command: java -Xmx512m -Dserver.port=9300 -Dh2.db.file=/opt/vcb/data/vcbdb -Dteleconf-ui.protocol=https -Dteleconf-ui.host=teleconf.demo1-csp.athens.intrasoft-intl.private -Dteleconf-ui.port=443 -jar server.jar
+    working_dir: /opt/csp
+    volumes:
+        - ./vcb-admin-3.5.0-SNAPSHOT-exec.jar:/opt/csp/server.jar
+        - /opt/csp/logs/:/opt/csplogs
+        - JitsiDataVolume:/opt/vcb/data
+    expose:
+        - 9300
+        - 587
+
+
+  csp-vcb-teleconf:
+    image: csp-java8:1.0
+    container_name: csp-vcb-teleconf
+    domainname: ${LOCAL_DOMAIN}
+    hostname: csp-vcb-teleconf
+    env_file:
+        - .env
+    command: java -Xmx512m -Dserver.port=9200 -Dh2.db.file=/opt/vcb/data/vcbdb -Djitsi.protocol=https -Djitsi.host=vc.sastix.com -Djitsi.port=443 -jar server.jar
+    working_dir: /opt/csp
+    volumes:
+        - ./vcb-teleconf-3.5.0-SNAPSHOT-exec.jar:/opt/csp/server.jar
+        - /opt/csp/logs/:/opt/csplogs
+        - JitsiDataVolume:/opt/vcb/data
+    expose:
+        - 9200
+
+
+volumes:
+    JitsiDataVolume:
+      external: true
+
+networks:
+  default:
+    external:
+      name: ${LOCAL_DOMAIN}
+
+
