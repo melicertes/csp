@@ -35,10 +35,10 @@
     #--------------------------------------------------------#
     #        External
     #--------------------------------------------------------#
-     {% if "apache" in docr_name %}
-        <VirtualHost *:443>
-     {% else %}
+     {% if "integration" in service.external_name %}
         <VirtualHost *:8443>
+     {% else %}
+        <VirtualHost *:443>
      {% endif %}
 
           ServerName {{ service.external_name }}.{{ csp_name }}.{{ domain }}
