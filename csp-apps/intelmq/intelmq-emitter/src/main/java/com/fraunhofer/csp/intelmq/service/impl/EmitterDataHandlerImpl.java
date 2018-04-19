@@ -28,7 +28,6 @@ import com.intrasoft.csp.commons.model.SharingParams;
 public class EmitterDataHandlerImpl implements EmitterDataHandler {
 
 	private static final String EVENT_NODE = "Event";
-
 	private static final String APPLICATION_ID = "intelmq";
 
 	private static final Logger LOG = LoggerFactory.getLogger(EmitterDataHandlerImpl.class);
@@ -54,30 +53,30 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler {
 		LOG.debug("calling handleIntelmqData....");
 		ResponseEntity<String> responseEntity;
 		if (null == intelmqEventData) {
-			LOG.error("IntelmqEvent is null!");
+			LOG.error("Intelmq Event is null!");
 			responseEntity = new ResponseEntity<>("FAILED TO READ EVENT FROM JSON NODE", HttpStatus.CONFLICT);
 			return responseEntity;
 		}
 
-		LOG.debug("intelmqEventData:json:" + intelmqEventData);
+		LOG.debug("handleIntelmqData:intelmqEventData:json:" + intelmqEventData);
 
 		ObjectMapper mapper = new ObjectMapper();
 		JsonNode dataObjectRaw = null;
 		JsonNode dataObject = null;
 		try {
 			dataObjectRaw = mapper.readTree(intelmqEventData);
-			LOG.info("Received from Intelmq emmiter: " + dataObjectRaw.toString());
+			LOG.info("Received from Intelmq emitter:" + dataObjectRaw.toString());
 			JsonNode jsonNodeRaw = dataObjectRaw.get("raw");
-			LOG.debug("intelmqEventData:raw" + prettyPrintJsonString(jsonNodeRaw));
+			LOG.debug("handleIntelmqData:intelmqEventData:raw:" + prettyPrintJsonString(jsonNodeRaw));
 			byte[] byteArray = Base64.decodeBase64(jsonNodeRaw.toString().getBytes());
 			String decodedString = new String(byteArray);
-			LOG.debug("intelmqEventData:decodedString" + decodedString);
+			LOG.debug("intelmqEventData:decodedString:" + decodedString);
 
 			dataObject = mapper.readTree(decodedString);
-		} catch (IOException e1) {
-			LOG.error("Event json object mapping failed with: ", e1.getMessage());
-			e1.printStackTrace();
-			responseEntity = new ResponseEntity<>("Event json object mapping failed with: " + e1.getMessage(),
+		} catch (IOException ioex) {
+			LOG.error("Event json object mapping failed with: ", ioex.getMessage());
+			// ioex.printStackTrace();
+			responseEntity = new ResponseEntity<>("Event json object mapping failed with: " + ioex.getMessage(),
 					HttpStatus.CONFLICT);
 			return responseEntity;
 		}
@@ -93,25 +92,28 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler {
 		String event_uuid = "";
 		try {
 			event_uuid = dataObject.get(EVENT_NODE).get("uuid").textValue();
-		} catch (Exception e2) {
-			LOG.debug("Got no uuid node in dataobject Event node.");
-			e2.printStackTrace();
+		} catch (Exception ex) {
+			// LOG.debug("Got no uuid node in dataobject Event node.");
+			LOG.debug("Got uuid node in dataobject Event node. failed.");
 		}
 		LOG.debug("Received from IMQ emitter event with event_uuid: " + event_uuid);
-
+		boolean intelmqObjextExists = false;
 		if (event_uuid == null || event_uuid.isEmpty()) {
 			UUID uuid = UUID.randomUUID();
+			event_uuid = uuid.toString();
 			LOG.debug("Create new uuid from IMQ emitter: " + uuid.toString());
-			dataParams.setRecordId(uuid.toString());
-			dataParams.setOriginRecordId(uuid.toString());
-			
-			//dataObject = ((ObjectNode) dataObject.get(EVENT_NODE)).put("uuid", uuid.toString());
+			dataParams.setRecordId(event_uuid);
+			dataParams.setOriginRecordId(event_uuid);
+			ObjectNode eventNode = ((ObjectNode) dataObject.get(EVENT_NODE)).put("uuid", event_uuid);
+			((ObjectNode) dataObject).set(EVENT_NODE, eventNode);
+			LOG.debug("dataObject with uuid: " + dataObject);
 
 		} else {
+			intelmqObjextExists = true;
 			dataParams.setRecordId(event_uuid);
 			dataParams.setOriginRecordId(event_uuid);
 		}
-
+		LOG.info("Intelmq emitter event has uuid Object exists: " + intelmqObjextExists);
 		/**
 		 * TODO Issue setUrl how does the url update from emitter
 		 */
@@ -134,18 +136,17 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler {
 		/**
 		 * TODO Issue setToShare how does the setToShare from emitter
 		 */
-		/*try {
-			Boolean eventPublished = Boolean.parseBoolean(dataObject.get(EVENT_NODE).get("published").toString());
-			LOG.debug("eventPublished: " + eventPublished);
-			sharingParams.setToShare(eventPublished);
-			if (dataObject.get(EVENT_NODE).get("distribution").textValue().equals("0")) {
-				sharingParams.setToShare(false);
-				LOG.debug("Integration data setToShare false(distribution=0)");
-			}
-		} catch (Exception e1) {
-			sharingParams.setToShare(false);
-			LOG.debug("Integration data setToShare false.");
-		}*/
+		/*
+		 * try { Boolean eventPublished =
+		 * Boolean.parseBoolean(dataObject.get(EVENT_NODE).get("published").toString());
+		 * LOG.debug("eventPublished: " + eventPublished);
+		 * sharingParams.setToShare(eventPublished); if
+		 * (dataObject.get(EVENT_NODE).get("distribution").textValue().equals("0")) {
+		 * sharingParams.setToShare(false);
+		 * LOG.debug("Integration data setToShare false(distribution=0)"); } } catch
+		 * (Exception e1) { sharingParams.setToShare(false);
+		 * LOG.debug("Integration data setToShare false."); }
+		 */
 
 		integrationData.setSharingParams(sharingParams);
 		integrationData.setDataObject(dataObject);
@@ -156,22 +157,18 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler {
 				for (JsonNode jn : dataObject.get(EVENT_NODE).get("Tag")) {
 					if (jn.get("name").textValue().equals("threat")) {
 						integrationDataType = IntegrationDataType.THREAT;
-						
+
 					}
 				}
 			}
-		} catch (Exception e1) {
-			LOG.error("Intelmq emitter cannot get Event->Tag node.");
-			e1.printStackTrace();
+		} catch (Exception ex) {
+			// LOG.error("Intelmq emitter cannot get Event->Tag node.");
+			LOG.debug("Got Tag node in dataobject Event node. failed with: ", ex);
 		}
-		
-		LOG.debug("Intelmq emitter we have IntegrationDataType:"+integrationDataType);
+
+		LOG.debug("Intelmq emitter we have IntegrationDataType:" + integrationDataType);
 		integrationData.setDataType(integrationDataType);
 		LOG.debug("Integration data: " + integrationData.toString());
-
-		boolean intelmqObjextExists = false;
-
-		LOG.debug("Intelmq Object exists: " + intelmqObjextExists);
 
 		try {
 			if (intelmqObjextExists) {
@@ -181,10 +178,9 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler {
 				LOG.debug("§§§§§§§§§§§§§§§§ INTELMQ EMITTER calling postIntegrationData POST POST POST POST");
 				responseEntity = cspClient.postIntegrationData(integrationData);
 			}
-		} catch (Exception e) {
-			LOG.error("Forward to IL failed with: ", e);
-
-			responseEntity = new ResponseEntity<>(e.getMessage(), HttpStatus.FAILED_DEPENDENCY);
+		} catch (Exception ex) {
+			LOG.error("Forward to IL failed with: ", ex);
+			responseEntity = new ResponseEntity<>(ex.getMessage(), HttpStatus.FAILED_DEPENDENCY);
 		}
 		return responseEntity;
 
