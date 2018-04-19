@@ -14,7 +14,7 @@ public enum Basis {
             case DAILY: return "yesterday";
             case WEEKLY: return "last week";
             case MONTHLY: return "last month";
-            case QUARTERLY: return "last 3 months";
+            case QUARTERLY: return "in the last 3 months";
             case YEARLY: return "last year";
         }
         return null;

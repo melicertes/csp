@@ -19,10 +19,8 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import javax.mail.MessagingException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 import static com.intrasoft.csp.regrep.DateMath.*;
 import static com.intrasoft.csp.regrep.service.Basis.*;
@@ -63,6 +61,14 @@ public class RegularReportsServiceImpl implements RegularReportsService {
     @Value("${regrep.to}")
     String to;
 
+    @Value("${regrep.date.pattern}")
+    String datePattern;
+
+    @Value("${th.email.message}")
+    String msg;
+
+    String parentheses;
+
     private List<Basis> basisList;
 
     @PostConstruct
@@ -71,6 +77,7 @@ public class RegularReportsServiceImpl implements RegularReportsService {
         // Populate the basis list depending on the placeholder values from the resource file.
         // Service will not send any emails for any basis types having false values.
         basisList = new ArrayList<>();
+        parentheses = new String();
 
         if (daily)
             basisList.add(DAILY);
@@ -87,7 +94,7 @@ public class RegularReportsServiceImpl implements RegularReportsService {
 
     }
 
-//    @Scheduled(cron="0/12 * * * * ?") // executes every 12 seconds (for testing purposes)
+//  @Scheduled(cron="0/12 * * * * ?") // executes every 12 seconds (for testing purposes)
     @Scheduled(cron="${regrep.cron.daily}")
     @Override
     public void reportDaily() {
@@ -116,7 +123,8 @@ public class RegularReportsServiceImpl implements RegularReportsService {
           report(QUARTERLY);
     }
 
-    @Scheduled(cron="${regrep.cron.yearly}")
+    @Scheduled(cron="0/12 * * * * ?") // executes every 12 seconds (for testing purposes)
+//    @Scheduled(cron="${regrep.cron.yearly}")
     @Override
     public void reportYearly() {
         if (basisList.contains(YEARLY))
@@ -133,38 +141,27 @@ public class RegularReportsServiceImpl implements RegularReportsService {
         Map<String, Integer> logstashResults = new HashMap<>();
 
         switch (basis) {
-            case DAILY: {
-                dateMath = ONE_DAY;
-            }
-            case WEEKLY: {
-                dateMath = ONE_WEEK;
-            }
-            case MONTHLY: {
-                dateMath = ONE_MONTH;
-            }
-            case QUARTERLY: {
-                dateMath = THREE_MONTHS;
-            }
-            case YEARLY: {
-                dateMath = ONE_YEAR;
-            }
-
-            default: {
-                for (CspDataMappingType cdmt : CspDataMappingType.values()) {
-                    if (cdmt != CspDataMappingType.ALL) {  // "all" used for query construction only
-                        requestBody = requestBodyService.buildRequestBody(dateMath, NOW, cdmt);
-                        cspDataResults.put(cdmt.beautify(), elasticSearchClient.getNdocs(requestBody));
-                    }
-                }
-                for (LogstashMappingType lmt : LogstashMappingType.values()) {
-                    if (lmt != LogstashMappingType.ALL) {  // "all" used for query construction only
-                        requestBody = requestBodyService.buildRequestBody(dateMath, NOW, lmt);
-                        logstashResults.put(lmt.beautify() + " Logs", elasticSearchClient.getNlogs(requestBody));
-                    }
-                }
-            }
+            case DAILY:     dateMath = ONE_DAY; break;
+            case WEEKLY:    dateMath = ONE_WEEK; break;
+            case MONTHLY:   dateMath = ONE_MONTH; break;
+            case QUARTERLY: dateMath = THREE_MONTHS; break;
+            case YEARLY:    dateMath = ONE_YEAR; break;
+            default: break;
         }
 
+        parentheses = getDates(basis);
+        for (CspDataMappingType cdmt : CspDataMappingType.values()) {
+            if (cdmt != CspDataMappingType.ALL) {  // "all" used for query construction only
+                requestBody = requestBodyService.buildRequestBody(dateMath, NOW, cdmt);
+                cspDataResults.put(cdmt.beautify(), elasticSearchClient.getNdocs(requestBody));
+            }
+        }
+        for (LogstashMappingType lmt : LogstashMappingType.values()) {
+            if (lmt != LogstashMappingType.ALL) {  // "all" used for query construction only
+                requestBody = requestBodyService.buildRequestBody(dateMath, NOW, lmt);
+                logstashResults.put(lmt.beautify() + " Logs", elasticSearchClient.getNlogs(requestBody));
+            }
+        }
 
         Mail newMail = new Mail();
         newMail.setFrom(from);
@@ -177,7 +174,7 @@ public class RegularReportsServiceImpl implements RegularReportsService {
         valuesMap.put("recipient", "Administrator");
         valuesMap.put("signature", "Regular Reports Service");
         valuesMap.put("subject", reportType);
-        valuesMap.put("message", String.format("Here is the %s for the number of documents created %s.", reportType, basis.getDescription()));
+        valuesMap.put("message", String.format(msg, reportType, basis.getDescription(), parentheses));
         valuesMap.put("thymeleafMapA", cspDataResults);
         valuesMap.put("thymeleafMapB", logstashResults);
         newMail.setModel(valuesMap);
@@ -189,5 +186,64 @@ public class RegularReportsServiceImpl implements RegularReportsService {
             LOG.error(e.getLocalizedMessage());
         }
 
+    }
+
+    private String getDates(Basis basis) {
+        String result = new String();
+        Calendar cal = Calendar.getInstance();
+        SimpleDateFormat sdf = new SimpleDateFormat(datePattern);
+
+        switch (basis) {
+
+            case DAILY: {
+                cal.add(Calendar.DATE, -1);
+                Date yesterday = cal.getTime();
+                result = sdf.format(yesterday);
+                break;
+            }
+
+            case WEEKLY: {
+                cal.add(Calendar.DATE, -1);
+                Date dateEnded = cal.getTime();
+                cal.add(Calendar.DATE, -7);
+                Date dateStarted = cal.getTime();
+                result = String.format("%s - %s", sdf.format(dateStarted), sdf.format(dateEnded));
+                break;
+            }
+
+            case MONTHLY: {
+                cal.add(Calendar.MONTH, -1);
+                Date lastMonth = cal.getTime();
+                sdf = new SimpleDateFormat("MMMM, yyyy");
+                result = sdf.format(lastMonth);
+                break;
+            }
+
+            case QUARTERLY: {
+                Date date = new Date();
+                sdf = new SimpleDateFormat("MMMM, ");
+                for (int i = 1; i <= 3; i++) {
+                    cal = Calendar.getInstance();
+                    cal.add(Calendar.MONTH, -i);
+                    date = cal.getTime();
+                    result += sdf.format(date);
+                }
+                result = result.substring(0, result.length()-2);
+                break;
+            }
+
+            case YEARLY: {
+                cal.add(Calendar.YEAR, -1);
+                Date date = cal.getTime();
+                sdf = new SimpleDateFormat("yyyy");
+                result = sdf.format(date);
+                break;
+            }
+
+            default: break;
+
+        }
+
+        return String.format("(%s)", result);
     }
 }
