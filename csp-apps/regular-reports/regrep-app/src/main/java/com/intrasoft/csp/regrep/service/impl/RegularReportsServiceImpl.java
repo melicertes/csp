@@ -1,6 +1,5 @@
 package com.intrasoft.csp.regrep.service.impl;
 
-
 import com.intrasoft.csp.regrep.CspDataMappingType;
 import com.intrasoft.csp.regrep.DateMath;
 import com.intrasoft.csp.regrep.ElasticSearchClient;
@@ -123,8 +122,7 @@ public class RegularReportsServiceImpl implements RegularReportsService {
           report(QUARTERLY);
     }
 
-    @Scheduled(cron="0/12 * * * * ?") // executes every 12 seconds (for testing purposes)
-//    @Scheduled(cron="${regrep.cron.yearly}")
+    @Scheduled(cron="${regrep.cron.yearly}")
     @Override
     public void reportYearly() {
         if (basisList.contains(YEARLY))
