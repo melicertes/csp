@@ -21,13 +21,13 @@ import javax.servlet.http.HttpSession;
 @Scope(value = "session", proxyMode = ScopedProxyMode.TARGET_CLASS)
 public class AppController {
 
-    @Value("${jitsi.protocol}")
+    @Value("${vc.protocol}")
     private String protocol;
 
-    @Value("${jitsi.host}")
+    @Value("${vc.host}")
     private String host;
 
-    @Value("${jitsi.port}")
+    @Value("${vc.port}")
     private Integer port;
 
 

@@ -83,9 +83,7 @@ public class EmailService {
 
             MimeMessagePreparator messagePreparator = mimeMessage -> {
                 MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage, true);
-                // messageHelper.setFrom(meeting.getUser().getEmail());
-                //messageHelper.setFrom("do-not-reply@sastix.com");
-                messageHelper.setFrom("deploy@dimitris.biz");
+                messageHelper.setFrom(meeting.getUser().getEmail());
                 messageHelper.setTo(p.getEmail());
 
                 m.put("email", p.getEmail());
@@ -192,9 +190,7 @@ public class EmailService {
         public void prepare(MimeMessage mimeMessage) throws Exception {
             Map<String, Object> m = new HashMap<>();
             MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage, true);
-            //messageHelper.setFrom(meeting.getUser().getEmail());
-            //messageHelper.setFrom("do-not-reply@sastix.com");
-            messageHelper.setFrom("deploy@dimitris.biz");
+            messageHelper.setFrom(meeting.getUser().getEmail());
             messageHelper.setTo(p.getEmail());
 
             m.put("email", p.getEmail());
