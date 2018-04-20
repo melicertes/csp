@@ -1,0 +1,139 @@
+{
+  "values": [
+    {
+      "entry": [
+        {
+          "expanded": "tag to hide from the user-interface.",
+          "value": "hide"
+        }
+      ],
+      "predicate": "ui"
+    },
+    {
+      "entry": [
+        {
+          "expanded": "tag to hide from the API.",
+          "value": "hide"
+        }
+      ],
+      "predicate": "api"
+    },
+    {
+      "entry": [
+        {
+          "expanded": "block",
+          "value": "block"
+        }
+      ],
+      "predicate": "expansion"
+    },
+    {
+      "predicate": "contributor",
+      "entry": [
+        {
+          "expanded": "OpenPGP Fingerprint",
+          "value": "pgpfingerprint"
+        }
+      ]
+    },
+    {
+      "predicate": "confidence-level",
+      "entry": [
+        {
+          "expanded": "Completely confident",
+          "value": "completely-confident",
+          "numerical_value": 100
+        },
+        {
+          "expanded": "Usually confident",
+          "value": "usually-confident",
+          "numerical_value": 75
+        },
+        {
+          "expanded": "Fairly confident",
+          "value": "fairly-confident",
+          "numerical_value": 50
+        },
+        {
+          "expanded": "Rarely confident",
+          "value": "rarely-confident",
+          "numerical_value": 25
+        },
+        {
+          "expanded": "Unconfident",
+          "value": "unconfident",
+          "numerical_value": 0
+        },
+        {
+          "expanded": "Confidence cannot be evaluated",
+          "value": "confidence-cannot-be-evalued"
+        }
+      ]
+    },
+    {
+      "predicate": "threat-level",
+      "entry": [
+        {
+          "expanded": "No risk",
+          "value": "no-risk",
+          "numerical_value": 0,
+          "description": "Harmless information. (CEUS threat level)"
+        },
+        {
+          "expanded": "Low risk",
+          "value": "low-risk",
+          "numerical_value": 25,
+          "description": "Low risk which can include mass-malware. (CEUS threat level)"
+        },
+        {
+          "expanded": "Medium risk",
+          "value": "medium-risk",
+          "numerical_value": 50,
+          "description": "Medium risk which can include targeted attacks (e.g. APT). (CEUS threat level)"
+        },
+        {
+          "expanded": "High risk",
+          "value": "high-risk",
+          "numerical_value": 100,
+          "description": "High risk which can include highly sophisticated attacks or 0-day attack. (CEUS threat level)"
+        }
+      ]
+    }
+  ],
+  "predicates": [
+    {
+      "expanded": "User-interface tag influencing the MISP behavior and visual interaction.",
+      "value": "ui"
+    },
+    {
+      "expanded": "API related tag influencing the MISP behavior of the API.",
+      "value": "api"
+    },
+    {
+      "description": "Expansion tag incluencing the MISP behavior using expansion modules",
+      "expanded": "Expansion",
+      "value": "expansion"
+    },
+    {
+      "expanded": "Information related to the contributor.",
+      "value": "contributor"
+    },
+    {
+      "expanded": "Confidence level",
+      "value": "confidence-level"
+    },
+    {
+      "expanded": "Cyberthreat Effect Universal Scale - MISP's internal threat level taxonomy",
+      "value": "threat-level"
+    },
+    {
+      "description": "Event with this tag should not be synced to other MISP instances",
+      "expanded": "Should not sync",
+      "value": "should-not-sync"
+    }
+  ],
+  "version": 4,
+  "description": "MISP taxonomy to infer with MISP behavior or operation.",
+  "expanded": "MISP",
+  "namespace": "misp"
+}

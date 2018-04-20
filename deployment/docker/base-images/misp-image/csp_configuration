@@ -1,0 +1,12 @@
+    'Plugin' =>
+      array (
+        'ZeroMQ_enable' => true,
+        'ZeroMQ_event_notifications_enable' => false,
+        'ZeroMQ_object_notifications_enable' => false,
+        'ZeroMQ_object_reference_notifications_enable' => false,
+        'ZeroMQ_attribute_notifications_enable' => false,
+        'ZeroMQ_audit_notifications_enable' => true,
+        'ZeroMQ_sighting_notifications_enable' => false,
+        'ZeroMQ_user_notifications_enable' => false,
+        'ZeroMQ_organisation_notifications_enable' => false,
+      ),

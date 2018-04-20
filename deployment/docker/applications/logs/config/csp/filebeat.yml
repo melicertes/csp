@@ -1,0 +1,9 @@
+filebeat.prospectors:
+- input_type: log
+  paths:
+    - /mnt/log/*-exc.log
+    - /mnt/log/*-aud.log
+output.logstash:
+  hosts: ["csp-logstash:5043"]
+
+  path.home: /usr/share/filebeat

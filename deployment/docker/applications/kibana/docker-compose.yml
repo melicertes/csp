@@ -1,0 +1,44 @@
+version: '3'
+services:
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:5.4.0
+    container_name: csp-kibana
+    domainname: ${LOCAL_DOMAIN}
+    hostname: csp-kibana
+    environment:
+          ELASTICSEARCH_URL: http://csp-es:${ES_DOCR_PORT}
+          KIBANA_DEFAULTAPPID: "dashboard/0547dbf0-43b0-11e7-a47f-7f9b1d8338f1"
+          ELASTICSEARCH_REQUESTTIMEOUT: 300000
+          XPACK_MONITORING_UI_CONTAINER_ELASTICSEARCH_ENABLED: "false"
+          XPACK_MONITORING_ENABLED: "false"
+    volumes:
+      - SSLDatavolume:/opt/ssl/
+    expose:
+      - ${KIBANA_DOCR_PORT}
+
+  kibana-logs:
+      image: docker.elastic.co/kibana/kibana:5.4.0
+      container_name: csp-kibana_logs
+      domainname: ${LOCAL_DOMAIN}
+      hostname: csp-kibana_logs
+      environment:
+            ELASTICSEARCH_URL: http://csp-es:${ES_DOCR_PORT}
+            KIBANA_DEFAULTAPPID: "dashboard/d7108b60-9918-11e7-be79-4fa76c6879ed"
+            KIBANA_INDEX: ".kibana4logstash"
+            ELASTICSEARCH_REQUESTTIMEOUT: 300000
+            XPACK_MONITORING_UI_CONTAINER_ELASTICSEARCH_ENABLED: "false"
+            XPACK_MONITORING_ENABLED: "false"
+      volumes:
+        - SSLDatavolume:/opt/ssl/
+      expose:
+        - ${KIBANA_LOGS_DOCR_PORT}
+
+volumes:
+    SSLDatavolume:
+        external: true
+
+networks:
+  default:
+    external:
+      name: ${LOCAL_DOMAIN}

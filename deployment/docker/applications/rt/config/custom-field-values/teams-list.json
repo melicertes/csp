@@ -1,0 +1,146 @@
+[
+   {
+      "id":"306de7b8-5e8c-4a5e-9de2-1f837713bfc1",
+      "short_name":"central-csp",
+      "name":"central-csp",
+      "host_organisation":"CERT-EU",
+      "description":"CERT-EU fat 04",
+      "country":"European Union",
+      "additional_countries":[
+
+      ],
+      "established":"2010-01-27",
+      "nis_team_types":[
+
+      ],
+      "nis_sectors":[
+         "Transport"
+      ],
+      "created":"2017-04-25T14:07:24.537000Z",
+      "csp_installed":true,
+      "csp_id":"central-csp",
+      "csp_domain":"central-csp.athens.intrasoft-intl.private",
+      "status":"Active"
+   },
+   {
+      "id":"974b5557-9aca-468c-90cc-961b31df0ef6",
+      "short_name":"delete me",
+      "name":"delete me",
+      "host_organisation":"delete me",
+      "description":"delete me",
+      "country":"Greece",
+      "additional_countries":[
+         "European Union",
+         "Greece"
+      ],
+      "established":"2010-01-27",
+      "nis_team_types":[
+         "MS Competent Authority",
+         "MS National SPoC"
+      ],
+      "nis_sectors":[
+         "Energy",
+         "Transport"
+      ],
+      "created":"2017-10-02T21:29:03.544000Z",
+      "csp_installed":true,
+      "csp_id":"delete me",
+      "csp_domain":"delete me",
+      "status":"Known"
+   },
+   {
+      "id":"578c0e4e-ebaf-455b-a2a1-faffb14be9e1",
+      "short_name":"demo1-csp",
+      "name":"demo1-csp",
+      "host_organisation":"German Government",
+      "description":"CERT of the German Government",
+      "country":"Germany",
+      "additional_countries":[
+
+      ],
+      "established":"2017-03-27",
+      "nis_team_types":[
+         "EU CSIRT",
+         "MS CSIRT"
+      ],
+      "nis_sectors":[
+
+      ],
+      "created":"2017-04-25T14:07:24.533000Z",
+      "csp_installed":true,
+      "csp_id":"demo1-csp",
+      "csp_domain":"demo1-csp.athens.intrasoft-intl.private",
+      "status":"Known"
+   },
+   {
+      "id":"af9d06ac-d7be-4684-86a3-808fe4f4d17c",
+      "short_name":"demo2-csp",
+      "name":"demo2-csp",
+      "host_organisation":"CERT-GR",
+      "description":"CERT-GR",
+      "country":"Greece",
+      "additional_countries":[
+
+      ],
+      "established":"2017-06-06",
+      "nis_team_types":[
+         "EU CSIRT"
+      ],
+      "nis_sectors":[
+
+      ],
+      "created":"2017-06-12T11:12:10.927000Z",
+      "csp_installed":true,
+      "csp_id":"demo2-csp",
+      "csp_domain":"demo2-csp.athens.intrasoft-intl.private",
+      "status":"Active"
+   },
+   {
+      "id":"88557939-db1c-4411-831a-9b6226ef4819",
+      "short_name":"demo3-csp",
+      "name":"demo3-csp",
+      "host_organisation":"demo3-csp",
+      "description":"demo3-csp",
+      "country":"Germany",
+      "additional_countries":[
+
+      ],
+      "established":"2017-09-21",
+      "nis_team_types":[
+         "EU CSIRT"
+      ],
+      "nis_sectors":[
+         "Banking"
+      ],
+      "created":"2017-09-21T11:52:38.007000Z",
+      "csp_installed":true,
+      "csp_id":"demo3-csp",
+      "csp_domain":"demo3-csp.athens.intrasoft-intl.private",
+      "status":"Active"
+   },
+   {
+      "id":"6a552fd8-100c-4c3f-8b0f-5ec1d6bf009d",
+      "short_name":"testing",
+      "name":"testing",
+      "host_organisation":"testing org",
+      "description":"descritpion",
+      "country":"Greece",
+      "additional_countries":[
+         "European Union",
+         "Greece"
+      ],
+      "established":"2010-07-13",
+      "nis_team_types":[
+         "MS CSIRT"
+      ],
+      "nis_sectors":[
+         "Energy",
+         "Transport"
+      ],
+      "created":"2017-10-05T11:21:48.794000Z",
+      "csp_installed":false,
+      "csp_id":"",
+      "csp_domain":"",
+      "status":"Active"
+   }
+]
