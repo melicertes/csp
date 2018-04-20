@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -152,22 +153,24 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler {
 			LOG.debug("All TCs and Teams size:" + tcsandTeams.size());
 			List<String> tcsIdlist = null;
 			List<String> teamsIdlist = null;
-			
+
 			List<TrustCircle> ltcs = tcClient.getAllLocalTrustCircles();
-			LOG.debug("All LocalTrustCircles size:" +ltcs.size());
+			LOG.debug("All LocalTrustCircles size:" + ltcs.size());
 			for (TrustCircle trustCircle : ltcs) {
-				LOG.debug("All LocalTrustCircles:id" + trustCircle.getId() +" Name:"+ trustCircle.getName()+" ShortName:"+ trustCircle.getShortName());
+				LOG.debug("All LocalTrustCircles:id" + trustCircle.getId() + " Name:" + trustCircle.getName()
+						+ " ShortName:" + trustCircle.getShortName());
 			}
-			
+
 			List<TrustCircle> tcs = tcClient.getAllTrustCircles();
-			LOG.debug("All LocalTrustCircles size:" +tcs.size());
+			LOG.debug("All LocalTrustCircles size:" + tcs.size());
 			for (TrustCircle trustCircle : tcs) {
-				LOG.debug("All TrustCircles:id" + trustCircle.getId() +" Name:"+ trustCircle.getName()+" ShortName:"+ trustCircle.getShortName());
+				LOG.debug("All TrustCircles:id" + trustCircle.getId() + " Name:" + trustCircle.getName() + " ShortName:"
+						+ trustCircle.getShortName());
 			}
-			
+
 			if (tcsandTeams != null && tcsandTeams.size() > 0) {
 				try {
-					//UAT FIX UAT FIX 4.4.2018 tcsIdlist = tcClient.getAllLocalTrustCircles().stream()
+					// UAT FIX 4.4.2018 tcsIdlist = tcClient.getAllLocalTrustCircles().stream()
 					tcsIdlist = tcClient.getAllTrustCircles().stream()
 							.filter(tc -> tcsandTeams.contains(tc.getShortName())).map(TrustCircle::getId)
 							.collect(Collectors.toList());
@@ -188,15 +191,18 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler {
 				sharingParams.setTcId(tcsIdlist);
 
 				List<Team> teams = tcClient.getAllTeams();
-				LOG.debug("All Teams size:" +teams.size());
+				LOG.debug("All Teams size:" + teams.size());
 				for (Team team : teams) {
-					LOG.debug("All Teams:id" + team.getId() +" Name:"+ team.getName()+" ShortName:"+ team.getShortName());
+					LOG.debug("All Teams:id" + team.getId() + " Name:" + team.getName() + " ShortName:"
+							+ team.getShortName());
 				}
-				
+
 				try {
-					//UAT FIX 4.4.2018 teamsIdlist = tcClient.getAllTeams().stream().filter(team -> tcsandTeams.contains(team.getName()))
-					teamsIdlist = tcClient.getAllTeams().stream().filter(team -> tcsandTeams.contains(team.getShortName()))
-							.map(Team::getId).collect(Collectors.toList());
+					// UAT FIX 4.4.2018 teamsIdlist = tcClient.getAllTeams().stream().filter(team ->
+					// tcsandTeams.contains(team.getName()))
+					teamsIdlist = tcClient.getAllTeams().stream()
+							.filter(team -> tcsandTeams.contains(team.getShortName())).map(Team::getId)
+							.collect(Collectors.toList());
 				} catch (Exception e) {
 					LOG.error("getAllTeams from TC failed with: ", e);
 					teamsIdlist = null;
@@ -247,10 +253,12 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler {
 			try {
 				if (rtObjextExists) {
 					LOG.debug("RT EMITTER calling updateIntegrationData UPDATE.");
-					cspClient.updateIntegrationData(integrationData);
+					ResponseEntity<String> response = cspClient.updateIntegrationData(integrationData);
+					LOG.info("RT EMITTER  updateIntegrationData UPDATE done with:" + response.getStatusCode());
 				} else {
 					LOG.debug("RT EMITTER calling postIntegrationData POST.");
-					cspClient.postIntegrationData(integrationData);
+					ResponseEntity<String> response = cspClient.postIntegrationData(integrationData);
+					LOG.info("RT EMITTER postIntegrationData POST done with:" + response.getStatusCode());
 				}
 			} catch (Exception e) {
 				LOG.error("Forward to IL failed with: ", e);

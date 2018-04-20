@@ -77,6 +77,7 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler {
 
 		String uuid = null;
 		String event_info = null;
+		String threat_level_id = "3";
 		Ticket incident = null;
 		// we have a INCIDENT
 		if (integrationData.getDataType() == IntegrationDataType.INCIDENT) {
@@ -101,11 +102,13 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler {
 		// We have EVENT
 		else {
 			try {
+				// "threat_level_id": "1",
 				uuid = jsonNode.get("Event").get("uuid").toString().replace("\"", "");
 				event_info = jsonNode.get("Event").get("info").toString().replace("\"", "");
+				threat_level_id = jsonNode.get("Event").get("threat_level_id").toString().replace("\"", "");
 			} catch (Exception e) {
-				LOG.error("FAILED TO READ UUID FROM JSON EVENT NODE.");
-				LOG.error("READ UUID FROM JSON EVENT NODE. FAILED WITH:" + e);
+				LOG.warn("FAILED TO READ UUID FROM JSON EVENT NODE.");
+				LOG.warn("READ UUID FROM JSON EVENT NODE. FAILED WITH:" + e);
 			}
 		}
 		// WE have a intelmq event
@@ -165,15 +168,20 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler {
 				}
 				// we have a EVENT/THREAT
 			} else {
-				if (origins.isEmpty()) {
-					LOG.info("############## ADAPTER CALLING addRtReport #############");
-					response = rtAppClient.addRtReport(uuid, event_info, originplusApplicationId,
-							integrationData.getDataParams().getUrl(), integrationData.getDataType());
-				} else {
-					LOG.info("############## ADAPTER CALLING updateRtReport #############");
-					response = rtAppClient.updateRtReport(jsonNode, originplusApplicationId,
-							integrationData.getDataParams().getUrl(), integrationData.getDataType());
-				}
+				if (threat_level_id.equalsIgnoreCase("1")) {
+					if (origins.isEmpty()) {
+						LOG.info("############## ADAPTER CALLING addRtReport #############");
+						response = rtAppClient.addRtReport(uuid, event_info, originplusApplicationId,
+								integrationData.getDataParams().getUrl(), integrationData.getDataType());
+					} else {
+						LOG.info("############## ADAPTER CALLING updateRtReport #############");
+						response = rtAppClient.updateRtReport(jsonNode, originplusApplicationId,
+								integrationData.getDataParams().getUrl(), integrationData.getDataType());
+					}
+				} else
+					LOG.debug("threat_level_id is NOT high, creating an event report is not necessary:"
+							+ threat_level_id);
+
 			}
 
 		}
