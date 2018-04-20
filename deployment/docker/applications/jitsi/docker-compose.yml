@@ -1,0 +1,38 @@
+version: '2'
+services: 
+  csp-jitsi:
+    image: csp-jitsiopenfire:1.0p2
+    domainname: ${LOCAL_DOMAIN}
+    hostname: csp-jitsi
+    container_name: csp-jitsi
+    env_file:
+      - .env
+    volumes:
+      - JitsiDataVolume:/usr/share/openfire
+    network_mode: "host"
+    ports:
+      - "7777:7777"
+      - "7443:7443"
+      - "5222:5222"
+      - "5223:5223"
+      - "9090:9090"
+      - "9091:9091"
+      - "5269:5269"
+      - "5000-5020:5000-5020/tcp"
+      - "5000-5020:5000-5020/udp"
+  vcbridge-server:
+    container_name: csp-vcbridge
+    depends_on:
+      - csp-jitsi
+    image: csp-jitsivcbridge:1.0p2
+    volumes:
+      - ./vc-bridge-admin-app.jar:/application.jar
+    env_file:
+      - .env
+    network_mode: "host"
+    ports:
+      - "8080:8080"
+
+volumes:
+    JitsiDataVolume:
+      external: true

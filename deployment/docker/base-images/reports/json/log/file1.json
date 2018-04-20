@@ -1,0 +1,16 @@
+{
+    "query": {
+	"bool" : {
+	  "must": [{
+        "range" : {
+            "@timestamp" : {
+                "gte" : "now-1y",
+                "lt" :  "now"
+            }
+        }
+    },
+	{ "match": { "logtype": "exc" }}
+	]
+	}
+	}
+}

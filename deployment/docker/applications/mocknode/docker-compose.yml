@@ -1,0 +1,29 @@
+version: '3'
+services:
+
+  mockadapter:
+    image: csp-mocknode:1.0
+    container_name: csp-mock
+    domainname: ${LOCAL_DOMAIN}
+    hostname: csp-mock
+    env_file:
+      - .env
+    environment:
+      - PORT=3002
+      - SSL_CA=/opt/ssl/ca/common-internal-ca.crt
+      - SSL_CERT=/opt/ssl/server/csp-internal.crt
+      - SSL_KEY=/opt/ssl/server/csp-internal.key
+      - APP_NAME=adapter
+    volumes:
+      - SSLDatavolume:/opt/ssl
+    expose:
+      - "3002"
+
+volumes:
+    SSLDatavolume:
+        external: true
+
+networks:
+  default:
+    external:
+      name: ${LOCAL_DOMAIN}

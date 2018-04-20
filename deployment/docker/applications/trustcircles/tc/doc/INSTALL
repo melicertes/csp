@@ -1,0 +1,132 @@
+Trust Circle Web Application
+============================
+To install this Alpha version of the trust circle app, please follow the guide
+below:
+
+
+1. Untar the archive into a directory on your server
+
+  # mkdir trustcircle-alpha
+  # cd trustcircle-alpha/
+  # tar -xzvf csp_<VERSION>.tar.gz
+
+
+2. Create a Python 2.7 virtualenv and install all required packages
+
+  # virtualenv ctc-venv
+  # source ctc-venv/bin/activate 
+  # cd csp
+  # pip install -r requirements.txt
+
+
+3. Setup the database and static files
+
+  By default this application uses an SQLite database. To use a 'proper' database
+  like PostgreSQL instead, please adjust the DATABASES configuration
+  lib/csp/settings.py.
+
+  Regardless which database engine you configure, please run the following
+  commands to set up the schema and initial data.
+
+  # python manage.py migrate
+  # python manage.py loaddata initial_config
+  # python manage.py loaddata initial_trustcircles
+  # python manage.py collectstatic --noinput
+
+  Optionally you can also load test users into the database:
+    - admin:admin
+    - user:user
+  with:
+  # python manage.py loaddata ctc_testusers
+
+
+4. Configure the ALLOWED_HOSTS for the web application
+
+  Edit csp/lib/csp/settings.py and adjust the line
+  
+  ALLOWED_HOSTS = ['csp.example.com'] 
+  
+  so it contains the domain name of your virtual host.
+
+
+5. Setup Apache to serve the application via mod_wsgi
+
+  You need to install mod_wsgi via your distribution package-manager. Then copy
+  and modify the example vhost config in csp/doc/vhost.conf.example.
+  
+  Set the correct virtual host server name. Also important are the two
+  directory paths at the top:
+  
+    Define CSP_HOME /path/to/csp/install/dir
+    Define CSP_VIRTUAL_ENV /path/to/venv/for/csp
+  
+  CSP_HOME should point to the trustcircle-alpha/csp directory, 
+  CSP_VIRTUAL_ENV should point to the trustcircle-alpha/ctc-venc directory.
+  
+  Then you only need to adjust the  SSL* configuration for your needs.
+  
+  *PLEASE NOTE*: The <Location /api/v1/adapter/integrationData> should be
+  secured with mandatory client certificate validation!
+
+  Once your SSL* options are set up, you can restart apache and should be able
+  to access the web application via configured hostname.
+
+
+6. OpenAM Integration
+
+  The Trust Circle Application is designed to be integrated into an OpenAM
+  authentication setup. It expects the username and the group membership
+  information in HTTP request headers:
+
+    Custom-User-Id: <username>
+    Custom-User-Is-Member-Of: <group dn>|<group dn>|...
+
+  The logout-URL is "/central/logout/", so it would be advisable to set up OpenAM
+  to listen to this URL and invalidate the user session.
+
+  *PLEASE NOTE*: If this installation is *not* protected by an OpenAM setup and
+  if external requests can contain HTTP headers set by a third party, then you
+  need to remove both "csp.openam_auth.middleware.*" entries from 
+  settings.MIDDLEWARE_CLASSES!
+
+
+INTEGRATION API
+===============
+To synchronize local changes to trust circles via the integration api, please 
+run the following command:
+
+(activate the ctc-virtualenv first with 
+# source /path/to/ctc-venv/bin/activate)
+
+# python manage.py dsl_sync \
+  --url https://dsl.example.com/api
+  --cert /path/to/certificate/file (optional)
+  --key /path/to/certificate/key/file (optional)
+  --cachain /path/to/certificate/chain (optional)
+
+
+This could be set up as a cron-job so that it syncronizes changes every minute.
+To have the correct PYTHONPATH available to the script, use the absolute path
+to the Python interpreter in the virtualenv:
+
+# /path/to/crc-venv/bin/python manage.py dsl_sync ...
+
+
+To run this command continuously without the use of cron, you can use
+the --interval <SECONDS> option. As an example, the following
+command would keep the synchronization script running continuously with
+a 60 second delay beween sync invocations:
+
+# python manage.py dsl_sync \
+  --url https://dsl.example.com/api
+  --cert /path/to/certificate/file (optional)
+  --key /path/to/certificate/key/file (optional)
+  --cachain /path/to/certificate/chain (optional)
+  --interval 60
+
+
+Any changes made to the trust circles, teams and related objects automatically
+get recorded for syncronization. To clear this list, you can use the following
+command:
+
+# python manage.py dsl_sync --clear

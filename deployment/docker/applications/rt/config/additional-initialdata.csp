@@ -1,0 +1,100 @@
+# additional initial data for CSP purposes
+
+@ScripActions = (
+    {  Name        => 'Set UUID to ticket',
+       Description => 'An UUID will be generated an assign to the particular ticket',
+       ExecModule  => 'SetUUIDAction',
+    },
+    {  Name        => 'Notify emitter',
+       Description => 'A ticket id of the changed ticket will be forward to the emitter (notification)',
+       ExecModule  => 'CSPOnCreateAction'
+    },
+);
+
+@ScripConditions = (
+    { Name                 => 'OnToEmitter',
+      Description          => 'Notify Emitter on transaction apart of some exluding cases',                
+      ApplicableTransTypes => 'Any, AnyTransaction',
+      ExecModule           => 'CSP_ToEmitter',
+    },
+);
+
+@Scrips = (
+    {
+       Description      => 'Set UUID while creating a ticket',
+       ScripCondition   => 'On Create',
+       ScripAction      => 'Set UUID to ticket',
+       Template         => 'Blank',
+    },
+    {
+       Description      => 'Notify emitter in case incident changed',
+       Queue            => 'Incidents', # TODO: can change, if linked artifacts also will be shared
+       ScripCondition   => 'OnToEmitter',
+       ScripAction      => 'Notify emitter',
+       Template         => 'Blank',
+       Stage		=> 'TransactionBatch',
+    },
+);
+
+@CustomFields = (
+    {
+        Name              => 'Additional data',
+        Description       => 'Relevant additional metadata copied from other sources',
+        LookupType        => 'RT::Queue-RT::Ticket',
+        Queue		  => ['Incidents','Incident Reports'],
+        Type              => 'FreeformMultiple',
+    },
+    {
+        Name              => 'Linked events',
+        Description       => 'Known events linked to this incident.',
+        LookupType        => 'RT::Queue-RT::Ticket',
+	Queue             => ['Incidents','Incident Reports'],
+        Type              => 'FreeformMultiple',
+	LinkValueTo	  => '__CustomField__',
+    },
+    {
+        Name              => 'Linked threats',
+        Description       => 'Known threats linked to this incident.',
+        LookupType        => 'RT::Queue-RT::Ticket',
+	Queue             => ['Incidents','Incident Reports'],
+        Type              => 'FreeformMultiple',
+	LinkValueTo	  => '__CustomField__',
+    },
+    {
+        Name              => 'Linked vulnerabilities',
+        Description       => 'Known vulnerabilities linked to this incident.',
+        LookupType        => 'RT::Queue-RT::Ticket',
+	Queue             => ['Incidents','Incident Reports'],
+        Type              => 'FreeformMultiple',
+	LinkValueTo	  => '__CustomField__',
+    },
+    {
+        Name              => 'RT_UUID',
+        Description       => 'Unique id of this incident.',
+        LookupType        => 'RT::Queue-RT::Ticket',
+        Type              => 'FreeformSingle',
+    },
+    {
+        Name              => 'Sharing policy',
+        Description       => 'Sharing policy to be appliet to this ticket.',
+        LookupType        => 'RT::Queue-RT::Ticket',
+	Queue             => 'Incidents',
+        Type              => 'SelectMultiple',
+        ValuesClass       => 'RT::CustomFieldValues::CustomTCSource',
+    },
+    {
+        Name		  => 'Originator CSP',
+        Description       => 'Name of CSP, which created this ticket.',
+        LookupType	  => 'RT::Queue-RT::Ticket',
+        Queue	          => 'Incidents',
+        Type		  => 'FreeformSingle',
+    },
+    {
+        Name		  => 'Last update done by',
+        Description       => 'Name of CSP, which shared last update on this incident',
+        LookupType	  => 'RT::Queue-RT::Ticket',
+        Queue		  => 'Incidents',
+        Type		  => 'FreeformSingle',
+    },
+);
+
