@@ -1,11 +1,9 @@
 package com.intrasoft.csp.misp.client.impl;
 
-//import com.intrasoft.csp.libraries.restclient.service.RetryRestTemplate;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.intrasoft.csp.libraries.restclient.exceptions.CspCommonException;
 import com.intrasoft.csp.libraries.restclient.service.RetryRestTemplate;
 import com.intrasoft.csp.misp.client.MispAppClient;
 import com.intrasoft.csp.misp.commons.config.MispContextUrl;
@@ -21,14 +19,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * @TODO change {@link RestTemplate} to {@link com.intrasoft.csp.libraries.restclient.service.RetryRestTemplate}
- */
 
 
 public class MispAppClientImpl implements MispAppClient, MispContextUrl {
@@ -64,7 +58,7 @@ public class MispAppClientImpl implements MispAppClient, MispContextUrl {
     public ResponseEntity<Object> getMispEvent(String uuid) {
         String url = context  + "/" + MISP_EVENTS + "/" + uuid;
 
-        LOG.info("API call [get]: " + url);
+        LOG.debug("API call [get]: " + url);
         HttpEntity<String> request = new HttpEntity<>(headers);
         ResponseEntity<Object> response = new ResponseEntity<Object>(HttpStatus.OK);
         response = retryRestTemplate.exchange(url, HttpMethod.GET, request, Object.class);
@@ -75,7 +69,7 @@ public class MispAppClientImpl implements MispAppClient, MispContextUrl {
     public ResponseEntity<String> addMispEvent(String body) {
         String url = context  + "/" + MISP_EVENTS;
 
-        LOG.info("API call [post]: " + url);
+        LOG.debug("API call [post]: " + url);
         HttpEntity<String> request = new HttpEntity<>(body, headers);
         ResponseEntity<String> response = new ResponseEntity<String>(HttpStatus.OK);
         response = retryRestTemplate.exchange(url, HttpMethod.POST, request, String.class);
@@ -92,7 +86,7 @@ public class MispAppClientImpl implements MispAppClient, MispContextUrl {
         objectNode.put("timestamp", String.valueOf(DateTime.now().getMillis()/1000));
         body = jsonNode.toString();
 
-        LOG.info("API call [put]: " + url);
+        LOG.debug("API call [put]: " + url);
         HttpEntity<String> request = new HttpEntity<>(body, headers);
         ResponseEntity<String> response = new ResponseEntity<String>(HttpStatus.OK);
         response = retryRestTemplate.exchange(url, HttpMethod.PUT, request, String.class);
@@ -104,7 +98,7 @@ public class MispAppClientImpl implements MispAppClient, MispContextUrl {
     public ResponseEntity<String> updateMispEvent(String location, String body) {
         String url = context  + "/" + MISP_EVENTS + "/" + location.split("/events/")[1];
 
-        LOG.info("API call [put]: " + url);
+        LOG.debug("API call [put]: " + url);
         HttpEntity<String> request = new HttpEntity<>(body, headers);
         ResponseEntity<String> response = new ResponseEntity<String>(HttpStatus.OK);
         response = retryRestTemplate.exchange(url, HttpMethod.PUT, request, String.class);
@@ -115,11 +109,11 @@ public class MispAppClientImpl implements MispAppClient, MispContextUrl {
     public ResponseEntity<String> deleteMispEvent(String uuid) {
         String url = context  + "/" + MISP_EVENTS + "/" + uuid;
 
-        LOG.info("API call [delete]: " + url);
+        LOG.debug("API call [delete]: " + url);
         HttpEntity<?> request = new HttpEntity<>(headers);
         ResponseEntity<String> response = retryRestTemplate.exchange(url, HttpMethod.DELETE, request, String.class);
 
-        LOG.info(response.toString());
+        LOG.debug(response.toString());
         retryRestTemplate.delete(url);
 
         return response;
@@ -132,7 +126,7 @@ public class MispAppClientImpl implements MispAppClient, MispContextUrl {
     public OrganisationDTO getMispOrganisation(String uuid) {
 
         String url = context  + "/" + MISP_ORGANISATIONS_VIEW + "/" + uuid;
-        LOG.info("API call [GET]: " + url);
+        LOG.debug("API call [GET]: " + url);
         HttpEntity<OrganisationWrapper> request = new HttpEntity<>(headers);
 
         ResponseEntity<OrganisationWrapper> organisationWrapper;
@@ -151,7 +145,7 @@ public class MispAppClientImpl implements MispAppClient, MispContextUrl {
     public List<OrganisationDTO> getAllMispOrganisations() {
 //      TODO: Which filter to use here? Local or both local and external? Create separate get methods for each filter?
         String url = context  + "/" + MISP_ORGANISATIONS_VIEW_ALL_LOCAL_AND_EXTERNAL;
-        LOG.info("API call [GET]: " + url);
+        LOG.debug("API call [GET]: " + url);
         HttpEntity<OrganisationWrapper> request = new HttpEntity<>(headers);
 
         ResponseEntity<List<OrganisationWrapper>> organisationResponse;
@@ -175,7 +169,7 @@ public class MispAppClientImpl implements MispAppClient, MispContextUrl {
     @Override
     public OrganisationDTO addMispOrganisation(OrganisationDTO organisationDTO) {
         String url = context  + "/" + MISP_ORGANISATIONS_ADD;
-        LOG.info("API call [POST]: " + url);
+        LOG.debug("API call [POST]: " + url);
 
         OrganisationWrapper tempWrapper = new OrganisationWrapper();
         tempWrapper.setOrganisationDTO(organisationDTO);
@@ -205,7 +199,7 @@ public class MispAppClientImpl implements MispAppClient, MispContextUrl {
     public OrganisationDTO updateMispOrganisation(OrganisationDTO organisationDTO) {
 
         String url = context  + "/" + MISP_ORGANISATIONS_EDIT + "/" + organisationDTO.getId();
-        LOG.info("API call [POST]: " + url);
+        LOG.debug("API call [POST]: " + url);
 
         OrganisationWrapper tempWrapper = new OrganisationWrapper();
         tempWrapper.setOrganisationDTO(organisationDTO);
@@ -223,7 +217,7 @@ public class MispAppClientImpl implements MispAppClient, MispContextUrl {
     public boolean deleteMispOrganisation(String id) {
 
         String url = context  + "/" + MISP_ORGANISATIONS_DELETE + "/" + id;
-        LOG.info("API call [POST]: " + url);
+        LOG.debug("API call [POST]: " + url);
 
         HttpEntity<OrganisationWrapper> request = new HttpEntity<>(headers);
 
@@ -253,7 +247,7 @@ public class MispAppClientImpl implements MispAppClient, MispContextUrl {
     public List<SharingGroup> getAllMispSharingGroups() {
 
         String url = context  + "/" + MISP_SHARINGGROUPS_VIEW_ALL;
-        LOG.info("API call [GET]: " + url);
+        LOG.debug("API call [GET]: " + url);
         HttpEntity<ResponseAll> request = new HttpEntity<>(headers);
 
         ResponseEntity<ResponseAll> response;
@@ -285,7 +279,7 @@ public class MispAppClientImpl implements MispAppClient, MispContextUrl {
 
         String url = context  + "/" + MISP_SHARINGGROUPS_VIEW + "/" + uuid;
 
-        LOG.info("API call [GET]: " + url);
+        LOG.debug("API call [GET]: " + url);
         HttpEntity<Response> request = new HttpEntity<>(headers);
 
         ResponseEntity<Response> response;
@@ -310,7 +304,7 @@ public class MispAppClientImpl implements MispAppClient, MispContextUrl {
     public SharingGroup addMispSharingGroup(SharingGroup sharingGroup) {
         String url = context  + "/" + MISP_SHARINGGROUPS_ADD;
 
-        LOG.info("API call [POST]: " + url);
+        LOG.debug("API call [POST]: " + url);
 
         HttpEntity<SharingGroup> request = new HttpEntity<>(sharingGroup, headers);
         ResponseEntity<List<Response>> response;
@@ -338,7 +332,7 @@ public class MispAppClientImpl implements MispAppClient, MispContextUrl {
         // Just like MISP's Organisations REST API, SharingGroups API also uses id and not uuid in the url.
         String url = context  + "/" + MISP_SHARINGGROUPS_EDIT + "/" + sharingGroup.getId();
 
-        LOG.info("API call [POST]: " + url);
+        LOG.debug("API call [POST]: " + url);
         HttpEntity<SharingGroup> request = new HttpEntity<>(sharingGroup, headers);
 
         ResponseEntity<List<Response>> response;
@@ -363,14 +357,14 @@ public class MispAppClientImpl implements MispAppClient, MispContextUrl {
 
         ResponseEntity<String> response;  // = new ResponseEntity<String>(HttpStatus.OK);
 
-        LOG.info("API call [POST]: " + url);
+        LOG.debug("API call [POST]: " + url);
         try {
             response = retryRestTemplate.exchange(url, HttpMethod.POST, request, String.class);
         } catch (Exception e) {
             LOG.error(e.getMessage());
             return false;
         }
-        LOG.trace("Organisation("+ organisationUuid + ") is added to Sharing Group(" + sharingGroupUuid+")");
+        LOG.debug("Organisation("+ organisationUuid + ") is added to Sharing Group(" + sharingGroupUuid+")");
         return true;
     }
 
@@ -380,14 +374,14 @@ public class MispAppClientImpl implements MispAppClient, MispContextUrl {
         HttpEntity<?> request = new HttpEntity<>(headers);
 
         ResponseEntity<String> response;
-        LOG.info("API call [POST]: " + url);
+        LOG.debug("API call [POST]: " + url);
         try {
             response = retryRestTemplate.exchange(url, HttpMethod.POST, request, String.class);
         } catch (Exception e) {
             LOG.error(e.getMessage());
             return false;
         }
-        LOG.trace("Organisation("+ organisationUuid + ") is removed from Sharing Group(" + sharingGroupUuid+")");
+        LOG.debug("Organisation("+ organisationUuid + ") is removed from Sharing Group(" + sharingGroupUuid+")");
         return true;
     }
 
@@ -395,7 +389,7 @@ public class MispAppClientImpl implements MispAppClient, MispContextUrl {
     public Boolean deleteMispSharingGroup(String id) {
         String url = context  + "/" + MISP_SHARINGGROUPS_DELETE + "/" + id;
 
-        LOG.info("API call [POST]: " + url);
+        LOG.debug("API call [POST]: " + url);
         HttpEntity<Response> request = new HttpEntity<>(headers);
 
         ResponseEntity<Response> response;
