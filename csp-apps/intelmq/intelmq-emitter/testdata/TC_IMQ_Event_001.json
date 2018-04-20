@@ -1,7 +1,5 @@
 {
    "Event":{
-      "threat_level_id":"1",
-      "info":"TC_IMQ_Event_001",
-      "published":false
+      "info":"TC_IMQ_Event_001"
    }
 }

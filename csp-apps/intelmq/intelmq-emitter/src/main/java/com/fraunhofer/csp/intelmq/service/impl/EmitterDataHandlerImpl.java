@@ -24,6 +24,9 @@ import com.intrasoft.csp.commons.model.IntegrationData;
 import com.intrasoft.csp.commons.model.IntegrationDataType;
 import com.intrasoft.csp.commons.model.SharingParams;
 
+/**
+ * Created by Majid Salehi on 20/04/2018
+ */
 @Service
 public class EmitterDataHandlerImpl implements EmitterDataHandler {
 
@@ -74,7 +77,7 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler {
 
 			dataObject = mapper.readTree(decodedString);
 		} catch (IOException ioex) {
-			LOG.error("Event json object mapping failed with: ", ioex.getMessage());
+			LOG.error("Event json object mapping failed.");
 			// ioex.printStackTrace();
 			responseEntity = new ResponseEntity<>("Event json object mapping failed with: " + ioex.getMessage(),
 					HttpStatus.CONFLICT);

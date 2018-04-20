@@ -11,6 +11,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.fraunhofer.csp.intelmq.service.EmitterDataHandler;
 
+/**
+ * Created by Majid Salehi on 20/04/2018
+ */
 @RestController
 public class IntelmqEmitterController {
 
