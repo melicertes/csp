@@ -5,6 +5,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.client.RestTemplate;
 
+/**
+ * Created by Majid Salehi on 20/04/2018
+ */
 @SpringBootApplication
 public class IntelmqEmitterApplication {
 
