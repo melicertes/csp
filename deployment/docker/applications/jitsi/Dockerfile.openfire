@@ -1,0 +1,14 @@
+FROM csp-java8:1.0
+MAINTAINER Thanos Angelatos
+
+ENV OF_VERSION=4.1.3 JAVA_HOME=/usr/lib/jvm/default-jvm
+RUN cd /usr/share \
+   && apk add --no-cache wget curl ca-certificates && update-ca-certificates \
+   && wget -q -O /tmp/of.tgz "http://central.preprod.melicertes.eu/repo-loads/jitsi/of.tgz" && tar xzf /tmp/of.tgz && rm /tmp/of.tgz 
+
+RUN apk --update add postgresql-client
+RUN chown -R nobody: /usr/share/openfire
+
+EXPOSE 9090 9091 5222 5223 5269 7070 7443 7777 5000-5050/udp 5000-5050/tcp
+CMD ["/usr/share/openfire/docker_scripts/start.sh"]
+

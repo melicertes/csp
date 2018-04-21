@@ -1,0 +1,60 @@
+#!/bin/bash
+echo 
+echo ******GENERATING LOG REPORTS******
+for number in {1..8}
+do
+echo 
+echo Generating log report $number
+echo
+curl -s -XGET 'localhost:9200/logstash*/_count/?pretty' -H 'Content-Type: application/json' -d @./json/log/file$number.json |  awk 'NR==2' | awk '1' RS=',\n' | tee ./data/log/report$number.txt
+sleep 1
+done
+echo 
+echo ******GENERATING CSPDATA REPORTS******
+echo 
+for number in {1..4}
+do
+echo 
+echo Generating general cspdata report $number
+echo
+curl -s -XGET 'localhost:9200/cspdata/_count/?pretty' -H 'Content-Type: application/json' -d @./json/csp/file$number.json |  awk 'NR==2' | awk '1' RS=',\n' | tee ./data/csp/csp/report$number.txt
+sleep 1
+done
+echo 
+for number in {1..4}
+do
+echo 
+echo Generating event cspdata report $number
+echo
+curl -s -XGET 'localhost:9200/cspdata/event/_count/?pretty' -H 'Content-Type: application/json' -d @./json/csp/file$number.json |  awk 'NR==2' | awk '1' RS=',\n' | tee ./data/csp/event/report$number.txt
+sleep 1
+done
+echo 
+for number in {1..4}
+do
+echo 
+echo Generating threat cspdata report $number
+echo
+curl -s -XGET 'localhost:9200/cspdata/threat/_count/?pretty' -H 'Content-Type: application/json' -d @./json/csp/file$number.json |  awk 'NR==2' | awk '1' RS=',\n' | tee ./data/csp/threat/report$number.txt
+sleep 1
+done
+echo 
+for number in {1..4}
+do
+echo 
+echo Generating artefact cspdata report $number
+echo
+curl -s -XGET 'localhost:9200/cspdata/artefact/_count/?pretty' -H 'Content-Type: application/json' -d @./json/csp/file$number.json |  awk 'NR==2' | awk '1' RS=',\n' | tee ./data/csp/artefact/report$number.txt
+sleep 1
+done
+echo 
+for number in {1..4}
+do
+echo 
+echo Generating vulnerability cspdata report $number
+echo
+curl -s -XGET 'localhost:9200/cspdata/vulnerability/_count/?pretty' -H 'Content-Type: application/json' -d @./json/csp/file$number.json |  awk 'NR==2' | awk '1' RS=',\n' | tee ./data/csp/vulnerability/report$number.txt
+sleep 1
+done
+echo *******REPORT GENERATION COMPLETED*******
+exit 0

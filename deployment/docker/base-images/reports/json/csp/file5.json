@@ -1,0 +1,16 @@
+{
+    "query": {
+	"bool" : {
+	  "must": [{
+        "range" : {
+            "dataParams.dateTime" : {
+                "gte" : "now-10y",
+                "lt" :  "now"
+            }
+        }
+    },
+	{ "match": { "_type": "threat"}}
+	]
+	}
+	}
+	}

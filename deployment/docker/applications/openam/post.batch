@@ -1,0 +1,35 @@
+create-identity --realm "/" --idname csp-admin --idtype Group
+create-identity --realm "/" --idname csp-user --idtype Group
+create-identity --realm "/" --idname tc-admin --idtype Group
+create-identity --realm "/" --idname tc-user --idtype Group
+create-identity --realm "/" --idname tc-admin --idtype User -a givenName=tc-admin sn=tc-admin userPassword=changeit
+create-identity --realm "/" --idname rt-admin --idtype Group 
+create-identity --realm "/" --idname rt-user --idtype Group
+create-identity --realm "/" --idname rt-admin --idtype User -a givenName=rt-admin sn=rt-admin userPassword=changeit
+create-identity --realm "/" --idname user1 --idtype User -a givenName=user1 sn=user1 userPassword=changeit
+create-identity --realm "/" --idname user2 --idtype User -a givenName=user2 sn=user2 userPassword=changeit
+create-identity --realm "/" --idname user3 --idtype User -a givenName=user3 sn=user3 userPassword=changeit
+create-identity --realm "/" --idname imq-admin --idtype Group
+create-identity --realm "/" --idname imq-admin --idtype User -a givenName=imq-admin sn=imq-admin userPassword=changeit
+create-identity --realm "/" --idname misp-admin --idtype Group
+create-identity --realm "/" --idname misp-user --idtype Group
+create-identity --realm "/" --idname misp-admin --idtype User -a givenName=misp-admin sn=misp-admin userPassword=changeit
+add-member --realm "/" --memberidname demo --memberidtype User --idname csp-admin --idtype Group
+add-member --realm "/" --memberidname tc-admin --memberidtype User --idname tc-admin --idtype Group
+add-member --realm "/" --memberidname rt-admin --memberidtype User --idname rt-admin --idtype Group
+add-member --realm "/" --memberidname misp-admin --memberidtype User --idname misp-admin --idtype Group
+add-member --realm "/" --memberidname imq-admin --memberidtype User --idname imq-admin --idtype Group
+add-member --realm "/" --memberidname user1 --memberidtype User --idname rt-user --idtype Group
+add-member --realm "/" --memberidname user1 --memberidtype User --idname tc-user --idtype Group
+add-member --realm "/" --memberidname user1 --memberidtype User --idname misp-user --idtype Group
+add-member --realm "/" --memberidname user1 --memberidtype User --idname csp-user --idtype Group
+add-member --realm "/" --memberidname user2 --memberidtype User --idname rt-user --idtype Group
+add-member --realm "/" --memberidname user2 --memberidtype User --idname tc-user --idtype Group
+add-member --realm "/" --memberidname user2 --memberidtype User --idname misp-user --idtype Group
+add-member --realm "/" --memberidname user2 --memberidtype User --idname csp-user --idtype Group
+add-member --realm "/" --memberidname user3 --memberidtype User --idname rt-user --idtype Group
+add-member --realm "/" --memberidname user3 --memberidtype User --idname tc-user --idtype Group
+add-member --realm "/" --memberidname user3 --memberidtype User --idname misp-user --idtype Group
+add-member --realm "/" --memberidname user3 --memberidtype User --idname csp-user --idtype Group
+
+ 

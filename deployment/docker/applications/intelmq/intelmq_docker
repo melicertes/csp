@@ -1,0 +1,25 @@
+#!/bin/sh
+
+trap "intelmqctl stop; exit" INT TERM
+
+echo "Starting intelmq..."
+intelmqctl start
+
+# Logfiles to stdout
+# Did not find a better solution (symlinks from file to stdout trigger an invalid seek error in intelmq application)
+tail -F /opt/intelmq/var/log/* &
+
+# Keep application in foreground and
+# exit when no bot is running
+while true
+do
+    if
+        test `pgrep "intelmq.bots" | wc -l` -eq 0
+    then
+        echo "No bot is running. Exiting."
+        exit
+    fi
+
+    sleep 60 &
+    wait $!
+done

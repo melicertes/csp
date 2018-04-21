@@ -351,7 +351,9 @@ public class BackgroundTaskService {
                                 installingModule.setExternalName(customEnv.getServices().get(0).getExternalName());
 
                             } else {
-                                List<String> names = customEnv.getServices().stream().map( s -> s.getExternalName()).collect(Collectors.toList());
+                                List<String> names = customEnv.getServices().stream()
+                                        .filter( s -> s.isAgent())
+                                        .map( s -> s.getExternalName()).collect(Collectors.toList());
                                 String namesjoined = String.join("|", names);
                                 installingModule.setExternalName(namesjoined);
                             }
@@ -382,12 +384,6 @@ public class BackgroundTaskService {
 
                 // b. copy .env from homedir to the module dir
                 copyEnvironment(moduleInstallDirectory);
-
-                // b1 make sure there are no previous containers with the same name!
-                Map<String,String> env = new HashMap<>();
-                env.put("SERVICE_DIR", moduleInstallDirectory);
-                env.put("SERVICE_NAME", installingModule.getName());
-                executeScriptSimple("rmContainers.sh", env);
 
                 // create custom environment
                 if (manifest.getFormat() > 1.0 && customEnv != null) { // env.json is not mandatory
@@ -421,6 +417,7 @@ public class BackgroundTaskService {
                         .filter( m -> !m.getHash().contentEquals(moduleHash)) // only not ours
                         .forEach( m -> {
                             m.setActive(false);
+                            log.info("Module {} with path {} is now set inactive",m.getModulePath(), m.getName());
                             installationService.saveSystemModule(m);
 
 
@@ -430,6 +427,8 @@ public class BackgroundTaskService {
                             params.put("SERVICE_NAME", m.getName());
                             try {
                                 executeScriptSimple("rmContainers.sh", params);
+                                log.info("Containers for module {} are now removed / path {} / active {}",
+                                        m.getName(), m.getModulePath(), m.getActive());
                             } catch (IOException e) {
                                 log.error("PROBLEM!!!! Failed to clear containers for module {} id {}", m.getName(), m.getId());
                             }
@@ -807,7 +806,13 @@ public class BackgroundTaskService {
 
     private SystemService checkOAMAgentCreation(SystemModule module, SystemService service) throws IOException {
         final SystemModule moduleOAM = installationService.queryModuleByName(moduleOAMname, true);
+        if (moduleOAM == null) {
+            log.error("SYSTEM ERROR; Module with name {} is not present in this installation!",moduleOAMname);
+        }
         final SystemModule moduleAPC = installationService.queryModuleByName(moduleAPCname, true);
+        if (moduleAPC == null) {
+            log.error("SYSTEM ERROR; Module with name {} is not present in this installation!",moduleAPCname);
+        }
         BackgroundTaskResult<Boolean, Integer> oamStarted = null;
         if (service.getOamAgentNecessary() && service.getOamAgentCreated() == null) {
             // we need to have OAM running and APACHE for this.

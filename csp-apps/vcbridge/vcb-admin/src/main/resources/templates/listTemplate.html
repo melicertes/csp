@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" th:include="layout :: page">
+<head th:fragment="header">
+</head>
+<div th:fragment="content">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        &nbsp;<br /> <br /> <br />
+      </div>
+    </div>
+    <div class="card">
+      <div class="row">
+        <div class="col-md-6">
+          <h3 style="margin-top: 0px">My Email Templates</h3>
+        </div>
+        <div class="col-md-6 text-right">
+          <a th:href="@{/emailTemplate}" class="btn btn-primary">Create template</a>
+        </div>
+      </div>
+
+
+
+      <p th:if="${#lists.isEmpty(templates.items)}">
+        <br />Nothing to display yet.
+        <a th:href="@{/emailTemplate}">Create a new template now</a>
+      </p>
+      <div th:unless="${#lists.isEmpty(templates.items)}">
+        <div class="row">
+          <div class="col-md-12">&nbsp;</div>
+        </div>
+        <div class="row">
+          <div class="col-md-8">
+            <!-- <form class="form form-inline">
+              <div class="form-group">
+                <input class="form-control-sm" type="text" placeholder="Search by subject" />
+              </div>
+              <div class="form-group">
+                <button type="submit" class="btn btn-primary">Search</button>
+                <button type="submit" class="btn btn-default">Reset</button>
+              </div>
+            </form> -->
+          </div>
+          <div class="col-md-4 text-right">
+            <button id="cancel_meeting_button" type="button" class="btn btn-danger btn-outline" th:classappend="${#lists.size(templates.content)}>0?'':'disabled'">
+              <span class="glyphicon glyphicon-remove"></span> Delete template
+            </button>
+            <!-- <button id="moreactions_meeting_button" type="button" class="btn btn-primary btn-outline" th:classappend="${#lists.size(templates.content)}>0?'':'disabled'">
+              <span class="glyphicon glyphicon-wrench"></span> More actions
+            </button> -->
+          </div>
+        </div>
+        <br />
+        <div class="row">
+          <p class="col-md-12 text-muted" th:text="'Showing ' + ${templates.showingStart} + '-' + ${templates.showingEnd} + ' of ' + ${#lists.size(templates.content)}">Meetings</p>
+        </div>
+        <div class="table-responsive">
+          <form id="cancellation-form" action="#" th:action="@{/deleteEmailTemplates}" method="post">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th><input type="checkbox" id="selectall" value=""></input></th>
+                  <th>Name</th>
+                  <th>Type</th>
+                  <th>Last modified <span data-placement="top" data-title="Last modification" data-trigger="hover" data-toggle="popover"
+                    th:attr="data-content='- Time is set in a 24-hour clock basis. - Your timezone is ' + ${userTZ}"><i class="glyphicon glyphicon-info-sign"></i></span></th>
+                  <th>Enabled</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="currentmeeting" th:each="template, stat : ${templates.content}">
+                  <td><input class="todelete" type="checkbox" name="id" th:value="${template.id}"
+                      th:attr="data-subject=${template.name},data-modified=${{template.modified}},data-active=${{template.active}}"></input></td>
+                  <td><a th:href="@{/emailTemplate(id=${template.id})}" th:text="${template.name}">name</a></td>
+                  <td th:text="${#strings.equals(template.type, 'CANCELLATION') ? 'Cancellation' : 'Invitation'}">type</td>
+                  <td th:text="${{template.modified}}">modified</td>
+                  <td><span th:text="${template.active ? 'Active' : 'Inactive'}" class="label"
+                        th:classappend="|${template.active ? 'label-success': ''} ${template.active == false ? 'label-default': ''}|"></span> </td>
+                </tr>
+              </tbody>
+            </table>
+          </form>
+
+        </div>
+        <nav class="pull-right">
+          <ul class="pagination">
+            <li class="page-item" th:classappend="${templates.firstPage}? 'disabled' : ''"><a th:href="@{${templates.url}(page=1,size=${templates.size})}">← First</a></li>
+            <li class="page-item" th:classappend="${templates.hasPreviousPage}? '' : 'disabled'"><a class="btn-link"
+                th:href="@{${templates.url}(page=${templates.number-1},size=${templates.size})}" title="Go to previous page">«</a></li>
+            <li th:each="item : ${templates.items}" class="page-item" th:classappend="${item.current}? 'active' : ''"><a th:href="@{${templates.url}(page=${item.number},size=${templates.size})}">
+                <span th:text="${item.number}">1</span>
+              </a></li>
+            <li class="page-item" th:classappend="${templates.hasNextPage}? '' : 'disabled'"><a th:href="@{${templates.url}(page=${templates.number+1},size=${templates.size})}"
+                title="Go to next page">»</a></li>
+            <li class="page-item" th:classappend="${templates.lastPage}? 'disabled' : ''"><a th:href="@{${templates.url}(page=${templates.totalPages},size=${templates.size})}">Last →</a></li>
+          </ul>
+        </nav>
+      </div>
+
+
+
+    </div>
+  </div>
+
+  <div class="modal fade" id="confirm-cancel" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header well">
+          <h4>Delete email templates</h4>
+        </div>
+        <div class="modal-body">
+          <p>
+            Are you sure you want to delete the following email templates: <br />
+          </p>
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Subject</th>
+                <th>Date/Time</th>
+                <th>Enabled</th>
+              </tr>
+            </thead>
+            <tbody id="meetingstobecancelled">
+              <tr>
+                <th>subject</th>
+                <td>datetime</td>
+                <td>duration</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="modal-footer">
+          <a href="#" id="submit-cancellation" class="btn btn-primary">Yes, delete these templates</a>
+          <button type="button" class="btn btn-default" data-dismiss="modal">No, don't delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div th:fragment="scripts">
+
+  <script>
+      $(document).ready(function() {
+
+        $("#selectall").change(function() {
+          checked = this.checked;
+          $("tr.currentmeeting").each(function() {
+            $this = $(this);
+            $(this).find("input.todelete").prop('checked', checked);
+          });
+        });
+        $("#cancel_meeting_button").click(function(e) {
+          e.preventDefault();
+          $("#meetingstobecancelled tr").remove();
+          var i = 0;
+          $("tr.currentmeeting").each(function() {
+
+            $this = $(this);
+            $(this).find("input.todelete").each(function() {
+              if ($(this).prop('checked') == true) {
+                i++;
+                $("#meetingstobecancelled").append('<tr><td>' + $(this).attr("data-subject") + '</td><td>' + $(this).attr("data-modified") + '</td><td>' + $(this).attr("data-active") + '</td></tr>');
+              }
+            });
+          }
+
+          );
+          if (i > 0)
+            $('#confirm-cancel').modal('show');
+        });
+        $('#submit-cancellation').click(function() {
+          $('#cancellation-form').submit();
+        });
+      });
+    </script>
+  <script>
+      $(document).ready(function() {
+        $('[data-toggle="popover"]').popover();
+      });
+    </script>
+</div>
+</html>
