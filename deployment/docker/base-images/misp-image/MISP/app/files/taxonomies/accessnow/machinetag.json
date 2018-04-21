@@ -1,0 +1,117 @@
+{
+  "predicates": [
+    {
+      "description": "The organization campaigns, or takes other actions against corruption and transparency.",
+      "expanded": "Anti-Corruption and transparency",
+      "value": "anti-corruption-transparency"
+    },
+    {
+      "description": "The organization campaigns, or takes other actions against war",
+      "expanded": "Anti-War / Anti-Violence",
+      "value": "anti-war-violence"
+    },
+    {
+      "description": "The organization campaigns or acts to promote cultural events",
+      "expanded": "Culture",
+      "value": "culture"
+    },
+    {
+      "description": "Issues of economic policy, wealth distribution, etc.",
+      "expanded": "Economic Change",
+      "value": "economic-change"
+    },
+    {
+      "description": "The organization is concerned with some form of education",
+      "expanded": "Education",
+      "value": "education"
+    },
+    {
+      "description": "The organization is an election monitor, or involved in election monitoring",
+      "expanded": "Election Monitoring",
+      "value": "election-monitoring"
+    },
+    {
+      "description": "The organization campaigns or acts to protect the environment",
+      "expanded": "Environment",
+      "value": "environment"
+    },
+    {
+      "description": "The organization is concerned with freedom of speech issues",
+      "expanded": "Freedom of Expression",
+      "value": "freedom-expression"
+    },
+    {
+      "description": "The organization develops tools for use in defending or extending digital rights",
+      "expanded": "Freedom Tool Development",
+      "value": "freedom-tool-development"
+    },
+    {
+      "description": " The organization is a funder of organizations or projects working with at risk users",
+      "expanded": "Funding",
+      "value": "funding"
+    },
+    {
+      "description": "The organization prevents epidemic illness or acts on curing them",
+      "expanded": "Health Issues",
+      "value": "health"
+    },
+    {
+      "description": "relating to the detection, recording, exposure, or challenging of abuses of human rights",
+      "expanded": "Human Rights Issues",
+      "value": "human-rights"
+    },
+    {
+      "description": "Issues of digital rights in electronic communications",
+      "expanded": "Internet and Telecoms",
+      "value": "internet-telecom"
+    },
+    {
+      "description": "Issues relating to the Lesbian, Gay, Bi, Transgender community",
+      "expanded": "LGBT / Gender / Sexuality",
+      "value": "lgbt-gender-sexuality"
+    },
+    {
+      "description": "The organization is a policy think-tank, or policy advocate",
+      "expanded": "Policy",
+      "value": "policy"
+    },
+    {
+      "description": "The organization takes a strong political view or is a political entity",
+      "expanded": "Politics",
+      "value": "politics"
+    },
+    {
+      "description": "Issues relating to the individual's reasonable right to privacy",
+      "expanded": "Privacy",
+      "value": "privacy"
+    },
+    {
+      "description": "The organization provides rapid response type capability for civil society",
+      "expanded": "Rapid Response",
+      "value": "rapid-response"
+    },
+    {
+      "description": "Issues relating to displaced people",
+      "expanded": "Refugees",
+      "value": "refugees"
+    },
+    {
+      "description": "Issues relating to physical or information security",
+      "expanded": "Security",
+      "value": "security"
+    },
+    {
+      "description": "Issues pertaining to inequality between men and women, or issues of particular relevance to women",
+      "expanded": "Women's Rights",
+      "value": "womens-right"
+    },
+    {
+      "description": "Issues of particular relevance to youth",
+      "expanded": "Youth Rights",
+      "value": "youth-rights"
+    }
+  ],
+  "version": 2,
+  "description": "Access Now",
+  "namespace": "accessnow"
+}

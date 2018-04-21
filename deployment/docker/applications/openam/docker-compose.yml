@@ -1,0 +1,25 @@
+version: '3'
+services:
+
+  oam:
+    image: csp-openam:1.0-Alpha-orcl
+    container_name: csp-oam
+    domainname: ${LOCAL_DOMAIN}
+    hostname: csp-oam
+    env_file:
+        - .env
+    expose:
+        - ${OAM_DOCR_PORT}
+    volumes:
+        - OAMDatavolume:/root/
+        - /opt/csp/logs/:/root/openam/openam/log/
+
+volumes:
+    OAMDatavolume:
+        external: true
+
+
+networks:
+  default:
+    external:
+      name: ${LOCAL_DOMAIN}

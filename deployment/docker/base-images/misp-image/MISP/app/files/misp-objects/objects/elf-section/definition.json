@@ -1,0 +1,171 @@
+{
+  "requiredOneOf": [
+    "text",
+    "name",
+    "md5",
+    "sha1",
+    "sha224",
+    "sha256",
+    "sha384",
+    "sha512",
+    "sha512/224",
+    "sha512/256"
+  ],
+  "attributes": {
+    "md5": {
+      "description": "[Insecure] MD5 hash (128 bits)",
+      "ui-priority": 1,
+      "misp-attribute": "md5",
+      "recommended": false
+    },
+    "sha1": {
+      "description": "[Insecure] Secure Hash Algorithm 1 (160 bits)",
+      "ui-priority": 1,
+      "misp-attribute": "sha1",
+      "recommended": false
+    },
+    "sha224": {
+      "description": "Secure Hash Algorithm 2 (224 bits)",
+      "ui-priority": 0,
+      "misp-attribute": "sha224",
+      "recommended": false
+    },
+    "sha256": {
+      "description": "Secure Hash Algorithm 2 (256 bits)",
+      "ui-priority": 1,
+      "misp-attribute": "sha256"
+    },
+    "sha384": {
+      "description": "Secure Hash Algorithm 2 (384 bits)",
+      "ui-priority": 0,
+      "misp-attribute": "sha384",
+      "recommended": false
+    },
+    "sha512": {
+      "description": "Secure Hash Algorithm 2 (512 bits)",
+      "ui-priority": 1,
+      "misp-attribute": "sha512"
+    },
+    "sha512/224": {
+      "description": "Secure Hash Algorithm 2 (224 bits)",
+      "ui-priority": 0,
+      "misp-attribute": "sha512/224",
+      "recommended": false
+    },
+    "sha512/256": {
+      "description": "Secure Hash Algorithm 2 (256 bits)",
+      "ui-priority": 0,
+      "misp-attribute": "sha512/256",
+      "recommended": false
+    },
+    "ssdeep": {
+      "description": "Fuzzy hash using context triggered piecewise hashes (CTPH)",
+      "ui-priority": 0,
+      "misp-attribute": "ssdeep"
+    },
+    "entropy": {
+      "description": "Entropy of the whole section",
+      "disable_correlation": true,
+      "ui-priority": 0,
+      "misp-attribute": "float"
+    },
+    "name": {
+      "description": "Name of the section",
+      "disable_correlation": true,
+      "ui-priority": 1,
+      "misp-attribute": "text"
+    },
+    "size-in-bytes": {
+      "description": "Size of the section, in bytes",
+      "disable_correlation": true,
+      "ui-priority": 1,
+      "misp-attribute": "size-in-bytes"
+    },
+    "text": {
+      "description": "Free text value to attach to the section",
+      "disable_correlation": true,
+      "ui-priority": 1,
+      "misp-attribute": "text",
+      "recommended": false
+    },
+    "type": {
+      "description": "Type of the section",
+      "sane_default": [
+        "NULL",
+        "PROGBITS",
+        "SYMTAB",
+        "STRTAB",
+        "RELA",
+        "HASH",
+        "DYNAMIC",
+        "NOTE",
+        "NOBITS",
+        "REL",
+        "SHLIB",
+        "DYNSYM",
+        "INIT_ARRAY",
+        "FINI_ARRAY",
+        "PREINIT_ARRAY",
+        "GROUP",
+        "SYMTAB_SHNDX",
+        "LOOS",
+        "GNU_ATTRIBUTES",
+        "GNU_HASH",
+        "GNU_VERDEF",
+        "GNU_VERNEED",
+        "GNU_VERSYM",
+        "HIOS",
+        "LOPROC",
+        "ARM_EXIDX",
+        "ARM_PREEMPTMAP",
+        "HEX_ORDERED",
+        "X86_64_UNWIND",
+        "MIPS_REGINFO",
+        "MIPS_OPTIONS",
+        "MIPS_ABIFLAGS",
+        "HIPROC",
+        "LOUSER",
+        "HIUSER"
+      ],
+      "disable_correlation": true,
+      "ui-priority": 0,
+      "misp-attribute": "text"
+    },
+    "flag": {
+      "description": "Flag of the section",
+      "sane_default": [
+        "ALLOC",
+        "EXCLUDE",
+        "EXECINSTR",
+        "GROUP",
+        "HEX_GPREL",
+        "INFO_LINK",
+        "LINK_ORDER",
+        "MASKOS",
+        "MASKPROC",
+        "MERGE",
+        "MIPS_ADDR",
+        "MIPS_LOCAL",
+        "MIPS_MERGE",
+        "MIPS_NAMES",
+        "MIPS_NODUPES",
+        "MIPS_NOSTRIP",
+        "NONE",
+        "OS_NONCONFORMING",
+        "STRINGS",
+        "TLS",
+        "WRITE",
+        "XCORE_SHF_CP_SECTION"
+      ],
+      "disable_correlation": true,
+      "ui-priority": 0,
+      "misp-attribute": "text",
+      "multiple": true
+    }
+  },
+  "version": 4,
+  "description": "Object describing a section of an Executable and Linkable Format",
+  "meta-category": "file",
+  "uuid": "ca271f32-1234-4e87-b240-6b6e882de5de",
+  "name": "elf-section"
+}

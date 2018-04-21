@@ -1,0 +1,126 @@
+/*body {*/
+    /*margin: 0px;*/
+    /*padding-top: 78px;*/
+    /*padding-right: 0px;*/
+    /*padding-bottom: 25px;*/
+    /*padding-left: 0px;*/
+    /*min-height: 0px;*/
+    /*height: auto;*/
+    /*text-align: center;*/
+    /*background-color: lightblue;*/
+    /*overflow:hidden;*/
+/*}*/
+
+#header {
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    /*height: 85px;*/
+    min-width: 1000px;
+    /*overflow: hidden;*/
+    /*background-color: darkblue;*/
+}
+
+div#footer {
+    bottom: 0px;
+    left: 0px;
+    width: 100%;
+    height: 50px;
+    min-width: 1000px;
+    background-color: lightgray;
+    padding-top: 10px;
+}
+
+/** START CHANGES **/
+div#content {
+    position: fixed;
+    top: 50px;
+    left: 0px;
+    bottom: 25px;
+    min-width: 100%;
+    /*    background: black;*/
+}
+
+div#content iframe {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 100%;
+    width: 100%;
+}
+/** END CHANGES **/
+
+div#block {
+
+    background-color: lightgreen;
+    margin: 40px;
+    position: fixed;
+    top: 80px;
+    left: 350px;
+    width: 200px;
+    bottom: 25px;
+    min-width: 200px;
+
+
+}
+
+
+
+@media screen {
+    body > div#header {
+        position: fixed;
+    }
+    body > div#footer {
+        position: fixed;
+    }
+}
+
+
+div#preloader {
+    padding: 200px auto;
+    text-align: center;
+    margin-top: 50px;
+}
+
+.popover {
+    max-width: 100%;
+}
+
+button.Pending {
+    /*primary*/
+    color: #fff;
+    background-color: #428bca;
+    border-color: #357ebd;
+}
+button.Running {
+    /*info*/
+    color: #fff;
+    background-color: #5bc0de;
+    border-color: #46b8da;
+}
+button.Expired {
+    /*warning*/
+    color: #fff;
+    background-color: #f0ad4e;
+    border-color: #eea236;
+}
+button.Completed {
+    /*success*/
+    color: #fff;
+    background-color: #5cb85c;
+    border-color: #4cae4c;
+}
+button.Cancel {
+    /*warning*/
+    color: #fff;
+    background-color: #f0ad4e;
+    border-color: #eea236;
+}
+button.Error {
+    /*danger*/
+    color: #fff;
+    background-color: #d9534f;
+    border-color: #d43f3a;
+}

@@ -1,0 +1,965 @@
+# Initial data for a fresh RT installation.
+
+@Users = (
+    {  Name             => 'root',
+       Gecos            => 'root',
+       RealName         => 'Enoch Root',
+       Password         => 'password',
+       EmailAddress     => "root\@localhost",
+       Comments         => 'SuperUser',
+       Privileged       => '1',
+       SkipCanonicalize => '1',
+    },
+    {
+       Name             => 'rt-admin',
+       Gecos            => 'rt-admin',
+       RealName         => 'rt-admin',
+       Password         => 'password',
+       EmailAddress     => "rt-admin\@localhost",
+       Comments         => 'SuperUser',
+       Privileged       => '1',
+       SkipCanonicalize => '1',
+    },
+);
+
+@Groups = (
+);
+
+@Queues = ({ Name              => 'General',
+             Description       => 'The default queue',
+             CorrespondAddress => "",
+             CommentAddress    => "", },
+           { Name        => '___Approvals',
+             Lifecycle   => 'approvals',
+             Description => 'A system-internal queue for the approvals system',
+             Disabled    => 2, } );
+
+@Catalogs = ({
+    Name        => "General assets",      # loc
+    Description => "The default catalog", # loc
+});
+
+@ScripActions = (
+
+    {  Name        => 'Autoreply To Requestors',    # loc
+       Description =>
+'Always sends a message to the requestors independent of message sender' ,                                            # loc
+       ExecModule => 'Autoreply',
+       Argument   => 'Requestor' },
+    { Name        => 'Notify Requestors',                    # loc
+      Description => 'Sends a message to the requestors',    # loc
+      ExecModule  => 'Notify',
+      Argument    => 'Requestor' },
+    { Name        => 'Notify Owner as Comment',              # loc
+      Description => 'Sends mail to the owner',              # loc
+      ExecModule  => 'NotifyAsComment',
+      Argument    => 'Owner' },
+    { Name        => 'Notify Owner',                         # loc
+      Description => 'Sends mail to the owner',              # loc
+      ExecModule  => 'Notify',
+      Argument    => 'Owner' },
+    { Name        => 'Notify Ccs as Comment',              # loc
+      Description => 'Sends mail to the Ccs as a comment', # loc
+      ExecModule  => 'NotifyAsComment',
+      Argument    => 'Cc' },
+    { Name        => 'Notify Ccs',                                   # loc
+      Description => 'Sends mail to the Ccs',                        # loc
+      ExecModule  => 'Notify',
+      Argument    => 'Cc' },
+    { Name        => 'Notify AdminCcs as Comment',                        # loc
+      Description => 'Sends mail to the administrative Ccs as a comment', # loc
+      ExecModule  => 'NotifyAsComment',
+      Argument    => 'AdminCc' },
+    { Name        => 'Notify AdminCcs',                                   # loc
+      Description => 'Sends mail to the administrative Ccs',              # loc
+      ExecModule  => 'Notify',
+      Argument    => 'AdminCc' },
+    { Name        => 'Notify Owner and AdminCcs',                         # loc
+      Description => 'Sends mail to the Owner and administrative Ccs',    # loc
+      ExecModule  => 'Notify',
+      Argument    => 'Owner,AdminCc' },
+    { Name        => 'Notify Owner or AdminCcs',                         # loc
+      Description => 'Sends mail to the Owner if set, otherwise administrative Ccs',    # loc
+      ExecModule  => 'NotifyOwnerOrAdminCc',
+    },
+    { Name        => 'Notify Requestors and Ccs as Comment',              # loc
+      Description => 'Send mail to requestors and Ccs as a comment',      # loc
+      ExecModule  => 'NotifyAsComment',
+      Argument    => 'Requestor,Cc' },
+
+    { Name        => 'Notify Requestors and Ccs',                         # loc
+      Description => 'Send mail to requestors and Ccs',                   # loc
+      ExecModule  => 'Notify',
+      Argument    => 'Requestor,Cc' },
+
+    { Name        => 'Notify Owner, Requestors, Ccs and AdminCcs as Comment',    # loc
+      Description => 'Send mail to owner and all watchers as a "comment"',          # loc
+      ExecModule  => 'NotifyAsComment',
+      Argument    => 'All' },
+    { Name        => 'Notify Owner, Requestors, Ccs and AdminCcs',               # loc
+      Description => 'Send mail to owner and all watchers',                         # loc
+      ExecModule  => 'Notify',
+      Argument    => 'All' },
+    { Name        => 'Notify Other Recipients as Comment',                # loc
+      Description => 'Sends mail to explicitly listed Ccs and Bccs',      # loc
+      ExecModule  => 'NotifyAsComment',
+      Argument    => 'OtherRecipients' },
+    { Name        => 'Notify Other Recipients',                           # loc
+      Description => 'Sends mail to explicitly listed Ccs and Bccs',      # loc
+      ExecModule  => 'Notify',
+      Argument    => 'OtherRecipients' },
+    { Name        => 'User Defined',                                      # loc
+      Description => 'Perform a user-defined action',                     # loc
+      ExecModule  => 'UserDefined', },
+    {  Name        => 'Create Tickets',                                    # loc
+       Description =>
+         'Create new tickets based on this scrip\'s template',             # loc
+       ExecModule => 'CreateTickets', },
+    { Name        => 'Open Tickets',                                      # loc
+      Description => 'Open tickets on correspondence',                    # loc
+      ExecModule  => 'AutoOpen' },
+    { Name        => 'Open Inactive Tickets',                             # loc
+      Description => 'Open inactive tickets',                             # loc
+      ExecModule  => 'AutoOpenInactive' },
+    { Name        => 'Extract Subject Tag',                               # loc
+      Description => 'Extract tags from a Transaction\'s subject and add them to the Ticket\'s subject.', # loc
+      ExecModule  => 'ExtractSubjectTag' },
+    { Name        => 'Send Forward',                 # loc
+      Description => 'Send forwarded message',       # loc
+      ExecModule  => 'SendForward', },
+    {  Name        => 'Set starts date according to SLA', # loc
+       Description => 'Set the starts date according to an agreement' , # loc
+       ExecModule  => 'SLA_SetStarts',
+    },
+    {  Name        => 'Set due date according to SLA', # loc
+       Description => 'Set the due date according to an agreement' , # loc
+       ExecModule  => 'SLA_SetDue',
+    },
+);
+
+@ScripConditions = (
+    { Name                 => 'On Create',                                # loc
+      Description          => 'When a ticket is created',                 # loc
+      ApplicableTransTypes => 'Create',
+      ExecModule           => 'AnyTransaction', },
+
+    { Name                 => 'On Transaction',                           # loc
+      Description          => 'When anything happens',                    # loc
+      ApplicableTransTypes => 'Any',
+      ExecModule           => 'AnyTransaction', },
+    {
+
+      Name                 => 'On Correspond',                             # loc
+      Description          => 'Whenever correspondence comes in',          # loc
+      ApplicableTransTypes => 'Correspond',
+      ExecModule           => 'AnyTransaction', },
+
+    {
+
+      Name                 => 'On Forward',                                # loc
+      Description          => 'Whenever a ticket or transaction is forwarded', # loc
+      ApplicableTransTypes => 'Forward Transaction,Forward Ticket',
+      ExecModule           => 'AnyTransaction', },
+
+    {
+
+      Name                 => 'On Forward Ticket',                         # loc
+      Description          => 'Whenever a ticket is forwarded',            # loc
+      ApplicableTransTypes => 'Forward Ticket',
+      ExecModule           => 'AnyTransaction', },
+
+    {
+
+      Name                 => 'On Forward Transaction',                    # loc
+      Description          => 'Whenever a transaction is forwarded',       # loc
+      ApplicableTransTypes => 'Forward Transaction',
+      ExecModule           => 'AnyTransaction', },
+
+    {
+
+      Name                 => 'On Comment',                                # loc
+      Description          => 'Whenever comments come in',                 # loc
+      ApplicableTransTypes => 'Comment',
+      ExecModule           => 'AnyTransaction' },
+    {
+
+      Name                 => 'On Status Change',                          # loc
+      Description          => 'Whenever a ticket\'s status changes',       # loc
+      ApplicableTransTypes => 'Status',
+      ExecModule           => 'AnyTransaction',
+
+    },
+    {
+
+      Name                 => 'On Priority Change',                       # loc
+      Description          => 'Whenever a ticket\'s priority changes',    # loc
+      ApplicableTransTypes => 'Set',
+      ExecModule           => 'PriorityChange',
+    },
+    {
+
+      Name                 => 'On Owner Change',                           # loc
+      Description          => 'Whenever a ticket\'s owner changes',        # loc
+      ApplicableTransTypes => 'Any',
+      ExecModule           => 'OwnerChange',
+
+    },
+    {
+
+      Name                 => 'On Queue Change',                           # loc
+      Description          => 'Whenever a ticket\'s queue changes',        # loc
+      ApplicableTransTypes => 'Set',
+      ExecModule           => 'QueueChange',
+
+    },
+    {  Name                 => 'On Resolve',                               # loc
+       Description          => 'Whenever a ticket is resolved',            # loc
+       ApplicableTransTypes => 'Status',
+       ExecModule           => 'StatusChange',
+       Argument             => 'resolved'
+
+    },
+    {  Name                 => 'On Reject',                                # loc
+       Description          => 'Whenever a ticket is rejected',            # loc
+       ApplicableTransTypes => 'Status',
+       ExecModule           => 'StatusChange',
+       Argument             => 'rejected'
+
+    },
+    {  Name                 => 'User Defined',                             # loc
+       Description          => 'Whenever a user-defined condition occurs', # loc
+       ApplicableTransTypes => 'Any',
+       ExecModule           => 'UserDefined'
+
+    },
+
+    {  Name                 => 'On Close',                                 # loc
+       Description          => 'Whenever a ticket is closed', # loc
+       ApplicableTransTypes => 'Status,Set',
+       ExecModule           => 'CloseTicket',
+    },
+    {  Name                 => 'On Reopen',                                # loc
+       Description          => 'Whenever a ticket is reopened', # loc
+       ApplicableTransTypes => 'Status,Set',
+       ExecModule           => 'ReopenTicket',
+    },
+    {  Name        => 'Require Starts set according to SLA', # loc
+       Description => 'Detect a situation when we should set Starts date' , # loc
+       ApplicableTransTypes => 'Create,Set',
+       ExecModule => 'SLA_RequireStartsSet',
+    },
+    {  Name        => 'Require Due set according to SLA', # loc
+       Description => 'Detect a situation when we should set Due date' , # loc
+       ApplicableTransTypes => 'Create,Correspond,Set,Status',
+       ExecModule => 'SLA_RequireDueSet',
+    },
+    {
+       Name                 => 'On TimeWorked Change',                    # loc
+       Description          => 'When TimeWorked Change',                  # loc
+       ApplicableTransTypes => 'Any',
+       ExecModule           => 'TimeWorkedChange',
+    },
+
+);
+
+@Templates = (
+    { Queue       => '0',
+      Name        => 'Blank',                                             # loc
+      Description => 'A blank template',                                  # loc
+      Content     => '', },
+    {  Queue       => '0',
+       Name        => 'Autoreply',                                         # loc
+       Description => 'Plain text Autoresponse template',                     # loc
+       Content     => 'Subject: AutoReply: {$Ticket->Subject}
+
+
+Greetings,
+
+This message has been automatically generated in response to the
+creation of a trouble ticket regarding:
+        "{$Ticket->Subject()}", 
+a summary of which appears below.
+
+There is no need to reply to this message right now.  Your ticket has been
+assigned an ID of { $Ticket->SubjectTag }.
+
+Please include the string:
+
+         { $Ticket->SubjectTag }
+
+in the subject line of all future correspondence about this issue. To do so, 
+you may reply to this message.
+
+                        Thank you,
+                        {$Ticket->QueueObj->CorrespondAddress()}
+
+-------------------------------------------------------------------------
+{$Transaction->Content()}
+'
+    },
+    {  Queue       => '0',
+       Name        => 'Autoreply in HTML',                              # loc
+       Description => 'HTML Autoresponse template',                     # loc
+       Content     => q[Subject: AutoReply: {$Ticket->Subject}
+Content-Type: text/html
+
+<p>Greetings,</p>
+
+<p>This message has been automatically generated in response to the
+creation of a trouble ticket regarding <b>{$Ticket->Subject()}</b>,
+a summary of which appears below.</p>
+
+<p>There is no need to reply to this message right now.  Your ticket has been
+assigned an ID of <b>{$Ticket->SubjectTag}</b>.</p>
+
+<p>Please include the string <b>{$Ticket->SubjectTag}</b>
+in the subject line of all future correspondence about this issue. To do so,
+you may reply to this message.</p>
+
+<p>Thank you,<br/>
+{$Ticket->QueueObj->CorrespondAddress()}</p>
+
+<hr/>
+{$Transaction->Content(Type => 'text/html')}
+],
+    },
+    {  Queue       => '0',
+       Name        => 'Transaction',                     # loc
+       Description => 'Plain text transaction template', # loc
+       Content     => 'RT-Attach-Message: yes
+
+
+{$Transaction->CreatedAsString}: Request {$Ticket->id} was acted upon.
+ Transaction: {$Transaction->Description}
+       Queue: {$Ticket->QueueObj->Name}
+     Subject: {$Transaction->Subject || $Ticket->Subject || "(No subject given)"}
+       Owner: {$Ticket->OwnerObj->Name}
+  Requestors: {$Ticket->RequestorAddresses}
+      Status: {$Ticket->Status}
+ Ticket <URL: {RT->Config->Get(\'WebURL\')}Ticket/Display.html?id={$Ticket->id} >
+
+
+{$Transaction->Content()}
+'
+    },
+    {  Queue       => '0',
+       Name        => 'Transaction in HTML',          # loc
+       Description => 'HTML transaction template',    # loc
+       Content     => 'RT-Attach-Message: yes
+Content-Type: text/html
+
+<b>{$Transaction->CreatedAsString}: Request <a href="{RT->Config->Get("WebURL")}Ticket/Display.html?id={$Ticket->id}">{$Ticket->id}</a> was acted upon by {$Transaction->CreatorObj->Name}.</b>
+<br>
+<table border="0">
+<tr><td align="right"><b>Transaction:</b></td><td>{$Transaction->Description}</td></tr>
+<tr><td align="right"><b>Queue:</b></td><td>{$Ticket->QueueObj->Name}</td></tr>
+<tr><td align="right"><b>Subject:</b></td><td>{$Transaction->Subject || $Ticket->Subject || "(No subject given)"} </td></tr>
+<tr><td align="right"><b>Owner:</b></td><td>{$Ticket->OwnerObj->Name}</td></tr>
+<tr><td align="right"><b>Requestors:</b></td><td>{$Ticket->RequestorAddresses}</td></tr>
+<tr><td align="right"><b>Status:</b></td><td>{$Ticket->Status}</td></tr>
+<tr><td align="right"><b>Ticket URL:</b></td><td><a href="{RT->Config->Get("WebURL")}Ticket/Display.html?id={$Ticket->id}">{RT->Config->Get("WebURL")}Ticket/Display.html?id={$Ticket->id}</a></td></tr>
+</table>
+<br/>
+<br/>
+{$Transaction->Content( Type => "text/html")}
+'
+    },
+    # Shadow the global templates of the same name to suppress duplicate
+    # notifications until rules is ripped out.
+    { Queue     => "___Approvals",
+      Name      => "Transaction in HTML",
+      Content   => "",
+    },
+    { Queue     => "___Approvals",
+      Name      => "Transaction",
+      Content   => "",
+    },
+    {
+
+      Queue       => '0',
+      Name        => 'Admin Correspondence',                     # loc
+      Description => 'Plain text admin correspondence template',    # loc
+      Content     => 'RT-Attach-Message: yes
+
+
+<URL: {RT->Config->Get(\'WebURL\')}Ticket/Display.html?id={$Ticket->id} >
+
+{$Transaction->Content()}
+'
+    },
+    {  Queue       => '0',
+       Name        => 'Admin Correspondence in HTML',                     # loc
+       Description => 'HTML admin correspondence template',    # loc
+       Content     => 'RT-Attach-Message: yes
+Content-Type: text/html
+
+Ticket URL: <a href="{RT->Config->Get("WebURL")}Ticket/Display.html?id={$Ticket->id}">{RT->Config->Get("WebURL")}Ticket/Display.html?id={$Ticket->id}</a>
+<br />
+<br />
+{$Transaction->Content(Type => "text/html");}
+'
+    },
+    {  Queue       => '0',
+       Name        => 'Correspondence',                          # loc
+       Description => 'Plain text correspondence template',         # loc
+       Content     => 'RT-Attach-Message: yes
+
+{$Transaction->Content()}
+'
+    },
+    {  Queue       => '0',
+       Name        => 'Correspondence in HTML',                 # loc
+       Description => 'HTML correspondence template',           # loc
+       Content     => 'RT-Attach-Message: yes
+Content-Type: text/html
+
+{$Transaction->Content( Type => "text/html")}
+'
+    },
+    {  Queue       => '0',
+       Name        => 'Admin Comment',                           # loc
+       Description => 'Plain text admin comment template',          # loc
+       Content     =>
+'Subject: [Comment] {my $s=($Transaction->Subject||$Ticket->Subject||""); $s =~ s/\\[Comment\\]\\s*//g; $s =~ s/^Re:\\s*//i; $s;}
+RT-Attach-Message: yes
+
+
+{RT->Config->Get(\'WebURL\')}Ticket/Display.html?id={$Ticket->id}
+This is a comment.  It is not sent to the Requestor(s):
+
+{$Transaction->Content()}
+'
+    },
+    {  Queue       => '0',
+       Name        => 'Admin Comment in HTML',                  # loc
+       Description => 'HTML admin comment template',            # loc
+       Content     => 
+'Subject: [Comment] {my $s=($Transaction->Subject||$Ticket->Subject||""); $s =~ s/\\[Comment\\]\\s*//g; $s =~ s/^Re:\\s*//i; $s;}
+RT-Attach-Message: yes
+Content-Type: text/html
+
+<p>This is a comment about <a href="{RT->Config->Get("WebURL")}Ticket/Display.html?id={$Ticket->id}">ticket {$Ticket->id}</a>. It is not sent to the Requestor(s):</p>
+
+{$Transaction->Content(Type => "text/html")}
+'
+    },
+    {  Queue       => '0',
+       Name        => 'Reminder',                           # loc
+       Description => 'Default reminder template',          # loc
+       Content     =>
+'Subject:{$Ticket->Subject} is due {$Ticket->DueObj->AsString}
+
+This reminder is for ticket #{$Target = $Ticket->RefersTo->First->TargetObj;$Target->Id}.
+
+{RT->Config->Get(\'WebURL\')}Ticket/Display.html?id={$Target->Id}
+'
+    },
+
+    {  Queue       => '0',
+       Name        => 'Status Change',                                     # loc
+       Description => 'Ticket status changed',                             # loc
+       Content     => 'Subject: Status Changed to: {$Transaction->NewValue}
+
+
+{RT->Config->Get(\'WebURL\')}Ticket/Display.html?id={$Ticket->id}
+
+{$Transaction->Content()}
+'
+    },
+    {  Queue       => '0',
+       Name        => 'Status Change in HTML',              # loc
+       Description => 'HTML Ticket status changed',              # loc
+       Content     => 'Subject: Status Changed to: {$Transaction->NewValue}
+Content-Type: text/html
+
+<a href="{RT->Config->Get("WebURL")}Ticket/Display.html?id={$Ticket->id}">{RT->Config->Get("WebURL")}Ticket/Display.html?id={$Ticket->id}</a>
+<br/>
+<br/>
+{$Transaction->Content(Type => "text/html")}
+'
+    },
+    {
+
+      Queue       => '0',
+      Name        => 'Resolved',                 # loc
+      Description => 'Ticket Resolved',          # loc
+      Content     => 'Subject: Resolved: {$Ticket->Subject}
+
+According to our records, your request has been resolved. If you have any
+further questions or concerns, please respond to this message.
+'
+    },
+    {  Queue       => '0',
+       Name        => 'Resolved in HTML',               # loc
+       Description => 'HTML Ticket Resolved',           # loc
+       Content     => 'Subject: Resolved: {$Ticket->Subject}
+Content-Type: text/html
+
+<p>According to our records, your request has been resolved.  If you have any further questions or concerns, please respond to this message.</p>
+'
+    },
+    {  Queue       => '___Approvals',
+       Name        => "New Pending Approval",    # loc
+       Description =>
+         "Notify Owners and AdminCcs of new items pending their approval", # loc
+       Content => 'Subject: New Pending Approval: {$Ticket->Subject}
+
+Greetings,
+
+There is a new item pending your approval: "{$Ticket->Subject()}", 
+a summary of which appears below.
+
+Please visit {RT->Config->Get(\'WebURL\')}Approvals/Display.html?id={$Ticket->id}
+to approve or reject this ticket, or {RT->Config->Get(\'WebURL\')}Approvals/ to
+batch-process all your pending approvals.
+
+-------------------------------------------------------------------------
+{$Transaction->Content()}
+'
+    },
+    {  Queue       => '___Approvals',
+       Name        => "New Pending Approval in HTML",                                   # loc
+       Description => "Notify Owners and AdminCcs of new items pending their approval", # loc
+       Content     => 'Subject: New Pending Approval: {$Ticket->Subject}
+Content-Type: text/html
+
+<p>Greetings,</p>
+
+<p>There is a new item pending your approval: <b>{$Ticket->Subject()}</b>,
+a summary of which appears below.</p>
+
+<p>Please <a href="{RT->Config->Get(\'WebURL\')}Approvals/Display.html?id={$Ticket->id}">approve
+or reject this ticket</a>, or visit the <a href="{RT->Config->Get(\'WebURL\')}Approvals/">approvals
+overview</a> to batch-process all your pending approvals.</p>
+
+<hr />
+{$Transaction->Content()}
+'
+    },
+    {  Queue       => '___Approvals',
+       Name        => "Approval Passed",    # loc
+       Description =>
+         "Notify Requestor of their ticket has been approved by some approver", # loc
+       Content => 'Subject: Ticket Approved: {$Ticket->Subject}
+
+Greetings,
+
+Your ticket has been approved by { eval { $Approver->Name } }.
+Other approvals may be pending.
+
+Approver\'s notes: { $Notes }
+'
+    },
+    {  Queue       => '___Approvals',
+       Name        => "Approval Passed in HTML",    # loc
+       Description =>
+         "Notify Requestor of their ticket has been approved by some approver", # loc
+       Content => 'Subject: Ticket Approved: {$Ticket->Subject}
+Content-Type: text/html
+
+<p>Greetings,</p>
+
+<p>Your ticket has been approved by <b>{ eval { $Approver->Name } }</b>.
+Other approvals may be pending.</p>
+
+<p>Approver\'s notes:</p>
+<blockquote>{ $Notes }</blockquote>
+'
+    },
+    {  Queue       => '___Approvals',
+       Name        => "All Approvals Passed",    # loc
+       Description =>
+         "Notify Requestor of their ticket has been approved by all approvers", # loc
+       Content => 'Subject: Ticket Approved: {$Ticket->Subject}
+
+Greetings,
+
+Your ticket has been approved by { eval { $Approver->Name } }.
+Its Owner may now start to act on it.
+
+Approver\'s notes: { $Notes }
+'
+    },
+    {  Queue       => '___Approvals',
+       Name        => "All Approvals Passed in HTML",    # loc
+       Description =>
+         "Notify Requestor of their ticket has been approved by all approvers", # loc
+       Content => 'Subject: Ticket Approved: {$Ticket->Subject}
+Content-Type: text/html
+
+<p>Greetings,</p>
+
+<p>Your ticket has been approved by <b>{ eval { $Approver->Name } }</b>.
+Its Owner may now start to act on it.</p>
+
+<p>Approver\'s notes:</p>
+<blockquote>{ $Notes }</blockquote>
+'
+    },
+    {  Queue       => '___Approvals',
+       Name        => "Approval Rejected",    # loc
+       Description =>
+         "Notify Owner of their rejected ticket", # loc
+       Content => 'Subject: Ticket Rejected: {$Ticket->Subject}
+
+Greetings,
+
+Your ticket has been rejected by { eval { $Approver->Name } }.
+
+Approver\'s notes: { $Notes }
+'
+    },
+    {  Queue       => '___Approvals',
+       Name        => "Approval Rejected in HTML",    # loc
+       Description =>
+         "Notify Owner of their rejected ticket", # loc
+       Content => 'Subject: Ticket Rejected: {$Ticket->Subject}
+Content-Type: text/html
+
+<p>Greetings,</p>
+
+<p>Your ticket has been rejected by <b>{ eval { $Approver->Name } }</b>.</p>
+
+<p>Approver\'s notes:</p>
+<blockquote>{ $Notes }</blockquote>
+'
+    },
+    {  Queue       => '___Approvals',
+       Name        => "Approval Ready for Owner",    # loc
+       Description =>
+         "Notify Owner of their ticket has been approved and is ready to be acted on", # loc
+       Content => 'Subject: Ticket Approved: {$Ticket->Subject}
+
+Greetings,
+
+The ticket has been approved, you may now start to act on it.
+
+'
+    },
+    {  Queue       => '___Approvals',
+       Name        => "Approval Ready for Owner in HTML",    # loc
+       Description =>
+         "Notify Owner of their ticket has been approved and is ready to be acted on", # loc
+       Content => 'Subject: Ticket Approved: {$Ticket->Subject}
+Content-Type: text/html
+
+<p>Greetings,</p>
+
+<p>The ticket has been approved, you may now start to act on it.</p>
+
+'
+    },
+    {  Queue       => 0,
+       Name        => "Forward",    # loc
+       Description => "Forwarded message", # loc
+       Content => q{
+
+{ $ForwardTransaction->Content =~ /\S/ ? $ForwardTransaction->Content : "This is a forward of transaction #".$Transaction->id." of ticket #". $Ticket->id }
+}
+    },
+    {  Queue       => 0,
+       Name        => "Forward Ticket",    # loc
+       Description => "Forwarded ticket message", # loc
+       Content => q{
+
+{ $ForwardTransaction->Content =~ /\S/ ? $ForwardTransaction->Content : "This is a forward of ticket #". $Ticket->id }
+}
+    },
+    {  Queue       => 0,
+       Name        => "Error: unencrypted message",    # loc
+       Description =>
+         "Inform user that their unencrypted mail has been rejected", # loc
+       Content => q{Subject: RT requires that all incoming mail be encrypted
+
+You received this message because RT received mail from you that was not encrypted.  As such, it has been rejected.
+}
+    },
+    {  Queue       => 0,
+       Name        => "Error: public key",    # loc
+       Description =>
+         "Inform user that he has problems with public key and couldn't recieve encrypted content", # loc
+       Content => q{Subject: We have no your public key or it's wrong
+
+You received this message as we have no your public PGP key or we have a problem with your key. Inform the administrator about the problem.
+}
+    },
+    {  Queue       => 0,
+       Name        => "Error to RT owner: public key",    # loc
+       Description =>
+         "Inform RT owner that user(s) have problems with public keys", # loc
+       Content => q{Subject: Some users have problems with public keys
+
+You received this message as RT has problems with public keys of the following user:
+{
+    foreach my $e ( @BadRecipients ) {
+        $OUT .= "* ". $e->{'Message'} ."\n";
+    }
+}}
+    },
+    {  Queue       => 0,
+       Name        => "Error: no private key",    # loc
+       Description =>
+         "Inform user that we received an encrypted email and we have no private keys to decrypt", # loc
+       Content => q{Subject: we received message we cannot decrypt
+
+You sent an encrypted message with subject '{ $Message->head->get('Subject') }',
+but we have no private key it's encrypted to.
+
+Please, check that you encrypt messages with correct keys
+or contact the system administrator.}
+    },
+    {  Queue       => 0,
+       Name        => "Error: bad encrypted data",    # loc
+       Description =>
+         "Inform user that a message he sent has invalid encryption data", # loc
+       Content => q{Subject: We received a message we cannot handle
+
+You sent us a message that we cannot handle due to corrupted signature or encrypted block. we get the following error(s):
+{ foreach my $msg ( @Messages ) {
+    $OUT .= "* $msg\n";
+  }
+}}
+    },
+    {  Queue       => 0,
+       Name        => "PasswordChange",    # loc
+       Description =>
+         "Inform user that his password has been reset", # loc
+       Content => q{Subject: [{RT->Config->Get('rtname')}] Password reset
+
+Greetings,
+
+Someone at {$ENV{'REMOTE_ADDR'}} requested a password reset for you on {RT->Config->Get('WebURL')}
+
+Your new password is:
+  {$NewPassword}
+}
+    },
+
+               {   Queue       => '0',
+                   Name        => 'Email Digest',    # loc
+                   Description => 'Email template for periodic notification digests',  # loc
+                   Content => q[Subject: RT Email Digest
+
+{ $Argument }
+],
+               },
+
+{
+    Queue       => 0,
+    Name        => "Error: Missing dashboard",    # loc
+    Description =>
+      "Inform user that a dashboard he subscribed to is missing", # loc
+    Content => q{Subject: [{RT->Config->Get('rtname')}] Missing dashboard!
+
+Greetings,
+
+You are subscribed to a dashboard that is currently missing. Most likely, the dashboard was deleted.
+
+RT will remove this subscription as it is no longer useful. Here's the information RT had about your subscription:
+
+DashboardID:  { $SubscriptionObj->SubValue('DashboardId') }
+Frequency:    { $SubscriptionObj->SubValue('Frequency') }
+Hour:         { $SubscriptionObj->SubValue('Hour') }
+{
+    $SubscriptionObj->SubValue('Frequency') eq 'weekly'
+    ? "Day of week:  " . $SubscriptionObj->SubValue('Dow')
+    : $SubscriptionObj->SubValue('Frequency') eq 'monthly'
+      ? "Day of month: " . $SubscriptionObj->SubValue('Dom')
+      : ''
+}
+}
+},
+);
+
+@Scrips = (
+    {  Description    => 'On Comment Notify AdminCcs as Comment',
+       ScripCondition => 'On Comment',
+       ScripAction    => 'Notify AdminCcs As Comment',
+       Template       => 'Admin Comment in HTML' },
+    {  Description    => 'On Comment Notify Other Recipients as Comment',
+       ScripCondition => 'On Comment',
+       ScripAction    => 'Notify Other Recipients As Comment',
+       Template       => 'Correspondence in HTML' },
+    {  Description    => 'On Correspond Notify Owner and AdminCcs',
+       ScripCondition => 'On Correspond',
+       ScripAction    => 'Notify Owner and AdminCcs',
+       Template       => 'Admin Correspondence in HTML' },
+    {  Description    => 'On Correspond Notify Other Recipients',
+       ScripCondition => 'On Correspond',
+       ScripAction    => 'Notify Other Recipients',
+       Template       => 'Correspondence in HTML' },
+    {  Description    => 'On Correspond Notify Requestors and Ccs',
+       ScripCondition => 'On Correspond',
+       ScripAction    => 'Notify Requestors And Ccs',
+       Template       => 'Correspondence in HTML' },
+    {  Description    => 'On Correspond Open Inactive Tickets',
+       ScripCondition => 'On Correspond',
+       ScripAction    => 'Open Inactive Tickets',
+       Template       => 'Blank' },
+    {  Description    => 'On Create Autoreply To Requestors',
+       ScripCondition => 'On Create',
+       ScripAction    => 'AutoReply To Requestors',
+       Template       => 'AutoReply in HTML' },
+    {  Description    => 'On Create Notify Owner and AdminCcs',
+       ScripCondition => 'On Create',
+       ScripAction    => 'Notify Owner and AdminCcs',
+       Template       => 'Transaction in HTML' },
+    {  Description    => 'On Create Notify Ccs',
+       ScripCondition => 'On Create',
+       ScripAction    => 'Notify Ccs',
+       Template       => 'Correspondence in HTML' },
+    {  Description    => 'On Create Notify Other Recipients',
+       ScripCondition => 'On Create',
+       ScripAction    => 'Notify Other Recipients',
+       Template       => 'Correspondence in HTML' },
+    {  Description    => 'On Owner Change Notify Owner',
+       ScripCondition => 'On Owner Change',
+       ScripAction    => 'Notify Owner',
+       Template       => 'Transaction in HTML' },
+    {  Description    => 'On Resolve Notify Requestors',
+       ScripCondition => 'On Resolve',
+       ScripAction    => 'Notify Requestors',
+       Template       => 'Resolved in HTML' },
+    {  Description    => "On transaction, add any tags in the transaction's subject to the ticket's subject",
+       ScripCondition => 'On Transaction',
+       ScripAction    => 'Extract Subject Tag',
+       Template       => 'Blank' },
+    {  Description    => 'On Forward Transaction Send forwarded message',
+       ScripCondition => 'On Forward Transaction',
+       ScripAction    => 'Send Forward',
+       Template       => 'Forward' },
+    {  Description    => 'On Forward Ticket Send forwarded message',
+       ScripCondition => 'On Forward Ticket',
+       ScripAction    => 'Send Forward',
+       Template       => 'Forward Ticket' },
+    {  Description       => "Set starts date if needed according to SLA",
+       ScripCondition    => 'Require starts set according to SLA',
+       ScripAction       => 'Set starts date according to SLA',
+       Template          => 'Blank' },
+    {  Description       => "Set due date if needed according to SLA",
+       ScripCondition    => 'Require due set according to SLA',
+       ScripAction       => 'Set due date according to SLA',
+       Template          => 'Blank' },
+);
+
+@ACL = (
+    { UserId => 'root',        # - principalid
+      Right  => 'SuperUser', },
+    ### csp ACL
+    { UserId => 'rt-admin',
+      Right  => 'SuperUser' }, 
+
+    { GroupDomain => 'SystemInternal',
+      GroupType => 'privileged',
+      Right  => 'ShowApprovalsTab', },
+);
+
+### csp ACLs
+push @ACL, map { 
+    {	
+      GroupDomain => 'SystemInternal',
+      GroupType   => 'Everyone',
+      Right	  => $_,
+    }
+} qw(CreateSavedSearch  LoadSavedSearch  CommentOnTicket CreateTicket ShowArticle ShowAsset ShowCatalog Watch SeeCustomField SeeQueue SeeDashboard ShowTicket ReplyToTicket ModifyCustomField ReassignTicket ModifyTicket OwnTicket StealTicket TakeTicket DeleteTicket);
+
+# Predefined searches
+
+@Attributes = (
+    { Name => 'Search - My Tickets',
+      Description => '[_1] highest priority tickets I own', # loc
+      Content     =>
+      { Format =>  q{'<a href="__WebPath__/Ticket/Display.html?id=__id__">__id__</a>/TITLE:#',}
+                 . q{'<a href="__WebPath__/Ticket/Display.html?id=__id__">__Subject__</a>/TITLE:Subject',}
+                 . q{Priority, QueueName, ExtendedStatus},
+        Query   => " Owner = '__CurrentUser__' AND Status = '__Active__'",
+        OrderBy => 'Priority',
+        Order   => 'DESC'
+      },
+    },
+    { Name => 'Search - Unowned Tickets',
+      Description => '[_1] newest unowned tickets', # loc
+      Content     =>
+# 'Take' #loc
+      { Format =>  q{'<a href="__WebPath__/Ticket/Display.html?id=__id__">__id__</a>/TITLE:#',}
+                 . q{'<a href="__WebPath__/Ticket/Display.html?id=__id__">__Subject__</a>/TITLE:Subject',}
+                 . q{QueueName, ExtendedStatus, CreatedRelative, }
+                 . q{'<A HREF="__WebPath__/Ticket/Display.html?Action=Take&id=__id__">__loc(Take)__</a>/TITLE:NBSP'},
+        Query   => " Owner = 'Nobody' AND Status = '__Active__'",
+        OrderBy => 'Created',
+        Order   => 'DESC'
+      },
+    },
+    { Name => 'Search - Bookmarked Tickets',
+      Description => 'Bookmarked Tickets', #loc
+      Content     =>
+      { Format => q{'<a href="__WebPath__/Ticket/Display.html?id=__id__">__id__</a>/TITLE:#',}
+                . q{'<a href="__WebPath__/Ticket/Display.html?id=__id__">__Subject__</a>/TITLE:Subject',}
+                . q{Priority, QueueName, ExtendedStatus, Bookmark},
+        Query   => "id = '__Bookmarked__'",
+        OrderBy => 'LastUpdated',
+        Order   => 'DESC' },
+    },
+    {
+        Name        => 'HomepageSettings',
+        Description => 'HomepageSettings',
+        Content     => {
+            'body' =>                               # loc_left_pair
+              [
+                {
+                    type => 'system',
+                    name => 'My Tickets',           # loc
+                },
+                {
+                    type => 'system',
+                    name => 'Unowned Tickets'       # loc
+                },
+                {
+                    type => 'system',
+                    name => 'Bookmarked Tickets'    # loc
+                },
+                {
+                    type => 'component',
+                    name => 'QuickCreate'           # loc
+                },
+              ],
+            'sidebar' =>                            # loc_left_pair
+              [
+                {
+                    type => 'component',
+                    name => 'MyReminders'           # loc
+                },
+                {
+                    type => 'component',
+                    name => 'QueueList'           # loc
+                },
+                {
+                    type => 'component',
+                    name => 'Dashboards'            # loc
+                },
+                {
+                    type => 'component',
+                    name => 'RefreshHomepage'       # loc
+                },
+              ],
+        },
+    },
+);
+
+@Classes = (
+    {
+        Name              => 'General',
+        Description       => 'The default class',
+        HotList           => 1,
+    },
+);
+
+@CustomFields = (
+    {
+        Name              => 'Content',
+        Description       => 'Content',
+        LookupType        => 'RT::Class-RT::Article',
+        Type              => 'Text',
+        MaxValues         => 1,
+    },
+);

@@ -1,0 +1,12 @@
+filebeat.prospectors:
+- input_type: log
+  paths:
+    - /mnt/log/error.log
+  multiline:
+       pattern: "201"
+       negate: true
+       match: after
+output.logstash:
+  hosts: ["csp-misp-logstash:5043"]
+
+  path.home: /usr/share/filebeat

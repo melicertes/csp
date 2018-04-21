@@ -9,10 +9,14 @@ CWD=$(pwd)
 cd "$SERVICE_DIR"
 
 #make sure the existing container is stopped.
-echo "Removing (pre)existing containers..."
-docker-compose rm -f -s &> /dev/null
+echo "Killing containers for $SERVICE_NAME (pwd=`pwd`)"
+docker-compose kill
 RET=$?
-echo "Done, returned $RET"
+echo "Kill done, returned $RET"
+echo "Removing (pre)existing containers...(pwd=`pwd`)"
+docker-compose rm -f -s
+RET=$?
+echo "Remove done, returned $RET"
 cd "$CWD"
 
 exit $RET

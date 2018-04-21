@@ -1,0 +1,45 @@
+version: '3'
+services:
+
+  tc:
+    env_file:
+      - .env
+    image: csp-python27:1.0
+    container_name: csp-tc
+    domainname: ${LOCAL_DOMAIN}
+    hostname: csp-tc
+    command: sh docker-entrypoint.sh
+    working_dir: /opt/tc
+    volumes:
+      - TCDatavolume:/opt/tc/
+      - SSLDatavolume:/opt/ssl
+      - /opt/csp/logs/:/opt/csplogs
+    expose:
+      - ${TC_DOCR_PORT}
+
+  tc_dsl:
+    env_file:
+      - .env
+    image: csp-python27:1.0
+    container_name: csp-tc-dsl
+    domainname: ${LOCAL_DOMAIN}
+    hostname: csp-tc-dsl
+    depends_on:
+      - "tc"
+    command: sh dsl_sync.sh
+    working_dir: /opt/tc
+    volumes:
+      - TCDatavolume:/opt/tc/
+      - SSLDatavolume:/opt/ssl
+      - /opt/csp/logs/:/opt/csplogs
+
+volumes:
+    SSLDatavolume:
+        external: true
+    TCDatavolume:
+        external: true
+
+networks:
+  default:
+    external:
+      name: ${LOCAL_DOMAIN}

@@ -1,0 +1,16 @@
+version: '3'
+services:
+
+  mocktc:
+    image: csp-mocknode:1.0
+    environment:
+      - PORT=3001
+      - SSL=true
+      - SSL_CA=/opt/csp/sslcert/ca.crt
+      - SSL_CERT=/opt/csp/sslcert/csp-internal.crt
+      - SSL_KEY=/opt/csp/sslcert/csp-internal.key
+      - APP_NAME=tc
+    volumes:
+      - /data/common/sslcert:/opt/csp/sslcert
+    ports:
+      - "8081:3001"

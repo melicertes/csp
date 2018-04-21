@@ -1,0 +1,8 @@
+filebeat.prospectors:
+- input_type: log
+  paths:
+    - /mnt/log/OAuth2Provider*
+output.logstash:
+  hosts: ["csp-oam-logstash:5043"]
+
+  path.home: /usr/share/filebeat

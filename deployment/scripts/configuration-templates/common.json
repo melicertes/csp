@@ -1,0 +1,25 @@
+{
+  "domain": "XXXDOMAINXXX",
+  "csp_name": "XXXNAMEXXX",
+  "host_ip": "XXXIPXXX",
+  "is_central": false,
+  "internalSSLCertificateFile": "/etc/apache2/ssl/server/csp-internal.crt",
+  "internalSSLCertificateKeyFile": "/etc/apache2/ssl/server/csp-internal.key",
+  "internalSSLCACertificateFile": "/etc/apache2/ssl/ca/common-internal-ca.crt",
+  "externalSSLCertificateFile": "/etc/apache2/ssl/server/csp-external.crt",
+  "externalSSLCertificateKeyFile": "/etc/apache2/ssl/server/csp-external.key",
+  "externalSSLCACertificateFile": "/etc/apache2/ssl/ca/common-external-ca.crt",
+  "postgres": {
+    "user": "postgres",
+    "password": "postgres",
+    "db": "tcdb",
+    "db_cfg": "cfgdb",
+    "docr_port": "5432"
+  },
+  "mail": {
+    "host": "XXXMAILHOSTXXX",
+    "port": "XXXMAILPORTXXX",
+    "username": "XXXMAILUSERNAMEXXX",
+    "password": "XXXMAILPASSWORDXXX"
+  }
+}
