@@ -47,8 +47,8 @@ RUN apk update && \
   echo "root ALL=(intelmq) NOPASSWD: /usr/bin/intelmqctl" >> /etc/sudoers && \
   mkdir /scripts && \
   mkdir /run/apache2 && \
-  chmod og+rw -R /tmp/intelmq-fileinput/ \
-  chmod og+rw -R /opt/intelmq/var/lib/bots/file-output \
+  chmod og+rw -R /tmp/intelmq-fileinput/ && \
+  chmod og+rw -R /opt/intelmq/var/lib/bots/file-output && \
   echo "DONE SUCCESSFULLY!"
 
 ADD scripts/run.sh /scripts/run.sh
@@ -56,6 +56,7 @@ ADD scripts/run.sh /scripts/run.sh
 ADD csp-config/runtime.conf /opt/intelmq/etc/runtime.conf
 ADD csp-config/pipeline.conf /opt/intelmq/etc/pipeline.conf
 RUN chmod -R 0770 /opt/intelmq/etc/ && \
+    sed -i "s/\"redis_cache_host\": \"127.0.0.1\",/\"redis_cache_host\": \"${REDIS_HOSTNAME}\",/g" runtime.conf && \
     chown -R intelmq.intelmq /opt/intelmq/etc/ && \
     echo "Added CSP custom runtime done"
 
