@@ -47,7 +47,8 @@ RUN apk update && \
   echo "root ALL=(intelmq) NOPASSWD: /usr/bin/intelmqctl" >> /etc/sudoers && \
   mkdir /scripts && \
   mkdir /run/apache2 && \
-  chmod og+rw -R /tmp/intelmq-fileinput/ && \
+  mkdir -p /tmp/intelmq-fileinput && \
+  chmod og+rw -R /tmp/intelmq-fileinput && \
   chmod og+rw -R /opt/intelmq/var/lib/bots/file-output && \
   echo "DONE SUCCESSFULLY!"
 
