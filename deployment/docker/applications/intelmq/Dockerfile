@@ -56,6 +56,7 @@ ADD scripts/run.sh /scripts/run.sh
 ADD csp-config/runtime.conf /opt/intelmq/etc/runtime.conf
 ADD csp-config/pipeline.conf /opt/intelmq/etc/pipeline.conf
 RUN chmod -R 0770 /opt/intelmq/etc/ && \
+    cd /opt/intelmq/etc && \
     sed -i "s/\"redis_cache_host\": \"127.0.0.1\",/\"redis_cache_host\": \"${REDIS_HOSTNAME}\",/g" runtime.conf && \
     chown -R intelmq.intelmq /opt/intelmq/etc/ && \
     echo "Added CSP custom runtime done"
