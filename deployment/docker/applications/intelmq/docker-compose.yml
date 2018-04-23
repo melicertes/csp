@@ -11,7 +11,7 @@ services:
     command: sh /scripts/run.sh
     volumes:
        - /opt/csp/intelmq-fileinput/:/tmp/intelmq-fileinput
-       - /opt/csp/intelmq-fileoutput/:/opt/intelmq/var/lib/bots/file-output/
+       - /opt/csp/intelmq-fileoutput/:/tmp/file-output
        - /opt/csp/logs/imq:/opt/intelmq/var/log
     expose:
        - ${INTELMQ_DOCR_PORT}
