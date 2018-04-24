@@ -49,8 +49,8 @@ RUN apk update && \
   mkdir /run/apache2 && \
   mkdir -p /tmp/intelmq-fileinput && \
   chmod og+rw -R /tmp/intelmq-fileinput && \
-  mkdir -p /tmp/intelmq-output && \
-  chmod og+rw -R /tmp/file-output && \
+  mkdir -p /tmp/intelmq-fileoutput && \
+  chmod og+rw -R /tmp/intelmq-fileoutput && \
   echo "DONE SUCCESSFULLY!"
 
 ADD scripts/run.sh /scripts/run.sh
