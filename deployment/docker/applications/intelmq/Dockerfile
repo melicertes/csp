@@ -54,7 +54,7 @@ RUN apk update && \
   echo "DONE SUCCESSFULLY!"
 
 ADD scripts/run.sh /scripts/run.sh
-Add TestData.zip /tmp/intelmq-fileinput/TestData.zip
+ADD TestData.zip /tmp/intelmq-fileinput/TestData.zip
 ADD csp-config/runtime.conf /opt/intelmq/etc/runtime.conf
 ADD csp-config/pipeline.conf /opt/intelmq/etc/pipeline.conf
 RUN chmod -R 0770 /opt/intelmq/etc/ && \
