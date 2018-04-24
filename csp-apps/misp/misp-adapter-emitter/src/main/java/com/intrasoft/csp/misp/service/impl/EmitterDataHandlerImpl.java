@@ -100,7 +100,7 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
             .build();
 
     @Override
-    public void handleMispData(Object object, MispEntity mispEntity, boolean isReEmittion) {
+    public void handleMispData(Object object, MispEntity mispEntity, boolean isReEmittion, boolean isDelete) {
 
         jsonNode = new ObjectMapper().convertValue(object, JsonNode.class);
 
@@ -191,6 +191,9 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
         } else if (eventValidationMap.containsKey("sg")) { // Valid Sharing Group without any valid organisations
             sharingParams.setTcId(eventValidationMap.get("sg"));
         }
+
+        ((ObjectNode)jsonNode.get(EVENT.toString())).put("published", "false");
+
         IntegrationData integrationData = new IntegrationData();
         integrationData.setDataParams(dataParams);
         integrationData.setSharingParams(sharingParams);
@@ -198,7 +201,7 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
 
         /**
          * issue: SXCSP-333
-         * define a classification to diferentiate between threat/event
+         * define a classification to differentiate between threat/event
          */
         IntegrationDataType integrationDataType = IntegrationDataType.EVENT;
         if (jsonNode.get(EVENT.toString()).has("Tag")){
@@ -215,6 +218,13 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
          * how to identify if it is post or put
          * should search in ES to see if this uuid exists
          * query the index based on datatype (event/threat), if found send put else send post */
+
+
+        if (isDelete) {
+            cspClient.deleteIntegrationData(integrationData);
+            return;
+        }
+
 
         LOG.debug("Integration Data Forwarded to IL: " + integrationData);
 
@@ -284,8 +294,8 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
     }
 
     @Override
-    public void handleReemittionMispData(IntegrationData integrationData, MispEntity mispEntity, boolean isDelete, boolean isReEmittion) {
-        handleMispData(integrationData.getDataObject(), mispEntity, true);
+    public void handleReemittionMispData(IntegrationData integrationData, MispEntity mispEntity, boolean isReEmittion, boolean isDelete) {
+        handleMispData(integrationData.getDataObject(), mispEntity, true, isDelete);
     }
 
     private JsonNode updateTimestamp(JsonNode rootNode) {
