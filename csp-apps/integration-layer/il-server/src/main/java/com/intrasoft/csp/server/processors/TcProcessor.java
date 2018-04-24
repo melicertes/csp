@@ -198,8 +198,11 @@ public class TcProcessor implements Processor,CamelRoutes{
 
     boolean tcExists(String uuid, boolean isLocal) throws IOException {
         String uri = (isLocal?this.getLocalCirclesURI():this.getTcCirclesURI()) + "/" + uuid;
-        TrustCircle tc = camelRestService.send(uri, null,  HttpMethod.GET.name(), TrustCircle.class,true);
-        //TODO: handle "404 not found" properly
+        //handle "404 not found" properly
+        List<Integer> doNotLogErrorOnTheseStatusCodes = new ArrayList<>();
+        doNotLogErrorOnTheseStatusCodes.add(404);
+        TrustCircle tc = camelRestService.send(uri, null,  HttpMethod.GET.name(),
+                TrustCircle.class,true, doNotLogErrorOnTheseStatusCodes);
         return tc != null;
     }
 
