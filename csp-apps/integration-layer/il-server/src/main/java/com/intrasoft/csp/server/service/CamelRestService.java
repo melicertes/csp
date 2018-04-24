@@ -87,6 +87,20 @@ public class CamelRestService {
         }
     }
 
+    public <T> T send(String uri, Object obj ,String httpMethod, Class<T> tClass,boolean checkForHttp4xxFailedOperationAndJustLogWithNoGRedelivery, List<Integer> doNotLogErrorOnTheseStatusCodes) throws IOException {
+        String out = send(uri,obj, httpMethod,checkForHttp4xxFailedOperationAndJustLogWithNoGRedelivery,doNotLogErrorOnTheseStatusCodes);
+        if(out == null){
+            return null;
+        }
+        try {
+            return objectMapper.readValue(out, tClass);
+        } catch (IOException e) {
+            throw new InvalidDataException(String.format("While parsing the response from this uri %s we got an exception. Response was: %s " +
+                    "\n\n" +
+                    "Initial exception message: %s",uri,out,e.getMessage()));
+        }
+    }
+
     public <T> T send(String uri, Object obj ,String httpMethod, Class<T> tClass,Map<String,Object> headers) throws IOException {
         String out = sendBodyAndHeaders(uri,obj, httpMethod,headers);
         try{
@@ -106,6 +120,10 @@ public class CamelRestService {
         return sendBodyAndHeaders(uri,obj,httpMethod,null,checkForHttp4xxFailedOperationAndJustLogWithNoGRedelivery);
     }
 
+    public String send(String uri, Object obj, String httpMethod,boolean checkForHttp4xxFailedOperationAndJustLogWithNoGRedelivery,List<Integer> doNotLogErrorOnTheseStatusCodes) throws IOException {
+        return sendBodyAndHeaders(uri,obj,httpMethod,null,checkForHttp4xxFailedOperationAndJustLogWithNoGRedelivery,doNotLogErrorOnTheseStatusCodes);
+    }
+
     public String sendBodyAndHeaders(String uri, Object obj, String httpMethod, Map<String,Object> headers) throws JsonProcessingException {
         return sendBodyAndHeaders(uri, obj, httpMethod, headers, false);
     }
@@ -113,6 +131,36 @@ public class CamelRestService {
 
     public String sendBodyAndHeaders(String uri, Object obj, String httpMethod, Map<String,Object> headers,
                                      boolean checkForHttp4xxFailedOperationAndJustLogWithNoGRedelivery) throws JsonProcessingException {
+//        //objectMapper.configure(JsonGenerator.Feature.QUOTE_FIELD_NAMES, false);
+//        //objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
+//        byte[] b = objectMapper.writeValueAsBytes(obj);
+//
+//        Exchange exchange = getExchange(camelRestServiceIsAsync,uri,b,httpMethod,headers);
+//
+//        String out = exchange.getOut().getBody(String.class);
+//        Exception exception = exchange.getException();
+//        Boolean isExternalRedelivered = exchange.isExternalRedelivered();
+//        Boolean isFailed = exchange.isFailed();
+//        if(isFailed && exception != null){
+//            //TODO: Redelivery only at specific 5xx and maybe 408. More researched is needed. Check SXCSP-282
+//            //HttpHostConnectException might be raised from TC calls
+//            if(checkForHttp4xxFailedOperationAndJustLogWithNoGRedelivery
+//                    &&  exception.getClass().equals(HttpOperationFailedException.class)
+//                    && ((HttpOperationFailedException) exception).getStatusCode()>= 400
+//                    && ((HttpOperationFailedException) exception).getStatusCode()< 500){
+//                HttpOperationFailedException ef = (HttpOperationFailedException) exception;
+//                LOG.error("ENDPOINT "+uri+" responded with statusCode "+ef.getStatusCode() + " "+ef.getStatusText());
+//            }else {
+//                throw new CspBusinessException("Exception in external request: " + exception.getMessage(), exception);
+//                //exception.getClass().equals(ConnectException.class)
+//            }
+//        }
+//        return out;
+        return sendBodyAndHeaders(uri, obj, httpMethod,  headers, checkForHttp4xxFailedOperationAndJustLogWithNoGRedelivery,null);
+    }
+
+    public String sendBodyAndHeaders(String uri, Object obj, String httpMethod, Map<String,Object> headers,
+                                     boolean checkForHttp4xxFailedOperationAndJustLogWithNoGRedelivery,List<Integer> doNotLogErrorOnTheseStatusCodes) throws JsonProcessingException {
         //objectMapper.configure(JsonGenerator.Feature.QUOTE_FIELD_NAMES, false);
         //objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
         byte[] b = objectMapper.writeValueAsBytes(obj);
@@ -131,7 +179,15 @@ public class CamelRestService {
                     && ((HttpOperationFailedException) exception).getStatusCode()>= 400
                     && ((HttpOperationFailedException) exception).getStatusCode()< 500){
                 HttpOperationFailedException ef = (HttpOperationFailedException) exception;
-                LOG.error("ENDPOINT "+uri+" responded with statusCode "+ef.getStatusCode() + " "+ef.getStatusText());
+                if(doNotLogErrorOnTheseStatusCodes!=null){
+                    for(Integer code:doNotLogErrorOnTheseStatusCodes){
+                        if(!code.equals(ef.getStatusCode())){
+                            LOG.error("ENDPOINT " + uri + " responded with statusCode " + ef.getStatusCode() + " " + ef.getStatusText());
+                        }
+                    }
+                }else {
+                    LOG.error("ENDPOINT " + uri + " responded with statusCode " + ef.getStatusCode() + " " + ef.getStatusText());
+                }
             }else {
                 throw new CspBusinessException("Exception in external request: " + exception.getMessage(), exception);
                 //exception.getClass().equals(ConnectException.class)
