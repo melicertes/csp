@@ -103,7 +103,7 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler{
         }
 
 
-        /*
+        /*ce
         Search and handle RTIR objects
          */
         integrationData = handleRTIR(integrationData);
@@ -158,7 +158,7 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler{
 
     private void handleEventAddEdit() throws IOException {
         // set "published":false
-        ((ObjectNode) jsonNode.get("Event")).put("published", false);
+        ((ObjectNode) jsonNode.get("Event")).put("published", new Boolean(false));
 
         try {
             ResponseEntity<String> responseEntity = mispAppClient.addMispEvent(jsonNode.toString());
@@ -184,23 +184,24 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler{
     }
     private void handleShadowAttributeAdd(List<LinkedHashMap> eventShadowAttributes, String eventId){
 
-        LOG.debug(eventShadowAttributes.toString());
+        LOG.debug("HANDLING SHADOW ATTRIBUTES");
 
         eventShadowAttributes.forEach(shadowAttribute -> {
             LOG.debug(shadowAttribute.toString());
             String shadowAttributeJsonString = null;
             try {
                 shadowAttributeJsonString = (new ObjectMapper()).writeValueAsString(shadowAttribute);
+                LOG.debug("PROPOSAL ADD: " + shadowAttributeJsonString);
+                ResponseEntity responseEntity = mispAppClient.addMispProposal(eventId ,shadowAttributeJsonString);
+                LOG.debug("PROPOSAL ADD RESPONSE:" + responseEntity.toString());
             } catch (JsonProcessingException e) {
-                e.printStackTrace();
-            }
-            try {
-                mispAppClient.addMispProposal(eventId ,shadowAttributeJsonString);
+                LOG.error("Could not parse shadowattribute: " + e);
             } catch (StatusCodeException e) {
                 LOG.error(e.getMessage());
                 String location = e.getHttpHeaders().get("location").get(0);
                 LOG.debug("" + location);
-                mispAppClient.updateMispProposal(location, shadowAttributeJsonString);
+                ResponseEntity responseEntity = mispAppClient.updateMispProposal(location, shadowAttributeJsonString);
+                LOG.debug("PROPOSAL EDIT RESPONSE<exc>:" + responseEntity.toString());
             }
         });
     }
@@ -213,8 +214,10 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler{
             // Get Attribute by UUID
             String attrUuid = String.valueOf(shadowAttribute.get("uuid"));
             JsonNode attribute = new ObjectMapper().createObjectNode();
+            LOG.debug("PROPOSAL EDIT: " + attribute.toString());
             try {
                 attribute = new ObjectMapper().readValue(mispAppClient.getMispAttribute(attrUuid).getBody(), JsonNode.class);
+                LOG.debug("FETCHING LOCAL ATTRIBUTE: " + attribute.toString());
             } catch (IOException e) {
                 LOG.error(e.getMessage());
             }
@@ -230,12 +233,14 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler{
             try {
                 ShadowAttributeRequestDTO shadowAttributeRequest = new ShadowAttributeRequestDTO(new ShadowAttributeRequestDTO.AttributeRequest(shadowAttribute));
                 String attrRequestStr = new ObjectMapper().writeValueAsString(shadowAttributeRequest);
-                mispAppClient.updateMispProposal(attrId , attrRequestStr);
+                ResponseEntity responseEntity = mispAppClient.updateMispProposal(attrId , attrRequestStr);
+                LOG.debug("PROPOSAL EDIT RESPONSE:" + responseEntity.toString());
             } catch (StatusCodeException e) {
                 LOG.error(e.getMessage());
                 String location = e.getHttpHeaders().get("location").get(0);
                 LOG.debug("" + location);
-                mispAppClient.updateMispProposal(location, shadowAttributeJsonString);
+                ResponseEntity responseEntity = mispAppClient.updateMispProposal(location, shadowAttributeJsonString);
+                LOG.debug("PROPOSAL EDIT RESPONSE<exc>:" + responseEntity.toString());
             } catch (JsonProcessingException e) {
                 LOG.error(e.getMessage());
             }
@@ -312,7 +317,7 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler{
 
                         JsonNode esObject = elasticClient.getESobjectFromOrigin(searchData);
                         if (esObject != null) {
-                            LOG.info("FOUND TRUE");
+                            LOG.debug("Found in elastic");
                             newURL = esObject.get("dataParams").get("url").textValue();
 
                             /**
@@ -321,7 +326,7 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler{
                             newTickerNumber = esObject.get("dataObject").get("id").textValue();
                         }
                         else {
-                            LOG.info("NOT FOUND");
+                            LOG.debug("NOT Found in elastic");
                         }
                         //replace
                         for (JsonNode ja : jn.get("Attribute")){

@@ -23,7 +23,7 @@ import static com.intrasoft.csp.misp.commons.config.MispContextUrl.MISP_EVENT;
 
 @Service
 public class EmitterSubscriberImpl implements EmitterSubscriber, MispContextUrl{
-    final private static Logger LOG = LoggerFactory.getLogger("root");
+    final private static Logger LOG = LoggerFactory.getLogger(EmitterSubscriber.class);
 
     //final Logger LOG = LoggerFactory.getLogger(EmitterSubscriber.class);
 
@@ -59,16 +59,18 @@ public class EmitterSubscriberImpl implements EmitterSubscriber, MispContextUrl{
         subscriber.subscribe("");
         while (!Thread.currentThread ().isInterrupted ()) {
             String msg = subscriber.recvStr();
-            //LOG.info(msg);
+            LOG.info(msg);
             String topic = msg.substring(0, msg.indexOf(' '));
             String content = msg.substring(msg.indexOf(' ') + 1);
             JsonNode jsonNode = null;
             try {
                 jsonNode = new ObjectMapper().disable(SerializationFeature.INDENT_OUTPUT).readValue(content, JsonNode.class);
+                boolean isDelete = jsonNode.toString().contains("\"action\":\"delete\"");
                 switch (topic){
                     case MISP_EVENT:
                         LOG.info("Event message received from queue.");
-                        emitterDataHandler.handleMispData(jsonNode, MispEntity.EVENT, false);
+                        LOG.debug(jsonNode.get("Event").has("action")?jsonNode.get("Event").get("action").asText():"-");
+                        emitterDataHandler.handleMispData(jsonNode, MispEntity.EVENT, false, isDelete);
                         break;
                     case MISP_AUDIT:
                         LOG.info("Audit log received from queue.");
