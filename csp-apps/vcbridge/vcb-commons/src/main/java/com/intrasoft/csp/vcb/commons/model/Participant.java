@@ -1,10 +1,6 @@
 package com.intrasoft.csp.vcb.commons.model;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
 @Entity
@@ -72,7 +68,11 @@ public class Participant {
 	@GeneratedValue
 	private Long id;
 	private String email;
+
+	@NotNull
+	@Column(name = "username", unique = true)
 	private String username;
+
 	private String password;
 	private String firstname;
 	private String lastname;

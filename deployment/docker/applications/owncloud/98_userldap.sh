@@ -18,7 +18,7 @@ then
   IFS="${OLDIFS}"
   for i in "${components[@]}" 
   do 
-    V="dn=$i,"
+    V="dc=$i,"
     F=($F$V)
     #echo "$i V=$V F=$F"; 
   done
