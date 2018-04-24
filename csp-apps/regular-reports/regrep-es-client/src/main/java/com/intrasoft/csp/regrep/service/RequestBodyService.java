@@ -10,4 +10,6 @@ public interface RequestBodyService {
 
     String buildRequestBody(DateMath gte, DateMath lt, CspDataMappingType type);
 
+    String buildRequestBodyForLogs(DateMath gte, DateMath lt, LogstashMappingType type);
+
 }
