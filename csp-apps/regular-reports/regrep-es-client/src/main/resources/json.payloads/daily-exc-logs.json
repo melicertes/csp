@@ -1,0 +1,17 @@
+{
+  "_source": ["@timestamp", "program", "message"],
+  "query": {
+    "bool" : {
+      "must": [{
+        "range" : {
+          "@timestamp" : {
+            "gte" : "now-1d",
+            "lt" :  "now"
+          }
+        }
+      },
+        { "match": { "logtype": "exc" }}
+      ]
+    }
+  }
+}

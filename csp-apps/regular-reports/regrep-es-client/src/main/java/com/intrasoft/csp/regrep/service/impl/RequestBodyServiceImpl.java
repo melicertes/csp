@@ -27,8 +27,9 @@ public class RequestBodyServiceImpl implements RequestBodyService {
     @Autowired
     ObjectMapper objectMapper;
 
-    URL nLogsByType = getClass().getClassLoader().getResource("json.payloads/nlogs-by-type.json");
-    URL nDocsByType = getClass().getClassLoader().getResource("json.payloads/ndocs-by-type.json");
+    URL nLogsByType   = getClass().getClassLoader().getResource("json.payloads/nlogs-by-type.json");
+    URL nDocsByType   = getClass().getClassLoader().getResource("json.payloads/ndocs-by-type.json");
+    URL dailyExcLogs  = getClass().getClassLoader().getResource("json.payloads/daily-exc-logs.json");
 
     final String TIME_DIF = "-9h";
 
@@ -38,9 +39,7 @@ public class RequestBodyServiceImpl implements RequestBodyService {
         String payload = null;
         try {
             payload = FileUtils.readFileToString(new File(nLogsByType.toURI()), Charset.forName("UTF-8"));
-        } catch (IOException e) {
-            LOG.error(e.getMessage());
-        } catch (URISyntaxException e) {
+        } catch (IOException | URISyntaxException e) {
             LOG.error(e.getMessage());
         }
 
@@ -66,9 +65,7 @@ public class RequestBodyServiceImpl implements RequestBodyService {
         String payload = null;
         try {
             payload = FileUtils.readFileToString(new File(nDocsByType.toURI()), Charset.forName("UTF-8"));
-        } catch (IOException e) {
-            LOG.error(e.getMessage());
-        } catch (URISyntaxException e) {
+        } catch (IOException | URISyntaxException e) {
             LOG.error(e.getMessage());
         }
 
@@ -82,6 +79,33 @@ public class RequestBodyServiceImpl implements RequestBodyService {
         ( (ObjectNode) jsonNode).findParent("gte").put("gte", "now-" + gte.toString() + TIME_DIF);
         ( (ObjectNode) jsonNode).findParent("lt").put("lt", lt.toString() + TIME_DIF);
         if (type.equals(CspDataMappingType.ALL))
+            ((ObjectNode) jsonNode).findParent("match").remove("match");
+        else
+            ( (ObjectNode) jsonNode).findParent("_type").put("_type", type.toString());
+        payload = jsonNode.toString();
+        return payload;
+    }
+
+    @Override
+    public String buildRequestBodyForLogs(DateMath gte, DateMath lt, LogstashMappingType type) {
+        String payload = null;
+        try {
+            payload = FileUtils.readFileToString(new File(dailyExcLogs.toURI()), Charset.forName("UTF-8"));
+        } catch (IOException | URISyntaxException e) {
+            LOG.error(e.getMessage());
+        }
+
+        JsonNode jsonNode = null;
+        try {
+            jsonNode = objectMapper.readTree(payload);
+        } catch (IOException e) {
+            LOG.error(e.getMessage());
+        }
+
+        ( (ObjectNode) jsonNode).findParent("gte").put("gte", "now-" + gte.toString() + TIME_DIF);
+        ( (ObjectNode) jsonNode).findParent("lt").put("lt", lt.toString() + TIME_DIF);
+
+        if (type.equals(LogstashMappingType.ALL))
             ((ObjectNode) jsonNode).findParent("match").remove("match");
         else
             ( (ObjectNode) jsonNode).findParent("_type").put("_type", type.toString());

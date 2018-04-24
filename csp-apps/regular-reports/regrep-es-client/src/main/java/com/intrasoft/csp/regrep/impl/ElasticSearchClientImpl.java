@@ -3,6 +3,8 @@ package com.intrasoft.csp.regrep.impl;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.intrasoft.csp.regrep.ElasticSearchClient;
+import com.intrasoft.csp.regrep.commons.model.DailyExceptionsResponse;
+import com.intrasoft.csp.regrep.commons.model.HitsItem;
 import com.intrasoft.csp.regrep.routes.ContextUrl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,6 +84,22 @@ public class ElasticSearchClientImpl implements ElasticSearchClient {
             LOG.error(e.getMessage());
         }
         return count;
+    }
+
+    @Override
+    public List<HitsItem> getLogData(String requestBody) {
+        String url = context + "/" + LOGS_INDEX + "/" + ContextUrl.Api.SEARCH;  // prettify?
+        LOG.info("API call [GET]: " + url);
+        HttpEntity<String> request = new HttpEntity<>(requestBody, headers);
+        ResponseEntity<DailyExceptionsResponse> responseEntity;
+        try {
+            responseEntity = restTemplate.exchange(url, HttpMethod.GET, request, DailyExceptionsResponse.class);
+        } catch (Exception e) {
+         LOG.error(e.getMessage());
+         return null;
+        }
+        List<HitsItem> hitsItems = responseEntity.getBody().getHits().getHits();
+        return hitsItems;
     }
 
     private int getCount(String requestBody, String url) {

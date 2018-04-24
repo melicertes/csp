@@ -3,7 +3,8 @@ package com.intrasoft.csp.regrep.routes;
 public interface ContextUrl {
 
     enum Api {
-        COUNT("_count");
+        COUNT("_count"),
+        SEARCH("_search");
 
         private final String value;
 
