@@ -75,6 +75,7 @@
                         th:attr="data-content='- Time is set in a 24-hour clock basis. - Your timezone is ' + ${userTZ}"><i class="glyphicon glyphicon-info-sign"></i></span></th>
                       <th>Duration</th>
                       <th>Participants</th>
+                      <th>UID</th>
                       <th>Status</th>
                     </tr>
                   </thead>
@@ -87,6 +88,7 @@
                       <td th:text="${{meeting.duration}}">duration</td>
                       <td><span th:text="${#lists.size(meeting.participants)}">#ofparticipants</span> <span class="participants-popover" data-placement="top"
                         th:attr="data-popover-content='#a'+${stat.index}" data-title="Data/Time Information" data-trigger="hover" data-toggle="popover"><i class="glyphicon glyphicon-info-sign"></i></span></td>
+                      <td th:text="${{meeting.uid}}">uid</td>
                       <td><span th:text="${meeting.status}" class="label"
                         th:classappend="|${#strings.equals(meeting.status ,'Running') ? 'label-success': ''} ${#strings.equals(meeting.status ,'Completed') ? 'label-info': ''} ${#strings.equals(meeting.status ,'Pending') ? 'label-warning': ''} ${#strings.equals(meeting.status ,'Error') ? 'label-danger': ''} ${#strings.equals(meeting.status ,'Cancel') ? 'label-default': ''}|">status</span><sup
                         th:if="${#strings.toString(meeting.status) == 'Error'}"> <a href="#" th:href="@{/retryMeeting(id=${meeting.id})}">Retry</a>

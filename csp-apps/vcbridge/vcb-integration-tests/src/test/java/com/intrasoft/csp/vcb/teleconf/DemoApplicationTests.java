@@ -1,4 +1,4 @@
-package com.intrasoft.csp.vcb.integrationtests.sandbox.client;
+package com.intrasoft.csp.vcb.teleconf;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
