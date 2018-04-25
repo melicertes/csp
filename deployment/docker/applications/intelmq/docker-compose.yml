@@ -5,7 +5,7 @@ services:
     env_file:
       - .env
     image: csp-intelmq:1.0
-    container_name: csp-intelmq
+    container_name: csp-imq
     domainname: ${LOCAL_DOMAIN}
     hostname: csp-intelmq
     command: sh /scripts/run.sh
