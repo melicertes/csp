@@ -4,6 +4,7 @@ import com.intrasoft.csp.regrep.CspDataMappingType;
 import com.intrasoft.csp.regrep.DateMath;
 import com.intrasoft.csp.regrep.ElasticSearchClient;
 import com.intrasoft.csp.regrep.LogstashMappingType;
+import com.intrasoft.csp.regrep.commons.model.HitsItem;
 import com.intrasoft.csp.regrep.commons.model.Mail;
 import com.intrasoft.csp.regrep.service.Basis;
 import com.intrasoft.csp.regrep.service.RegularReportsMailService;
@@ -132,11 +133,13 @@ public class RegularReportsServiceImpl implements RegularReportsService {
     @Override
     public void report(Basis basis) {
         String reportType = basis + " Report";
+        boolean isDaily = basis.equals(DAILY) ? true : false;
         LOG.info(String.format("Preparing %s...", reportType));
         DateMath dateMath = null;
         String requestBody = new String();
         Map<String, Integer> cspDataResults = new HashMap<>();
         Map<String, Integer> logstashResults = new HashMap<>();
+        List<HitsItem> hitsItemList = new ArrayList<>();
 
         switch (basis) {
             case DAILY:     dateMath = ONE_DAY; break;
@@ -161,12 +164,18 @@ public class RegularReportsServiceImpl implements RegularReportsService {
             }
         }
 
+        if (basis.equals(DAILY)) {
+            requestBody = requestBodyService.buildRequestBodyForLogs(dateMath, NOW, LogstashMappingType.EXCEPTION);
+            hitsItemList = elasticSearchClient.getLogData(requestBody);
+        }
+
         Mail newMail = new Mail();
         newMail.setFrom(from);
         newMail.setSubject(reportType);
         newMail.setTo(to);
         Map valuesMap = new HashMap();
 
+        valuesMap.put("isDaily", isDaily);
         valuesMap.put("thymeleafTypeDescription", "DOCUMENT TYPE");
         valuesMap.put("thymeleafNumberDescription", "CREATED");
         valuesMap.put("recipient", "Administrator");
@@ -175,6 +184,9 @@ public class RegularReportsServiceImpl implements RegularReportsService {
         valuesMap.put("message", String.format(msg, reportType, basis.getDescription(), parentheses));
         valuesMap.put("thymeleafMapA", cspDataResults);
         valuesMap.put("thymeleafMapB", logstashResults);
+        if (isDaily)
+            valuesMap.put("excLogsList", hitsItemList);
+
         newMail.setModel(valuesMap);
 
 
