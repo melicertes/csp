@@ -108,7 +108,7 @@ public class RequestBodyServiceImpl implements RequestBodyService {
         if (type.equals(LogstashMappingType.ALL))
             ((ObjectNode) jsonNode).findParent("match").remove("match");
         else
-            ( (ObjectNode) jsonNode).findParent("_type").put("_type", type.toString());
+            ( (ObjectNode) jsonNode).findParent("logtype").put("logtype", type.toString());
         payload = jsonNode.toString();
         return payload;
     }

@@ -62,6 +62,18 @@
             border-bottom: 1px solid #ddd;
         }
 
+        tr.reportable-exc {
+            /*border-bottom: 1px solid #ddd;
+            border-right: 1px solid #ddd;
+            border-left: 1px solid #ddd;*/
+            border: 1px solid #ddd;
+        }
+
+        td.reportable-exc {
+            padding: 8px;
+            border: 1px solid #ddd;
+        }
+
         /* ----------- responsivity ----------- */
 
         @media only screen and (max-width: 640px) {
@@ -255,6 +267,8 @@
                                             <span th:text="${message}" />
                                         </p>
                                         <div th:include="fragments/data-table-fragment :: reportable"></div>
+                                        <div th:if="${isDaily}"><br></div>
+                                        <div th:if="${isDaily AND excLogsList != null}" th:include="fragments/exc-table-fragment :: exc-logs-data"></div>
                                         <br>
                                         <p style="line-height: 24px">
                                             Kind regards,<br>
