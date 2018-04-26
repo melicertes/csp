@@ -51,7 +51,7 @@ public class EmitterAuditLogHandlerImpl implements EmitterAuditLogHandler {
         "action":"log"
     }
     */
-        LOG.info(object.toString());
+        LOG.debug(object.toString());
         String msg;
         if (object.get("Log").has("action") && object.get("Log").has("title") && object.get("Log").has("change") &&
                 object.get("Log").has("description") && object.get("Log").has("user_id") ){
