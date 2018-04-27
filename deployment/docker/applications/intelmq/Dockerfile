@@ -3,10 +3,11 @@ FROM csp-python3:1.0
 MAINTAINER tku
 MAINTAINER msg
 
-ENV INTELMQ_VERSION=1.0.1
-ENV INTELMQ_MGR_VERSION=0.3.1
+ENV INTELMQ_VERSION=1.0.4
+ENV INTELMQ_MGR_VERSION=1.0.1
 ENV INTELMQ_HOSTNAME=csp-intelmq
 ENV REDIS_HOSTNAME=csp-redis
+
 
 RUN apk update && \
   apk upgrade && \
@@ -22,6 +23,13 @@ RUN apk update && \
   rm -f intelmq-${INTELMQ_VERSION}.tar.gz && \
   rm -f intelmq-manager-${INTELMQ_MGR_VERSION}.tar.gz && \
   cd intelmq-${INTELMQ_VERSION} && \
+  rm contrib/cron-jobs/intelmq-update-data && \
+  rm contrib/cron-jobs/update-asn-data && \
+  cp intelmq/bots/experts/asn_lookup/update-asn-data contrib/cron-jobs/ && \
+  rm contrib/cron-jobs/update-geoip-data && \
+  cp intelmq/bots/experts/maxmind_geoip/update-geoip-data contrib/cron-jobs/ && \
+  rm contrib/cron-jobs/update-tor-nodes && \
+  cp intelmq/bots/experts/tor_nodes/update-tor-nodes contrib/cron-jobs/ && \
   pip3 install . && \
   find . -name REQUIREMENTS.txt -exec pip3 install -q -r {} \; && \
   adduser -D -h /opt/intelmq -s /bin/sh intelmq && \
@@ -37,11 +45,13 @@ RUN apk update && \
   sed -i "s/#ServerName www.example.com:80/ServerName ${INTELMQ_HOSTNAME}/g" /etc/apache2/httpd.conf && \
   cp -R /tmp/intelmq-manager-${INTELMQ_MGR_VERSION}/intelmq-manager/* /var/www/localhost/htdocs/ && \
   chown -R apache:apache /var/www/localhost/htdocs/ && \
+  mv /var/www/localhost/htdocs/index.html /var/www/localhost/htdocs/index.html.bak && \
   usermod -a -G intelmq apache && \
   mkdir /opt/intelmq/etc/manager/ && \
-  touch /opt/intelmq/etc/manager/positions.conf && \
-  chgrp apache /opt/intelmq/etc/*.conf /opt/intelmq/etc/manager/positions.conf && \
-  chmod g+w /opt/intelmq/etc/*.conf /opt/intelmq/etc/manager/positions.conf && \
+ # touch /opt/intelmq/etc/manager/positions.conf && \
+ # chgrp apache /opt/intelmq/etc/*.conf /opt/intelmq/etc/manager/positions.conf && \
+  chgrp apache /opt/intelmq/etc/*.conf  && \
+  chmod g+w /opt/intelmq/etc/*.conf  && \
   echo "apache ALL=(intelmq) NOPASSWD: /usr/bin/intelmqctl" >> /etc/sudoers && \
   sed -i "s/\/usr\/local\/bin\/intelmqctl/\/usr\/bin\/intelmqctl/g" /var/www/localhost/htdocs/php/config.php && \
   echo "root ALL=(intelmq) NOPASSWD: /usr/bin/intelmqctl" >> /etc/sudoers && \
@@ -61,6 +71,10 @@ RUN chmod -R 0770 /opt/intelmq/etc/ && \
     sed -i "s/\"redis_cache_host\": \"127.0.0.1\",/\"redis_cache_host\": \"${REDIS_HOSTNAME}\",/g" runtime.conf && \
     chown -R intelmq.intelmq /opt/intelmq/etc/ && \
     echo "Added CSP custom runtime done"
+
+ADD positions.conf /opt/intelmq/etc/manager/positions.conf
+RUN chgrp apache  /opt/intelmq/etc/manager/positions.conf && \
+    chmod g+w  /opt/intelmq/etc/manager/positions.conf
 
 RUN chmod u+x /scripts/run.sh
 
