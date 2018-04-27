@@ -25,6 +25,7 @@
 		<module>vcbridge</module>
 		<module>misp</module>
 		<module>libraries</module>
+        <module>regular-reports</module>
     </modules>
 
 	<properties>
