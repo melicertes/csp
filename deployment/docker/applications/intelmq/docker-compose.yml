@@ -12,8 +12,6 @@ services:
     volumes:
        - /opt/csp/intelmq-fileinput/:/tmp/intelmq-fileinput
        - /opt/csp/intelmq-fileoutput/:/tmp/intelmq-fileoutput
-       - ./TestData.zip:/opt/csp/TestData.zip
-
        - /opt/csp/logs/imq:/opt/intelmq/var/log
     expose:
        - ${INTELMQ_DOCR_PORT}
