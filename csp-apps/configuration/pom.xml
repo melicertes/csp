@@ -17,8 +17,8 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>conf-client</module>
         <module>conf-commons</module>
+        <module>conf-client</module>
         <module>conf-server</module>
         <module>conf-integration-tests</module>
 	    <module>conf-client-cspapp</module>
