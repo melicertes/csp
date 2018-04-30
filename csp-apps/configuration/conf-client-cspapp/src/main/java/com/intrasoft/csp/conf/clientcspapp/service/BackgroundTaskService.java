@@ -49,6 +49,42 @@ public class BackgroundTaskService {
 
     public static final String DOCKERCOMPOSE_YML_TEMPLATE = "docker-compose.yml.j2";
 
+    @Value("${installation.reqs.memoryInGB}")
+    public int memoryGb;
+
+    @Value("${installation.reqs.diskFreeInGB}")
+    public int diskGb;
+
+    @Value("${installation.reqs.cpus}")
+    public int vcpus;
+
+
+    public Boolean checkRequirementsForInstall() {
+        log.info("Requirements: Verifying H/W requirements: {}GB total memory, {}GB free disk, {} CPUs available");
+
+        int vcpusFound = Runtime.getRuntime().availableProcessors();
+        int diskFreeMB = (int) (new File("/").getFreeSpace() / 1024 / 1024);
+        int memoryFoundMB = (int) (Runtime.getRuntime().totalMemory() / 1024 / 1024 );
+
+        int success = 0;
+        if (vcpusFound < vcpus) {
+            log.warn("Found CPUs: {} Required CPUs: {}", vcpusFound, vcpus);
+            success++;
+        }
+        if (diskFreeMB < diskGb * 1024) {
+            log.warn("Found Free space: {}MB, Required: {}MB", diskFreeMB, diskGb * 1024);
+            success++;
+        }
+
+        if (memoryFoundMB < memoryGb * 1024) {
+            log.warn("Found Total memory: {}MB, Required: {}MB", memoryFoundMB, memoryGb * 1024);
+            success++;
+        }
+        log.info("Requirements: {}", success > 0 ? "FAILED" : "Have been met MET.");
+
+        return success > 0 ? false : true;
+    }
+
     @Getter
     enum ControlScript {
         FIRST_TIME("exec_first-time.sh", "FIRST_TIME_SH"),
@@ -853,7 +889,6 @@ public class BackgroundTaskService {
                     envOAM.put("C_EXTNAME", serviceName);
 
                     rOAM = executeScriptSimple(EXEC_CONT_SCRIPT_SH, envOAM);
-                    //TODO do something with result, do we care if oam is left running at the end?
                     //start apache if not started
                     boolean apacheStarted = true; //assume it is already started.
                     if (installationService.queryService(moduleAPC).getServiceState()==ServiceState.NOT_RUNNING) {

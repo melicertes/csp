@@ -65,7 +65,7 @@ public class PagesController implements ContextUrl {
 
         model.addAttribute("internetAvailable", backgroundTaskService.isInternetAvailable());
         model.addAttribute("navHomeClassActive", "active");
-
+        model.addAttribute("reqsCheck", backgroundTaskService.checkRequirementsForInstall());
         model.addAttribute("asyncInterval", statusInterval);
 
         return new ModelAndView("pages/dashboard", "dashboard", model);
