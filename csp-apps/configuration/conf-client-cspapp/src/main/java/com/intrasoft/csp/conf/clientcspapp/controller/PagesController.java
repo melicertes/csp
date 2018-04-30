@@ -65,7 +65,7 @@ public class PagesController implements ContextUrl {
 
         model.addAttribute("internetAvailable", backgroundTaskService.isInternetAvailable());
         model.addAttribute("navHomeClassActive", "active");
-        model.addAttribute("reqsCheck", backgroundTaskService.checkRequirementsForInstall());
+        model.addAttribute("reqsCheck", backgroundTaskService.canInstallAsPerRequirements());
         model.addAttribute("asyncInterval", statusInterval);
 
         return new ModelAndView("pages/dashboard", "dashboard", model);
@@ -79,6 +79,8 @@ public class PagesController implements ContextUrl {
 
         if (installService.isInstallationComplete() || installService.isInstallationOngoing()) {
             return new ModelAndView("pages/install-complete", "install-complete", model);
+        } else if (!backgroundTaskService.canInstallAsPerRequirements() ) {
+            return new ModelAndView("redirect:/dashboard.html");
         } else {
             model.addAttribute("cspId", UUID.randomUUID().toString());
             model.addAttribute("cspRegisterApi", REST_REGISTER);

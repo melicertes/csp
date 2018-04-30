@@ -18,16 +18,17 @@ import org.apache.commons.io.IOUtils;
 import org.joda.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
-
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.io.*;
+import java.lang.management.ManagementFactory;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
@@ -58,31 +59,43 @@ public class BackgroundTaskService {
     @Value("${installation.reqs.cpus}")
     public int vcpus;
 
+    @Value("${installation.forced:false}")
+    private Boolean canProceedForced;
 
-    public Boolean checkRequirementsForInstall() {
-        log.info("Requirements: Verifying H/W requirements: {}GB total memory, {}GB free disk, {} CPUs available");
-
+    @Cacheable(cacheNames = {"req.check"})
+    public Boolean canInstallAsPerRequirements() {
+        log.info("Requirements: Verifying H/W requirements: {}GB total memory, {}GB free disk, {} CPUs available",
+                memoryGb,diskGb,vcpus);
         int vcpusFound = Runtime.getRuntime().availableProcessors();
-        int diskFreeMB = (int) (new File("/").getFreeSpace() / 1024 / 1024);
-        int memoryFoundMB = (int) (Runtime.getRuntime().totalMemory() / 1024 / 1024 );
+        int diskFreeMB = (int) (new File("/opt/csp").getFreeSpace() / 1024 / 1024);
+        int memoryFoundMB = (int) (((com.sun.management.OperatingSystemMXBean) ManagementFactory
+                .getOperatingSystemMXBean()).getTotalPhysicalMemorySize()/ 1024 / 1024 );
 
         int success = 0;
+        log.info("Found OS         : {}", System.getProperty("os.name"));
+
         if (vcpusFound < vcpus) {
-            log.warn("Found CPUs: {} Required CPUs: {}", vcpusFound, vcpus);
+            log.warn("Found CPUs       : {}, Required: {} - FAIL", vcpusFound, vcpus);
             success++;
         }
         if (diskFreeMB < diskGb * 1024) {
-            log.warn("Found Free space: {}MB, Required: {}MB", diskFreeMB, diskGb * 1024);
+            log.warn("Found Free space : {}MB, Required: {}MB - FAIL", diskFreeMB, diskGb * 1024);
             success++;
         }
 
         if (memoryFoundMB < memoryGb * 1024) {
-            log.warn("Found Total memory: {}MB, Required: {}MB", memoryFoundMB, memoryGb * 1024);
+            log.warn("Found Total RAM  : {}MB, Required: {}MB - FAIL", memoryFoundMB, memoryGb * 1024);
             success++;
         }
-        log.info("Requirements: {}", success > 0 ? "FAILED" : "Have been met MET.");
+        if (success > 0) {
+            log.error("Requirements check result: {}", success > 0 ? "FAILED" : "SUCCESS");
+        }
 
-        return success > 0 ? false : true;
+        if (canProceedForced) {
+            log.warn("Installation is forced due to configuration override");
+            return true;
+        } else
+            return success > 0 ? false : true;
     }
 
     @Getter
