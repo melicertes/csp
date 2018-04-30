@@ -25,7 +25,7 @@
 
     <div class="row">
         <div class="col-md-12">
-            <div id="toolbar" class="btn-group pull-right">
+            <div th:if="${canStart != null}" id="toolbar" class="btn-group pull-right">
                 <a href="#" th:href="${canStart ? startUrl : '#'}" id="start" class="btn btn-success" th:disabled="${!canStart}"><i class="fa fa-play fa-2"></i> Start</a>
                 <a href="#" th:href="${canStop ? stopUrl : '#' }" id="stop" class="btn btn-danger" th:disabled="${!canStop}"><i class="fa fa-stop fa-2"></i> Stop</a>
             </div>
