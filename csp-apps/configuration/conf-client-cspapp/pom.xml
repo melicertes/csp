@@ -50,6 +50,11 @@
 		</dependency>
 
 
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+		</dependency>
+
         <dependency>
             <groupId>com.intrasoft.csp</groupId>
             <artifactId>conf-client</artifactId>
