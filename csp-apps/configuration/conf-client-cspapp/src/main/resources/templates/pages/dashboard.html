@@ -30,6 +30,11 @@
             <a class="close" data-dismiss="alert" href="#" aria-hidden="true">×</a>
             <strong>Error: Internet connectivity test failure.</strong><br/>Please check connectivity with internet and DNS</div>
     </div>
+    <div class="row" th:if="${ reqsCheck == null || reqsCheck == false  }">
+        <div class="alert alert-dismissable alert-danger">
+            <a class="close" data-dismiss="alert" href="#" aria-hidden="true">×</a>
+            <strong>Error: Requirements not met. The installation will fail.</strong><br/>Please verify system and VM setup instructions</div>
+    </div>
     <div class="row">
         <div class="col-md-3 col-xs-12">
             <div class="pie-chart2 pie-chart pie-number" data-percent="26">
@@ -37,13 +42,18 @@
             </div>
         </div>
         <div class="col-md-9 col-xs-12">
-            <div class="message-text">
+            <div  class="message-text">
                 <p>
                     Welcome to the CSP Installation Control Application - Dashboard.
                 </p>
-                <p th:unless="${links != null}">
+                <p th:unless="${links != null}" th:if="${reqsCheck != null and reqsCheck eq true}">
                     To proceed with installation, please go to the <a href="#" th:href="${installUrl}">installation</a> page to configure the CSP or the
                     <a href="#" th:href="${updatesUrl}">Updates page</a> to see updates and installation status.
+                </p>
+                <p th:if="${reqsCheck != null and reqsCheck eq false}">
+                    Please consult the Installation Guide about the CSP installation requirements. To be able to continue, the VM should
+                    support <strong>at least the minimum requirements for RAM, available disk space and CPUs</strong>. Please go to
+                    to <a href="#" th:href="${statusUrl}">the system logs</a> for further information.
                 </p>
             </div>
             <div class="container" id="linksStatus"></div>
