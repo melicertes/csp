@@ -30,6 +30,11 @@
             <a class="close" data-dismiss="alert" href="#" aria-hidden="true">×</a>
             <strong>Error: Internet connectivity test failure.</strong><br/>Please check connectivity with internet and DNS</div>
     </div>
+    <div class="row" th:if="${ reqsCheck == null || reqsCheck == false  }">
+        <div class="alert alert-dismissable alert-danger">
+            <a class="close" data-dismiss="alert" href="#" aria-hidden="true">×</a>
+            <strong>Error: Requirements not met. The installation will fail.</strong><br/>Please verify system and VM setup instructions</div>
+    </div>
     <div class="row">
         <div class="col-md-3 col-xs-12">
             <div class="pie-chart2 pie-chart pie-number" data-percent="26">
