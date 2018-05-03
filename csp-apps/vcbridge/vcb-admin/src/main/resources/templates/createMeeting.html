@@ -114,11 +114,14 @@
 
             </div>
             <div id="menu2" class="tab-pane fade">
-              <div class="row">
-                <div class="col-md-12  text-right">
+              <div class="row margin-bt-30">
+                <div class="col-md-6">
+                  <input class="form-control border-input typeahead" type="email" id="tc_email" placeholder="Search for Team Contact"/>
+                </div>
+                <div class="col-md-6  text-right">
                   <div class="dropdown btn-group">
                     <button id="add_participants_btn" class="btn btn-primary btn-outline dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                      Add Participant<span class="caret"></span>
+                      Add External Participant<span class="caret"></span>
                     </button>
                     <ul class="dropdown-menu" aria-labelledby="add_participants_btn">
                       <li>
@@ -197,6 +200,7 @@
 </div>
 
 <div th:fragment="scripts">
+  <script type="text/javascript" th:src="@{/resources/js/typeahead.jquery.min.js}"></script>
   <script type="text/javascript" th:src="@{/resources/js/email-parser.js}"></script>
   <script type="text/javascript" th:src="@{/resources/js/createMeeting.js}"></script>
 
