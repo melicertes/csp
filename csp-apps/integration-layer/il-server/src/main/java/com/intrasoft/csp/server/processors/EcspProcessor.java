@@ -37,7 +37,11 @@ public class EcspProcessor implements Processor{
         EnhancedTeamDTO enhancedTeamDTO = exchange.getIn().getBody(EnhancedTeamDTO.class);
         LOG.info("DCL - Sending to external CSP: " + enhancedTeamDTO.getTeam().getName() + " -- " + enhancedTeamDTO.getTeam().getUrl());
         //TODO: versioning in context path below should be extracted dynamically from the header
-        String uri = enhancedTeamDTO.getTeam().getUrl() + "/v"+ContextUrl.REST_API_V1+ContextUrl.DCL_INTEGRATION_DATA;
+
+        String externalSslPort = StringUtils.isEmpty(cspSslConfiguration.getExternalSslPort())?"":
+                ":"+cspSslConfiguration.getExternalSslPort();
+
+        String uri = enhancedTeamDTO.getTeam().getUrl()+externalSslPort + "/v"+ContextUrl.REST_API_V1+ContextUrl.DCL_INTEGRATION_DATA;
         //external certificate
         if(cspSslConfiguration.getExternalUseSSL()){
             if(uri.contains("http")) {
