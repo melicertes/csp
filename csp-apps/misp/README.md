@@ -5,9 +5,9 @@
 cd /home/csp
 cd misp
 ### take a backup of the current misp-adapter jar
-cp misp-server-3.5.0-SNAPSHOT-exec.jar misp-server-3.5.0-SNAPSHOT-exec_201801301614.jar
+cp misp-server-3.6.0-SNAPSHOT-exec.jar misp-server-3.6.0-SNAPSHOT-exec_201801301614.jar
 ### override current jar in use
-cp /tmp/boulougaris/misp-adapter-emitter-3.5.0-SNAPSHOT-exec.jar misp-server-3.5.0-SNAPSHOT-exec.jar
+cp /tmp/boulougaris/misp-adapter-emitter-3.6.0-SNAPSHOT-exec.jar misp-server-3.6.0-SNAPSHOT-exec.jar
 ### stop misp-adapter docker container
 docker-compose -f docker-compose-intra.yml stop misp-adapter
 ### kill misp-adapter docker container (might not be needed,just in cased it didn;t properly stopped)
@@ -27,9 +27,9 @@ cd /opt/csp/modules/misp3ed1d715ba26/
 ### you might need root priveleges
 su
 ### when prompted systempass
-cp misp-server-3.5.0-SNAPSHOT-exec.jar misp-server-3.5.0-SNAPSHOT-exec_201801301614.jar
+cp misp-server-3.6.0-SNAPSHOT-exec.jar misp-server-3.6.0-SNAPSHOT-exec_201801301614.jar
 ### override current jar in use
-cp /tmp/boulougaris/misp-adapter-emitter-3.5.0-SNAPSHOT-exec.jar misp-server-3.5.0-SNAPSHOT-exec.jar
+cp /tmp/boulougaris/misp-adapter-emitter-3.6.0-SNAPSHOT-exec.jar misp-server-3.6.0-SNAPSHOT-exec.jar
 ### stop misp-adapter docker container
 docker-compose -f docker-compose.yml stop misp-adapter
 ### kill misp-adapter docker container (might not be needed,just in cased it didn;t properly stopped)
@@ -48,9 +48,9 @@ cd /opt/csp/modules/misp3ed1d715ba26/
 ### you might need root priveleges
 su
 ### when prompted systempass
-cp misp-server-3.5.0-SNAPSHOT-exec.jar misp-server-3.5.0-SNAPSHOT-exec_201801301614.jar
+cp misp-server-3.6.0-SNAPSHOT-exec.jar misp-server-3.6.0-SNAPSHOT-exec_201801301614.jar
 ### override current jar in use
-cp /tmp/boulougaris/misp-adapter-emitter-3.5.0-SNAPSHOT-exec.jar misp-server-3.5.0-SNAPSHOT-exec.jar
+cp /tmp/boulougaris/misp-adapter-emitter-3.6.0-SNAPSHOT-exec.jar misp-server-3.6.0-SNAPSHOT-exec.jar
 ### stop misp-adapter docker container
 docker-compose -f docker-compose.yml stop misp-adapter
 ### kill misp-adapter docker container (might not be needed,just in cased it didn;t properly stopped)
