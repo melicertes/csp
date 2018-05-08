@@ -11,7 +11,7 @@ services:
     command: java -Xmx512m -Dspring.profiles.active=docker -jar server.jar
     working_dir: /opt/csp
     volumes:
-        - ./conf-server-3.5.0-SNAPSHOT-exec.jar:/opt/csp/server.jar
+        - ./conf-server-3.6.0-SNAPSHOT-exec.jar:/opt/csp/server.jar
         - /opt/csp/logs/:/opt/csplogs
         - CFGDataVolume:/opt/cfg/data
     expose:
