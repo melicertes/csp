@@ -1,25 +1,57 @@
 package com.intrasoft.csp.commons.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.intrasoft.csp.commons.model.tc.Certificate;
+import com.intrasoft.csp.commons.model.tc.Membership;
+import com.intrasoft.csp.commons.model.tc.PhoneNumber;
+
 import java.util.List;
 
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonPropertyOrder({
+        "id",
+        "full_name",
+        "email",
+        "email_visibility",
+        "postal_address",
+        "postal_country",
+        "ml_email",
+        "ml_key",
+        "phone_numbers",
+        "certificates",
+        "memberships"
+})
 public class PersonContact {
 
+    @JsonProperty("id")
     private String id;
-    private String cspId;
-    private String cspDomain;
-    private boolean cspInstalled;
-    private List<String> nisTeamTypes;
-    private List<String> nisSectors;
+    @JsonProperty("full_name")
     private String fullName;
+    @JsonProperty("email")
     private String email;
-    private boolean emailVisibility;
+    /**
+     * @apiNote CMM API yaml denotes this as Boolean but API returns String, i.e. "private"
+     */
+    @JsonProperty("email_visibility")
+    private String emailVisibility;
+    @JsonProperty("postal_address")
     private String postalAddress;
+    @JsonProperty("postal_country")
     private String postalCountry;
+    @JsonProperty("ml_email")
     private String mlEmail;
+    @JsonProperty("ml_key")
     private String mlKey;
-    private String phoneNumbers;
-    private String certificates;
-    private String memberships;
+    @JsonProperty("phone_numbers")
+    private List<PhoneNumber> phoneNumbers;
+    @JsonProperty("certificates")
+    private List<Certificate> certificates;
+    @JsonProperty("memberships")
+    private List<Membership> memberships;
+
 
     public String getId() {
         return id;
@@ -27,46 +59,6 @@ public class PersonContact {
 
     public void setId(String id) {
         this.id = id;
-    }
-
-    public String getCspId() {
-        return cspId;
-    }
-
-    public void setCspId(String cspId) {
-        this.cspId = cspId;
-    }
-
-    public String getCspDomain() {
-        return cspDomain;
-    }
-
-    public void setCspDomain(String cspDomain) {
-        this.cspDomain = cspDomain;
-    }
-
-    public boolean isCspInstalled() {
-        return cspInstalled;
-    }
-
-    public void setCspInstalled(boolean cspInstalled) {
-        this.cspInstalled = cspInstalled;
-    }
-
-    public List<String> getNisTeamTypes() {
-        return nisTeamTypes;
-    }
-
-    public void setNisTeamTypes(List<String> nisTeamTypes) {
-        this.nisTeamTypes = nisTeamTypes;
-    }
-
-    public List<String> getNisSectors() {
-        return nisSectors;
-    }
-
-    public void setNisSectors(List<String> nisSectors) {
-        this.nisSectors = nisSectors;
     }
 
     public String getFullName() {
@@ -85,11 +77,11 @@ public class PersonContact {
         this.email = email;
     }
 
-    public boolean isEmailVisibility() {
+    public String getEmailVisibility() {
         return emailVisibility;
     }
 
-    public void setEmailVisibility(boolean emailVisibility) {
+    public void setEmailVisibility(String emailVisibility) {
         this.emailVisibility = emailVisibility;
     }
 
@@ -125,27 +117,27 @@ public class PersonContact {
         this.mlKey = mlKey;
     }
 
-    public String getPhoneNumbers() {
+    public List<PhoneNumber> getPhoneNumbers() {
         return phoneNumbers;
     }
 
-    public void setPhoneNumbers(String phoneNumbers) {
+    public void setPhoneNumbers(List<PhoneNumber> phoneNumbers) {
         this.phoneNumbers = phoneNumbers;
     }
 
-    public String getCertificates() {
+    public List<Certificate> getCertificates() {
         return certificates;
     }
 
-    public void setCertificates(String certificates) {
+    public void setCertificates(List<Certificate> certificates) {
         this.certificates = certificates;
     }
 
-    public String getMemberships() {
+    public List<Membership> getMemberships() {
         return memberships;
     }
 
-    public void setMemberships(String memberships) {
+    public void setMemberships(List<Membership> memberships) {
         this.memberships = memberships;
     }
 }

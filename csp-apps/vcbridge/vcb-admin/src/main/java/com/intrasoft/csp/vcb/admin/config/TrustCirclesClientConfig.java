@@ -1,23 +1,19 @@
-package com.intrasoft.csp.client.config;
+package com.intrasoft.csp.vcb.admin.config;
 
-import com.intrasoft.csp.client.CspClient;
 import com.intrasoft.csp.client.TrustCirclesClient;
-import com.intrasoft.csp.client.impl.CspClientImpl;
 import com.intrasoft.csp.client.impl.TrustCirclesClientImpl;
-import com.intrasoft.csp.commons.exceptions.InvalidDataTypeException;
 import com.intrasoft.csp.commons.routes.ContextUrl;
 import com.intrasoft.csp.libraries.restclient.config.RestTemplateConfiguration;
 import com.intrasoft.csp.libraries.restclient.exceptions.CspGeneralException;
 import com.intrasoft.csp.libraries.restclient.handlers.ExceptionHandler;
 import com.intrasoft.csp.libraries.restclient.service.RetryRestTemplate;
-import com.intrasoft.csp.libraries.versioning.client.ApiVersionClient;
-import com.intrasoft.csp.libraries.versioning.client.ApiVersionClientImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.support.ResourcePatternResolver;
+import org.springframework.http.HttpStatus;
 
 import java.io.IOException;
 import java.security.KeyManagementException;
@@ -32,55 +28,57 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @Configuration
 public class TrustCirclesClientConfig implements ContextUrl {
-    @Value("${tc.protocol:http}")
+    @Value("${app.tc.protocol:http}")
     private String protocol;
 
-    @Value("${tc.host:localhost}")
+    @Value("${app.tc.host:localhost}")
     private String host;
 
-    @Value("${tc.port:8081}")
+    @Value("${app.tc.port:9000}")
     private String port;
 
-    @Value("${tc.path.circles}")
+    @Value("${app.tc.path.circles}")
     String tcPathCircles;
 
-    @Value("${tc.path.teams}")
+    @Value("${app.tc.path.teams}")
     String tcPathTeams;
 
-    @Value("${tc.path.localcircle}")
+    @Value("${app.tc.path.localcircle}")
     String tcPathLocalCircle;
 
-    @Value("${tc.path.contacts}")
+    @Value("${app.tc.path.contacts}")
     String tcPathContacts;
 
-    @Value("${tc.path.teamcontacts}")
+    @Value("${app.tc.path.teamcontacts}")
     String tcPathTeamContacts;
 
-    @Value("${tc.path.personcontacts}")
+    @Value("${app.tc.path.personcontacts}")
     String tcPathPersonContacts;
 
-    @Value("${tc.retry.backOffPeriod:5000}")
+    @Value("${app.tc.retry.backOffPeriod:5000}")
     private String backOffPeriod;
 
-    @Value("${tc.retry.maxAttempts:3}")
+    @Value("${app.tc.retry.maxAttempts:3}")
     private String maxAttempts;
 
-    @Value("${tc.client.ssl.enabled:false}")
+    @Value("${app.tc.client.ssl.enabled:false}")
     Boolean tcClientSslEnabled;
 
-    @Value("${tc.client.ssl.jks.keystore:path}")
+    @Value("${app.tc.client.ssl.jks.keystore:path}")
     String tcClientSslJksKeystore;
 
-    @Value("${tc.client.ssl.jks.keystore.password:securedPass}")
+    @Value("${app.tc.client.ssl.jks.keystore.password:securedPass}")
     String tcClientSslJksKeystorePassword;
 
     @Autowired
     ResourcePatternResolver resourcePatternResolver;
 
     private static final ConcurrentHashMap<String, ExceptionHandler> SUPPORTED_EXCEPTIONS = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<Integer, String> AVOID_RETRY_ON_STATUS_CODE = new ConcurrentHashMap<>();
 
     static {
         SUPPORTED_EXCEPTIONS.put(CspGeneralException.class.getName(), CspGeneralException::new);
+        AVOID_RETRY_ON_STATUS_CODE.put(HttpStatus.NOT_FOUND.value(), "TC server responded with 404");
     }
 
     @Bean(name = "TcClient")
@@ -96,7 +94,7 @@ public class TrustCirclesClientConfig implements ContextUrl {
     public RetryRestTemplate getRetryRestTemplate() throws CertificateException, UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException, KeyManagementException, IOException {
         RestTemplateConfiguration restTemplateConfiguration = new RestTemplateConfiguration(backOffPeriod, maxAttempts,
                 tcClientSslEnabled, tcClientSslJksKeystore, tcClientSslJksKeystorePassword, resourcePatternResolver);
-        return restTemplateConfiguration.getRestTemplateWithSupportedExceptions(SUPPORTED_EXCEPTIONS);
+        return restTemplateConfiguration.getRestTemplateWithOptions(SUPPORTED_EXCEPTIONS,AVOID_RETRY_ON_STATUS_CODE);
     }
 
     public String getTcPathCircles() {
