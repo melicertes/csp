@@ -18,6 +18,7 @@ public interface MispAppClient {
 	ResponseEntity<String> deleteMispEvent(String uuid);
 	ResponseEntity<String> addMispProposal(String id, String body);
 	ResponseEntity<String> updateMispProposal(String object);
+	ResponseEntity<String> deleteMispProposal(String object);
 	ResponseEntity<String> updateMispProposal(String id, String object);
 	ResponseEntity<String> getMispAttribute(String uuid);
 	OrganisationDTO getMispOrganisation(String uuid);

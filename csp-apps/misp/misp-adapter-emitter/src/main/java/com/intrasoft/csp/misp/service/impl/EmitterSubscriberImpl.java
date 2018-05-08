@@ -3,6 +3,7 @@ package com.intrasoft.csp.misp.service.impl;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.intrasoft.csp.misp.client.MispAppClient;
 import com.intrasoft.csp.misp.commons.config.MispContextUrl;
 import com.intrasoft.csp.misp.service.EmitterAuditLogHandler;
 import com.intrasoft.csp.misp.service.EmitterDataHandler;
@@ -10,6 +11,7 @@ import com.intrasoft.csp.misp.service.EmitterSubscriber;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.zeromq.ZFrame;
@@ -20,6 +22,7 @@ import java.io.IOException;
 
 import static com.intrasoft.csp.misp.commons.config.MispContextUrl.MISP_ATTRIBUTE;
 import static com.intrasoft.csp.misp.commons.config.MispContextUrl.MISP_EVENT;
+import static com.intrasoft.csp.misp.commons.config.MispContextUrl.MispEntity.EVENT;
 
 @Service
 public class EmitterSubscriberImpl implements EmitterSubscriber, MispContextUrl{
@@ -45,6 +48,10 @@ public class EmitterSubscriberImpl implements EmitterSubscriber, MispContextUrl{
     @Autowired
     EmitterAuditLogHandler auditLogHandler;
 
+    @Autowired
+    @Qualifier("MispAppClient")
+    MispAppClient mispAppClient;
+
     @Override
     public void subscribe() {
         // Prepare our context and subscriber
@@ -59,21 +66,53 @@ public class EmitterSubscriberImpl implements EmitterSubscriber, MispContextUrl{
         subscriber.subscribe("");
         while (!Thread.currentThread ().isInterrupted ()) {
             String msg = subscriber.recvStr();
-            LOG.info(msg);
+            LOG.debug(msg);
             String topic = msg.substring(0, msg.indexOf(' '));
             String content = msg.substring(msg.indexOf(' ') + 1);
             JsonNode jsonNode = null;
             try {
                 jsonNode = new ObjectMapper().disable(SerializationFeature.INDENT_OUTPUT).readValue(content, JsonNode.class);
-                boolean isDelete = jsonNode.toString().contains("\"action\":\"delete\"");
+//                boolean isDelete = jsonNode.toString().contains("\"action\":\"delete\"");
+                boolean isDelete = false;
+                boolean hasEvent = jsonNode.has("Event");
+
+                if (jsonNode.has("Event") && jsonNode.has("action") && jsonNode.get("action").textValue().equals("delete")){
+                    LOG.debug("Delete");
+                    isDelete = true;
+                }
+                LOG.debug("Message received from queue. Topic: "  + topic);
                 switch (topic){
                     case MISP_EVENT:
-                        LOG.info("Event message received from queue.");
-                        LOG.debug(jsonNode.get("Event").has("action")?jsonNode.get("Event").get("action").asText():"-");
+                        emitterDataHandler.handleMispData(jsonNode, MispEntity.EVENT, false, isDelete);
+                        break;
+                    case MISP_JSON_ATTRIBUTE:
+                        if (jsonNode.has("Event") && jsonNode.has("action")){
+                            String uuid = jsonNode.get(EVENT.toString()).get("uuid").textValue();
+                            try {
+                                Object object = mispAppClient.getMispEvent(uuid).getBody();
+                                jsonNode = new ObjectMapper().convertValue(object, JsonNode.class);
+                            }
+                            catch (Exception e){
+                                LOG.error("Could not fetch event, probably deleted");
+                            }
+                        }
+                        emitterDataHandler.handleMispData(jsonNode, MispEntity.EVENT, false, isDelete);
+                        break;
+                    case MISP_JSON_EVENT:
+                        if (jsonNode.has("Event") && jsonNode.has("action")){
+                            String uuid = jsonNode.get(EVENT.toString()).get("uuid").textValue();
+                            try {
+                                Object object = mispAppClient.getMispEvent(uuid).getBody();
+                                jsonNode = new ObjectMapper().convertValue(object, JsonNode.class);
+                            }
+                            catch (Exception e){
+                                LOG.error("Could not fetch event, probably deleted");
+                            }
+                        }
                         emitterDataHandler.handleMispData(jsonNode, MispEntity.EVENT, false, isDelete);
                         break;
                     case MISP_AUDIT:
-                        LOG.info("Audit log received from queue.");
+                        LOG.debug("Audit log received from queue.");
                         auditLogHandler.handleAuditLog(jsonNode);
                         break;
                     default:
