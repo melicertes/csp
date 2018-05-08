@@ -1,6 +1,8 @@
 package com.intrasoft.csp.vcb.admin.scheduler;
 
 import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.Comparator;
 import java.util.List;
 
 import com.intrasoft.csp.vcb.admin.config.VcbadminProperties;
@@ -10,6 +12,8 @@ import com.intrasoft.csp.vcb.admin.service.EmailService;
 import com.intrasoft.csp.vcb.admin.service.MeetingService;
 import com.intrasoft.csp.vcb.admin.service.exception.MeetingNotFound;
 import com.intrasoft.csp.vcb.commons.constants.MeetingScheduledTaskType;
+import com.intrasoft.csp.vcb.commons.constants.MeetingStatus;
+import com.intrasoft.csp.vcb.commons.model.Meeting;
 import com.intrasoft.csp.vcb.commons.model.MeetingScheduledTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,8 +38,7 @@ public class MeetingScheduler {
 	@Autowired
 	RetryTemplate retryTemplate;
 
-//	@Autowired
-//	OpenfireService openfireService;
+
 
 	@Autowired
 	VcbadminProperties vcbadminProperties;
@@ -96,12 +99,40 @@ public class MeetingScheduler {
 	}
 
 	@Transactional
-	@Scheduled(fixedRate = 60000)
+	//@Scheduled(fixedRate = 60000)
+	@Scheduled(fixedRate = 6000)
 	public void changeStatus() {
 		/**
-		 * @TODO
+		 * Usage with native query:
+		 * meetingRepository.updateRunningToExpired(ZonedDateTime.now());
+		 *
+		 * Instead loop meetings and change their status after comparing start + duration ? now (in seconds)
 		 */
-		meetingRepository.updateRunningToExpired(ZonedDateTime.now());
-		meetingRepository.updatePendingToRunning(ZonedDateTime.now());
+		List<Meeting> meetingsRunningToExpired = meetingRepository.findByStatusOrStatus(MeetingStatus.Running, MeetingStatus.Expired);
+		for (Meeting m : meetingsRunningToExpired) {
+			ZonedDateTime first = m.getStart().plusSeconds(m.getDuration().getSeconds());
+			ZonedDateTime second = ZonedDateTime.now();
+			Comparator<ZonedDateTime> comparator = Comparator.comparing(
+					zdt -> zdt.truncatedTo(ChronoUnit.SECONDS));
+			Integer result = comparator.compare(first, second);
+			if (result < 0) {
+				m.setStatus(MeetingStatus.Expired);
+				meetingRepository.save(m);
+			}
+		}
+
+		/**
+		 * Usage with native query:
+		 * meetingRepository.updatePendingToRunning(ZonedDateTime.now());
+		 *
+		 * Instead loop meetings and change their status after querying for relevant scheduled tasks
+		 */
+		List<Meeting> meetingsPendingToRunning = meetingRepository.findByStatusAndStartLessThan(MeetingStatus.Pending, ZonedDateTime.now());
+		for (Meeting m : meetingsPendingToRunning) {
+			if (meetingScheduledTaskRepository.countByMeetingIdAndTaskTypeAndCompletedIsFalse(m.getId(), MeetingScheduledTaskType.START_MEETING) == 0) {
+				m.setStatus(MeetingStatus.Running);
+				meetingRepository.save(m);
+			}
+		}
 	}
 }

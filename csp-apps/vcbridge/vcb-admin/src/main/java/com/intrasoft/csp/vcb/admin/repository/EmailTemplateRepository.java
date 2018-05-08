@@ -16,6 +16,7 @@ public interface EmailTemplateRepository extends JpaRepository<EmailTemplate, Lo
 	List<EmailTemplate> findByUserEmail(String email);
 
 	Page<EmailTemplate> findByUserEmail(String email, Pageable p);
+	Page<EmailTemplate> findByUserId(Long userId, Pageable p);
 
 	EmailTemplate findOneByIdAndUserEmail(Long id, String email);
 

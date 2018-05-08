@@ -73,6 +73,10 @@
 	margin-top: 30px;
 }
 
+.participants-popover > .glyphicon-info-sign, .participants-popover > .glyphicon-info-sign:hover {
+	cursor: pointer;
+}
+
 /**
 TYPEAHEAD
  */
