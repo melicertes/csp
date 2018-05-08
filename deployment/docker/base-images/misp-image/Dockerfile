@@ -199,7 +199,7 @@ RUN chown -R www-data:www-data /var/www/MISP/app/files/
 # Final archive
 RUN tar czpf /root/MISP.tgz .
 
-COPY Event.php /var/www/MISP/app/Model/Event.php
+#COPY Event.php /var/www/MISP/app/Model/Event.php
 #VOLUME /var/www/MISP
 EXPOSE 80
 ENTRYPOINT ["/run.sh"]
