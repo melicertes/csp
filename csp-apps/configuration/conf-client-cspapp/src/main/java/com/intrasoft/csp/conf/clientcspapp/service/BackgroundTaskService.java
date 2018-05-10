@@ -18,16 +18,17 @@ import org.apache.commons.io.IOUtils;
 import org.joda.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
-
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.io.*;
+import java.lang.management.ManagementFactory;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
@@ -48,6 +49,54 @@ import java.util.stream.Collectors;
 public class BackgroundTaskService {
 
     public static final String DOCKERCOMPOSE_YML_TEMPLATE = "docker-compose.yml.j2";
+
+    @Value("${installation.reqs.memoryInGB}")
+    public int memoryGb;
+
+    @Value("${installation.reqs.diskFreeInGB}")
+    public int diskGb;
+
+    @Value("${installation.reqs.cpus}")
+    public int vcpus;
+
+    @Value("${installation.forced:false}")
+    private Boolean canProceedForced;
+
+    @Cacheable(cacheNames = {"req.check"})
+    public Boolean canInstallAsPerRequirements() {
+        log.info("Requirements: Verifying H/W requirements: {}GB total memory, {}GB free disk, {} CPUs available",
+                memoryGb,diskGb,vcpus);
+        int vcpusFound = Runtime.getRuntime().availableProcessors();
+        int diskFreeMB = (int) (new File("/opt/csp").getFreeSpace() / 1024 / 1024);
+        int memoryFoundMB = (int) (((com.sun.management.OperatingSystemMXBean) ManagementFactory
+                .getOperatingSystemMXBean()).getTotalPhysicalMemorySize()/ 1024 / 1024 );
+
+        int success = 0;
+        log.info("Found OS         : {}", System.getProperty("os.name"));
+
+        if (vcpusFound < vcpus) {
+            log.warn("Found CPUs       : {}, Required: {} - FAIL", vcpusFound, vcpus);
+            success++;
+        }
+        if (diskFreeMB < diskGb * 1024) {
+            log.warn("Found Free space : {}MB, Required: {}MB - FAIL", diskFreeMB, diskGb * 1024);
+            success++;
+        }
+
+        if (memoryFoundMB < memoryGb * 1024) {
+            log.warn("Found Total RAM  : {}MB, Required: {}MB - FAIL", memoryFoundMB, memoryGb * 1024);
+            success++;
+        }
+        if (success > 0) {
+            log.error("Requirements check result: {}", success > 0 ? "FAILED" : "SUCCESS");
+        }
+
+        if (canProceedForced) {
+            log.warn("Installation is forced due to configuration override");
+            return true;
+        } else
+            return success > 0 ? false : true;
+    }
 
     @Getter
     enum ControlScript {
@@ -853,7 +902,6 @@ public class BackgroundTaskService {
                     envOAM.put("C_EXTNAME", serviceName);
 
                     rOAM = executeScriptSimple(EXEC_CONT_SCRIPT_SH, envOAM);
-                    //TODO do something with result, do we care if oam is left running at the end?
                     //start apache if not started
                     boolean apacheStarted = true; //assume it is already started.
                     if (installationService.queryService(moduleAPC).getServiceState()==ServiceState.NOT_RUNNING) {
