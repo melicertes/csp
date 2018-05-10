@@ -24,7 +24,7 @@ public class RetryRestTemplate extends RestTemplate {
         LOGGER.trace("Injecting execute(String, HttpMethod, RequestCallback, ResponseExtractor, Map) method. Applying retry template.");
         final long start = System.currentTimeMillis();
         T t = retryTemplate.execute(retryContext -> super.execute(url, method, requestCallback, responseExtractor, urlVariables));
-        LOGGER.info("[API]:" + url + " took\t" + (System.currentTimeMillis() - start) + "ms");
+        LOGGER.debug("[API]:" + url + " took\t" + (System.currentTimeMillis() - start) + "ms");
         return t;
     }
 
@@ -33,7 +33,7 @@ public class RetryRestTemplate extends RestTemplate {
         LOGGER.trace("Injecting execute(URI, HttpMethod, RequestCallback, ResponseExtractor) method. Applying retry template.");
         final long start = System.currentTimeMillis();
         T t = retryTemplate.execute(retryContext -> super.execute(url, method, requestCallback, responseExtractor));
-        LOGGER.info("[API]:" + url + " took\t" + (System.currentTimeMillis() - start) + "ms");
+        LOGGER.debug("[API]:" + url + " took\t" + (System.currentTimeMillis() - start) + "ms");
         return t;
     }
 
@@ -42,7 +42,7 @@ public class RetryRestTemplate extends RestTemplate {
         LOGGER.trace("Injecting execute(String, HttpMethod, RequestCallback, ResponseExtractor, Object) method. Applying retry template.");
         final long start = System.currentTimeMillis();
         T t = retryTemplate.execute(retryContext -> super.execute(url, method, requestCallback, responseExtractor, urlVariables));
-        LOGGER.info("[API]:" + url + " took\t" + (System.currentTimeMillis() - start) + "ms");
+        LOGGER.debug("[API]:" + url + " took\t" + (System.currentTimeMillis() - start) + "ms");
         return t;
     }
 

@@ -6,12 +6,12 @@
 	<parent>
 		<groupId>com.intrasoft.csp</groupId>
 		<artifactId>configuration</artifactId>
-		<version>3.5.0-SNAPSHOT</version>
+		<version>3.6.0-SNAPSHOT</version>
 	</parent>
 
 	<groupId>com.intrasoft.csp</groupId>
 	<artifactId>conf-client-cspapp</artifactId>
-	<version>3.5.0-SNAPSHOT</version>
+	<version>3.6.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>Configuration Service CSP Installer</name>
@@ -49,6 +49,12 @@
 			<optional>true</optional>
 		</dependency>
 
+
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>25.0-jre</version>
+		</dependency>
 
         <dependency>
             <groupId>com.intrasoft.csp</groupId>

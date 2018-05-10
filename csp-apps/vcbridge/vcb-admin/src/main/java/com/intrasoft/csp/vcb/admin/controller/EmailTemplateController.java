@@ -67,8 +67,7 @@ public class EmailTemplateController {
         }
         model.addAttribute("userTZ", user_tz);
         PageWrapper<EmailTemplate> templates;
-        templates = new PageWrapper<>(emailTemplateRepository.findByUserEmail(auth.getName(), pageable),
-                "/listEmailTemplates");
+        templates = new PageWrapper<>(emailTemplateRepository.findByUserEmail(auth.getName(), pageable), "/listEmailTemplates");
         model.addAttribute("templates", templates);
         return "listTemplate";
     }
