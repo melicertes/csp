@@ -77,7 +77,7 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler{
     @Override
     public ResponseEntity<String> handleIntegrationData(IntegrationData integrationData, String requestMethod) {
 
-        LOG.info("Handle integration data POSTed by IL.");
+        LOG.info("Handle integration data got by IL.");
         String uuid = integrationData.getDataParams().getOriginRecordId();
         Object getLocalEventResponseBody = integrationData.getDataObject();
 
