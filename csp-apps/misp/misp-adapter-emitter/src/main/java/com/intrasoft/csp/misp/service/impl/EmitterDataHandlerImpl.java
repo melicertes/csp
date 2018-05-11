@@ -110,16 +110,16 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
         LOG.info("Handling misp Event emission");
 
         if (isReEmittion){
-            LOG.debug("Received re-emission: " + jsonNode.toString());
+            LOG.debug("Received re-emission.");
         }
         else {
-            LOG.debug("Received from emitter: " + jsonNode.toString());
+            LOG.debug("Received from emitter.");
         }
 
 
         if (mispEntity.equals(EVENT)) {
             uuid = jsonNode.get(EVENT.toString()).get("uuid").textValue();
-            LOG.debug("Received from emmiter event with uuid: " + uuid);
+            LOG.debug("Event with uuid: " + uuid);
             eventValidationMap = eventValidation(jsonNode, LOG);
             // @TODO check for potential bug
             try{

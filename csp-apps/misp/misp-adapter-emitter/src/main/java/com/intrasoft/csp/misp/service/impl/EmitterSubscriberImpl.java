@@ -72,7 +72,6 @@ public class EmitterSubscriberImpl implements EmitterSubscriber, MispContextUrl{
             JsonNode jsonNode = null;
             try {
                 jsonNode = new ObjectMapper().disable(SerializationFeature.INDENT_OUTPUT).readValue(content, JsonNode.class);
-//                boolean isDelete = jsonNode.toString().contains("\"action\":\"delete\"");
                 boolean isDelete = false;
                 boolean hasEvent = jsonNode.has("Event");
 
