@@ -102,6 +102,8 @@ public class RestApiController implements ContextUrl, ApiContextUrl {
         smtp.setPort(cspForm.getSmtp_port());
         smtp.setUserName(cspForm.getSmtp_user());
         smtp.setPassword(cspForm.getSmtp_pass());
+        smtp.setSenderEmail(cspForm.getSender_email());
+        smtp.setSenderName(cspForm.getSender_name());
 
         final ResponseDTO dto = installService.registerCsp(cspId, cspRegistration, smtp);
         if (dto.getResponseCode() == 0) {
