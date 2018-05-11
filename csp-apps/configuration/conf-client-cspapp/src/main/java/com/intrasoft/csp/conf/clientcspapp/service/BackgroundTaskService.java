@@ -354,6 +354,15 @@ public class BackgroundTaskService {
                     env.put("MAIL_PORT", smtp.getPort().toString());
                     env.put("MAIL_USERNAME", smtp.getUserName());
                     env.put("MAIL_PASSWORD", smtp.getPassword());
+
+                    if (smtp.getSenderEmail() == null) {
+                        env.put("MAIL_SENDER_NAME", "Notification - Do Not Reply");
+                        env.put("MAIL_SENDER_EMAIL", smtp.getUserName());
+                        log.warn("Sender Email is not specified, using {}", smtp.getUserName());
+                    } else {
+                        env.put("MAIL_SENDER_NAME", smtp.getSenderName());
+                        env.put("MAIL_SENDER_EMAIL", smtp.getSenderEmail());
+                    }
                 } else {
                     log.warn("SMTP Details not specified, empty values provided!");
 
@@ -361,6 +370,8 @@ public class BackgroundTaskService {
                     env.put("MAIL_PORT", "");
                     env.put("MAIL_USERNAME", "");
                     env.put("MAIL_PASSWORD", "");
+                    env.put("MAIL_SENDER_NAME", "");
+                    env.put("MAIL_SENDER_EMAIL", "");
                 }
                 log.debug("Configured environment variables: {}",env);
                 return executeScriptSimple(ENV_CREATION_SH, env);
