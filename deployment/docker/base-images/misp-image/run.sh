@@ -26,7 +26,6 @@ verifyMispState(){
                         touch /opt/state/installed.tmp
                 else
                         echo "Misp first run"
-                        rm -f /opt/state/installed.tmp
 
                 fi
         else
