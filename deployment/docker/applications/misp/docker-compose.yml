@@ -17,6 +17,7 @@ services:
             - /dev/urandom:/dev/random
             - MISPSharedDatavolume:/run/secrets
             - MISPDatavolume:/var/www/MISP
+            - MISPStateDatavolume:/opt/state
             - /opt/csp/logs/:/var/www/MISP/app/tmp/logs/
         environment:
             - MYSQL_ROOT_PASSWORD=changeit
@@ -71,6 +72,8 @@ volumes:
     MYSQLDatavolume:
         external: true
     MISPSharedDatavolume:
+        external: true
+    MISPStateDatavolume:
         external: true
     SSLDatavolume:
         external: true
