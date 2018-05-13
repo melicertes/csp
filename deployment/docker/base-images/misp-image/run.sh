@@ -1,8 +1,44 @@
 #!/bin/bash
 
 set -e
+verifyMispState(){
+        echo "Waiting for mysql"
+        until mysql -h"$MYSQL_HOST" -u root --password=$MYSQL_ROOT_PASSWORD  -e  "show databases"  &> /dev/null
+        do
+          printf "."
+          sleep 1
+        done
 
-if [ -r /.firstboot.tmp ]; then
+        echo -e "\nmysql ready"
+
+        ret=`echo 'SHOW DATABASES;' | mysql -u root --password="$MYSQL_ROOT_PASSWORD" -h $MYSQL_HOST -P 3306 # 2>&1`
+
+        if [ $? -eq 0 ]; then
+                echo "Connected to database successfully!"
+                found=0
+                for db in $ret; do
+                        if [ "$db" == "misp" ]; then
+                                found=1
+                        fi
+                done
+                if [ $found -eq 1 ]; then
+                        echo "Misp Already Installed"
+                        touch /opt/state/installed.tmp
+                else
+                        echo "Misp first run"
+                        rm -f /opt/state/installed.tmp
+
+                fi
+        else
+                echo "ERROR: Connecting to database failed:"
+                echo $ret
+        fi
+
+}
+
+verifyMispState
+
+if [ ! -f /opt/state/installed.tmp ]; then
         echo "Container started for the fist time. Setup might time a few minutes. Please wait..."
         echo "(Details are logged in /tmp/install.log)"
         export DEBIAN_FRONTEND=noninteractive
@@ -175,7 +211,7 @@ Don't forget:
 - Change the MISP admin email address to $MISP_ADMIN_EMAIL
 
 __WELCOME__
-        rm -f /.firstboot.tmp
+        touch /opt/state/installed.tmp
 fi
 
 # Start supervisord
