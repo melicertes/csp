@@ -5,7 +5,7 @@ services:
         image: csp-java8:1.0
         container_name: csp-cfg
         hostname: csp-cfg
-        command: java -Xmx512m -Dspring.profiles.active=docker -jar server.jar
+        command: java -Xmx512m -Dinstallation.forced=true -Dspring.profiles.active=docker -jar server.jar
         working_dir: /opt/csp
         environment:
             - CFG_DOCR_PORT=19090
@@ -16,7 +16,7 @@ services:
 #            - /opt/csp/logs/:/opt/csplogs
             - ./cfg/data:/opt/cfg/data
         ports:
-            - 19090:19090
+            - 127.0.0.1:19090:19090
 
     cfg-client:
         image: csp-docker-java8:1.0
@@ -35,5 +35,5 @@ services:
 #            - /opt/csp/logs/:/opt/csplogs
             - ./cfg-client/data:/opt/cspinst/
         ports:
-            - 18080:18080
+            - 127.0.0.1:18080:18080
 
