@@ -13,9 +13,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 
@@ -37,6 +39,9 @@ public class ApiDataHandler implements CamelRoutes{
     @Value("${server.camel.rest.service.is.async:true}")
     Boolean camelRestServiceIsAsync;
 
+    @Value("${check.cspid.cert.header}")
+    String checkCspIdCertHeader;
+
     @Produce
     private ProducerTemplate producerTemplate;
 
@@ -55,5 +60,25 @@ public class ApiDataHandler implements CamelRoutes{
 
         return new ResponseEntity<>(HttpStatusResponseType.SUCCESSFUL_OPERATION.getReasonPhrase(),
                 HttpStatus.OK);
+    }
+
+    public  void checkIsValidCspIdAgainstCertificateHeader(HttpHeaders headers, IntegrationData integrationData){
+        String headerValue;
+        if(!StringUtils.isEmpty(checkCspIdCertHeader)){
+            headerValue = headers.getFirst(checkCspIdCertHeader);
+            if(StringUtils.isEmpty(headerValue)){
+                throw new InvalidDataTypeException("Could not detect header value with valid CspId extracted from certificate. IntegrationData.cspId"+integrationData.getDataParams().getCspId());
+            }else{
+                if(headerValue.equalsIgnoreCase(integrationData.getDataParams().getCspId())){
+                    LOG.debug("CspIds Match! "+checkCspIdCertHeader+" value = "+headerValue+", IntegrationData.cspId="+integrationData.getDataParams().getCspId());
+                }else{
+                    throw new InvalidDataTypeException("CpsIds are not matching! IntegrationData.cspId="+integrationData.getDataParams().getCspId()+" while cspId identified: "+headerValue);
+                }
+            }
+        }
+    }
+
+    public String getCheckCspIdCertHeader() {
+        return checkCspIdCertHeader;
     }
 }
