@@ -31,6 +31,7 @@ services:
          - CONF_SERVER_PORT=19090
          - CONF_SERVER_PROTOCOL=http
          - INSTALLATION_FORCED=true
+         - SERVER_ADDRESS=0.0.0.0
         volumes:
             - ./conf-client-cspapp-3.6.0-SNAPSHOT.jar:/opt/csp/server.jar
 #            - /opt/csp/logs/:/opt/csplogs
