@@ -1,10 +1,10 @@
 version: '3'
 
 services:
-    cfg:
+    sa-cfg:
         image: csp-java8:1.0
-        container_name: csp-cfg
-        hostname: csp-cfg
+        container_name: sa-csp-cfg
+        hostname: sa-csp-cfg
         command: java -Xmx512m -Dspring.profiles.active=docker -jar server.jar
         working_dir: /opt/csp
         environment:
@@ -18,16 +18,16 @@ services:
         ports:
             - 127.0.0.1:19090:19090
 
-    cfg-client:
+    sa-cfg-client:
         image: csp-docker-java8:1.0
         depends_on:
-            - cfg
-        container_name: csp-cfg-client
-        hostname: csp-cfg-client
+            - sa-cfg
+        container_name: sa-csp-cfg-client
+        hostname: sa-csp-cfg-client
         command: java -Xmx512m -jar server.jar
         working_dir: /opt/csp
         environment:
-         - CONF_SERVER_HOST=csp-cfg
+         - CONF_SERVER_HOST=sa-csp-cfg
          - CONF_SERVER_PORT=19090
          - CONF_SERVER_PROTOCOL=http
          - INSTALLATION_FORCED=true
