@@ -1,0 +1,39 @@
+version: '3'
+
+services:
+    cfg:
+        image: csp-java8:1.0
+        container_name: csp-cfg
+        hostname: csp-cfg
+        command: java -Xmx512m -Dspring.profiles.active=docker -jar server.jar
+        working_dir: /opt/csp
+        environment:
+            - CFG_DOCR_PORT=19090
+            - CFG_PATH_REPO=/opt/cfg/data
+            - ENABLE_OAM=false
+        volumes:
+            - ./conf-server-3.6.0-SNAPSHOT-exec.jar:/opt/csp/server.jar
+#            - /opt/csp/logs/:/opt/csplogs
+            - ./cfg/data:/opt/cfg/data
+        ports:
+            - 19090:19090
+
+    cfg-client:
+        image: csp-docker-java8:1.0
+        depends_on:
+            - cfg
+        container_name: csp-cfg-client
+        hostname: csp-cfg-client
+        command: java -Xmx512m -Dspring.profiles.active=docker -jar server.jar
+        working_dir: /opt/csp
+        environment:
+         - CONF_SERVER_HOST=csp-cfg
+         - CONF_SERVER_PORT=19090
+         - CONF_SERVER_PROTOCOL=http
+        volumes:
+            - ./conf-client-cspapp-3.6.0-SNAPSHOT.jar:/opt/csp/server.jar
+#            - /opt/csp/logs/:/opt/csplogs
+            - ./cfg-client/data:/opt/cspinst/
+        ports:
+            - 18080:18080
+
