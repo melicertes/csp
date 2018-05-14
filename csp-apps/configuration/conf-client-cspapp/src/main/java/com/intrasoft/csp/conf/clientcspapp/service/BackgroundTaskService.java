@@ -703,7 +703,8 @@ public class BackgroundTaskService {
             state.setInstallationState(InstallationState.COMPLETED);
             state = installationService.updateSystemInstallationState(state);
 
-            final List<BackgroundTaskResult<Boolean, Integer>> results = installationService.queryAllModulesInstalled(true).stream()
+            final List<BackgroundTaskResult<Boolean, Integer>> results = installationService.queryAllModulesInstalled(true)
+                    .stream()
                     .filter(m -> m.getActive())
                     .map(module -> {
                 SystemService service = installationService.queryService(module);
@@ -976,7 +977,10 @@ public class BackgroundTaskService {
     public void scheduleStopActiveModules() {
         addTask(() -> {
             // for every active module, sort by priority
-            installationService.queryAllModulesInstalled(false).forEach(module -> {
+            installationService.queryAllModulesInstalled(false)
+                .stream()
+                .filter( m -> m.getActive())
+                .forEach(module -> {
                 SystemService service = installationService.queryService(module);
                 stopSingleService(module, service);
             });

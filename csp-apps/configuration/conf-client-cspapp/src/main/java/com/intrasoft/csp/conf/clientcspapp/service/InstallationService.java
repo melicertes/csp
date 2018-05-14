@@ -270,7 +270,7 @@ public class InstallationService {
         if (service.getModule().getId().longValue() == module.getId().longValue()) {
             log.debug("Service id {} linked to Module id {}, CORRECT", service.getId(), module.getId());
         } else {
-            log.warn("Service id {} linked to Module id {}, but module requested id {}",
+            log.warn("Service id {} linked to Module id {}, but incoming module has id {}",
                     service.getId(), service.getModule().getId(), module.getId());
         }
         return service;
