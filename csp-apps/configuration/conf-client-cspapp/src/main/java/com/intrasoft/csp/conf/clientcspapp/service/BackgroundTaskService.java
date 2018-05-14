@@ -88,14 +88,14 @@ public class BackgroundTaskService {
             success++;
         }
         if (success > 0) {
-            log.error("Requirements check result: {}", success > 0 ? "FAILED" : "SUCCESS");
+            log.error("Requirements check result: FAILED");
         }
 
         if (canProceedForced) {
             log.warn("Installation is forced due to configuration override");
             return true;
         } else
-            return success > 0 ? false : true;
+            return success <= 0;
     }
 
     @Getter
