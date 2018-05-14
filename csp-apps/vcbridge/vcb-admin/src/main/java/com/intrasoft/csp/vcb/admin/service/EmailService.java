@@ -39,6 +39,7 @@ import java.util.Map;
 @Service
 public class EmailService {
     private static final Logger log = LoggerFactory.getLogger(EmailService.class);
+
     @Autowired
     JavaMailSender mailSender;
     @Autowired
@@ -161,9 +162,9 @@ public class EmailService {
             // ics);
             try {
                 mailSender.send(messagePreparator);
-                log.info("Email sent to {}", p.getEmail());
+                log.info("Email sent to: " + p.getEmail() + " for Meeting UID: " + meeting.getUid() + ", subject:" + meeting.getSubject());
             } catch (MailException e) {
-                log.error("Error sending email to " + p.getEmail(), e);
+                log.error("Error sending email to: " + p.getEmail() + " for Meeting UID: " + meeting.getUid() + ", subject:" + meeting.getSubject());
                 // runtime exception; compiler will not force you to handle it
             }
         }

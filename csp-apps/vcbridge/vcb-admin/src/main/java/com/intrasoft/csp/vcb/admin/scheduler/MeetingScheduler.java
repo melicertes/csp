@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 @Component
 public class MeetingScheduler {
 	private static final Logger log = LoggerFactory.getLogger(MeetingScheduler.class);
+
 	@Autowired
 	private MeetingScheduledTaskRepository meetingScheduledTaskRepository;
 	@Autowired
@@ -52,38 +53,38 @@ public class MeetingScheduler {
 		List<MeetingScheduledTask> tasks = meetingScheduledTaskRepository
 				.findByTaskTimeLessThanAndCompletedIsFalseAndFailedLessThan(ZonedDateTime.now(),
 						vcbadminProperties.getMaxTaskRetries());
-		log.info("Scheduler is now checking for MeetingScheduledTask(s)...");
+		log.debug("Scheduler is now checking for MeetingScheduledTask(s)...");
 		try {
 			for (MeetingScheduledTask task : tasks) {
-				log.info("Running scheduled task: {}", task);
+				log.debug("Running scheduled task: {}", task);
 				task.getMeeting().getParticipants().size();
 				task.getMeeting().getUser();
 				try {
 					if (task.getTaskType().equals(MeetingScheduledTaskType.START_MEETING)) {
-						log.info("Creating meeting...");
+						log.debug("Creating meeting...");
 						//openfireService.createMeeting(task.getMeeting());
-						log.info("Meeting created...");
+						log.debug("Meeting created...");
 
-						log.info("Changing task to completed...");
+						log.debug("Changing task to completed...");
 						task.setCompleted(true);
 						meetingScheduledTaskRepository.save(task);
-						log.info("Task changed...");
-						log.info("Sending invitation emails for meeting {}", task.getMeeting().getId());
+						log.debug("Task changed...");
+						log.debug("Sending invitation emails for meeting {}", task.getMeeting().getId());
 						emailService.prepareAndSend(task.getMeeting().getUser().getInvitation(), task.getMeeting());
 					} else {
 						try {
-							log.info("Finishing meeting...");
+							log.debug("Finishing meeting...");
 							meetingService.completeMeeting(task.getMeeting());
 							//openfireService.deleteMeeting(task.getMeeting());
-							log.info("Meeting finished...");
+							log.debug("Meeting finished...");
 						} catch (MeetingNotFound e) {
 							log.error("Scheduler: Meeting not found", e);
 						}
 					}
 				} catch (Exception e) { // instead of OpenfireException
 				//} catch (OpenfireException e) { // instead of OpenfireException
-					log.error("Error in Meeting Scheduler");
-					log.error(e.getMessage(), e);
+					log.error("Error in Meeting Scheduler: " + e.toString());
+					log.debug(e.getMessage(), e);
 					// task.setError(true);
 					task.increaseFailed();
 					if (task.getFailed().equals(vcbadminProperties.getMaxTaskRetries())) {
@@ -94,7 +95,7 @@ public class MeetingScheduler {
 				}
 			}
 		} catch (Exception e) {
-			log.error(e.getMessage(), e);
+			log.debug(e.getMessage(), e);
 		}
 	}
 
