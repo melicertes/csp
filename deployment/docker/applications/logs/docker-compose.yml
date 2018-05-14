@@ -72,7 +72,7 @@ services:
             - .env
          volumes:
             - ./config/misp/filebeat.yml:/usr/share/filebeat/filebeat.yml
-            - /opt/csp/logs/:/mnt/log/
+            - /opt/csp/logs/misp/:/mnt/log/
 
 networks:
   default:
