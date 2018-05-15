@@ -33,19 +33,19 @@ public class ElasticSearchClientConfig implements ContextUrl {
     @Value("${app.es.port}")
     private String port;
 
-    @Value("${csp.retry.backOffPeriod:5000}")
+    @Value("${app.es.csp.retry.backOffPeriod:5000}")
     private String backOffPeriod;
 
-    @Value("${csp.retry.maxAttempts:3}")
+    @Value("${app.es.csp.retry.maxAttempts:3}")
     private String maxAttempts;
 
-    @Value("${csp.client.ssl.enabled:false}")
+    @Value("${app.es.client.ssl.enabled:false}")
     Boolean cspClientSslEnabled;
 
-    @Value("${csp.client.ssl.jks.keystore:path}")
+    @Value("${app.es.client.ssl.jks.keystore:path}")
     String cspClientSslJksKeystore;
 
-    @Value("${csp.client.ssl.jks.keystore.password:securedPass}")
+    @Value("${app.es.client.ssl.jks.keystore.password:securedPass}")
     String cspClientSslJksKeystorePassword;
 
     private static final ConcurrentHashMap<String, ExceptionHandler> SUPPORTED_EXCEPTIONS = new ConcurrentHashMap<>();
