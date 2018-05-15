@@ -14,10 +14,13 @@ services:
         - ./regrep-app-3.6.0-SNAPSHOT-exec.jar:/opt/csp/server.jar
         - /opt/csp/logs/:/opt/csplogs
         - RegRepDatavolume:/opt/regrep/data
+        - SSLDatavolume:/opt/ssl/
     expose:
         - ${REGREP_DOCR_PORT}
 volumes:
     RegRepDatavolume:
+        external: true
+    SSLDatavolume:
         external: true
 
 networks:
