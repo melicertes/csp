@@ -25,6 +25,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.mail.MessagingException;
+import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import javax.mail.util.ByteArrayDataSource;
 import java.io.BufferedReader;
@@ -39,6 +40,28 @@ import java.util.Map;
 @Service
 public class EmailService {
     private static final Logger log = LoggerFactory.getLogger(EmailService.class);
+
+
+    @Value(value = "${app.mail.sender.name}")
+    private String mailFromName;
+    @Value(value = "${app.mail.sender.email}")
+    private String mailFromMail;
+
+
+    @Value(value = "${XXXMAILSERVERHOSTXXX}")
+    private String XXX_MAIL_SERVER_HOST;
+    @Value(value = "${XXXMAILSERVERPORTXXX}")
+    private Integer XXX_MAIL_SERVER_PORT;
+    @Value(value = "${XXXMAILUSERNAMEXXX}")
+    private String XXX_MAIL_USERNAME;
+    @Value(value = "${XXXMAILPASSWORDXXX}")
+    private String XXX_MAIL_PASSWORD;
+    @Value(value = "${MAIL_SENDER_NAME}")
+    private String XXX_MAIL_SENDER_NAME;
+    @Value(value = "${MAIL_SENDER_EMAIL}")
+    private String XXX_MAIL_SENDER_EMAIL;
+
+
 
     @Autowired
     JavaMailSender mailSender;
@@ -84,7 +107,10 @@ public class EmailService {
 
             MimeMessagePreparator messagePreparator = mimeMessage -> {
                 MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage, true);
-                messageHelper.setFrom(meeting.getUser().getEmail());
+
+                messageHelper.setFrom(new InternetAddress(mailFromMail, mailFromName));
+                //messageHelper.setFrom(meeting.getUser().getEmail());
+
                 messageHelper.setTo(p.getEmail());
 
                 m.put("email", p.getEmail());
@@ -160,10 +186,17 @@ public class EmailService {
             // MimeMessagePreparator messagePreparator = new
             // MessagePreparatorImpl(meeting, et, mailContentBuilder, p,
             // ics);
+            log.debug(XXX_MAIL_SERVER_HOST);
+            log.debug(XXX_MAIL_SERVER_PORT.toString());
+            log.debug(XXX_MAIL_USERNAME);
+            log.debug(XXX_MAIL_PASSWORD);
+            log.debug(XXX_MAIL_SENDER_NAME);
+            log.debug(XXX_MAIL_SENDER_EMAIL);
             try {
                 mailSender.send(messagePreparator);
                 log.info("Email sent to: " + p.getEmail() + " for Meeting UID: " + meeting.getUid() + ", subject:" + meeting.getSubject());
             } catch (MailException e) {
+                log.debug(e.toString());
                 log.error("Error sending email to: " + p.getEmail() + " for Meeting UID: " + meeting.getUid() + ", subject:" + meeting.getSubject());
                 // runtime exception; compiler will not force you to handle it
             }
@@ -192,6 +225,7 @@ public class EmailService {
             Map<String, Object> m = new HashMap<>();
             MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage, true);
             messageHelper.setFrom(meeting.getUser().getEmail());
+
             messageHelper.setTo(p.getEmail());
 
             m.put("email", p.getEmail());
