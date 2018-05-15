@@ -56,6 +56,14 @@ function createEnvironment() {
 		docker network create local.$CSPNAME.$CSPDOMAIN
 	fi
 	echo "Docker network (internal) should be local.$CSPNAME.$CSPDOMAIN"
+
+	### create docker network
+	local DN=$(docker network ls |grep installer_net|wc -l)
+	if [ "$DN" == "0" ]; then
+		echo "Creating docker network installer_net"
+		docker network create installer_net
+	fi
+	echo "Docker installer network (internal) should be installer_net"
 	docker network ls
 
 	# are we sure the directory exists?
