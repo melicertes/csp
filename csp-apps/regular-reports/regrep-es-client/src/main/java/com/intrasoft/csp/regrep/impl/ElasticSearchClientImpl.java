@@ -2,6 +2,7 @@ package com.intrasoft.csp.regrep.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.intrasoft.csp.libraries.restclient.service.RetryRestTemplate;
 import com.intrasoft.csp.regrep.ElasticSearchClient;
 import com.intrasoft.csp.regrep.commons.model.DailyExceptionsResponse;
 import com.intrasoft.csp.regrep.commons.model.HitsItem;
@@ -9,9 +10,9 @@ import com.intrasoft.csp.regrep.routes.ContextUrl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.*;
 import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
@@ -21,7 +22,8 @@ import java.util.List;
 public class ElasticSearchClientImpl implements ElasticSearchClient {
 
     @Autowired
-    RestTemplate restTemplate;
+    @Qualifier("ElasticRestTemplate")
+    RetryRestTemplate retryRestTemplate;
 
     @Autowired
     ObjectMapper objectMapper;
@@ -93,7 +95,7 @@ public class ElasticSearchClientImpl implements ElasticSearchClient {
         HttpEntity<String> request = new HttpEntity<>(requestBody, headers);
         ResponseEntity<DailyExceptionsResponse> responseEntity;
         try {
-            responseEntity = restTemplate.exchange(url, HttpMethod.GET, request, DailyExceptionsResponse.class);
+            responseEntity = retryRestTemplate.exchange(url, HttpMethod.GET, request, DailyExceptionsResponse.class);
         } catch (Exception e) {
          LOG.error(e.getMessage());
          return null;
@@ -105,7 +107,7 @@ public class ElasticSearchClientImpl implements ElasticSearchClient {
     private int getCount(String requestBody, String url) {
         LOG.info("API call [GET]: " + url);
         HttpEntity<String> request = new HttpEntity<>(requestBody, headers);
-        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, request, String.class);
+        ResponseEntity<String> response = retryRestTemplate.exchange(url, HttpMethod.GET, request, String.class);
         JsonNode obj = null;
         try {
             obj = objectMapper.readTree(response.getBody());
