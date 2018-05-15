@@ -832,7 +832,7 @@ public class BackgroundTaskService {
         try {
             domains.addAll(Files.readAllLines(envFile.toPath()).stream()
                     .filter(line -> line.contains("_LOCAL"))
-                    .map(line -> line.split(Pattern.quote("="))[0])
+                    .map(line -> line.split(Pattern.quote("="))[0]).distinct()
                     .collect(Collectors.toList()));
             log.info("Domains discovered: {}",domains);
         } catch (IOException e) {
