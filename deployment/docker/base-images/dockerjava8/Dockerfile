@@ -49,6 +49,8 @@ RUN apk add --no-cache --virtual=build-dependencies wget ca-certificates unzip &
 RUN apk add --no-cache bash drill wget ca-certificates libressl python py2-pip py-jinja2 git \
    && pip install --upgrade pip \
    && pip install j2cli[yaml] && update-ca-certificates
+RUN pip install docker-compose
+
 
 
 COPY docker-entrypoint.sh /usr/local/bin/
