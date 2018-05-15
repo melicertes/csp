@@ -46,6 +46,11 @@ RUN apk add --no-cache --virtual=build-dependencies wget ca-certificates unzip &
    && wget "http://central.preprod.melicertes.eu/repo-loads/java8/jce_policy-8.zip" \
    && unzip -jo -d "${JAVA_HOME}/jre/lib/security" "jce_policy-${JAVA_VERSION}.zip" && rm "${JAVA_HOME}/jre/lib/security/README.txt" && apk del build-dependencies && rm "/tmp/"*
 
+RUN apk add --no-cache bash drill wget ca-certificates libressl python py2-pip py-jinja2 git \
+   && pip install --upgrade pip \
+   && pip install j2cli[yaml] && update-ca-certificates
+
+
 COPY docker-entrypoint.sh /usr/local/bin/
 RUN ln -s usr/local/bin/docker-entrypoint.sh / # backwards compat
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh

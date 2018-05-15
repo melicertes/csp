@@ -24,13 +24,12 @@ services:
             - sa-cfg
         container_name: csp-sa_cfg_client
         hostname: csp-sa_cfg_client
-        command: java -Dinstallation.forced=true -Xmx512m -jar server.jar
+        command: java -Xmx512m -jar server.jar
         working_dir: /opt/csp
         environment:
          - CONF_SERVER_HOST=csp-sa_cfg
          - CONF_SERVER_PORT=19090
          - CONF_SERVER_PROTOCOL=http
-         - INSTALLATION_FORCED=true
          - SERVER_ADDRESS=0.0.0.0
         volumes:
             - /var/run/docker.sock:/var/run/docker.sock
