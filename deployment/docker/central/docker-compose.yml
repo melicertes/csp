@@ -35,6 +35,7 @@ services:
             - /var/run/docker.sock:/var/run/docker.sock
             - ./conf-client-cspapp-3.6.0-SNAPSHOT.jar:/opt/csp/server.jar
             - ./cfg-client/data:/opt/cspinst/
+            - ./cfg-client/root:/root/
             - /opt/csp/:/opt/csp/
         ports:
             - 127.0.0.1:18080:18080
