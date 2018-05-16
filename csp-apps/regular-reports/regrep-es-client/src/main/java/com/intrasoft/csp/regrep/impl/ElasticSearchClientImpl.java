@@ -92,10 +92,12 @@ public class ElasticSearchClientImpl implements ElasticSearchClient {
     public List<HitsItem> getLogData(String requestBody) {
         String url = context + "/" + LOGS_INDEX + "/" + ContextUrl.Api.SEARCH;  // prettify?
         LOG.info("API call [GET]: " + url);
+        LOG.debug("API call [requestBody]: " + requestBody);
         HttpEntity<String> request = new HttpEntity<>(requestBody, headers);
         ResponseEntity<DailyExceptionsResponse> responseEntity;
         try {
             responseEntity = retryRestTemplate.exchange(url, HttpMethod.GET, request, DailyExceptionsResponse.class);
+            LOG.debug("Response: \n"+responseEntity.getBody().toString());
         } catch (Exception e) {
          LOG.error(e.getMessage());
          return null;
@@ -106,8 +108,10 @@ public class ElasticSearchClientImpl implements ElasticSearchClient {
 
     private int getCount(String requestBody, String url) {
         LOG.info("API call [GET]: " + url);
+        LOG.debug("API call [requestBody]: " + requestBody);
         HttpEntity<String> request = new HttpEntity<>(requestBody, headers);
         ResponseEntity<String> response = retryRestTemplate.exchange(url, HttpMethod.GET, request, String.class);
+        LOG.debug("Response: \n"+response.getBody());
         JsonNode obj = null;
         try {
             obj = objectMapper.readTree(response.getBody());
