@@ -65,6 +65,7 @@
           {% endif -%}
 
           {% if "integration" in service.external_name %}
+          SSLOptions +StdEnvVars
           RequestHeader set CspId-Client-Certificate-Header %{SSL_CLIENT_S_DN_CN}e
           {% endif %}
     </VirtualHost>

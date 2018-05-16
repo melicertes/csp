@@ -64,6 +64,7 @@ public class ApiDataHandler implements CamelRoutes{
 
     public  void checkIsValidCspIdAgainstCertificateHeader(HttpHeaders headers, IntegrationData integrationData){
         String headerValue;
+        LOG.debug("checkCspIdCertHeader: "+checkCspIdCertHeader);
         if(!StringUtils.isEmpty(checkCspIdCertHeader)){
             headerValue = headers.getFirst(checkCspIdCertHeader);
             LOG.debug("CspId checking...");
@@ -71,7 +72,7 @@ public class ApiDataHandler implements CamelRoutes{
             if(StringUtils.isEmpty(headerValue)){
                 throw new InvalidDataTypeException("Could not detect header value with valid CspId extracted from certificate. IntegrationData.cspId: "+integrationData.getDataParams().getCspId());
             }else{
-                if(headerValue.equalsIgnoreCase(integrationData.getDataParams().getCspId())){
+                if(headerValue.toLowerCase().contains(integrationData.getDataParams().getCspId().toLowerCase())){
                     LOG.debug("CspIds Match! "+checkCspIdCertHeader+" value = "+headerValue+", IntegrationData.cspId="+integrationData.getDataParams().getCspId());
                 }else{
                     throw new InvalidDataTypeException("CpsIds are not matching! IntegrationData.cspId="+integrationData.getDataParams().getCspId()+" while cspId identified: "+headerValue);
