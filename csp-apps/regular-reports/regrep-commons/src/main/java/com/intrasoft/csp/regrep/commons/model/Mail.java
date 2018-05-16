@@ -5,6 +5,8 @@ import java.util.Map;
 public class Mail {
 
     private String from;
+    private String senderName;
+    private String senderEmail;
     private String to;
     private String subject;
     private String content;
@@ -60,10 +62,28 @@ public class Mail {
         this.model = model;
     }
 
+    public String getSenderName() {
+        return senderName;
+    }
+
+    public void setSenderName(String senderName) {
+        this.senderName = senderName;
+    }
+
+    public String getSenderEmail() {
+        return senderEmail;
+    }
+
+    public void setSenderEmail(String senderEmail) {
+        this.senderEmail = senderEmail;
+    }
+
     @Override
     public String toString() {
         return "Mail{" +
                 "from='" + from + '\'' +
+                ", senderName='" + senderName + '\'' +
+                ", senderEmail='" + senderEmail + '\'' +
                 ", to='" + to + '\'' +
                 ", subject='" + subject + '\'' +
                 ", content='" + content + '\'' +
