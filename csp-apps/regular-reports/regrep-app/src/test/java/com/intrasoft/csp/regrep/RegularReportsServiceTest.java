@@ -16,7 +16,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.web.client.RestTemplate;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringBootTest(classes = {RegularReportsServiceImpl.class, ElasticSearchClientImpl.class, RequestBodyServiceImpl.class, RestTemplate.class, ObjectMapper.class})
+@SpringBootTest(classes = {RegularReportsApplication.class})
 public class RegularReportsServiceTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(RegularReportsService.class);
