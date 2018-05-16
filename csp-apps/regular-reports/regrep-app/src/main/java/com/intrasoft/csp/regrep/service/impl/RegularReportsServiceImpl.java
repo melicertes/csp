@@ -54,12 +54,12 @@ public class RegularReportsServiceImpl implements RegularReportsService {
 
     @Value("${regrep.basis.yearly}")
     boolean yearly;
-
-    @Value("${regrep.from}")
-    String from;
+// Deprecated
+//    @Value("${regrep.from}")
+//    String from;
 
     @Value("${regrep.to}")
-    String to;
+    String[] to;
 
     @Value(value = "${app.mail.sender.name}")
     private String mailFromName;
@@ -179,7 +179,7 @@ public class RegularReportsServiceImpl implements RegularReportsService {
         newMail.setSenderName(mailFromName);
         newMail.setSenderEmail(mailFromMail);
         newMail.setSubject(reportType);
-        newMail.setTo(to);
+        newMail.setToArr(to);
         Map valuesMap = new HashMap();
 
         valuesMap.put("isDaily", isDaily);

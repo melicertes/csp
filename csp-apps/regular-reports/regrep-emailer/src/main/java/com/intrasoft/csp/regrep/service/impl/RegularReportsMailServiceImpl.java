@@ -76,7 +76,13 @@ public class RegularReportsMailServiceImpl implements RegularReportsMailService 
         context.setVariables(mail.getModel());
         final String html = templateEngine.process(emailTemplate, context);
 
-        helper.setTo(mail.getTo());
+        if(mail.getTo()!=null) {
+            helper.setTo(mail.getTo());
+        }
+
+        if(mail.getToArr()!=null){
+            helper.setTo(mail.getToArr());
+        }
         helper.setText(html, true);
         helper.setSubject(mail.getSubject());
         if(!StringUtils.isEmpty(mail.getFrom())){

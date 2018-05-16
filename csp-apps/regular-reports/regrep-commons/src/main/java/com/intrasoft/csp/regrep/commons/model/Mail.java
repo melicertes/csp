@@ -8,6 +8,7 @@ public class Mail {
     private String senderName;
     private String senderEmail;
     private String to;
+    private String[] toArr;
     private String subject;
     private String content;
     private Map<String, Object> model;
@@ -78,6 +79,14 @@ public class Mail {
         this.senderEmail = senderEmail;
     }
 
+    public String[] getToArr() {
+        return toArr;
+    }
+
+    public void setToArr(String[] toArr) {
+        this.toArr = toArr;
+    }
+
     @Override
     public String toString() {
         return "Mail{" +
@@ -85,6 +94,7 @@ public class Mail {
                 ", senderName='" + senderName + '\'' +
                 ", senderEmail='" + senderEmail + '\'' +
                 ", to='" + to + '\'' +
+                ", toArr='" + toArr + '\'' +
                 ", subject='" + subject + '\'' +
                 ", content='" + content + '\'' +
                 ", model=" + model +
