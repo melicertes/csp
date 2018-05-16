@@ -1,0 +1,9 @@
+{
+   "Event":{    
+      "info":"TC_IMQ_Report_002",
+	  "threat_level_id": "1",
+	  "Tag": [{
+			"name": "threat"
+		}]
+   }
+}
