@@ -11,12 +11,15 @@ import org.springframework.mail.MailAuthenticationException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
 import javax.annotation.PostConstruct;
 import javax.mail.MessagingException;
+import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
@@ -76,7 +79,19 @@ public class RegularReportsMailServiceImpl implements RegularReportsMailService 
         helper.setTo(mail.getTo());
         helper.setText(html, true);
         helper.setSubject(mail.getSubject());
-        helper.setFrom(mail.getFrom());
+        if(!StringUtils.isEmpty(mail.getFrom())){
+            helper.setFrom(mail.getFrom());
+        }else{
+            String mailFromName = mail.getSenderName();
+            String mailFromMail = mail.getSenderEmail();
+            try {
+                helper.setFrom(new InternetAddress(mailFromMail, mailFromName));
+            } catch (UnsupportedEncodingException e) {
+                LOG.error("Could not set 'from' field.",e);
+            }
+        }
+
+
         try {
             javaMailSender.send(message);
         } catch (MailAuthenticationException e) {

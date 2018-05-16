@@ -61,6 +61,12 @@ public class RegularReportsServiceImpl implements RegularReportsService {
     @Value("${regrep.to}")
     String to;
 
+    @Value(value = "${app.mail.sender.name}")
+    private String mailFromName;
+
+    @Value(value = "${app.mail.sender.email}")
+    private String mailFromMail;
+
     @Value("${regrep.date.pattern}")
     String datePattern;
 
@@ -170,7 +176,8 @@ public class RegularReportsServiceImpl implements RegularReportsService {
         }
 
         Mail newMail = new Mail();
-        newMail.setFrom(from);
+        newMail.setSenderName(mailFromName);
+        newMail.setSenderEmail(mailFromMail);
         newMail.setSubject(reportType);
         newMail.setTo(to);
         Map valuesMap = new HashMap();
