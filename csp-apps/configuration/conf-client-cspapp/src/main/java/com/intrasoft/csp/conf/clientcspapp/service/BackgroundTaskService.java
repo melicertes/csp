@@ -705,27 +705,15 @@ public class BackgroundTaskService {
 
             final List<BackgroundTaskResult<Boolean, Integer>> results = installationService.queryAllModulesInstalled(true)
                     .stream()
-                    .filter(m -> m.getActive())
+                    .filter(SystemModule::getActive)
                     .map(module -> {
                 SystemService service = installationService.queryService(module);
-                log.info("Starting service {} id {} [linked to id {}, active {}] from Module id {}",
-                        service.getName(), service.getId(), service.getModule().getId(), service.getModule().getActive(), module.getId());
                 if (service == null) {
                     log.error("Module {} has no service!",module.getName());
-                } else if (service.getStartable() == true) {
-
-                    //copy the environment again before starting
-                    try {
-                        copyEnvironment(module.getModulePath());
-                        log.info("Environment merged");
-
-                        service = checkOAMAgentCreation(module,service);
-
-                        service = checkVHostCreation(module,service);
-
-                    } catch (IOException e) {
-                        log.error("Failed to copy ENVIRONMENT! {}", e.getMessage(),e);
-                    }
+                } else if (service.getStartable()) {
+                    log.info("Starting service {} id {} [linked to id {}, active {}] from Module id {}",
+                            service.getName(), service.getId(), service.getModule().getId(), service.getModule().getActive(), module.getId());
+                    service = createModuleEnvAndAgents(module, service);
                     if (service.getServiceState() == ServiceState.NOT_RUNNING) {
                         return startSingleService(module, service);
                     } else {
@@ -733,7 +721,8 @@ public class BackgroundTaskService {
                     }
                     log.info("Service {} state {}", service.getName(), service.getServiceState());
                 } else {
-                    log.info("Service {} is not a startable service, moving on", service.getName());
+                    log.info("Service {} is not a startable service - checking agents", service.getName());
+                    createModuleEnvAndAgents(module, service);
                 }
                 return new BackgroundTaskResult<Boolean, Integer>(true, 0, module.getName());
             }).distinct().collect(Collectors.toList());
@@ -747,6 +736,21 @@ public class BackgroundTaskService {
             });
             return finalResult;
         });
+    }
+
+    private SystemService createModuleEnvAndAgents(SystemModule module, SystemService service) {
+        //copy the environment again before starting
+        try {
+            copyEnvironment(module.getModulePath());
+            log.info("Environment merged for {} - {} / {} / {}", module.getId(), service.getId(), service.getName(), module.getModulePath());
+            service = checkOAMAgentCreation(module,service);
+            log.info("OAM Agent checked for {} - {} / {} / {}", module.getId(), service.getId(), service.getName(), module.getModulePath());
+            service = checkVHostCreation(module,service);
+            log.info("VHost checked for {} - {} / {} / {}", module.getId(), service.getId(), service.getName(), module.getModulePath());
+        } catch (IOException e) {
+            log.error("Failure while setting up the module! error: {}", e.getMessage(),e);
+        }
+        return service;
     }
 
     private BackgroundTaskResult<Boolean, Integer> startSingleService(SystemModule module, SystemService service) {
