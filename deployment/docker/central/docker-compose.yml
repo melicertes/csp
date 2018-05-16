@@ -7,6 +7,8 @@ services:
         hostname: csp-sa_cfg
         command: java -Xmx512m -Dspring.profiles.active=docker -jar server.jar
         working_dir: /opt/csp
+        networks:
+            - installer_net
         environment:
             - CFG_DOCR_PORT=19090
             - CFG_PATH_REPO=/opt/cfg/data
