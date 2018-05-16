@@ -8,13 +8,12 @@ services:
         shm_size: 1524m
         env_file:
             - .env
-        networks:
-            - installer_net
 {% endraw %}
   {% if local_domains is defined -%}
   {% if local_domains|length > 1 %}
 
         networks:
+            installer_net:
             default:
                 aliases:
             {% for local_domain in local_domains -%}
