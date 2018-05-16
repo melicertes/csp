@@ -35,7 +35,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
             dbentity.setTimezone(u.getTimezone());
             return demoAuthentication;
         } else {
-            log.error("error creating user..");
+            log.error("Error creating user..");
             return null;
         }
 
