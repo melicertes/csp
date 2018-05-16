@@ -8,6 +8,8 @@ import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,6 +17,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.support.ResourcePatternResolver;
 
+import com.fraunhofer.csp.intelmq.service.impl.EmitterDataHandlerImpl;
 import com.intrasoft.csp.client.CspClient;
 import com.intrasoft.csp.client.impl.CspClientImpl;
 import com.intrasoft.csp.commons.exceptions.InvalidDataTypeException;
@@ -54,7 +57,9 @@ public class CspClientConfig implements ContextUrl {
 
 	@Value("${csp.client.ssl.jks.keystore.password:securedPass}")
 	String cspClientSslJksKeystorePassword;
-
+	
+	private static final Logger LOG = LoggerFactory.getLogger(CspClientConfig.class);
+	
 	@Autowired
 	ResourcePatternResolver resourcePatternResolver;
 
@@ -80,6 +85,8 @@ public class CspClientConfig implements ContextUrl {
 			NoSuchAlgorithmException, KeyStoreException, KeyManagementException, IOException {
 		RestTemplateConfiguration restTemplateConfiguration = new RestTemplateConfiguration(backOffPeriod, maxAttempts,
 				cspClientSslEnabled, cspClientSslJksKeystore, cspClientSslJksKeystorePassword, resourcePatternResolver);
+		//LOG.debug("cspClientSslJksKeystore::"+cspClientSslJksKeystore);
+		//LOG.debug("cspClientSslJksKeystorePassword:"+cspClientSslJksKeystorePassword);
 		return restTemplateConfiguration.getRestTemplateWithSupportedExceptions(SUPPORTED_EXCEPTIONS);
 	}
 
