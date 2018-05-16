@@ -26,7 +26,9 @@ import com.intrasoft.csp.vcb.admin.repository.MeetingRepository;
 
 @Service
 public class MeetingService {
+
 	private static final Logger log = LoggerFactory.getLogger(MeetingService.class);
+
 	@Autowired
 	MeetingRepository meetingRepository;
 
@@ -49,6 +51,7 @@ public class MeetingService {
 			task.setMeeting(meeting);
 		}
 		meetingScheduledTaskRepository.save(tasks);
+		log.info("Meeting UID: " + meeting.getUid() + " created, Subject: " + meeting.getSubject() + ", Start: " + meeting.getStart());
 		return meeting;
 	}
 
@@ -62,9 +65,10 @@ public class MeetingService {
 			}
 			meetings.add(m);
 			m.setStatus(MeetingStatus.Cancel);
+			log.info("Meeting UID: " + m.getUid() + " cancelled, Subject: " + m.getSubject() + ", Start: " + m.getStart());
 		}
 		meetingRepository.save(meetings);
-		log.info("Sending cancellation emails...");
+		log.debug("Sending cancellation emails...");
 		meetings.clear();
 		for (long id : ids) {
 			Meeting m = meetingRepository.findOne(id);
@@ -76,13 +80,14 @@ public class MeetingService {
 					.filter(st -> st.getCompleted() && st.getTaskType().equals(MeetingScheduledTaskType.START_MEETING))
 					.collect(Collectors.toList());
 			if (!already_started.isEmpty()) {
-				log.info("Sending cancellation emails for meeting {}", m.getId());
+				log.debug("Sending cancellation emails for meeting {}", m.getId());
 				emailService.prepareAndSend(m.getUser().getCancellation(), m);
 			} else {
-				log.info("Not sending email for meeting {} because email invitations haven't been sent yet", m.getId());
+				log.debug("Not sending email for meeting {} because email invitations haven't been sent yet", m.getId());
 			}
 			m.getScheduledTasks().forEach(st -> st.setCompleted(true));
 		}
+
 		meetingRepository.save(meetings);
 	}
 
@@ -113,7 +118,7 @@ public class MeetingService {
 		for (MeetingScheduledTask task : tasks) {
 			task.setFailed(0);
 		}
-		log.info("Set task trials to 0 for {} meeting tasks", tasks.size());
+		log.debug("Set task trials to 0 for {} meeting tasks", tasks.size());
 		meetingScheduledTaskRepository.save(tasks);
 		return true;
 	}

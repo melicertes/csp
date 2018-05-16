@@ -39,7 +39,7 @@ public class MailContentBuilder {
 		// springMessageResolver,html?TemplateMode.HTML.name():TemplateMode.TEXT.name());
 		// String result = templateEngine.processTemplateCode(emailTemplate);
 		String result = emailTemplateEngine.process(emailTemplate, context);
-		log.info("Prepared text for email:\n {}", result);
+		log.debug("Prepared text for email:\n {}", result);
 		return result;// , context);
 	}
 

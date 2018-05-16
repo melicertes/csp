@@ -73,7 +73,7 @@ public class UserDetailsService implements org.springframework.security.core.use
     public User createUserIfNotExists(String username) {
         Optional<User> u = userRepository.findByEmail(username);
         if (!u.isPresent()) {
-            log.info("User not found. Creating profile automatically..");
+            log.debug("User not found. Creating profile automatically..");
             // create profile automatically
             User new_user = new User();
             new_user.setEmail(username);
@@ -85,7 +85,7 @@ public class UserDetailsService implements org.springframework.security.core.use
                 return new_user;
             } catch (Exception e) {
                 // return failure whatever the exception is
-                log.error(e.getMessage(), e);
+                log.debug(e.getMessage(), e);
                 return null;
             }
         }
@@ -97,7 +97,7 @@ public class UserDetailsService implements org.springframework.security.core.use
     @Transactional
     public User createNewUser(User userForm) throws IOException {
         userForm.setPassword(passwordEncoder.encode(userForm.getPassword()));
-        log.info("Creating user {}", userForm);
+        log.debug("Creating user {}", userForm);
         User user = userRepository.save(userForm);
 
         log.debug("Constructing init invitation email for user {}", user.getEmail());
