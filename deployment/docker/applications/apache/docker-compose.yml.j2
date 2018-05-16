@@ -8,6 +8,8 @@ services:
         shm_size: 1524m
         env_file:
             - .env
+        networks:
+            - installer_net
 {% endraw %}
   {% if local_domains is defined -%}
   {% if local_domains|length > 1 %}
