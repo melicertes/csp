@@ -572,6 +572,8 @@ public class BackgroundTaskService {
             env.put("MAIL_PORT", smtp.getPort().toString());
             env.put("MAIL_USERNAME", smtp.getUserName());
             env.put("MAIL_PASSWORD", smtp.getPassword());
+            env.put("MAIL_SENDER_NAME", smtp.getSenderName());
+            env.put("MAIL_SENDER_EMAIL", smtp.getUserName());
         }
         log.info("Configured environment variables: {}",env);
 
