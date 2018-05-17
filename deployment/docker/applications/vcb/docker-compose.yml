@@ -25,12 +25,12 @@ services:
       
   vcb-admin:
     image: csp-java8:1.0
-    container_name: csp-vcadm
+    container_name: csp-vcb_admin
     domainname: ${LOCAL_DOMAIN}
-    hostname: csp-vcadm
+    hostname: csp-vcb_admin
     env_file:
         - .env
-    command: java -Xmx512m -Dspring.profiles.active=docker -jar server.jar
+    command: java -Xmx512m -Dspring.profiles.active=docker -Dspring.mail.smtp.auth=false -Dspring.mail.properties.mail.smtp.auth=false -Dspring.mail.properties.mail.smtp.starttls.enable=false -Dlogging.level.com.intrasoft.csp=DEBUG -jar server.jar
     working_dir: /opt/csp
     volumes:
         - ./vcb-admin-3.6.0-SNAPSHOT-exec.jar:/opt/csp/server.jar
@@ -43,9 +43,9 @@ services:
         
   vcb-teleconf:
     image: csp-java8:1.0
-    container_name: csp-vcui
+    container_name: csp-vcb_teleconf
     domainname: ${LOCAL_DOMAIN}
-    hostname: csp-vcui
+    hostname: csp-vcb_teleconf
     env_file:
         - .env
     command: java -Xmx512m -Dspring.profiles.active=docker -jar server.jar
