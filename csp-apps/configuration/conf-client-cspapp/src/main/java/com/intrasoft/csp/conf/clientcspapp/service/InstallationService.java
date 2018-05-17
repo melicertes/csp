@@ -267,13 +267,18 @@ public class InstallationService {
 
     public SystemService queryService(SystemModule module) {
         SystemService service = serviceRepository.findByName(module.getName());
-        if (service.getModule().getId().longValue() == module.getId().longValue()) {
-            log.debug("Service id {} linked to Module id {}, CORRECT", service.getId(), module.getId());
+        if (service != null) {
+            if (service.getModule().getId().longValue() == module.getId().longValue()) {
+                log.debug("Service id {} linked to Module id {}, CORRECT", service.getId(), module.getId());
+            } else {
+                log.warn("Service id {} linked to Module id {}, but incoming module has id {}",
+                        service.getId(), service.getModule().getId(), module.getId());
+            }
+            return service;
         } else {
-            log.warn("Service id {} linked to Module id {}, but incoming module has id {}",
-                    service.getId(), service.getModule().getId(), module.getId());
+            log.warn("There is no service for module {}",module);
+            return null;
         }
-        return service;
     }
 
     @Transactional
