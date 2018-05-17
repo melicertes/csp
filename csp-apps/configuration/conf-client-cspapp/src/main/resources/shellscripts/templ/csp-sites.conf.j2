@@ -35,13 +35,13 @@
     #--------------------------------------------------------#
     #        External
     #--------------------------------------------------------#
-     {% if "integration" in service.external_name %}
+     {% if 'integration' == service.external_name %}
         <VirtualHost *:5443>
-     {% elif "configuration" in service.external_name %}
+     {% elif 'configuration' == service.external_name %}
         <VirtualHost *:5443>
-     {% elif "vc" in service.external_name %}
+     {% elif 'vc' == service.external_name %}
         <VirtualHost *:6443>
-     {% elif "teleconf" in service.external_name %}
+     {% elif 'teleconf' in service.external_name %}
         <VirtualHost *:6443>
      {% else %}
         <VirtualHost *:443>
