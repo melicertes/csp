@@ -30,7 +30,7 @@ services:
     hostname: csp-vcb_admin
     env_file:
         - .env
-    command: java -Xmx512m -Dspring.profiles.active=docker -Dspring.mail.smtp.auth=false -Dspring.mail.properties.mail.smtp.auth=false -Dspring.mail.properties.mail.smtp.starttls.enable=false -Dlogging.level.com.intrasoft.csp=DEBUG -jar server.jar
+    command: java -Xmx512m -Dspring.profiles.active=docker -jar server.jar
     working_dir: /opt/csp
     volumes:
         - ./vcb-admin-3.6.0-SNAPSHOT-exec.jar:/opt/csp/server.jar
