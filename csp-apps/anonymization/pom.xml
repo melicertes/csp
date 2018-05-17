@@ -6,14 +6,14 @@
     <parent>
         <groupId>com.intrasoft.csp</groupId>
         <artifactId>parent-pom</artifactId>
-        <version>3.5.0-SNAPSHOT</version>
+        <version>3.6.0-SNAPSHOT</version>
     </parent>
 
 
     <name>Anonymization Service</name>
     <groupId>com.intrasoft.csp</groupId>
     <artifactId>anonymization</artifactId>
-    <version>3.5.0-SNAPSHOT</version>
+    <version>3.6.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <modules>

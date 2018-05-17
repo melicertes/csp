@@ -2,15 +2,7 @@ package com.intrasoft.csp.vcb.commons.model;
 
 import java.time.ZonedDateTime;
 
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Lob;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.NotBlank;
@@ -31,7 +23,8 @@ public class EmailTemplate {
 	private String subject;
 
 	@NotNull
-	@Lob
+	//@Lob
+	@Column(name = "content", length = 10240)
 	private String content;
 
 	@NotNull

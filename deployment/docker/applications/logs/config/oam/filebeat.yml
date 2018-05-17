@@ -1,7 +1,10 @@
 filebeat.prospectors:
 - input_type: log
   paths:
-    - /mnt/log/OAuth2Provider*
+    - /mnt/log/access.csv
+    - /mnt/log/authentication.csv
+    - /mnt/log/activity.csv
+    - /mnt/log/config.csv
 output.logstash:
   hosts: ["csp-oam-logstash:5043"]
 

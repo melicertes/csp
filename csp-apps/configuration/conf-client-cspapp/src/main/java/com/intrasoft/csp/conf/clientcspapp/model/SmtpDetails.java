@@ -26,5 +26,11 @@ public class SmtpDetails {
 
     @Column(columnDefinition = "VARCHAR(50)")
     private String password;
+
+    @Column(columnDefinition = "VARCHAR(120)")
+    private String senderName;
+
+    @Column(columnDefinition = "VARCHAR(120)")
+    private String senderEmail;
     
 }

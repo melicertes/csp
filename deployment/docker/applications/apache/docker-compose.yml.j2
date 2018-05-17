@@ -13,6 +13,7 @@ services:
   {% if local_domains|length > 1 %}
 
         networks:
+            installer_net:
             default:
                 aliases:
             {% for local_domain in local_domains -%}
@@ -43,6 +44,8 @@ networks:
     default:
         external:
             name: ${LOCAL_DOMAIN}
+    installer_net:
+       external: true
 {% endraw %}
 
 
