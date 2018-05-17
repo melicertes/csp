@@ -654,16 +654,19 @@ public class BackgroundTaskService {
         });
     }
 
-
     public void scheduleDelete(SystemModule module) {
         addTask(() -> {
             final SystemService service = installationService.queryService(module);
-            if (service.getServiceState() == ServiceState.RUNNING) {
+            if (service != null && service.getServiceState() == ServiceState.RUNNING) {
                 log.error("Service is running and cannot be deleted! STOP first and then delete.");
                 return new BackgroundTaskResult<>(false, -1000);
             }
 
             try {
+                if (service != null) {
+                    installationService.removeService(service);
+                }
+
                 Manifest manifest = getManifest(module.getModulePath());
                 if (manifest.getFormat() > 1.0 && manifest.getShLast() != null
                         &&  installationService.moduleContains(module, manifest.getShLast())) { //last-time is only 1.1+
@@ -674,23 +677,20 @@ public class BackgroundTaskService {
                 module.setModuleState(ModuleState.DOWNLOADED);
 
                 module.setActive(false);
-                installationService.removeService(service);
                 SystemModule moduleUpdated = installationService.saveSystemModule(module);
-                log.info("Module {}/{} [installed: {}]state now {}", moduleUpdated.getName(),
-                        moduleUpdated.getId(), moduleUpdated.getInstallDate(),
-                        moduleUpdated.getModuleState());
                 File vHostDir = new File(vhostDirectory);
                 final File[] files = vHostDir.listFiles(file -> file.getName().contains(module.getName() + "." + module.getStartPriority()));
 
                 for (File file : files) {
-                    log.info("Deleting {} from vhost directory",file);
+                    log.info("Deleting {} from vhost directory", file);
                     boolean d = file.delete();
                     if (!d) {
-                        log.error("Failed to delete file: {} - problem in installation and re-install",file);
+                        log.error("Failed to delete file: {} - problem in installation and re-install", file);
                     }
                 }
-
-                log.info("Module {} has been removed and service deleted", module.getName());
+                log.info("Module {}/{} [installed: {}] state now {}", moduleUpdated.getName(),
+                        moduleUpdated.getId(), moduleUpdated.getInstallDate(),
+                        moduleUpdated.getModuleState());
                 return new BackgroundTaskResult<>(true, 0, module.getName());
             } catch (IOException e) {
                 log.error("Exception removing module {} with error {}",module.getName(), e.getMessage(),e);
