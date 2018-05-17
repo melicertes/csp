@@ -126,6 +126,12 @@ public class RestApiController implements ContextUrl, ApiContextUrl {
         backgroundTaskService.scheduleEnvironmentCreation(false);
     }
 
+    @GetMapping(value = "/recreateOAMVH")
+    public void recreateOamAndVhosts() {
+        log.info("Request to recreate all OAM agents and VHost agents (will happen at next restart)");
+        installService.resetAgentAndHostFlags();
+    }
+
     @RequestMapping(value = REST_LOG,
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE,
             method = RequestMethod.GET)
