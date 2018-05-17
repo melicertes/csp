@@ -72,6 +72,7 @@ public class ApiDataHandler implements CamelRoutes{
             if(StringUtils.isEmpty(headerValue)){
                 throw new InvalidDataTypeException("Could not detect header value with valid CspId extracted from certificate. IntegrationData.cspId: "+integrationData.getDataParams().getCspId());
             }else{
+                LOG.debug("url: "+integrationData.getDataParams().getUrl());
                 if(headerValue.toLowerCase().contains(integrationData.getDataParams().getCspId().toLowerCase())){
                     LOG.debug("CspIds Match! "+checkCspIdCertHeader+" value = "+headerValue+", IntegrationData.cspId="+integrationData.getDataParams().getCspId());
                 }else{
