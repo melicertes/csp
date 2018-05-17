@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+    <body>
+        <div th:fragment="reportable">
+            <table class="reportable" >
+                <!--<caption class="reportable" style="color: #5caad2">Elasticsearch Results</caption>-->
+                <tr class="reportable">
+                    <th class="reportable" th:text="${thymeleafTypeDescription}">Document Type</th>
+                    <th class="reportable" th:text="${thymeleafNumberDescription}">Number of Documents created</th>
+                </tr>
+                <tr class="reportable" th:each="thymeleafEntry : ${thymeleafMapA}">
+                    <td th:text="${thymeleafEntry.key}">Threat</td>
+                    <td th:text="${thymeleafEntry.value}">23</td>
+                </tr>
+                <tr class="reportable" th:each="thymeleafEntry : ${thymeleafMapB}">
+                    <td th:text="${thymeleafEntry.key}">Audit Log</td>
+                    <td th:text="${thymeleafEntry.value}">23</td>
+                </tr>
+            </table>
+        </div>
+    </body>
+</html>
