@@ -3,6 +3,7 @@ package com.intrasoft.csp.client.impl;
 import com.intrasoft.csp.client.TrustCirclesClient;
 import com.intrasoft.csp.client.config.TrustCirclesClientConfig;
 import com.intrasoft.csp.commons.model.Contact;
+import com.intrasoft.csp.commons.model.PersonContact;
 import com.intrasoft.csp.commons.model.Team;
 import com.intrasoft.csp.commons.model.TrustCircle;
 import com.intrasoft.csp.libraries.restclient.service.RetryRestTemplate;
@@ -33,13 +34,17 @@ public class TrustCirclesClientImpl implements TrustCirclesClient {
     String pathTeams;
     String pathLocalCircle;
     String pathContacts;
+    String pathTeamContacts;
+    String pathPersonContacts;
 
-    public TrustCirclesClientImpl(String baseContextPath, String pathCircles, String pathTeams, String pathLocalCircle, String pathContacts) {
+    public TrustCirclesClientImpl(String baseContextPath, String pathCircles, String pathTeams, String pathLocalCircle, String pathContacts, String pathTeamContacts, String pathPersonContacts) {
         this.baseContextPath = baseContextPath;
         this.pathCircles = pathCircles;
         this.pathTeams = pathTeams;
         this.pathLocalCircle = pathLocalCircle;
         this.pathContacts = pathContacts;
+        this.pathTeamContacts = pathTeamContacts;
+        this.pathPersonContacts = pathPersonContacts;
     }
 
     @PostConstruct
@@ -122,4 +127,21 @@ public class TrustCirclesClientImpl implements TrustCirclesClient {
         return context;
     }
 
+
+    @Override
+    public List<PersonContact> getPersonContacts() {
+        String url = context + pathPersonContacts;
+        LOG.debug("API call [get]: " + url);
+        List<PersonContact> list = Arrays.asList(retryRestTemplate.getForObject(url, PersonContact[].class));
+        return list;
+    }
+
+    @Override
+    public PersonContact getPersonContactByEmail(String email) {
+        String query_param = "email";
+        String url = context + pathPersonContacts + "?" + query_param + "=" + email;
+        LOG.debug("API call [get]: " + url);
+        List<PersonContact> list = Arrays.asList(retryRestTemplate.getForObject(url, PersonContact[].class));
+        return list.get(0);
+    }
 }

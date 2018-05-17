@@ -17,7 +17,8 @@ services:
             - /dev/urandom:/dev/random
             - MISPSharedDatavolume:/run/secrets
             - MISPDatavolume:/var/www/MISP
-            - /opt/csp/logs/:/var/www/MISP/app/tmp/logs/
+            - MISPStateDatavolume:/opt/state
+            - /opt/csp/logs/misp/:/var/www/MISP/app/tmp/logs/
         environment:
             - MYSQL_ROOT_PASSWORD=changeit
             - MYSQL_MISP_PASSWORD=changeit
@@ -39,7 +40,7 @@ services:
         command: sh -c "while [ ! -f /run/secrets/authkey ]; do echo "Waiting..." ; sleep 1 ; done && java -Xmx512m -Dspring.profiles.active=docker -Dmisp.app.authorization.key=$$(cat /run/secrets/authkey) -jar server.jar"
         working_dir: /opt/csp
         volumes:
-            - ./misp-server-3.5.0-SNAPSHOT-exec.jar:/opt/csp/server.jar
+            - ./misp-server-3.6.0-SNAPSHOT-exec.jar:/opt/csp/server.jar
             - /opt/csp/logs/:/opt/csplogs
             - SSLDatavolume:/opt/ssl/
             - MISPAdapterDatavolume:${MISP_ADAPTER_PATH_REPO}
@@ -71,6 +72,8 @@ volumes:
     MYSQLDatavolume:
         external: true
     MISPSharedDatavolume:
+        external: true
+    MISPStateDatavolume:
         external: true
     SSLDatavolume:
         external: true

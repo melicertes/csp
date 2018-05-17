@@ -149,7 +149,7 @@ public class MeetingController {
 		// list
 
 		if (bindingResult.hasErrors()) {
-			log.info("{}", bindingResult.getAllErrors().toString());
+			log.debug("{}", bindingResult.getAllErrors().toString());
 			return "createMeeting";
 		}
 
@@ -160,8 +160,8 @@ public class MeetingController {
 		Meeting m = MeetingForm.createMeetingFromForm(meetingForm, user.get());
 		String url = String.format("%s?uid=%s", jitsiProperties.buildURI(), m.getUid());
 		m.setUrl(url);
-		log.info("Start of meeting: {}", m.getStart());
-		log.info("Now - 30 min: {}", ZonedDateTime.now().minusMinutes(30));
+		log.debug("Start of meeting: {}", m.getStart());
+		log.debug("Now - 30 min: {}", ZonedDateTime.now().minusMinutes(30));
 
 		ZonedDateTime invitationDate = ZonedDateTime.now()
 				.plusMinutes(vcbadminProperties.getEmailNotifications().getWaitAfterSubmission());
@@ -192,6 +192,7 @@ public class MeetingController {
 		} catch (MeetingNotFound e) {
 			model.addAttribute("errors", e.getMessage());
 		}
+
 		return "redirect:/listMeeting/scheduled";
 	}
 

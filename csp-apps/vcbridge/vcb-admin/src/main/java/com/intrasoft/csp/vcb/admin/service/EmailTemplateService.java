@@ -26,7 +26,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class EmailTemplateService {
+
 	private static final Logger log = LoggerFactory.getLogger(EmailTemplateService.class);
+
 	@Autowired
 	EmailTemplateRepository emailTemplateRepository;
 	@Autowired
@@ -53,6 +55,7 @@ public class EmailTemplateService {
 			}
 		}
 		template = emailTemplateRepository.save(template);
+		log.info("Created email template: " + template.getName());
 		return template;
 	}
 
@@ -106,6 +109,6 @@ public class EmailTemplateService {
 			et.setUser(user);
 			EmailTemplate cancellation = emailTemplateRepository.save(et);
 		}
-		log.info("Deleted email templates...");
+		log.info("Deleted email template");
 	}
 }

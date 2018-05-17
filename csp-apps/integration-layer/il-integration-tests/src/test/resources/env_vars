@@ -42,7 +42,7 @@ IL_LOCAL_DOMAIN=integration.local.central-csp.athens.intrasoft-intl.private
 IL_PORT=443
 IL_SSL_KEYSTORE_PASS=123456
 IL_SSL_KEY_PASS=123456
-IL_VERSION=3.5.0-SNAPSHOT
+IL_VERSION=3.6.0-SNAPSHOT
 ANON_LOCAL_DOMAIN=anon.local.central-csp.athens.intrasoft-intl.private
 INTELMQ_DOCR_PORT=8000
 INTELMQ_LOCAL_DOMAIN=intelmq.local.central-csp.athens.intrasoft-intl.private
@@ -108,4 +108,4 @@ VIPER_PORT=443
 VIPER_PROTOCOL=https4-in
 
 
-java -jar -DES_PATH_BASE=/pathbse -DES_PORT=9000 -DES_LOCAL_DOMAIN=es.local -DIL_SSL_KEYSTORE_PASS=123456 -DIL_SSL_KEY_PASS=12345 -DIL_CSP_SUBDOMAIN_PREFIX=pref -DTC_PATH_TEAMS=/teams -Dspring.profiles.active=docker -DTC_PATH_CIRCLES=/circles -DCSP_NAME -DTC_LOCAL_DOMAIN=tc.local  integration-tests-3.5.0-SNAPSHOT.jar com.intrasoft.csp.integration.business.server.internal.CspServerInternalBusinessTcTest
+java -jar -DES_PATH_BASE=/pathbse -DES_PORT=9000 -DES_LOCAL_DOMAIN=es.local -DIL_SSL_KEYSTORE_PASS=123456 -DIL_SSL_KEY_PASS=12345 -DIL_CSP_SUBDOMAIN_PREFIX=pref -DTC_PATH_TEAMS=/teams -Dspring.profiles.active=docker -DTC_PATH_CIRCLES=/circles -DCSP_NAME -DTC_LOCAL_DOMAIN=tc.local  integration-tests-3.6.0-SNAPSHOT.jar com.intrasoft.csp.integration.business.server.internal.CspServerInternalBusinessTcTest

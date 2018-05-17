@@ -14,15 +14,19 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
 
+import com.intrasoft.csp.vcb.admin.controller.RegisterController;
 import com.intrasoft.csp.vcb.commons.constants.MeetingStatus;
 import com.intrasoft.csp.vcb.commons.model.Meeting;
 import com.intrasoft.csp.vcb.commons.model.Participant;
 import com.intrasoft.csp.vcb.commons.model.User;
 import org.hibernate.validator.constraints.NotEmpty;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class MeetingForm {
+	private static final Logger log = LoggerFactory.getLogger(MeetingForm.class);
+
 	private static HexBinaryAdapter hba = new HexBinaryAdapter();
 
 	public static Meeting createMeetingFromForm(MeetingForm form_meeting, User user) {
@@ -37,7 +41,8 @@ public class MeetingForm {
 														// instance
 														// not thread safe
 			} catch (NoSuchAlgorithmException e) {
-				e.printStackTrace();
+				//e.printStackTrace();
+				log.error(e.toString());
 			}
 			if (md != null) {
 				String hashed_email = hba.marshal(md.digest((p.getEmail() + System.currentTimeMillis()).getBytes()));

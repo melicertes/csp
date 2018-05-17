@@ -4,7 +4,7 @@ echo "Save all CSP images (base images) to tar for packaging"
 
 
 
-declare -a arr=( csp-alpine35glibc csp-java8 csp-apache csp-postgres csp-python3 csp-python27 csp-tomcat8 ) ## now loop through the above array
+declare -a arr=( csp-alpine35glibc csp-java8 csp-docker-java8 csp-apache csp-postgres csp-python3 csp-python27 csp-tomcat8 ) ## now loop through the above array
 for i in "${arr[@]}"
 do
    echo "$i" 

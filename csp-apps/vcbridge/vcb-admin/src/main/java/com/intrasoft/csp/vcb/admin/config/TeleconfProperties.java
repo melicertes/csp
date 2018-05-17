@@ -7,16 +7,16 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties("jitsi")
 public class TeleconfProperties {
 
-    @Value("${teleconf-ui.protocol}")
+    @Value("${teleconf.protocol}")
     private String protocol;
 
-    @Value("${teleconf-ui.host}")
+    @Value("${teleconf.host}")
     private String host;
 
-    @Value("${teleconf-ui.port}")
+    @Value("${teleconf.port}")
     private Integer port;
 
-    @Value("${teleconf-ui.path}")
+    @Value("${teleconf.path}")
     private String path;
 
 

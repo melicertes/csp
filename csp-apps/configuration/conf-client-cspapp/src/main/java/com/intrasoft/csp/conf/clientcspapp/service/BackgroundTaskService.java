@@ -18,16 +18,17 @@ import org.apache.commons.io.IOUtils;
 import org.joda.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
-
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.io.*;
+import java.lang.management.ManagementFactory;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
@@ -48,6 +49,54 @@ import java.util.stream.Collectors;
 public class BackgroundTaskService {
 
     public static final String DOCKERCOMPOSE_YML_TEMPLATE = "docker-compose.yml.j2";
+
+    @Value("${installation.reqs.memoryInGB}")
+    public int memoryGb;
+
+    @Value("${installation.reqs.diskFreeInGB}")
+    public int diskGb;
+
+    @Value("${installation.reqs.cpus}")
+    public int vcpus;
+
+    @Value("${installation.forced:false}")
+    private Boolean canProceedForced;
+
+    @Cacheable(cacheNames = {"req.check"})
+    public Boolean canInstallAsPerRequirements() {
+        log.info("Requirements: Verifying H/W requirements: {}GB total memory, {}GB free disk, {} CPUs available",
+                memoryGb,diskGb,vcpus);
+        int vcpusFound = Runtime.getRuntime().availableProcessors();
+        int diskFreeMB = (int) (new File("/opt/csp").getFreeSpace() / 1024 / 1024);
+        int memoryFoundMB = (int) (((com.sun.management.OperatingSystemMXBean) ManagementFactory
+                .getOperatingSystemMXBean()).getTotalPhysicalMemorySize()/ 1024 / 1024 );
+
+        int success = 0;
+        log.info("Found OS         : {}", System.getProperty("os.name"));
+
+        if (vcpusFound < vcpus) {
+            log.warn("Found CPUs       : {}, Required: {} - FAIL", vcpusFound, vcpus);
+            success++;
+        }
+        if (diskFreeMB < diskGb * 1024) {
+            log.warn("Found Free space : {}MB, Required: {}MB - FAIL", diskFreeMB, diskGb * 1024);
+            success++;
+        }
+
+        if (memoryFoundMB < memoryGb * 1024) {
+            log.warn("Found Total RAM  : {}MB, Required: {}MB - FAIL", memoryFoundMB, memoryGb * 1024);
+            success++;
+        }
+        if (success > 0) {
+            log.error("Requirements check result: FAILED");
+        }
+
+        if (canProceedForced) {
+            log.warn("Installation is forced due to configuration override");
+            return true;
+        } else
+            return success <= 0;
+    }
 
     @Getter
     enum ControlScript {
@@ -283,7 +332,7 @@ public class BackgroundTaskService {
     }
 
 
-    public void scheduleEnvironmentCreation() {
+    public void scheduleEnvironmentCreation(boolean deleteContents) {
         addTask(() -> {
             try {
                 final SystemInstallationState state = installationService.getState();
@@ -297,14 +346,23 @@ public class BackgroundTaskService {
                 Map<String,String> env = new HashMap<String, String>();
                 env.put("ENVJSON", envJsonFile);
                 env.put("J2ENV", envFile);
-                //env.put("SITESC", cspSitesFile);
                 env.put("INT_IP", state.getCspRegistration().getInternalIPs().get(0));
+                env.put("DELETE_CONTENTS", Boolean.toString(deleteContents));
 
                 if (smtp != null && smtp.getPort()!=null) {
                     env.put("MAIL_HOST", smtp.getHost());
                     env.put("MAIL_PORT", smtp.getPort().toString());
                     env.put("MAIL_USERNAME", smtp.getUserName());
                     env.put("MAIL_PASSWORD", smtp.getPassword());
+
+                    if (smtp.getSenderEmail() == null) {
+                        env.put("MAIL_SENDER_NAME", "Notification - Do Not Reply");
+                        env.put("MAIL_SENDER_EMAIL", smtp.getUserName());
+                        log.warn("Sender Email is not specified, using {}", smtp.getUserName());
+                    } else {
+                        env.put("MAIL_SENDER_NAME", smtp.getSenderName());
+                        env.put("MAIL_SENDER_EMAIL", smtp.getSenderEmail());
+                    }
                 } else {
                     log.warn("SMTP Details not specified, empty values provided!");
 
@@ -312,6 +370,8 @@ public class BackgroundTaskService {
                     env.put("MAIL_PORT", "");
                     env.put("MAIL_USERNAME", "");
                     env.put("MAIL_PASSWORD", "");
+                    env.put("MAIL_SENDER_NAME", "");
+                    env.put("MAIL_SENDER_EMAIL", "");
                 }
                 log.debug("Configured environment variables: {}",env);
                 return executeScriptSimple(ENV_CREATION_SH, env);
@@ -341,7 +401,7 @@ public class BackgroundTaskService {
                 if (installationService.moduleContains(installingModule, "manifest.json") ) {
                     manifest = getManifest(moduleInstallDirectory);
                     if (manifest.getFormat() == 1.0) {
-                        log.warn("Manifest version 1.0 detected! LEGACY MODE = ON");
+                        log.warn("Manifest version 1.0 detected! LEGACY MODE");
                         isLegacy = true;
                     } else if (manifest.getFormat() == 1.1) {
                         log.warn("Manifest version 1.1 detected!");
@@ -512,6 +572,8 @@ public class BackgroundTaskService {
             env.put("MAIL_PORT", smtp.getPort().toString());
             env.put("MAIL_USERNAME", smtp.getUserName());
             env.put("MAIL_PASSWORD", smtp.getPassword());
+            env.put("MAIL_SENDER_NAME", smtp.getSenderName());
+            env.put("MAIL_SENDER_EMAIL", smtp.getUserName());
         }
         log.info("Configured environment variables: {}",env);
 
@@ -613,7 +675,10 @@ public class BackgroundTaskService {
 
                 module.setActive(false);
                 installationService.removeService(service);
-
+                SystemModule moduleUpdated = installationService.saveSystemModule(module);
+                log.info("Module {}/{} [installed: {}]state now {}", moduleUpdated.getName(),
+                        moduleUpdated.getId(), moduleUpdated.getInstallDate(),
+                        moduleUpdated.getModuleState());
                 File vHostDir = new File(vhostDirectory);
                 final File[] files = vHostDir.listFiles(file -> file.getName().contains(module.getName() + "." + module.getStartPriority()));
 
@@ -643,28 +708,17 @@ public class BackgroundTaskService {
             state.setInstallationState(InstallationState.COMPLETED);
             state = installationService.updateSystemInstallationState(state);
 
-            final List<BackgroundTaskResult<Boolean, Integer>> results = installationService.queryAllModulesInstalled(true).stream()
-                    .filter(m -> m.getActive())
+            final List<BackgroundTaskResult<Boolean, Integer>> results = installationService.queryAllModulesInstalled(true)
+                    .stream()
+                    .filter(SystemModule::getActive)
                     .map(module -> {
                 SystemService service = installationService.queryService(module);
-                log.info("Starting service {} id {} [linked to id {}, active {}] from Module id {}",
-                        service.getName(), service.getId(), service.getModule().getId(), service.getModule().getActive(), module.getId());
                 if (service == null) {
                     log.error("Module {} has no service!",module.getName());
-                } else if (service.getStartable() == true) {
-
-                    //copy the environment again before starting
-                    try {
-                        copyEnvironment(module.getModulePath());
-                        log.info("Environment merged");
-
-                        service = checkOAMAgentCreation(module,service);
-
-                        service = checkVHostCreation(module,service);
-
-                    } catch (IOException e) {
-                        log.error("Failed to copy ENVIRONMENT! {}", e.getMessage(),e);
-                    }
+                } else if (service.getStartable()) {
+                    log.info("Starting service {} id {} [linked to id {}, active {}] from Module id {}",
+                            service.getName(), service.getId(), service.getModule().getId(), service.getModule().getActive(), module.getId());
+                    service = createModuleEnvAndAgents(module, service);
                     if (service.getServiceState() == ServiceState.NOT_RUNNING) {
                         return startSingleService(module, service);
                     } else {
@@ -672,7 +726,8 @@ public class BackgroundTaskService {
                     }
                     log.info("Service {} state {}", service.getName(), service.getServiceState());
                 } else {
-                    log.info("Service {} is not a startable service, moving on", service.getName());
+                    log.info("Service {} is not a startable service - checking agents", service.getName());
+                    createModuleEnvAndAgents(module, service);
                 }
                 return new BackgroundTaskResult<Boolean, Integer>(true, 0, module.getName());
             }).distinct().collect(Collectors.toList());
@@ -686,6 +741,21 @@ public class BackgroundTaskService {
             });
             return finalResult;
         });
+    }
+
+    private SystemService createModuleEnvAndAgents(SystemModule module, SystemService service) {
+        //copy the environment again before starting
+        try {
+            copyEnvironment(module.getModulePath());
+            log.info("Environment merged for {} - {} / {} / {}", module.getId(), service.getId(), service.getName(), module.getModulePath());
+            service = checkOAMAgentCreation(module,service);
+            log.info("OAM Agent checked for {} - {} / {} / {}", module.getId(), service.getId(), service.getName(), module.getModulePath());
+            service = checkVHostCreation(module,service);
+            log.info("VHost checked for {} - {} / {} / {}", module.getId(), service.getId(), service.getName(), module.getModulePath());
+        } catch (IOException e) {
+            log.error("Failure while setting up the module! error: {}", e.getMessage(),e);
+        }
+        return service;
     }
 
     private BackgroundTaskResult<Boolean, Integer> startSingleService(SystemModule module, SystemService service) {
@@ -771,7 +841,7 @@ public class BackgroundTaskService {
         try {
             domains.addAll(Files.readAllLines(envFile.toPath()).stream()
                     .filter(line -> line.contains("_LOCAL"))
-                    .map(line -> line.split(Pattern.quote("="))[0])
+                    .map(line -> line.split(Pattern.quote("="))[0]).distinct()
                     .collect(Collectors.toList()));
             log.info("Domains discovered: {}",domains);
         } catch (IOException e) {
@@ -853,7 +923,6 @@ public class BackgroundTaskService {
                     envOAM.put("C_EXTNAME", serviceName);
 
                     rOAM = executeScriptSimple(EXEC_CONT_SCRIPT_SH, envOAM);
-                    //TODO do something with result, do we care if oam is left running at the end?
                     //start apache if not started
                     boolean apacheStarted = true; //assume it is already started.
                     if (installationService.queryService(moduleAPC).getServiceState()==ServiceState.NOT_RUNNING) {
@@ -917,7 +986,10 @@ public class BackgroundTaskService {
     public void scheduleStopActiveModules() {
         addTask(() -> {
             // for every active module, sort by priority
-            installationService.queryAllModulesInstalled(false).forEach(module -> {
+            installationService.queryAllModulesInstalled(false)
+                .stream()
+                .filter( m -> m.getActive())
+                .forEach(module -> {
                 SystemService service = installationService.queryService(module);
                 stopSingleService(module, service);
             });

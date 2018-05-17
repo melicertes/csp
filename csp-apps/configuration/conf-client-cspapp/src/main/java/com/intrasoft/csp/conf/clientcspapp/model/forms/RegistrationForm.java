@@ -26,5 +26,11 @@ public class RegistrationForm extends CspForm {
     @JsonProperty("smtp_pass")
     private String smtp_pass;
 
+    @JsonProperty("sender_name")
+    private String sender_name;
+
+    @JsonProperty("sender_email")
+    private String sender_email;
+
 
 }

@@ -38,8 +38,8 @@ public class AuthorizationFilter extends OncePerRequestFilter {
 		String userHeaderValue = request.getHeader(USER_HEADER);
 		String groupHeaderValue = request.getHeader(GROUP_HEADER);
 
-		LOG.info("-- userHeaderValue: " + userHeaderValue);
-		LOG.info("-- groupHeaderValue: " + groupHeaderValue);
+		LOG.debug("-- userHeaderValue: " + userHeaderValue);
+		LOG.debug("-- groupHeaderValue: " + groupHeaderValue);
 
 		if (StringUtils.isEmpty(userHeaderValue) || StringUtils.isEmpty(groupHeaderValue)) {
 			// response.setStatus(401);
