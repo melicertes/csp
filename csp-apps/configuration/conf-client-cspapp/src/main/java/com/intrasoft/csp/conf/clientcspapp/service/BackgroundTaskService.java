@@ -332,7 +332,7 @@ public class BackgroundTaskService {
     }
 
 
-    public void scheduleEnvironmentCreation() {
+    public void scheduleEnvironmentCreation(boolean deleteContents) {
         addTask(() -> {
             try {
                 final SystemInstallationState state = installationService.getState();
@@ -346,8 +346,8 @@ public class BackgroundTaskService {
                 Map<String,String> env = new HashMap<String, String>();
                 env.put("ENVJSON", envJsonFile);
                 env.put("J2ENV", envFile);
-                //env.put("SITESC", cspSitesFile);
                 env.put("INT_IP", state.getCspRegistration().getInternalIPs().get(0));
+                env.put("DELETE_CONTENTS", Boolean.toString(deleteContents));
 
                 if (smtp != null && smtp.getPort()!=null) {
                     env.put("MAIL_HOST", smtp.getHost());
@@ -401,7 +401,7 @@ public class BackgroundTaskService {
                 if (installationService.moduleContains(installingModule, "manifest.json") ) {
                     manifest = getManifest(moduleInstallDirectory);
                     if (manifest.getFormat() == 1.0) {
-                        log.warn("Manifest version 1.0 detected! LEGACY MODE = ON");
+                        log.warn("Manifest version 1.0 detected! LEGACY MODE");
                         isLegacy = true;
                     } else if (manifest.getFormat() == 1.1) {
                         log.warn("Manifest version 1.1 detected!");
@@ -675,7 +675,10 @@ public class BackgroundTaskService {
 
                 module.setActive(false);
                 installationService.removeService(service);
-
+                SystemModule moduleUpdated = installationService.saveSystemModule(module);
+                log.info("Module {}/{} [installed: {}]state now {}", moduleUpdated.getName(),
+                        moduleUpdated.getId(), moduleUpdated.getInstallDate(),
+                        moduleUpdated.getModuleState());
                 File vHostDir = new File(vhostDirectory);
                 final File[] files = vHostDir.listFiles(file -> file.getName().contains(module.getName() + "." + module.getStartPriority()));
 

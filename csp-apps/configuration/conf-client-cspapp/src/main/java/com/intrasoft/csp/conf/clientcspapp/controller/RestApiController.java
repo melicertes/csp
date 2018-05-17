@@ -110,7 +110,7 @@ public class RestApiController implements ContextUrl, ApiContextUrl {
         if (dto.getResponseCode() == 0) {
             backgroundTaskService.scheduleInternalCertsGeneration();
             backgroundTaskService.scheduleExternalCertsGeneration();
-            backgroundTaskService.scheduleEnvironmentCreation();
+            backgroundTaskService.scheduleEnvironmentCreation(true);
         } else {
             log.error("Not successful ; certificates creation has not been scheduled!");
         }
@@ -120,9 +120,16 @@ public class RestApiController implements ContextUrl, ApiContextUrl {
 
     @GetMapping(value = "/regenerateEnv")
     public void regenerateEnv() {
+        log.info("Regenerate environment API called [not deleting csp-sites]");
         backgroundTaskService.scheduleInternalCertsGeneration();
         backgroundTaskService.scheduleExternalCertsGeneration();
-        backgroundTaskService.scheduleEnvironmentCreation();
+        backgroundTaskService.scheduleEnvironmentCreation(false);
+    }
+
+    @GetMapping(value = "/recreateOAMVH")
+    public void recreateOamAndVhosts() {
+        log.info("Request to recreate all OAM agents and VHost agents (will happen at next restart)");
+        installService.resetAgentAndHostFlags();
     }
 
     @RequestMapping(value = REST_LOG,

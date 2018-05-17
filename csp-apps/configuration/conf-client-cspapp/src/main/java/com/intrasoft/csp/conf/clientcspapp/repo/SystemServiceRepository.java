@@ -13,5 +13,4 @@ public interface SystemServiceRepository extends JpaRepository<SystemService, Lo
 
     SystemService findByName(String serviceName);
 
-
 }
