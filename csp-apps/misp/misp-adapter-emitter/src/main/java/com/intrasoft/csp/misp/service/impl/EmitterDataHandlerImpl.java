@@ -304,7 +304,7 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
     }
 
     @Override
-    public void handleReemittionMispData(IntegrationData integrationData, MispEntity mispEntity, boolean isReEmittion, boolean isDelete) {
+    public void handleReemittionMispData(IntegrationData integrationData, MispEntity mispEntity, boolean isDelete, boolean isReEmittion) {
         handleMispData(integrationData.getDataObject(), mispEntity, true, isDelete);
     }
 
