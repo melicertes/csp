@@ -37,6 +37,10 @@
     #--------------------------------------------------------#
      {% if "integration" in service.external_name %}
         <VirtualHost *:5443>
+     {% elif "vc" in service.external_name %}
+        <VirtualHost *:6443>
+     {% elif "teleconf" in service.external_name %}
+        <VirtualHost *:6443>
      {% else %}
         <VirtualHost *:443>
      {% endif %}
