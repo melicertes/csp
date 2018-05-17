@@ -18,7 +18,7 @@ services:
             - MISPSharedDatavolume:/run/secrets
             - MISPDatavolume:/var/www/MISP
             - MISPStateDatavolume:/opt/state
-            - /opt/csp/logs/misp/:/var/www/MISP/app/tmp/logs/
+            - /opt/csp/logs_misp/:/var/www/MISP/app/tmp/logs/
         environment:
             - MYSQL_ROOT_PASSWORD=changeit
             - MYSQL_MISP_PASSWORD=changeit
