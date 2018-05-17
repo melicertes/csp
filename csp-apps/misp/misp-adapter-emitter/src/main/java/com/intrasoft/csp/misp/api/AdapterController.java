@@ -25,7 +25,7 @@ public class AdapterController implements ApiContextUrl {
             consumes = {"application/json"},
             method = RequestMethod.POST)
     public ResponseEntity<String> synchNewIntData(@RequestBody IntegrationData integrationData) {
-        LOG.info("MISP Endpoint: POST received");
+        LOG.info("MISP adapter Endpoint: POST received");
         return adapterDataHandler.handleIntegrationData(integrationData, "POST");
     }
 
@@ -34,7 +34,7 @@ public class AdapterController implements ApiContextUrl {
             consumes = {"application/json"},
             method = RequestMethod.PUT)
     public ResponseEntity<String> synchUpdatedIntData(@RequestBody IntegrationData integrationData) {
-        LOG.info("MISP Endpoint: PUT received");
+        LOG.info("MISP adapter Endpoint: PUT received");
         return adapterDataHandler.handleIntegrationData(integrationData, "PUT");
     }
 
@@ -42,7 +42,7 @@ public class AdapterController implements ApiContextUrl {
             consumes = {"application/json"},
             method = RequestMethod.DELETE)
     public ResponseEntity<String> synchDeletedIntData(@RequestBody IntegrationData integrationData) {
-        LOG.info("MISP Endpoint: DELETE received");
+        LOG.info("MISP adapter Endpoint: DELETE received");
         return adapterDataHandler.handleIntegrationData(integrationData, "DELETE");
     }
 }

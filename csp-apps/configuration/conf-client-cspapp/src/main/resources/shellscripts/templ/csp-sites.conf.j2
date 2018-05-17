@@ -35,7 +35,15 @@
     #--------------------------------------------------------#
     #        External
     #--------------------------------------------------------#
-     <VirtualHost *:443>
+     {% if "integration" in service.external_name %}
+        <VirtualHost *:5443>
+     {% elif "vc" in service.external_name %}
+        <VirtualHost *:6443>
+     {% elif "teleconf" in service.external_name %}
+        <VirtualHost *:6443>
+     {% else %}
+        <VirtualHost *:443>
+     {% endif %}
 
           ServerName {{ service.external_name }}.{{ csp_name }}.{{ domain }}
           Alias /static/ /opt/tc/var/static/
