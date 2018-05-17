@@ -30,7 +30,7 @@ services:
     hostname: csp-vcb_admin
     env_file:
         - .env
-    command: java -Xmx512m -Dspring.profiles.active=docker -jar server.jar
+    command: sh -c "sleep 10 && java -Xmx512m -Dspring.profiles.active=docker -jar server.jar"
     working_dir: /opt/csp
     volumes:
         - ./vcb-admin-3.6.0-SNAPSHOT-exec.jar:/opt/csp/server.jar
