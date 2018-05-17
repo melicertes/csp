@@ -69,7 +69,10 @@ function createEnvironment() {
 	docker network ls
 
 	# are we sure the directory exists?
-	rm -fr /opt/csp/apache2/csp-sites
+	echo "Creating CSP Sites directory (DELETE=$DELETE_CONTENTS)"
+	if [ "$DELETE_CONTENTS" == "true" ]; then
+    	rm -fr /opt/csp/apache2/csp-sites
+    fi
     mkdir -p /opt/csp/apache2/csp-sites
 
 
