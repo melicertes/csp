@@ -21,6 +21,9 @@ COPY config/prosody.cfg.lua /etc/prosody/prosody.cfg.lua
 
 COPY start.sh /start.sh
 
+# making sure this will start
+RUN chmod 770 /start.sh
+
 ENV DOMAIN=test.com STUN=stun.ekiga.net BRIDGE_IP=1.2.3.4 BRIDGE_TCP_PORT=4443 BRIDGE_UDP_PORT=10000
 
 EXPOSE 80 4443 10000/udp
