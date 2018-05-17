@@ -9,7 +9,7 @@ services:
     env_file:
       - .env
     environment:
-      - DOMAIN=${JITSI_VC_DOMAIN}
+      - DOMAIN=${JITSI_DOMAIN}
       - STUN=stun.ekiga.net
       - BRIDGE_IP=${HOST_IP}
       - BRIDGE_TCP_PORT=4443
@@ -17,7 +17,8 @@ services:
     ports:
       - 4443:4443
       - 10000:10000/udp
-      - 10080:80
+    expose:
+      - 80
     volumes:
         - /opt/csp/logs/:/var/log/jitsi
       
