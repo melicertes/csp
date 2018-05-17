@@ -81,9 +81,9 @@ public class EmitterSubscriberImpl implements EmitterSubscriber, MispContextUrl{
                 }
                 LOG.debug("Message received from queue. Topic: "  + topic);
                 switch (topic){
-                    case MISP_EVENT:
+                    /*case MISP_EVENT:
                         emitterDataHandler.handleMispData(jsonNode, MispEntity.EVENT, false, isDelete);
-                        break;
+                        break;*/
                     case MISP_JSON_ATTRIBUTE:
                         if (jsonNode.has("Event") && jsonNode.has("action")){
                             String uuid = jsonNode.get(EVENT.toString()).get("uuid").textValue();

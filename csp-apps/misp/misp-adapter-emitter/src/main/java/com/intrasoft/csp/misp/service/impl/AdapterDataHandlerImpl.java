@@ -159,7 +159,7 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler{
         List<LinkedHashMap> attributeShadowAttributes = ctx.read("$.Event.Attribute[*].ShadowAttribute[*]", List.class);
         handleShadowAttributeEdit(attributeShadowAttributes);
 
-        /*// Edit Existing Attribute Proposals
+        /*// Edit Existing Object Proposals
         List<LinkedHashMap> objectAttributeShadowAttributes = ctx.read("$.Event.Object[*].Attribute[*].ShadowAttribute[*]", List.class);
         handleShadowAttributeEdit(objectAttributeShadowAttributes);*/
 
@@ -169,6 +169,7 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler{
          * Implement reemition flow
          */
         try {
+            LOG.debug("Re-emit.");
             emitterDataHandler.handleReemittionMispData(integrationData, MispContextUrl.MispEntity.EVENT, false, true);
         }
         catch (Exception e){
