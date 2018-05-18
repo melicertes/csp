@@ -6,10 +6,10 @@ import com.intrasoft.csp.regrep.LogstashMappingType;
 
 public interface RequestBodyService {
 
-    String buildRequestBody(DateMath gte, DateMath lt, LogstashMappingType type);
+    String buildRequestBody(String gte, String lt, LogstashMappingType type);
 
-    String buildRequestBody(DateMath gte, DateMath lt, CspDataMappingType type);
+    String buildRequestBody(String gte, String lt, CspDataMappingType type);
 
-    String buildRequestBodyForLogs(DateMath gte, DateMath lt, LogstashMappingType type);
+    String buildRequestBodyForLogs(String gte, String lt, LogstashMappingType type);
 
 }
