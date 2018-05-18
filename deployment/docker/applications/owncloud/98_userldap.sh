@@ -76,8 +76,8 @@ function performLDAPConfig() {
   echo "----------------------"
   echo ""
   echo ""
-  echo "Setting host ${OWNCLOUD_DOMAIN} ... "
-  su-exec www-data php /var/www/owncloud/occ config:system:set overwritehost --value=${OWNCLOUD_DOMAIN}
+  echo "Setting host ${OWNCLOUD_DOMAIN}:${OWNCLOUD_HTTPS_PORT} ... "
+  su-exec www-data php /var/www/owncloud/occ config:system:set overwritehost --value=${OWNCLOUD_DOMAIN}:${OWNCLOUD_HTTPS_PORT}
   echo "Setting protocol https ... "
   su-exec www-data php /var/www/owncloud/occ config:system:set overwriteprotocol --value=https
   echo ""
