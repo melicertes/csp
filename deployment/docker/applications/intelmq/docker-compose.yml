@@ -13,7 +13,7 @@ services:
        - /opt/csp/intelmq-fileinput/:/tmp/intelmq-fileinput
        - /opt/csp/intelmq-fileoutput/:/tmp/intelmq-fileoutput
        - /opt/csp/logs/imq:/opt/intelmq/var/log
-    expose:
+    ports:
        - ${INTELMQ_DOCR_PORT}
 
   intelmq-adapter:
