@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+    <body>
+        <div th:fragment="exc-logs-data">
+            <table class="reportable">
+                <caption class="reportable" style="color: #5caad2"><strong>EXCEPTION LOGS</strong></strong></caption>
+                <tr class="reportable-exc">
+                    <th>Timestamp & Program</th>
+                    <th>Message</th>
+                </tr>
+                <tr class="reportable-exc" th:each="excLog : ${excLogsList}">
+                    <td class="reportable-exc">
+                        <span th:text="${excLog.source.timestamp}">2018-04-19T01:03:47.516Z</span>
+                        <br>
+                        <strong><span th:text="${excLog.source.program}"></span></strong>
+                    </td>
+                    <td class="reportable-exc" th:text="${excLog.source.message}">2018-04-19 03:04:20 csp-misp-adapter.local.demo1-csp.athens.intrasoft-intl.private CSP.MISP-ADAPTER[38]: Servlet.service() for servlet [dispatcherServlet] in context with path [] threw exception [Request processing failed; nested exception is java.lang.NullPointerException] with root cause</td>
+                </tr>
+            </table>
+        </div>
+    </body>
+</html>
