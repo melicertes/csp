@@ -1,0 +1,120 @@
+{
+  "took" : 1092,
+  "timed_out" : false,
+  "_shards" : {
+    "total" : 470,
+    "successful" : 470,
+    "failed" : 0
+  },
+  "hits" : {
+    "total" : 817,
+    "max_score" : 6.7593894,
+    "hits" : [
+      {
+        "_index" : "logstash-2018.04.19",
+        "_type" : "log",
+        "_id" : "AWLbNqj-65cDyhNhdFLv",
+        "_score" : 6.7593894,
+        "_source" : {
+          "@timestamp" : "2018-04-19T00:03:32.275Z",
+          "message" : "java.lang.NullPointerException: null"
+        }
+      },
+      {
+        "_index" : "logstash-2018.04.19",
+        "_type" : "log",
+        "_id" : "AWLbNpVv65cDyhNhdFLa",
+        "_score" : 6.7593894,
+        "_source" : {
+          "@timestamp" : "2018-04-19T00:03:27.274Z",
+          "message" : "java.lang.NullPointerException: null"
+        }
+      },
+      {
+        "_index" : "logstash-2018.04.19",
+        "_type" : "log",
+        "_id" : "AWLbNpVv65cDyhNhdFLm",
+        "_score" : 6.7593894,
+        "_source" : {
+          "@timestamp" : "2018-04-19T00:03:29.275Z",
+          "message" : "java.lang.NullPointerException: null"
+        }
+      },
+      {
+        "_index" : "logstash-2018.04.19",
+        "_type" : "log",
+        "_id" : "AWLbbdKK65cDyhNhdGma",
+        "_score" : 6.7593894,
+        "_source" : {
+          "@timestamp" : "2018-04-19T01:03:47.516Z",
+          "message" : "java.lang.NullPointerException: null"
+        }
+      },
+      {
+        "_index" : "logstash-2018.04.19",
+        "_type" : "log",
+        "_id" : "AWLbbdKK65cDyhNhdGmb",
+        "_score" : 6.7593894,
+        "_source" : {
+          "@timestamp" : "2018-04-19T01:03:47.516Z",
+          "program" : "CSP.MISP-ADAPTER",
+          "message" : "2018-04-19 01:03:47 csp-misp-adapter.local.demo1-csp.athens.intrasoft-intl.private CSP.MISP-ADAPTER[38]: Servlet.service() for servlet [dispatcherServlet] in context with path [] threw exception [Request processing failed; nested exception is java.lang.NullPointerException] with root cause"
+        }
+      },
+      {
+        "_index" : "logstash-2018.04.19",
+        "_type" : "log",
+        "_id" : "AWLbbdKK65cDyhNhdGmd",
+        "_score" : 6.7593894,
+        "_source" : {
+          "@timestamp" : "2018-04-19T01:03:47.516Z",
+          "program" : "CSP.IL",
+          "message" : "2018-04-19 01:03:47 csp-il.local.demo1-csp.athens.intrasoft-intl.private CSP.IL[1]: Exception 'com.intrasoft.csp.libraries.restclient.exceptions.CspBusinessException: Exception in external request: HTTP operation failed invoking https://misp-adapter.local.demo1-csp.athens.intrasoft-intl.private:443/misp/v1/adapter with statusCode: 500; nested exception is org.apache.camel.http.common.HttpOperationFailedException: HTTP operation failed invoking https://misp-adapter.local.demo1-csp.athens.intrasoft-intl.private:443/misp/v1/adapter with statusCode: 500' caught at endpoint 'direct://app' with body 'class IntegrationData {     dataParams: DataParams{cspId='demo1-csp', applicationId='intelmq', recordId='5a953ec7-be90-4031-9c32-00ffac120015', dateTime=2018-04-18T15:12:33.165Z, originCspId='demo1-csp', originApplicationId='intelmq', originRecordId='5a953ec7-be90-4031-9c32-00ffac120015', url='\"file://localhost/tmp/intelmq-fileinput/misp.event.high.json\"'}     sharingParams: class SharingParams {         toShare: false         isExternal: false         tcId: null         teamId: null     }     dataType: event     dataObject: {Event={id=304, orgc_id=25, org_id=23, date=2018-03-28, threat_level_id=1, info=EVENT HIGH FROM INTELMQ PIPELINE ADPATER 18.04.2018, published=true, uuid=5a953ec7-be90-4031-9c32-00ffac120015, attribute_count=0, analysis=0, timestamp=1519730375, distribution=1, proposal_email_lock=false, locked=false, publish_timestamp=1519730427, sharing_group_id=0, disable_correlation=false, Org={id=23, name=CSP::demo1-csp, uuid=68067af3-2ec3-45b4-8c77-bf001e397482}, Orgc={id=25, name=CSP::demo3-csp, uuid=3bea60b7-1f86-4c57-9656-05d18135b736}, Attribute=[], ShadowAttribute=[], RelatedEvent=[], Galaxy=[], Object=[]}} }'"
+        }
+      },
+      {
+        "_index" : "logstash-2018.04.19",
+        "_type" : "log",
+        "_id" : "AWLb3Dk_65cDyhNhdJXS",
+        "_score" : 6.7593894,
+        "_source" : {
+          "@timestamp" : "2018-04-19T03:04:23.008Z",
+          "message" : "java.lang.NullPointerException: null"
+        }
+      },
+      {
+        "_index" : "logstash-2018.04.19",
+        "_type" : "log",
+        "_id" : "AWLb3DlK65cDyhNhdJY5",
+        "_score" : 6.7593894,
+        "_source" : {
+          "@timestamp" : "2018-04-19T03:04:21.007Z",
+          "program" : "CSP.MISP-ADAPTER",
+          "message" : "2018-04-19 03:04:20 csp-misp-adapter.local.demo1-csp.athens.intrasoft-intl.private CSP.MISP-ADAPTER[38]: Servlet.service() for servlet [dispatcherServlet] in context with path [] threw exception [Request processing failed; nested exception is java.lang.NullPointerException] with root cause"
+        }
+      },
+      {
+        "_index" : "logstash-2018.04.19",
+        "_type" : "log",
+        "_id" : "AWLb3DlK65cDyhNhdJZP",
+        "_score" : 6.7593894,
+        "_source" : {
+          "@timestamp" : "2018-04-19T03:04:22.007Z",
+          "message" : "java.lang.NullPointerException: null"
+        }
+      },
+      {
+        "_index" : "logstash-2018.04.19",
+        "_type" : "log",
+        "_id" : "AWLcE2LS65cDyhNhdKxe",
+        "_score" : 6.7593894,
+        "_source" : {
+          "@timestamp" : "2018-04-19T04:04:38.291Z",
+          "program" : "CSP.MISP-ADAPTER",
+          "message" : "2018-04-19 04:04:34 csp-misp-adapter.local.demo1-csp.athens.intrasoft-intl.private CSP.MISP-ADAPTER[38]: Servlet.service() for servlet [dispatcherServlet] in context with path [] threw exception [Request processing failed; nested exception is java.lang.NullPointerException] with root cause"
+        }
+      }
+    ]
+  }
+}
+
