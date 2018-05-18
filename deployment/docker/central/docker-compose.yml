@@ -24,7 +24,7 @@ services:
             - sa-cfg
         container_name: csp-sa_cfg_client
         hostname: csp-sa_cfg_client
-        command: java -Xmx512m -jar server.jar
+        command: sh -c "sleep 10 && java -Xmx512m -jar server.jar"
         working_dir: /opt/csp
         environment:
          - CONF_SERVER_HOST=csp-sa_cfg
