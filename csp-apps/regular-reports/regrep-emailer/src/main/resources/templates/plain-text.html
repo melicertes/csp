@@ -220,7 +220,7 @@
                                         </p>
                                         <div th:include="fragments/data-table-fragment :: reportable"></div>
                                         <div th:if="${isDaily}"><br></div>
-                                        <div th:if="${isDaily AND excLogsList != null}" th:include="fragments/exc-table-fragment :: exc-logs-data"></div>
+                                        <div th:if="${isDaily AND not #lists.isEmpty(excLogsList)}" th:include="fragments/exc-table-fragment :: exc-logs-data"></div>
                                         <br>
                                         <p style="line-height: 24px">
                                             Kind regards,<br>
