@@ -32,7 +32,7 @@ echo "OAM_AGENT=$OAM_AGENT"
 echo "OAM_AGPW=(not shown)"
 echo "OAM_BASE=$OAM_BASE"
 
-TP="/mnt/data/.ldapconfig"
+TP="/mnt/data/.ldapconfig-v360"
 
 function performLDAPConfig() {
 
