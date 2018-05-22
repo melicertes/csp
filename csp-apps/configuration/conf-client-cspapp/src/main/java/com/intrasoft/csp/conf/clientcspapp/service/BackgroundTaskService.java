@@ -852,7 +852,7 @@ public class BackgroundTaskService {
 
     private SystemService checkVHostCreation(SystemModule module, SystemService service) {
         //we copy the vhost configuration from the $HOME folder to the apache folders
-        if (service.getVHostNecessary() && service.getVhostCreated() == null) {
+        if (service.getVHostNecessary() /* && service.getVhostCreated() == null*/ ) {
             String confFileName = "csp-sites." + module.getName() + "." + module.getStartPriority() + ".conf";
             File rootEnvDir = new File(System.getProperty("user.home"));
             File confFile = new File(rootEnvDir, confFileName);
