@@ -93,7 +93,7 @@ public class RequestBodyServiceImpl implements RequestBodyService {
             LOG.error(e.getMessage());
         }
 
-        ( (ObjectNode) jsonNode).findParent("size").put("size", excLogsLimitSize);
+        ( (ObjectNode) jsonNode).findParent("size").put("size", String.valueOf(excLogsLimitSize));
         ( (ObjectNode) jsonNode).findParent("gte").put("gte", "now-" + gte.toString() + TIME_DIF);
         ( (ObjectNode) jsonNode).findParent("lt").put("lt", lt.toString() + TIME_DIF);
 
