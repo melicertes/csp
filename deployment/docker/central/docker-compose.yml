@@ -8,7 +8,7 @@ services:
         command: java -Xmx512m -Dspring.profiles.active=docker -jar server.jar
         working_dir: /opt/csp
         environment:
-            - CFG_DOCR_PORT=19090
+            - CFG_DOCR_PORT=5443
             - CFG_PATH_REPO=/opt/cfg/data
             - ENABLE_OAM=false
         volumes:
@@ -16,7 +16,7 @@ services:
             - /opt/csp/logs/:/opt/csplogs
             - ./cfg/data:/opt/cfg/data
         ports:
-            - 127.0.0.1:19090:19090
+            - 127.0.0.1:19090:5443
 
     sa-cfg-client:
         image: csp-docker-java8:1.0
@@ -28,7 +28,7 @@ services:
         working_dir: /opt/csp
         environment:
          - CONF_SERVER_HOST=csp-sa_cfg
-         - CONF_SERVER_PORT=19090
+         - CONF_SERVER_PORT=5443
          - CONF_SERVER_PROTOCOL=http
          - SERVER_ADDRESS=0.0.0.0
         volumes:
