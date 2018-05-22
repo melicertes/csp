@@ -1,0 +1,70 @@
+################################
+## CSP Services
+################################
+{% for service in services -%}
+#------------------------------------------------------------#
+#   Docker   :     {{ service.docr_name }}
+#   Internal :     {{ service.internal_name }}
+#   External :     {{ service.external_name }}
+#------------------------------------------------------------#
+    {% if (  service.internal_name) -%}
+    #        Internal
+    #--------------------------------------------------------#
+    <VirtualHost *:443>
+
+          ServerName {{ service.internal_name }}.local.{{ csp_name }}.{{ domain }}
+
+          SSLEngine on
+          SSLCertificateFile    {{ internalSSLCertificateFile }}
+          SSLCertificateKeyFile {{ internalSSLCertificateKeyFile }}
+          {% if service.mutual_ssl.internal == true-%}
+          SSLVerifyClient require
+          SSLVerifyDepth 1
+          {% if internalSSLCACertificateFile is defined %}
+          SSLCACertificateFile {{ internalSSLCACertificateFile }}
+          {% endif %}
+          {% endif -%}
+
+          {% set docr_name = service.docr_name.split('-')[0] %}
+          ProxyPass / {{ service.protocol }}://csp-{{ docr_name }}:{{ service.docr_port }}/
+          ProxyPassReverse / {{ service.protocol }}://csp-{{ docr_name }}:{{ service.docr_port }}/
+
+    </VirtualHost>
+    {% endif -%}
+    {% if ( service.external_name) -%}
+    #--------------------------------------------------------#
+    #        External
+    #--------------------------------------------------------#
+
+        <VirtualHost *:5443>
+
+          ServerName {{ service.external_name }}.{{ csp_name }}.{{ domain }}
+
+          {% for path in service.skip_reverse_proxy_paths -%}
+          ProxyPass {{ path }} !
+          {% endfor %}
+
+          SSLEngine on
+          SSLCertificateFile    {{ externalSSLCertificateFile }}
+          SSLCertificateKeyFile {{ externalSSLCertificateKeyFile }}
+
+          {% if service.mutual_ssl.external == true-%}
+          SSLVerifyClient require
+          SSLVerifyDepth 1
+          {% if externalSSLCACertificateFile is defined %}
+          SSLCACertificateFile {{ externalSSLCACertificateFile }}
+          {% endif -%}
+          {% endif -%}
+
+          {% set docr_name = service.docr_name.split('-')[0] %}
+          ProxyPass /api {{ service.protocol }}://csp-{{ docr_name }}:{{ service.docr_port }}/api
+          ProxyPassReverse /api {{ service.protocol }}://csp-{{ docr_name }}:{{ service.docr_port }}/api
+
+          {% if service.agent == true-%}
+          AmAgent On
+          AmAgentConf /web_agents/apache24_agent/bin/../instances/agent_{{ service.external_name }}/config/agent.conf
+          {% endif -%}
+
+    </VirtualHost>
+    {% endif %}
+{% endfor %}
