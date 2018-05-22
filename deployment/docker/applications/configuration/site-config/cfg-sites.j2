@@ -57,6 +57,9 @@
           {% endif -%}
 
           {% set docr_name = service.docr_name.split('-')[0] %}
+          ProxyPass /apiversion {{ service.protocol }}://csp-{{ docr_name }}:{{ service.docr_port }}/apiversion
+          ProxyPassReverse /apiversion {{ service.protocol }}://csp-{{ docr_name }}:{{ service.docr_port }}/apiversion
+
           ProxyPass /api {{ service.protocol }}://csp-{{ docr_name }}:{{ service.docr_port }}/api
           ProxyPassReverse /api {{ service.protocol }}://csp-{{ docr_name }}:{{ service.docr_port }}/api
 
