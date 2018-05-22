@@ -11,6 +11,7 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,9 @@ public class RequestBodyServiceImpl implements RequestBodyService {
 
     @Autowired
     ObjectMapper objectMapper;
+
+    @Value("${app.es.logs.exc.limit.size}")
+    int excLogsLimitSize;
 
     String payload;
 
@@ -89,6 +93,7 @@ public class RequestBodyServiceImpl implements RequestBodyService {
             LOG.error(e.getMessage());
         }
 
+        ( (ObjectNode) jsonNode).findParent("size").put("size", excLogsLimitSize);
         ( (ObjectNode) jsonNode).findParent("gte").put("gte", "now-" + gte.toString() + TIME_DIF);
         ( (ObjectNode) jsonNode).findParent("lt").put("lt", lt.toString() + TIME_DIF);
 
