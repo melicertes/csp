@@ -73,6 +73,12 @@ public class RegularReportsServiceImpl implements RegularReportsService {
     @Value("${th.email.message}")
     String msg;
 
+    @Value("${app.es.logs.exc.limit.size}")
+    int excLogsLimitSize;
+
+    @Value("${th.email.es.logs.exc.limit.message}")
+    String excLogsLimitMessage;
+
     String parentheses;
 
     private List<Basis> basisList;
@@ -191,11 +197,13 @@ public class RegularReportsServiceImpl implements RegularReportsService {
         valuesMap.put("message", String.format(msg, reportType, basis.getDescription(), parentheses));
         valuesMap.put("thymeleafMapA", cspDataResults);
         valuesMap.put("thymeleafMapB", logstashResults);
-        if (isDaily)
+        if (isDaily) {
             valuesMap.put("excLogsList", hitsItemList);
+            valuesMap.put("excLogsLimitSize", excLogsLimitSize);
+            valuesMap.put("excLogsLimitMessage", String.format(excLogsLimitMessage, excLogsLimitSize, hitsItemList.size()));
+        }
 
         newMail.setModel(valuesMap);
-
 
         try {
             regularReportsMailService.sendEmail(newMail);
