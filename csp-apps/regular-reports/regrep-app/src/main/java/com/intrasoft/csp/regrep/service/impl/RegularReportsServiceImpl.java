@@ -202,7 +202,8 @@ public class RegularReportsServiceImpl implements RegularReportsService {
         if (isDaily) {
             valuesMap.put("excLogsList", hitsItemList);
             valuesMap.put("excLogsLimitSize", excLogsLimitSize);
-            valuesMap.put("excLogsLimitMessage", String.format(excLogsLimitMessage, excLogsLimitSize, hitsItemList.size()));
+            valuesMap.put("excLogsTotalSize", logstashResults.get("Exception Logs"));
+            valuesMap.put("excLogsLimitMessage", String.format(excLogsLimitMessage, excLogsLimitSize, logstashResults.get("Exception Logs")));
         }
 
         newMail.setModel(valuesMap);
