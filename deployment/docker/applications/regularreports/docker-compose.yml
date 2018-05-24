@@ -1,0 +1,29 @@
+version: '3'
+services:
+
+  regrep:
+    image: csp-java8:1.0
+    container_name: csp-regrep
+    domainname: ${LOCAL_DOMAIN}
+    hostname: csp-regrep
+    env_file:
+        - .env
+    command: java -Xmx512m -Dspring.profiles.active=docker -jar server.jar
+    working_dir: /opt/csp
+    volumes:
+        - ./regrep-app-3.6.0-SNAPSHOT-exec.jar:/opt/csp/server.jar
+        - /opt/csp/logs/:/opt/csplogs
+        - RegRepDatavolume:/opt/regrep/data
+        - SSLDatavolume:/opt/ssl/
+    expose:
+        - ${REGREP_DOCR_PORT}
+volumes:
+    RegRepDatavolume:
+        external: true
+    SSLDatavolume:
+        external: true
+
+networks:
+  default:
+    external:
+      name: ${LOCAL_DOMAIN}
