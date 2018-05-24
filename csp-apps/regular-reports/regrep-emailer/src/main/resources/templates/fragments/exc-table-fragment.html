@@ -17,7 +17,7 @@
                     <td class="reportable-exc" th:text="${excLog.source.message}">2018-04-19 03:04:20 csp-misp-adapter.local.demo1-csp.athens.intrasoft-intl.private CSP.MISP-ADAPTER[38]: Servlet.service() for servlet [dispatcherServlet] in context with path [] threw exception [Request processing failed; nested exception is java.lang.NullPointerException] with root cause</td>
                 </tr>
             </table>
-            <div th:if="${excLogsLimitSize < #lists.size(excLogsList)}" style="font-size:small; text-align: center;">
+            <div th:if="${excLogsLimitSize < excLogsTotalSize}" style="font-size:small; text-align: center;">
                 <p th:text="${excLogsLimitMessage}">Showing x out of y results. Please use Kibana for more.</p>
             </div>
         </div>
