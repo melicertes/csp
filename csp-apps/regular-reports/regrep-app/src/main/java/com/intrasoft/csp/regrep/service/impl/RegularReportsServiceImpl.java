@@ -6,10 +6,7 @@ import com.intrasoft.csp.regrep.ElasticSearchClient;
 import com.intrasoft.csp.regrep.LogstashMappingType;
 import com.intrasoft.csp.regrep.commons.model.HitsItem;
 import com.intrasoft.csp.regrep.commons.model.Mail;
-import com.intrasoft.csp.regrep.service.Basis;
-import com.intrasoft.csp.regrep.service.RegularReportsMailService;
-import com.intrasoft.csp.regrep.service.RegularReportsService;
-import com.intrasoft.csp.regrep.service.RequestBodyService;
+import com.intrasoft.csp.regrep.service.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +36,9 @@ public class RegularReportsServiceImpl implements RegularReportsService {
 
     @Autowired
     RequestBodyService requestBodyService;
+
+    @Autowired
+    DateMathStringBuilder dateMathStringBuilder;
 
     @Value("${regrep.basis.daily}")
     boolean daily;
@@ -147,37 +147,39 @@ public class RegularReportsServiceImpl implements RegularReportsService {
         String reportType = basis + " Report";
         boolean isDaily = basis.equals(DAILY) ? true : false;
         LOG.info(String.format("Preparing %s...", reportType));
-        DateMath dateMath = null;
-        String requestBody = new String();
+        String requestBody;
+        String gte = new String();
+        String lt;
         Map<String, Integer> cspDataResults = new HashMap<>();
         Map<String, Integer> logstashResults = new HashMap<>();
         List<HitsItem> hitsItemList = new ArrayList<>();
 
         switch (basis) {
-            case DAILY:     dateMath = ONE_DAY; break;
-            case WEEKLY:    dateMath = ONE_WEEK; break;
-            case MONTHLY:   dateMath = ONE_MONTH; break;
-            case QUARTERLY: dateMath = THREE_MONTHS; break;
-            case YEARLY:    dateMath = ONE_YEAR; break;
+            case DAILY:     gte = dateMathStringBuilder.buildStringPattern(NOW, MINUS, ONE_DAY, RBTS_OF, DAY); break;
+            case WEEKLY:    gte = dateMathStringBuilder.buildStringPattern(NOW, MINUS,ONE_DAY,RBTS_OF,DAY,MINUS,ONE_WEEK,RBTS_OF,DAY); break;
+            case MONTHLY:   gte = dateMathStringBuilder.buildStringPattern(NOW, MINUS, ONE_DAY, RBTS_OF, DAY, MINUS, ONE_MONTH, RBTS_OF, DAY); break;
+            case QUARTERLY: gte = dateMathStringBuilder.buildStringPattern(NOW, MINUS, ONE_DAY, RBTS_OF, DAY, MINUS, THREE_MONTHS, RBTS_OF, DAY); break;
+            case YEARLY:    gte = dateMathStringBuilder.buildStringPattern(NOW,MINUS,ONE_DAY,RBTS_OF,DAY,MINUS,ONE_YEAR,RBTS_OF,DAY); break;
             default: break;
         }
+        lt = dateMathStringBuilder.buildStringPattern(NOW,RBTS_OF,DAY);
 
         parentheses = getDates(basis);
         for (CspDataMappingType cdmt : CspDataMappingType.values()) {
             if (cdmt != CspDataMappingType.ALL) {  // "all" used for query construction only
-                requestBody = requestBodyService.buildRequestBody(dateMath, NOW, cdmt);
+                requestBody = requestBodyService.buildRequestBody(gte, lt, cdmt);
                 cspDataResults.put(cdmt.beautify(), elasticSearchClient.getNdocs(requestBody));
             }
         }
         for (LogstashMappingType lmt : LogstashMappingType.values()) {
             if (lmt != LogstashMappingType.ALL) {  // "all" used for query construction only
-                requestBody = requestBodyService.buildRequestBody(dateMath, NOW, lmt);
+                requestBody = requestBodyService.buildRequestBody(gte, lt, lmt);
                 logstashResults.put(lmt.beautify() + " Logs", elasticSearchClient.getNlogs(requestBody));
             }
         }
 
         if (basis.equals(DAILY)) {
-            requestBody = requestBodyService.buildRequestBodyForLogs(dateMath, NOW, LogstashMappingType.EXCEPTION);
+            requestBody = requestBodyService.buildRequestBodyForLogs(gte, lt, LogstashMappingType.EXCEPTION);
             hitsItemList = elasticSearchClient.getLogData(requestBody);
         }
 
