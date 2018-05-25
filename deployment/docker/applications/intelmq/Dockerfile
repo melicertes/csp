@@ -82,6 +82,3 @@ RUN chmod u+x /scripts/run.sh
 
 ENTRYPOINT ["scripts/run.sh"]  
 
-
-
-
