@@ -173,6 +173,17 @@ public class MispAppClientImpl implements MispAppClient, MispContextUrl {
         return response;
     }
 
+    @Override
+    public ResponseEntity<String> postMispAttribute(String uuid) {
+        String url = context  + "/" + MISP_ATTRIBUTES + "/" + uuid;
+
+        LOG.debug("API call [get]: " + url);
+        HttpEntity<String> request = new HttpEntity<>(headers);
+        ResponseEntity<String> response;
+        response = retryRestTemplate.exchange(url, HttpMethod.POST, request, String.class);
+        return response;
+    }
+
     /*
     * Organisations API management
     * */
