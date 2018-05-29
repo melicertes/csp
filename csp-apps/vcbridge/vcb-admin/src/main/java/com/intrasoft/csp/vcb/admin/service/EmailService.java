@@ -5,7 +5,6 @@ import com.intrasoft.csp.vcb.commons.constants.EmailTemplateType;
 import com.intrasoft.csp.vcb.commons.model.EmailTemplate;
 import com.intrasoft.csp.vcb.commons.model.Meeting;
 import com.intrasoft.csp.vcb.commons.model.Participant;
-import org.hibernate.validator.constraints.Email;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.safety.Whitelist;
@@ -15,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.mail.MailException;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.mail.javamail.MimeMessagePreparator;
@@ -24,7 +22,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.mail.MessagingException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import javax.mail.util.ByteArrayDataSource;
@@ -48,18 +45,18 @@ public class EmailService {
     private String mailFromMail;
 
 
-    @Value(value = "${XXXMAILSERVERHOSTXXX}")
-    private String XXX_MAIL_SERVER_HOST;
-    @Value(value = "${XXXMAILSERVERPORTXXX}")
-    private Integer XXX_MAIL_SERVER_PORT;
-    @Value(value = "${XXXMAILUSERNAMEXXX}")
-    private String XXX_MAIL_USERNAME;
-    @Value(value = "${XXXMAILPASSWORDXXX}")
-    private String XXX_MAIL_PASSWORD;
+    @Value(value = "${MAIL_SERVER_HOST}")
+    private String MAIL_SERVER_HOST;
+    @Value(value = "${MAIL_SERVER_PORT}")
+    private Integer MAIL_SERVER_PORT;
+    @Value(value = "${MAIL_USERNAME}")
+    private String MAIL_USERNAME;
+    @Value(value = "${MAIL_PASSWORD}")
+    private String MAIL_PASSWORD;
     @Value(value = "${MAIL_SENDER_NAME}")
-    private String XXX_MAIL_SENDER_NAME;
+    private String MAIL_SENDER_NAME;
     @Value(value = "${MAIL_SENDER_EMAIL}")
-    private String XXX_MAIL_SENDER_EMAIL;
+    private String MAIL_SENDER_EMAIL;
 
 
 
@@ -186,12 +183,12 @@ public class EmailService {
             // MimeMessagePreparator messagePreparator = new
             // MessagePreparatorImpl(meeting, et, mailContentBuilder, p,
             // ics);
-            log.debug(XXX_MAIL_SERVER_HOST);
-            log.debug(XXX_MAIL_SERVER_PORT.toString());
-            log.debug(XXX_MAIL_USERNAME);
-            log.debug(XXX_MAIL_PASSWORD);
-            log.debug(XXX_MAIL_SENDER_NAME);
-            log.debug(XXX_MAIL_SENDER_EMAIL);
+            log.debug(MAIL_SERVER_HOST);
+            log.debug(MAIL_SERVER_PORT.toString());
+            log.debug(MAIL_USERNAME);
+            log.debug(MAIL_PASSWORD);
+            log.debug(MAIL_SENDER_NAME);
+            log.debug(MAIL_SENDER_EMAIL);
             try {
                 mailSender.send(messagePreparator);
                 log.info("Email sent to: " + p.getEmail() + " for Meeting UID: " + meeting.getUid() + ", subject:" + meeting.getSubject());

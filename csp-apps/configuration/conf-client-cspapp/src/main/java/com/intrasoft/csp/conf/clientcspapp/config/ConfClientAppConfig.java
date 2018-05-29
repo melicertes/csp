@@ -38,7 +38,7 @@ public class ConfClientAppConfig implements ApiContextUrl {
     @Value("${conf.server.host:localhost}")
     private String host;
 
-    @Value("${conf.server.port:8090}")
+    @Value("${conf.server.api.port:5443}")
     private String port;
 
     @Value("${conf.retry.backOffPeriod:5000}")

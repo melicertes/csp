@@ -7,6 +7,7 @@ import com.intrasoft.csp.misp.client.MispAppClient;
 import com.intrasoft.csp.misp.commons.models.OrganisationDTO;
 import com.intrasoft.csp.misp.commons.models.generated.SharingGroup;
 import com.intrasoft.csp.misp.commons.models.generated.SharingGroupOrgItem;
+import com.intrasoft.csp.misp.service.Conversions;
 import com.intrasoft.csp.misp.service.MispTcSyncService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +22,7 @@ import java.util.*;
 import java.util.function.Predicate;
 
 @Service
-public class MispTcSyncServiceImpl implements MispTcSyncService {
+public class MispTcSyncServiceImpl implements MispTcSyncService,Conversions {
 
     private static final Logger LOG = LoggerFactory.getLogger(MispTcSyncServiceImpl.class);
 
@@ -74,38 +75,78 @@ public class MispTcSyncServiceImpl implements MispTcSyncService {
         List<Team> teamList = trustCirclesClient.getAllTeams();
         List<OrganisationDTO> orgList = mispAppClient.getAllMispOrganisations();
 
-        // Making the necessary calls to MISP, depending on TC's Teams content.
-        boolean loopBreak;
-        for (int i=0; i<teamList.size(); i++) {
-            loopBreak = false;
-            for (int j=0; j<orgList.size(); j++) {
-                OrganisationDTO organisation = orgList.get(j);
-                // Uuid Match
-                if (teamList.get(i).getId().equals(organisation.getUuid())) {
-                    // Updating the MISP organisation with the TC team data.
-                    mispAppClient.updateMispOrganisation(mapTeamToOrganisation(teamList.get(i), organisation));
-                    loopBreak = true;
-                    break;
+        // check misp orgs to decide if we do a 'create' or 'update'
+        if(teamList!=null && teamList.size()>0) {
+            for (int i=0; i<teamList.size(); i++) {
+                OrganisationDTO organisation = getOrgIfExistsInTeams(teamList.get(i), orgList);
+                if (organisation == null) {
+                    //CREATE Misp Organization
+                    //------------------------
+                    OrganisationDTO organisationDTO = mapTeamToOrganisation(teamList.get(i),null);
+                    try {
+                        mispAppClient.addMispOrganisation(organisationDTO);
+                    }catch (Exception e){
+                        LOG.error(String.format("Error while adding misp org: %s. Logging the error and continue",organisationDTO.getName()),e);
+                    }
+                }else{
+                    //UPDATE Misp Organization
+                    //------------------------
+                    // Uuid Match
+                    if (teamList.get(i).getId().equals(organisation.getUuid())) {
+                        // Updating the MISP organisation with the TC team data.
+                        mispAppClient.updateMispOrganisation(mapTeamToOrganisation(teamList.get(i), organisation));
+                    }
                 }
             }
-            if (loopBreak) continue;
-            // No match; create this team as an organisation in MISP.
-
-            OrganisationDTO organisationDTO = mapTeamToOrganisation(teamList.get(i),null);
-            try {
-                mispAppClient.addMispOrganisation(organisationDTO);
-            }catch (Exception e){
-                LOG.error(String.format("Error while adding misp org: %s. Logging the error and continue",organisationDTO.getName()),e);
-            }
+        }else{
+            LOG.debug("No teams found during sync..");
         }
 
-        // Finding orphan MISP organisations
 
+        // Making the necessary calls to MISP, depending on TC's Teams content.
+//        boolean loopBreak;
+//        for (int i=0; i<teamList.size(); i++) {
+//            loopBreak = false;
+//            for (int j=0; j<orgList.size(); j++) {
+//                OrganisationDTO organisation = orgList.get(j);
+//                // Uuid Match
+//                if (teamList.get(i).getId().equals(organisation.getUuid())) {
+//                    // Updating the MISP organisation with the TC team data.
+//                    mispAppClient.updateMispOrganisation(mapTeamToOrganisation(teamList.get(i), organisation));
+//                    loopBreak = true;
+//                    break;
+//                }
+//            }
+//            if (loopBreak) continue;
+//            // No match; create this team as an organisation in MISP.
+//
+//            OrganisationDTO organisationDTO = mapTeamToOrganisation(teamList.get(i),null);
+//            try {
+//                mispAppClient.addMispOrganisation(organisationDTO);
+//            }catch (Exception e){
+//                LOG.error(String.format("Error while adding misp org: %s. Logging the error and continue",organisationDTO.getName()),e);
+//            }
+//        }
+
+        // Finding orphan MISP organisations
+        findOrphanOrgs(teamList);
+    }
+
+    private OrganisationDTO getOrgIfExistsInTeams(Team team, List<OrganisationDTO> orgList){
+        OrganisationDTO ret = null;
+        if(orgList!=null){
+            ret = orgList.stream().filter(org->org.getUuid().equals(team.getId())).findFirst().orElse(null);
+        }
+        return ret;
+    }
+
+
+    public void findOrphanOrgs(List<Team> teamList){
         // Refreshing our lists first
-        orgList = mispAppClient.getAllMispOrganisations();
+        List<OrganisationDTO> orgList = mispAppClient.getAllMispOrganisations();
 //        teamList = trustCirclesClient.getAllTeams();
         List<String> teamIdList = new ArrayList<>();
-
+        boolean loopBreak;
         // Getting orphan MISP organisation ids
         for (OrganisationDTO org : orgList) {
             loopBreak = false;
@@ -122,7 +163,6 @@ public class MispTcSyncServiceImpl implements MispTcSyncService {
         LOG.trace("Found " + teamIdList.size() + " orphan organisations in MISP");
         // TODO: What is the action to be taken when a MISP organisation does not have a corresponding team in TC? (deletion is not an option for now)
         // teamIdList.forEach(id -> mispAppClient.deleteMispOrganisation(id));
-
     }
 
 //  TODO: Sharing Groups API response on GET calls for all Sharing Groups does not include their UUIDs.
@@ -178,15 +218,17 @@ public class MispTcSyncServiceImpl implements MispTcSyncService {
 
     }
 
-
     public OrganisationDTO mapTeamToOrganisation(Team team, OrganisationDTO organisation) {
-
+        OrganisationDTO newOrganisation = null;
         if(organisation == null){
             //Organization will be created from scratch
-            organisation = new OrganisationDTO();
+            newOrganisation = new OrganisationDTO();
+        }else{
+            //map to new object
+            newOrganisation = copyOrganization.apply(organisation);
         }
 
-        organisation.setUuid(team.getId());
+        newOrganisation.setUuid(team.getId());
         // SXCSP-436 Mapping Teams NIS Sectors to Organisations Sector
         List<String> teamSectors = team.getNisSectors();
         String orgSectors = new String();
@@ -196,18 +238,18 @@ public class MispTcSyncServiceImpl implements MispTcSyncService {
             }
             orgSectors = orgSectors.substring(0, orgSectors.lastIndexOf(", "));
         }
-        organisation.setSector(orgSectors);
+        newOrganisation.setSector(orgSectors);
         // Modifying the name field to differentiate synchronized organisations.
-        organisation.setName(prefix + team.getShortName());
-        organisation.setDescription(team.getDescription());
-        organisation.setNationality(team.getCountry());
+        newOrganisation.setName(prefix + team.getShortName());
+        newOrganisation.setDescription(team.getDescription());
+        newOrganisation.setNationality(team.getCountry());
         // SXCSP-420: "The team with the csp-id that is equal to this csp-id should be imported as local org."
         if (team.getCspId().equals(cspId))  // case-sensitivity?
-            organisation.setLocal(true);
+            newOrganisation.setLocal(true);
         else
-            organisation.setLocal(false);
+            newOrganisation.setLocal(false);
 
-        return organisation;
+        return newOrganisation;
     }
 
     public SharingGroup mapTrustCircleToSharingGroup(TrustCircle tCircle, SharingGroup sGroup) {
