@@ -7,7 +7,7 @@ RUN apt-get -y update \
 RUN wget -qO - https://download.jitsi.org/jitsi-key.gpg.key | apt-key add - \
  && echo 'deb http://download.jitsi.org stable/' >> /etc/apt/sources.list \
  && apt-get -y update \
- && apt-get -y install jitsi-meet
+ && apt-get -y install jitsi-meet=1.0.2635-1 jitsi-videobridge=1011-1 jicofo=1.0-388-1 jitsi-meet-web=1.0.2441-1 jitsi-meet-web-config=1.0.2441-1 jitsi-meet-prosody=1.0.2441-1
 
 RUN rm -rf /etc/nginx/sites-enabled/* \
  && rm -rf /etc/prosody/conf.d/*
@@ -21,8 +21,12 @@ COPY config/prosody.cfg.lua /etc/prosody/prosody.cfg.lua
 
 COPY start.sh /start.sh
 
-ENV DOMAIN=test.com STUN=stun.test.com BRIDGE_IP=1.2.3.4 BRIDGE_TCP_PORT=4443 BRIDGE_UDP_PORT=10000
+# making sure this will start
+RUN chmod 770 /start.sh
 
-EXPOSE 4443 10000/udp
+ENV DOMAIN=test.com STUN=stun.ekiga.net BRIDGE_IP=1.2.3.4 BRIDGE_TCP_PORT=4443 BRIDGE_UDP_PORT=10000
+
+EXPOSE 80 4443 10000/udp
 
 CMD /start.sh
+

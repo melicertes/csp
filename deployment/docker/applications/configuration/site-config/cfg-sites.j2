@@ -17,7 +17,6 @@
           SSLEngine on
           SSLCertificateFile    {{ internalSSLCertificateFile }}
           SSLCertificateKeyFile {{ internalSSLCertificateKeyFile }}
-
           {% if service.mutual_ssl.internal == true-%}
           SSLVerifyClient require
           SSLVerifyDepth 1
@@ -36,10 +35,11 @@
     #--------------------------------------------------------#
     #        External
     #--------------------------------------------------------#
-     <VirtualHost *:443>
+
+        <VirtualHost *:5443>
 
           ServerName {{ service.external_name }}.{{ csp_name }}.{{ domain }}
-          Alias /static/ /opt/tc/var/static/
+
           {% for path in service.skip_reverse_proxy_paths -%}
           ProxyPass {{ path }} !
           {% endfor %}
@@ -48,24 +48,6 @@
           SSLCertificateFile    {{ externalSSLCertificateFile }}
           SSLCertificateKeyFile {{ externalSSLCertificateKeyFile }}
 
-          {% if service.docr_name == 'oam' -%}
-          SSLProxyEngine on
-          SSLProxyVerify none
-          SSLProxyCheckPeerCN off
-          SSLProxyCheckPeerName off
-
-          ProxyPreserveHost on
-
-          ProxyPass /ofmeet http://10.240.125.21:7070/ofmeet
-          ProxyPassReverse /ofmeet http://10.240.125.21:7070/ofmeet
-
-          ProxyPass /ofmeetws ws://10.240.125.21:7070/ofmeetws
-          ProxyPassReverse /ofmeetws ws://10.240.125.21:7070/ofmeetws
-
-          ProxyPass / http://10.240.125.21:7070/
-          ProxyPassReverse / http://10.240.125.21:7070/
-
-          {% endif -%}
           {% if service.mutual_ssl.external == true-%}
           SSLVerifyClient require
           SSLVerifyDepth 1
@@ -75,12 +57,15 @@
           {% endif -%}
 
           {% set docr_name = service.docr_name.split('-')[0] %}
-          ProxyPass / {{ service.protocol }}://csp-{{ docr_name }}:{{ service.docr_port }}/
-          ProxyPassReverse / {{ service.protocol }}://csp-{{ docr_name }}:{{ service.docr_port }}/
+          ProxyPass /apiversion {{ service.protocol }}://csp-{{ docr_name }}:{{ service.docr_port }}/apiversion
+          ProxyPassReverse /apiversion {{ service.protocol }}://csp-{{ docr_name }}:{{ service.docr_port }}/apiversion
+
+          ProxyPass /api {{ service.protocol }}://csp-{{ docr_name }}:{{ service.docr_port }}/api
+          ProxyPassReverse /api {{ service.protocol }}://csp-{{ docr_name }}:{{ service.docr_port }}/api
 
           {% if service.agent == true-%}
           AmAgent On
-          AmAgentConf /web_agents/apache24_agent/bin/../instances/agent_{{ service.internal_name }}/config/agent.conf
+          AmAgentConf /web_agents/apache24_agent/bin/../instances/agent_{{ service.external_name }}/config/agent.conf
           {% endif -%}
 
     </VirtualHost>

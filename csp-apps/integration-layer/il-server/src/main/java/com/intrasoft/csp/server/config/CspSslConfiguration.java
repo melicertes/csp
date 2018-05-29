@@ -40,6 +40,9 @@ public class CspSslConfiguration {
     @Value("${external.ssl.keystore.passphrase}")
     String externalSslKeystorePassphrase;
 
+    @Value("${external.ssl.port}")
+    String externalSslPort;
+
     @Value("${server.ssl.allow.all.hostname}")
     Boolean serverSslAllowAllHostname;
 
@@ -129,6 +132,14 @@ public class CspSslConfiguration {
 
     public void setExternalSslKeystorePassphrase(String externalSslKeystorePassphrase) {
         this.externalSslKeystorePassphrase = externalSslKeystorePassphrase;
+    }
+
+    public String getExternalSslPort() {
+        return externalSslPort;
+    }
+
+    public void setExternalSslPort(String externalSslPort) {
+        this.externalSslPort = externalSslPort;
     }
 
     public Boolean getServerSslAllowAllHostname() {

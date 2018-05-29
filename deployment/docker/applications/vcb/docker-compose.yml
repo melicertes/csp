@@ -9,7 +9,7 @@ services:
     env_file:
       - .env
     environment:
-      - DOMAIN=${JITSI_VC_DOMAIN}
+      - DOMAIN=${JITSI_DOMAIN}
       - STUN=stun.ekiga.net
       - BRIDGE_IP=${HOST_IP}
       - BRIDGE_TCP_PORT=4443
@@ -17,19 +17,20 @@ services:
     ports:
       - 4443:4443
       - 10000:10000/udp
-      - 10080:80
+    expose:
+      - 80
     volumes:
         - /opt/csp/logs/:/var/log/jitsi
       
       
   vcb-admin:
     image: csp-java8:1.0
-    container_name: csp-vcadm
+    container_name: csp-vcb_admin
     domainname: ${LOCAL_DOMAIN}
-    hostname: csp-vcadm
+    hostname: csp-vcb_admin
     env_file:
         - .env
-    command: java -Xmx512m -Dspring.profiles.active=docker -jar server.jar
+    command: sh -c "sleep 10 && java -Xmx512m -Dspring.profiles.active=docker -jar server.jar"
     working_dir: /opt/csp
     volumes:
         - ./vcb-admin-3.6.0-SNAPSHOT-exec.jar:/opt/csp/server.jar
@@ -42,9 +43,9 @@ services:
         
   vcb-teleconf:
     image: csp-java8:1.0
-    container_name: csp-vcui
+    container_name: csp-vcb_teleconf
     domainname: ${LOCAL_DOMAIN}
-    hostname: csp-vcui
+    hostname: csp-vcb_teleconf
     env_file:
         - .env
     command: java -Xmx512m -Dspring.profiles.active=docker -jar server.jar

@@ -213,6 +213,11 @@ __WELCOME__
         touch /opt/state/installed.tmp
 fi
 
+
+echo "Fixing permissions on /var/www/MISP/app/tmp/logs/"
+chown -R 33.33 /var/www/MISP/app/tmp/logs/
+chmod -R 777 /var/www/MISP/app/tmp/logs/
+
 # Start supervisord
 echo "Starting supervisord"
 cd /
