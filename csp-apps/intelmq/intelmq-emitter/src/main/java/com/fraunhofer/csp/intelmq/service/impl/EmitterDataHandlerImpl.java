@@ -74,8 +74,12 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler {
 			byte[] byteArray = Base64.decodeBase64(jsonNodeRaw.toString().getBytes());
 			String decodedString = new String(byteArray);
 			LOG.debug("intelmqEventData:decodedString:" + decodedString);
-
+			//misp conform event converting
 			dataObject = mapper.readTree(decodedString);
+			ObjectNode objectNodeEvent = mapper.createObjectNode();
+			objectNodeEvent.set("Event", dataObject);
+			dataObject = objectNodeEvent;
+
 		} catch (IOException ioex) {
 			LOG.error("Event json object mapping failed.");
 			// ioex.printStackTrace();
