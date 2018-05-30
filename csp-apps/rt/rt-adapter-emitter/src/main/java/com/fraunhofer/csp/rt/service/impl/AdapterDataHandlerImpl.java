@@ -102,13 +102,27 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler {
 		// We have EVENT
 		else {
 			try {
-				// "threat_level_id": "1",
-				uuid = jsonNode.get("Event").get("uuid").toString().replace("\"", "");
-				event_info = jsonNode.get("Event").get("info").toString().replace("\"", "");
-				threat_level_id = jsonNode.get("Event").get("threat_level_id").toString().replace("\"", "");
+				
+				uuid = jsonNode.get("Event").get("uuid").toString().replace("\"", "");	
+				LOG.debug("Get event_uuid: " + uuid);
 			} catch (Exception e) {
 				LOG.warn("FAILED TO READ UUID FROM JSON EVENT NODE.");
 				LOG.warn("READ UUID FROM JSON EVENT NODE. FAILED WITH:" + e);
+			}
+			try {			
+				event_info = jsonNode.get("Event").get("info").toString().replace("\"", "");		
+				LOG.debug("Get event_info: " + event_info);
+			} catch (Exception e) {
+				LOG.warn("FAILED TO READ INFO NODE.");
+				LOG.warn("READ EVENT INFO NODE. FAILED WITH:" + e);
+			}
+			try {				
+				// "threat_level_id": "1",
+				threat_level_id = jsonNode.get("Event").get("threat_level_id").toString().replace("\"", "");
+				LOG.debug("Get threat_level_id: " + threat_level_id);
+			} catch (Exception e) {
+				LOG.warn("FAILED TO READ EVENT threat_level_id NODE.");
+				LOG.warn("READ threat_level_id NODE. FAILED WITH:" + e);
 			}
 		}
 		// WE have a intelmq event
