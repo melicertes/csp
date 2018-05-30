@@ -12,10 +12,16 @@ services:
         - ${OAM_DOCR_PORT}
     volumes:
         - OAMDatavolume:/root/
+        - OAMOptvolume:/opt/
+        - OAMWebappsvolume:/usr/local/tomcat/webapps/
         - /opt/csp/logs/:/root/openam/openam/log/
 
 volumes:
     OAMDatavolume:
+        external: true
+    OAMOptvolume:
+        external: true
+    OAMWebappsvolume:
         external: true
 
 
