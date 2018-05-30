@@ -13,7 +13,7 @@ services:
        - /opt/csp/intelmq-fileinput/:/tmp/intelmq-fileinput
        - /opt/csp/intelmq-fileoutput/:/tmp/intelmq-fileoutput
        - /opt/csp/logs/imq:/opt/intelmq/var/log
-    expose:
+    ports:
        - ${INTELMQ_DOCR_PORT}
 
   intelmq-adapter:
@@ -25,7 +25,7 @@ services:
     hostname: csp-imq-adapter
     env_file:
         - .env
-    command: java  -Xmx512m -Dspring.profiles.active=docker -Dcsp.client.ssl.jks.keystore.password=123456   -jar server.jar
+    command: java  -Xmx512m -Dspring.profiles.active=docker -jar server.jar
     working_dir: /opt/csp
     ports:
         - 80
