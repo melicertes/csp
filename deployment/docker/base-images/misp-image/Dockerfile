@@ -1,4 +1,4 @@
-FROM csp-alpine35glibc:1.0 as builder
+FROM csp-alpine35glibc:1.0 as builder_2.4.88
 
 RUN apk add --no-cache git
 WORKDIR /var/www
@@ -66,7 +66,7 @@ RUN apt-get clean
 WORKDIR /var/www
 
 USER www-data
-COPY --from=builder /var/www/ .
+COPY --from=builder_2.4.88 /var/www/ .
 
 WORKDIR /var/www/MISP/app/files/scripts/python-cybox
 USER root
@@ -135,7 +135,7 @@ RUN echo "sudo -u www-data bash /var/www/MISP/app/Console/worker/start.sh" >>/et
 # Install MISP Modules
 WORKDIR /opt
 RUN apt-get install -y python3 python3-pip libjpeg-dev
-COPY --from=builder /opt/ .
+COPY --from=builder_2.4.88 /opt/ .
 ADD misp-modules /opt/misp-modules
 WORKDIR /opt/misp-modules
 RUN pip3 install --upgrade --ignore-installed urllib3
