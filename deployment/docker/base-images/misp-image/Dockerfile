@@ -6,7 +6,8 @@ WORKDIR /var/www
 #USER www-data
 RUN git clone https://github.com/MISP/MISP.git
 WORKDIR /var/www/MISP
-RUN git checkout tags/$(git describe --tags `git rev-list --tags --max-count=1`)
+#RUN git checkout tags/$(git describe --tags `git rev-list --tags --max-count=1000`)
+RUN git checkout tags/$(git describe --tags v2.4.88)
 RUN git config core.filemode false
 
 WORKDIR /var/www/MISP/app/files/scripts
