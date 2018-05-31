@@ -184,6 +184,17 @@ $TOOLS_HOME/openam/bin/ssoadm do-batch --batchfile $TOOLS_HOME/post.batch --admi
 echo '[i] Create Users and Groups done.'
 
 
+# update the server config -> workaround for cache issue with user data
+echo "[i] update the server config configuration"
+echo "update-server-cfg -s http://csp-oam:8080/openam -a com.iplanet.am.sdk.caching.enabled=false" > /tmp/tmp-002.batch
+echo "update-server-cfg -s http://csp-oam:8080/openam -a com.sun.identity.sm.cache.enabled=true" >> /tmp/tmp-002.batch
+echo "[i] update the server config configuration done!"
+
+# update the embedded datastore -> workaround for cache issue with user data
+echo "[i] update the datastore"
+update-datastore -e / -m embedded -a sun-idrepo-ldapv3-config-memberof= >> /tmp/tmp-002.batch
+echo "[i] update the datastore done!"
+
 #Update Authentication Instance Cert 
 echo "[i] set up CSP certificate authentication module instance properties"
 sed -i "s@___CSP_DOMAIN___@$DOMAIN@g" $TOOLS_HOME/CSP-Cert.properties
@@ -193,7 +204,7 @@ echo '[i] create empty file Cert2.xml'
 touch $CATALINA_HOME/webapps/openam/config/auth/default/Cert2.xml
 
 echo '[i] creating a new service for csp-certificate authentication module'
-echo "create-svc --xmlfile /tmp/amAuthCert2.xml" > /tmp/tmp-002.batch
+echo "create-svc --xmlfile /tmp/amAuthCert2.xml" >> /tmp/tmp-002.batch
 
 echo "[i] register new authentication service CSP Certificate"
 echo "register-auth-module --authmodule com.fraunhofer.fokus.csp.oam.auth.Cert2" >> /tmp/tmp-002.batch
