@@ -62,10 +62,12 @@ ADD web-page/logo-horizontal.png $TOOLS_HOME/logo-horizontal.png
 ADD web-page/ThemeConfiguration.js $TOOLS_HOME/ThemeConfiguration.js
 ADD web-page/DataStore1.html $TOOLS_HOME/DataStore1.html
 
-
-RUN chmod +x /usr/local/tomcat/bin/setenv.sh
-RUN chmod +x $TOOLS_HOME/run-openam.sh
-RUN chmod +x $TOOLS_HOME/post-config-openam.sh
+#update section, if needed
+RUN mkdir /tmp/updates
+#ADD update.sh /tmp/updates/update.sh
+RUN chmod +x /usr/local/tomcat/bin/setenv.sh && \
+  chmod +x $TOOLS_HOME/run-openam.sh && \
+  chmod +x $TOOLS_HOME/post-config-openam.sh
 
 
 COPY create-agent.sh /usr/local/bin/

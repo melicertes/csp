@@ -192,7 +192,7 @@ echo "[i] update the server config configuration done!"
 
 # update the embedded datastore -> workaround for cache issue with user data
 echo "[i] update the datastore"
-update-datastore -e / -m embedded -a sun-idrepo-ldapv3-config-memberof= >> /tmp/tmp-002.batch
+echo "update-datastore -e \"/\" -m \"embedded\" -a sun-idrepo-ldapv3-config-memberof=" >> /tmp/tmp-002.batch
 echo "[i] update the datastore done!"
 
 #Update Authentication Instance Cert 
@@ -220,7 +220,7 @@ echo "update-auth-cfg-entr --realm \"/\" -m ldapService -a \"CSP-Certs|SUFFICIEN
 echo '[i] Updating the authentication chain done.' 
 
 echo '[i] performing command update-auth-instance to update CSP-Certs '
-echo "update-auth-instance --realm \"/\" --adminid amadmin --password-file $TOOLS_HOME/pwd.txt --datafile $TOOLS_HOME/CSP-Cert.properties --name CSP-Certs" >> /tmp/tmp-002.batch
+echo "update-auth-instance --realm \"/\" --datafile $TOOLS_HOME/CSP-Cert.properties --name CSP-Certs" >> /tmp/tmp-002.batch
 echo '[i] Update Authentication Instance CSP Certs done.' 
 
 echo '[i] performing batch command for tmp-002.batch ...'
