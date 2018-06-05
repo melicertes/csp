@@ -120,8 +120,8 @@ public class EmailService {
                 m.put("meeting_password", p.getPassword());
                 m.put("meeting_url", meeting.getUrl());
                 m.put("meeting_subject", meeting.getSubject());
-                m.put("user_first", meeting.getUser().getFirstName());
-                m.put("user_lastname", meeting.getUser().getLastName());
+                //m.put("user_first", meeting.getUser().getFirstName());
+                //m.put("user_lastname", meeting.getUser().getLastName());
 
                 String subject = mailContentBuilder.build(et.getSubject(), m);
                 messageHelper.setSubject(subject);
@@ -232,8 +232,8 @@ public class EmailService {
             m.put("meeting_password", p.getPassword());
             m.put("meeting_url", meeting.getUrl());
             m.put("meeting_subject", meeting.getSubject());
-            m.put("user_first", meeting.getUser().getFirstName());
-            m.put("user_lastname", meeting.getUser().getLastName());
+            //m.put("user_first", meeting.getUser().getFirstName());
+            //m.put("user_lastname", meeting.getUser().getLastName());
 
             String subject = mailContentBuilder.build(et.getSubject(), m);
             messageHelper.setSubject(subject);
