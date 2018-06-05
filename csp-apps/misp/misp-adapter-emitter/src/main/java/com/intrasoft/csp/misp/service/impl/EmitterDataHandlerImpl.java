@@ -104,6 +104,8 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
 
         jsonNode = new ObjectMapper().convertValue(object, JsonNode.class);
 
+        LOG.info(jsonNode.toString());
+
         String uuid = "";
         Map<String, List<String>> eventValidationMap = new HashMap<>();
 
@@ -127,6 +129,7 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
                 if (!isDelete){
                     object = mispAppClient.getMispEvent(uuid).getBody();
                     jsonNode = new ObjectMapper().convertValue(object, JsonNode.class);
+//                    jsonNode = updateTimestamp(new ObjectMapper().convertValue(object, JsonNode.class));
                 }
 
             }
@@ -303,15 +306,10 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
         return result; // When Sharing Group is valid but has no Organisations, method returns its UUID along with a key indication.
     }
 
-    @Override
-    public void handleReemittionMispData(IntegrationData integrationData, MispEntity mispEntity, boolean isDelete, boolean isReEmittion) {
-        handleMispData(integrationData.getDataObject(), mispEntity, true, isDelete);
-    }
-
     private JsonNode updateTimestamp(JsonNode rootNode) {
         ReadContext ctx = JsonPath.using(configuration).parse(rootNode);
         List<String> timestampPaths = ctx.read("$..timestamp", List.class);
-        Long timestamp = Instant.now().getEpochSecond();
+        Long timestamp = Instant.now().getEpochSecond() - 1;
         for (String path : timestampPaths){
             rootNode = JsonPath.using(configuration).parse(rootNode).set(path, String.valueOf(timestamp)).json();
         }
