@@ -22,7 +22,7 @@ if [ ! -f /root/.$UPDATE_NAME ]; then
 
   # update the embedded datastore -> workaround for cache issue with user data
   echo "[i] update the datastore"
-  echo "update-datastore -e \"/\" -m \"embedded\" -a sun-idrepo-ldapv3-config-memberof=" >> /tmp/${BATCH_FNAME}
+  echo "update-datastore -e \"/\" -m \"embedded\" -a \"sun-idrepo-ldapv3-config-psearchbase=\"" >> /tmp/${BATCH_FNAME}
 
   echo "[i] performing batch command for ${BATCH_FNAME} ..."
 $TOOLS_HOME/openam/bin/ssoadm do-batch --batchfile /tmp/${BATCH_FNAME} --adminid amadmin --password-file $TOOLS_HOME/pwd.txt

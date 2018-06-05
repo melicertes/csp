@@ -192,7 +192,7 @@ echo "[i] update the server config configuration done!"
 
 # update the embedded datastore -> workaround for cache issue with user data
 echo "[i] update the datastore"
-echo "update-datastore -e \"/\" -m \"embedded\" -a sun-idrepo-ldapv3-config-memberof=" >> /tmp/tmp-002.batch
+echo "update-datastore -e \"/\" -m \"embedded\" -a \"sun-idrepo-ldapv3-config-psearchbase=\"" >> /tmp/tmp-002.batch
 echo "[i] update the datastore done!"
 
 #Update Authentication Instance Cert 
