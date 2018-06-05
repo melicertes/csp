@@ -35,22 +35,11 @@
     #--------------------------------------------------------#
     #        External
     #--------------------------------------------------------#
-     {% if 'integration' == service.external_name %}
+
         <VirtualHost *:5443>
-     {% elif 'configuration' == service.external_name %}
-        <VirtualHost *:5443>
-     {% elif 'vc' == service.external_name %}
-        <VirtualHost *:6443>
-     {% elif 'files' == service.external_name %}
-        <VirtualHost *:6443>
-     {% elif 'teleconf' == service.external_name %}
-        <VirtualHost *:6443>
-     {% else %}
-        <VirtualHost *:443>
-     {% endif %}
 
           ServerName {{ service.external_name }}.{{ csp_name }}.{{ domain }}
-          Alias /static/ /opt/tc/var/static/
+
           {% for path in service.skip_reverse_proxy_paths -%}
           ProxyPass {{ path }} !
           {% endfor %}
@@ -68,8 +57,11 @@
           {% endif -%}
 
           {% set docr_name = service.docr_name.split('-')[0] %}
-          ProxyPass / {{ service.protocol }}://csp-{{ docr_name }}:{{ service.docr_port }}/
-          ProxyPassReverse / {{ service.protocol }}://csp-{{ docr_name }}:{{ service.docr_port }}/
+          ProxyPass /apiversion {{ service.protocol }}://csp-{{ docr_name }}:{{ service.docr_port }}/apiversion
+          ProxyPassReverse /apiversion {{ service.protocol }}://csp-{{ docr_name }}:{{ service.docr_port }}/apiversion
+
+          ProxyPass /api {{ service.protocol }}://csp-{{ docr_name }}:{{ service.docr_port }}/api
+          ProxyPassReverse /api {{ service.protocol }}://csp-{{ docr_name }}:{{ service.docr_port }}/api
 
           {% if service.agent == true-%}
           AmAgent On

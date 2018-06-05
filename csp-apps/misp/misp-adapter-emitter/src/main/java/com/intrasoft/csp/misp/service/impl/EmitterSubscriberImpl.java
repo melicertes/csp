@@ -8,6 +8,12 @@ import com.intrasoft.csp.misp.commons.config.MispContextUrl;
 import com.intrasoft.csp.misp.service.EmitterAuditLogHandler;
 import com.intrasoft.csp.misp.service.EmitterDataHandler;
 import com.intrasoft.csp.misp.service.EmitterSubscriber;
+import com.jayway.jsonpath.Configuration;
+import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.Option;
+import com.jayway.jsonpath.ReadContext;
+import com.jayway.jsonpath.spi.json.JacksonJsonNodeJsonProvider;
+import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +25,7 @@ import org.zeromq.ZMQ;
 import org.zeromq.ZMsg;
 
 import java.io.IOException;
+import java.util.*;
 
 import static com.intrasoft.csp.misp.commons.config.MispContextUrl.MISP_ATTRIBUTE;
 import static com.intrasoft.csp.misp.commons.config.MispContextUrl.MISP_EVENT;
@@ -52,6 +59,14 @@ public class EmitterSubscriberImpl implements EmitterSubscriber, MispContextUrl{
     @Qualifier("MispAppClient")
     MispAppClient mispAppClient;
 
+    private Set<String> addedAttributes = new HashSet<>();
+
+    private static final Configuration configuration = Configuration.builder()
+            .options(Option.ALWAYS_RETURN_LIST, Option.SUPPRESS_EXCEPTIONS)
+            .jsonProvider(new JacksonJsonNodeJsonProvider())
+            .mappingProvider(new JacksonMappingProvider())
+            .build();
+
     @Override
     public void subscribe() {
         // Prepare our context and subscriber
@@ -81,25 +96,18 @@ public class EmitterSubscriberImpl implements EmitterSubscriber, MispContextUrl{
                 }
                 LOG.debug("Message received from queue. Topic: "  + topic);
                 switch (topic){
-                    /*case MISP_EVENT:
-                        emitterDataHandler.handleMispData(jsonNode, MispEntity.EVENT, false, isDelete);
-                        break;*/
-                    case MISP_JSON_ATTRIBUTE:
-                        if (jsonNode.has("Event") && jsonNode.has("action")){
-                            String uuid = jsonNode.get(EVENT.toString()).get("uuid").textValue();
-                            try {
-                                Object object = mispAppClient.getMispEvent(uuid).getBody();
-                                jsonNode = new ObjectMapper().convertValue(object, JsonNode.class);
-                            }
-                            catch (Exception e){
-                                LOG.error("Could not fetch event, probably deleted");
-                            }
-                        }
+                    case MISP_EVENT:
                         emitterDataHandler.handleMispData(jsonNode, MispEntity.EVENT, false, isDelete);
                         break;
-                    case MISP_JSON_EVENT:
+                    /*case MISP_JSON_ATTRIBUTE:
                         if (jsonNode.has("Event") && jsonNode.has("action")){
                             String uuid = jsonNode.get(EVENT.toString()).get("uuid").textValue();
+
+                            if (jsonNode.get("action").textValue().equals("add") && addedAttributes.contains(uuid)){
+                                addedAttributes.remove(uuid);
+                                break;
+                            }
+
                             try {
                                 Object object = mispAppClient.getMispEvent(uuid).getBody();
                                 jsonNode = new ObjectMapper().convertValue(object, JsonNode.class);
@@ -109,6 +117,33 @@ public class EmitterSubscriberImpl implements EmitterSubscriber, MispContextUrl{
                             }
                         }
                         emitterDataHandler.handleMispData(jsonNode, MispEntity.EVENT, false, isDelete);
+                        break;*/
+                    case MISP_JSON_EVENT:
+                        if (jsonNode.has("Event") && jsonNode.has("action") && isDelete){
+                            /*String uuid = jsonNode.get(EVENT.toString()).get("uuid").textValue();
+
+                            if (jsonNode.get("action").textValue().equals("add")){
+                                ReadContext ctx = JsonPath.using(configuration).parse(jsonNode);
+                                // Edit Existing Attribute Proposals
+                                List<String> attributes = ctx.read("$.Event.Attribute[*].uuid", List.class);
+
+                                // Edit Existing Object Proposals
+                                List<String> objectAttributes = ctx.read("$.Event.Object[*].Attribute[*].uuid", List.class);
+
+                                addedAttributes.addAll(attributes);
+                                addedAttributes.addAll(objectAttributes);
+                            }
+
+                            try {
+                                Object object = mispAppClient.getMispEvent(uuid).getBody();
+                                jsonNode = new ObjectMapper().convertValue(object, JsonNode.class);
+                            }
+                            catch (Exception e){
+                                LOG.error("Could not fetch event, probably deleted");
+                            }*/
+                            emitterDataHandler.handleMispData(jsonNode, MispEntity.EVENT, false, isDelete);
+                        }
+
                         break;
                     case MISP_AUDIT:
                         LOG.debug("Audit log received from queue.");

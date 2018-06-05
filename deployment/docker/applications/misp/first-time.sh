@@ -6,5 +6,5 @@ docker volume create MYSQLDatavolume
 docker volume create MISPSharedDatavolume
 docker volume create MISPStateDatavolume
 
-mkdir -p /opt/csp/logs/misp
-chown -R 33.33 /opt/csp/logs/misp
+mkdir -p /opt/csp/logs_misp/
+chown -R 33.33 /opt/csp/logs_misp/
