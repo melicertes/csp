@@ -489,7 +489,7 @@ public class DataController implements DataContextUrl, PagesContextUrl {
         LOG_AUDIT.info(logInfo + "POST Request received");
 
         //check if Module exists
-        if (moduleRepository.exists(moduleId)) {
+        if (!moduleRepository.exists(moduleId)) {
             throw new ConfException(StatusResponseType.DATA_INVALID_MODULE_ID.text(), StatusResponseType.DATA_INVALID_MODULE_ID.code());
         }
 

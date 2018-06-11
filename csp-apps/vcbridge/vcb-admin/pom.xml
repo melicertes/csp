@@ -24,6 +24,16 @@
 	<dependencies>
 		<dependency>
 			<groupId>com.intrasoft.csp</groupId>
+			<artifactId>il-commons</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.intrasoft.csp</groupId>
+			<artifactId>il-client</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.intrasoft.csp</groupId>
 			<artifactId>vcb-commons</artifactId>
 			<version>${project.version}</version>
 		</dependency>

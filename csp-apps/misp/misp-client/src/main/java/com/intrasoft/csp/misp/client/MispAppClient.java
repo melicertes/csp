@@ -16,7 +16,12 @@ public interface MispAppClient {
 	ResponseEntity<String> updateMispEvent(String object);
 	ResponseEntity<String> updateMispEvent(String uuid, String object) ;
 	ResponseEntity<String> deleteMispEvent(String uuid);
-
+	ResponseEntity<String> addMispProposal(String id, String body);
+	ResponseEntity<String> updateMispProposal(String object);
+	ResponseEntity<String> deleteMispProposal(String object);
+	ResponseEntity<String> updateMispProposal(String id, String object);
+	ResponseEntity<String> getMispAttribute(String uuid);
+	ResponseEntity<String> postMispAttribute(String uuid);
 	OrganisationDTO getMispOrganisation(String uuid);
 	List<OrganisationDTO> getAllMispOrganisations();
 	OrganisationDTO addMispOrganisation(OrganisationDTO organisationDTO);
