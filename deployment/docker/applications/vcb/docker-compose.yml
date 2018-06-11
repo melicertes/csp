@@ -4,6 +4,7 @@ services:
   csp-jitsi:
     image: csp-jitsimeet:1.0
     container_name: csp-jitsi
+    hostname: csp-jitsi
     dns:
       - 8.8.8.8
     env_file:
@@ -20,8 +21,12 @@ services:
     expose:
       - 80
     volumes:
-        - /opt/csp/logs/:/var/log/jitsi
-      
+      - /opt/csp/logs/:/var/log/jitsi
+    networks:
+      default:
+        aliases:
+          - ${JITSI_DOMAIN}
+
       
   vcb-admin:
     image: csp-java8:1.0
