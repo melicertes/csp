@@ -25,14 +25,9 @@
           {% endif %}
           {% endif -%}
 
-          {% if 'vc' == service.external_name %}
-          ProxyPass / {{ service.protocol }}://vc.{{ domain }}:{{ service.docr_port }}/
-          ProxyPassReverse / {{ service.protocol }}://vc.{{ domain }}:{{ service.docr_port }}/
-          {% else %}
           {% set docr_name = service.docr_name.split('-')[0] %}
           ProxyPass / {{ service.protocol }}://csp-{{ docr_name }}:{{ service.docr_port }}/
           ProxyPassReverse / {{ service.protocol }}://csp-{{ docr_name }}:{{ service.docr_port }}/
-          {% endif %}
 
     </VirtualHost>
     {% endif -%}
@@ -72,9 +67,15 @@
           {% endif -%}
           {% endif -%}
 
+
+          {% if 'vc' == service.external_name %}
+          ProxyPass / {{ service.protocol }}://vc.{{ domain }}:{{ service.docr_port }}/
+          ProxyPassReverse / {{ service.protocol }}://vc.{{ domain }}:{{ service.docr_port }}/
+          {% else %}
           {% set docr_name = service.docr_name.split('-')[0] %}
           ProxyPass / {{ service.protocol }}://csp-{{ docr_name }}:{{ service.docr_port }}/
           ProxyPassReverse / {{ service.protocol }}://csp-{{ docr_name }}:{{ service.docr_port }}/
+          {% endif %}
 
           {% if service.agent == true-%}
           AmAgent On
