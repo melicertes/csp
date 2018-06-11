@@ -8,6 +8,6 @@ var config = { // eslint-disable-line no-unused-vars
         bridge: 'jitsi-videobridge.{{ DOMAIN }}',
     },
     useNicks: false,
-    bosh: '//{{ DOMAIN }}/http-bind', // FIXME: use xep-0156 for that
+    bosh: '//{{ DOMAIN }}:6443/http-bind', // FIXME: use xep-0156 for that
     clientNode: 'http://jitsi.org/jitsimeet', // The name of client node advertised in XEP-0115 'c' stanza
 };
