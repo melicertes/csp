@@ -33,4 +33,6 @@ fi
 /etc/init.d/prosody restart
 /etc/init.d/jicofo restart
 /etc/init.d/jitsi-videobridge restart
-exec nginx -g 'daemon off;'
+nginx -g 'daemon off;' &
+tail -F /var/log/nginx/*log
+
