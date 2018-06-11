@@ -15,6 +15,22 @@ public class DistributionPolicyRectifierImpl implements DistributionPolicyRectif
     public JsonNode rectifyEvent(JsonNode jsonNode) {
         LOG.debug("Rectifying event...");
         // TODO Implementation
+
+        int eventDistributionPolicyLevel = getEventDistributionPolicyLevel(jsonNode);
+
+        JsonNode attributes = getEventAttributes(jsonNode);
+
         return jsonNode;
     }
+
+    private int getEventDistributionPolicyLevel(JsonNode jsonNode) {
+        JsonNode locatedNode = jsonNode.path("Event").path("distribution");
+        int level = Integer.parseInt(locatedNode.textValue());
+        return level;
+    }
+
+    private JsonNode getEventAttributes(JsonNode jsonNode) {
+        return jsonNode.path("Event").path("Attribute");
+    }
+
 }
