@@ -34,6 +34,7 @@ public class DistributionPolicyRectifierTest {
     JsonNode jsonNode;
 
     Resource zmqEventSampleA = new ClassPathResource("json/zmqEventA.json");
+    Resource zmqEventSamplePlain = new ClassPathResource("json/zmqEventPlain.json");
 
     @Before
     public void init() {
