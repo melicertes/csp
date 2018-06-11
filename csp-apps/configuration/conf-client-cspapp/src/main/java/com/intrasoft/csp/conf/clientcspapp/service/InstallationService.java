@@ -240,7 +240,7 @@ public class InstallationService {
         }).distinct().collect(Collectors.toList());
 
         for (BackgroundTaskResult<Boolean, Integer> r : list) {
-            if (r.getSuccess() == false) {
+            if (!r.getSuccess()) {
                 return false;
             }
         }
@@ -267,15 +267,21 @@ public class InstallationService {
 
     public SystemService queryService(SystemModule module) {
         SystemService service = serviceRepository.findByName(module.getName());
-        if (service.getModule().getId().longValue() == module.getId().longValue()) {
-            log.debug("Service id {} linked to Module id {}, CORRECT", service.getId(), module.getId());
+        if (service != null) {
+            if (service.getModule().getId().longValue() == module.getId().longValue()) {
+                log.debug("Service id {} linked to Module id {}, CORRECT", service.getId(), module.getId());
+            } else {
+                log.warn("Service id {} linked to Module id {}, but incoming module has id {}",
+                        service.getId(), service.getModule().getId(), module.getId());
+            }
+            return service;
         } else {
-            log.warn("Service id {} linked to Module id {}, but incoming module has id {}",
-                    service.getId(), service.getModule().getId(), module.getId());
+            log.warn("There is no service for module {}",module);
+            return null;
         }
-        return service;
     }
 
+    @Transactional
     public SystemService updateServiceState(SystemService service, ServiceState state) {
         SystemService upd = serviceRepository.findByName(service.getName());
         upd.setServiceState(state);
@@ -286,6 +292,7 @@ public class InstallationService {
         return serviceRepository.findAll(new Sort(Sort.Direction.ASC, "module.startPriority"));
     }
 
+    @Transactional
     public void removeService(SystemService service) {
         serviceRepository.delete(service.getId());
     }
@@ -296,6 +303,31 @@ public class InstallationService {
         serviceRepository.findAll(new Sort(Sort.Direction.ASC,"module.startPriority")).forEach(service -> modules.add(service.getModule()));
 
         return modules;
+    }
+
+    @Transactional
+    public void resetAgentAndHostFlags() {
+        final List<SystemService> forUpdate = serviceRepository.findAll().stream()
+                .filter(s -> s.getOamAgentNecessary() || s.getVHostNecessary())
+                .filter(s -> s.getModule().getActive())
+                .map(s -> {
+                    StringBuilder l = new StringBuilder();
+                    l.append("Service ").append(s.getId()).append(" / ").append(s.getName())
+                            .append(" of module ").append(s.getModule().getId()).append(" / ").append(s.getModule().getName());
+                    if (s.getVHostNecessary()) {
+                        s.setVhostCreated(null);
+                        l.append(" vhost reset ");
+                    }
+                    if (s.getOamAgentNecessary()) {
+                        s.setOamAgentCreated(null);
+                        l.append(" oam reset ");
+                    }
+                    log.info("{}",l.toString());
+                    return s;
+                }).collect(Collectors.toList());
+        final List<SystemService> saved = serviceRepository.save(forUpdate);
+        log.info("Total {} services to be updated, {} updated", forUpdate.size(), saved.size());
+
     }
 }
 

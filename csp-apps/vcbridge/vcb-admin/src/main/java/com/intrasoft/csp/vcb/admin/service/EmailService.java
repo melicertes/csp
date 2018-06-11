@@ -5,7 +5,6 @@ import com.intrasoft.csp.vcb.commons.constants.EmailTemplateType;
 import com.intrasoft.csp.vcb.commons.model.EmailTemplate;
 import com.intrasoft.csp.vcb.commons.model.Meeting;
 import com.intrasoft.csp.vcb.commons.model.Participant;
-import org.hibernate.validator.constraints.Email;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.safety.Whitelist;
@@ -15,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.mail.MailException;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.mail.javamail.MimeMessagePreparator;
@@ -24,7 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.mail.MessagingException;
+import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import javax.mail.util.ByteArrayDataSource;
 import java.io.BufferedReader;
@@ -39,6 +37,29 @@ import java.util.Map;
 @Service
 public class EmailService {
     private static final Logger log = LoggerFactory.getLogger(EmailService.class);
+
+
+    @Value(value = "${app.mail.sender.name}")
+    private String mailFromName;
+    @Value(value = "${app.mail.sender.email}")
+    private String mailFromMail;
+
+
+    @Value(value = "${MAIL_SERVER_HOST}")
+    private String MAIL_SERVER_HOST;
+    @Value(value = "${MAIL_SERVER_PORT}")
+    private Integer MAIL_SERVER_PORT;
+    @Value(value = "${MAIL_USERNAME}")
+    private String MAIL_USERNAME;
+    @Value(value = "${MAIL_PASSWORD}")
+    private String MAIL_PASSWORD;
+    @Value(value = "${MAIL_SENDER_NAME}")
+    private String MAIL_SENDER_NAME;
+    @Value(value = "${MAIL_SENDER_EMAIL}")
+    private String MAIL_SENDER_EMAIL;
+
+
+
     @Autowired
     JavaMailSender mailSender;
     @Autowired
@@ -83,7 +104,10 @@ public class EmailService {
 
             MimeMessagePreparator messagePreparator = mimeMessage -> {
                 MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage, true);
-                messageHelper.setFrom(meeting.getUser().getEmail());
+
+                messageHelper.setFrom(new InternetAddress(mailFromMail, mailFromName));
+                //messageHelper.setFrom(meeting.getUser().getEmail());
+
                 messageHelper.setTo(p.getEmail());
 
                 m.put("email", p.getEmail());
@@ -96,8 +120,8 @@ public class EmailService {
                 m.put("meeting_password", p.getPassword());
                 m.put("meeting_url", meeting.getUrl());
                 m.put("meeting_subject", meeting.getSubject());
-                m.put("user_first", meeting.getUser().getFirstName());
-                m.put("user_lastname", meeting.getUser().getLastName());
+                //m.put("user_first", meeting.getUser().getFirstName());
+                //m.put("user_lastname", meeting.getUser().getLastName());
 
                 String subject = mailContentBuilder.build(et.getSubject(), m);
                 messageHelper.setSubject(subject);
@@ -159,11 +183,18 @@ public class EmailService {
             // MimeMessagePreparator messagePreparator = new
             // MessagePreparatorImpl(meeting, et, mailContentBuilder, p,
             // ics);
+            log.debug(MAIL_SERVER_HOST);
+            log.debug(MAIL_SERVER_PORT.toString());
+            log.debug(MAIL_USERNAME);
+            log.debug(MAIL_PASSWORD);
+            log.debug(MAIL_SENDER_NAME);
+            log.debug(MAIL_SENDER_EMAIL);
             try {
                 mailSender.send(messagePreparator);
-                log.info("Email sent to {}", p.getEmail());
+                log.info("Email sent to: " + p.getEmail() + " for Meeting UID: " + meeting.getUid() + ", subject:" + meeting.getSubject());
             } catch (MailException e) {
-                log.error("Error sending email to " + p.getEmail(), e);
+                log.debug(e.toString());
+                log.error("Error sending email to: " + p.getEmail() + " for Meeting UID: " + meeting.getUid() + ", subject:" + meeting.getSubject());
                 // runtime exception; compiler will not force you to handle it
             }
         }
@@ -191,6 +222,7 @@ public class EmailService {
             Map<String, Object> m = new HashMap<>();
             MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage, true);
             messageHelper.setFrom(meeting.getUser().getEmail());
+
             messageHelper.setTo(p.getEmail());
 
             m.put("email", p.getEmail());
@@ -200,8 +232,8 @@ public class EmailService {
             m.put("meeting_password", p.getPassword());
             m.put("meeting_url", meeting.getUrl());
             m.put("meeting_subject", meeting.getSubject());
-            m.put("user_first", meeting.getUser().getFirstName());
-            m.put("user_lastname", meeting.getUser().getLastName());
+            //m.put("user_first", meeting.getUser().getFirstName());
+            //m.put("user_lastname", meeting.getUser().getLastName());
 
             String subject = mailContentBuilder.build(et.getSubject(), m);
             messageHelper.setSubject(subject);

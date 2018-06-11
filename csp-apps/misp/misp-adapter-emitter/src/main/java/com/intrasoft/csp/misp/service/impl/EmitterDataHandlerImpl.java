@@ -100,27 +100,44 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
             .build();
 
     @Override
-    public void handleMispData(Object object, MispEntity mispEntity, boolean isReEmittion) {
+    public void handleMispData(Object object, MispEntity mispEntity, boolean isReEmittion, boolean isDelete) {
 
         jsonNode = new ObjectMapper().convertValue(object, JsonNode.class);
+
+        LOG.info(jsonNode.toString());
 
         String uuid = "";
         Map<String, List<String>> eventValidationMap = new HashMap<>();
 
-        LOG.debug("Received from emmiter: " + jsonNode.toString());
+        LOG.info("Handling misp Event emission");
+
+        if (isReEmittion){
+            LOG.debug("Received re-emission.");
+        }
+        else {
+            LOG.debug("Received from emitter.");
+        }
+
 
         if (mispEntity.equals(EVENT)) {
             uuid = jsonNode.get(EVENT.toString()).get("uuid").textValue();
-            LOG.info("Received from emmiter event with uuid: " + uuid);
+            LOG.debug("Event with uuid: " + uuid);
             eventValidationMap = eventValidation(jsonNode, LOG);
             // @TODO check for potential bug
             try{
-                object = mispAppClient.getMispEvent(uuid).getBody();
-                jsonNode = new ObjectMapper().convertValue(object, JsonNode.class);
+                // TO REMOVE
+                if (!isDelete){
+                    object = mispAppClient.getMispEvent(uuid).getBody();
+                    jsonNode = new ObjectMapper().convertValue(object, JsonNode.class);
+//                    jsonNode = updateTimestamp(new ObjectMapper().convertValue(object, JsonNode.class));
+                }
+
             }
             catch (Exception e){
                 LOG.error("Get Event from MISP API Failed: ", e);
-                return;
+                if (!isDelete){
+                    return;
+                }
             }
         }
 
@@ -191,6 +208,7 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
         } else if (eventValidationMap.containsKey("sg")) { // Valid Sharing Group without any valid organisations
             sharingParams.setTcId(eventValidationMap.get("sg"));
         }
+
         IntegrationData integrationData = new IntegrationData();
         integrationData.setDataParams(dataParams);
         integrationData.setSharingParams(sharingParams);
@@ -198,7 +216,7 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
 
         /**
          * issue: SXCSP-333
-         * define a classification to diferentiate between threat/event
+         * define a classification to differentiate between threat/event
          */
         IntegrationDataType integrationDataType = IntegrationDataType.EVENT;
         if (jsonNode.get(EVENT.toString()).has("Tag")){
@@ -215,6 +233,11 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
          * how to identify if it is post or put
          * should search in ES to see if this uuid exists
          * query the index based on datatype (event/threat), if found send put else send post */
+
+        if (isDelete) {
+            cspClient.deleteIntegrationData(integrationData);
+            return;
+        }
 
         LOG.debug("Integration Data Forwarded to IL: " + integrationData);
 
@@ -283,15 +306,10 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
         return result; // When Sharing Group is valid but has no Organisations, method returns its UUID along with a key indication.
     }
 
-    @Override
-    public void handleReemittionMispData(IntegrationData integrationData, MispEntity mispEntity, boolean isDelete, boolean isReEmittion) {
-        handleMispData(integrationData.getDataObject(), mispEntity, true);
-    }
-
     private JsonNode updateTimestamp(JsonNode rootNode) {
         ReadContext ctx = JsonPath.using(configuration).parse(rootNode);
         List<String> timestampPaths = ctx.read("$..timestamp", List.class);
-        Long timestamp = Instant.now().getEpochSecond();
+        Long timestamp = Instant.now().getEpochSecond() - 1;
         for (String path : timestampPaths){
             rootNode = JsonPath.using(configuration).parse(rootNode).set(path, String.valueOf(timestamp)).json();
         }

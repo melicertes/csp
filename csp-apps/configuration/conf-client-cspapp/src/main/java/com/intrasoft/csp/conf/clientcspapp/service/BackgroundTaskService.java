@@ -88,14 +88,14 @@ public class BackgroundTaskService {
             success++;
         }
         if (success > 0) {
-            log.error("Requirements check result: {}", success > 0 ? "FAILED" : "SUCCESS");
+            log.error("Requirements check result: FAILED");
         }
 
         if (canProceedForced) {
             log.warn("Installation is forced due to configuration override");
             return true;
         } else
-            return success > 0 ? false : true;
+            return success <= 0;
     }
 
     @Getter
@@ -332,7 +332,7 @@ public class BackgroundTaskService {
     }
 
 
-    public void scheduleEnvironmentCreation() {
+    public void scheduleEnvironmentCreation(boolean deleteContents) {
         addTask(() -> {
             try {
                 final SystemInstallationState state = installationService.getState();
@@ -346,8 +346,8 @@ public class BackgroundTaskService {
                 Map<String,String> env = new HashMap<String, String>();
                 env.put("ENVJSON", envJsonFile);
                 env.put("J2ENV", envFile);
-                //env.put("SITESC", cspSitesFile);
                 env.put("INT_IP", state.getCspRegistration().getInternalIPs().get(0));
+                env.put("DELETE_CONTENTS", Boolean.toString(deleteContents));
 
                 if (smtp != null && smtp.getPort()!=null) {
                     env.put("MAIL_HOST", smtp.getHost());
@@ -401,7 +401,7 @@ public class BackgroundTaskService {
                 if (installationService.moduleContains(installingModule, "manifest.json") ) {
                     manifest = getManifest(moduleInstallDirectory);
                     if (manifest.getFormat() == 1.0) {
-                        log.warn("Manifest version 1.0 detected! LEGACY MODE = ON");
+                        log.warn("Manifest version 1.0 detected! LEGACY MODE");
                         isLegacy = true;
                     } else if (manifest.getFormat() == 1.1) {
                         log.warn("Manifest version 1.1 detected!");
@@ -572,6 +572,8 @@ public class BackgroundTaskService {
             env.put("MAIL_PORT", smtp.getPort().toString());
             env.put("MAIL_USERNAME", smtp.getUserName());
             env.put("MAIL_PASSWORD", smtp.getPassword());
+            env.put("MAIL_SENDER_NAME", smtp.getSenderName());
+            env.put("MAIL_SENDER_EMAIL", smtp.getUserName());
         }
         log.info("Configured environment variables: {}",env);
 
@@ -652,16 +654,19 @@ public class BackgroundTaskService {
         });
     }
 
-
     public void scheduleDelete(SystemModule module) {
         addTask(() -> {
             final SystemService service = installationService.queryService(module);
-            if (service.getServiceState() == ServiceState.RUNNING) {
+            if (service != null && service.getServiceState() == ServiceState.RUNNING) {
                 log.error("Service is running and cannot be deleted! STOP first and then delete.");
                 return new BackgroundTaskResult<>(false, -1000);
             }
 
             try {
+                if (service != null) {
+                    installationService.removeService(service);
+                }
+
                 Manifest manifest = getManifest(module.getModulePath());
                 if (manifest.getFormat() > 1.0 && manifest.getShLast() != null
                         &&  installationService.moduleContains(module, manifest.getShLast())) { //last-time is only 1.1+
@@ -672,20 +677,20 @@ public class BackgroundTaskService {
                 module.setModuleState(ModuleState.DOWNLOADED);
 
                 module.setActive(false);
-                installationService.removeService(service);
-
+                SystemModule moduleUpdated = installationService.saveSystemModule(module);
                 File vHostDir = new File(vhostDirectory);
                 final File[] files = vHostDir.listFiles(file -> file.getName().contains(module.getName() + "." + module.getStartPriority()));
 
                 for (File file : files) {
-                    log.info("Deleting {} from vhost directory",file);
+                    log.info("Deleting {} from vhost directory", file);
                     boolean d = file.delete();
                     if (!d) {
-                        log.error("Failed to delete file: {} - problem in installation and re-install",file);
+                        log.error("Failed to delete file: {} - problem in installation and re-install", file);
                     }
                 }
-
-                log.info("Module {} has been removed and service deleted", module.getName());
+                log.info("Module {}/{} [installed: {}] state now {}", moduleUpdated.getName(),
+                        moduleUpdated.getId(), moduleUpdated.getInstallDate(),
+                        moduleUpdated.getModuleState());
                 return new BackgroundTaskResult<>(true, 0, module.getName());
             } catch (IOException e) {
                 log.error("Exception removing module {} with error {}",module.getName(), e.getMessage(),e);
@@ -705,27 +710,15 @@ public class BackgroundTaskService {
 
             final List<BackgroundTaskResult<Boolean, Integer>> results = installationService.queryAllModulesInstalled(true)
                     .stream()
-                    .filter(m -> m.getActive())
+                    .filter(SystemModule::getActive)
                     .map(module -> {
                 SystemService service = installationService.queryService(module);
-                log.info("Starting service {} id {} [linked to id {}, active {}] from Module id {}",
-                        service.getName(), service.getId(), service.getModule().getId(), service.getModule().getActive(), module.getId());
                 if (service == null) {
                     log.error("Module {} has no service!",module.getName());
-                } else if (service.getStartable() == true) {
-
-                    //copy the environment again before starting
-                    try {
-                        copyEnvironment(module.getModulePath());
-                        log.info("Environment merged");
-
-                        service = checkOAMAgentCreation(module,service);
-
-                        service = checkVHostCreation(module,service);
-
-                    } catch (IOException e) {
-                        log.error("Failed to copy ENVIRONMENT! {}", e.getMessage(),e);
-                    }
+                } else if (service.getStartable()) {
+                    log.info("Starting service {} id {} [linked to id {}, active {}] from Module id {}",
+                            service.getName(), service.getId(), service.getModule().getId(), service.getModule().getActive(), module.getId());
+                    service = createModuleEnvAndAgents(module, service);
                     if (service.getServiceState() == ServiceState.NOT_RUNNING) {
                         return startSingleService(module, service);
                     } else {
@@ -733,7 +726,8 @@ public class BackgroundTaskService {
                     }
                     log.info("Service {} state {}", service.getName(), service.getServiceState());
                 } else {
-                    log.info("Service {} is not a startable service, moving on", service.getName());
+                    log.info("Service {} is not a startable service - checking agents", service.getName());
+                    createModuleEnvAndAgents(module, service);
                 }
                 return new BackgroundTaskResult<Boolean, Integer>(true, 0, module.getName());
             }).distinct().collect(Collectors.toList());
@@ -747,6 +741,21 @@ public class BackgroundTaskService {
             });
             return finalResult;
         });
+    }
+
+    private SystemService createModuleEnvAndAgents(SystemModule module, SystemService service) {
+        //copy the environment again before starting
+        try {
+            copyEnvironment(module.getModulePath());
+            log.info("Environment merged for {} - {} / {} / {}", module.getId(), service.getId(), service.getName(), module.getModulePath());
+            service = checkOAMAgentCreation(module,service);
+            log.info("OAM Agent checked for {} - {} / {} / {}", module.getId(), service.getId(), service.getName(), module.getModulePath());
+            service = checkVHostCreation(module,service);
+            log.info("VHost checked for {} - {} / {} / {}", module.getId(), service.getId(), service.getName(), module.getModulePath());
+        } catch (IOException e) {
+            log.error("Failure while setting up the module! error: {}", e.getMessage(),e);
+        }
+        return service;
     }
 
     private BackgroundTaskResult<Boolean, Integer> startSingleService(SystemModule module, SystemService service) {
@@ -832,7 +841,7 @@ public class BackgroundTaskService {
         try {
             domains.addAll(Files.readAllLines(envFile.toPath()).stream()
                     .filter(line -> line.contains("_LOCAL"))
-                    .map(line -> line.split(Pattern.quote("="))[0])
+                    .map(line -> line.split(Pattern.quote("="))[0]).distinct()
                     .collect(Collectors.toList()));
             log.info("Domains discovered: {}",domains);
         } catch (IOException e) {
@@ -843,7 +852,7 @@ public class BackgroundTaskService {
 
     private SystemService checkVHostCreation(SystemModule module, SystemService service) {
         //we copy the vhost configuration from the $HOME folder to the apache folders
-        if (service.getVHostNecessary() && service.getVhostCreated() == null) {
+        if (service.getVHostNecessary() /* && service.getVhostCreated() == null*/ ) {
             String confFileName = "csp-sites." + module.getName() + "." + module.getStartPriority() + ".conf";
             File rootEnvDir = new File(System.getProperty("user.home"));
             File confFile = new File(rootEnvDir, confFileName);
