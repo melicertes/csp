@@ -1,0 +1,16 @@
+version: '2'
+services:
+
+  viper-ui:
+    env_file:
+      - ../../base-images/python27-viper/.env
+    image: viper:latest
+    container_name: viper-ui
+    domainname: ${LOCAL_DOMAIN}
+    hostname: csp-viper
+    ports:
+      - 8083:8083
+    command: python viper/viper-web -H 0.0.0.0 -p 8083
+    working_dir: /home/viper
+    expose:
+      - 8083

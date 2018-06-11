@@ -1,4 +1,4 @@
-FROM phusion/baseimage
+FROM ubuntu:16.04
 MAINTAINER Christos Panagiotou
 
 # ensure local python is preferred over distribution python
