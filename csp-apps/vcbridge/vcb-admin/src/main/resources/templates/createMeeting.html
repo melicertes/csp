@@ -8,236 +8,286 @@
 </head>
 <div th:fragment="content">
 
-  <div class="container">
-    <div class="row">
-      <div class="col-md-12">
-        &nbsp;<br /> <br /> <br /> <span th:text="${timezone}"></span>
-      </div>
-    </div>
-    <form role="form" id="createMeetingForm" action="#" th:action="@{/createMeeting}" th:object="${meetingForm}" method="post">
-      <div class="card">
-        <div class="header">
-          <div class="row">
-            <div class="col-md-6">
-              <h3 style="margin-top: 0px">Create meeting</h3>
-              <p class="text-muted">Schedule a conference meeting</p>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                &nbsp;<br/> <br/> <br/> <span th:text="${timezone}"></span>
             </div>
-            <div class="col-md-6 text-right">
-              <a th:href="@{/listMeeting/scheduled}" class="btn btn-default">Cancel</a>
-              <button value="Create" type="submit" class="btn btn-success">Save meeting</button>
-            </div>
-          </div>
         </div>
-        <div class="content">
-          <div th:if="${param.error}">Invalid username and password.</div>
-          <div th:if="${param.logout}">You have been logged out.</div>
-
-          <ul class="nav nav-tabs">
-            <li class="active"><a data-toggle="tab" href="#menu1">Meeting details</a></li>
-            <li><a data-toggle="tab" href="#menu2">Participants list</a></li>
-          </ul>
-
-
-
-
-          <div class="tab-content">
-            <div id="menu1" class="tab-pane fade in active margin-bt-30">
-
-              <input class="datetimeoutput" hidden="true" type="text" th:field="*{start}" placeholder="2011-12-03T10:15:30+01:00" />
-              <div class="row form-group">
-                <div class="col-md-12">
-                  <div class="form-group has-feedback" th:classappend="${#fields.hasErrors('start')} ? has-danger">
-                    <label class="control-label">Subject</label>
-                    <input class="form-control border-input col-md-4" type="text" maxlength="120" th:field="*{subject}" placeholder="Brief subject" required="required" />
-                    <div th:if="${#fields.hasErrors('subject')}" th:errors="*{subject}" class="form-control-feedback">Error subject</div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="row form-group">
-                <div class="col-md-5">
-                  <div class="form-group" th:classappend="${#fields.hasErrors('start')} ? 'has-error':''">
-                    <label class="control-label">Date</label>
-                    <div class="input-group">
-                      <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
-                      <input id="datepicker" data-provide="datepicker" data-orientation="auto bottom" data-format="yy-mm-dd" class="form-control border-input date col-sm-4 datetimeinput"
-                        required="required" th:value="${{meetingForm.startDate}}" placeholder="e.g., 05-31-2021" />
+        <form role="form" id="createMeetingForm" action="#" th:action="@{/createMeeting}" th:object="${meetingForm}"
+              method="post">
+            <div class="card">
+                <div class="header">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h3 style="margin-top: 0px">Create meeting</h3>
+                            <p class="text-muted">Schedule a conference meeting</p>
+                        </div>
+                        <div class="col-md-6 text-right">
+                            <a th:href="@{/listMeeting/scheduled}" class="btn btn-default">Cancel</a>
+                            <button value="Create" type="submit" class="btn btn-success">Save meeting</button>
+                        </div>
                     </div>
-                  </div>
                 </div>
-                <div class="col-md-3">
-                  <div class="form-group" th:classappend="${#fields.hasErrors('start')}  ? 'has-error' :''">
-                    <label class="control-label">Time</label>
-                    <div class="input-group">
-                      <span class="input-group-addon"><i class="glyphicon glyphicon-time"></i></span>
-                      <input id="timepicker" class="form-control border-input  bootstrap-timepicker timepicker col-sm-4" data-provide="timepicker" data-template="dropdown" data-minute-step="1"
-                        data-show-meridian="false" type="text" required="required" th:value="${{meetingForm.startTime}}" placeholder="e.g., 18:20" />
-                    </div>
-                  </div>
-                </div>
-                <div class="col-md-4">
-                  <div class="form-group" th:classappend="${#fields.hasErrors('timeZone')} or ${#fields.hasErrors('start')}  ? 'has-error' :''">
-                    <label class="control-label">TimeZone</label>
-                    <div class="input-group">
-                      <span class="input-group-addon"><i class="glyphicon glyphicon-globe"></i></span>
-                      <select id="selecttimezone" name="timeZone"></select>
-                    </div>
-                    <label th:if="${#fields.hasErrors('timeZone')}" th:errors="*{timeZone}" class="text-danger">Error TimeZone</label>
-                  </div>
-                </div>
+                <div class="content">
+                    <div th:if="${param.error}">Invalid username and password.</div>
+                    <div th:if="${param.logout}">You have been logged out.</div>
 
-              </div>
-              <div class="form-group">
-                <label th:if="${#fields.hasErrors('start')}" th:errors="*{start}" class="control-label text-danger">Error start</label>
-              </div>
+                    <ul class="nav nav-tabs">
+                        <li class="active"><a data-toggle="tab" href="#menu1">Meeting details</a></li>
+                        <li><a data-toggle="tab" href="#menu2">Participants list</a></li>
+                    </ul>
 
 
-              <div class="row">
-                <div class="col-md-8">
-                  <div class="form-group" th:classappend="${#fields.hasErrors('duration')} ? has-error">
-                    <label class="control-label">Duration</label>
-                    <div class="input-group" th:classappend="${#fields.hasErrors('duration')}?'has-error':''">
-                      <span class="input-group-addon"><i class="glyphicon glyphicon-bell"></i></span>
-                      <input id="durationpicker" class="form-control border-input bootstrap-timepicker timepicker col-md-3" data-provide="timepicker" data-template="dropdown" th:field="*{duration}"
-                        data-minute-step="1" data-show-meridian="false" data-max-hours="8" data-default-time="01:00" type="text" required="required" th:value="${{meetingForm.startTime}}"
-                        placeholder="e.g., 01:30" />
-                    </div>
-                    <label th:if="${#fields.hasErrors('duration')}" th:errors="*{duration}" class="text-danger">Error duration</label>
-                  </div>
-                </div>
-              </div>
+                    <div class="tab-content">
+                        <div id="menu1" class="tab-pane fade in active margin-bt-30">
 
+                            <input class="datetimeoutput" hidden="true" type="text" th:field="*{start}"
+                                   placeholder="2011-12-03T10:15:30+01:00"/>
+                            <div class="row form-group">
+                                <div class="col-md-12">
+                                    <div class="form-group has-feedback"
+                                         th:classappend="${#fields.hasErrors('start')} ? has-danger">
+                                        <label class="control-label">Subject</label>
+                                        <input class="form-control border-input col-md-4" type="text" maxlength="120"
+                                               th:field="*{subject}" placeholder="Brief subject" required="required"/>
+                                        <div th:if="${#fields.hasErrors('subject')}" th:errors="*{subject}"
+                                             class="form-control-feedback">Error subject
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
 
+                            <div class="row form-group">
+                                <div class="col-md-5">
+                                    <div class="form-group"
+                                         th:classappend="${#fields.hasErrors('start')} ? 'has-error':''">
+                                        <label class="control-label">Date</label>
+                                        <div class="input-group">
+                                            <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+                                            <input id="datepicker" data-provide="datepicker"
+                                                   data-orientation="auto bottom" data-format="yy-mm-dd"
+                                                   class="form-control border-input date col-sm-4 datetimeinput"
+                                                   required="required" th:value="${{meetingForm.startDate}}"
+                                                   placeholder="e.g., 05-31-2021"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group"
+                                         th:classappend="${#fields.hasErrors('start')}  ? 'has-error' :''">
+                                        <label class="control-label">Time</label>
+                                        <div class="input-group">
+                                            <span class="input-group-addon"><i
+                                                    class="glyphicon glyphicon-time"></i></span>
+                                            <input id="timepicker"
+                                                   class="form-control border-input  bootstrap-timepicker timepicker col-sm-4"
+                                                   data-provide="timepicker" data-template="dropdown"
+                                                   data-minute-step="1"
+                                                   data-show-meridian="false" type="text" required="required"
+                                                   th:value="${{meetingForm.startTime}}" placeholder="e.g., 18:20"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group"
+                                         th:classappend="${#fields.hasErrors('timeZone')} or ${#fields.hasErrors('start')}  ? 'has-error' :''">
+                                        <label class="control-label">TimeZone</label>
+                                        <div class="input-group">
+                                            <span class="input-group-addon"><i
+                                                    class="glyphicon glyphicon-globe"></i></span>
+                                            <select id="selecttimezone" name="timeZone"></select>
+                                        </div>
+                                        <label th:if="${#fields.hasErrors('timeZone')}" th:errors="*{timeZone}"
+                                               class="text-danger">Error TimeZone</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label th:if="${#fields.hasErrors('start')}" th:errors="*{start}"
+                                               class="control-label text-danger">Error start</label>
+                                    </div>
+                                </div>
+                            </div>
 
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <div class="form-group"
+                                         th:classappend="${#fields.hasErrors('duration')} ? has-error">
+                                        <label class="control-label">Duration</label>
+                                        <div class="input-group"
+                                             th:classappend="${#fields.hasErrors('duration')}?'has-error':''">
+                                            <span class="input-group-addon"><i
+                                                    class="glyphicon glyphicon-bell"></i></span>
+                                            <input id="durationpicker"
+                                                   class="form-control border-input bootstrap-timepicker timepicker col-md-3"
+                                                   data-provide="timepicker" data-template="dropdown"
+                                                   th:field="*{duration}"
+                                                   data-minute-step="1" data-show-meridian="false" data-max-hours="8"
+                                                   data-default-time="01:00" type="text" required="required"
+                                                   th:value="${{meetingForm.startTime}}"
+                                                   placeholder="e.g., 01:30"/>
+                                        </div>
+                                        <label th:if="${#fields.hasErrors('duration')}" th:errors="*{duration}"
+                                               class="text-danger">Error duration</label>
+                                    </div>
+                                </div>
+                            </div>
 
-
-
-            </div>
-            <div id="menu2" class="tab-pane fade">
-              <div class="row margin-bt-30">
-                <div class="col-md-6">
-                  <input class="form-control border-input typeahead" type="email" id="tc_email" placeholder="Search for Team Contact"/>
-                </div>
-                <div class="col-md-6  text-right">
-                  <div class="dropdown btn-group">
-                    <button id="add_participants_btn" class="btn btn-primary btn-outline dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                      Add External Participant<span class="caret"></span>
-                    </button>
-                    <ul class="dropdown-menu" aria-labelledby="add_participants_btn">
-                      <li>
-                          <div class="input-group" th:classappend="${#fields.hasErrors('emails')}?'has-error':''">
-                            <input class="form-control border-input" type="email" id="new_email" placeholder="Enter email" />
-                            <span class="input-group-btn">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <span class="text-danger"
+                                          th:classappend="${#fields.hasErrors('emails')} ? has-error"
+                                          th:if="${#fields.hasErrors('emails')}" th:errors="*{emails}">
+                                        At least one participant (either Team Contact OR External) must be added
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="menu2" class="tab-pane fade">
+                            <div class="row margin-bt-30">
+                                <div class="col-md-6">
+                                    <input class="form-control border-input typeahead" type="email" id="tc_email"
+                                           placeholder="Search for Team Contact"/>
+                                </div>
+                                <div class="col-md-6  text-right">
+                                    <div class="dropdown btn-group">
+                                        <button id="add_participants_btn"
+                                                class="btn btn-primary btn-outline dropdown-toggle"
+                                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                            Add External Participant<span class="caret"></span>
+                                        </button>
+                                        <ul class="dropdown-menu" aria-labelledby="add_participants_btn">
+                                            <li>
+                                                <div class="input-group"
+                                                     th:classappend="${#fields.hasErrors('emails')}?'has-error':''">
+                                                    <input class="form-control border-input" type="email"
+                                                           id="new_email" placeholder="Enter email"/>
+                                                    <span class="input-group-btn">
                               <button id="add_field_button" class="btn btn-default">Add</button>
                             </span>
-                          </div>
-                          <label th:if="${#fields.hasErrors('emails')}" th:errors="*{emails}" class="text-danger">Error emails</label>
-                        </li>
-                      <li><a class="btn" data-toggle="modal" data-target="#participants_bulk_modal">
-                          <span class="fa  fa-list-ol"></span> Add in Bulk
-                        </a></li>
-                    </ul>
-                  </div>
-                  <button id="delete_button" class="btn btn-danger btn-outline">Remove Participant</button>
-                  <!--
-                  <button id="more_actions_btn" class="btn btn-default btn-outline">More actions</button>
-                  -->
+                                                </div>
+                                                <label th:if="${#fields.hasErrors('emails')}" th:errors="*{emails}"
+                                                       class="text-danger">Error emails</label>
+                                            </li>
+                                            <li><a class="btn" data-toggle="modal"
+                                                   data-target="#participants_bulk_modal">
+                                                <span class="fa  fa-list-ol"></span> Add in Bulk
+                                            </a></li>
+                                        </ul>
+                                    </div>
+                                    <button id="delete_button" class="btn btn-danger btn-outline">Remove
+                                        Participant
+                                    </button>
+                                    <!--
+                                    <button id="more_actions_btn" class="btn btn-default btn-outline">More actions</button>
+                                    -->
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <table class="table">
+
+                                <thead>
+                                <tr>
+                                    <th>Select</th>
+                                    <th>Firstname</th>
+                                    <th>Lastname</th>
+                                    <th>Email address</th>
+                                </tr>
+                                </thead>
+                                <tbody class="input_fields_wrap">
+                                <!--
+                                <tr class="useremail" th:each="email, stat : ${meetingForm.emails}">
+                                  <td><input class="todelete" type="checkbox" value=""></input></td>
+                                    <td><input hidden="true" type="text" th:field="*{emails[__${stat.index}__].name}" th:value="${email.name}" />
+                                      <div th:text="${email.name}"></div></td>
+                                    <td><input hidden="true" type="text" th:field="*{emails[__${stat.index}__].surname}" th:value="${email.surname}" />
+                                      <div th:text="${email.surname}"></div></td>
+                                    <td th:classappend="${#fields.hasErrors('emails[__${stat.index}__].email') ? 'danger':''}"><input hidden="true" type="text" th:field="*{emails[__${stat.index}__].email}"
+                                        th:value="${email.email}" />
+                                      <div th:text="${email.email}"></div></td>
+                                  </tr>
+                                  -->
+                                </tbody>
+                            </table>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <span class="text-danger"
+                                          th:classappend="${#fields.hasErrors('emails')} ? has-error"
+                                          th:if="${#fields.hasErrors('emails')}" th:errors="*{emails}">
+                                        At least one participant (either Team Contact OR External) must be added
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
                 </div>
-              </div>
-
-              <!-- <label th:if="${#fields.hasErrors('emails[]')}" th:errors="*{emails}" class="text-danger">Error emails</label> -->
-              <table class="table">
-
-                <thead>
-                  <tr>
-                    <th>Select</th>
-                    <th>Firstname</th>
-                    <th>Lastname</th>
-                    <th>Email address</th>
-                  </tr>
-                </thead>
-                <tbody class="input_fields_wrap">
-                <!--
-                <tr class="useremail" th:each="email, stat : ${meetingForm.emails}">
-                  <td><input class="todelete" type="checkbox" value=""></input></td>
-                    <td><input hidden="true" type="text" th:field="*{emails[__${stat.index}__].name}" th:value="${email.name}" />
-                      <div th:text="${email.name}"></div></td>
-                    <td><input hidden="true" type="text" th:field="*{emails[__${stat.index}__].surname}" th:value="${email.surname}" />
-                      <div th:text="${email.surname}"></div></td>
-                    <td th:classappend="${#fields.hasErrors('emails[__${stat.index}__].email') ? 'danger':''}"><input hidden="true" type="text" th:field="*{emails[__${stat.index}__].email}"
-                        th:value="${email.email}" />
-                      <div th:text="${email.email}"></div></td>
-                  </tr>
-                  -->
-                </tbody>
-              </table>
             </div>
-          </div>
-
-
-        </div>
-      </div>
-    </form>
-  </div>
-
-  <div class="modal fade" id="participants_bulk_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header well">
-          <h4>Add participants in Bulk</h4>
-        </div>
-        <div class="modal-body">
-          <div class="form-group">
-            <label for="participants_bulk_ta">Enter participants' email addresses (any format).</label>
-            <textarea tabindex="0" class="form-control" rows="5" id="participants_bulk_ta"></textarea>
-          </div>
-        </div>
-
-        <div class="modal-footer">
-          <a href="#" id="submit-participants" class="btn btn-primary" data-dismiss="modal">Add</a>
-          <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-        </div>
-      </div>
+        </form>
     </div>
-  </div>
+
+    <div class="modal fade" id="participants_bulk_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header well">
+                    <h4>Add participants in Bulk</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="participants_bulk_ta">Enter participants' email addresses (any format).</label>
+                        <textarea tabindex="0" class="form-control" rows="5" id="participants_bulk_ta"></textarea>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <a href="#" id="submit-participants" class="btn btn-primary" data-dismiss="modal">Add</a>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
 </div>
 
 <div th:fragment="scripts">
-  <script type="text/javascript" th:src="@{/resources/js/typeahead.jquery.min.js}"></script>
-  <script type="text/javascript" th:src="@{/resources/js/email-parser.js}"></script>
-  <script type="text/javascript" th:src="@{/resources/js/createMeeting.js}"></script>
+    <script type="text/javascript" th:src="@{/resources/js/typeahead.jquery.min.js}"></script>
+    <script type="text/javascript" th:src="@{/resources/js/email-parser.js}"></script>
+    <script type="text/javascript" th:src="@{/resources/js/createMeeting.js}"></script>
 
 
-  
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.4/js/standalone/selectize.min.js"></script>
-  <script th:inline="javascript">
-    /*<![CDATA[*/
-    var userTZ=[[${userTZ}]];
-    /*]]>*/
-    $(document).ready(
-        function() {
-          timezone = moment.tz.names();
-          for (var i = 0; i < timezone.length; i++) {
-            $('select').append(
-                '<option' + ((userTZ==timezone[i])?' selected="selected"':'') +' value="' + timezone[i] + '">'
-                    + timezone[i] + '</option>');
-          }
-          $('#selecttimezone').selectize({
-            inputClass : 'form-control selectize-input'
-          });
-          //$('select').selectpicker();
-          $('#participants_bulk_modal').on('shown.bs.modal', function () {
-              $('#participants_bulk_ta').focus();
-            })
-        });
-  </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.4/js/standalone/selectize.min.js"></script>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var userTZ = [[${userTZ}]];
+        /*]]>*/
+        $(document).ready(
+            function () {
+                timezone = moment.tz.names();
+                for (var i = 0; i < timezone.length; i++) {
+                    $('select').append(
+                        '<option' + ((userTZ == timezone[i]) ? ' selected="selected"' : '') + ' value="' + timezone[i] + '">'
+                        + timezone[i] + '</option>');
+                }
+                var $select = $('#selecttimezone').selectize({
+                    inputClass: 'form-control selectize-input'
+                });
+                var selectize = $select[0].selectize;
+                selectize.setValue(userTZ);
+                //$('select').selectpicker();
+                $('#participants_bulk_modal').on('shown.bs.modal', function () {
+                    $('#participants_bulk_ta').focus();
+                })
+            });
+    </script>
 
 </div>
-
-
-
-
 
 
 </html>
