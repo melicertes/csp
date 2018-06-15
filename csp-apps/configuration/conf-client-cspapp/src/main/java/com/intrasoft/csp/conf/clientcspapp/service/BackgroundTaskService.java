@@ -233,7 +233,7 @@ public class BackgroundTaskService {
             for (SystemModule m : forDeletionList) {
                 // verify not in the services
                 SystemService s = installationService.queryService(m);
-                if (s != null) { //there is a service?
+                if (s != null && s.getModule().getId().longValue() == m.getId()) { //there is a service?
                     log.error("Module {} shows inactive but there is a service {} for it. Contact Support!",
                             m.getName() + "/" + m.getId(), s.getId() + "/" + s.getServiceState());
                     continue;
@@ -241,11 +241,11 @@ public class BackgroundTaskService {
                 try {
                     log.info("Cleanin up old module {}/{}", m.getId(), m.getName());
                     storageService.deleteDirectoryAndContents(m.getModulePath());
-                    log.info("Module directory deleted: ", m.getModulePath());
+                    log.info("Module directory deleted: {}", m.getModulePath());
                     Files.deleteIfExists(new File(m.getArchivePath()).toPath());
-                    log.info("Module download file deleted: ", m.getArchivePath());
+                    log.info("Module download file deleted: {}", m.getArchivePath());
                     installationService.deleteModule(m);
-                    log.info("Module record deleted: ", m.getId());
+                    log.info("Module record deleted: {}", m.getId());
                 } catch (IOException ioe) {
                     log.error("Unable to cleanup {} - please contact support ({})", m.getName(), ioe.getMessage());
                 }
