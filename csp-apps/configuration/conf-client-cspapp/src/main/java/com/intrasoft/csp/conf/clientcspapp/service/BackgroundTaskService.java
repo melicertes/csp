@@ -220,6 +220,45 @@ public class BackgroundTaskService {
     }
 
 
+    /**
+     * starts every 1 hour and looks for old (inactive) modules.
+     * deletes from DB, disk and download folders
+     */
+    @Scheduled(initialDelay = 25000, fixedDelay = 3600000)
+    @SneakyThrows
+    public void cleanUpOldModules() {
+        final List<SystemModule> forDeletionList = installationService.queryAllModulesInstalled(true).stream()
+                .filter(m -> !m.getActive()).collect(Collectors.toList());
+        if (forDeletionList != null && forDeletionList.size() != 0) {
+            for (SystemModule m : forDeletionList) {
+                // verify not in the services
+                SystemService s = installationService.queryService(m);
+                if (s != null) { //there is a service?
+                    log.error("Module {} shows inactive but there is a service {} for it. Contact Support!",
+                            m.getName() + "/" + m.getId(), s.getId() + "/" + s.getServiceState());
+                    continue;
+                }
+                try {
+                    log.info("Cleanin up old module {}/{}", m.getId(), m.getName());
+                    storageService.deleteDirectoryAndContents(m.getModulePath());
+                    log.info("Module directory deleted: ", m.getModulePath());
+                    Files.deleteIfExists(new File(m.getArchivePath()).toPath());
+                    log.info("Module download file deleted: ", m.getArchivePath());
+                    installationService.deleteModule(m);
+                    log.info("Module record deleted: ", m.getId());
+                } catch (IOException ioe) {
+                    log.error("Unable to cleanup {} - please contact support ({})", m.getName(), ioe.getMessage());
+                }
+
+            }
+        } else {
+            log.info("Cleanup - module cleanup - nothing to clean");
+            return;
+        }
+
+
+    }
+
     @SneakyThrows
     public <S, R> void addTask(BackgroundTask<S, R> task) {
         while (!backgroundTasks.offer(task)) {
@@ -477,8 +516,8 @@ public class BackgroundTaskService {
                         .filter( m -> !m.getHash().contentEquals(moduleHash)) // only not ours
                         .forEach( m -> {
                             m.setActive(false);
-                            log.info("Module {} with path {} is now set inactive",m.getModulePath(), m.getName());
-                            installationService.saveSystemModule(m);
+                            log.info("Module {} with path {} is now set inactive",m.getName(), m.getModulePath());
+                            m = installationService.saveSystemModule(m);
 
 
                             // b1 make sure there are no previous containers with the same name!
@@ -487,7 +526,7 @@ public class BackgroundTaskService {
                             params.put("SERVICE_NAME", m.getName());
                             try {
                                 executeScriptSimple("rmContainers.sh", params);
-                                log.info("Containers for module {} are now removed / path {} / active {}",
+                                log.info("Containers for old module {} are now removed / path {} / active {}",
                                         m.getName(), m.getModulePath(), m.getActive());
                             } catch (IOException e) {
                                 log.error("PROBLEM!!!! Failed to clear containers for module {} id {}", m.getName(), m.getId());
