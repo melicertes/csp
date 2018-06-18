@@ -129,7 +129,8 @@ $(document).ready(function () {
         e.preventDefault(); // prevent
         // form from
         // submitting
-        console.log($(".datetimeinput").val());
+        //alert($('#createMeetingForm').serialize());
+        console.log("1" + $(".datetimeinput").val());
         console.log($("#timepicker").val());
         $(".datetimeoutput").val(moment.tz($("#datepicker").val() + 'T' + $("#timepicker").val(), 'MM-DD-YYYYTHH:mm', $("#selecttimezone").val()).format());
         console.log($("#selecttimezone").val());
