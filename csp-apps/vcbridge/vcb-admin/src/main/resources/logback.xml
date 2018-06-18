@@ -6,7 +6,7 @@
 
     <!--Basic configuration-->
     <property name="APP_NAME" value="CSP.VCB-ADMIN"/>
-    <property name="LOGS_HOME" value="/opt/csplogs/"/>
+    <property name="LOGS_HOME" value="/opt/csp/csplogs/"/>
     <property name="TYPE_EXC" value="exc"/>
     <property name="TYPE_AUD" value="aud"/>
     <property name="HISTORY_EXC" value="1"/>
