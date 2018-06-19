@@ -1,0 +1,11 @@
+filebeat.prospectors:
+- input_type: log
+  paths:
+    - /mnt/log/access.csv
+    - /mnt/log/authentication.csv
+    - /mnt/log/activity.csv
+    - /mnt/log/config.csv
+output.logstash:
+  hosts: ["csp-oam-logstash:5043"]
+
+  path.home: /usr/share/filebeat

@@ -6,19 +6,19 @@
     <parent>
         <groupId>com.intrasoft.csp</groupId>
         <artifactId>parent-pom</artifactId>
-        <version>0.3.0-SNAPSHOT</version>
+        <version>3.6.0-SNAPSHOT</version>
     </parent>
 
 
     <name>Configuration Service</name>
     <groupId>com.intrasoft.csp</groupId>
     <artifactId>configuration</artifactId>
-    <version>0.3.0-SNAPSHOT</version>
+    <version>3.6.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <modules>
-        <module>conf-client</module>
         <module>conf-commons</module>
+        <module>conf-client</module>
         <module>conf-server</module>
         <module>conf-integration-tests</module>
 	    <module>conf-client-cspapp</module>

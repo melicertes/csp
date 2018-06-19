@@ -7,6 +7,7 @@ import com.intrasoft.csp.commons.routes.ContextUrl;
 import com.intrasoft.csp.libraries.versioning.client.ApiVersionClient;
 import com.intrasoft.csp.libraries.versioning.model.VersionDTO;
 import com.intrasoft.csp.server.CspApp;
+import com.intrasoft.csp.server.processors.TcProcessor;
 import com.intrasoft.csp.server.service.CamelRestService;
 import com.intrasoft.csp.server.utils.MockUtils;
 import org.apache.camel.test.spring.CamelSpringBootRunner;
@@ -16,11 +17,13 @@ import org.joda.time.format.DateTimeFormat;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Matchers;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -72,7 +75,15 @@ public class CspSSLTest implements ContextUrl {
     CamelRestService camelRestService;
 
     @Autowired
+    Environment env;
+
+    @Autowired
+    TcProcessor tcProcessor;
+
+    @Autowired
     MockUtils mockUtils;
+
+    String tcShortNameToTest = IntegrationDataType.CTC_CSP_SHARING;//default
 
     @Before
     public void init() throws IOException {
@@ -82,9 +93,19 @@ public class CspSSLTest implements ContextUrl {
                 .thenReturn(mockUtils.getMockedTeam(1,"http://external.csp%s.com"))
                 .thenReturn(mockUtils.getMockedTeam(2,"http://external.csp%s.com"))
                 .thenReturn(mockUtils.getMockedTeam(3,"http://external.csp%s.com"));
+
+        String urlShouldContain = tcProcessor.getTcCirclesURI();
+        if(tcShortNameToTest.equalsIgnoreCase(IntegrationDataType.LTC_CSP_SHARING)){
+            urlShouldContain = tcProcessor.getLocalCirclesURI();
+        }
+
+        /*
         Mockito.when(camelRestService.sendAndGetList(anyString(), anyObject(), eq("GET"), eq(TrustCircle.class), anyObject()))
                 .thenReturn(mockUtils.getAllMockedTrustCircles(3, IntegrationDataType.tcNamingConventionForShortName.get(IntegrationDataType.INCIDENT)));
+        */
 
+        Mockito.when(camelRestService.sendAndGetList(Matchers.contains(urlShouldContain), anyObject(), eq("GET"), eq(TrustCircle.class), anyObject()))
+                .thenReturn(mockUtils.getAllMockedTrustCircles(3, tcShortNameToTest));
     }
 
     @Test

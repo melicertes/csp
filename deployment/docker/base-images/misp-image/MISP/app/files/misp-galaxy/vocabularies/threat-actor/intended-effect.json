@@ -1,0 +1,101 @@
+{
+  "values": [
+    {
+      "value": "Advantage",
+      "description": "The intended effect of the incident was for the attacker to obtain some advantage over the target."
+    },
+    {
+      "value": "Advantage - Economic",
+      "description": "The intended effect of the incident was for the attacker to obtain some economic advantage over the target."
+    },
+    {
+      "value": "Advantage - Military",
+      "description": "The intended effect of the incident was for the attacker to obtain some military advantage over the target."
+    },
+    {
+      "value": "Advantage - Political",
+      "description": "The intended effect of the incident was for the attacker to obtain some political advantage over the target."
+    },
+    {
+      "value": "Theft",
+      "description": "The intended effect of the incident was to perpetrate a non-specific theft."
+    },
+    {
+      "value": "Theft - Intellectual Property",
+      "description": "The intended effect of the incident was to perpetrate a theft of intellectual property."
+    },
+    {
+      "value": "Theft - Credential Theft",
+      "description": "The intended effect of the incident was to perpetrate a theft of credentials."
+    },
+    {
+      "value": "Theft - Identity Theft",
+      "description": "The intended effect of the incident was to perpetrate a theft of the target’s identity."
+    },
+    {
+      "value": "Theft - Theft of Proprietary Information",
+      "description": "The intended effect of the incident was to perpetrate a theft of proprietary information."
+    },
+    {
+      "value": "Account Takeover",
+      "description": "The intended effect of the incident was for the attacker to obtain control over an account (financial, etc)."
+    },
+    {
+      "value": "Brand Damage",
+      "description": "The intended effect of the incident was for the attacker to cause some brand damage on the target."
+    },
+    {
+      "value": "Competitive Advantage",
+      "description": "The intended effect of the incident was for the attacker to obtain some non-specific competitive advantage over the target."
+    },
+    {
+      "value": "Degradation of Service",
+      "description": "The intended effect of the incident was reducing the level of services provided by the target."
+    },
+    {
+      "value": "Denial and Deception",
+      "description": ""
+    },
+    {
+      "value": "Destruction",
+      "description": "The intended effect of the incident was to cause the destruction of a software or hardware system."
+    },
+    {
+      "value": "Disruption"
+    },
+    {
+      "value": "Embarrassment",
+      "description": "The intended effect of the incident was to expose a socially unacceptable action by the target."
+    },
+    {
+      "value": "Exposure"
+    },
+    {
+      "value": "Extortion",
+      "description": "The intended effect of the incident was force the payment of some sort to prevent the attacker from taking some action."
+    },
+    {
+      "value": "Fraud"
+    },
+    {
+      "value": "Harassment",
+      "description": "The intended effect of the incident was to pressure or intimidate the target."
+    },
+    {
+      "value": "ICS Control"
+    },
+    {
+      "value": "Traffic Diversion"
+    },
+    {
+      "value": "Unauthorized Access"
+    }
+  ],
+  "version" : 2,
+  "description": "The IntendedEffectVocab is the default STIX vocabulary for expressing the intended effect of a threat actor",
+  "source": "STIX 1.0",
+  "author": ["STIX"],
+  "uuid": "b6975c96-296a-48cf-9006-034ed102bc85",
+  "stix": "1.2.1",
+  "type": "threat-actor-intended-effect-vocabulary"
+}

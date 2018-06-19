@@ -4,6 +4,7 @@ import com.intrasoft.csp.client.TrustCirclesClient;
 import com.intrasoft.csp.client.config.TrustCirclesClientConfig;
 import com.intrasoft.csp.client.test.util.TcMockUtil;
 import com.intrasoft.csp.client.test.util.TestUtil;
+import com.intrasoft.csp.commons.model.Contact;
 import com.intrasoft.csp.commons.model.Team;
 import com.intrasoft.csp.commons.model.TrustCircle;
 import com.intrasoft.csp.libraries.restclient.service.RetryRestTemplate;
@@ -16,6 +17,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.test.web.client.response.MockRestResponseCreators;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.File;
 import java.io.IOException;
@@ -50,6 +52,7 @@ public class TrustCirclesClientTest {
     URL allTeams = getClass().getClassLoader().getResource("json/tc/allTeams.json");
     URL allTrustCircles = getClass().getClassLoader().getResource("json/tc/allTrustCircles.json");
     URL allLocalTrustCircles = getClass().getClassLoader().getResource("json/tc/allLocalTrustCircles.json");
+    URL allContacts = getClass().getClassLoader().getResource("json/tc/allContacts.json");
 
 
     @Test
@@ -122,7 +125,7 @@ public class TrustCirclesClientTest {
     @Test
     public void getAllLocalTrustCirclesTest() throws IOException, URISyntaxException {
         //mock the TC server using json based on LTC Specifications document
-        String apiUrl = tcConfig.getTcLocalCirclesURI();
+        String apiUrl = tcConfig.getTcLocalCircleURI();
         MockRestServiceServer mockServer = MockRestServiceServer.bindTo(retryRestTemplate).build();
         mockServer.expect(requestTo(apiUrl))
                 .andRespond(MockRestResponseCreators
@@ -145,10 +148,50 @@ public class TrustCirclesClientTest {
                 .andRespond(MockRestResponseCreators
                         .withSuccess(TcMockUtil.getJsonBytesForTrustCircleByUuid(allLocalTrustCircles,uuid),TestUtil.APPLICATION_JSON_UTF8));
 
-
         //test client
         TrustCircle tc = tcClient.getLocalTrustCircleByUuid(uuid);
         assertThat(tc.getId(),is(uuid));
+        mockServer.verify();
+    }
+
+    @Test
+    public void getLocalTrustcircleByShortNameTest() throws IOException, URISyntaxException {
+        String shortName = "LTC";
+        String queryParam = "short_name";
+        String apiUrl = tcConfig.getTcLocalCircleURI();
+        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(apiUrl).queryParam(queryParam, shortName);
+        apiUrl = builder.toUriString();
+        MockRestServiceServer mockServer = MockRestServiceServer.bindTo(retryRestTemplate).build();
+        mockServer.expect(requestTo(apiUrl))
+                .andRespond(MockRestResponseCreators
+                        .withSuccess(TcMockUtil.getJsonBytesForLTCByShortName(allLocalTrustCircles, shortName),TestUtil.APPLICATION_JSON_UTF8));
+
+        //test client
+        List<TrustCircle> list = tcClient.getLocalTrustCircleByShortName(shortName);
+        // Items containing the shortName string in their name should be 3.
+        assertThat(list.size(), is(3));
+        mockServer.verify();
+    }
+
+    @Test
+    public void getContactByIdTest() throws IOException, URISyntaxException {
+        String id = "a1a2876b-cbb2-4cbd-b99d-340e6e4ffb34";
+        String shortName = "Mocked B";
+        String email = "userB@example.com";
+
+        //mock the TC server using json based on LTC Specifications document
+        String apiUrl = tcConfig.getTcContactsURI();
+        MockRestServiceServer mockServer = MockRestServiceServer.bindTo(retryRestTemplate).build();
+        mockServer.expect(requestTo(apiUrl+"/"+id))
+                .andRespond(MockRestResponseCreators
+                        .withSuccess(TcMockUtil.getJsonBytesForContactById(allContacts,id),TestUtil.APPLICATION_JSON_UTF8));
+
+        // test client
+        Contact contact = tcClient.getContactById(id);
+        assertThat(contact.getId(), is(id));
+        assertThat(contact.getShortName(), is(shortName));
+        assertThat(contact.getEmail(), is(email));
+
         mockServer.verify();
     }
 

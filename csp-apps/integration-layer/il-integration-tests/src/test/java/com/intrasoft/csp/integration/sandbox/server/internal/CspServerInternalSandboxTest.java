@@ -9,6 +9,7 @@ import com.intrasoft.csp.server.policy.domain.model.EvaluatedPolicyDTO;
 import com.intrasoft.csp.server.policy.domain.model.PolicyDTO;
 import com.intrasoft.csp.server.policy.domain.model.SharingPolicyAction;
 import com.intrasoft.csp.server.policy.service.SharingPolicyService;
+import com.intrasoft.csp.server.processors.TcProcessor;
 import com.intrasoft.csp.server.routes.RouteUtils;
 import com.intrasoft.csp.server.service.CamelRestService;
 import com.intrasoft.csp.server.utils.MockUtils;
@@ -27,9 +28,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.core.env.Environment;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.util.StringUtils;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.util.List;
@@ -56,6 +59,7 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
                 "csp.retry.maxAttempts:1",
                 "embedded.activemq.start:false",
                 "apache.camel.use.activemq:false",
+                "server.camel.rest.service.is.async:false" //make it sync for better handling in tests (gracefull shutdown etc.)
         })
 @MockEndpointsAndSkip("http:*")
 public class CspServerInternalSandboxTest implements CamelRoutes{
@@ -99,6 +103,14 @@ public class CspServerInternalSandboxTest implements CamelRoutes{
     @MockBean
     SharingPolicyService sharingPolicyService;
 
+    @Autowired
+    TcProcessor tcProcessor;
+
+    @Autowired
+    Environment env;
+
+    String tcShortNameToTest = IntegrationDataType.CTC_CSP_SHARING;//default
+
     DataParams anonObject;
 
     private Integer numOfCsps = 3;
@@ -112,10 +124,35 @@ public class CspServerInternalSandboxTest implements CamelRoutes{
         mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX,routes.apply(DSL),mockedDsl.getEndpointUri());
         mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX,routes.apply(DDL), mockedDdl.getEndpointUri());
         mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX,routes.apply(ECSP), mockedEcsp.getEndpointUri());
+
+        String tcShortNameToTestArg = env.getProperty("tcShortNameToTest");
+        if(!StringUtils.isEmpty(tcShortNameToTestArg)){
+            tcShortNameToTest = tcShortNameToTestArg;
+        }
+
+        /*
         Mockito.when(camelRestService.sendAndGetList(anyString(), anyObject(), eq("GET"), eq(TrustCircle.class),anyObject()))
                 .thenReturn(mockUtils.getAllMockedTrustCircles(3));
         Mockito.when(camelRestService.send(anyString(), anyObject(), eq("GET"), eq(TrustCircle.class)))
                 .thenReturn(mockUtils.getMockedTrustCircle(3));
+        */
+
+
+
+        String urlShouldContain = tcProcessor.getTcCirclesURI();
+        if(tcShortNameToTest.equalsIgnoreCase(IntegrationDataType.LTC_CSP_SHARING)){
+            urlShouldContain = tcProcessor.getLocalCirclesURI();
+        }
+        Mockito.when(camelRestService.send(Matchers.contains(urlShouldContain), anyObject(), eq("GET"), eq(TrustCircle.class), anyObject()))
+                .thenReturn(mockUtils.getMockedTrustCircle(3, tcShortNameToTest));
+
+        Mockito.when(camelRestService.send(Matchers.contains(urlShouldContain), anyObject(), eq("GET"), eq(TrustCircle.class)))
+                .thenReturn(mockUtils.getMockedTrustCircle(3, tcShortNameToTest));
+
+
+
+
+
         Mockito.when(camelRestService.send(anyString(), anyObject(), eq("GET"), eq(Team.class)))
                 .thenReturn(mockUtils.getMockedTeam(1,"http://external.csp%s.com"))
                 .thenReturn(mockUtils.getMockedTeam(2,"http://external.csp%s.com"))

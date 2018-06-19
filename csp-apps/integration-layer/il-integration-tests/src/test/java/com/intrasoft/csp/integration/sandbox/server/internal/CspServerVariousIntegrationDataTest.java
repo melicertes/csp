@@ -78,6 +78,7 @@ public class CspServerVariousIntegrationDataTest implements CamelRoutes, Context
 
     URL data_artefact_with_team_id = getClass().getClassLoader().getResource("json/data_artefact_with_team_id.json");
     URL data_artefact_with_teamid_arr = getClass().getClassLoader().getResource("json/data_artefact_with_teamid_arr.json");
+    URL tc_cmm_sample = getClass().getClassLoader().getResource("json/tc_cmm_sample.json");
 
     @Autowired
     void setConverters(HttpMessageConverter<?>[] converters) {
@@ -216,6 +217,16 @@ public class CspServerVariousIntegrationDataTest implements CamelRoutes, Context
     @Test
     public void teamsArrTest() throws Exception {
         String jsonStr = FileUtils.readFileToString(new File(data_artefact_with_teamid_arr.toURI()), Charset.forName("UTF-8"));
+        mvc.perform(post("/v"+REST_API_V1+"/"+DSL_INTEGRATION_DATA).accept(MediaType.TEXT_PLAIN)
+                .content(jsonStr)
+                .contentType(TestUtil.APPLICATION_JSON_UTF8))
+                .andExpect(status().isOk())
+                .andExpect(content().string(HttpStatusResponseType.SUCCESSFUL_OPERATION.getReasonPhrase()));
+    }
+
+    @Test
+    public void tcCMMTest() throws Exception {
+        String jsonStr = FileUtils.readFileToString(new File(tc_cmm_sample.toURI()), Charset.forName("UTF-8"));
         mvc.perform(post("/v"+REST_API_V1+"/"+DSL_INTEGRATION_DATA).accept(MediaType.TEXT_PLAIN)
                 .content(jsonStr)
                 .contentType(TestUtil.APPLICATION_JSON_UTF8))

@@ -1,0 +1,130 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "title": "Validator for misp-taxonomies",
+  "id": "https://www.github.com/MISP/misp-taxonomies/schema.json",
+  "defs": {
+    "entry": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "numerical_value": {
+            "type": "number"
+          },
+          "expanded": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "colour": {
+            "type": "string"
+          },
+          "value": {
+            "type": "string"
+          },
+          "required": [
+            "value"
+          ]
+        }
+      }
+    },
+    "values": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "entry": {
+            "$ref": "#/defs/entry"
+          },
+          "predicate": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "predicate"
+        ]
+      }
+    },
+    "predicates": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "numerical_value": {
+            "type": "number"
+          },
+          "colour": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "expanded": {
+            "type": "string"
+          },
+          "value": {
+            "type": "string"
+          },
+          "required": [
+            "value"
+          ]
+        }
+      }
+    }
+  },
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "type": "integer"
+    },
+    "description": {
+      "type": "string"
+    },
+    "expanded": {
+      "type": "string"
+    },
+    "namespace": {
+      "type": "string"
+    },
+    "type": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "enum": [
+          "org",
+          "user",
+          "attribute",
+          "event"
+        ]
+      }
+    },
+    "refs": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string"
+      }
+    },
+    "predicates": {
+      "$ref": "#/defs/predicates"
+    },
+    "values": {
+      "$ref": "#/defs/values"
+    }
+  },
+  "required": [
+    "namespace",
+    "description",
+    "version",
+    "predicates"
+  ]
+}

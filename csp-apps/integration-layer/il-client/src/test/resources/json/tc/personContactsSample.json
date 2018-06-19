@@ -1,0 +1,28 @@
+[
+  {
+    "id": "7ba41b02-7bc2-4549-bdec-b9daed97fb70",
+    "phone_numbers": [],
+    "certificates": [],
+    "memberships": [],
+    "full_name": "Kyriakos Stefanidis",
+    "email_visibility": "private",
+    "postal_address": "",
+    "postal_country": "",
+    "ml_email": "",
+    "ml_key": "",
+    "email": "kyr.stefanidis@gmail.com"
+  },
+  {
+    "id": "b481cd97-7fec-4b2f-b2c6-08fac1d78332",
+    "phone_numbers": [],
+    "certificates": [],
+    "memberships": [],
+    "full_name": "Dimitris Karadimas",
+    "email_visibility": "private",
+    "postal_address": "",
+    "postal_country": "",
+    "ml_email": "",
+    "ml_key": "",
+    "email": "dimitris@karadimas.org"
+  }
+]

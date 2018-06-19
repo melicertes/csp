@@ -1,0 +1,40 @@
+version: '3'
+services:
+
+  apache:
+    image: csp-apache:1.0
+    container_name: csp-apache
+    hostname: csp-apache
+    env_file:
+      - .env
+    networks:
+        default:
+            aliases:
+                - ${IL_LOCAL_DOMAIN}
+                - ${ES_LOCAL_DOMAIN}
+                - ${KIBANA_LOCAL_DOMAIN}
+                - ${TC_LOCAL_DOMAIN}
+                - ${JITSI_LOCAL_DOMAIN}
+                - ${FILES_LOCAL_DOMAIN}
+                - ${VIPER_LOCAL_DOMAIN}
+                - ${MISP_LOCAL_DOMAIN}
+                - ${TARANIS_LOCAL_DOMAIN}
+                - ${INTELMQ_LOCAL_DOMAIN}
+                - ${RT_LOCAL_DOMAIN}
+                - ${ANON_LOCAL_DOMAIN}
+                - ${CFG_LOCAL_DOMAIN}
+    volumes:
+      - /opt/csp/apache2/ssl:/etc/apache2/ssl
+      - /opt/csp/apache2/csp-sites:/etc/apache2/csp-sites
+      - /opt/csp/tc/var/static/:/opt/tc/static/
+      - /opt/agent:/opt/agent
+    ports:
+      - "443:443"
+
+networks:
+  default:
+    external:
+      name: ${LOCAL_DOMAIN}
+
+
+

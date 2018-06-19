@@ -1,0 +1,20 @@
+{
+  "dataParams": {
+    "originCspId": "central-csp",
+    "recordId": "common.suggestion:1",
+    "originApplicationId": "trustCircle",
+    "dateTime": "2018-02-12T10:16:35+0000",
+    "originRecordId": "common.suggestion:1",
+    "cspId": "central-csp",
+    "applicationId": "trustCircle"
+  },
+  "dataType": "trustCircle",
+  "sharingParams": {
+    "trustCircleId": [
+      "CTC::CSP_ALL"
+    ],
+    "toShare": true,
+    "isExternal": false
+  },
+  "dataObject": "[{\"model\": \"common.suggestion\", \"pk\": 1, \"fields\": {\"name\": \"reactive_service\", \"value\": \"Alerts and Warnings\"}}]"
+}

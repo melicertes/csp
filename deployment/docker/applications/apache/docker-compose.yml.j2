@@ -1,0 +1,53 @@
+{% raw -%}
+version: '3'
+services:
+    apache:
+        image: csp-apache:1.0p1
+        container_name: csp-apache
+        hostname: csp-apache
+        shm_size: 1524m
+        env_file:
+            - .env
+{% endraw %}
+  {% if local_domains is defined -%}
+  {% if local_domains|length > 1 %}
+
+        networks:
+            installer_net:
+            default:
+                aliases:
+            {% for local_domain in local_domains -%}
+            {{'     - ${' }}{{local_domain}}{{'}' }}
+            {% endfor %}
+  {% endif -%}
+  {% endif -%}
+{% raw %}
+
+        volumes:
+            - SSLDatavolume:/etc/apache2/ssl
+            - /opt/csp/apache2/csp-sites/:/etc/apache2/csp-sites
+            - TCDatavolume:/opt/tc/
+            - WebAgentsDatavolume:/web_agents
+        ports:
+            - "443:443"
+            - "7443:7443"
+            - "5443:5443"
+            - "6443:6443"
+
+volumes:
+    SSLDatavolume:
+        external: true
+    TCDatavolume:
+        external: true
+    WebAgentsDatavolume:
+        external: true
+
+networks:
+    default:
+        external:
+            name: ${LOCAL_DOMAIN}
+    installer_net:
+       external: true
+{% endraw %}
+
+

@@ -1,0 +1,236 @@
+{
+  "values": [
+    {
+      "entry": [
+        {
+          "expanded": "Less than 1 year",
+          "value": "less-than-1-year",
+          "numerical_value": 1
+        },
+        {
+          "expanded": "Between 1 and 5 years",
+          "value": "between-1-and-5-years",
+          "numerical_value": 2
+        },
+        {
+          "expanded": "Between 5 and 10 years",
+          "value": "between-5-and-10-years",
+          "numerical_value": 3
+        },
+        {
+          "expanded": "Between 10 and 20 years",
+          "value": "between-10-and-20-years",
+          "numerical_value": 4
+        },
+        {
+          "expanded": "More than 20 years",
+          "value": "more-than-20-years",
+          "numerical_value": 5
+        }
+      ],
+      "predicate": "experience"
+    },
+    {
+      "entry": [
+        {
+          "expanded": "x86-32 & x86-64",
+          "value": "x86"
+        },
+        {
+          "expanded": "ARM & ARM-64",
+          "value": "arm"
+        },
+        {
+          "expanded": "mips & mips-64",
+          "value": "mips"
+        },
+        {
+          "expanded": "PowerPC",
+          "value": "powerpc"
+        }
+      ],
+      "predicate": "binary-reversing-arch"
+    },
+    {
+      "entry": [
+        {
+          "expanded": "Less than 1 year",
+          "value": "less-than-1-year",
+          "numerical_value": 1
+        },
+        {
+          "expanded": "Between 1 and 5 years",
+          "value": "between-1-and-5-years",
+          "numerical_value": 2
+        },
+        {
+          "expanded": "Between 5 and 10 years",
+          "value": "between-5-and-10-years",
+          "numerical_value": 3
+        },
+        {
+          "expanded": "Between 10 and 20 years",
+          "value": "between-10-and-20-years",
+          "numerical_value": 4
+        },
+        {
+          "expanded": "More than 20 years",
+          "value": "more-than-20-years",
+          "numerical_value": 5
+        }
+      ],
+      "predicate": "binary-reversing-experience"
+    },
+    {
+      "entry": [
+        {
+          "expanded": "Current Microsoft Windows system",
+          "value": "windows"
+        },
+        {
+          "expanded": "GNU/linux derivative OS",
+          "value": "linux"
+        },
+        {
+          "expanded": "Current IOS",
+          "value": "ios"
+        },
+        {
+          "expanded": "Current Apple OS",
+          "value": "macos"
+        },
+        {
+          "expanded": "Current Android OS",
+          "value": "android"
+        },
+        {
+          "expanded": "BSD",
+          "value": "bsd"
+        }
+      ],
+      "predicate": "os"
+    },
+    {
+      "entry": [
+        {
+          "expanded": "Inter-protocol exploitations",
+          "value": "ipex"
+        },
+        {
+          "expanded": "Common vulnerabilities as SQL injections, CSRF, XSS, CSP bypasses, etc.",
+          "value": "common"
+        },
+        {
+          "expanded": "De-obfuscation of Javascript payloads",
+          "value": "js-desobfuscation"
+        }
+      ],
+      "predicate": "web"
+    },
+    {
+      "entry": [
+        {
+          "expanded": "Less than 1 year",
+          "value": "less-than-1-year",
+          "numerical_value": 1
+        },
+        {
+          "expanded": "Between 1 and 5 years",
+          "value": "between-1-and-5-years",
+          "numerical_value": 2
+        },
+        {
+          "expanded": "Between 5 and 10 years",
+          "value": "between-5-and-10-years",
+          "numerical_value": 3
+        },
+        {
+          "expanded": "Between 10 and 20 years",
+          "value": "between-10-and-20-years",
+          "numerical_value": 4
+        },
+        {
+          "expanded": "More than 20 years",
+          "value": "more-than-20-years",
+          "numerical_value": 5
+        }
+      ],
+      "predicate": "web-experience"
+    },
+    {
+      "entry": [
+        {
+          "expanded": "Less than 1 year",
+          "value": "less-than-1-year",
+          "numerical_value": 1
+        },
+        {
+          "expanded": "Between 1 and 5 years",
+          "value": "between-1-and-5-years",
+          "numerical_value": 2
+        },
+        {
+          "expanded": "Between 5 and 10 years",
+          "value": "between-5-and-10-years",
+          "numerical_value": 3
+        },
+        {
+          "expanded": "Between 10 and 20 years",
+          "value": "between-10-and-20-years",
+          "numerical_value": 4
+        },
+        {
+          "expanded": "More than 20 years",
+          "value": "more-than-20-years",
+          "numerical_value": 5
+        }
+      ],
+      "predicate": "crypto-experience"
+    }
+  ],
+  "predicates": [
+    {
+      "description": "The analyst experience expressed in years range in the field tagged. The year range is based on a standard 40-hour work week.",
+      "expanded": "Experience",
+      "value": "experience"
+    },
+    {
+      "description": "Architecture that the analyst has experience with.",
+      "expanded": "Reversing arch",
+      "value": "binary-reversing-arch"
+    },
+    {
+      "description": "The analyst experience in reversing expressed in years range in the field tagged. The year range is based on a standard 40-hour work week.",
+      "expanded": "Reversing experience",
+      "value": "binary-reversing-experience"
+    },
+    {
+      "description": "Operating System that the analyst has experience with.",
+      "expanded": "Operating System",
+      "value": "os"
+    },
+    {
+      "description": "Web application vulnerabilities and technique that the analyst has experience with.",
+      "expanded": "Web applications-related skills",
+      "value": "web"
+    },
+    {
+      "description": "The analyst experience expressed to web application security in years range in the field tagged.",
+      "expanded": "Experience",
+      "value": "web-experience"
+    },
+    {
+      "description": "The analyst experience related to cryptography expressed in years range in the field tagged.",
+      "expanded": "Experience",
+      "value": "crypto-experience"
+    }
+  ],
+  "type": [
+    "org",
+    "user"
+  ],
+  "version": 2,
+  "description": "A series of assessment predicates describing the analyst capabilities to perform analysis. These assessment can be assigned by the analyst him/herself or by another party evaluating the analyst.",
+  "expanded": "Analyst (Self) Assessment",
+  "namespace": "analyst-assessment"
+}

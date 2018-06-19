@@ -1,0 +1,15 @@
+{
+    "conditions" : [ "LEAuthLevel", "Policy", "Script", "AuthenticateToService", "SimpleTime", "AMIdentityMembership", "OR", "IPv6", "IPv4", "SessionProperty", "AuthScheme", "AuthLevel", "NOT", "AuthenticateToRealm", "AND", "ResourceEnvIP", "LDAPFilter", "OAuth2Scope", "Session" ],
+    "applicationType" : "iPlanetAMWebAgentService",
+    "resourceTypeUuids" : [ "__RES_TYPE_ID_TO_BE_INSERTED__" ],
+    "resourceComparator" : "com.sun.identity.entitlement.URLResourceName",
+    "subjects" : [ "Policy", "NOT", "OR", "JwtClaim", "AuthenticatedUsers", "AND", "Identity", "NONE" ],
+    "entitlementCombiner" : "DenyOverride",
+    "saveIndex" : null,
+    "searchIndex" : null,
+    "attributeNames" : [ ],
+    "editable" : true,
+    "description" : "Policy set to cover RT user authorization.",
+    "name" : "RTPolicySet",
+    "realm" : "/"
+}

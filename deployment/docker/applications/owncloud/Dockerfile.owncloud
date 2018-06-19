@@ -1,0 +1,4 @@
+FROM owncloud/server:10.0.7
+MAINTAINER Thanos Angelatos <agelatos@gmail.com>
+
+
