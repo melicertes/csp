@@ -1,0 +1,85 @@
+version: '2.1'
+
+
+services:
+  owncloud:
+    image: owncloud:1.0
+    container_name: csp-oc
+    expose:
+       - "${OC_DOCR_PORT}"
+    depends_on:
+      - ocdb
+      - ocredis
+    environment:
+      - OAM_DOCR_HOST=${OAM_DOCR_HOST}
+      - FQDN=${DOMAIN}
+      - OWNCLOUD_DOMAIN=${OC_DOMAIN}
+      - OWNCLOUD_HTTPS_PORT=${OC_HTTPS_PORT}
+      - OWNCLOUD_DB_TYPE=mysql
+      - OWNCLOUD_DB_NAME=owncloud
+      - OWNCLOUD_DB_USERNAME=owncloud
+      - OWNCLOUD_DB_PASSWORD=owncloud
+      - OWNCLOUD_DB_HOST=ocdb
+      - OWNCLOUD_ADMIN_USERNAME=${OC_ADMIN_USERNAME}
+      - OWNCLOUD_ADMIN_PASSWORD=${OC_ADMIN_PASSWORD}
+      - OWNCLOUD_UTF8MB4_ENABLED=true
+      - OWNCLOUD_REDIS_ENABLED=true
+      - OWNCLOUD_REDIS_HOST=ocredis
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/status.php"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    volumes:
+      - OCfiles:/mnt/data
+      - ./98_userldap.sh:/etc/owncloud.d/98_userldap.sh
+
+  ocdb:
+    image: ocdb:1.0
+    container_name: csp-ocdb
+    environment:
+      - MARIADB_ROOT_PASSWORD=owncloud
+      - MARIADB_USERNAME=owncloud
+      - MARIADB_PASSWORD=owncloud
+      - MARIADB_DATABASE=owncloud
+      - MARIADB_MAX_ALLOWED_PACKET=256M
+      - MARIADB_INNODB_LOG_FILE_SIZE=64M
+      - MARIADB_INNODB_LARGE_PREFIX=ON
+      - MARIADB_INNODB_FILE_FORMAT=Barracuda
+    healthcheck:
+      test: ["CMD", "/usr/bin/healthcheck"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    volumes:
+      - OCdb:/var/lib/mysql
+      - OCbackup:/var/lib/backup
+
+  ocredis:
+    image: ocredis:1.0
+    container_name: csp-ocredis
+    environment:
+      - REDIS_DATABASES=1
+    healthcheck:
+      test: ["CMD", "/usr/bin/healthcheck"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    volumes:
+      - OCredis:/var/lib/redis
+
+networks:
+  default:
+    external:
+      name: ${LOCAL_DOMAIN}
+
+volumes:
+  OCfiles:
+    external: true
+  OCdb:
+    external: true
+  OCbackup:
+    external: true
+  OCredis:
+    external: true
+

@@ -6,13 +6,13 @@
     <parent>
         <groupId>com.intrasoft.csp</groupId>
         <artifactId>configuration</artifactId>
-        <version>0.3.0-SNAPSHOT</version>
+        <version>3.6.0-SNAPSHOT</version>
     </parent>
 
     <name>Configuration Commons</name>
     <groupId>com.intrasoft.csp</groupId>
     <artifactId>conf-commons</artifactId>
-    <version>0.3.0-SNAPSHOT</version>
+    <version>3.6.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
 
@@ -47,8 +47,17 @@
         </dependency>
         <dependency>
             <groupId>com.intrasoft.csp</groupId>
+            <artifactId>libraries-headersauth</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.intrasoft.csp</groupId>
             <artifactId>il-commons</artifactId>
             <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
         </dependency>
     </dependencies>
 

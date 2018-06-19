@@ -1,0 +1,146 @@
+[
+  {
+    "id": "string",
+    "csp_id": "string",
+    "csp_domain": "string",
+    "csp_installed": true,
+    "nis_team_types": [
+      "string"
+    ],
+    "nis_sectors": [
+      "string"
+    ],
+    "status": "string",
+    "short_name": "Mocked A",
+    "name": "string",
+    "host_organisation": "string",
+    "country": "string",
+    "additional_countries": [
+      "string"
+    ],
+    "established_on": "string",
+    "constituency_types": [
+      "string"
+    ],
+    "constituency_description": "string",
+    "member_locations": [
+      "string"
+    ],
+    "constituency_asns": [
+      "string"
+    ],
+    "constituency_domains": [
+      "string"
+    ],
+    "constituency_ipranges": [
+      "string"
+    ],
+    "scope_asns": [
+      "string"
+    ],
+    "scope_ipranges": [
+      "string"
+    ],
+    "scope_email": [
+      "user@example.com"
+    ],
+    "contact_postal_address": "string",
+    "contact_postal_country": "string",
+    "phone_numbers": "string",
+    "main_email": "user@example.com",
+    "public_email": "user@example.com",
+    "automated_email": "user@example.com",
+    "automated_email_format": [
+      "string"
+    ],
+    "public_www": "string",
+    "public_ftp": "string",
+    "public_mailinglist": "string",
+    "public_usenet": "string",
+    "business_hours": "string",
+    "outside_business_hours": "string",
+    "business_hours_timezone": "string",
+    "team_members": "string",
+    "full_name": "string",
+    "email": "userA@example.com",
+    "email_visibility": true,
+    "postal_address": "string",
+    "postal_country": "string",
+    "ml_email": "user@example.com",
+    "ml_key": "string",
+    "certificates": "string",
+    "memberships": "string"
+  },
+  {
+    "id": "a1a2876b-cbb2-4cbd-b99d-340e6e4ffb34",
+    "csp_id": "string",
+    "csp_domain": "string",
+    "csp_installed": true,
+    "nis_team_types": [
+      "string"
+    ],
+    "nis_sectors": [
+      "string"
+    ],
+    "status": "string",
+    "short_name": "Mocked B",
+    "name": "string",
+    "host_organisation": "string",
+    "country": "string",
+    "additional_countries": [
+      "string"
+    ],
+    "established_on": "string",
+    "constituency_types": [
+      "string"
+    ],
+    "constituency_description": "string",
+    "member_locations": [
+      "string"
+    ],
+    "constituency_asns": [
+      "string"
+    ],
+    "constituency_domains": [
+      "string"
+    ],
+    "constituency_ipranges": [
+      "string"
+    ],
+    "scope_asns": [
+      "string"
+    ],
+    "scope_ipranges": [
+      "string"
+    ],
+    "scope_email": [
+      "user@example.com"
+    ],
+    "contact_postal_address": "string",
+    "contact_postal_country": "string",
+    "phone_numbers": "string",
+    "main_email": "user@example.com",
+    "public_email": "user@example.com",
+    "automated_email": "user@example.com",
+    "automated_email_format": [
+      "string"
+    ],
+    "public_www": "string",
+    "public_ftp": "string",
+    "public_mailinglist": "string",
+    "public_usenet": "string",
+    "business_hours": "string",
+    "outside_business_hours": "string",
+    "business_hours_timezone": "string",
+    "team_members": "string",
+    "full_name": "string",
+    "email": "userB@example.com",
+    "email_visibility": true,
+    "postal_address": "string",
+    "postal_country": "string",
+    "ml_email": "user@example.com",
+    "ml_key": "string",
+    "certificates": "string",
+    "memberships": "string"
+  }
+]

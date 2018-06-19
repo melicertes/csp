@@ -1,7 +1,7 @@
 package com.intrasoft.csp.misp.tests.sandbox;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.intrasoft.csp.client.TrustCirclesClient;
-import com.intrasoft.csp.client.config.TrustCirclesClientConfig;
 import com.intrasoft.csp.commons.model.Team;
 import com.intrasoft.csp.commons.model.TrustCircle;
 import com.intrasoft.csp.libraries.restclient.service.RetryRestTemplate;
@@ -9,9 +9,11 @@ import com.intrasoft.csp.misp.client.MispAppClient;
 import com.intrasoft.csp.misp.client.config.MispAppClientConfig;
 import com.intrasoft.csp.misp.commons.models.OrganisationDTO;
 import com.intrasoft.csp.misp.commons.models.generated.SharingGroup;
+import com.intrasoft.csp.misp.config.TrustCirclesClientConfig;
 import com.intrasoft.csp.misp.service.MispTcSyncService;
 import com.intrasoft.csp.misp.service.impl.MispTcSyncServiceImpl;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -29,8 +31,10 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -41,7 +45,7 @@ import static org.springframework.test.web.client.match.MockRestRequestMatchers.
 @RunWith(SpringJUnit4ClassRunner.class)
 
 @SpringBootTest( classes = {MispTcSyncServiceImpl.class,
-                            TrustCirclesClientConfig.class, MispAppClient.class, MispAppClientConfig.class},
+                            TrustCirclesClientConfig.class, ObjectMapper.class, MispAppClient.class, MispAppClientConfig.class},
         properties = {
                 "misp.app.protocol:http",
                 "misp.app.host:192.168.56.50",
@@ -224,17 +228,28 @@ public class MispTcSyncServiceTest {
     // a temporary solution is deleting and re-creating the Sharing Group with the updated Organisation content.
     @Test
     public void syncSharingGroupsExistingSharingGroupsTest() throws URISyntaxException, IOException {
-        String tcCirclesURI = tcConfig.getTcCirclesURI();
+
         String mispGroupsURI = "http://192.168.56.50:80/sharing_groups";
         String mispAddGroupURI = "http://192.168.56.50:80/sharing_groups/add";
         String sharingGroupUuid = "a36c31f4-dad3-4f49-b443-e6d6333649b1";
 
+        MockRestServiceServer tcMockServer;
+
         // We first need to mock TC server's getAllTrustCircles response
-        MockRestServiceServer tcMockServer = MockRestServiceServer.bindTo(tcRetryRestTemplate).build();
+        String tcCirclesURI = tcConfig.getTcCirclesURI();
+        tcMockServer = MockRestServiceServer.bindTo(tcRetryRestTemplate).build();
         tcMockServer.expect(requestTo(tcCirclesURI))
                 .andRespond(MockRestResponseCreators
                         .withSuccess(FileUtils.readFileToString(new File(twoTrustCirclesUpdated.toURI()),
                                 Charset.forName("UTF-8")).getBytes(), MediaType.APPLICATION_JSON_UTF8));
+
+        // Then mock TC server's getAllLocalTrustCircles response
+        String tcLocalCirclesURI = tcConfig.getTcLocalCircleURI(); // Mock file's path containing response of LTCs
+        tcMockServer.expect(requestTo(tcLocalCirclesURI))
+                .andRespond(MockRestResponseCreators
+                        .withSuccess(FileUtils.readFileToString(new File(allLocalTrustCircles.toURI()),
+                                Charset.forName("UTF-8")).getBytes(), MediaType.APPLICATION_JSON_UTF8));
+
 
         // create the existing organisation here manually
         String newOrgUuid = "9a74c807-e6c4-4a19-9c77-37457e3285df";
@@ -243,7 +258,7 @@ public class MispTcSyncServiceTest {
         OrganisationDTO organisationDTO = new OrganisationDTO();
         organisationDTO.setName("DELETE ME");
         organisationDTO.setUuid(newOrgUuid);
-        mispAppClient.addMispOrganisation(organisationDTO);
+//        mispAppClient.addMispOrganisation(organisationDTO);
 
         mispTcSyncService.syncSharingGroups();
 
@@ -279,7 +294,7 @@ public class MispTcSyncServiceTest {
     public void syncSharingGroupsLocalTrustCirclesTest() throws URISyntaxException, IOException {
 
         String tcCirclesURI = tcConfig.getTcCirclesURI();
-        String tcLocalCirclesURI = tcConfig.getTcLocalCirclesURI();
+        String tcLocalCirclesURI = tcConfig.getTcLocalCircleURI();
         String mispGroupsURI = "http://192.168.56.50:80/sharing_groups";
 
         // We first need to mock TC server's getAllTrustCircles response
@@ -385,6 +400,31 @@ public class MispTcSyncServiceTest {
         assertTrue(sg.isActive());
 
         tcMockServer.verify();
+    }
+
+    @Test
+    public void excludeTrustCirclesFromSyncByShortNameTest() {
+        String[] trustCircleNamesExcluded = { "CTC::CSP_ALL", "CTC::CSP_SHARING", "LTC::CSP_SHARING" };
+        List<TrustCircle> unfilteredList = new ArrayList<>();
+        int size = 7;
+        for (int i = 0; i < size; i++) {
+            unfilteredList.add(new TrustCircle());
+            unfilteredList.get(i).setShortName("(L)(C)TC::" + RandomStringUtils.random(7,true,false));
+            unfilteredList.get(i).setId(UUID.randomUUID().toString());
+        }
+
+        // Add blacklisted names to unfiltered list before invoking the filtering method
+        unfilteredList.get(0).setShortName(trustCircleNamesExcluded[2]);
+        unfilteredList.get(3).setShortName(trustCircleNamesExcluded[1]);
+        unfilteredList.get(6).setShortName(trustCircleNamesExcluded[0]);
+
+        List<TrustCircle> filteredList = mispTcSyncService.excludeTrustCirclesFromSyncByShortName(unfilteredList);
+
+        // TrustCircles with those names should have been removed and list size is smaller
+        for (String shortName : trustCircleNamesExcluded) {
+            assertThat(filteredList.stream().anyMatch(tc -> tc.getShortName().equals(shortName)), is(false));
+        }
+        assertThat(filteredList.size(), is(size-trustCircleNamesExcluded.length));
     }
 
     @Test

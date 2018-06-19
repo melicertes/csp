@@ -6,13 +6,13 @@
 	<parent>
 		<groupId>com.intrasoft.csp</groupId>
 		<artifactId>misp</artifactId>
-		<version>0.3.0-SNAPSHOT</version>
+		<version>3.6.0-SNAPSHOT</version>
 	</parent>
 
 	<name>misp-adapter-emitter</name>
 	<groupId>com.intrasoft.csp</groupId>
 	<artifactId>misp-adapter-emitter</artifactId>
-	<version>0.3.0-SNAPSHOT</version>
+	<version>3.6.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<properties>
@@ -61,6 +61,10 @@
 			<groupId>com.intrasoft.csp</groupId>
 			<artifactId>misp-client</artifactId>
 			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
 		</dependency>
         <!--https://mvnrepository.com/artifact/org.apache.camel/camel-jsonpath-->
         <dependency>

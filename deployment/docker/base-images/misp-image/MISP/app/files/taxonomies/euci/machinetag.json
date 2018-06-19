@@ -1,0 +1,27 @@
+{
+  "namespace": "euci",
+  "description": "EU classified information (EUCI) means any information or material designated by a EU security classification, the unauthorised disclosure of which could cause varying degrees of prejudice to the interests of the European Union or of one or more of the Member States.",
+  "version": 2,
+  "predicates": [
+    {
+      "value": "TS-UE/EU-TS",
+      "expanded": "TRES SECRET UE/EU TOP SECRET",
+      "description": "Information and material the unauthorised disclosure of which could cause exceptionally grave prejudice to the essential interests of the European Union or of one or more of the Member States."
+    },
+    {
+      "value": "S-UE/EU-S",
+      "expanded": "SECRET UE/EU SECRET",
+      "description": "Information and material the unauthorised disclosure of which could seriously harm the essential interests of the European Union or of one or more of the Member States."
+    },
+    {
+      "value": "C-UE/EU-C",
+      "expanded": "CONFIDENTIEL UE/EU CONFIDENTIAL",
+      "description": "Information and material the unauthorised disclosure of which could harm the essential interests of the European Union or of one or more of the Member States."
+    },
+    {
+      "value": "R-UE/EU-R",
+      "expanded": "RESTREINT UE/EU RESTRICTED",
+      "description": "Information and material the unauthorised disclosure of which could be disadvantageous to the interests of the European Union or of one or more of the Member States."
+    }
+  ]
+}

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:fragment="page">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+<meta name="description" content="VCBridge - Admin Console" />
+<meta name="author" content="Dimis Savva" />
+<link rel="shortcut icon" href="resources/img/logo.png" />
+<title>VCBridge - Admin Console</title>
+
+
+<!-- Main styles for this application -->
+<link href="/resources/css/bootstrap.min.css" rel="stylesheet" />
+<link rel="stylesheet" th:href="@{/resources/css/bootstrap-datetimepicker.min.css}" />
+<!-- Icons -->
+<link href="http://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css" th:href="@{/resources/css/font-awesome.min.css}" rel="stylesheet">
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-timepicker/0.5.2/css/bootstrap-timepicker.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.4/css/bootstrap-datepicker.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.4/css/selectize.min.css" />
+
+
+<link th:href="@{/resources/css/main.css}" rel="stylesheet" />
+<object th:include="this :: header" th:remove="tag"></object>
+</head>
+
+
+
+<body class="app header-fixed">
+  <nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+          <span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" th:href="@{/}">VCBridge Admin</a>
+
+
+      </div>
+      <ul class="nav navbar-nav">
+
+        <li class=""><a th:href="@{/listMeeting/scheduled}">
+            <i class="fa fa-list "></i> My Meetings
+          </a></li>
+        <!-- <li class=""><a th:href="@{/createMeeting}">
+            <i class="fa fa-pencil "></i> Create
+          </a></li> -->
+        <li class=""><a th:href="@{/listEmailTemplates}">
+            <i class="fa fa-wrench "></i> Email Templates
+          </a></li>
+      </ul>
+      <div id="navbar" class="navbar-collapse collapse">
+        <!--------------------------->
+        <ul class="nav navbar-nav navbar-right">
+          <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">
+              <span class="glyphicon glyphicon-user"></span> <strong th:inline="text">[[${#httpServletRequest.remoteUser}]]</strong> <span class="glyphicon glyphicon-chevron-down"></span>
+            </a>
+            <ul class="dropdown-menu">
+              <li>
+                <div class="navbar-login navbar-login-session">
+                  <div class="row">
+                    <div class="col-lg-12">
+                        <a th:href="@{/logout/}" class="btn btn-danger btn-block">Logout</a>
+                    </div>
+                  </div>
+                </div>
+              </li>
+            </ul></li>
+        </ul>
+
+
+
+      </div>
+      <!--/.navbar-collapse -->
+
+
+    </div>
+  </nav>
+
+
+
+
+  <div class="container">
+    <!-- Main content -->
+    <br /> <br />
+    <div class="" th:each="err, stat : ${errors}">
+      <div class="alert alert-warning alert-dismissible show" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <strong>Error</strong><span th:text="${err}">You should check in on some of those fields below.</span>
+      </div>
+    </div>
+
+    <div th:include="this :: content"></div>
+
+
+
+
+  </div>
+
+  <div class="footer navbar-fixed-bottom">
+    <a href="#">CSP</a> &copy; 2018.
+    </span>
+  </div>
+
+
+
+  <!-- Bootstrap and necessary plugins -->
+  <script src="/resources/js/jquery-1.10.2.js"></script>
+  <script src="/resources/js/tether.min.js"></script>
+  <script src="/resources/js/moment-with-locales.min.js"></script>
+  <script src="/resources/js/moment.min.js"></script>
+  <script src="/resources/js/bootstrap.min.js"></script>
+  <script type="text/javascript" src="/resources/js/bootstrap-datetimepicker.min.js"></script>
+  <!-- Date/Time picker -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-timepicker/0.5.2/js/bootstrap-timepicker.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.4/js/bootstrap-datepicker.min.js"></script>
+
+  <!-- Make all buttons small -->
+  <script>
+      $(document).ready(function() {
+        $(".btn").addClass("btn-sm")
+      })
+    </script>
+  <object th:include="this :: scripts" th:remove="tag"></object>
+</body>
+
+</html>

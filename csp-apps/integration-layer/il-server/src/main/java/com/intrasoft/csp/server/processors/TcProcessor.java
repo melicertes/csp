@@ -10,7 +10,6 @@ import com.intrasoft.csp.commons.exceptions.ErrorLogException;
 import com.intrasoft.csp.commons.exceptions.InvalidSharingParamsException;
 import com.intrasoft.csp.commons.model.*;
 import com.intrasoft.csp.commons.routes.CamelRoutes;
-import com.intrasoft.csp.libraries.restclient.exceptions.CspBusinessException;
 import com.intrasoft.csp.server.policy.domain.model.EvaluatedPolicyDTO;
 import com.intrasoft.csp.server.policy.domain.model.SharingPolicyAction;
 import com.intrasoft.csp.server.policy.service.SharingPolicyService;
@@ -26,7 +25,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.PostConstruct;
-import javax.script.ScriptException;
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -51,6 +49,9 @@ public class TcProcessor implements Processor,CamelRoutes{
     String tcPathCircles;
     @Value("${tc.path.teams}")
     String tcPathTeams;
+
+    @Value("${tc.path.localcircle}")
+    String tcPathLocalCircle;
 
     @Autowired
     ObjectMapper objectMapper;
@@ -105,14 +106,14 @@ public class TcProcessor implements Processor,CamelRoutes{
                     if(list.size()>0){
                         for(String tcId:list) {
                             if(!StringUtils.isEmpty(tcId)) {
-                                sendByTcId(tcId, exchange);
+                                sendByTcId(tcId,localTcExists(tcId), exchange);
                             }
                         }
                     }
                 }else if(integrationData.getSharingParams().getTcId() instanceof String){
                     String tcId = (String) integrationData.getSharingParams().getTcId();
                     if(!StringUtils.isEmpty(tcId)) {
-                        sendByTcId(tcId, exchange);
+                        sendByTcId(tcId, localTcExists(tcId),exchange);
                     }
                 }
 
@@ -147,21 +148,66 @@ public class TcProcessor implements Processor,CamelRoutes{
     }
 
     private void sendByDataType(IntegrationData integrationData, Exchange exchange, String originEndpoint, String httpMethod) throws IOException, NoSuchAlgorithmException, InvalidKeyException {
-        //make all-TCs call
-        String getAllTcUri = this.getTcCirclesURI();
-        List<TrustCircle> tcList = camelRestService.sendAndGetList(getAllTcUri, null,  HttpMethod.GET.name(), TrustCircle.class,null);
+        Optional<TrustCircle> optionalTc;
+        List<TrustCircle> tcList = null;
+        String tcShortNameMapping = IntegrationDataType.CTC_CSP_SHARING;
 
-        Optional<TrustCircle> optionalTc  = tcList.stream().filter(t->t.getShortName().toLowerCase().contains(IntegrationDataType.tcNamingConventionForShortName.get(integrationData.getDataType()).toString().toLowerCase())).findAny();
+        if(!integrationData.getDataType().equals(IntegrationDataType.TRUSTCIRCLE)) {
+            //first make an LTC call and if available use that, instead of CTC.
+            String getAllLocalTcUri = this.getLocalCirclesURI() + "?short_name=" + IntegrationDataType.LTC_CSP_SHARING;
+            tcList = camelRestService.sendAndGetList(getAllLocalTcUri, null, HttpMethod.GET.name(), TrustCircle.class, null, true);
+        }else{
+            tcShortNameMapping = IntegrationDataType.CTC_CSP_ALL;
+        }
+
+        boolean useLTC = false;
+        if(tcList == null || tcList.isEmpty()) {
+            LOG.info("Using "+tcShortNameMapping+"..");
+            //make all-TCs call
+            String getAllTcUri = this.getTcCirclesURI();
+            //TODO we can get a TC by short name. It is already supported!
+            //eg.
+            //tcList = camelRestService.sendAndGetList(getAllTcUri+"/"+tcShortNameMapping, null, HttpMethod.GET.name(), TrustCircle.class, null);
+            //optionalTc  = tcList.stream().findAny();
+            TrustCircle tc = camelRestService.send(getAllTcUri+"/"+tcShortNameMapping, null, HttpMethod.GET.name(), TrustCircle.class, null);
+            optionalTc = Optional.of(tc);
+            //tcList = camelRestService.sendAndGetList(getAllTcUri, null, HttpMethod.GET.name(), TrustCircle.class, null);
+            //optionalTc  = tcList.stream().filter(t->t.getShortName().toLowerCase().contains(IntegrationDataType.tcNamingConventionForShortName.get(integrationData.getDataType()).toString().toLowerCase())).findAny();
+        }else{
+            LOG.info("Using "+IntegrationDataType.LTC_CSP_SHARING+"..");
+            optionalTc  = tcList.stream().findAny();
+            useLTC = true;
+        }
+
         if(optionalTc.isPresent()){
-            sendByTcId(optionalTc.get().getId(),exchange);
+            sendByTcId(optionalTc.get().getId(),useLTC, exchange);
         }else{
             //DO NO ACTIVATE GDELIVERY by throwing any exception, just log the error
             throw new ErrorLogException("Could not find trust circle id for this data. "+integrationData.toString());
         }
     }
 
-    private void sendByTcId(String tcId, Exchange exchange) throws IOException, InvalidKeyException, NoSuchAlgorithmException {
-        String uri = this.getTcCirclesURI() + "/" + tcId;
+
+    boolean localTcExists(String uuid) throws IOException {
+        return tcExists(uuid,true);
+    }
+
+    boolean centralTcExists(String uuid) throws IOException {
+        return tcExists(uuid,false);
+    }
+
+    boolean tcExists(String uuid, boolean isLocal) throws IOException {
+        String uri = (isLocal?this.getLocalCirclesURI():this.getTcCirclesURI()) + "/" + uuid;
+        //handle "404 not found" properly
+        List<Integer> doNotLogErrorOnTheseStatusCodes = new ArrayList<>();
+        doNotLogErrorOnTheseStatusCodes.add(404);
+        TrustCircle tc = camelRestService.send(uri, null,  HttpMethod.GET.name(),
+                TrustCircle.class,true, doNotLogErrorOnTheseStatusCodes);
+        return tc != null;
+    }
+
+    private void sendByTcId(String tcId, boolean useLTC, Exchange exchange) throws IOException, InvalidKeyException, NoSuchAlgorithmException {
+        String uri = (useLTC?this.getLocalCirclesURI():this.getTcCirclesURI()) + "/" + tcId;
         List<Team> teams = getTcTeams(uri,exchange);
         //all TC calls have been made up to this point, TEAMS list has been populated
         // Decide the flow
@@ -229,13 +275,39 @@ public class TcProcessor implements Processor,CamelRoutes{
     }
 
     public String getTcUri(IntegrationDataType integrationDataType) throws IOException {
+        Optional<TrustCircle> optionalTc;
         String uri;
-        String getAllTcUri = this.getTcCirclesURI();
-        List<TrustCircle> tcList = camelRestService.sendAndGetList(getAllTcUri, null,  HttpMethod.GET.name(), TrustCircle.class,null);
+        List<TrustCircle> tcList = null;
+        String tcShortNameMapping = IntegrationDataType.CTC_CSP_SHARING;
 
-        Optional<TrustCircle> optionalTc  = tcList.stream().filter(t->t.getShortName().toLowerCase().contains(IntegrationDataType.tcNamingConventionForShortName.get(integrationDataType).toString().toLowerCase())).findAny();
+        if(!integrationDataType.equals(IntegrationDataType.TRUSTCIRCLE)) {
+            //if trustCircle, do not check LTC
+            String getAllLocalTcUri = this.getLocalCirclesURI() + "?short_name=" + IntegrationDataType.LTC_CSP_SHARING;
+            tcList = camelRestService.sendAndGetList(getAllLocalTcUri, null, HttpMethod.GET.name(), TrustCircle.class, null);
+        }else{
+            tcShortNameMapping = IntegrationDataType.CTC_CSP_ALL;
+        }
+
+        if(tcList == null || tcList.isEmpty()) {
+            LOG.info("Using "+tcShortNameMapping+"..");
+            String getAllTcUri = this.getTcCirclesURI();
+            //we can get a TC by short name. It is already supported!
+            //eg.
+            //tcList = camelRestService.sendAndGetList(getAllTcUri+"/"+tcShortNameMapping, null, HttpMethod.GET.name(), TrustCircle.class, null);
+            //optionalTc  = tcList.stream().findAny();
+            TrustCircle tc = camelRestService.send(getAllTcUri+"/"+tcShortNameMapping, null, HttpMethod.GET.name(), TrustCircle.class, null);
+            optionalTc = Optional.of(tc);
+            //tcList = camelRestService.sendAndGetList(getAllTcUri, null,  HttpMethod.GET.name(), TrustCircle.class,null);
+            //optionalTc = tcList.stream().filter(t->t.getShortName().toLowerCase().contains(IntegrationDataType.tcNamingConventionForShortName.get(integrationDataType).toString().toLowerCase())).findAny();
+            uri = this.getTcCirclesURI();
+        }else{
+            LOG.info("Using "+IntegrationDataType.LTC_CSP_SHARING+"..");
+            optionalTc = tcList.stream().findAny();
+            uri = this.getLocalCirclesURI();
+        }
+
         if(optionalTc.isPresent()){
-            uri = this.getTcCirclesURI() + "/" + optionalTc.get().getId();
+            uri = uri + "/" + optionalTc.get().getId();
         }else{
             //SHOULD NOT activate GDelivery. Log as error
             throw new ErrorLogException("Integration Test error: Could not find trust circle id for this data. ");
@@ -340,7 +412,10 @@ public class TcProcessor implements Processor,CamelRoutes{
     }
 
     // flow2
-    private void handleExternalDclFlowAndSendToDSL(Exchange exchange,String httpMethod,List<Team> teams, IntegrationData integrationData){
+    private void handleExternalDclFlowAndSendToDSL(Exchange exchange,String httpMethod,List<Team> teams, IntegrationData coreIntegrationData) throws IOException {
+
+        String jsonIntegrationData = objectMapper.writeValueAsString(coreIntegrationData);
+        IntegrationData integrationData = objectMapper.readValue(jsonIntegrationData, IntegrationData.class);
 
         //SXCSP-255. Using cspId and not shortName
         //should have all teams regardless of any teamId provided in sharingParams
@@ -348,19 +423,36 @@ public class TcProcessor implements Processor,CamelRoutes{
         LOG.info("Authorized (cspId or shortName="+integrationData.getDataParams().getCspId().toLowerCase()+"): "+authorized);
         if (authorized){
             integrationData.getSharingParams().setIsExternal(true);
+            boolean shouldSend = true;
 
-            //exchange.getIn().setBody(integrationData); //replace with producer
-            //exchange.getIn().setHeader("recipients", routes.apply(DSL));//replace with producer
-            Map<String, Object> headers = new HashMap<>();
-            headers.put(Exchange.HTTP_METHOD, httpMethod);
-            producer.sendBodyAndHeaders(routes.apply(DSL),ExchangePattern.InOut,integrationData,headers);
+            String cspId = integrationData.getDataParams().getCspId();
+            List<String> authorizedCentralCspIdsList = Arrays.asList(IntegrationDataType.authorizedCentralCspIds);
+
+            if(integrationData.getDataType().equals(IntegrationDataType.TRUSTCIRCLE)
+                    && !authorizedCentralCspIdsList.stream().anyMatch(c->c.equalsIgnoreCase(cspId))){
+                shouldSend = false;
+                LOG.warn(String.format("TC dataType change request received from external CSP (flow2) and is not %s. Csp tried to do this is: %s"
+                        ,authorizedCentralCspIdsList.toString(),cspId));
+            }
+
+            if(shouldSend) {
+                //exchange.getIn().setBody(integrationData); //replace with producer
+                //exchange.getIn().setHeader("recipients", routes.apply(DSL));//replace with producer
+                Map<String, Object> headers = new HashMap<>();
+                headers.put(Exchange.HTTP_METHOD, httpMethod);
+                producer.sendBodyAndHeaders(routes.apply(DSL), ExchangePattern.InOut, integrationData, headers);
+            }
         }
     }
 
-    private String getTcCirclesURI() {
+    public String getLocalCirclesURI() {
+        return tcProtocol + "://" + tcHost + ":" + tcPort + tcPathLocalCircle;
+    }
+
+    public String getTcCirclesURI() {
         return tcProtocol + "://" + tcHost + ":" + tcPort + tcPathCircles;
     }
-    private String getTcTeamsURI() {
+    public String getTcTeamsURI() {
         return tcProtocol + "://" + tcHost + ":" + tcPort + tcPathTeams;
     }
 }

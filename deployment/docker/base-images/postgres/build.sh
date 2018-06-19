@@ -1,0 +1,1 @@
+docker build -t csp-postgres:1.0 .

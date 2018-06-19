@@ -490,6 +490,73 @@ public class MispAppClientTest {
 
     }
 
+    // This test creates a Sharing Group and two Organisations. Then attempts to add these Organisations
+    // to the Sharing Group one by one. These organisations should be a part of that Sharing Group.
+    @Test
+    public void updateMispSharingGroupAddOrganisationTest() {
+        SharingGroup sharingGroup = createSharingGroupObject();
+        sharingGroup = mispAppClient.addMispSharingGroup(sharingGroup);
+        OrganisationDTO orgA = new OrganisationDTO();
+        OrganisationDTO orgB = new OrganisationDTO();
+        String orgAName = "Test-" + RandomStringUtils.random(4, true, false);
+        String orgBName = "Test-" + RandomStringUtils.random(4, true, false);
+        orgA.setName(orgAName);
+        orgB.setName(orgBName);
+        orgA = mispAppClient.addMispOrganisation(orgA);
+        orgB = mispAppClient.addMispOrganisation(orgB);
+
+        // Adding these new Organisations to our new Sharing Group
+        assertTrue(mispAppClient.updateMispSharingGroupAddOrganisation(sharingGroup.getUuid(), orgA.getUuid()));
+        assertTrue(mispAppClient.updateMispSharingGroupAddOrganisation(sharingGroup.getUuid(), orgB.getUuid()));
+
+        sharingGroup = mispAppClient.getMispSharingGroup(sharingGroup.getId());  // uuid not supported yet
+
+        // Asserting the Sharing Group now contains the expected Organisations.
+        List<OrganisationDTO> organisations = sharingGroup.getAllOrganisations();
+
+        // When adding an empty Sharing Group, MISP adds to it the user's organisation by default (expected size = 3)
+        assertThat(organisations.size(), is(3));
+        String orgAUuid = orgA.getUuid();
+        String orgBUuid = orgB.getUuid();
+
+        assertTrue(organisations.stream().filter(o -> o.getUuid().equals(orgAUuid))
+                .filter(o -> o.getName().equals(orgAName)).findFirst().isPresent());
+        assertTrue(organisations.stream().filter(o -> o.getUuid().equals(orgBUuid))
+                .filter(o -> o.getName().equals(orgBName)).findFirst().isPresent());
+    }
+
+    // This test creates a Sharing Group and adds two Organisations to it. Then attempts to remove these Organisations
+    // from the Sharing Group one by one. The organisations should not be a part of that Sharing Group after the remove operations.
+    @Test
+    public void updateMispSharingGroupRemoveOrganisationTest() {
+        SharingGroup sharingGroup = createSharingGroupObject();
+        sharingGroup = mispAppClient.addMispSharingGroup(sharingGroup);
+        OrganisationDTO orgA = new OrganisationDTO();
+        OrganisationDTO orgB = new OrganisationDTO();
+        String orgAName = "Test-" + RandomStringUtils.random(4, true, false);
+        String orgBName = "Test-" + RandomStringUtils.random(4, true, false);
+        orgA.setName(orgAName);
+        orgB.setName(orgBName);
+        orgA = mispAppClient.addMispOrganisation(orgA);
+        orgB = mispAppClient.addMispOrganisation(orgB);
+
+        // Adding these new Organisations to our new Sharing Group
+        mispAppClient.updateMispSharingGroupAddOrganisation(sharingGroup.getUuid(), orgA.getUuid());
+        mispAppClient.updateMispSharingGroupAddOrganisation(sharingGroup.getUuid(), orgB.getUuid());
+
+        sharingGroup = mispAppClient.getMispSharingGroup(sharingGroup.getId());  // uuid not supported yet
+        List<OrganisationDTO> organisations = sharingGroup.getAllOrganisations();
+        int initialSize = organisations.size();
+
+        assertTrue(mispAppClient.updateMispSharingGroupRemoveOrganisation(sharingGroup.getUuid(), orgA.getUuid()));
+        assertTrue(mispAppClient.updateMispSharingGroupRemoveOrganisation(sharingGroup.getUuid(), orgB.getUuid()));
+
+        sharingGroup = mispAppClient.getMispSharingGroup(sharingGroup.getId());  // uuid not supported yet
+        organisations = sharingGroup.getAllOrganisations();
+        assertThat(organisations.size(), is(initialSize-2));
+
+    }
+
     /*
     * Mocking Sharing Groups API tests
     * */

@@ -12,7 +12,7 @@
 
 	<groupId>com.intrasoft.csp</groupId>
 	<artifactId>parent-pom</artifactId>
-	<version>0.3.0-SNAPSHOT</version>
+	<version>3.6.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>CSP Applications</name>
 
@@ -22,9 +22,10 @@
 		<module>integration-layer</module>
 		<module>anonymization</module>
 		<module>configuration</module>
-		<module>vcbridgeadm</module>
+		<module>vcbridge</module>
 		<module>misp</module>
 		<module>libraries</module>
+        <module>regular-reports</module>
     </modules>
 
 	<properties>
@@ -35,6 +36,44 @@
 		<spring.retry.version>1.1.2.RELEASE</spring.retry.version>
         <camel.version>2.19.0</camel.version>
 	</properties>
+
+	<distributionManagement>
+		<repository>
+			<id>sastix-releases-repo</id>
+			<name>release</name>
+			<url>https://nexus.sastix.com/repository/maven-releases/</url>
+		</repository>
+		<snapshotRepository>
+			<id>sastix-snapshots-repo</id>
+			<name>snapshot</name>
+			<url>https://nexus.sastix.com/repository/maven-snapshots/</url>
+		</snapshotRepository>
+	</distributionManagement>
+
+	<repositories>
+		<repository>
+			<id>sastix-releases-repo</id>
+			<name>Private Sparks Repo</name>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+			<url>https://nexus.sastix.com/repository/maven-releases/</url>
+		</repository>
+		<repository>
+			<id>sastix-snapshots-repo</id>
+			<name>Private Sparks Repo</name>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+			<url>https://nexus.sastix.com/repository/maven-snapshots/</url>
+		</repository>
+	</repositories>
 
 	<build>
 		<pluginManagement>

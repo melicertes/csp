@@ -1,11 +1,5 @@
 package com.intrasoft.csp.misp.commons.models;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonRootName;
-
-import java.util.Map;
-
-
 
 //@JsonIgnoreProperties(ignoreUnknown = true)
 

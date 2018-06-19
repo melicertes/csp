@@ -1,0 +1,38 @@
+version: '2'
+
+services:
+  elasticsearch:
+    env_file:
+        - .env
+    image:  csp-elasticsearch:1.0
+    container_name: csp-es
+    domainname: ${LOCAL_DOMAIN}
+    hostname: csp-es
+    environment:
+      - cluster.name=CSP-cluster
+      - bootstrap.memory_lock=true
+      - xpack.security.enabled=false
+      - xpack.watcher.enabled=false
+      - "ES_JAVA_OPTS=-Xms4096m -Xmx4096m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+          soft: 65536
+          hard: 65536
+    mem_limit:  16g
+    volumes:
+      - ESDataVolume:/usr/share/elasticsearch/data
+    expose:
+      - ${ES_DOCR_PORT}
+      - 9300
+
+volumes:
+    ESDataVolume:
+      external: true
+
+networks:
+  default:
+    external:
+      name: ${LOCAL_DOMAIN}

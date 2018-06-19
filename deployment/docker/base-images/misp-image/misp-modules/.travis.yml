@@ -1,0 +1,37 @@
+language: python
+
+services:
+    - redis-server
+
+cache: pip
+
+python:
+    - "3.4"
+    - "3.5"
+    - "3.5-dev"
+    - "3.6"
+    - "3.6-dev"
+    - "nightly"
+
+install:
+    - pip install -U nose codecov pytest
+    - pip install -U -r REQUIREMENTS
+    - pip install .
+
+script:
+    - coverage run -m --parallel-mode --source=misp_modules misp_modules.__init__ &
+    - pid=$!
+    - sleep 5
+    - nosetests --with-coverage --cover-package=misp_modules
+    - kill -s INT $pid
+    - pushd ~/
+    - coverage run -m --parallel-mode --source=misp_modules misp_modules.__init__ -s &
+    - pid=$!
+    - popd
+    - sleep 5
+    - nosetests --with-coverage --cover-package=misp_modules
+    - kill -s INT $pid
+
+after_success:
+    - coverage combine .coverage*
+    - codecov

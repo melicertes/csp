@@ -1,0 +1,80 @@
+version: '3'
+services:
+
+    logstash:
+        image: docker.elastic.co/logstash/logstash:5.6.0
+        container_name: csp-logstash
+        domainname: ${LOCAL_DOMAIN}
+        hostname: csp-logstash
+        env_file:
+            - .env
+        environment:
+          - 'xpack.monitoring.enabled=false'
+        volumes:
+          - ./config/csp/logstash.conf:/usr/share/logstash/pipeline/logstash.conf
+
+    oam-logstash:
+        image: docker.elastic.co/logstash/logstash:5.6.0
+        container_name: csp-oam-logstash
+        domainname: ${LOCAL_DOMAIN}
+        hostname: csp-oam-logstash
+        env_file:
+            - .env
+        environment:
+          - 'xpack.monitoring.enabled=false'
+        volumes:
+          - ./config/oam/logstash.conf:/usr/share/logstash/pipeline/logstash.conf
+
+    misp-logstash:
+        image: docker.elastic.co/logstash/logstash:5.6.0
+        container_name: csp-misp-logstash
+        hostname: csp-misp-logstash
+        env_file:
+            - .env
+        environment:
+          - 'xpack.monitoring.enabled=false'
+        volumes:
+          - ./config/misp/logstash.conf:/usr/share/logstash/pipeline/logstash.conf
+
+    filebeat:
+         image: docker.elastic.co/beats/filebeat:5.6.0
+         depends_on:
+             - logstash
+         container_name: csp-filebeat
+         domainname: ${LOCAL_DOMAIN}
+         hostname: csp-filebeat
+         env_file:
+            - .env
+         volumes:
+            - ./config/csp/filebeat.yml:/usr/share/filebeat/filebeat.yml
+            - /opt/csp/logs/:/mnt/log/
+
+    oam-filebeat:
+         image: docker.elastic.co/beats/filebeat:5.6.0
+         depends_on:
+            - oam-logstash
+         container_name: csp-oam-filebeat
+         domainname: ${LOCAL_DOMAIN}
+         hostname: csp-oam-filebeat
+         env_file:
+            - .env
+         volumes:
+            - ./config/oam/filebeat.yml:/usr/share/filebeat/filebeat.yml
+            - /opt/csp/logs/:/mnt/log/
+
+    misp-filebeat:
+         image: docker.elastic.co/beats/filebeat:5.6.0
+         depends_on:
+            - misp-logstash
+         container_name: csp-misp-filebeat
+         hostname: csp-misp-filebeat
+         env_file:
+            - .env
+         volumes:
+            - ./config/misp/filebeat.yml:/usr/share/filebeat/filebeat.yml
+            - /opt/csp/logs_misp/:/mnt/log/
+
+networks:
+  default:
+    external:
+      name: ${LOCAL_DOMAIN}

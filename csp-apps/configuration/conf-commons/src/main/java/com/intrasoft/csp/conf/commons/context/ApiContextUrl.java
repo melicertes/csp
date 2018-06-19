@@ -1,7 +1,7 @@
 package com.intrasoft.csp.conf.commons.context;
 
 public interface ApiContextUrl {
-    String API_BASEURL = "/csp/confservice";
+    String API_BASEURL = "/api";
 
     String API_UPDATES = "/updates";
     String API_APPINFO = "/appInfo";

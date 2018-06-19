@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
+import com.intrasoft.csp.commons.model.Contact;
 import com.intrasoft.csp.commons.model.Team;
 import com.intrasoft.csp.commons.model.TrustCircle;
 import org.apache.commons.io.FileUtils;
@@ -45,6 +46,19 @@ public class TcMockUtil {
         return mapper.writeValueAsBytes(tc);
     }
 
+    public static byte[] getJsonBytesForLTCByShortName(URL url, String shortName) throws URISyntaxException, IOException {
+        String json = FileUtils.readFileToString(new File(url.toURI()), Charset.forName("UTF-8"));
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        mapper.registerModule(new JodaModule());
+        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        TrustCircle[] arr = mapper.readValue(json,TrustCircle[].class);
+        List<TrustCircle> list = Arrays.asList(arr);
+
+        //TrustCircle tc = list.stream().filter(t->t.getShortName().equals(shortName)).findAny().get();
+        return mapper.writeValueAsBytes(list);
+    }
+
     public static byte[] getJsonBytesForTeamByUuid(URL url, String uuid) throws URISyntaxException, IOException {
         String json = FileUtils.readFileToString(new File(url.toURI()), Charset.forName("UTF-8"));
         ObjectMapper mapper = new ObjectMapper();
@@ -55,5 +69,14 @@ public class TcMockUtil {
         List<Team> list = Arrays.asList(arr);
         Team team = list.stream().filter(t->t.getId().equals(uuid)).findAny().get();
         return mapper.writeValueAsBytes(team);
+    }
+
+    public static byte[] getJsonBytesForContactById(URL url, String id) throws URISyntaxException, IOException {
+        String json = FileUtils.readFileToString(new File(url.toURI()), Charset.forName("UTF-8"));
+        ObjectMapper mapper = new ObjectMapper();
+        Contact[] arr = mapper.readValue(json, Contact[].class);
+        List<Contact> list = Arrays.asList(arr);
+        Contact contact = list.stream().filter(c->c.getId().equals(id)).findAny().get();
+        return mapper.writeValueAsBytes(contact);
     }
 }

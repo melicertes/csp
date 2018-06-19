@@ -1,0 +1,115 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "title": "Validator for misp-objects",
+  "id": "https://www.github.com/MISP/misp-objects/schema.json",
+  "defs": {
+    "attribute": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "misp-attribute": {
+          "type": "string"
+        },
+        "ui-priority": {
+          "type": "number"
+        },
+        "categories": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        "values_list": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        "sane_default": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        "multiple": {
+          "type": "boolean"
+        },
+        "disable_correlation": {
+          "type": "boolean"
+        },
+        "to_ids": {
+          "type": "boolean"
+        },
+        "recommended": {
+          "type": "boolean"
+        },
+        "description": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "misp-attribute",
+        "ui-priority",
+        "description"
+      ]
+    }
+  },
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "meta-category": {
+      "type": "string",
+      "enum": [
+        "file",
+        "network",
+        "financial",
+        "misc",
+        "internal"
+      ]
+    },
+    "name": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "version": {
+      "type": "integer"
+    },
+    "uuid": {
+      "type": "string"
+    },
+    "attributes": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "$ref": "#/defs/attribute"
+      }
+    },
+    "requiredOneOf": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string"
+      }
+    },
+    "required": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "attributes",
+    "version",
+    "description",
+    "meta-category",
+    "name",
+    "uuid"
+  ]
+}

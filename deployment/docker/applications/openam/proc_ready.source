@@ -1,0 +1,38 @@
+
+COUNT=0
+F=/tmp/logs-oam-`date +%s`
+
+function is_ready() {
+   COUNT=$(( $COUNT + 1 ))
+
+   if [[ "$COUNT" -eq 60 ]] ;
+   then
+      echo "Too many attempts! Failed!"
+      return 100
+   fi
+
+   echo "Monitoring attempt $COUNT..."
+
+   docker inspect csp-oam >/dev/null
+   if [[ "$?" -gt 0 ]] ;
+   then
+   	echo "OpenAM Container not present (csp-oam not found)"
+	return 100;
+   fi
+
+   docker logs csp-oam &> $F
+   # we wait to see that deployment of openam.war has finished
+   # only happens at the end
+   fgrep "openam.war has finished in" $F
+   RET=$?
+   if [[ "$RET" -eq 0 ]] ;
+   then
+      echo "OpenAM appears ready. Waiting for 2 min more"
+      sleep 120
+      return 1
+   else
+      return 0
+   fi
+
+}
+
