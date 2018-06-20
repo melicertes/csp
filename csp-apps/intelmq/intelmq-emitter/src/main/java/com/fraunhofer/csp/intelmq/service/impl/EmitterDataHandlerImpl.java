@@ -77,7 +77,7 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler {
 			//misp conform event converting
 			dataObject = mapper.readTree(decodedString);
 			ObjectNode objectNodeEvent = mapper.createObjectNode();
-			objectNodeEvent.set("Event", dataObject);
+			objectNodeEvent.set(EVENT_NODE, dataObject);
 			dataObject = objectNodeEvent;
 
 		} catch (IOException ioex) {
@@ -138,7 +138,8 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler {
 		SharingParams sharingParams = new SharingParams();
 		sharingParams.setTcId(null);
 		sharingParams.setTeamId(null);
-		sharingParams.setIsExternal(false);
+		//setIsExternal(true) IL only sends to the prime app (MISP) and not to RT
+		sharingParams.setIsExternal(true);
 		sharingParams.setToShare(false);
 		/**
 		 * TODO Issue setToShare how does the setToShare from emitter
