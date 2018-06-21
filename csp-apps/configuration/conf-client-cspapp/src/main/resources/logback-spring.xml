@@ -7,14 +7,11 @@
     <include resource="org/springframework/boot/logging/logback/console-appender.xml" />
 
     <appender name="DB" class="ch.qos.logback.classic.db.DBAppender">
-
-        <connectionSource class="ch.qos.logback.core.db.DataSourceConnectionSource">
-            <dataSource class="com.zaxxer.hikari.HikariDataSource">
-                <driverClassName>${spring.datasource.driver-class-name}</driverClassName>
-                <jdbcUrl>${spring.datasource.url}</jdbcUrl>
-                <username>${spring.datasource.username}</username>
-                <password>${spring.datasource.password}</password>
-            </dataSource>
+        <connectionSource class="ch.qos.logback.core.db.DriverManagerConnectionSource">
+            <driverClass>${spring.datasource.driver-class-name}</driverClass>
+            <url>${spring.datasource.url}</url>
+            <user>${spring.datasource.username}</user>
+            <password>${spring.datasource.password}</password>
         </connectionSource>
     </appender>
 
