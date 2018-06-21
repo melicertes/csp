@@ -329,5 +329,10 @@ public class InstallationService {
         log.info("Total {} services to be updated, {} updated", forUpdate.size(), saved.size());
 
     }
+
+    @Transactional
+    public void deleteModule(SystemModule m) {
+        moduleRepository.delete(m.getId());
+    }
 }
 
