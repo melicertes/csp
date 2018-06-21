@@ -116,7 +116,40 @@ public class RestApiController implements ContextUrl, ApiContextUrl {
         }
         return dto;
     }
+    @RequestMapping(value = REST_EDIT_SMTP + "/{cspId}",
+            consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
+            produces = MediaType.APPLICATION_JSON_UTF8_VALUE,
+            method = RequestMethod.POST)
+    public ResponseDTO editSmtp(@PathVariable String cspId, @RequestBody RegistrationForm cspForm) {
+        SmtpDetails smtp = new SmtpDetails();
+        smtp.setHost(cspForm.getSmtp_host());
+        smtp.setPort(cspForm.getSmtp_port());
+        smtp.setUserName(cspForm.getSmtp_user());
+        smtp.setPassword(cspForm.getSmtp_pass());
+        smtp.setSenderEmail(cspForm.getSender_email());
+        smtp.setSenderName(cspForm.getSender_name());
 
+        SystemInstallationState state = installService.getState();
+        ResponseDTO dto = new ResponseDTO();
+
+        if (!state.getCspId().contentEquals(cspId)) {
+            dto.setResponseCode(-1);
+            dto.setResponseText("System error! csp is not recognised, please refresh the page.");
+        } else {
+            if (state.getSmtpDetails().equals(smtp)) {
+                log.info("No changes on SMTP details; no need to schedule update");
+                dto.setResponseText("Nothing to be applied. Page will automatically refresh.");
+                dto.setResponseCode(0);
+            } else {
+                state.setSmtpDetails(smtp);
+                state = installService.updateSystemInstallationState(state);
+                dto.setResponseCode(1);
+                dto.setResponseText("Changes have been saved ("+state.getSmtpDetails().hashCode()+"), restart of CSP is necessary.");
+                //TODO: schedule regeneration of common env.
+            }
+        }
+        return dto;
+    }
 
     @GetMapping(value = "/regenerateEnv")
     public void regenerateEnv() {

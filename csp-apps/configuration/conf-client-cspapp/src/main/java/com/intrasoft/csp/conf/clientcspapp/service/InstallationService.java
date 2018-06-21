@@ -203,6 +203,7 @@ public class InstallationService {
         return 95;
     }
 
+    @Transactional
     public SystemInstallationState updateSystemInstallationState(SystemInstallationState state) {
         return repo.save(state);
     }
