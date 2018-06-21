@@ -145,7 +145,9 @@ public class RestApiController implements ContextUrl, ApiContextUrl {
                 state = installService.updateSystemInstallationState(state);
                 dto.setResponseCode(1);
                 dto.setResponseText("Changes have been saved ("+state.getSmtpDetails().hashCode()+"), restart of CSP is necessary.");
-                //TODO: schedule regeneration of common env.
+                // lets regenerate environment
+
+                backgroundTaskService.scheduleEnvironmentCreation(false);
             }
         }
         return dto;
