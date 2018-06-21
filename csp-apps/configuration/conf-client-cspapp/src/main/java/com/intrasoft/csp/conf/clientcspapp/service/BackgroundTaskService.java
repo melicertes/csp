@@ -71,23 +71,23 @@ public class BackgroundTaskService {
         int memoryFoundMB = (int) (((com.sun.management.OperatingSystemMXBean) ManagementFactory
                 .getOperatingSystemMXBean()).getTotalPhysicalMemorySize()/ 1024 / 1024 );
 
-        int success = 0;
+        int failsFound = 0;
         log.info("Found OS         : {}", System.getProperty("os.name"));
 
         if (vcpusFound < vcpus) {
             log.warn("Found CPUs       : {}, Required: {} - FAIL", vcpusFound, vcpus);
-            success++;
+            failsFound++;
         }
         if (diskFreeMB < diskGb * 1024) {
             log.warn("Found Free space : {}MB, Required: {}MB - FAIL", diskFreeMB, diskGb * 1024);
-            success++;
+            failsFound++;
         }
 
         if (memoryFoundMB < memoryGb * 1024) {
             log.warn("Found Total RAM  : {}MB, Required: {}MB - FAIL", memoryFoundMB, memoryGb * 1024);
-            success++;
+            failsFound++;
         }
-        if (success > 0) {
+        if (failsFound > 0) {
             log.error("Requirements check result: FAILED");
         }
 
@@ -95,7 +95,7 @@ public class BackgroundTaskService {
             log.warn("Installation is forced due to configuration override");
             return true;
         } else
-            return success <= 0;
+            return failsFound <= 0;
     }
 
     @Getter
