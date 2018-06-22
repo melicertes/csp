@@ -221,10 +221,10 @@ public class BackgroundTaskService {
 
 
     /**
-     * starts every 1 hour and looks for old (inactive) modules.
+     * starts every 10 hour and looks for old (inactive) modules.
      * deletes from DB, disk and download folders
      */
-    @Scheduled(initialDelay = 25000, fixedDelay = 3600000)
+    @Scheduled(initialDelay = 25000, fixedDelay = 36000000)
     @SneakyThrows
     public void cleanUpOldModules() {
         final List<SystemModule> forDeletionList = installationService.queryAllModulesInstalled(true).stream()
@@ -239,7 +239,7 @@ public class BackgroundTaskService {
                     continue;
                 }
                 try {
-                    log.info("Cleanin up old module {}/{}", m.getId(), m.getName());
+                    log.info("Cleaning up old module {}/{}", m.getId(), m.getName());
                     storageService.deleteDirectoryAndContents(m.getModulePath());
                     log.info("Module directory deleted: {}", m.getModulePath());
                     Files.deleteIfExists(new File(m.getArchivePath()).toPath());
@@ -252,7 +252,7 @@ public class BackgroundTaskService {
 
             }
         } else {
-            log.info("Cleanup - module cleanup - nothing to clean");
+            log.debug("Cleanup - module cleanup - nothing to clean");
             return;
         }
 
@@ -260,17 +260,17 @@ public class BackgroundTaskService {
     }
 
     @SneakyThrows
-    public <S, R> void addTask(BackgroundTask<S, R> task) {
-        while (!backgroundTasks.offer(task)) {
+    public <S, R> void addTask(String taskDescription, BackgroundTask<S, R> task) {
+        while (!backgroundTasks.offer(new BackgroundTaskImpl(taskDescription,task))) {
             log.warn("Task {} was not submitted at this time, capacity full. Waiting 200ms", task);
             Thread.sleep(200);
         }
         log.info("Task {} was added for background work", countTasks.incrementAndGet());
     }
 
-    public <S, R> BackgroundTaskResult<S, R> retrieveResult(BackgroundTask<S, R> task) {
-        return completedTasks.get(task);
-    }
+//    public <S, R> BackgroundTaskResult<S, R> retrieveResult(BackgroundTask<S, R> task) {
+//        return completedTasks.get(task);
+//    }
 
     @Scheduled(fixedDelay = 10000, initialDelay = 30000)
     public void pollAndProcessTasks() {
@@ -281,15 +281,28 @@ public class BackgroundTaskService {
             backgroundTasks.drainTo(toDo);
             log.info("Found {} tasks to execute in the background",toDo.size());
             for (BackgroundTask t : toDo) {
-                log.info("Executing {}",t);
+                BackgroundTaskImpl impl = (BackgroundTaskImpl)t;
+                log.info("Executing Task {}/{}",impl.getDescription(), impl.getDelegate().toString());
                 final BackgroundTaskResult result = t.execute();
-                log.info("Completed, result is {}", result);
+                log.info("Completed Task {}/{} result is {}", impl.getDescription(), impl.getDelegate().toString(), result);
+                impl.setCompletionDate(LocalDateTime.now());
                 completedTasks.put(t,result);
             }
         }
-
     }
 
+    @Scheduled(cron = "0 1 0 * * ?")
+    public void reportExecutedTasks() {
+        final LocalDateTime yesterdayMidnight = LocalDateTime.now().withTime(0, 0, 0, 0).minusDays(1);
+        log.info("---- Completed tasks Report from {} to now ----",yesterdayMidnight);
+        completedTasks.keySet().stream()
+                .map( k -> (BackgroundTaskImpl)k)
+                .filter(k -> k.getCompletionDate().isAfter(yesterdayMidnight))
+                .sorted(Comparator.comparing(BackgroundTaskImpl::getCompletionDate))
+                .map( taskOfDay -> taskOfDay.getDescription() + " completed: " + taskOfDay.getCompletionDate())
+                .forEach(log::info);
+        log.info("--------------------------------");
+    }
 
     @Scheduled(fixedDelay = 360000, initialDelay = 5000)
     public void verifyInternetConnectivity() {
@@ -306,7 +319,7 @@ public class BackgroundTaskService {
     }
 
     public void scheduleDownload(final SystemModule module) {
-        addTask(() -> {
+        addTask("Download of "+module.getName(), () -> {
             if (installationService.canDownload() && internetAvailable) {
                 module.setModuleState(ModuleState.DOWNLOADING);
                 installationService.updateSystemModuleState(module.getId(), ModuleState.DOWNLOADING);
@@ -346,7 +359,7 @@ public class BackgroundTaskService {
 
 
     public void scheduleInternalCertsGeneration() {
-        addTask(() -> {
+        addTask("Internal Certificates Creation", () -> {
             try {
                 return executeScriptSimple(INTERNAL_CERTS_SH, null);
             } catch (IOException e) {
@@ -357,7 +370,7 @@ public class BackgroundTaskService {
     }
 
     public void scheduleExternalCertsGeneration() {
-        addTask(() -> {
+        addTask("External Certificates Creation", () -> {
             try {
                 Map<String,String> env = new HashMap<String, String>();
                 env.put("TMPDIR", tempDirectory);
@@ -372,7 +385,7 @@ public class BackgroundTaskService {
 
 
     public void scheduleEnvironmentCreation(boolean deleteContents) {
-        addTask(() -> {
+        addTask("Environment Creation (deleteContents="+deleteContents+")",() -> {
             try {
                 final SystemInstallationState state = installationService.getState();
                 final SmtpDetails smtp = state.getSmtpDetails();
@@ -423,7 +436,7 @@ public class BackgroundTaskService {
     }
 
     public void scheduleInstall(final SystemModule module) {
-        addTask(() -> {
+        addTask("Installation of module "+module.getName(), () -> {
             //extract module to destination location
             final File moduleDir = new File(modulesDirectory, module.getName() + module.getHash().substring(0,12));
             boolean isLegacy = false;
@@ -684,7 +697,7 @@ public class BackgroundTaskService {
     }
 
     public void scheduleReInstall(SystemModule module) {
-        addTask(() -> {
+        addTask("Reinstallation of module "+module.getName(), () -> {
             // the tasks below will happen in sequence:
             log.info("Re-install scheduling a DELETE with an INSTALL afterwards...");
             scheduleDelete(module);
@@ -694,7 +707,7 @@ public class BackgroundTaskService {
     }
 
     public void scheduleDelete(SystemModule module) {
-        addTask(() -> {
+        addTask("Deletion of module "+module.getName(), () -> {
             final SystemService service = installationService.queryService(module);
             if (service != null && service.getServiceState() == ServiceState.RUNNING) {
                 log.error("Service is running and cannot be deleted! STOP first and then delete.");
@@ -740,7 +753,7 @@ public class BackgroundTaskService {
 
 
     public void scheduleStartActiveModules() {
-        addTask(() -> {
+        addTask("Start of active modules", () -> {
 
             //we assume that following the guide, start is pressed after installation is complete.
             SystemInstallationState state = installationService.getState();
@@ -1023,7 +1036,7 @@ public class BackgroundTaskService {
 
 
     public void scheduleStopActiveModules() {
-        addTask(() -> {
+        addTask("Stopping modules", () -> {
             // for every active module, sort by priority
             installationService.queryAllModulesInstalled(false)
                 .stream()
