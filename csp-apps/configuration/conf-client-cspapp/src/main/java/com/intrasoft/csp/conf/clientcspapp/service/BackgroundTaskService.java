@@ -175,18 +175,20 @@ public class BackgroundTaskService {
 
     @PostConstruct
     public void verifyStartupState() {
-        //for the moment, we check if there are any modules in DOWNLOADING state and we modify them
-        // to be in unknown
-
-        installationService.queryModuleByState(ModuleState.DOWNLOADING)
-                .stream()
-                .map(m -> {
-                    m.setModuleState(ModuleState.UNKNOWN);
-                    m.setArchivePath(null);
-                    SystemModule mupd = installationService.saveSystemModule(m);
-                    return mupd.getId() +" / " + mupd.getName() + " has been reset from DOWNLOADING to UNKNOWN.";
-                })
-                .forEach(log::info);
+        addTask("Fixing Module States", () -> {
+            //for the moment, we check if there are any modules in DOWNLOADING state and we modify them
+            // to be in unknown
+            installationService.queryModuleByState(ModuleState.DOWNLOADING)
+                    .stream()
+                    .map(m -> {
+                        m.setModuleState(ModuleState.UNKNOWN);
+                        m.setArchivePath(null);
+                        SystemModule mupd = installationService.saveSystemModule(m);
+                        return mupd.getId() +" / " + mupd.getName() + " has been reset from DOWNLOADING to UNKNOWN.";
+                    })
+                    .forEach(log::info);
+            return new BackgroundTaskResult<String,Boolean>("Completed",true);
+        });
     }
 
 
