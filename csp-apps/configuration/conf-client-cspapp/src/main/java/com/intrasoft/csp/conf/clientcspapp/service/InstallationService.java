@@ -223,27 +223,25 @@ public class InstallationService {
     public boolean installDockerImages(SystemModule module) {
         File moduleDir = new File(module.getModulePath());
 
-        final List<BackgroundTaskResult<Boolean, Integer>> list = Stream.of(moduleDir.list((File dir, String name) -> {
-            if (name.endsWith("tar")||name.endsWith("bz2")) {
-                return true;
-            } else
-                return false;
-        })).map(fName -> {
-            Map<String, String> env = new HashMap<>();
-            env.put("ARCHIVE_FILE", fName);
-            env.put("WORK_DIR", moduleDir.getAbsolutePath());
+        final String[] compressedFiles = moduleDir.list((File dir, String name) -> name.endsWith("tar") || name.endsWith("bz2"));
+        if (compressedFiles != null) {
+            final List<BackgroundTaskResult<Boolean, Integer>> list = Stream.of(compressedFiles).map(fName -> {
+                Map<String, String> env = new HashMap<>();
+                env.put("ARCHIVE_FILE", fName);
+                env.put("WORK_DIR", moduleDir.getAbsolutePath());
 
-            try {
-                return backgroundTaskService.executeScriptSimple("dockerLoad.sh", env);
-            } catch (IOException e) {
-                log.error("Exception in load execution: {}", e.getMessage(), e);
-                return new BackgroundTaskResult<>(false, -1);
-            }
-        }).distinct().collect(Collectors.toList());
+                try {
+                    return backgroundTaskService.executeScriptSimple("dockerLoad.sh", env);
+                } catch (IOException e) {
+                    log.error("Exception in load execution: {}", e.getMessage(), e);
+                    return new BackgroundTaskResult<>(false, -1);
+                }
+            }).distinct().collect(Collectors.toList());
 
-        for (BackgroundTaskResult<Boolean, Integer> r : list) {
-            if (!r.getSuccess()) {
-                return false;
+            for (BackgroundTaskResult<Boolean, Integer> r : list) {
+                if (!r.getSuccess()) {
+                    return false;
+                }
             }
         }
         return true; //not a very nice way to handle errors in returns
@@ -335,6 +333,11 @@ public class InstallationService {
     @Transactional
     public void deleteModule(SystemModule m) {
         moduleRepository.delete(m.getId());
+    }
+
+    @Transactional
+    public List<SystemModule> queryModuleByState(ModuleState state) {
+        return moduleRepository.findByModuleStateOrderByStartPriority(state);
     }
 }
 

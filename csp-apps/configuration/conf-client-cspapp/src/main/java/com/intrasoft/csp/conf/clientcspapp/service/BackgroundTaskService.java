@@ -27,6 +27,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
+import javax.annotation.PostConstruct;
 import java.io.*;
 import java.lang.management.ManagementFactory;
 import java.net.InetSocketAddress;
@@ -170,6 +171,23 @@ public class BackgroundTaskService {
 
     @Autowired
     ObjectMapper jackson;
+
+
+    @PostConstruct
+    public void verifyStartupState() {
+        //for the moment, we check if there are any modules in DOWNLOADING state and we modify them
+        // to be in unknown
+
+        installationService.queryModuleByState(ModuleState.DOWNLOADING)
+                .stream()
+                .map(m -> {
+                    m.setModuleState(ModuleState.UNKNOWN);
+                    m.setArchivePath(null);
+                    SystemModule mupd = installationService.saveSystemModule(m);
+                    return mupd.getId() +" / " + mupd.getName() + " has been reset from DOWNLOADING to UNKNOWN.";
+                })
+                .forEach(log::info);
+    }
 
 
     @Scheduled(initialDelay = 10000, fixedRate = 600000)
@@ -340,7 +358,8 @@ public class BackgroundTaskService {
                         log.info("File has been received in temporary location for {}", module.getHash());
                         return new BackgroundTaskResult<SystemModule, Boolean>(module, true);
                     } else {
-                        return new BackgroundTaskResult<SystemModule, Boolean>(module,false);
+                        //return new BackgroundTaskResult<SystemModule, Boolean>(module,false);
+                        throw new IOException("Download did not complete as expected. Resetting module state.");
                     }
                 } catch (IOException ioe) {
                     module.setModuleState(ModuleState.UNKNOWN);
