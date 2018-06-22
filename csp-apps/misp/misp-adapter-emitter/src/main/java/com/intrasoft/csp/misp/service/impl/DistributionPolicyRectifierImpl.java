@@ -19,25 +19,46 @@ public class DistributionPolicyRectifierImpl implements DistributionPolicyRectif
     @Override
     public JsonNode rectifyEvent(JsonNode jsonNode) {
         LOG.debug("Rectifying event...");
-        // TODO Implementation
 
-        int eventDistributionLevel = getEventDistributionPolicyLevel(jsonNode);
+        // TODO Implementation for Objects and their attributes
 
-        JsonNode attributes = getEventAttributes(jsonNode);
+        deleteInvalidAttributes(jsonNode);
+
+
+        return jsonNode;
+    }
+
+    private void deleteInvalidAttributes(JsonNode jsonNode) {
+        // TODO switch for stand-alone attributes and object attributes
         ArrayNode attributesArray = (ArrayNode) jsonNode.path("Event").path("Attribute");
-        List<Integer> indexesToDelete = new ArrayList<>();
+        int eventDistributionLevel = getEventDistributionPolicyLevel(jsonNode);
+        List<String> idsToDelete = new ArrayList<>();
 
-        // Iterate any attributes and remove matches with lower distribution level from the event
-        for (int i = 0; i<attributesArray.size(); i++) {
-            int attributeDistributionLevel = Integer.parseInt(attributesArray.get(i).path("distribution").textValue());
+        attributesArray.forEach(attrib -> {
+            int attributeDistributionLevel = attrib.path("distribution").asInt();
             if (attributeDistributionLevel < eventDistributionLevel) {
-                indexesToDelete.add(i);
+                idsToDelete.add(attrib.path("id").textValue());
+            } else if (attributeDistributionLevel == 4 && attributeDistributionLevel == eventDistributionLevel) {
+                if ( attrib.path("sharing_group_id").asInt() != jsonNode.path("Event").path("sharing_group_id").asInt()) {
+                    idsToDelete.add(attrib.path("id").textValue());
+                }
+            }
+        });
+
+        int attribsDeleted = 0;
+        while (attribsDeleted < idsToDelete.size()) {
+            for (String id : idsToDelete) {
+                for (int i = 0; i < attributesArray.size(); i++) {
+                    if (attributesArray.get(i).path("id").textValue().equals(id)) {
+                        attributesArray.remove(i);
+                        attribsDeleted++;
+                        break;
+                    }
+                }
             }
         }
 
-        indexesToDelete.forEach(attributesArray::remove);
 
-        return jsonNode;
     }
 
     private int getEventDistributionPolicyLevel(JsonNode jsonNode) {
@@ -47,7 +68,7 @@ public class DistributionPolicyRectifierImpl implements DistributionPolicyRectif
     }
 
     private JsonNode getEventAttributes(JsonNode jsonNode) {
-        return jsonNode.path("Event").path("Attribute");
+        return jsonNode.path(MispEntity.EVENT.toString()).path("Attribute");
     }
 
 }
