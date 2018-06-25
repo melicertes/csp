@@ -2,11 +2,12 @@ package com.intrasoft.csp.misp.service;
 
 public enum DistributionPolicy {
 
-    YOUR_ORGANISATION_ONLY(1, "Your organisation only"),
-    THIS_COMMUNITY_ONLY(2, "This community only"),
-    CONNECTED_COMMUNITIES(3, "Connected communities"),
-    ALL_COMMUNITIES(4, "All communities"),
-    SHARING_GROUP(5, "Sharing Group");
+    YOUR_ORGANISATION_ONLY(0, "Your organisation only"),
+    THIS_COMMUNITY_ONLY(1, "This community only"),
+    CONNECTED_COMMUNITIES(2, "Connected communities"),
+    ALL_COMMUNITIES(3, "All communities"),
+    SHARING_GROUP(4, "Sharing Group"),
+    INHERIT_EVENT(5, "Inherit event");
 
     private final int level;
     private final String description;

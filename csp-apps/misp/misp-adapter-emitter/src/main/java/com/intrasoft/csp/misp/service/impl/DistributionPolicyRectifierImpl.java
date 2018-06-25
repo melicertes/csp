@@ -3,6 +3,7 @@ package com.intrasoft.csp.misp.service.impl;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.intrasoft.csp.misp.commons.config.MispContextUrl;
+import com.intrasoft.csp.misp.service.DistributionPolicy;
 import com.intrasoft.csp.misp.service.DistributionPolicyRectifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,30 +17,31 @@ public class DistributionPolicyRectifierImpl implements DistributionPolicyRectif
 
     private static final Logger LOG = LoggerFactory.getLogger(DistributionPolicyRectifierImpl.class);
 
+    // TODO Implementation for Objects and their attributes
     @Override
     public JsonNode rectifyEvent(JsonNode jsonNode) {
         LOG.debug("Rectifying event...");
 
-        // TODO Implementation for Objects and their attributes
+        int eventDistributionLevel = getEventDistributionPolicyLevel(jsonNode);
+        int eventSharinggroupId = jsonNode.path("Event").path("sharing_group_id").asInt();
 
-        deleteInvalidAttributes(jsonNode);
+        ArrayNode attributesArray = (ArrayNode) jsonNode.path("Event").path("Attribute");
 
+        deleteInvalidAttributes(attributesArray, eventDistributionLevel, eventSharinggroupId);
 
         return jsonNode;
     }
 
-    private void deleteInvalidAttributes(JsonNode jsonNode) {
-        // TODO switch for stand-alone attributes and object attributes
-        ArrayNode attributesArray = (ArrayNode) jsonNode.path("Event").path("Attribute");
-        int eventDistributionLevel = getEventDistributionPolicyLevel(jsonNode);
+    private void deleteInvalidAttributes(ArrayNode attributesArray, int eventDistributionLevel, int eventSharingGroupId) {
+
         List<String> idsToDelete = new ArrayList<>();
 
         attributesArray.forEach(attrib -> {
             int attributeDistributionLevel = attrib.path("distribution").asInt();
             if (attributeDistributionLevel < eventDistributionLevel) {
                 idsToDelete.add(attrib.path("id").textValue());
-            } else if (attributeDistributionLevel == 4 && attributeDistributionLevel == eventDistributionLevel) {
-                if ( attrib.path("sharing_group_id").asInt() != jsonNode.path("Event").path("sharing_group_id").asInt()) {
+            } else if (attributeDistributionLevel == DistributionPolicy.SHARING_GROUP.getLevel() && attributeDistributionLevel == eventDistributionLevel) {
+                if ( attrib.path("sharing_group_id").asInt() != eventSharingGroupId) {
                     idsToDelete.add(attrib.path("id").textValue());
                 }
             }
