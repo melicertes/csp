@@ -10,10 +10,12 @@ import com.intrasoft.csp.conf.commons.utils.VersionParser;
 import com.intrasoft.csp.conf.server.domain.entities.*;
 import com.intrasoft.csp.conf.server.repository.*;
 import com.intrasoft.csp.conf.server.utils.FileHelper;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
@@ -24,6 +26,9 @@ import org.springframework.stereotype.Service;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -184,16 +189,16 @@ public class ConfService implements ApiContextUrl, Configuration {
             headers.add("Pragma", "no-cache");
             headers.add("Expires", "0");
             headers.add("Content-Disposition", "attachment; filename=\"" + updateFile.getName() + "\"");
-
-            InputStreamResource inputStreamResource = new InputStreamResource(new FileInputStream(updateFile));
+            
+            byte[] content = Files.readAllBytes(Paths.get(updateFile.getAbsolutePath()));
 
             LOG_AUDIT.info(logInfo + StatusResponseType.OK.text());
             return ResponseEntity
                     .ok()
                     .headers(headers)
-                    .contentLength(inputStreamResource.contentLength())
+                    .contentLength(content.length)
                     .contentType(MediaType.parseMediaType(fileMediaType))
-                    .body(new InputStreamResource(new FileInputStream(updateFile)));
+                    .body(content);
 
         } catch (IOException e) {
             throw new UpdateNotFoundException(StatusResponseType.API_UPDATE_NOT_FOUND.text());
