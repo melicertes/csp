@@ -3,6 +3,7 @@ package com.intrasoft.csp.misp.tests.sandbox;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import static com.intrasoft.csp.misp.commons.config.MispContextUrl.*;
 import com.intrasoft.csp.misp.service.DistributionPolicyRectifier;
 import com.intrasoft.csp.misp.service.impl.DistributionPolicyRectifierImpl;
 import org.apache.commons.io.IOUtils;
@@ -40,7 +41,7 @@ public class DistributionPolicyRectifierTest {
 
     Resource zmqEventSampleA = new ClassPathResource("json/zmqEventA.json");
     Resource zmqEventWithAttributes = new ClassPathResource("json/zmqEventWithAttribs.json");
-    Resource zmqEventSamplePlain = new ClassPathResource("json/zmqEventPlain.json");
+    Resource zmqEventWithObjects = new ClassPathResource("json/zmqEventWithObjs.json");
 
     @Before
     public void init() {
@@ -87,7 +88,7 @@ public class DistributionPolicyRectifierTest {
 
         assertTrue( (idsFound.contains(shouldKeepIds[0])));
 
-        // Search in attributes array for ids that should not be present (deleted by method in test)
+        // Search in attributes array for ids that should not be present (deleted by the method in test)
         for (int id : shouldDeleteIds) {
             attributesArray.forEach(attrib -> {
                 if (attrib.get("id").asInt() == id)
@@ -139,7 +140,7 @@ public class DistributionPolicyRectifierTest {
         assertTrue( (idsFound.contains(shouldKeepIds[0])));
         assertTrue( (idsFound.contains(shouldKeepIds[1])));
 
-        // Search in attributes array for ids that should not be present (deleted by method in test)
+        // Search in attributes array for ids that should not be present (deleted by the method in test)
         for (int id : shouldDeleteIds) {
             attributesArray.forEach(attrib -> {
                 if (attrib.get("id").asInt() == id)
@@ -152,6 +153,134 @@ public class DistributionPolicyRectifierTest {
         });
 
     }
+
+
+    // According to SXCSP-505, for the given resource:
+    //    - Objects having "Inherit event" as their distribution policy must not be deleted (object ids 3,4)
+    //    - Objects having a stricter policy must be deleted (object ids 5,6)
+    // ** This is an object-level test (not testing nested attributes)
+    @Test
+    public void rectifyEventShouldKeepTwoObjectsTest() {
+
+        event = getResourceAsJsonNode(zmqEventWithObjects);
+
+        // Get the event's objects into an array and get hold of its size
+        ArrayNode objectsArray = (ArrayNode) event.path(MispEntity.EVENT.toString()).path(MispEntity.OBJECT.toString());
+        int initialNumberOfObjects = objectsArray.size();
+
+        // Objects' ids
+        int[] shouldKeepObjIds = {3, 4};
+        int[] shouldDeleteObjIds = {5, 6};
+
+        Map<Integer, Boolean> objectsMap = new HashMap<>();
+        for (int id : shouldDeleteObjIds) {
+            objectsMap.put(id, false);
+        }
+
+        List<Integer> objIdsFound = new ArrayList<>();
+
+        distributionPolicyRectifier.rectifyEvent(event);
+
+        // Search in attributes array for ids that should be present
+        for (int objToKeepId : shouldKeepObjIds) {
+            objectsArray.forEach(attrib -> {
+                if (attrib.get("id").textValue().equals(String.valueOf(objToKeepId)))
+                    objIdsFound.add(objToKeepId);
+            });
+        }
+        assertTrue( (objIdsFound.contains(shouldKeepObjIds[0])));
+        assertTrue( (objIdsFound.contains(shouldKeepObjIds[1])));
+
+        // Search in attributes array for ids that should not be present (deleted by the method in test)
+        for (int id : shouldDeleteObjIds) {
+            objectsArray.forEach(attrib -> {
+                if (attrib.get("id").asInt() == id)
+                    objectsMap.replace(id, true);
+            });
+        }
+
+        objectsMap.forEach( (k,v) -> {
+            assertFalse(v);
+        });
+
+    }
+
+/*
+     According to SXCSP-505, for the given resource:
+       - Objects having "Inherit event" as their distribution policy must not be deleted, as well as their
+         attributes as long as they follow the rules described in SXCSP-505 (in this case, all of the object's
+         attributes also have a distribution policy of "Inherit event").
+         Therefore, Object with Id 3 and all of its attributes should not be deleted.
+       - Objects having the same distribution policy as the event must not be deleted. However, each of their
+         attributes have their own distribution policy, hence they should follow the rules described in SXCSP-505.
+         Object with Id 4 should not be deleted, but any of its attributes not following the distribution policy
+         rules should. Therefore:
+           - Attribute with Id 27 should be deleted because although it's distribution policy is the same as
+             the event's (sharing group), it has a different sharing group id, which is not allowed and should be deleted.
+           - Attributes with Ids 28 and 32 should be deleted (have a stricter distribution policy than the event).
+           - Attributes with Ids 29,30,31, 33, 34 should not be deleted (inherit event policy).
+*/
+    @Test
+    public void rectifyEventObjectAttributesTest() {
+
+        event = getResourceAsJsonNode(zmqEventWithObjects);
+
+        // Get the event's objects
+        ArrayNode objectsArray = (ArrayNode) event.path(MispEntity.EVENT.toString()).path(MispEntity.OBJECT.toString());
+
+        int objId3expectedNumberOfAttributes = 9;
+        int objId4expectedNumberOfAttributes = 5;
+
+        // Expected attribute Ids
+        int[] shouldKeepIds = { 29, 30, 31, 33, 34 };
+        int[] shouldDeleteIds = { 27, 28, 32 };
+
+        Map<Integer, Boolean> attribMap = new HashMap<>();
+        for (int id : shouldDeleteIds) {
+            attribMap.put(id, false);
+        }
+
+        List<Integer> idsFound = new ArrayList<>();
+
+        // Invoke the method in test
+        distributionPolicyRectifier.rectifyEvent(event);
+
+        // Assert that we have the expected number of attributes for each object
+        for (JsonNode object : objectsArray) {
+            if (object.path("id").asInt()==3) {
+                ArrayNode objId3AttribsArray = (ArrayNode) object.path(MispEntity.ATTRIBUTE.toString());
+                assertTrue(objId3AttribsArray.size()==objId3expectedNumberOfAttributes);
+            }
+            if (object.path("id").asInt()==4) {
+                ArrayNode objId4AttribsArray = (ArrayNode) object.path(MispEntity.ATTRIBUTE.toString());
+                assertTrue(objId4AttribsArray.size()==objId4expectedNumberOfAttributes);
+                for (int attribToKeepId : shouldKeepIds) {
+                    objId4AttribsArray.forEach(attrib -> {
+                        if (attrib.get("id").textValue().equals(String.valueOf(attribToKeepId)))
+                            idsFound.add(attribToKeepId);
+                    });
+                }
+                for (int id : shouldDeleteIds) {
+                    objId4AttribsArray.forEach(attrib -> {
+                        if (attrib.get("id").asInt() == id)
+                            attribMap.replace(id, true);
+                    });
+                }
+            }
+        }
+
+
+        for (int id : shouldKeepIds) {
+            assertTrue( (idsFound.contains(id)));
+        }
+
+        attribMap.forEach( (k,v) -> {
+            assertFalse(v);
+        });
+
+
+    }
+
 
     private JsonNode getResourceAsJsonNode(Resource resource) {
         JsonNode jsonNode = null;
