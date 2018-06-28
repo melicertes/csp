@@ -17,7 +17,6 @@ public class DistributionPolicyRectifierImpl implements DistributionPolicyRectif
 
     private static final Logger LOG = LoggerFactory.getLogger(DistributionPolicyRectifierImpl.class);
 
-    // TODO Implementation for Objects and their attributes
     @Override
     public JsonNode rectifyEvent(JsonNode jsonNode) {
         LOG.debug("Rectifying event...");
@@ -25,24 +24,40 @@ public class DistributionPolicyRectifierImpl implements DistributionPolicyRectif
         int eventDistributionLevel = getEventDistributionPolicyLevel(jsonNode);
         int eventSharinggroupId = jsonNode.path("Event").path("sharing_group_id").asInt();
 
-        ArrayNode attributesArray = (ArrayNode) jsonNode.path("Event").path("Attribute");
+        MispEntity[] entitiesArray = {MispEntity.ATTRIBUTE, MispEntity.OBJECT};
 
-        deleteInvalidAttributes(attributesArray, eventDistributionLevel, eventSharinggroupId);
+        for (MispEntity entity : entitiesArray) {
+            ArrayNode entityArray = (ArrayNode) jsonNode.path(MispEntity.EVENT.toString()).path(entity.toString());
+            // LOG.debug(entity.toString() + " occurances: " + entityArray.size());
+            if (entityArray.size()>0) {
+                if (entity.equals(MispEntity.OBJECT)) {
+                    // First pass
+                    removeNonShareableNodes(entityArray, eventDistributionLevel, eventSharinggroupId);
+                    // Object attributes
+                    ArrayNode objAttribsArray;
+                    for (JsonNode eventObject : entityArray) {
+                        objAttribsArray = (ArrayNode) eventObject.path(MispEntity.ATTRIBUTE.toString());
+                        removeNonShareableNodes(objAttribsArray, eventDistributionLevel, eventSharinggroupId);
+                    }
+                }
+                removeNonShareableNodes(entityArray, eventDistributionLevel, eventSharinggroupId);
+            }
+        }
 
         return jsonNode;
     }
 
-    private void deleteInvalidAttributes(ArrayNode attributesArray, int eventDistributionLevel, int eventSharingGroupId) {
+    private void removeNonShareableNodes(ArrayNode arrayNode, int eventDistributionLevel, int eventSharingGroupId) {
 
         List<String> idsToDelete = new ArrayList<>();
 
-        attributesArray.forEach(attrib -> {
-            int attributeDistributionLevel = attrib.path("distribution").asInt();
+        arrayNode.forEach(node -> {
+            int attributeDistributionLevel = node.path("distribution").asInt();
             if (attributeDistributionLevel < eventDistributionLevel) {
-                idsToDelete.add(attrib.path("id").textValue());
+                idsToDelete.add(node.path("id").textValue());
             } else if (attributeDistributionLevel == DistributionPolicy.SHARING_GROUP.getLevel() && attributeDistributionLevel == eventDistributionLevel) {
-                if ( attrib.path("sharing_group_id").asInt() != eventSharingGroupId) {
-                    idsToDelete.add(attrib.path("id").textValue());
+                if ( node.path("sharing_group_id").asInt() != eventSharingGroupId) {
+                    idsToDelete.add(node.path("id").textValue());
                 }
             }
         });
@@ -50,16 +65,15 @@ public class DistributionPolicyRectifierImpl implements DistributionPolicyRectif
         int attribsDeleted = 0;
         while (attribsDeleted < idsToDelete.size()) {
             for (String id : idsToDelete) {
-                for (int i = 0; i < attributesArray.size(); i++) {
-                    if (attributesArray.get(i).path("id").textValue().equals(id)) {
-                        attributesArray.remove(i);
+                for (int i = 0; i < arrayNode.size(); i++) {
+                    if (arrayNode.get(i).path("id").textValue().equals(id)) {
+                        arrayNode.remove(i);
                         attribsDeleted++;
                         break;
                     }
                 }
             }
         }
-
 
     }
 
@@ -70,7 +84,7 @@ public class DistributionPolicyRectifierImpl implements DistributionPolicyRectif
     }
 
     private JsonNode getEventAttributes(JsonNode jsonNode) {
-        return jsonNode.path(MispEntity.EVENT.toString()).path("Attribute");
+        return jsonNode.path(MispEntity.EVENT.toString()).path(MispEntity.ATTRIBUTE.toString());
     }
 
 }
