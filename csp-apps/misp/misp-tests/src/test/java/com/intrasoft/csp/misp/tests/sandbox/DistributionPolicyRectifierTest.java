@@ -3,7 +3,7 @@ package com.intrasoft.csp.misp.tests.sandbox;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import static com.intrasoft.csp.misp.commons.config.MispContextUrl.*;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.intrasoft.csp.misp.service.DistributionPolicyRectifier;
 import com.intrasoft.csp.misp.service.impl.DistributionPolicyRectifierImpl;
 import org.apache.commons.io.IOUtils;
@@ -21,9 +21,9 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import java.io.IOException;
 import java.util.*;
 
+import static com.intrasoft.csp.misp.commons.config.MispContextUrl.*;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertFalse;
-import static org.hamcrest.MatcherAssert.assertThat;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = {DistributionPolicyRectifierImpl.class, ObjectMapper.class})
@@ -278,6 +278,45 @@ public class DistributionPolicyRectifierTest {
             assertFalse(v);
         });
 
+
+    }
+
+    // According to SXCSP-505, distribution level should be changed:
+    //   - this community        -> your organisation (1 -> 0)
+    //   - connected communities -> this community    (2 -> 1)
+    @Test
+    public void rectifyEventChangesEventDistributionLevelTest() {
+
+        event = getResourceAsJsonNode(zmqEventWithObjects);
+
+        // Modifying resource's distribution level in-memory for this test.
+        // Scenario A: Event's distribution level is 1 ("This community").
+        ( (ObjectNode) event).findParent("distribution").put("distribution", "1");
+
+        distributionPolicyRectifier.rectifyEvent(event);
+
+        assertTrue(event.path(MispEntity.EVENT.toString()).path("distribution").asInt()==0);
+
+        // Scenario B: Event's distribution level is 2 ("Connected communities").
+        ( (ObjectNode) event).findParent("distribution").put("distribution", "2");
+
+        distributionPolicyRectifier.rectifyEvent(event);
+
+        assertTrue(event.path(MispEntity.EVENT.toString()).path("distribution").asInt()==1);
+
+        // Scenario C: Event's distribution level is > 2 and should stay the same
+        ( (ObjectNode) event).findParent("distribution").put("distribution", "3");
+
+        distributionPolicyRectifier.rectifyEvent(event);
+
+        assertTrue(event.path(MispEntity.EVENT.toString()).path("distribution").asInt()==3);
+
+        // Scenario D: Event's distribution level is < 1 and should stay the same
+        ( (ObjectNode) event).findParent("distribution").put("distribution", "0");
+
+        distributionPolicyRectifier.rectifyEvent(event);
+
+        assertTrue(event.path(MispEntity.EVENT.toString()).path("distribution").asInt()==0);
 
     }
 

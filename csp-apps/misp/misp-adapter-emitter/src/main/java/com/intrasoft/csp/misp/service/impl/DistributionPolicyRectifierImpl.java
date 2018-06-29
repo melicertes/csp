@@ -2,6 +2,7 @@ package com.intrasoft.csp.misp.service.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.intrasoft.csp.misp.commons.config.MispContextUrl;
 import com.intrasoft.csp.misp.service.DistributionPolicy;
 import com.intrasoft.csp.misp.service.DistributionPolicyRectifier;
@@ -23,6 +24,10 @@ public class DistributionPolicyRectifierImpl implements DistributionPolicyRectif
 
         int eventDistributionLevel = getEventDistributionPolicyLevel(jsonNode);
         int eventSharinggroupId = jsonNode.path("Event").path("sharing_group_id").asInt();
+
+        // SXCSP-503: Change Distribution to one lower state (2 -> 1, 1 -> 0)
+        if (eventDistributionLevel == 2 || eventDistributionLevel == 1)
+            ( (ObjectNode) jsonNode).findParent("distribution").put("distribution", eventDistributionLevel-1);
 
         MispEntity[] entitiesArray = {MispEntity.ATTRIBUTE, MispEntity.OBJECT};
 
