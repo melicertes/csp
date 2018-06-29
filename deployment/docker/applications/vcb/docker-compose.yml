@@ -21,7 +21,7 @@ services:
     expose:
       - 80
     volumes:
-      - /opt/csp/logs/:/var/log/jitsi
+      - /opt/csp/logs_jitsi:/var/log/jitsi
     networks:
       default:
         aliases:
