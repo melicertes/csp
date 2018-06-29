@@ -112,15 +112,16 @@ public class InstallationService {
 
     public SystemModule queryModuleByName(String name, boolean active) {
         List<SystemModule> module = moduleRepository.findByNameAndActiveOrderByIdDesc(name, active);
-        if (module != null && module.size()==1) {
-            log.info("Module list size : {} retrieved!", module.size());
-            return module.get(0);
-        } else if (module.size() > 0){
-            log.error("SYSTEM ERROR; Modules are active: {} cannot have same name and active=true more than once!!!", module);
-        } else if (module.size() <= 0) {
-            log.error("SYSTEM ERROR; Module with name {} and active {} is not found?",
-                    name, active);
-        }
+        if (module != null)
+            if (module.size()==1) {
+                log.info("Module list size : {} retrieved!", module.size());
+                return module.get(0);
+            } else if (module.size() > 1){
+                log.error("SYSTEM ERROR; Modules are active: {} cannot have same name and active=true more than once!!!", module);
+            } else {
+                log.error("SYSTEM ERROR; Module with name {} and active {} is not found?",
+                        name, active);
+            }
         return null;
     }
 
@@ -203,6 +204,7 @@ public class InstallationService {
         return 95;
     }
 
+    @Transactional
     public SystemInstallationState updateSystemInstallationState(SystemInstallationState state) {
         return repo.save(state);
     }
@@ -221,27 +223,25 @@ public class InstallationService {
     public boolean installDockerImages(SystemModule module) {
         File moduleDir = new File(module.getModulePath());
 
-        final List<BackgroundTaskResult<Boolean, Integer>> list = Stream.of(moduleDir.list((File dir, String name) -> {
-            if (name.endsWith("tar")||name.endsWith("bz2")) {
-                return true;
-            } else
-                return false;
-        })).map(fName -> {
-            Map<String, String> env = new HashMap<>();
-            env.put("ARCHIVE_FILE", fName);
-            env.put("WORK_DIR", moduleDir.getAbsolutePath());
+        final String[] compressedFiles = moduleDir.list((File dir, String name) -> name.endsWith("tar") || name.endsWith("bz2"));
+        if (compressedFiles != null) {
+            final List<BackgroundTaskResult<Boolean, Integer>> list = Stream.of(compressedFiles).map(fName -> {
+                Map<String, String> env = new HashMap<>();
+                env.put("ARCHIVE_FILE", fName);
+                env.put("WORK_DIR", moduleDir.getAbsolutePath());
 
-            try {
-                return backgroundTaskService.executeScriptSimple("dockerLoad.sh", env);
-            } catch (IOException e) {
-                log.error("Exception in load execution: {}", e.getMessage(), e);
-                return new BackgroundTaskResult<>(false, -1);
-            }
-        }).distinct().collect(Collectors.toList());
+                try {
+                    return backgroundTaskService.executeScriptSimple("dockerLoad.sh", env);
+                } catch (IOException e) {
+                    log.error("Exception in load execution: {}", e.getMessage(), e);
+                    return new BackgroundTaskResult<>(false, -1);
+                }
+            }).distinct().collect(Collectors.toList());
 
-        for (BackgroundTaskResult<Boolean, Integer> r : list) {
-            if (!r.getSuccess()) {
-                return false;
+            for (BackgroundTaskResult<Boolean, Integer> r : list) {
+                if (!r.getSuccess()) {
+                    return false;
+                }
             }
         }
         return true; //not a very nice way to handle errors in returns
@@ -328,6 +328,16 @@ public class InstallationService {
         final List<SystemService> saved = serviceRepository.save(forUpdate);
         log.info("Total {} services to be updated, {} updated", forUpdate.size(), saved.size());
 
+    }
+
+    @Transactional
+    public void deleteModule(SystemModule m) {
+        moduleRepository.delete(m.getId());
+    }
+
+    @Transactional
+    public List<SystemModule> queryModuleByState(ModuleState state) {
+        return moduleRepository.findByModuleStateOrderByStartPriority(state);
     }
 }
 

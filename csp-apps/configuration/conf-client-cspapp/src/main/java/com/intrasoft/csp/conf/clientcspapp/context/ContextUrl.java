@@ -5,12 +5,14 @@ public interface ContextUrl {
 
     String PAGE_DASHBOARD = "/dashboard.html";
     String PAGE_INSTALL = "/install.html";
+    String PAGE_SMTP = "/install-smtp.html";
     String PAGE_UPDATES = "/updates.html";
     String PAGE_SYSTEM = "/system.html";
     String PAGE_STATUS = "/status.html";
 
     String PAGE_LINKS = "/links.html";
 
+    String REST_EDIT_SMTP = "/editSmtp";
     String REST_REGISTER_FILES = "/registerFiles";
     String REST_REGISTER = "/register";
     String REST_LOG = "/log";
