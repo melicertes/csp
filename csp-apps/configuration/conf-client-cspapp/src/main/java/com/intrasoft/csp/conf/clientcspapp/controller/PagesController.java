@@ -3,6 +3,7 @@ package com.intrasoft.csp.conf.clientcspapp.controller;
 
 import com.intrasoft.csp.conf.clientcspapp.context.ContextUrl;
 import com.intrasoft.csp.conf.clientcspapp.model.ServiceState;
+import com.intrasoft.csp.conf.clientcspapp.model.SystemInstallationState;
 import com.intrasoft.csp.conf.clientcspapp.model.SystemService;
 import com.intrasoft.csp.conf.clientcspapp.service.BackgroundTaskService;
 import com.intrasoft.csp.conf.clientcspapp.service.InstallationService;
@@ -89,6 +90,23 @@ public class PagesController implements ContextUrl {
             return new ModelAndView("pages/install-register", "install-register", model);
         }
     }
+
+    @RequestMapping(value = PAGE_SMTP, method = RequestMethod.GET)
+    public ModelAndView editSmtp(Model model) {
+
+        final SystemInstallationState state = installService.getState();
+
+        model = this.init(model);
+        model.addAttribute("navInstallClassActive", "active");
+
+        model.addAttribute("smtp", state.getSmtpDetails());
+        model.addAttribute("cspId", state.getCspId());
+
+        model.addAttribute("editSmtpApi", REST_EDIT_SMTP);
+
+        return new ModelAndView("pages/install-smtp", "install-smtp", model);
+    }
+
 
     @RequestMapping(value = PAGE_UPDATES, method = RequestMethod.GET)
     public ModelAndView updates(Model model) {
@@ -197,6 +215,7 @@ public class PagesController implements ContextUrl {
     private Model init(Model m) {
         m.addAttribute("dashboardUrl", PAGE_DASHBOARD);
         m.addAttribute("installUrl", PAGE_INSTALL);
+        m.addAttribute("installSmtpUrl", PAGE_SMTP);
         m.addAttribute("updatesUrl", PAGE_UPDATES);
         m.addAttribute("systemUrl", PAGE_SYSTEM);
         m.addAttribute("statusUrl", PAGE_STATUS);

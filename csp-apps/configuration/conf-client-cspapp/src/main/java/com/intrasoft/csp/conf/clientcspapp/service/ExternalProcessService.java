@@ -2,7 +2,9 @@ package com.intrasoft.csp.conf.clientcspapp.service;
 
 import com.intrasoft.csp.conf.clientcspapp.model.LoggingEvent;
 import com.intrasoft.csp.conf.clientcspapp.repo.LoggingEventRepository;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -14,7 +16,7 @@ import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
-import java.util.stream.Collector;
+import java.util.stream.Stream;
 
 /**
  * Created by tangelatos on 10/09/2017.
@@ -36,22 +38,6 @@ public class ExternalProcessService {
     public List<LoggingEvent> getLastEntries(int lastEntries) {
         return logRepository.findAll(new PageRequest(0, lastEntries, new Sort(Sort.Direction.DESC, "timestamp"))).getContent();
     }
-
-
-    public static <T> Collector<T, ?, List<T>> lastN(int n) {
-        return Collector.<T, Deque<T>, List<T>>of(ArrayDeque::new, (acc, t) -> {
-            if(acc.size() == n) {
-                acc.pollFirst();
-            }
-            acc.add(t);
-        }, (acc1, acc2) -> {
-            while(acc2.size() < n && !acc1.isEmpty()) {
-                acc2.addFirst(acc1.pollLast());
-            }
-            return acc2;
-        }, ArrayList<T>::new);
-    }
-
 
     public int executeExternalProcess(String workingDirectory, Optional<Map<String,String>> environment, String... processAndArguments) {
 
@@ -76,9 +62,10 @@ public class ExternalProcessService {
             return EXEC_ERROR;
         }
         // we should be ready.
+        final StreamGobbler inputGobbler = new StreamGobbler(proc.getInputStream(), log::info );
+        final StreamGobbler errorGobbler = new StreamGobbler(proc.getErrorStream(), log::error );
+
         try  {
-            final StreamGobbler inputGobbler = new StreamGobbler(proc.getInputStream(), log::info );
-            final StreamGobbler errorGobbler = new StreamGobbler(proc.getErrorStream(), log::error );
             threadPool.submit(inputGobbler);
             threadPool.submit(errorGobbler);
 
@@ -88,26 +75,30 @@ public class ExternalProcessService {
         } catch (InterruptedException e) {
             log.error("Process {} failed in execution: {}", processAndArguments, e.getMessage());
             log.error("Exception",e);
+        } finally {
+            IOUtils.closeQuietly(inputGobbler.getStream());
+            IOUtils.closeQuietly(errorGobbler.getStream());
         }
         return EXEC_ERROR;
     }
 
 
 
+    @Getter
     private static class StreamGobbler implements Runnable {
-        private InputStream inputStream;
+        private InputStream stream;
         private Consumer<String> consumer;
 
         public StreamGobbler(InputStream inputStream, Consumer<String> consumer) {
-            this.inputStream = inputStream;
+            this.stream = inputStream;
             this.consumer = consumer;
         }
 
         @Override
         public void run() {
             log.debug("StreamGobler started");
-            new BufferedReader(new InputStreamReader(inputStream)).lines()
-                    .forEach(consumer);
+            Stream<String> lines = new BufferedReader(new InputStreamReader(stream)).lines();
+            lines.forEach(consumer);
             log.debug("StreamGobler complete");
         }
     }

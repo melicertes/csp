@@ -41,7 +41,7 @@ services:
         restart: on-failure
         working_dir: /opt/csp
         volumes:
-            - ./misp-server-3.6.0-SNAPSHOT-exec.jar:/opt/csp/server.jar
+            - ./misp-server-3.8.0-SNAPSHOT-exec.jar:/opt/csp/server.jar
             - /opt/csp/logs/:/opt/csplogs
             - SSLDatavolume:/opt/ssl/
             - MISPAdapterDatavolume:${MISP_ADAPTER_PATH_REPO}

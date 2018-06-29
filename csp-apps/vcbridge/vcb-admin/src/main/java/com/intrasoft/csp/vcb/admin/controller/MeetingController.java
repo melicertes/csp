@@ -111,25 +111,15 @@ public class MeetingController {
 
 	@PostMapping("/createMeeting")
 	public String createMeeting(@Valid @ModelAttribute("meetingForm") MeetingForm meetingForm,
-			BindingResult bindingResult, Authentication auth) {
+			BindingResult bindingResult, Authentication auth, Model model) {
 		List<ParticipantForm> emails = meetingForm.getEmails().stream()
 				.filter(s -> Objects.nonNull(s) && s.getEmail() != null && (!s.getEmail().trim().isEmpty()))
 				.collect(Collectors.toList());
-		// log.debug(emails.toString());
-		// if (emails.isEmpty()) {
-		// bindingResult.rejectValue("emails", "errors.emails.empty", "Please
-		// provide at least one participant");
-		// } else {
-		// for (String email : emails) {
-		// System.out.println(email);
-		// Pattern pattern = Pattern.compile(EMAIL_PATTERN);
-		// Matcher matcher = pattern.matcher(email);
-		// if (!matcher.matches()) {
-		// bindingResult.rejectValue("emails", "errors.emails.malformed", "Some
-		// emails are not well-formed");
-		// }
-		// }
-		// }
+
+		if (emails.size() == 0) {
+			bindingResult.rejectValue("emails", "errors.participants.number",
+					"At least one participant (either Team Contact OR External) must be added");
+		}
 		if (meetingForm.getDuration() != null) {
 			if (meetingForm.getDuration().compareTo(Duration.ofMinutes(vcbadminProperties.getMaxMeetingDuration())) > 0
 					|| meetingForm.getDuration()
@@ -144,12 +134,27 @@ public class MeetingController {
 						"Start datetime cannot refer to past");
 			}
 		}
+
+
 		meetingForm.setEmails(new LinkedList<>(emails)); // important: update
 		// the correct email
 		// list
 
 		if (bindingResult.hasErrors()) {
 			log.debug("{}", bindingResult.getAllErrors().toString());
+
+			String user_tz = meetingForm.getTimeZone();
+			try {
+				ZoneId.of(user_tz);
+			} catch (Exception e) {
+				user_tz = tz_default;
+			}
+			model.addAttribute("userTZ", user_tz);
+			if (bindingResult.hasFieldErrors("start")) {
+				meetingForm.setStart(null);
+				meetingForm.setStartDate(null);
+			}
+			model.addAttribute("meetingForm", meetingForm);
 			return "createMeeting";
 		}
 
