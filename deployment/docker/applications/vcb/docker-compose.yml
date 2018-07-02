@@ -38,7 +38,7 @@ services:
     command: sh -c "sleep 10 && java -Xmx512m -Dspring.profiles.active=docker -jar server.jar"
     working_dir: /opt/csp
     volumes:
-        - ./vcb-admin-3.8.0-SNAPSHOT-exec.jar:/opt/csp/server.jar
+        - ./vcb-admin-3.6.0-SNAPSHOT-exec.jar:/opt/csp/server.jar
         - /opt/csp/logs/:/opt/csplogs
         - SSLDatavolume:/opt/ssl/
         - JitsiDataVolume:/opt/vcb/data
@@ -56,7 +56,7 @@ services:
     command: java -Xmx512m -Dspring.profiles.active=docker -jar server.jar
     working_dir: /opt/csp
     volumes:
-        - ./vcb-teleconf-3.8.0-SNAPSHOT-exec.jar:/opt/csp/server.jar
+        - ./vcb-teleconf-3.6.0-SNAPSHOT-exec.jar:/opt/csp/server.jar
         - /opt/csp/logs/:/opt/csplogs
         - JitsiDataVolume:/opt/vcb/data
     expose:
