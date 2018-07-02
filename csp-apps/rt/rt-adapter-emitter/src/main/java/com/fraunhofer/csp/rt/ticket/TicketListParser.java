@@ -21,8 +21,8 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.Provider;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+//import org.slf4j.Logger;
+//import org.slf4j.LoggerFactory;
 
 /**
  * Created by Majid Salehi on 4/8/17.
@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
 @Provider
 @Consumes(MediaType.TEXT_PLAIN)
 public class TicketListParser implements MessageBodyReader<List<Ticket>> {
-	private static final Logger LOG = LoggerFactory.getLogger(TicketListParser.class);
+	//private static final Logger LOG = LoggerFactory.getLogger(TicketListParser.class);
 
 	@Override
 	public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
