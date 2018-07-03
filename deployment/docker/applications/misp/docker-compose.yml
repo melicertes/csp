@@ -16,7 +16,8 @@ services:
         volumes:
             - /dev/urandom:/dev/random
             - MISPSharedDatavolume:/run/secrets
-            - MISPDatavolume:/var/www/MISP
+            - MISPConfigVolume:/var/www/MISP/app/Config
+            - MISPGnuVolume:/var/www/MISP/.gnupg
             - MISPStateDatavolume:/opt/state
             - /opt/csp/logs_misp/:/var/www/MISP/app/tmp/logs/
         environment:
@@ -67,7 +68,9 @@ services:
 volumes:
     MISPAdapterDatavolume:
         external: true
-    MISPDatavolume:
+    MISPConfigVolume:
+        external: true
+    MISPGnuVolume:
         external: true
     MYSQLDatavolume:
         external: true
