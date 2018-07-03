@@ -21,6 +21,12 @@ if [[ "$?" -eq 0 ]] ; then
     docker rm csp-misp
 fi
 
+echo ">> sleeping for 5"
+sleep 5
+
+echo ">> sleeping for 5 more"
+sleep 5
+
 docker volume  ls --format '{{.Name}}' | grep MISPDatavolume  > /dev/null
 if [[ "$?" -eq 0 ]] ; then
     echo ">>  Found old Docker volume MISPDatavolume"
