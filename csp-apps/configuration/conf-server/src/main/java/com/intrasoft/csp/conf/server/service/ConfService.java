@@ -189,7 +189,7 @@ public class ConfService implements ApiContextUrl, Configuration {
             headers.add("Pragma", "no-cache");
             headers.add("Expires", "0");
             headers.add("Content-Disposition", "attachment; filename=\"" + updateFile.getName() + "\"");
-            
+
             byte[] content = Files.readAllBytes(Paths.get(updateFile.getAbsolutePath()));
 
             LOG_AUDIT.info(logInfo + StatusResponseType.OK.text());
