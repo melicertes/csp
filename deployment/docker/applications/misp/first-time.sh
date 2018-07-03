@@ -19,7 +19,7 @@ if [[ "$?" -eq 0 ]] ; then
         docker run -d --rm -v MISPDatavolume:/old -v MISPGnuVolume:/var/www/MISP/.gnupg frolvlad/alpine-oraclejdk8:slim sh -c "cp /old/.gnupg/* /var/www/MISP/.gnupg/"
     fi
     docker rm csp-misp
-    docker MISPDatavolume
+    docker volume rm MISPDatavolume
 fi
 
 mkdir -p /opt/csp/logs_misp/
