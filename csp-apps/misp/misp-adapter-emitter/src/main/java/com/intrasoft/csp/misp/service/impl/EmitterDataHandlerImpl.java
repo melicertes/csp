@@ -14,6 +14,7 @@ import com.intrasoft.csp.misp.client.MispAppClient;
 import com.intrasoft.csp.misp.commons.config.MispContextUrl;
 import com.intrasoft.csp.misp.domain.model.Origin;
 import com.intrasoft.csp.misp.domain.service.impl.OriginServiceImpl;
+import com.intrasoft.csp.misp.service.DistributionPolicyRectifier;
 import com.intrasoft.csp.misp.service.EmitterDataHandler;
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.JsonPath;
@@ -79,6 +80,9 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
     @Qualifier("MispAppClient")
     MispAppClient mispAppClient;
 
+    @Autowired
+    DistributionPolicyRectifier distributionPolicyRectifier;
+
     @Value("${elastic.protocol}")
     String elasticProtocol;
     @Value("${elastic.host}")
@@ -122,6 +126,7 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
         if (mispEntity.equals(EVENT)) {
             uuid = jsonNode.get(EVENT.toString()).get("uuid").textValue();
             LOG.debug("Event with uuid: " + uuid);
+            distributionPolicyRectifier.rectifyEvent(jsonNode);
             eventValidationMap = eventValidation(jsonNode, LOG);
             // @TODO check for potential bug
             try{
