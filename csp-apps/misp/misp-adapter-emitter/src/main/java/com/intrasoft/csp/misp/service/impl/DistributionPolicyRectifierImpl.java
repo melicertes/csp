@@ -58,7 +58,8 @@ public class DistributionPolicyRectifierImpl implements DistributionPolicyRectif
 
         arrayNode.forEach(node -> {
             int attributeDistributionLevel = node.path("distribution").asInt();
-            if (attributeDistributionLevel < eventDistributionLevel) {
+            if ( (attributeDistributionLevel < eventDistributionLevel)
+                    || (attributeDistributionLevel == DistributionPolicy.SHARING_GROUP.getLevel() && eventDistributionLevel!=DistributionPolicy.SHARING_GROUP.getLevel()) ) {
                 idsToDelete.add(node.path("id").textValue());
             } else if (attributeDistributionLevel == DistributionPolicy.SHARING_GROUP.getLevel() && attributeDistributionLevel == eventDistributionLevel) {
                 if ( node.path("sharing_group_id").asInt() != eventSharingGroupId) {
