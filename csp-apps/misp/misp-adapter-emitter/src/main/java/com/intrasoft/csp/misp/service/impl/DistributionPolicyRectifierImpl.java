@@ -27,7 +27,7 @@ public class DistributionPolicyRectifierImpl implements DistributionPolicyRectif
 
         // SXCSP-503: Change Distribution to one lower state (2 -> 1, 1 -> 0)
         if (eventDistributionLevel == 2 || eventDistributionLevel == 1)
-            ( (ObjectNode) jsonNode).findParent("distribution").put("distribution", eventDistributionLevel-1);
+            ( (ObjectNode) jsonNode).findParent("distribution").put("distribution", String.valueOf(eventDistributionLevel-1));
 
         MispEntity[] entitiesArray = {MispEntity.ATTRIBUTE, MispEntity.OBJECT};
 

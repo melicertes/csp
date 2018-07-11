@@ -126,7 +126,6 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
         if (mispEntity.equals(EVENT)) {
             uuid = jsonNode.get(EVENT.toString()).get("uuid").textValue();
             LOG.debug("Event with uuid: " + uuid);
-            distributionPolicyRectifier.rectifyEvent(jsonNode);
             eventValidationMap = eventValidation(jsonNode, LOG);
             // @TODO check for potential bug
             try{
@@ -134,6 +133,7 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
                 if (!isDelete){
                     object = mispAppClient.getMispEvent(uuid).getBody();
                     jsonNode = new ObjectMapper().convertValue(object, JsonNode.class);
+                    distributionPolicyRectifier.rectifyEvent(jsonNode);
 //                    jsonNode = updateTimestamp(new ObjectMapper().convertValue(object, JsonNode.class));
                 }
 
