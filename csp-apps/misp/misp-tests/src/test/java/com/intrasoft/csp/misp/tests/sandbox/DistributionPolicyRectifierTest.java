@@ -154,6 +154,60 @@ public class DistributionPolicyRectifierTest {
 
     }
 
+    // According to SXCSP-505, for the given event (event distribution set in memory to non-sharing group):
+    //   - Attributes having sharing group distribution setting should be deleted (attribs with id 14, 16)
+    //   - Attributes having "Inherit event" as their distribution policy should not be deleted (attrib with id 15)
+    //   - Attributes having a different sharing group id than the event should be deleted (attrib with id 16)
+    //   - Attributes having the same distribution setting as the event (explicity) should not be deleted (attrib with id 17)
+    @Test
+    public void rectifyEventWithoutSgroupDistribShouldDeleteAttribsWithSgroupDistribTest() {
+
+        event = getResourceAsJsonNode(zmqEventWithAttributes);
+
+        // Setting the Event's distribution level to !=SharingGroup (4) for the purpose of this test
+        ( (ObjectNode) event).findParent("distribution").put("distribution", "3");
+
+        // Get all main the attributes of the event into an array and get hold of its size
+        ArrayNode attributesArray = (ArrayNode) event.path("Event").path("Attribute");
+        int initialNumberOfAttributes = attributesArray.size();
+
+        // Attributes ids
+        int[] shouldKeepIds = {15, 17};
+        int[] shouldDeleteIds = {14, 16};
+
+        Map<Integer, Boolean> attribMap = new HashMap<>();
+        for (int id : shouldDeleteIds) {
+            attribMap.put(id, false);
+        }
+
+        List<Integer> idsFound = new ArrayList<>();
+
+        distributionPolicyRectifier.rectifyEvent(event);
+
+        // Search in attributes array for ids that should be present
+        for (int attribToKeepId : shouldKeepIds) {
+            attributesArray.forEach(attrib -> {
+                if (attrib.get("id").textValue().equals(String.valueOf(attribToKeepId)))
+                    idsFound.add(attribToKeepId);
+            });
+        }
+        assertTrue( (idsFound.contains(shouldKeepIds[0])));
+        assertTrue( (idsFound.contains(shouldKeepIds[1])));
+
+        // Search in attributes array for ids that should not be present (deleted by the method in test)
+        for (int id : shouldDeleteIds) {
+            attributesArray.forEach(attrib -> {
+                if (attrib.get("id").asInt() == id)
+                    attribMap.replace(id, true);
+            });
+        }
+
+        attribMap.forEach( (k,v) -> {
+            assertFalse(v);
+        });
+
+    }
+
 
     // According to SXCSP-505, for the given resource:
     //    - Objects having "Inherit event" as their distribution policy must not be deleted (object ids 3,4)
