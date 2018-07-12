@@ -17,7 +17,7 @@ public interface SystemModuleRepository extends JpaRepository<SystemModule,Long>
 
     SystemModule findOneByHash(String hash);
 
-    List<SystemModule> findByModuleStateOrderByStartPriority(ModuleState state);
+    List<SystemModule> findByModuleStateInOrderByStartPriority(ModuleState... state);
 
-    List<SystemModule> findByModuleStateOrderByStartPriorityDesc(ModuleState state);
+    List<SystemModule> findByModuleStateInOrderByStartPriorityDesc(ModuleState... state);
 }
