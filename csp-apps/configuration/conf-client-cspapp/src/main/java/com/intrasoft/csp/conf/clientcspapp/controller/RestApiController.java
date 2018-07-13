@@ -236,41 +236,7 @@ public class RestApiController implements ContextUrl, ApiContextUrl {
                             module = installService.saveSystemModule(module);
                         }
 
-                        final long running = runningServices();
-
-                        switch (module.getModuleState()) {
-                            case UNKNOWN:
-                                actions.append("&nbsp;<a class=\"btn btn-xs btn-primary\" title=\"Download ").append(module.getName()).append("\" href=\"").append(PAGE_DOWNLOADMODULE).append("/").append(module.getHash()).append("\"><i class=\"fa fa-download\"></i></a>");
-                                break;
-                            case DOWNLOADING:
-                                actions.append("&nbsp;<a class=\"btn btn-xs btn-primary\" title=\"Show ").append(module.getName()).append(" progress\" href=\"").append(PAGE_STATUS).append("?moduleId=").append(module.getHash()).append("\"><i class=\"fa fa-cog fa-spin\"></i></a>");
-                                break;
-                            case DOWNLOADED:
-                                if (running == 0) {
-                                    actions.append("&nbsp;<a class=\"btn btn-xs btn-success\" title=\"Install ").append(module.getName()).append("\" href=\"").append(PAGE_INSTALLMODULE).append("/").append(module.getHash()).append("\"><i class=\"fa fa-cogs\"></i></a>");
-                                    actions.append("&nbsp;<a class=\"btn btn-xs btn-danger\" title=\"Delete ").append(module.getName()).append("\" href=\"").append(PAGE_DELETEMODULE).append("/").append(module.getHash()).append("\"><i class=\"fa fa-trash\"></i></a>");
-                                } else {
-                                    log.warn("Cannot allow installations because there are {} services running",running);
-                                    actions.append("&nbsp;State: RUN");
-                                }
-                                break;
-                            case INSTALLED:
-                                if (running == 0) {
-                                    actions.append("&nbsp;<a class=\"btn btn-xs btn-warning\" title=\"Re-Install ").append(module.getName()).append("\" href=\"").append(PAGE_REINSTALLMODULE).append("/").append(module.getHash()).append("\"><i class=\"fa fa-refresh\"></i></a>");
-                                    actions.append("&nbsp;<a class=\"btn btn-xs btn-danger\" title=\"Delete ").append(module.getName()).append("\" href=\"").append(PAGE_DELETEMODULE).append("/").append(module.getHash()).append("\"><i class=\"fa fa-trash\"></i></a>");
-                                } else {
-                                    log.warn("Cannot allow installations because there are {} services running",running);
-                                    actions.append("&nbsp;State: RUN");
-                                }
-                                break;
-                            case OBSOLETE:
-                                actions.append("&nbsp;<a class=\"btn btn-xs btn-danger\" title=\"Delete ").append(module.getName()).append("\" href=\"").append(PAGE_DELETEMODULE).append("/").append(module.getHash()).append("\"><i class=\"fa fa-trash\"></i></a>");
-                                break;
-                            case REMOVED:
-                                break;
-                        }
-
-
+                        buildActions(module, actions);
                         return UpdateVersion.builder()
                                 .name(mod.getName())
                                 .description(mod.getDescription())
@@ -285,6 +251,61 @@ public class RestApiController implements ContextUrl, ApiContextUrl {
         }
 
 
+    }
+
+    private void buildActions(SystemModule module, StringBuilder actions) {
+        final long running = runningServices();
+
+        switch (module.getModuleState()) {
+            case UNKNOWN:
+                actions.append("&nbsp;<a class=\"btn btn-xs btn-primary\" title=\"Download ")
+                        .append(module.getName()).append("\" href=\"").append(PAGE_DOWNLOADMODULE).append("/")
+                        .append(module.getHash()).append("\"><i class=\"fa fa-download\"></i></a>");
+                break;
+            case DOWNLOADING:
+                actions.append("&nbsp;<a class=\"btn btn-xs btn-primary\" title=\"Show ")
+                        .append(module.getName()).append(" progress\" href=\"").append(PAGE_STATUS).append("?moduleId=")
+                        .append(module.getHash()).append("\"><i class=\"fa fa-cog fa-spin\"></i></a>");
+                break;
+            case DOWNLOADED:
+                if (running == 0) {
+                    actions.append("&nbsp;<a class=\"btn btn-xs btn-primary\" title=\"Re-Download ").append(module.getName())
+                            .append("\" href=\"").append(PAGE_DOWNLOADMODULE).append("/").append(module.getHash())
+                            .append("\"><i class=\"fa fa-download\"></i></a>");
+                    actions.append("&nbsp;<a class=\"btn btn-xs btn-success\" title=\"Install ").append(module.getName())
+                            .append("\" href=\"").append(PAGE_INSTALLMODULE).append("/").append(module.getHash())
+                            .append("\"><i class=\"fa fa-cogs\"></i></a>");
+                    actions.append("&nbsp;<a class=\"btn btn-xs btn-danger\" title=\"Delete ").append(module.getName())
+                            .append("\" href=\"").append(PAGE_DELETEMODULE).append("/").append(module.getHash())
+                            .append("\"><i class=\"fa fa-trash\"></i></a>");
+                } else {
+                    actions.append("&nbsp;<a class=\"btn btn-xs btn-danger\" title=\"Cannot allow installations because there are ")
+                            .append(running).append(" services running")
+                            .append("\" href=\"#").append("\"><i class=\"fa fa-ban\"></i></a>");
+                }
+                break;
+            case INSTALLED:
+                if (running == 0) {
+                    actions.append("&nbsp;<a class=\"btn btn-xs btn-warning\" title=\"Re-Install ").append(module.getName())
+                            .append("\" href=\"").append(PAGE_REINSTALLMODULE).append("/").append(module.getHash())
+                            .append("\"><i class=\"fa fa-refresh\"></i></a>");
+                    actions.append("&nbsp;<a class=\"btn btn-xs btn-danger\" title=\"Delete ").append(module.getName())
+                            .append("\" href=\"").append(PAGE_DELETEMODULE).append("/").append(module.getHash())
+                            .append("\"><i class=\"fa fa-trash\"></i></a>");
+                } else {
+                    actions.append("&nbsp;<a class=\"btn btn-xs btn-danger disabled\" title=\"Cannot allow installations because there are ")
+                            .append(running).append(" services running")
+                            .append("\" href=\"#").append("\"><i class=\"fa fa-ban\"></i></a>");
+                }
+                break;
+            case OBSOLETE:
+                actions.append("&nbsp;<a class=\"btn btn-xs btn-danger\" title=\"Delete").append(module.getName())
+                        .append("\" href=\"").append(PAGE_DELETEMODULE).append("/").append(module.getHash())
+                        .append("\"><i class=\"fa fa-trash\"></i></a>");
+                break;
+            case REMOVED:
+                break;
+        }
     }
 
     private long runningServices() {

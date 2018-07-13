@@ -749,15 +749,17 @@ public class BackgroundTaskService {
                     installationService.removeService(service);
                 }
 
-                Manifest manifest = getManifest(module.getModulePath());
-                if (manifest.getFormat() > 1.0 && manifest.getShLast() != null
-                        &&  installationService.moduleContains(module, manifest.getShLast())) { //last-time is only 1.1+
-                    executeModuleShScript(module, module.getModulePath(), manifest.getShLast(), ControlScript.LAST_TIME);
+                File moduleDir = new File(module.getModulePath());
+                if (moduleDir.exists()) {
+                    Manifest manifest = getManifest(module.getModulePath());
+                    if (manifest.getFormat() > 1.0 && manifest.getShLast() != null
+                            && installationService.moduleContains(module, manifest.getShLast())) { //last-time is only 1.1+
+                        executeModuleShScript(module, module.getModulePath(), manifest.getShLast(), ControlScript.LAST_TIME);
+                    }
+
+                    storageService.deleteDirectoryAndContents(module.getModulePath());
                 }
-
-                storageService.deleteDirectoryAndContents(module.getModulePath());
                 module.setModuleState(ModuleState.DOWNLOADED);
-
                 module.setActive(false);
                 SystemModule moduleUpdated = installationService.saveSystemModule(module);
                 File vHostDir = new File(vhostDirectory);
