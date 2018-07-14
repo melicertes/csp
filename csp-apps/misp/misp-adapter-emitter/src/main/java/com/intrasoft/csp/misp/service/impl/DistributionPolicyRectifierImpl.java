@@ -25,15 +25,11 @@ public class DistributionPolicyRectifierImpl implements DistributionPolicyRectif
         int eventDistributionLevel = getEventDistributionPolicyLevel(jsonNode);
         int eventSharinggroupId = jsonNode.path("Event").path("sharing_group_id").asInt();
 
-        // SXCSP-503: Change Distribution to one lower state (2 -> 1, 1 -> 0)
-        if (eventDistributionLevel == 2 || eventDistributionLevel == 1)
-            ( (ObjectNode) jsonNode).findParent("distribution").put("distribution", String.valueOf(eventDistributionLevel-1));
-
         MispEntity[] entitiesArray = {MispEntity.ATTRIBUTE, MispEntity.OBJECT};
 
         for (MispEntity entity : entitiesArray) {
             ArrayNode entityArray = (ArrayNode) jsonNode.path(MispEntity.EVENT.toString()).path(entity.toString());
-            // LOG.debug(entity.toString() + " occurances: " + entityArray.size());
+            // LOG.debug(entity.toString() + " occurrences: " + entityArray.size());
             if (entityArray.size()>0) {
                 if (entity.equals(MispEntity.OBJECT)) {
                     // First pass

@@ -283,7 +283,19 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
             return result; // returns empty map on sharing group absence
         }
         // Retrieving any synchronized Organisations in the Sharing Group even if it has no synchronization prefix.
-        sharingGroupUuid = jsonNode.get(EVENT.toString()).get("SharingGroup").get("uuid").toString().replace("\"","");
+        try {
+            sharingGroupUuid = jsonNode.get(EVENT.toString()).get("SharingGroup").get("uuid").toString().replace("\"","");
+            LOG.debug("~~~~~ Sharing Group UUID is " + sharingGroupUuid + "~~~~~");
+        } catch (NullPointerException e) {
+            LOG.debug("~~~~~ Error getting Sharing Group UUID ~~~~~");
+            try {
+                LOG.debug("~~~~~ Retrying for Sharing Group UUID ~~~~~");
+                sharingGroupUuid = jsonNode.get(EVENT.toString()).get("SharingGroup").get("uuid").textValue();
+                LOG.debug("~~~~~ UUID is " + sharingGroupUuid + "~~~~~");
+            } catch (NullPointerException ex) {
+                LOG.debug("~~~~~ Error Getting Sharing Group UUID ~~~~~");
+            }
+        }
         // Get any organisations found in the sharing group node.
         ArrayNode sGroupOrgs = (ArrayNode) jsonNode.get(EVENT.toString()).get("SharingGroup").get("SharingGroupOrg");
         // Catch the exception in case the sharing group has no organisations at all.
