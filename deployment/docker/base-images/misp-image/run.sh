@@ -218,6 +218,7 @@ echo "Fixing permissions on /var/www/MISP/app/tmp/logs/"
 chown -R 33.33 /var/www/MISP/app/tmp/logs/
 chown -R 33.33 /var/www/MISP/app/Config/
 chmod -R 777 /var/www/MISP/app/tmp/logs/
+chown -R 33.33 /var/www/MISP/.gnupg
 
 # Start supervisord
 echo "Starting supervisord"
