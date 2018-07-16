@@ -160,6 +160,8 @@ EOSQL
         echo "Configuring MISP (ZMQ and SSO)..."
         sed -e "N;/\n.*'SecureAuth'/{r csp_configuration" -e "};P;D" -i /var/www/MISP/app/Config/config.php
 
+        chown -R 33.33 /var/www/MISP/.gnupg
+
         # Generate the admin user PGP key
         echo "Creating admin GnuPG key"
         if [ -z "$MISP_ADMIN_EMAIL" -o -z "$MISP_ADMIN_PASSPHRASE" ]; then
@@ -217,8 +219,7 @@ fi
 echo "Fixing permissions on /var/www/MISP/app/tmp/logs/"
 chown -R 33.33 /var/www/MISP/app/tmp/logs/
 chown -R 33.33 /var/www/MISP/app/Config/
-chmod -R 777 /var/www/MISP/app/tmp/logs/
-chown -R 33.33 /var/www/MISP/.gnupg
+chmod -R 777 /var/www/MISP/app/tmp/logs
 
 # Start supervisord
 echo "Starting supervisord"
