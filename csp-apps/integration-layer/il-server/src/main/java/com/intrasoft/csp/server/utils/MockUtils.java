@@ -9,6 +9,7 @@ import com.intrasoft.csp.commons.model.elastic.ElasticSearchResponse;
 import com.intrasoft.csp.commons.model.elastic.search.Hit;
 import com.intrasoft.csp.commons.model.elastic.search.Hits;
 import com.intrasoft.csp.commons.routes.ContextUrl;
+import com.intrasoft.csp.server.service.ApiDataHandler;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.model.RouteDefinition;
 import org.apache.camel.spring.SpringCamelContext;
@@ -45,6 +46,9 @@ public class MockUtils implements ContextUrl {
 
     @Autowired
     MockUtils mockUtils;
+
+    @Autowired
+    ApiDataHandler apiDataHandler;
 
     Map<IntegrationDataType, String> dataObjectMap = new HashMap<>();
 
@@ -316,6 +320,7 @@ public class MockUtils implements ContextUrl {
         if (httpMethod.toLowerCase().equals("post")) {
             mvc.perform(post("/v"+REST_API_V1+"/"+DCL_INTEGRATION_DATA).accept(MediaType.TEXT_PLAIN)
                     .content(TestUtil.convertObjectToJsonBytes(integrationData))
+                    .header(apiDataHandler.getCheckCspIdCertHeader(),integrationData.getDataParams().getCspId())
                     .contentType(TestUtil.APPLICATION_JSON_UTF8))
                     .andExpect(status().isOk())
                     .andExpect(content().string(HttpStatusResponseType.SUCCESSFUL_OPERATION.getReasonPhrase()));
@@ -323,6 +328,7 @@ public class MockUtils implements ContextUrl {
         else if (httpMethod.toLowerCase().equals("put")) {
             mvc.perform(put("/v"+REST_API_V1+"/"+DCL_INTEGRATION_DATA).accept(MediaType.TEXT_PLAIN)
                     .content(TestUtil.convertObjectToJsonBytes(integrationData))
+                    .header(apiDataHandler.getCheckCspIdCertHeader(),integrationData.getDataParams().getCspId())
                     .contentType(TestUtil.APPLICATION_JSON_UTF8))
                     .andExpect(status().isOk())
                     .andExpect(content().string(HttpStatusResponseType.SUCCESSFUL_OPERATION.getReasonPhrase()));
