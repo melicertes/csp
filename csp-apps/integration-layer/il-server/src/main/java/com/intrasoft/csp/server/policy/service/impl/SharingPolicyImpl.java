@@ -155,6 +155,7 @@ public class SharingPolicyImpl implements SharingPolicyService, Conversions{
     @Override
     public void deleteAllPolicies() {
         policyRepository.deleteAll();
+        LOG.info("All policies have been deleted");
     }
 
     @Override
