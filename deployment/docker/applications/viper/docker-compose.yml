@@ -10,10 +10,20 @@ services:
     hostname: csp-viper
     ports:
       - 8083:8083
-    command: python viper/viper-web -H 0.0.0.0 -p 8083
-    working_dir: /home/viper
+    command: python viper-web -H 0.0.0.0 -p 8083
+    working_dir: /home/viper/viper
+    volumes:
+      - /opt/csp/logs/:/home/viper/viper/logs
+      - ViperDatavolume:/home/viper/viper
+      - MISPSharedDatavolume:/run/secrets
 
 networks:
   default:
     external:
       name: ${LOCAL_DOMAIN}
+
+volumes:
+    ViperDatavolume:
+        external: true
+    MISPDatavolume:
+            external: true
