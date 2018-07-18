@@ -29,7 +29,7 @@ services:
     command: java -Xmx512m -Dspring.profiles.active=docker -jar server.jar
     working_dir: /opt/csp
     volumes:
-        - ./rt-emitter-adapter-3.6.0-SNAPSHOT-exec.jar:/opt/csp/server.jar
+        - ./rt-emitter-adapter-3.8.0-SNAPSHOT-exec.jar:/opt/csp/server.jar
         - SSLDatavolume:/opt/ssl/
         - RTAdapterDBDatavolume:/opt/csp/RTuuidRepositoryDB
     expose:

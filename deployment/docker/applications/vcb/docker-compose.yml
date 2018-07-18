@@ -1,5 +1,7 @@
 version: '3'
+
 services: 
+
 
   csp-jitsi:
     image: csp-jitsimeet:1.0
@@ -21,7 +23,7 @@ services:
     expose:
       - 80
     volumes:
-      - /opt/csp/logs/:/var/log/jitsi
+      - /opt/csp/logs_jitsi:/var/log/jitsi
     networks:
       default:
         aliases:
@@ -62,12 +64,14 @@ services:
     expose:
         - 9100
         
+        
 volumes:
     JitsiDataVolume:
       external: true
     SSLDatavolume:
         external: true
-        
+      
+      
 networks:
   default:
     external:
