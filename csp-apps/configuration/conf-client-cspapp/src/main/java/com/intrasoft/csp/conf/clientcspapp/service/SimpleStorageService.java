@@ -130,10 +130,12 @@ public class SimpleStorageService {
      */
     public void deleteDirectoryAndContents(String directory) throws IOException {
         Path rootPath = Paths.get(directory);
-        Files.walk(rootPath, FileVisitOption.FOLLOW_LINKS)
-                .sorted(Comparator.reverseOrder())
-                .map(Path::toFile)
-                .peek(System.out::println)
-                .forEach(File::delete);
+        try ( Stream<Path> files = Files.walk(rootPath, FileVisitOption.FOLLOW_LINKS)) {
+            files.sorted(Comparator.reverseOrder())
+                    .map(Path::toFile)
+                    .peek(System.out::println)
+                    .forEach(File::delete);
+        }
+
     }
 }
