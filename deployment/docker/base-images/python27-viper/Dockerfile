@@ -34,7 +34,7 @@ RUN apt install -y \
     python \
     python-dev \
     python-pip \
-    linux-headers-$(uname -r) \
+#    linux-headers-$(uname -r) \
     curl \
     libffi-dev \
 #    freetype-dev \
