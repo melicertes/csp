@@ -16,6 +16,7 @@ services:
       - /opt/csp/logs/:/home/viper/viper/logs
       - ViperDatavolume:/home/viper/viper
       - MISPSharedDatavolume:/run/secrets
+      - SSLDatavolume:/opt/ssl/
 
 networks:
   default:
@@ -25,5 +26,7 @@ networks:
 volumes:
     ViperDatavolume:
         external: true
-    MISPDatavolume:
-            external: true
+    MISPSharedDatavolume:
+        external: true
+    SSLDatavolume:
+        external: true
