@@ -246,13 +246,14 @@ echo "User Update"
 #/var/www/MISP/app/Console/cake Password $CSP_USER $MISP_ADMIN_PASSPHRASE
 
 sleep 10
+echo "Init Authkey"
+/var/www/MISP/app/Console/cake Authkey $MISP_ADMIN_EMAIL | tail  -1 > /run/secrets/authkey
+
+sleep 10
 echo "Applying MISP Server settings for CSP functionality..."
 initMispConfig
 updateMispConfig
 
-sleep 10
-echo "Init Authkey"
-/var/www/MISP/app/Console/cake Authkey $MISP_ADMIN_EMAIL | tail  -1 > /run/secrets/authkey
 
         # Display tips
         cat <<__WELCOME__
