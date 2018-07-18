@@ -38,9 +38,9 @@ verifyMispState(){
 initMispConfig() {
   declare -g -A MISP_AUTO_SETTINGS
   CSP_ID_PREFIX="CSP::"
-  MISP_AUTO_SETTINGS["MISP.live"]="1"
+  #MISP_AUTO_SETTINGS["MISP.live"]="1"
   MISP_AUTO_SETTINGS["MISP.org"]=$CSP_ID_PREFIX$CSP_NAME
-  MISP_AUTO_SETTINGS["Plugin.CustomAuth_enable"]="1"
+  MISP_AUTO_SETTINGS["Plugin.CustomAuth_enable"]="0"
   MISP_AUTO_SETTINGS["Plugin.CustomAuth_header"]="CUSTOM_USER_ID"
   MISP_AUTO_SETTINGS["Plugin.CustomAuth_use_header_namespace"]="1"
   MISP_AUTO_SETTINGS["Plugin.CustomAuth_header_namespace"]="HTTP_"
@@ -246,13 +246,14 @@ echo "User Update"
 #/var/www/MISP/app/Console/cake Password $CSP_USER $MISP_ADMIN_PASSPHRASE
 
 sleep 10
+echo "Init Authkey"
+/var/www/MISP/app/Console/cake Authkey $MISP_ADMIN_EMAIL | tail  -1 > /run/secrets/authkey
+
+sleep 10
 echo "Applying MISP Server settings for CSP functionality..."
 initMispConfig
 updateMispConfig
 
-sleep 10
-echo "Init Authkey"
-/var/www/MISP/app/Console/cake Authkey $MISP_ADMIN_EMAIL | tail  -1 > /run/secrets/authkey
 
         # Display tips
         cat <<__WELCOME__
