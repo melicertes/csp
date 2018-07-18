@@ -55,7 +55,8 @@ RUN pip install \
     SQLAlchemy \
     PrettyTable \
     python-magic \
-    requests
+    requests \
+    pymisp
 
 
 RUN wget https://github.com/ssdeep-project/ssdeep/releases/download/release-2.14.1/ssdeep-2.14.1.tar.gz && \
@@ -70,6 +71,10 @@ RUN mkdir /home/viper
 WORKDIR /home/viper
 RUN git clone https://github.com/viper-framework/viper.git
 WORKDIR /home/viper/viper
+RUN mkdir logs
+COPY config/viper.conf /home/viper/viper
+COPY config/misp.py /home/viper/viper/viper/modules/misp.py
+COPY config/cspHeaderMiddleware.py /home/viper/viper/viper/web/viperweb/cspHeaderMiddleware.py
 #RUN pip install numpy
 #RUN apk add --no-cache numpy
 #RUN echo git+https://github.com/viper-framework/pefile.git#egg=pefile > constraints.txt
@@ -80,7 +85,6 @@ RUN pip install setuptools --upgrade
 RUN pip install -r requirements.txt
 
 #CMD ["python", "../viper/viper-cli"]
-#CMD ["python", "../viper/viper-api.py"]
 #CMD ["python", "../viper/viper-web.py","-H", "localhost", "-p", "9090"]
 
 
