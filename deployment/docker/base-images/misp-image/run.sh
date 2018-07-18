@@ -38,9 +38,9 @@ verifyMispState(){
 initMispConfig() {
   declare -g -A MISP_AUTO_SETTINGS
   CSP_ID_PREFIX="CSP::"
-  MISP_AUTO_SETTINGS["MISP.live"]="1"
+  #MISP_AUTO_SETTINGS["MISP.live"]="1"
   MISP_AUTO_SETTINGS["MISP.org"]=$CSP_ID_PREFIX$CSP_NAME
-  MISP_AUTO_SETTINGS["Plugin.CustomAuth_enable"]="1"
+  MISP_AUTO_SETTINGS["Plugin.CustomAuth_enable"]="0"
   MISP_AUTO_SETTINGS["Plugin.CustomAuth_header"]="CUSTOM_USER_ID"
   MISP_AUTO_SETTINGS["Plugin.CustomAuth_use_header_namespace"]="1"
   MISP_AUTO_SETTINGS["Plugin.CustomAuth_header_namespace"]="HTTP_"
