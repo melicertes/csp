@@ -9,19 +9,23 @@ import com.intrasoft.csp.server.routes.RouteUtils;
 import org.apache.camel.Exchange;
 import org.apache.camel.Produce;
 import org.apache.camel.ProducerTemplate;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by iskitsas on 6/10/17.
@@ -35,6 +39,9 @@ public class ApiDataHandler implements CamelRoutes{
 
     @Autowired
     IntegrationDataValidator integrationDataValidator;
+
+    @Autowired
+    CamelRestService camelRestService;
 
     @Value("${server.camel.rest.service.is.async:true}")
     Boolean camelRestServiceIsAsync;
@@ -53,7 +60,15 @@ public class ApiDataHandler implements CamelRoutes{
         }
 
         if(camelRestServiceIsAsync){
-            producerTemplate.asyncRequestBodyAndHeader(route, integrationData, Exchange.HTTP_METHOD, requestMethod);
+            //producerTemplate.asyncRequestBodyAndHeader(route, integrationData, Exchange.HTTP_METHOD, requestMethod);
+            Map<String,Object> headers = new ConcurrentHashMap<>();
+            headers.put(Exchange.HTTP_METHOD, requestMethod);
+            headers.put(Exchange.CONTENT_TYPE, MediaType.APPLICATION_JSON);
+            long now = DateTime.now().getMillis();
+            camelRestService.asyncSendInOnly(route,integrationData,headers);
+            long after = DateTime.now().getMillis();
+            LOG.debug("async route: "+route+" ["+integrationData.getDataParams().getCspId()+"]");
+            LOG.debug("async duration: "+(after-now));
         }else{
             producerTemplate.sendBodyAndHeader(route, integrationData, Exchange.HTTP_METHOD, requestMethod);
         }
