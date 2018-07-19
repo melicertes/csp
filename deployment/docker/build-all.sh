@@ -18,8 +18,8 @@ echo "building Tomcat 7.0.77 base image"
 cd ./base-images/tomcat7 && ./build.sh ; cd $CWD
 echo "building Tomcat 8.5.13 base image"
 cd ./base-images/tomcat8 && ./build.sh ; cd $CWD
-# echo "building ElasticSearch base image"
-# cd ./base-images/elasticsearch && ./build.sh ; cd $CWD
+echo "building ActiveMQ base image"
+cd ./base-images/activemq/ && ./build.sh ; cd $CWD
 
 if [ "$1xx" == "basexx" ]; 
 then

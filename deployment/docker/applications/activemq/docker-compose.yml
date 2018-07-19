@@ -1,0 +1,43 @@
+version: '3'
+
+services:
+    activemq:
+        container_name: csp-activemq
+        domainname: ${LOCAL_DOMAIN}
+        hostname: csp-activemq
+        image: csp-activemq:1.0
+        env_file:
+            - .env
+        expose:
+            - 8161
+            - 61616
+            - 61613
+        volumes:
+            - AMQDatavolume:/data/activemq
+            - /opt/csp/logs_activemq/:/var/log/activemq
+            - AMQConfigVolume:/opt/activemq/conf
+        environment:            
+            - ACTIVEMQ_NAME=csp-activemq
+            - ACTIVEMQ_REMOVE_DEFAULT_ACCOUNT=true
+            - ACTIVEMQ_ADMIN_LOGIN=admin 
+            - ACTIVEMQ_ADMIN_PASSWORD=admin
+            - ACTIVEMQ_WRITE_LOGIN=user_write
+            - ACTIVEMQ_WRITE_PASSWORD=user_write
+            - ACTIVEMQ_READ_LOGIN=user_read
+            - ACTIVEMQ_READ_PASSWORD=user_read
+            - ACTIVEMQ_JMX_LOGIN=admin
+            - ACTIVEMQ_JMX_PASSWORD=admin
+            - ACTIVEMQ_MIN_MEMORY=1024
+            - ACTIVEMQ_MAX_MEMORY=4096
+            - ACTIVEMQ_ENABLED_SCHEDULER=true
+
+volumes:
+    AMQDatavolume:
+        external: true
+    AMQConfigVolume:
+        external: true
+
+networks:
+  default:
+    external:
+      name: ${LOCAL_DOMAIN}
