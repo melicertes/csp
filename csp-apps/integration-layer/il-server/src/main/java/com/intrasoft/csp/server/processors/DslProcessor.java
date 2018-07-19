@@ -6,12 +6,14 @@ import com.intrasoft.csp.commons.model.IntegrationDataType;
 import com.intrasoft.csp.commons.routes.CamelRoutes;
 import com.intrasoft.csp.commons.routes.HeaderName;
 import com.intrasoft.csp.server.routes.RouteUtils;
+import com.intrasoft.csp.server.service.CamelRestService;
 import com.intrasoft.csp.server.service.CspUtils;
 import org.apache.camel.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -33,6 +35,12 @@ public class DslProcessor implements Processor,CamelRoutes {
 
     @Autowired
     RouteUtils routes;
+
+    @Autowired
+    CamelRestService camelRestService;
+
+    @Value("${server.camel.rest.service.is.async:true}")
+    Boolean camelRestServiceIsAsync;
 
     private static final Logger LOG = LoggerFactory.getLogger(DslProcessor.class);
 
@@ -77,7 +85,11 @@ public class DslProcessor implements Processor,CamelRoutes {
             Map<String,Object> headers = new HashMap<>();
             headers.put(HeaderName.APP_NAME,app);
             headers.put(Exchange.HTTP_METHOD,exchange.getIn().getHeader(Exchange.HTTP_METHOD));
-            producerTemplate.sendBodyAndHeaders(routes.apply(APP), ExchangePattern.InOut,integrationData, headers);
+            if(!camelRestServiceIsAsync) {
+                producerTemplate.sendBodyAndHeaders(routes.apply(APP), ExchangePattern.InOnly, integrationData, headers);
+            } else {
+                camelRestService.asyncSendInOnly(routes.apply(APP),integrationData,headers);
+            }
         }
 
         return recipients;
