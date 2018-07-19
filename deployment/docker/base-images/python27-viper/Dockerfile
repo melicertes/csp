@@ -72,6 +72,7 @@ WORKDIR /home/viper
 RUN git clone https://github.com/viper-framework/viper.git
 WORKDIR /home/viper/viper
 RUN mkdir logs
+
 COPY config/viper.conf /home/viper/viper
 COPY config/misp.py /home/viper/viper/viper/modules/misp.py
 COPY config/cspHeaderMiddleware.py /home/viper/viper/viper/web/viperweb/cspHeaderMiddleware.py

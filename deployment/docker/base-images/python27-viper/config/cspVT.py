@@ -15,7 +15,7 @@ import requests
 
 class CspVT(Module):
     cmd = 'cspVT'
-    description = 'This module does this and that'
+    description = 'Updates MISP event with a virus total report.'
     authors = ['CSP']
 
     def __init__(self):
@@ -27,12 +27,13 @@ class CspVT(Module):
             return
 
         print("Do something.")
-        key = 'RnCpy64iWasEqfwAHTMLy3s5fXxqq38VyXDFOez1'
-        url = 'http://localhost:8182'
+        key = 'gxJGbYKjsJSdQ3IsmfT4dGvwikuwudh2VTig0sb6'
+        url = 'https://misp.local.demo1-csp.athens.intrasoft-intl.private'
 
         vt_apikey = '56e0213297540537b9dad11f0e28957b16706a7038363afcc8a3f0db1eb07e10'
 
-        pymisp = PyMISP(url, key, ssl=False, proxies=None, cert=None)
+        pymisp = PyMISP(url, key, ssl=False, proxies=None, cert=('/opt/ssl/server/csp-internal.crt','/opt/ssl/server/csp-internal.key'))
+        print(pymisp.get_object_templates_list())
 
         print(__sessions__.current.file.path)
 
@@ -55,55 +56,41 @@ class CspVT(Module):
             print('MISP session attached')
             print ('MISP event id: ' + str(__sessions__.current.misp_event.event.id))
             event = pymisp.get_event(__sessions__.current.misp_event.event.id)
-            print(event)
+            #print(event)
             misp_event = MISPEvent()
             misp_event.load(event)
         else:
             print('MISP session not attached')
             return
 
+#        vt_response_misp_object = MISPObject(name="virustotal-report")
+#        vt_response_misp_object.add_attribute("comment", value=indicator)
+#        vt_response_misp_object.add_attribute("permalink", value=response.json()['permalink'])
+#        vt_response_misp_object.add_reference(referenced_uuid=vt_response_misp_object.uuid, relationship_type="report of")
+#        res = pymisp.add_object(__sessions__.current.misp_event.event.id, 67, vt_response_misp_object)
+#        print(res)
+
+
         for misp_object in misp_objects:
             print(misp_object)
-            pymisp.add_object(misp_event.id, 41, misp_object)
+            res = pymisp.add_object(__sessions__.current.misp_event.event.id, 67, misp_object)
+            print(res)
 
 
 def generate_report(indicator, apikey):
-    '''
-    Build our VirusTotal report object, File object, and AV signature objects
-    and link them appropriately
-    :indicator: Indicator hash to search in VT for
-    '''
     report_objects = []
     vt_report = VTReportObject(apikey, indicator)
     report_objects.append(vt_report)
     raw_report = vt_report._report
+    
+    print(raw_report) 
 
-    vt_report._resource_type = "file"
+    file_object = MISPObject(name="file")
+    file_object.add_attribute("md5", value=raw_report["md5"])
+    file_object.add_attribute("sha1", value=raw_report["sha1"])
+    file_object.add_attribute("sha256", value=raw_report["sha256"])
+    vt_report.add_reference(referenced_uuid=file_object.uuid, relationship_type="report of")
+    report_objects.append(file_object)
 
-    if vt_report._resource_type == "file":
-        file_object = MISPObject(name="file")
-        file_object.add_attribute("md5", value=raw_report["md5"])
-        file_object.add_attribute("sha1", value=raw_report["sha1"])
-        file_object.add_attribute("sha256", value=raw_report["sha256"])
-        vt_report.add_reference(referenced_uuid=file_object.uuid, relationship_type="report of")
-        report_objects.append(file_object)
-    elif vt_report._resource_type == "url":
-        parsed = urlsplit(indicator)
-        url_object = pymisp.MISPObject(name="url")
-        url_object.add_attribute("url", value=parsed.geturl())
-        url_object.add_attribute("host", value=parsed.hostname)
-        url_object.add_attribute("scheme", value=parsed.scheme)
-        url_object.add_attribute("port", value=parsed.port)
-        vt_report.add_reference(referenced_uuid=url_object.uuid, relationship_type="report of")
-        report_objects.append(url_object)
-    for antivirus in raw_report["scans"]:
-        if raw_report["scans"][antivirus]["detected"]:
-            av_object = pymisp.MISPObject(name="av-signature")
-            av_object.add_attribute("software", value=antivirus)
-            signature_name = raw_report["scans"][antivirus]["result"]
-            av_object.add_attribute("signature", value=signature_name, disable_correlation=True)
-            vt_report.add_reference(referenced_uuid=av_object.uuid, relationship_type="included-in")
-            report_objects.append(av_object)
     return report_objects
-
 
