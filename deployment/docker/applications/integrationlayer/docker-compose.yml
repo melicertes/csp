@@ -8,7 +8,7 @@ services:
     hostname: csp-il
     env_file:
         - .env
-    command: java -Xmx512m -Dserver.ssl.enabled=false -Dapache.camel.use.activemq=false -Dspring.profiles.active=docker -jar server.jar
+    command: java -Xmx512m -Dserver.ssl.enabled=false -Dapache.camel.use.activemq=true -Dspring.profiles.active=docker -jar server.jar
     working_dir: /opt/csp
     volumes:
         - ./il-server-3.8.0-SNAPSHOT-exec.jar:/opt/csp/server.jar
