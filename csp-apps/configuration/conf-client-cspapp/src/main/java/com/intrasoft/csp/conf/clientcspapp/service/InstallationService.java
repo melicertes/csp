@@ -259,9 +259,9 @@ public class InstallationService {
 
     public List<SystemModule> queryAllModulesInstalled(boolean orderIncreasing) {
         if (orderIncreasing) {
-            return moduleRepository.findByModuleStateOrderByStartPriority(ModuleState.INSTALLED);
+            return moduleRepository.findByModuleStateInOrderByStartPriority(ModuleState.INSTALLED);
         } else {
-            return moduleRepository.findByModuleStateOrderByStartPriorityDesc(ModuleState.INSTALLED);
+            return moduleRepository.findByModuleStateInOrderByStartPriorityDesc(ModuleState.INSTALLED);
         }
     }
 
@@ -336,8 +336,8 @@ public class InstallationService {
     }
 
     @Transactional
-    public List<SystemModule> queryModuleByState(ModuleState state) {
-        return moduleRepository.findByModuleStateOrderByStartPriority(state);
+    public List<SystemModule> queryModuleByState(ModuleState... state) {
+        return moduleRepository.findByModuleStateInOrderByStartPriority(state);
     }
 }
 

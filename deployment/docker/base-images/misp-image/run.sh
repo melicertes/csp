@@ -35,6 +35,52 @@ verifyMispState(){
 
 }
 
+initMispConfig() {
+  declare -g -A MISP_AUTO_SETTINGS
+  CSP_ID_PREFIX="CSP::"
+  #MISP_AUTO_SETTINGS["MISP.live"]="1"
+  MISP_AUTO_SETTINGS["MISP.org"]=$CSP_ID_PREFIX$CSP_NAME
+  MISP_AUTO_SETTINGS["Plugin.CustomAuth_enable"]="0"
+  MISP_AUTO_SETTINGS["Plugin.CustomAuth_header"]="CUSTOM_USER_ID"
+  MISP_AUTO_SETTINGS["Plugin.CustomAuth_use_header_namespace"]="1"
+  MISP_AUTO_SETTINGS["Plugin.CustomAuth_header_namespace"]="HTTP_"
+  MISP_AUTO_SETTINGS["Plugin.CustomAuth_required"]="0"
+  MISP_AUTO_SETTINGS["Plugin.CustomAuth_only_allow_source"]=""
+  MISP_AUTO_SETTINGS["Plugin.CustomAuth_name"]="External authentication"
+  MISP_AUTO_SETTINGS["Plugin.CustomAuth_disable_logout"]="1"
+  MISP_AUTO_SETTINGS["Plugin.CustomAuth_custom_password_reset"]=""
+  MISP_AUTO_SETTINGS["Plugin.CustomAuth_custom_logout"]="/logout/"
+  MISP_AUTO_SETTINGS["Plugin.ZeroMQ_enable"]="1"
+  MISP_AUTO_SETTINGS["Plugin.ZeroMQ_user_notifications_enable"]="1"
+  MISP_AUTO_SETTINGS["Plugin.ZeroMQ_audit_notifications_enable"]="1"
+  MISP_AUTO_SETTINGS["Plugin.ZeroMQ_event_notifications_enable"]="1"
+}
+
+updateMispConfig() {
+  for key in "${!MISP_AUTO_SETTINGS[@]}"; do
+    testvar=("$key")
+    /var/www/MISP/app/Console/cake Admin setSetting "$key" "${MISP_AUTO_SETTINGS[$key]}" -q;
+    sleep 0.1
+    afterValue=$(/var/www/MISP/app/Console/cake Admin getSetting "$key" -q | python -c "import sys, json; print json.load(sys.stdin)['value']";)
+    # Converting python booleans back to binary
+    if [ "$afterValue" == "False" ]
+    then
+	    afterValue="0"
+    elif [ "$afterValue" == "True" ]
+    then
+	    afterValue="1"
+    fi
+
+    if [ "${MISP_AUTO_SETTINGS[$key]}" == "$afterValue" ]
+    then
+	    echo -n "SUCCESS : "
+    else
+	    echo -n "FAILED  : "
+    fi
+    echo Setting $testvar as "${MISP_AUTO_SETTINGS[$key]}"
+  done
+}
+
 verifyMispState
 
 if [ ! -f /opt/state/installed.tmp ]; then
@@ -160,6 +206,8 @@ EOSQL
         echo "Configuring MISP (ZMQ and SSO)..."
         sed -e "N;/\n.*'SecureAuth'/{r csp_configuration" -e "};P;D" -i /var/www/MISP/app/Config/config.php
 
+        chown -R 33.33 /var/www/MISP/.gnupg
+
         # Generate the admin user PGP key
         echo "Creating admin GnuPG key"
         if [ -z "$MISP_ADMIN_EMAIL" -o -z "$MISP_ADMIN_PASSPHRASE" ]; then
@@ -201,6 +249,12 @@ sleep 10
 echo "Init Authkey"
 /var/www/MISP/app/Console/cake Authkey $MISP_ADMIN_EMAIL | tail  -1 > /run/secrets/authkey
 
+sleep 10
+echo "Applying MISP Server settings for CSP functionality..."
+initMispConfig
+updateMispConfig
+
+
         # Display tips
         cat <<__WELCOME__
 Congratulations!
@@ -216,7 +270,8 @@ fi
 
 echo "Fixing permissions on /var/www/MISP/app/tmp/logs/"
 chown -R 33.33 /var/www/MISP/app/tmp/logs/
-chmod -R 777 /var/www/MISP/app/tmp/logs/
+chown -R 33.33 /var/www/MISP/app/Config/
+chmod -R 777 /var/www/MISP/app/tmp/logs
 
 # Start supervisord
 echo "Starting supervisord"

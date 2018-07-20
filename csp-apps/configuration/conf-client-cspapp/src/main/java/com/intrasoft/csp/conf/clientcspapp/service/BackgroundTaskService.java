@@ -176,15 +176,24 @@ public class BackgroundTaskService {
     @PostConstruct
     public void verifyStartupState() {
         addTask("Fixing Module States", () -> {
-            //for the moment, we check if there are any modules in DOWNLOADING state and we modify them
-            // to be in unknown
-            installationService.queryModuleByState(ModuleState.DOWNLOADING)
+            //for the moment, we check if there are any modules in
+            // DOWNLOADING state ---> to UNKNOWN
+            // INSTALLING state  ---> to DOWNLOADED
+            installationService.queryModuleByState(ModuleState.DOWNLOADING, ModuleState.INSTALLING)
                     .stream()
                     .map(m -> {
-                        m.setModuleState(ModuleState.UNKNOWN);
+                        ModuleState orig = m.getModuleState();
+                        switch (orig) {
+                            case INSTALLING:
+                                m.setModuleState(ModuleState.DOWNLOADED);
+                                break;
+                            case DOWNLOADING:
+                                m.setModuleState(ModuleState.UNKNOWN);
+                                break;
+                        }
                         m.setArchivePath(null);
                         SystemModule mupd = installationService.saveSystemModule(m);
-                        return mupd.getId() +" / " + mupd.getName() + " has been reset from DOWNLOADING to UNKNOWN.";
+                        return mupd.getId() +" / " + mupd.getName() + " has been reset from "+orig+" to " + m.getModuleState();
                     })
                     .forEach(log::info);
             return new BackgroundTaskResult<String,Boolean>("Completed",true);
@@ -740,15 +749,17 @@ public class BackgroundTaskService {
                     installationService.removeService(service);
                 }
 
-                Manifest manifest = getManifest(module.getModulePath());
-                if (manifest.getFormat() > 1.0 && manifest.getShLast() != null
-                        &&  installationService.moduleContains(module, manifest.getShLast())) { //last-time is only 1.1+
-                    executeModuleShScript(module, module.getModulePath(), manifest.getShLast(), ControlScript.LAST_TIME);
+                File moduleDir = new File(module.getModulePath());
+                if (moduleDir.exists()) {
+                    Manifest manifest = getManifest(module.getModulePath());
+                    if (manifest.getFormat() > 1.0 && manifest.getShLast() != null
+                            && installationService.moduleContains(module, manifest.getShLast())) { //last-time is only 1.1+
+                        executeModuleShScript(module, module.getModulePath(), manifest.getShLast(), ControlScript.LAST_TIME);
+                    }
+
+                    storageService.deleteDirectoryAndContents(module.getModulePath());
                 }
-
-                storageService.deleteDirectoryAndContents(module.getModulePath());
                 module.setModuleState(ModuleState.DOWNLOADED);
-
                 module.setActive(false);
                 SystemModule moduleUpdated = installationService.saveSystemModule(module);
                 File vHostDir = new File(vhostDirectory);
