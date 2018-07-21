@@ -5,8 +5,7 @@ do echo "Waiting..." ;
 sleep 1 ;
 done
 
-sed -i "s/misp_url =/misp_url = ${MISP_LOCAL_DOMAIN}/g" /home/viper/viper/viper.conf
-
-sed -i -e "s/misp_key =/misp_key = $(cat /run/secrets/authkey)/g" /home/viper/viper/viper.conf
+sed -i "s@misp_url =.*@misp_url = $(echo "$MISP_LOCAL_DOMAIN")@g" /home/viper/viper/viper.conf
+sed -i "s/misp_key =.*/misp_key = $(cat /run/secrets/authkey)/g" /home/viper/viper/viper.conf
 
 
