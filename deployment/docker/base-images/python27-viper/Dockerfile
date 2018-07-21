@@ -83,4 +83,5 @@ RUN pip install setuptools --upgrade
 RUN pip install -r requirements.txt
 
 ADD docker-entrypoint.sh /docker-entrypoint.sh
+RUN chmod 0755 /docker-entrypoint.sh
 ENTRYPOINT ["/docker-entrypoint.sh"]
