@@ -81,6 +81,5 @@ RUN pip install setuptools --upgrade
 
 # Install python3 VIPER dependencies
 RUN pip install -r requirements.txt
-RUN cat $$(cat /run/secrets/authkey) >> /home/viper/viper/viper.conf
 
 ENTRYPOINT ["/docker-entrypoint.sh"]
