@@ -82,4 +82,5 @@ RUN pip install setuptools --upgrade
 # Install python3 VIPER dependencies
 RUN pip install -r requirements.txt
 
+ADD docker-entrypoint.sh /docker-entrypoint.sh
 ENTRYPOINT ["/docker-entrypoint.sh"]
