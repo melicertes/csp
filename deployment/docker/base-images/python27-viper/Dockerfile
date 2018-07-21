@@ -15,30 +15,16 @@ ENV LANG C.UTF-8
 ENV GPG_KEY C01E1CAD5EA2C4F0B8E3571504C367C218ADD4FF
 ENV PYTHON_VERSION 2.7.13
 
-#RUN set -ex \
-#	&& apk add --no-cache \
-#	    gcc \
-#	    g++ \
-#	    make \
-#		gnupg \
-#		openssl \
-#		tar \
-#		xz \
-#		python-dev \
-#		py-pip \
-#		postgresql-dev
-
 RUN apt update
 RUN apt install -y \
     build-essential \
     python \
     python-dev \
     python-pip \
-#    linux-headers-$(uname -r) \
+    python3 \
+    python3-dev \
     curl \
     libffi-dev \
-#    freetype-dev \
-#    freetype \
     libpng-dev \
     git \
     wget
@@ -73,20 +59,22 @@ RUN git clone https://github.com/viper-framework/viper.git
 WORKDIR /home/viper/viper
 RUN mkdir logs
 
+# Copy viper configuration file
 COPY config/viper.conf /home/viper/viper
+
+# Copy new VIPER modules
 COPY config/misp.py /home/viper/viper/viper/modules/misp.py
+COPY config/cspVT.py /home/viper/viper/viper/modules/cspVT.py
+COPY config/cspXOR.py /home/viper/viper/viper/modules/cspXOR.py
+
+# Copy custom CSP auth middleware
 COPY config/cspHeaderMiddleware.py /home/viper/viper/viper/web/viperweb/cspHeaderMiddleware.py
-#RUN pip install numpy
-#RUN apk add --no-cache numpy
-#RUN echo git+https://github.com/viper-framework/pefile.git#egg=pefile > constraints.txt
-#RUN cp constraints.txt exclude.txt
-#RUN cat constraints.txt
-#RUN sed -i '/git+https:\/\/github.com\/viper-framework\/pefile.git#egg=pefile/d' requirements-modules.txt
+
+# Install pip3
+RUN curl "https://bootstrap.pypa.io/get-pip.py" -o "get-pip.py"
+RUN python3 get-pip.py
 RUN pip install setuptools --upgrade
+
+# Install python3 VIPER dependencies
 RUN pip install -r requirements.txt
 
-#CMD ["python", "../viper/viper-cli"]
-#CMD ["python", "../viper/viper-web.py","-H", "localhost", "-p", "9090"]
-
-
-#CMD ["python2"]
