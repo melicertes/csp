@@ -27,7 +27,8 @@ RUN apt install -y \
     libffi-dev \
     libpng-dev \
     git \
-    wget
+    wget \
+    vim
 
 # VIPER STUFF
 
@@ -57,7 +58,7 @@ RUN mkdir /home/viper
 WORKDIR /home/viper
 RUN git clone https://github.com/viper-framework/viper.git
 WORKDIR /home/viper/viper
-RUN mkdir logs
+RUN mkdir -p /opt/csplogs
 
 # Copy viper configuration file
 COPY config/viper.conf /home/viper/viper
@@ -66,6 +67,9 @@ COPY config/viper.conf /home/viper/viper
 COPY config/misp.py /home/viper/viper/viper/modules/misp.py
 COPY config/cspVT.py /home/viper/viper/viper/modules/cspVT.py
 COPY config/cspXOR.py /home/viper/viper/viper/modules/cspXOR.py
+
+# Copy settings
+COPY config/settings.py /home/viper/viper/viper/web/settings.py
 
 # Copy custom CSP auth middleware
 COPY config/cspHeaderMiddleware.py /home/viper/viper/viper/web/viperweb/cspHeaderMiddleware.py
@@ -77,4 +81,6 @@ RUN pip install setuptools --upgrade
 
 # Install python3 VIPER dependencies
 RUN pip install -r requirements.txt
+RUN cat $$(cat /run/secrets/authkey) >> /home/viper/viper/viper.conf
 
+ENTRYPOINT ["/docker-entrypoint.sh"]
