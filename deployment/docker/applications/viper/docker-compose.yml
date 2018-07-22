@@ -12,8 +12,8 @@ services:
       - 8083:8083
     working_dir: /home/viper/viper
     volumes:
-      - /opt/csp/logs/:/home/viper/viper/logs
-      - ViperDatavolume:/home/viper/viper
+      - /opt/csp/logs/:/opt/csplogs
+      - ViperDatavolume:/home/viper/resources
       - MISPSharedDatavolume:/run/secrets
       - SSLDatavolume:/opt/ssl/
     environment:
