@@ -58,7 +58,9 @@ RUN mkdir /home/viper
 WORKDIR /home/viper
 RUN git clone https://github.com/viper-framework/viper.git
 WORKDIR /home/viper/viper
+
 RUN mkdir -p /opt/csplogs
+RUN mkdir -p /home/viper/resources
 
 # Copy viper configuration file
 COPY config/viper.conf /home/viper/viper
