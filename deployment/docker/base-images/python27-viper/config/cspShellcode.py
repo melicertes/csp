@@ -29,13 +29,13 @@ class CspXor(Module):
         key = cfg.misp.misp_key
         url = cfg.misp.misp_url
 
-        pymisp = PyMISP(url, key, ssl=False, proxies=None,cert=None)
+        pymisp = PyMISP(url, key, ssl=False, proxies=None,cert=('/opt/ssl/server/csp-internal.crt','/opt/ssl/server/csp-internal.key'))
 
-        xorSearch = Shellcode()
-        xorSearch.run()
+        shellcode = Shellcode()
+        shellcode.run()
 
         commentVal = ""
-        for out in xorSearch.output:
+        for out in shellcode.output:
             commentVal += out['data']
 
         self.log("info", "Updating MISP event " + str(__sessions__.current.misp_event.event.id) + "...")
