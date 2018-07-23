@@ -39,7 +39,7 @@ class CspXor(Module):
             print(str(out))
             if out['type'] == 'error':
                 print(">>: " + out['data'])
-                pymisp.add_named_attribute(__sessions__.current.misp_event.event.id, "comment", "XOR search out: " + out['data'])
+                pymisp.add_named_attribute(__sessions__.current.misp_event.event.id, "comment", "File: " + __sessions__.current.file.path + " XOR search out: " + out['data'])
 
 
 

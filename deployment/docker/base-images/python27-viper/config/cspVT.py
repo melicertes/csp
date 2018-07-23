@@ -33,6 +33,10 @@ class CspVT(Module):
 
         vt_apikey = cfg.virustotal.virustotal_key
 
+        if vt_apikey == '' or vt_apikey == None:
+            print('virustotal_key not set')
+            return
+
         pymisp = PyMISP(url, key, ssl=False, proxies=None, cert=('/opt/ssl/server/csp-internal.crt','/opt/ssl/server/csp-internal.key'))
 
         url = 'https://www.virustotal.com/vtapi/v2/file/scan'
