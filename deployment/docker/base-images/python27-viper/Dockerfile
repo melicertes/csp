@@ -69,6 +69,7 @@ COPY config/viper.conf /home/viper/viper
 COPY config/misp.py /home/viper/viper/viper/modules/misp.py
 COPY config/cspVT.py /home/viper/viper/viper/modules/cspVT.py
 COPY config/cspXOR.py /home/viper/viper/viper/modules/cspXOR.py
+COPY config/cspShellcode.py /home/viper/viper/viper/modules/cspShellcode.py
 
 # Copy settings
 COPY config/settings.py /home/viper/viper/viper/web/settings.py
