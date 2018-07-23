@@ -28,7 +28,7 @@ class CspXor(Module):
         url = cfg.misp.misp_url
 
 
-        pymisp = PyMISP(url, key, ssl=False, proxies=None,cert=None)
+        pymisp = PyMISP(url, key, ssl=False, proxies=None,cert=('/opt/ssl/server/csp-internal.crt','/opt/ssl/server/csp-internal.key'))
 
         xorSearch = XorSearch()
         xorSearch.run()
