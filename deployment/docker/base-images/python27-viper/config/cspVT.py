@@ -24,7 +24,7 @@ class CspVT(Module):
 
     def run(self):
         if (not __sessions__.is_attached_misp()):
-            print('MISP session not attached')
+            self.log("error", "MISP session not attached")
             return
 
         cfg = Config()
@@ -34,7 +34,7 @@ class CspVT(Module):
         vt_apikey = cfg.virustotal.virustotal_key
 
         if vt_apikey == '' or vt_apikey == None:
-            print('virustotal_key not set')
+            self.log("error", 'virustotal_key not set')
             return
 
         pymisp = PyMISP(url, key, ssl=False, proxies=None, cert=('/opt/ssl/server/csp-internal.crt','/opt/ssl/server/csp-internal.key'))
@@ -52,29 +52,19 @@ class CspVT(Module):
         misp_objects = generate_report(indicator, vt_apikey)
 
         if (__sessions__.is_attached_misp()):
-            print('MISP session attached')
-            print ('MISP event id: ' + str(__sessions__.current.misp_event.event.id))
+            self.log("info", 'MISP session attached')
+            self.log("info", 'MISP event id: ' + str(__sessions__.current.misp_event.event.id))
             event = pymisp.get_event(__sessions__.current.misp_event.event.id)
             #print(event)
             misp_event = MISPEvent()
             misp_event.load(event)
         else:
-            print('MISP session not attached')
+            self.log("error", 'MISP session not attached')
             return
-
-#        vt_response_misp_object = MISPObject(name="virustotal-report")
-#        vt_response_misp_object.add_attribute("comment", value=indicator)
-#        vt_response_misp_object.add_attribute("permalink", value=response.json()['permalink'])
-#        vt_response_misp_object.add_reference(referenced_uuid=vt_response_misp_object.uuid, relationship_type="report of")
-#        res = pymisp.add_object(__sessions__.current.misp_event.event.id, 67, vt_response_misp_object)
-#        print(res)
 
 
         for misp_object in misp_objects:
-            print(misp_object)
             res = pymisp.add_object(__sessions__.current.misp_event.event.id, 67, misp_object)
-            print(res)
-
 
 def generate_report(indicator, apikey):
     report_objects = []
@@ -82,8 +72,6 @@ def generate_report(indicator, apikey):
     report_objects.append(vt_report)
     raw_report = vt_report._report
     
-    print(raw_report) 
-
     file_object = MISPObject(name="file")
     file_object.add_attribute("md5", value=raw_report["md5"])
     file_object.add_attribute("sha1", value=raw_report["sha1"])
