@@ -7,6 +7,7 @@ from viper.core.session import __sessions__
 # import the necessary packages
 # import argparse
 from viper.modules.xor import XorSearch
+from viper.core.config import Config
 
 
 class CspXor(Module):
@@ -18,15 +19,14 @@ class CspXor(Module):
         super(CspXor, self).__init__()
 
     def run(self):
-        # if (not __sessions__.is_attached_misp()):
-        #     print('MISP session not attached')
-        #     return
+        if (not __sessions__.is_attached_misp()):
+            print('MISP session not attached')
+            return
 
-        print("Do something.")
-        # key = 'gxJGbYKjsJSdQ3IsmfT4dGvwikuwudh2VTig0sb6'
-        key = 'RnCpy64iWasEqfwAHTMLy3s5fXxqq38VyXDFOez1'
-        # url = 'https://misp.local.demo1-csp.athens.intrasoft-intl.private'
-        url = 'http://localhost:8182'
+        cfg = Config()
+        key = cfg.misp.misp_key
+        url = cfg.misp.misp_url
+
 
         pymisp = PyMISP(url, key, ssl=False, proxies=None,cert=None)
 

@@ -10,6 +10,7 @@ from viper.core.session import __sessions__
 # import the necessary packages
 # import argparse
 import requests
+from viper.core.config import Config
 
 
 
@@ -26,16 +27,13 @@ class CspVT(Module):
             print('MISP session not attached')
             return
 
-        print("Do something.")
-        key = 'gxJGbYKjsJSdQ3IsmfT4dGvwikuwudh2VTig0sb6'
-        url = 'https://misp.local.demo1-csp.athens.intrasoft-intl.private'
+        cfg = Config()
+        key = cfg.misp.misp_key
+        url = cfg.misp.misp_url
 
-        vt_apikey = '56e0213297540537b9dad11f0e28957b16706a7038363afcc8a3f0db1eb07e10'
+        vt_apikey = cfg.virustotal.virustotal_key
 
         pymisp = PyMISP(url, key, ssl=False, proxies=None, cert=('/opt/ssl/server/csp-internal.crt','/opt/ssl/server/csp-internal.key'))
-        print(pymisp.get_object_templates_list())
-
-        print(__sessions__.current.file.path)
 
         url = 'https://www.virustotal.com/vtapi/v2/file/scan'
 
@@ -45,12 +43,9 @@ class CspVT(Module):
 
         response = requests.post(url, files=files, params=params)
 
-        print(response.json())
-
         indicator = response.json()['md5']
 
         misp_objects = generate_report(indicator, vt_apikey)
-        print(misp_objects)
 
         if (__sessions__.is_attached_misp()):
             print('MISP session attached')
