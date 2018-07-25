@@ -21,6 +21,7 @@ RUN git clone https://github.com/certtools/intelmq.git /opt/dev_intelmq
 WORKDIR /opt/dev_intelmq
 RUN git checkout tags/1.1.0rc1
 
+ADD test-data /tmp/test-data
 ADD csp-config/cve /opt/dev_intelmq/intelmq/bots/parsers/cve
 COPY ./csp-config/BOTS /opt/dev_intelmq/intelmq/bots/BOTS
 COPY ./csp-config/BOTS /opt/intelmq/etc/BOTS
@@ -38,7 +39,8 @@ RUN chown -R www-data:www-data /var/www/html/
 RUN usermod -a -G intelmq www-data
 RUN mkdir /opt/intelmq/etc/manager/
 ADD positions.conf /opt/intelmq/etc/manager/positions.conf
-RUN chmod 666  /opt/intelmq/etc/manager/positions.conf 
+RUN chmod 666  /opt/intelmq/etc/manager/positions.conf
+RUN rm -rf /tmp/intelmq-manager
 
 COPY ./csp-config/*.conf /opt/intelmq/etc/
 RUN chown intelmq:www-data /opt/intelmq/etc/*.conf
