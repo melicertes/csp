@@ -1,84 +1,72 @@
-FROM csp-python3:1.0
+
+FROM ubuntu:16.04
 
 MAINTAINER tku
 MAINTAINER msg
 
-ENV INTELMQ_VERSION=1.0.4
-ENV INTELMQ_MGR_VERSION=1.0.1
+
 ENV INTELMQ_HOSTNAME=csp-intelmq
 ENV REDIS_HOSTNAME=csp-redis
+ENV APACHE_PID_FILE=/var/run/apache2/apache2.pid
+
+RUN rm -rf /var/lib/apt/lists/*
+RUN apt-get clean &&  apt-get update &&  apt-get -y upgrade
+RUN	apt-get install -y python3-pip python3-dnspython python3-psutil python3-redis python3-requests python3-termstyle python3-tz 
+RUN apt-get update -y
+RUN apt-get install -y apt-utils git apache2 php libapache2-mod-php7.0
+RUN apt-get install -y sudo build-essential libcurl4-gnutls-dev libgnutls28-dev python3-dev
+RUN apt-get install -y nano vim
+
+RUN git clone https://github.com/certtools/intelmq.git /opt/dev_intelmq
+WORKDIR /opt/dev_intelmq
+RUN git checkout tags/1.1.0rc1
+
+ADD csp-config/cve /opt/dev_intelmq/intelmq/bots/parsers/cve
+COPY ./csp-config/BOTS /opt/dev_intelmq/intelmq/bots/BOTS
+COPY ./csp-config/BOTS /opt/intelmq/etc/BOTS
+
+RUN pip3 install .
+RUN cp /opt/intelmq/etc/examples/harmonization.conf /opt/intelmq/etc/
+RUN useradd -d /opt/intelmq -U -s /bin/bash intelmq && \
+    mkdir -p /opt/intelmq/var/log && \
+	chmod -R 0777 /opt/intelmq && \
+    chown -R intelmq:intelmq /opt/intelmq
+
+RUN git clone https://github.com/certtools/intelmq-manager.git /tmp/intelmq-manager
+RUN cp -R /tmp/intelmq-manager/intelmq-manager/* /var/www/html/
+RUN chown -R www-data:www-data /var/www/html/
+RUN usermod -a -G intelmq www-data
+RUN mkdir /opt/intelmq/etc/manager/
+ADD positions.conf /opt/intelmq/etc/manager/positions.conf
+RUN chmod 666  /opt/intelmq/etc/manager/positions.conf 
+
+COPY ./csp-config/*.conf /opt/intelmq/etc/
+RUN chown intelmq:www-data /opt/intelmq/etc/*.conf
+RUN chmod g+w /opt/intelmq/etc/*.conf
+RUN echo "www-data ALL=(intelmq) NOPASSWD: /usr/local/bin/intelmqctl" >> /etc/sudoers
+RUN echo "intelmq ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 
 
-RUN apk update && \
-  apk upgrade && \
-  apk add wget vim sudo php5-apache2 php5-curl php5-cli php5-json python3-dev \
-    alpine-sdk linux-headers postgresql-dev libffi-dev shadow && \
-  wget https://github.com/certtools/intelmq/archive/${INTELMQ_VERSION}.tar.gz \
-    -O /tmp/intelmq-${INTELMQ_VERSION}.tar.gz && \
-  wget https://github.com/certtools/intelmq-manager/archive/${INTELMQ_MGR_VERSION}.tar.gz \
-    -O /tmp/intelmq-manager-${INTELMQ_MGR_VERSION}.tar.gz && \
-  cd /tmp && \
-  tar -xzf intelmq-${INTELMQ_VERSION}.tar.gz && \
-  tar -xzf intelmq-manager-${INTELMQ_MGR_VERSION}.tar.gz && \
-  rm -f intelmq-${INTELMQ_VERSION}.tar.gz && \
-  rm -f intelmq-manager-${INTELMQ_MGR_VERSION}.tar.gz && \
-  cd intelmq-${INTELMQ_VERSION} && \
-  rm contrib/cron-jobs/intelmq-update-data && \
-  rm contrib/cron-jobs/update-asn-data && \
-  cp intelmq/bots/experts/asn_lookup/update-asn-data contrib/cron-jobs/ && \
-  rm contrib/cron-jobs/update-geoip-data && \
-  cp intelmq/bots/experts/maxmind_geoip/update-geoip-data contrib/cron-jobs/ && \
-  rm contrib/cron-jobs/update-tor-nodes && \
-  cp intelmq/bots/experts/tor_nodes/update-tor-nodes contrib/cron-jobs/ && \
-  pip3 install . && \
-  find . -name REQUIREMENTS.txt -exec pip3 install -q -r {} \; && \
-  adduser -D -h /opt/intelmq -s /bin/sh intelmq && \
-  mkdir -p /opt/intelmq/var/log && \
-  chmod -R 0770 /opt/intelmq && \
-  chown -R intelmq.intelmq /opt/intelmq && \
-  cd /opt/intelmq/etc && \
-  cp -a examples/* . && \
+RUN  cd /opt/intelmq/etc && \
   sed -i "s/\"destination_pipeline_host\": \"127.0.0.1\"/\"destination_pipeline_host\": \"${REDIS_HOSTNAME}\"/g" defaults.conf && \
-  sed -i "s/\"source_pipeline_host\": \"127.0.0.1\"/\"source_pipeline_host\": \"${REDIS_HOSTNAME}\"/g" defaults.conf && \
-  sed -i "s/\"redis_cache_host\": \"127.0.0.1\",/\"redis_cache_host\": \"${REDIS_HOSTNAME}\",/g" runtime.conf && \
-  cd /tmp/intelmq-manager-${INTELMQ_MGR_VERSION} && \
-  sed -i "s/#ServerName www.example.com:80/ServerName ${INTELMQ_HOSTNAME}/g" /etc/apache2/httpd.conf && \
-  cp -R /tmp/intelmq-manager-${INTELMQ_MGR_VERSION}/intelmq-manager/* /var/www/localhost/htdocs/ && \
-  chown -R apache:apache /var/www/localhost/htdocs/ && \
-  mv /var/www/localhost/htdocs/index.html /var/www/localhost/htdocs/index.html.bak && \
-  usermod -a -G intelmq apache && \
-  mkdir /opt/intelmq/etc/manager/ && \
- # touch /opt/intelmq/etc/manager/positions.conf && \
- # chgrp apache /opt/intelmq/etc/*.conf /opt/intelmq/etc/manager/positions.conf && \
-  chgrp apache /opt/intelmq/etc/*.conf  && \
-  chmod g+w /opt/intelmq/etc/*.conf  && \
-  echo "apache ALL=(intelmq) NOPASSWD: /usr/bin/intelmqctl" >> /etc/sudoers && \
-  sed -i "s/\/usr\/local\/bin\/intelmqctl/\/usr\/bin\/intelmqctl/g" /var/www/localhost/htdocs/php/config.php && \
-  echo "root ALL=(intelmq) NOPASSWD: /usr/bin/intelmqctl" >> /etc/sudoers && \
-  mkdir /scripts && \
-  mkdir /run/apache2 && \
-  mkdir -p /tmp/intelmq-fileinput && \
+  sed -i "s/\"source_pipeline_host\": \"127.0.0.1\"/\"source_pipeline_host\": \"${REDIS_HOSTNAME}\"/g" defaults.conf 
+  
+RUN  mkdir -p /tmp/intelmq-fileinput && \
   chmod og+rw -R /tmp/intelmq-fileinput && \
   mkdir -p /tmp/intelmq-fileoutput && \
   chmod og+rw -R /tmp/intelmq-fileoutput && \
-  echo "DONE SUCCESSFULLY!"
+  mkdir /scripts && \
+  echo "Added CSP custom fileinput-output"
 
 ADD scripts/run.sh /scripts/run.sh
-ADD csp-config/runtime.conf /opt/intelmq/etc/runtime.conf
-ADD csp-config/pipeline.conf /opt/intelmq/etc/pipeline.conf
+RUN chmod u+x /scripts/run.sh
+
 RUN chmod -R 0770 /opt/intelmq/etc/ && \
     cd /opt/intelmq/etc && \
     sed -i "s/\"redis_cache_host\": \"127.0.0.1\",/\"redis_cache_host\": \"${REDIS_HOSTNAME}\",/g" runtime.conf && \
     chown -R intelmq.intelmq /opt/intelmq/etc/ && \
-    echo "Added CSP custom runtime done"
+    echo "Added CSP custom runtime done" && \
+    echo "DONE SUCCESSFULLY!"
 
-ADD positions.conf /opt/intelmq/etc/manager/positions.conf
-RUN chgrp apache  /opt/intelmq/etc/manager/positions.conf && \
-    chmod g+w  /opt/intelmq/etc/manager/positions.conf
-
-RUN chmod u+x /scripts/run.sh
-
-#USER intelmq
-
-ENTRYPOINT ["scripts/run.sh"]  
+ENTRYPOINT ["/scripts/run.sh"]  
 
