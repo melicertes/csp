@@ -21,10 +21,10 @@ public class RequestFilter implements Filter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
 
-        String currentUserName = "anonymous";
+        String currentUserName = "";
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (!(authentication instanceof AnonymousAuthenticationToken)) {
+        if (authentication != null && !(authentication instanceof AnonymousAuthenticationToken)) {
             currentUserName = authentication.getName();
         }
 
