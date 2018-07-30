@@ -21,8 +21,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.csrf().disable();
         if (enableOAM) {
             http.addFilterBefore(new AuthorizationFilter(), BasicAuthenticationFilter.class);
-            http.antMatcher("/rulesets/**");
-            http.antMatcher("/mappings/**");
+            http.requestMatchers().antMatchers("/rulesets/**", "/mappings/**");
         }
     }
 }
