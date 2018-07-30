@@ -1,5 +1,8 @@
 package com.intrasoft.csp.server.policy.config;
 
+import com.intrasoft.csp.libraries.headersauth.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -11,6 +14,7 @@ import java.io.IOException;
 
 @Component
 public class RequestFilter implements Filter {
+    private static final Logger LOG = LoggerFactory.getLogger(RequestFilter.class);
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
@@ -20,11 +24,10 @@ public class RequestFilter implements Filter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
 
-        String currentUserName = "anonymous";
-
+        String currentUserName = "";
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (!(authentication instanceof AnonymousAuthenticationToken)) {
-            currentUserName = authentication.getName();
+        if (authentication != null && !(authentication instanceof AnonymousAuthenticationToken)) {
+            currentUserName = ((User)authentication.getPrincipal()).getUsername();
         }
 
         try {
