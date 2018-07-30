@@ -2,6 +2,8 @@ package com.intrasoft.csp.libraries.headersauth;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -49,6 +51,20 @@ public class AuthorizationFilter extends OncePerRequestFilter {
 
             SecurityContextHolder.getContext().setAuthentication(auth);
             filterChain.doFilter(request, response);
+        }
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        String currentUserName = "";
+        if (authentication != null && !(authentication instanceof AnonymousAuthenticationToken)) {
+            currentUserName = authentication.getName();
+        }
+
+        try {
+            String mdcData = String.format("[%s] ", currentUserName);
+            MDC.put("user", mdcData);
+        } finally {
+            MDC.clear();
         }
     }
 }
