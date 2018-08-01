@@ -11,7 +11,7 @@ ENV APACHE_PID_FILE=/var/run/apache2/apache2.pid
 
 RUN rm -rf /var/lib/apt/lists/*
 RUN apt-get clean &&  apt-get update &&  apt-get -y upgrade
-RUN	apt-get install -y python3-pip python3-dnspython python3-psutil python3-redis python3-requests python3-termstyle python3-tz 
+RUN	apt-get install -y python3-pip python3-dnspython python3-psutil python3-redis python3-requests python3-termstyle python3-tz python3-bs4 
 RUN apt-get update -y
 RUN apt-get install -y apt-utils git apache2 php libapache2-mod-php7.0
 RUN apt-get install -y sudo build-essential libcurl4-gnutls-dev libgnutls28-dev python3-dev
