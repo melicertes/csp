@@ -253,11 +253,15 @@
     },
     "Parser": {
           "CVE server": {
-            "description": "CVE server Parser is the bot responsible to parse the report and sanitize the information.",
+            "description": "CVE server Parser is the bot responsible to parse the report and sanitize the information from api interface https://cve.circl.lu/api/last/.",
             "module": "intelmq.bots.parsers.cve.parser_cve_server",
             "parameters": {}
         },
-
+          "CVE scraping": {
+            "description": "CVE scraping Parser is the bot responsible to parse the reports from twitter page https://twitter.com/CVEnew/.",
+            "module": "intelmq.bots.parsers.cve.parser_cve_scraping",
+            "parameters": {}
+        },
         "Abuse.ch Domain": {
             "description": "Abuse.ch Domain Parser is the bot responsible to parse the report and sanitize the information.",
             "module": "intelmq.bots.parsers.abusech.parser_domain",
