@@ -1,11 +1,14 @@
 package com.intrasoft.csp.server.policy.controller;
 
 import com.intrasoft.csp.commons.model.IntegrationDataType;
+import com.intrasoft.csp.libraries.headersauth.AuthorizationFilter;
 import com.intrasoft.csp.libraries.headersauth.User;
 import com.intrasoft.csp.server.policy.domain.SharingPolicyRoutes;
 import com.intrasoft.csp.server.policy.domain.model.PolicyDTO;
 import com.intrasoft.csp.server.policy.domain.model.SharingPolicyAction;
 import com.intrasoft.csp.server.policy.service.SharingPolicyService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -22,6 +25,7 @@ import java.util.List;
 
 @Controller
 public class SharingPolicyController implements SharingPolicyRoutes {
+    private static final Logger LOG = LoggerFactory.getLogger(SharingPolicyController.class);
 
     @Autowired
     SharingPolicyService sharingPolicyService;
@@ -53,6 +57,7 @@ public class SharingPolicyController implements SharingPolicyRoutes {
 
     @RequestMapping(BASE_URL)
     public String viewPolicy(final Model model,@ModelAttribute("policy") PolicyDTO policy) {
+        LOG.info("Page loaded: "+BASE_URL);
         return HOME_TH;
     }
 
@@ -60,6 +65,7 @@ public class SharingPolicyController implements SharingPolicyRoutes {
     public String getPolicy(@PathVariable Integer id, final Model model) {
         PolicyDTO policyDTO = sharingPolicyService.getPolicyById(id);
         model.addAttribute("policy",policyDTO);
+        LOG.info("Page loaded: "+BASE_URL+"/"+id);
         return HOME_TH;
     }
 
