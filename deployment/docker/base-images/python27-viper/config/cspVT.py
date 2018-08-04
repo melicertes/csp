@@ -39,6 +39,16 @@ class CspVT(Module):
 
         pymisp = PyMISP(url, key, ssl=False, proxies=None, cert=('/opt/ssl/server/csp-internal.crt','/opt/ssl/server/csp-internal.key'))
 
+        # Get VT object template id from misp
+        object_pattern_id = 0;
+        json_string = pymisp.get_object_templates_list()
+        for item in json_string:
+            # print("==>" + str(item))
+            if str(item["ObjectTemplate"]["name"]) == "virustotal-report":
+                # print(item["ObjectTemplate"])
+                object_pattern_id = int(item["ObjectTemplate"]["id"])
+
+
         url = 'https://www.virustotal.com/vtapi/v2/file/scan'
 
         params = {'apikey': vt_apikey}
@@ -64,7 +74,7 @@ class CspVT(Module):
 
 
         for misp_object in misp_objects:
-            res = pymisp.add_object(__sessions__.current.misp_event.event.id, 67, misp_object)
+            res = pymisp.add_object(__sessions__.current.misp_event.event.id, object_pattern_id, misp_object)
 
 def generate_report(indicator, apikey):
     report_objects = []
