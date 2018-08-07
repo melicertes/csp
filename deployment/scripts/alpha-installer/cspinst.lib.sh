@@ -588,7 +588,7 @@ function downloadCSPImage() {
 	echo "Downloading image #3...."
 	curl --progress-bar -o docker/applications/jitsi/vc-bridge-admin-app.jar http://central.preprod.melicertes.eu/repo-loads/vc-bridge-admin-app.jar
 	local r=$(( $? ))
-	curl --progress-bar -o /opt/csp/il/integration-tests-3.8.0-SNAPSHOT.jar http://central.preprod.melicertes.eu/repo-loads/integration-layer/integration-tests-3.8.0-SNAPSHOT.jar
+	curl --progress-bar -o /opt/csp/il/integration-tests-3.10.0-SNAPSHOT.jar http://central.preprod.melicertes.eu/repo-loads/integration-layer/integration-tests-3.10.0-SNAPSHOT.jar
 	r=$(( $r + $? ))
 	curl --progress-bar -o /opt/csp/il/il-server-0.0.1-ALPHA.jar http://central.preprod.melicertes.eu/repo-loads/integration-layer/il-server-0.0.1-ALPHA.jar
 	r=$(( $r + $? ))
