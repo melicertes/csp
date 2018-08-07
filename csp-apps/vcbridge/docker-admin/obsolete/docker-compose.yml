@@ -6,7 +6,7 @@ services:
     container_name: sastimex-server
     image: openjdk:8
     volumes:
-      - ./application/target/vcbridge-admin-application-3.8.0-SNAPSHOT:/application.jar
+      - ./application/target/vcbridge-admin-application-3.10.0-SNAPSHOT:/application.jar
       - ./docker-volume/entrypoint.sh:/entrypoint.sh
     ports:
       - "8080:8080"
