@@ -40,6 +40,7 @@ public interface MispContextUrl {
         ACTION("action"),
         ATTRIBUTE("Attribute"),
         ORGANISATION("Organisation"),
+        OBJECT("Object"),
         SHARINGGROUP("SharingGroup");
 
         private final String value;
