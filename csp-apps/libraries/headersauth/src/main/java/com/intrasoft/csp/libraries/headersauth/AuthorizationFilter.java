@@ -2,6 +2,8 @@ package com.intrasoft.csp.libraries.headersauth;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -23,6 +25,7 @@ public class AuthorizationFilter extends OncePerRequestFilter {
     public static final String USER_HEADER = "Custom-User-Id";
     public static final String GROUP_HEADER = "Custom-User-Is-Member-Of";
     public static final String ADMIN_GROUP = "csp-admin";
+    private final String USER_KEY = "user";
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -46,9 +49,31 @@ public class AuthorizationFilter extends OncePerRequestFilter {
             user.setGroup(groupHeaderValue);
 
             Authentication auth = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
-
             SecurityContextHolder.getContext().setAuthentication(auth);
-            filterChain.doFilter(request, response);
+
+            Boolean successfulRegistration = injectUsernameInLogs(userHeaderValue);
+
+            try {
+                filterChain.doFilter(request, response);
+            } finally {
+                if (successfulRegistration) {
+                    MDC.remove(USER_KEY);
+                }
+            }
+
         }
+    }
+
+    private Boolean injectUsernameInLogs(String username) {
+        try {
+            String mdcData = String.format("[%s] ", username);
+            if(!StringUtils.isEmpty(mdcData)) {
+                MDC.put(USER_KEY, mdcData);
+                return true;
+            }
+        } catch (Exception e) {
+            LOG.error("Error injecting user header value in logs. ", e);
+        }
+        return false;
     }
 }

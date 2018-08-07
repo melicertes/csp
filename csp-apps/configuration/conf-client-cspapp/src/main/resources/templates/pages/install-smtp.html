@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments::head(title='SMTP Settings', description='Editing SMTP settings')"></head>
+
+<body>
+
+<nav class="navbar navbar-inverse navbar-fixed-top">
+    <div th:replace="fragments::nav"></div>
+</nav>
+
+<div class="container">
+
+    <div class="row">
+        <div class="col-md-12">
+            <p>&nbsp;</p>
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="col-md-12">
+            <h2 class="page-header"><i class="fa fa-cube fa-2x"></i> Installation</h2>
+        </div>
+    </div>
+
+
+    <div id="smtp" class="row">
+        <div class="col-md-12">
+            <form method="POST" action="#" id="csp-form">
+                <input type="hidden" id="cspId" name="cspId" th:value="${cspId}"></input>
+
+                <div class="row">
+                    <div class="col-md-12" style="text-align: right">
+                        <a th:href="${dashboardUrl}" class="save btn btn-default">Cancel</a>
+                        <button type="submit" class="save btn btn-success">Save</button>
+                    </div>
+                </div>
+
+
+                <div class="row">
+                    <div class="col-md-12 col-sm-12">
+                        <p class="lead pull-left">Outgoing Emails</p>
+                        <p class="pull-right help-block">The configuration below enables use of SMTP services for CSP.
+                            For supported SMTP settings (e.g. TLS), please refer to the installation manual. To activate any
+                            change, a system stop/start cycle from the "System" page is required.</p>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-3 col-xs-6">
+                        <div class="form-group">
+                            <label for="smtp_host">Sender Name:</label>
+                            <input id="sender_name" name="sender_name" type="text" th:value="${smtp.senderName}" class="form-control"></input>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-xs-6">
+                        <div class="form-group">
+                            <label for="smtp_host">Sender Email:</label>
+                            <input id="sender_email" name="sender_email" type="text" th:value="${smtp.senderEmail}" class="form-control"></input>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-xs-6">
+                        <div class="form-group">
+                            <label for="smtp_host">SMTP Host:</label>
+                            <input id="smtp_host" name="smtp_host" type="text" th:value="${smtp.host}" class="form-control"></input>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-xs-6">
+                        <div class="form-group">
+                            <label for="smtp_port">SMTP Port:</label>
+                            <input id="smtp_port" name="smtp_port" type="text" th:value="${smtp.port}" class="form-control"></input>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-xs-6">
+                        <div class="form-group">
+                            <label for="smtp_user">SMTP Username:</label>
+                            <input id="smtp_user" name="smtp_user" type="text" th:value="${smtp.userName}" class="form-control"></input>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-xs-6">
+                        <div class="form-group">
+                            <label for="smtp_pass">SMTP Password:</label>
+                            <input id="smtp_pass" name="smtp_pass" type="password" th:value="${smtp.password}" class="form-control"></input>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12 col-sm-12">
+                        <p>&nbsp;</p>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12" style="text-align: right">
+                        <a th:href="${dashboardUrl}" class="save btn btn-default">Cancel</a>
+                        <button type="submit" class="save btn btn-success">Save</button>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12 col-sm-12">
+                        <p>&nbsp;</p>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12" id="result"></div>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+
+</div>
+
+
+<th:block th:replace="fragments::scripts"></th:block>
+
+<script th:src="@{/webjars/jquery-validation/1.16.0/jquery.validate.min.js}"></script>
+<script th:src="@{/webjars/jquery-validation/1.16.0/additional-methods.min.js}"></script>
+<script th:src="@{/webjars/jquery-mask-plugin/1.14.10/dist/jquery.mask.min.js}"></script>
+<script th:src="@{/webjars/bootstrap-checkbox/1.2.5/dist/js/bootstrap-checkbox.min.js}"></script>
+<script th:src="@{/webjars/bootstrap-fileinput/4.4.0/js/fileinput.min.js}"></script>
+<script th:src="@{/webjars/bootstrap3-dialog/1.35.3/dist/js/bootstrap-dialog.min.js}"></script>
+
+<script th:src="@{/assets/js/vendor/jquery.duplicate.min.js}"></script>
+<script th:src="@{/assets/js/vendor/jquery.serializeObject.js}"></script>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    var POST_URL = [[${editSmtpApi}]];
+    var REDIRECT_URL = [[${installSmtpUrl}]];
+    /*]]>*/
+</script>
+<script th:src="@{/assets/js/pages/install-smtp.js}"></script>
+
+</body>
+
+</html>

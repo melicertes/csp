@@ -92,10 +92,12 @@ public class SharingPolicyImpl implements SharingPolicyService, Conversions{
 
     @Override
     public PolicyDTO savePolicy(PolicyDTO policyDTO) {
+        String s;
         Policy policy;
         if(policyDTO.getId() != null){
             // UPDATE
             policy = policyRepository.findOne(policyDTO.getId());
+            s = "has been updated";
         }else{
             // INSERT
             policy = new Policy();
@@ -104,6 +106,7 @@ public class SharingPolicyImpl implements SharingPolicyService, Conversions{
                 throw new PolicySaveException("The sharing policy object you provided could not be saved. " +
                         "Check if passing empty or null fields");
             }
+            s = "has been created";
         }
 
         policy.setActive(policyDTO.getActive());
@@ -120,6 +123,14 @@ public class SharingPolicyImpl implements SharingPolicyService, Conversions{
             policy.setSharingPolicyAction(policyDTO.getSharingPolicyAction());
         }
 
+        s = "Policy: " +
+                "{DataType:" + policy.getIntegrationDataType().toString() + "} - " +
+                "{Status:" + (policy.getActive() == null ? "Default" : policy.getActive()) + "} - " +
+                "{Condition:" + policy.getPolicyCondition() + "} - " +
+                "{PolicyAction:" + policy.getSharingPolicyAction().text() + "} " +
+                s;
+        LOG.info(s);
+
         Policy savedPolicy = policyRepository.save(policy);
         return convertPolicyToDTO.apply(savedPolicy);
     }
@@ -127,7 +138,15 @@ public class SharingPolicyImpl implements SharingPolicyService, Conversions{
     @Override
     public void deletePolicy(Integer id) {
         try {
+            Policy policy = policyRepository.findOne(id);
             policyRepository.delete(id);
+            String s = "Policy: " +
+                    "{DataType:" + policy.getIntegrationDataType().toString() + "} - " +
+                    "{Status:" + (policy.getActive() == null ? "Default" : policy.getActive()) + "} - " +
+                    "{Condition:" + policy.getPolicyCondition() + "} - " +
+                    "{PolicyAction:" + policy.getSharingPolicyAction().text() + "} " +
+                    "has been deleted";
+            LOG.info(s);
         }catch (EmptyResultDataAccessException e){
             throw new CouldNotDeleteException(String.format("Could not delete policy with this id: %d. Does it exist?",id));
         }
@@ -136,6 +155,7 @@ public class SharingPolicyImpl implements SharingPolicyService, Conversions{
     @Override
     public void deleteAllPolicies() {
         policyRepository.deleteAll();
+        LOG.info("All policies have been deleted");
     }
 
     @Override

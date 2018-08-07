@@ -12,7 +12,7 @@ services:
             - CFG_PATH_REPO=/opt/cfg/data
             - ENABLE_OAM=false
         volumes:
-            - ./conf-server-3.6.0-SNAPSHOT-exec.jar:/opt/csp/server.jar
+            - ./conf-server-3.8.0-SNAPSHOT-exec.jar:/opt/csp/server.jar
             - /opt/csp/logs/:/opt/csplogs
             - ./cfg/data:/opt/cfg/data
         ports:
@@ -33,7 +33,7 @@ services:
          - SERVER_ADDRESS=0.0.0.0
         volumes:
             - /var/run/docker.sock:/var/run/docker.sock
-            - ./conf-client-cspapp-3.6.0-SNAPSHOT.jar:/opt/csp/server.jar
+            - ./conf-client-cspapp-3.8.0-SNAPSHOT.jar:/opt/csp/server.jar
             - ./cfg-client/data:/opt/cspinst/
             - ./cfg-client/root:/root/
             - /opt/csp/:/opt/csp/

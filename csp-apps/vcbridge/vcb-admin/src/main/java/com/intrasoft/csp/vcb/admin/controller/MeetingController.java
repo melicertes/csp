@@ -5,12 +5,7 @@ import java.time.Duration;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import javax.validation.Valid;
@@ -102,7 +97,8 @@ public class MeetingController {
 		}
 		MeetingForm formMeeting = new MeetingForm();
 		LinkedList<ParticipantForm> l = new LinkedList<>();
-		l.add(new ParticipantForm(principal.getFirstname(), principal.getLastname(), principal.getUsername()));
+		//Do not add current user's email
+		//l.add(new ParticipantForm(principal.getFirstname(), principal.getLastname(), principal.getUsername()));
 		formMeeting.setEmails(l);
 		model.addAttribute("userTZ", user_tz);
 		model.addAttribute("meetingForm", formMeeting);
@@ -154,6 +150,13 @@ public class MeetingController {
 				meetingForm.setStart(null);
 				meetingForm.setStartDate(null);
 			}
+
+			//add participants to the returned object
+			LinkedList<ParticipantForm> participants = new LinkedList<>();
+			participants.addAll(emails);
+			meetingForm.setEmails(participants);
+
+
 			model.addAttribute("meetingForm", meetingForm);
 			return "createMeeting";
 		}
