@@ -35,6 +35,7 @@ RUN useradd -d /opt/intelmq -U -s /bin/bash intelmq && \
 
 RUN git clone https://github.com/certtools/intelmq-manager.git /tmp/intelmq-manager
 RUN cp -R /tmp/intelmq-manager/intelmq-manager/* /var/www/html/
+RUN mv /var/www/html/index.html /var/www/html/index.html.save
 RUN chown -R www-data:www-data /var/www/html/
 RUN usermod -a -G intelmq www-data
 RUN mkdir /opt/intelmq/etc/manager/
