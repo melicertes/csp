@@ -1,19 +1,17 @@
 FROM ubuntu:16.04
 
+
 MAINTAINER tku
 MAINTAINER msg
 
 
-ENV INTELMQ_HOSTNAME=csp-intelmq
-ENV REDIS_HOSTNAME=csp-redis
-ENV APACHE_PID_FILE=/var/run/apache2/apache2.pid
-
-RUN apt-get clean &&  apt-get update &&  apt-get -y upgrade && \
+#RUN apt-get clean &&  apt-get update &&  apt-get -y upgrade && \
+RUN apt-get update &&   \
  apt-get install -y python3-pip python3-dnspython python3-psutil python3-redis python3-requests python3-termstyle python3-tz python3-bs4 && \
  apt-get update -y && \
  apt-get install -y apt-utils git apache2 php libapache2-mod-php7.0 && \
  apt-get install -y sudo build-essential libcurl4-gnutls-dev libgnutls28-dev python3-dev && \
- apt-get install -y nano vim && \
+# apt-get install -y nano vim && \
  rm -rf /var/lib/apt/lists/*
 
 RUN git clone https://github.com/certtools/intelmq.git /opt/dev_intelmq
@@ -51,7 +49,12 @@ RUN chown intelmq:www-data /opt/intelmq/etc/*.conf && \
  echo "www-data ALL=(intelmq) NOPASSWD: /usr/local/bin/intelmqctl" >> /etc/sudoers && \
  echo "intelmq ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 
+ENV INTELMQ_HOSTNAME=csp-intelmq
+RUN sed -i "s/#ServerName www.example.com/ServerName ${INTELMQ_HOSTNAME}/g" /etc/apache2/sites-enabled/000-default.conf && \
+ sed -i "s/#ServerName www.example.com/ServerName ${INTELMQ_HOSTNAME}/g" /etc/apache2/sites-available/000-default.conf 
 
+
+ENV REDIS_HOSTNAME=csp-redis
 RUN cd /opt/intelmq/etc && \
   sed -i "s/\"destination_pipeline_host\": \"127.0.0.1\"/\"destination_pipeline_host\": \"${REDIS_HOSTNAME}\"/g" defaults.conf && \
   sed -i "s/\"source_pipeline_host\": \"127.0.0.1\"/\"source_pipeline_host\": \"${REDIS_HOSTNAME}\"/g" defaults.conf 
