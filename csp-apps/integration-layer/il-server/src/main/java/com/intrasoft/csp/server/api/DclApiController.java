@@ -1,6 +1,7 @@
 package com.intrasoft.csp.server.api;
 
 import com.intrasoft.csp.commons.apiHttpStatusResponse.HttpStatusResponseType;
+import com.intrasoft.csp.commons.exceptions.InvalidDataTypeException;
 import com.intrasoft.csp.commons.model.IntegrationData;
 import com.intrasoft.csp.commons.routes.CamelRoutes;
 import com.intrasoft.csp.commons.routes.ContextUrl;
@@ -11,12 +12,9 @@ import org.apache.camel.ProducerTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.beanvalidation.SpringValidatorAdapter;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class DclApiController implements CamelRoutes,ContextUrl{
@@ -25,9 +23,6 @@ public class DclApiController implements CamelRoutes,ContextUrl{
 
     @Autowired
     RouteUtils routes;
-
-    @Autowired
-    SpringValidatorAdapter springValidatorAdapter;
 
     @Produce
     private ProducerTemplate producerTemplate;
@@ -43,10 +38,9 @@ public class DclApiController implements CamelRoutes,ContextUrl{
     @RequestMapping(value = "/v"+REST_API_V1+"/"+DCL_INTEGRATION_DATA,
             consumes = {"application/json"},
             method = RequestMethod.POST)
-    public ResponseEntity<String> getNewIntDataFromExtCsp(@RequestBody IntegrationData integrationData) {
-
+    public ResponseEntity<String> getNewIntDataFromExtCsp(@RequestBody IntegrationData integrationData,@RequestHeader HttpHeaders headers) {
         LOG.info("DCL Endpoint: POST received");
-
+        apiDataHandler.checkIsValidCspIdAgainstCertificateHeader(headers,integrationData);
         return handleIntegrationData(integrationData, "POST");
     }
 
@@ -58,10 +52,9 @@ public class DclApiController implements CamelRoutes,ContextUrl{
     @RequestMapping(value = "/v"+REST_API_V1+"/"+DCL_INTEGRATION_DATA,
             consumes = {"application/json"},
             method = RequestMethod.PUT)
-    public ResponseEntity<String> getUpdateIntDataFromExtCsp(@RequestBody IntegrationData integrationData) {
-
+    public ResponseEntity<String> getUpdateIntDataFromExtCsp(@RequestBody IntegrationData integrationData,@RequestHeader HttpHeaders headers) {
         LOG.info("DCL Endpoint: PUT received");
-
+        apiDataHandler.checkIsValidCspIdAgainstCertificateHeader(headers,integrationData);
         return handleIntegrationData(integrationData, "PUT");
     }
 

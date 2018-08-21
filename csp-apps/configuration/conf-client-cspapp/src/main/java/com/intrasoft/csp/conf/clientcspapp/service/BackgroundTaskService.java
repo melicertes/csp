@@ -27,6 +27,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
+import javax.annotation.PostConstruct;
 import java.io.*;
 import java.lang.management.ManagementFactory;
 import java.net.InetSocketAddress;
@@ -71,23 +72,23 @@ public class BackgroundTaskService {
         int memoryFoundMB = (int) (((com.sun.management.OperatingSystemMXBean) ManagementFactory
                 .getOperatingSystemMXBean()).getTotalPhysicalMemorySize()/ 1024 / 1024 );
 
-        int success = 0;
+        int failsFound = 0;
         log.info("Found OS         : {}", System.getProperty("os.name"));
 
         if (vcpusFound < vcpus) {
             log.warn("Found CPUs       : {}, Required: {} - FAIL", vcpusFound, vcpus);
-            success++;
+            failsFound++;
         }
         if (diskFreeMB < diskGb * 1024) {
             log.warn("Found Free space : {}MB, Required: {}MB - FAIL", diskFreeMB, diskGb * 1024);
-            success++;
+            failsFound++;
         }
 
         if (memoryFoundMB < memoryGb * 1024) {
             log.warn("Found Total RAM  : {}MB, Required: {}MB - FAIL", memoryFoundMB, memoryGb * 1024);
-            success++;
+            failsFound++;
         }
-        if (success > 0) {
+        if (failsFound > 0) {
             log.error("Requirements check result: FAILED");
         }
 
@@ -95,7 +96,7 @@ public class BackgroundTaskService {
             log.warn("Installation is forced due to configuration override");
             return true;
         } else
-            return success <= 0;
+            return failsFound <= 0;
     }
 
     @Getter
@@ -172,6 +173,34 @@ public class BackgroundTaskService {
     ObjectMapper jackson;
 
 
+    @PostConstruct
+    public void verifyStartupState() {
+        addTask("Fixing Module States", () -> {
+            //for the moment, we check if there are any modules in
+            // DOWNLOADING state ---> to UNKNOWN
+            // INSTALLING state  ---> to DOWNLOADED
+            installationService.queryModuleByState(ModuleState.DOWNLOADING, ModuleState.INSTALLING)
+                    .stream()
+                    .map(m -> {
+                        ModuleState orig = m.getModuleState();
+                        switch (orig) {
+                            case INSTALLING:
+                                m.setModuleState(ModuleState.DOWNLOADED);
+                                break;
+                            case DOWNLOADING:
+                                m.setModuleState(ModuleState.UNKNOWN);
+                                break;
+                        }
+                        m.setArchivePath(null);
+                        SystemModule mupd = installationService.saveSystemModule(m);
+                        return mupd.getId() +" / " + mupd.getName() + " has been reset from "+orig+" to " + m.getModuleState();
+                    })
+                    .forEach(log::info);
+            return new BackgroundTaskResult<String,Boolean>("Completed",true);
+        });
+    }
+
+
     @Scheduled(initialDelay = 10000, fixedRate = 600000)
     public void registerCspHeartbeat() {
         final SystemInstallationState state = installationService.getState();
@@ -220,18 +249,57 @@ public class BackgroundTaskService {
     }
 
 
+    /**
+     * starts every 10 hour and looks for old (inactive) modules.
+     * deletes from DB, disk and download folders
+     */
+    @Scheduled(initialDelay = 25000, fixedDelay = 36000000)
     @SneakyThrows
-    public <S, R> void addTask(BackgroundTask<S, R> task) {
-        while (!backgroundTasks.offer(task)) {
+    public void cleanUpOldModules() {
+        final List<SystemModule> forDeletionList = installationService.queryAllModulesInstalled(true).stream()
+                .filter(m -> !m.getActive()).collect(Collectors.toList());
+        if (forDeletionList != null && forDeletionList.size() != 0) {
+            for (SystemModule m : forDeletionList) {
+                // verify not in the services
+                SystemService s = installationService.queryService(m);
+                if (s != null && s.getModule().getId().longValue() == m.getId()) { //there is a service?
+                    log.error("Module {} shows inactive but there is a service {} for it. Contact Support!",
+                            m.getName() + "/" + m.getId(), s.getId() + "/" + s.getServiceState());
+                    continue;
+                }
+                try {
+                    log.info("Cleaning up old module {}/{}", m.getId(), m.getName());
+                    storageService.deleteDirectoryAndContents(m.getModulePath());
+                    log.info("Module directory deleted: {}", m.getModulePath());
+                    Files.deleteIfExists(new File(m.getArchivePath()).toPath());
+                    log.info("Module download file deleted: {}", m.getArchivePath());
+                    installationService.deleteModule(m);
+                    log.info("Module record deleted: {}", m.getId());
+                } catch (IOException ioe) {
+                    log.error("Unable to cleanup {} - please contact support ({})", m.getName(), ioe.getMessage());
+                }
+
+            }
+        } else {
+            log.debug("Cleanup - module cleanup - nothing to clean");
+            return;
+        }
+
+
+    }
+
+    @SneakyThrows
+    public <S, R> void addTask(String taskDescription, BackgroundTask<S, R> task) {
+        while (!backgroundTasks.offer(new BackgroundTaskImpl(taskDescription,task))) {
             log.warn("Task {} was not submitted at this time, capacity full. Waiting 200ms", task);
             Thread.sleep(200);
         }
         log.info("Task {} was added for background work", countTasks.incrementAndGet());
     }
 
-    public <S, R> BackgroundTaskResult<S, R> retrieveResult(BackgroundTask<S, R> task) {
-        return completedTasks.get(task);
-    }
+//    public <S, R> BackgroundTaskResult<S, R> retrieveResult(BackgroundTask<S, R> task) {
+//        return completedTasks.get(task);
+//    }
 
     @Scheduled(fixedDelay = 10000, initialDelay = 30000)
     public void pollAndProcessTasks() {
@@ -242,15 +310,28 @@ public class BackgroundTaskService {
             backgroundTasks.drainTo(toDo);
             log.info("Found {} tasks to execute in the background",toDo.size());
             for (BackgroundTask t : toDo) {
-                log.info("Executing {}",t);
+                BackgroundTaskImpl impl = (BackgroundTaskImpl)t;
+                log.info("Executing Task {}/{}",impl.getDescription(), impl.getDelegate().toString());
                 final BackgroundTaskResult result = t.execute();
-                log.info("Completed, result is {}", result);
+                log.info("Completed Task {}/{} result is {}", impl.getDescription(), impl.getDelegate().toString(), result);
+                impl.setCompletionDate(LocalDateTime.now());
                 completedTasks.put(t,result);
             }
         }
-
     }
 
+    @Scheduled(cron = "0 1 0 * * ?")
+    public void reportExecutedTasks() {
+        final LocalDateTime yesterdayMidnight = LocalDateTime.now().withTime(0, 0, 0, 0).minusDays(1);
+        log.info("---- Completed tasks Report from {} to now ----",yesterdayMidnight);
+        completedTasks.keySet().stream()
+                .map( k -> (BackgroundTaskImpl)k)
+                .filter(k -> k.getCompletionDate().isAfter(yesterdayMidnight))
+                .sorted(Comparator.comparing(BackgroundTaskImpl::getCompletionDate))
+                .map( taskOfDay -> taskOfDay.getDescription() + " completed: " + taskOfDay.getCompletionDate())
+                .forEach(log::info);
+        log.info("--------------------------------");
+    }
 
     @Scheduled(fixedDelay = 360000, initialDelay = 5000)
     public void verifyInternetConnectivity() {
@@ -267,7 +348,7 @@ public class BackgroundTaskService {
     }
 
     public void scheduleDownload(final SystemModule module) {
-        addTask(() -> {
+        addTask("Download of "+module.getName(), () -> {
             if (installationService.canDownload() && internetAvailable) {
                 module.setModuleState(ModuleState.DOWNLOADING);
                 installationService.updateSystemModuleState(module.getId(), ModuleState.DOWNLOADING);
@@ -288,7 +369,8 @@ public class BackgroundTaskService {
                         log.info("File has been received in temporary location for {}", module.getHash());
                         return new BackgroundTaskResult<SystemModule, Boolean>(module, true);
                     } else {
-                        return new BackgroundTaskResult<SystemModule, Boolean>(module,false);
+                        //return new BackgroundTaskResult<SystemModule, Boolean>(module,false);
+                        throw new IOException("Download did not complete as expected. Resetting module state.");
                     }
                 } catch (IOException ioe) {
                     module.setModuleState(ModuleState.UNKNOWN);
@@ -307,7 +389,7 @@ public class BackgroundTaskService {
 
 
     public void scheduleInternalCertsGeneration() {
-        addTask(() -> {
+        addTask("Internal Certificates Creation", () -> {
             try {
                 return executeScriptSimple(INTERNAL_CERTS_SH, null);
             } catch (IOException e) {
@@ -318,7 +400,7 @@ public class BackgroundTaskService {
     }
 
     public void scheduleExternalCertsGeneration() {
-        addTask(() -> {
+        addTask("External Certificates Creation", () -> {
             try {
                 Map<String,String> env = new HashMap<String, String>();
                 env.put("TMPDIR", tempDirectory);
@@ -333,7 +415,7 @@ public class BackgroundTaskService {
 
 
     public void scheduleEnvironmentCreation(boolean deleteContents) {
-        addTask(() -> {
+        addTask("Environment Creation (deleteContents="+deleteContents+")",() -> {
             try {
                 final SystemInstallationState state = installationService.getState();
                 final SmtpDetails smtp = state.getSmtpDetails();
@@ -384,7 +466,7 @@ public class BackgroundTaskService {
     }
 
     public void scheduleInstall(final SystemModule module) {
-        addTask(() -> {
+        addTask("Installation of module "+module.getName(), () -> {
             //extract module to destination location
             final File moduleDir = new File(modulesDirectory, module.getName() + module.getHash().substring(0,12));
             boolean isLegacy = false;
@@ -477,8 +559,8 @@ public class BackgroundTaskService {
                         .filter( m -> !m.getHash().contentEquals(moduleHash)) // only not ours
                         .forEach( m -> {
                             m.setActive(false);
-                            log.info("Module {} with path {} is now set inactive",m.getModulePath(), m.getName());
-                            installationService.saveSystemModule(m);
+                            log.info("Module {} with path {} is now set inactive",m.getName(), m.getModulePath());
+                            m = installationService.saveSystemModule(m);
 
 
                             // b1 make sure there are no previous containers with the same name!
@@ -487,7 +569,7 @@ public class BackgroundTaskService {
                             params.put("SERVICE_NAME", m.getName());
                             try {
                                 executeScriptSimple("rmContainers.sh", params);
-                                log.info("Containers for module {} are now removed / path {} / active {}",
+                                log.info("Containers for old module {} are now removed / path {} / active {}",
                                         m.getName(), m.getModulePath(), m.getActive());
                             } catch (IOException e) {
                                 log.error("PROBLEM!!!! Failed to clear containers for module {} id {}", m.getName(), m.getId());
@@ -645,7 +727,7 @@ public class BackgroundTaskService {
     }
 
     public void scheduleReInstall(SystemModule module) {
-        addTask(() -> {
+        addTask("Reinstallation of module "+module.getName(), () -> {
             // the tasks below will happen in sequence:
             log.info("Re-install scheduling a DELETE with an INSTALL afterwards...");
             scheduleDelete(module);
@@ -655,7 +737,7 @@ public class BackgroundTaskService {
     }
 
     public void scheduleDelete(SystemModule module) {
-        addTask(() -> {
+        addTask("Deletion of module "+module.getName(), () -> {
             final SystemService service = installationService.queryService(module);
             if (service != null && service.getServiceState() == ServiceState.RUNNING) {
                 log.error("Service is running and cannot be deleted! STOP first and then delete.");
@@ -667,15 +749,17 @@ public class BackgroundTaskService {
                     installationService.removeService(service);
                 }
 
-                Manifest manifest = getManifest(module.getModulePath());
-                if (manifest.getFormat() > 1.0 && manifest.getShLast() != null
-                        &&  installationService.moduleContains(module, manifest.getShLast())) { //last-time is only 1.1+
-                    executeModuleShScript(module, module.getModulePath(), manifest.getShLast(), ControlScript.LAST_TIME);
+                File moduleDir = new File(module.getModulePath());
+                if (moduleDir.exists()) {
+                    Manifest manifest = getManifest(module.getModulePath());
+                    if (manifest.getFormat() > 1.0 && manifest.getShLast() != null
+                            && installationService.moduleContains(module, manifest.getShLast())) { //last-time is only 1.1+
+                        executeModuleShScript(module, module.getModulePath(), manifest.getShLast(), ControlScript.LAST_TIME);
+                    }
+
+                    storageService.deleteDirectoryAndContents(module.getModulePath());
                 }
-
-                storageService.deleteDirectoryAndContents(module.getModulePath());
                 module.setModuleState(ModuleState.DOWNLOADED);
-
                 module.setActive(false);
                 SystemModule moduleUpdated = installationService.saveSystemModule(module);
                 File vHostDir = new File(vhostDirectory);
@@ -701,7 +785,7 @@ public class BackgroundTaskService {
 
 
     public void scheduleStartActiveModules() {
-        addTask(() -> {
+        addTask("Start of active modules", () -> {
 
             //we assume that following the guide, start is pressed after installation is complete.
             SystemInstallationState state = installationService.getState();
@@ -984,7 +1068,7 @@ public class BackgroundTaskService {
 
 
     public void scheduleStopActiveModules() {
-        addTask(() -> {
+        addTask("Stopping modules", () -> {
             // for every active module, sort by priority
             installationService.queryAllModulesInstalled(false)
                 .stream()

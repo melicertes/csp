@@ -33,7 +33,13 @@
         <div class="col-md-12">
             <div class="panel panel-default">
                 <div class="panel-body">
-                    <i class="fa fa-thumbs-up"></i> Data entry is complete! Click <a th:href="${dashboardUrl}">here</a> to navigate to the dashboard.
+                    <p>
+                        <i class="fa fa-thumbs-up"></i> Data entry is complete! Click <a
+                            th:href="${dashboardUrl}">here</a> to navigate to the dashboard, or <a th:href="${installSmtpUrl}" href="#">check and modify the <i class="fa fa-envelope"></i> SMTP settings</a>.
+                    </p>
+                    <p>You may also go to the <a href="#" th:href="${updatesUrl}">Updates page</a> to see updates and
+                        installation status.
+                        To see the logs go to <a href="#" th:href="${statusUrl}">the system logs</a>.</p>
                 </div>
             </div>
         </div>

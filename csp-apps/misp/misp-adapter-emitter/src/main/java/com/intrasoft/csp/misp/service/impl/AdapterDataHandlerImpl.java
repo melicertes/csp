@@ -230,6 +230,11 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler{
         }
 
         try {
+            // SXCSP-503: Change Distribution to one lower state (2 -> 1, 1 -> 0)
+            int eventDistributionLevel = getEventDistributionPolicyLevel(jsonNode);
+            if (eventDistributionLevel == 2 || eventDistributionLevel == 1)
+                ( (ObjectNode) jsonNode).findParent("distribution").put("distribution", String.valueOf(eventDistributionLevel-1));
+
             ResponseEntity<String> responseEntity = mispAppClient.addMispEvent(jsonNode.toString());
             eventCreatedUpdated = new ObjectMapper().readValue(responseEntity.getBody(), JsonNode.class);
             try {
@@ -539,6 +544,12 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler{
         modifiedIlData.setDataObject(jsonNode);
 
         return modifiedIlData;
+    }
+
+    private int getEventDistributionPolicyLevel(JsonNode jsonNode) {
+        JsonNode locatedNode = jsonNode.path(MispContextUrl.MispEntity.EVENT.toString()).path("distribution");
+        int level = Integer.parseInt(locatedNode.textValue());
+        return level;
     }
 
 
