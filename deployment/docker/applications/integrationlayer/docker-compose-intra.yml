@@ -11,8 +11,8 @@ services:
     command: java -Xmx512m -Danon.client.ssl.jks.keystore=file:/opt/ssl/server/csp-internal.jks  -Danon.client.ssl.jks.keystore.password=123456 -Dserver.ssl.enabled=false -Dapache.camel.use.activemq=false -Dspring.profiles.active=docker -Dexternal.ssl.keystore.passphrase=123456 -Dinternal.ssl.keystore.passphrase=123456 -jar server.jar
     working_dir: /opt/csp
     volumes:
-        - ./il-server-3.6.0-SNAPSHOT-exec.jar:/opt/csp/server.jar
-        - ./integration-tests-3.6.0-SNAPSHOT.jar:/opt/csp/itests.jar
+        - ./il-server-3.10.0-SNAPSHOT-exec.jar:/opt/csp/server.jar
+        - ./integration-tests-3.10.0-SNAPSHOT.jar:/opt/csp/itests.jar
         - /opt/csp/logs/:/opt/csplogs
         - SSLDatavolume:/opt/ssl/
         - ILDatavolume:/opt/data/activemq

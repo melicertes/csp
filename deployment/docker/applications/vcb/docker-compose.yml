@@ -1,5 +1,7 @@
 version: '3'
+
 services: 
+
 
   csp-jitsi:
     image: csp-jitsimeet:1.0
@@ -21,7 +23,7 @@ services:
     expose:
       - 80
     volumes:
-      - /opt/csp/logs/:/var/log/jitsi
+      - /opt/csp/logs_jitsi:/var/log/jitsi
     networks:
       default:
         aliases:
@@ -38,7 +40,7 @@ services:
     command: sh -c "sleep 10 && java -Xmx512m -Dspring.profiles.active=docker -jar server.jar"
     working_dir: /opt/csp
     volumes:
-        - ./vcb-admin-3.6.0-SNAPSHOT-exec.jar:/opt/csp/server.jar
+        - ./vcb-admin-3.10.0-SNAPSHOT-exec.jar:/opt/csp/server.jar
         - /opt/csp/logs/:/opt/csplogs
         - SSLDatavolume:/opt/ssl/
         - JitsiDataVolume:/opt/vcb/data
@@ -56,18 +58,20 @@ services:
     command: java -Xmx512m -Dspring.profiles.active=docker -jar server.jar
     working_dir: /opt/csp
     volumes:
-        - ./vcb-teleconf-3.6.0-SNAPSHOT-exec.jar:/opt/csp/server.jar
+        - ./vcb-teleconf-3.10.0-SNAPSHOT-exec.jar:/opt/csp/server.jar
         - /opt/csp/logs/:/opt/csplogs
         - JitsiDataVolume:/opt/vcb/data
     expose:
         - 9100
+        
         
 volumes:
     JitsiDataVolume:
       external: true
     SSLDatavolume:
         external: true
-        
+      
+      
 networks:
   default:
     external:

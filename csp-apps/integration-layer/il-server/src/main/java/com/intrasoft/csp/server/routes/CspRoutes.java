@@ -9,6 +9,7 @@ import com.sun.media.sound.InvalidDataException;
 import org.apache.camel.ExchangePattern;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.util.AsyncProcessorConverterHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -71,8 +72,10 @@ public class CspRoutes extends RouteBuilder implements CamelRoutes{
                 .maximumRedeliveries(maxRedeliveryAttempts)
                 .redeliveryDelay(redeliveryDelay)
                 .retryAttemptedLogLevel(LoggingLevel.WARN)
-                .process(exceptionProcessor)
+                .asyncDelayedRedelivery()// this is very important to make the IL platform really asynchronous (eg. when using TC nuke and some CSP nodes are down/inactive)
+                .process(AsyncProcessorConverterHelper.convert(exceptionProcessor))
                 .handled(true)
+                .threads(10)
                 .inOnly(endpoint.apply(ERROR))
         ;
 
@@ -102,14 +105,15 @@ public class CspRoutes extends RouteBuilder implements CamelRoutes{
 
         //TrustCircles Circles routes
         from(endpoint.apply(TC))
-                .threads(10)//TC processing is heavy worker,thus making it threaded
+                 //.threads(10)//TC processing is heavy worker,thus making it threaded // commenting out, the TC requests must not be delivered async, since priority for TC server makes a difference
                 .process(tcProcessor)
         ;
 
         //ExternalCSPs
         from(endpoint.apply(ECSP))
+                 .threads(10)
                 .setExchangePattern(ExchangePattern.InOnly)
-                .process(ecspProcessor);
+                .process(AsyncProcessorConverterHelper.convert(ecspProcessor));// AsyncProcessorConverterHelper.convert(
 
 
         //App routing
@@ -119,7 +123,7 @@ public class CspRoutes extends RouteBuilder implements CamelRoutes{
         //Elastic route
         from(endpoint.apply(ELASTIC))
                 .setExchangePattern(ExchangePattern.InOnly)
-                .threads(10)
+                 //.threads(10) // commenting out, the order of the requests might matter, like in TC requests
                 .process(elasticProcessor);
 
     }

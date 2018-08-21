@@ -47,7 +47,7 @@ CSP_NAME=demo1-csp
  IL_EX_THREAT_APPS="misp"
  IL_SSL_KEY_PASS=123456
  IL_SSL_KEYSTORE_PASS=123456
- IL_VERSION=3.6.0-SNAPSHOT
+ IL_VERSION=3.10.0-SNAPSHOT
 
  ## ES
  ES_LOCAL_DOMAIN=es.local.demo1-csp.athens.intrasoft-intl.private

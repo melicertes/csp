@@ -2,6 +2,7 @@ package com.intrasoft.csp.server.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.intrasoft.csp.commons.model.IntegrationData;
 import com.intrasoft.csp.libraries.restclient.exceptions.CspBusinessException;
 import com.sun.media.sound.InvalidDataException;
 import org.apache.camel.*;
@@ -233,5 +234,27 @@ public class CamelRestService {
         }
 
         return ret;
+    }
+
+    public Exchange asyncSendInOnly(String uri, Object data,Map<String,Object> headers){
+        Exchange futureExchange = null;
+        CompletableFuture<Exchange> exchangeCompletableFuture = producerTemplate.asyncSend(uri, exchange -> {
+            if(headers!=null){
+                for (Map.Entry<String, Object> entry : headers.entrySet()) {
+                    exchange.getIn().setHeader(entry.getKey(), entry.getValue());
+                }
+            }
+            exchange.setPattern(ExchangePattern.InOnly);
+            exchange.getIn().setBody(data);
+        });
+
+        try {
+            futureExchange = exchangeCompletableFuture.get();
+        } catch (InterruptedException e) {
+            LOG.error("Unrecoverable error occured.",e);
+        } catch (ExecutionException e) {
+            LOG.error("Unrecoverable error occured.",e);
+        }
+        return futureExchange;
     }
 }

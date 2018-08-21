@@ -7,13 +7,13 @@
     <parent>
         <groupId>com.intrasoft.csp</groupId>
         <artifactId>regular-reports</artifactId>
-        <version>3.6.0-SNAPSHOT</version>
+        <version>3.10.0-SNAPSHOT</version>
     </parent>
 
     <name>Regular Reports Elasticsearch Client</name>
     <groupId>com.intrasoft.csp</groupId>
     <artifactId>regrep-es-client</artifactId>
-    <version>3.6.0-SNAPSHOT</version>
+    <version>3.10.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <dependencies>
@@ -44,12 +44,12 @@
         <dependency>
             <groupId>com.intrasoft.csp</groupId>
             <artifactId>regrep-commons</artifactId>
-            <version>3.6.0-SNAPSHOT</version>
+            <version>3.10.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>com.intrasoft.csp</groupId>
             <artifactId>libraries-restclient</artifactId>
-            <version>3.6.0-SNAPSHOT</version>
+            <version>3.10.0-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>

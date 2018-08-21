@@ -1,0 +1,33 @@
+version: '3'
+services:
+
+  viper-ui:
+    env_file:
+      - .env
+    image: csp-python27-viper:1.0
+    container_name: csp-viper
+    domainname: ${LOCAL_DOMAIN}
+    hostname: csp-viper
+    ports:
+      - 8083:8083
+    working_dir: /home/viper/viper
+    volumes:
+      - /opt/csp/logs/:/opt/csplogs
+      - ViperDatavolume:/home/viper/resources
+      - MISPSharedDatavolume:/run/secrets
+      - SSLDatavolume:/opt/ssl/
+    environment:
+      - MISP_LOCAL_DOMAIN=https://${MISP_LOCAL_DOMAIN}
+
+networks:
+  default:
+    external:
+      name: ${LOCAL_DOMAIN}
+
+volumes:
+    ViperDatavolume:
+        external: true
+    MISPSharedDatavolume:
+        external: true
+    SSLDatavolume:
+        external: true
