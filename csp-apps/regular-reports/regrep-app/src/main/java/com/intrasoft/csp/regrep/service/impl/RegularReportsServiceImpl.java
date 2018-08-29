@@ -149,39 +149,70 @@ public class RegularReportsServiceImpl implements RegularReportsService {
         LOG.info(String.format("Preparing %s...", reportType));
         String requestBody;
         String gte = new String();
-        String lt;
+        String lt = new String();
         Map<String, Integer> cspDataResults = new HashMap<>();
         Map<String, Integer> logstashResults = new HashMap<>();
         List<HitsItem> hitsItemList = new ArrayList<>();
 
         switch (basis) {
-            case DAILY:     gte = dateMathStringBuilder.buildStringPattern(NOW, MINUS, ONE_DAY, RBTS_OF, DAY); break;
-            case WEEKLY:    gte = dateMathStringBuilder.buildStringPattern(NOW, MINUS,ONE_DAY,RBTS_OF,DAY,MINUS,ONE_WEEK,RBTS_OF,DAY); break;
-            case MONTHLY:   gte = dateMathStringBuilder.buildStringPattern(NOW, MINUS, ONE_DAY, RBTS_OF, DAY, MINUS, ONE_MONTH, RBTS_OF, DAY); break;
-            case QUARTERLY: gte = dateMathStringBuilder.buildStringPattern(NOW, MINUS, ONE_DAY, RBTS_OF, DAY, MINUS, THREE_MONTHS, RBTS_OF, DAY); break;
-            case YEARLY:    gte = dateMathStringBuilder.buildStringPattern(NOW,MINUS,ONE_DAY,RBTS_OF,DAY,MINUS,ONE_YEAR,RBTS_OF,DAY); break;
+            case DAILY: {
+                gte = dateMathStringBuilder.buildStringPattern(NOW, MINUS, ONE_DAY, RBTS_OF, DAY);
+                lt = dateMathStringBuilder.buildStringPattern(NOW,RBTS_OF,DAY);
+                break;
+            }
+            case WEEKLY: {
+                gte = dateMathStringBuilder.buildStringPattern(NOW, MINUS,ONE_WEEK,RBTS_OF,WEEK);
+                lt = dateMathStringBuilder.buildStringPattern(NOW,RBTS_OF,WEEK);
+                break;
+            }
+            case MONTHLY: {
+                gte = dateMathStringBuilder.buildStringPattern(NOW, MINUS, ONE_MONTH, RBTS_OF, MONTH);
+                lt = dateMathStringBuilder.buildStringPattern(NOW,RBTS_OF,MONTH);
+                break;
+            }
+            case QUARTERLY: {
+                gte = dateMathStringBuilder.buildStringPattern(NOW, MINUS, THREE_MONTHS, RBTS_OF, MONTH);
+                lt = dateMathStringBuilder.buildStringPattern(NOW,RBTS_OF,MONTH);
+                break;
+            }
+            case YEARLY: {
+                gte = dateMathStringBuilder.buildStringPattern(NOW,MINUS,ONE_YEAR,RBTS_OF,YEAR);
+                lt = dateMathStringBuilder.buildStringPattern(NOW,RBTS_OF,YEAR);
+                break;
+            }
             default: break;
         }
-        lt = dateMathStringBuilder.buildStringPattern(NOW,RBTS_OF,DAY);
+        LOG.debug("lt = "+ lt);
+        //lt = dateMathStringBuilder.buildStringPattern(NOW,RBTS_OF,DAY);
 
         parentheses = getDates(basis);
+
+        LOG.debug("cspdata request bodies... {");
         for (CspDataMappingType cdmt : CspDataMappingType.values()) {
             if (cdmt != CspDataMappingType.ALL) {  // "all" used for query construction only
                 requestBody = requestBodyService.buildRequestBody(gte, lt, cdmt);
+                LOG.debug(requestBody);
                 cspDataResults.put(cdmt.beautify(), elasticSearchClient.getNdocs(requestBody));
             }
         }
+        LOG.debug("\n}");
+
+        LOG.debug("logstash request bodies... {");
         for (LogstashMappingType lmt : LogstashMappingType.values()) {
             if (lmt != LogstashMappingType.ALL) {  // "all" used for query construction only
                 requestBody = requestBodyService.buildRequestBody(gte, lt, lmt);
                 logstashResults.put(lmt.beautify() + " Logs", elasticSearchClient.getNlogs(requestBody));
             }
         }
+        LOG.debug("\n}");
 
+        LOG.debug("Daily logstash request body {");
         if (basis.equals(DAILY)) {
             requestBody = requestBodyService.buildRequestBodyForLogs(gte, lt, LogstashMappingType.EXCEPTION);
+            LOG.info(requestBody);
             hitsItemList = elasticSearchClient.getLogData(requestBody);
         }
+        LOG.debug("\n}");
 
         Mail newMail = new Mail();
         newMail.setSenderName(mailFromName);
