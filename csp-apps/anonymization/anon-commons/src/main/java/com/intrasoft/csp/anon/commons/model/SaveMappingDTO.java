@@ -15,20 +15,24 @@ public class SaveMappingDTO implements Serializable{
 
     IntegrationDataType dataType;
 
+    ApplicationId applicationId;
+
     public SaveMappingDTO() {
     }
 
-    public SaveMappingDTO(Long id, String cspId, Long ruleSetId, IntegrationDataType dataType) {
+    public SaveMappingDTO(Long id, String cspId, Long ruleSetId, IntegrationDataType dataType, ApplicationId applicationId) {
         this.id = id;
         this.cspId = cspId;
         this.ruleSetId = ruleSetId;
         this.dataType = dataType;
+        this.applicationId =applicationId;
     }
 
-    public SaveMappingDTO(String cspId, Long ruleSetId, IntegrationDataType dataType) {
+    public SaveMappingDTO(String cspId, Long ruleSetId, IntegrationDataType dataType, ApplicationId applicationId) {
         this.cspId = cspId;
         this.ruleSetId = ruleSetId;
         this.dataType = dataType;
+        this.applicationId =applicationId;
     }
 
     public Long getId() {
@@ -63,13 +67,23 @@ public class SaveMappingDTO implements Serializable{
         this.dataType = dataType;
     }
 
+    public ApplicationId getApplicationId() {
+        return applicationId;
+    }
+
+    public void setApplicationId(ApplicationId applicationId) {
+        this.applicationId = applicationId;
+    }
+
     @Override
     public String toString() {
-        return "SaveMappingDTO{" +
-                "id=" + id +
-                ", cspId='" + cspId + '\'' +
-                ", ruleSetId=" + ruleSetId +
-                ", dataType=" + dataType +
-                '}';
+        final StringBuilder sb = new StringBuilder("SaveMappingDTO{");
+        sb.append("id=").append(id);
+        sb.append(", cspId='").append(cspId).append('\'');
+        sb.append(", ruleSetId=").append(ruleSetId);
+        sb.append(", dataType=").append(dataType);
+        sb.append(", applicationId=").append(applicationId);
+        sb.append('}');
+        return sb.toString();
     }
 }

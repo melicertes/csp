@@ -221,13 +221,16 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
 
         /**
          * issue: SXCSP-333
-         * define a classification to differentiate between threat/event
+         * define a classification to differentiate between threat/event/vulnerability
          */
         IntegrationDataType integrationDataType = IntegrationDataType.EVENT;
         if (jsonNode.get(EVENT.toString()).has("Tag")){
             for (JsonNode jn : jsonNode.get(EVENT.toString()).get("Tag")){
                 if (jn.get("name").textValue().equals("threat")){
                     integrationDataType = IntegrationDataType.THREAT;
+                }
+                else if (jn.get("name").textValue().toLowerCase().equals("vulnerability")){
+                    integrationDataType = IntegrationDataType.VULNERABILITY;
                 }
             }
         }
@@ -237,7 +240,7 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
         /** issue: SXCSP-334
          * how to identify if it is post or put
          * should search in ES to see if this uuid exists
-         * query the index based on datatype (event/threat), if found send put else send post */
+         * query the index based on datatype (event/threat/vulnerability), if found send put else send post */
 
         if (isDelete) {
             cspClient.deleteIntegrationData(integrationData);
