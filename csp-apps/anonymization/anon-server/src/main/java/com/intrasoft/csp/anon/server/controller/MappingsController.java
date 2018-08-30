@@ -70,7 +70,7 @@ public class MappingsController {
         mav.addObject("mappings", getMappings());
         MappingDTO mapping = anonService.getMappingById(id);
         LOG.info("UI: GET mapping " + mapping.toString());
-        mav.addObject("mapping", new SaveMappingDTO(mapping.getId(),mapping.getCspId(),mapping.getRuleSetDTO().getId(),mapping.getDataType()));
+        mav.addObject("mapping", new SaveMappingDTO(mapping.getId(),mapping.getCspId(),mapping.getRuleSetDTO().getId(),mapping.getDataType(),mapping.getApplicationId()));
         return mav;
     }
 
