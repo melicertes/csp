@@ -1,6 +1,7 @@
 package com.intrasoft.csp.anon.server.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.intrasoft.csp.anon.commons.model.ApplicationId;
 import com.intrasoft.csp.anon.server.model.Mapping;
 import com.intrasoft.csp.anon.server.model.Rules;
 import com.intrasoft.csp.anon.server.repository.MappingRepository;
@@ -27,6 +28,24 @@ public class RulesServiceImpl implements RulesService {
     @Override
     public Rules getRule(IntegrationDataType integrationDataType, String cspId) throws IOException {
         Mapping mapping = mappingRepository.findDistinctByDataTypeAndCspId(integrationDataType, cspId.trim());
+        Rules rules = null;
+        if (mapping != null){
+            LOG.debug("Mapping found");
+            rules = new ObjectMapper().readerFor(Rules.class).readValue(new String(mapping.getRuleset().getFile()));
+        }
+        else {
+            LOG.debug("Mapping not found");
+            mapping = mappingRepository.findDistinctByDataTypeAndCspId(integrationDataType, "**");
+            if (mapping != null){
+                rules = new ObjectMapper().readerFor(Rules.class).readValue(new String(mapping.getRuleset().getFile()));
+            }
+        }
+        return rules;
+    }
+
+    @Override
+    public Rules getRule(IntegrationDataType integrationDataType, String cspId, ApplicationId applicationId) throws IOException {
+        Mapping mapping = mappingRepository.findDistinctByDataTypeAndCspIdAndApplicationId(integrationDataType, cspId.trim(), applicationId);
         Rules rules = null;
         if (mapping != null){
             LOG.debug("Mapping found");
