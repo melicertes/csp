@@ -25,14 +25,14 @@ public class SaveMappingDTO implements Serializable{
         this.cspId = cspId;
         this.ruleSetId = ruleSetId;
         this.dataType = dataType;
-        this.applicationId =applicationId;
+        this.applicationId = applicationId;
     }
 
     public SaveMappingDTO(String cspId, Long ruleSetId, IntegrationDataType dataType, ApplicationId applicationId) {
         this.cspId = cspId;
         this.ruleSetId = ruleSetId;
         this.dataType = dataType;
-        this.applicationId =applicationId;
+        this.applicationId = applicationId;
     }
 
     public Long getId() {

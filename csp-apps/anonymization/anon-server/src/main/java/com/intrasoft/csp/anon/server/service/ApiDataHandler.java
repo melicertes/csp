@@ -80,7 +80,7 @@ public class ApiDataHandler {
             throw new AnonException(HttpStatusResponseType.MALFORMED_INTEGRATION_DATA_STRUCTURE.getReasonPhrase()+"[integrationAnonData is null]");
         }
 
-        LOG.info("Handle integrationAnonData: " + integrationAnonData.toString());
+        LOG.debug("Handle integrationAnonData: " + integrationAnonData.toString());
         String cspId = integrationAnonData.getCspId();
         IntegrationDataType dataType = integrationAnonData.getDataType();
         String applicationIdString = integrationAnonData.getApplicationId();
@@ -124,7 +124,7 @@ public class ApiDataHandler {
         ReadContext ctx = JsonPath.using(configuration).parse(out);
 
         for (Rule rule : rules.getRules()){
-            LOG.info("Applying rule: " + rule.toString());
+            LOG.debug("Applying rule: " + rule.toString());
             List<LinkedHashMap> tmp = ctx.read(rule.getCondition(), List.class);
             for (LinkedHashMap jn : tmp){
                 JsonNode jjn = new ObjectMapper().valueToTree(jn);
@@ -156,10 +156,10 @@ public class ApiDataHandler {
                 MessageDigest md = MessageDigest.getInstance("MD5");
                 md.update(hmac.getKey().getKey().getBytes());
                 String digest = new BigInteger(1, md.digest()).toString(16);
-                LOG.info("CryptoPAN mask: " + digest);
+                LOG.trace("CryptoPAN mask: " + digest);
                 CryptoPAN cryptoPAN = new CryptoPAN(digest);
                 newVal = cryptoPAN.anonymize(fieldValue);
-                LOG.info(fieldValue + " --> " + newVal);
+                LOG.trace(fieldValue + " --> " + newVal);
             }
             else  {
                 newVal = pseudoField(fieldValue);
