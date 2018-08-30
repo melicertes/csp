@@ -124,10 +124,16 @@ public class ApiDataHandler {
         ReadContext ctx = JsonPath.using(configuration).parse(out);
 
         for (Rule rule : rules.getRules()){
+            LOG.info("Applying rule: " + rule.toString());
             List<LinkedHashMap> tmp = ctx.read(rule.getCondition(), List.class);
             for (LinkedHashMap jn : tmp){
                 JsonNode jjn = new ObjectMapper().valueToTree(jn);
-                out = JsonPath.using(configuration).parse(out).set(rule.getCondition(), ((ObjectNode)jjn).put(rule.getField(),updateField(rule.getAction(), rule.getFieldType(), jjn.get(rule.getField()).textValue(), dataType))).json();
+
+                String fieldVal = null;
+                if (jjn.get(rule.getField()) != null){
+                    fieldVal = jjn.get(rule.getField()).textValue();
+                }
+                out = JsonPath.using(configuration).parse(out).set(rule.getCondition(), ((ObjectNode)jjn).put(rule.getField(),updateField(rule.getAction(), rule.getFieldType(), fieldVal, dataType))).json();
             }
         }
 
