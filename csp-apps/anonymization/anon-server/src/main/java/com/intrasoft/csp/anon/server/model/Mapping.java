@@ -1,5 +1,6 @@
 package com.intrasoft.csp.anon.server.model;
 
+import com.intrasoft.csp.anon.commons.model.ApplicationId;
 import com.intrasoft.csp.commons.model.IntegrationDataType;
 import org.hibernate.validator.constraints.NotEmpty;
 
@@ -24,6 +25,8 @@ public class Mapping {
 
     @NotNull
     IntegrationDataType dataType;
+
+    ApplicationId applicationId;
 
     public long getId() {
         return id;
@@ -57,7 +60,13 @@ public class Mapping {
         this.dataType = dataType;
     }
 
+    public ApplicationId getApplicationId() {
+        return applicationId;
+    }
 
+    public void setApplicationId(ApplicationId applicationId) {
+        this.applicationId = applicationId;
+    }
 
     @Override
     public String toString() {
@@ -66,6 +75,7 @@ public class Mapping {
         sb.append(", cspId='").append(cspId).append('\'');
         sb.append(", ruleset=").append(ruleset);
         sb.append(", dataType=").append(dataType);
+        sb.append(", applicationId=").append(applicationId);
         sb.append('}');
         return sb.toString();
     }
