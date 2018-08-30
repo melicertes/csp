@@ -24,6 +24,7 @@ public interface Conversions {
         mappingDTO.setId(mapping.getId());
         mappingDTO.setRuleSetDTO(convertRuleSetToDTO.apply(mapping.getRuleset()));
         mappingDTO.setCspId(mapping.getCspId());
+        mappingDTO.setApplicationId(mapping.getApplicationId());
 
         return mappingDTO;
     };
