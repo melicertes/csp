@@ -60,8 +60,9 @@ public class MappingsController {
 
     @GetMapping("/mappings")
     public ModelAndView showMappings(@ModelAttribute("mapping") SaveMappingDTO mapping) {
-        LOG.info("UI: GET mapping " + mapping.toString());
-        return new ModelAndView("pages/mappings", "mappings", getMappings());
+        List<MappingDTO> mappingDTOS = getMappings();
+        LOG.info("UI: GET mappings " + mappingDTOS.toString());
+        return new ModelAndView("pages/mappings", "mappings", mappingDTOS);
     }
 
     @GetMapping("/mappings/{id}")
