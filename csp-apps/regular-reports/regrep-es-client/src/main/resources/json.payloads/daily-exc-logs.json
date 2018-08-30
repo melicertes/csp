@@ -1,5 +1,6 @@
 {
   "_source": ["@timestamp", "program", "message"],
+  "size": 10,
   "query": {
     "bool" : {
       "must": [{

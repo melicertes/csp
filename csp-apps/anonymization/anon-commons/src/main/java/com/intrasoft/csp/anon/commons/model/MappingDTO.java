@@ -15,6 +15,8 @@ public class MappingDTO implements Serializable{
 
     RuleSetDTO ruleSetDTO;
 
+    ApplicationId applicationId;
+
     IntegrationDataType dataType;
 
     public MappingDTO() {
@@ -23,20 +25,22 @@ public class MappingDTO implements Serializable{
     /**
      * Constructor to update a new RuleSet
      * */
-    public MappingDTO(Long id, String cspId, RuleSetDTO ruleSetDTO, IntegrationDataType dataType) {
+    public MappingDTO(Long id, String cspId, RuleSetDTO ruleSetDTO, IntegrationDataType dataType, ApplicationId applicationId) {
         this.id = id;
         this.cspId = cspId;
         this.ruleSetDTO = ruleSetDTO;
         this.dataType = dataType;
+        this.applicationId = applicationId;
     }
 
     /**
      * Constructor to create a new RuleSet
      * */
-    public MappingDTO(String cspId, RuleSetDTO ruleSetDTO, IntegrationDataType dataType) {
+    public MappingDTO(String cspId, RuleSetDTO ruleSetDTO, IntegrationDataType dataType, ApplicationId applicationId) {
         this.cspId = cspId;
         this.ruleSetDTO = ruleSetDTO;
         this.dataType = dataType;
+        this.applicationId = applicationId;
     }
 
     public Long getId() {
@@ -71,13 +75,24 @@ public class MappingDTO implements Serializable{
         this.dataType = dataType;
     }
 
+    public ApplicationId getApplicationId() {
+        return applicationId;
+    }
+
+    public void setApplicationId(ApplicationId applicationId) {
+        this.applicationId = applicationId;
+    }
+
     @Override
     public String toString() {
-        return "MappingDTO{" +
-                "id=" + id +
-                ", cspId='" + cspId + '\'' +
-                ", ruleSetDTO=" + ruleSetDTO +
-                ", dataType=" + dataType +
-                '}';
+        final StringBuilder sb = new StringBuilder("MappingDTO{");
+        sb.append("id=").append(id);
+        sb.append(", cspId='").append(cspId).append('\'');
+        sb.append(", ruleSetDTO=").append(ruleSetDTO);
+        sb.append(", applicationId=").append(applicationId);
+        sb.append(", dataType=").append(dataType);
+        sb.append('}');
+        return sb.toString();
     }
+
 }

@@ -60,8 +60,9 @@ public class MappingsController {
 
     @GetMapping("/mappings")
     public ModelAndView showMappings(@ModelAttribute("mapping") SaveMappingDTO mapping) {
-        LOG.info("UI: GET mapping " + mapping.toString());
-        return new ModelAndView("pages/mappings", "mappings", getMappings());
+        List<MappingDTO> mappingDTOS = getMappings();
+        LOG.info("UI: GET mappings " + mappingDTOS.toString());
+        return new ModelAndView("pages/mappings", "mappings", mappingDTOS);
     }
 
     @GetMapping("/mappings/{id}")
@@ -70,7 +71,7 @@ public class MappingsController {
         mav.addObject("mappings", getMappings());
         MappingDTO mapping = anonService.getMappingById(id);
         LOG.info("UI: GET mapping " + mapping.toString());
-        mav.addObject("mapping", new SaveMappingDTO(mapping.getId(),mapping.getCspId(),mapping.getRuleSetDTO().getId(),mapping.getDataType()));
+        mav.addObject("mapping", new SaveMappingDTO(mapping.getId(),mapping.getCspId(),mapping.getRuleSetDTO().getId(),mapping.getDataType(),mapping.getApplicationId()));
         return mav;
     }
 
