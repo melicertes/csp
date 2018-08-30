@@ -6,10 +6,7 @@ import com.intrasoft.csp.regrep.ElasticSearchClient;
 import com.intrasoft.csp.regrep.LogstashMappingType;
 import com.intrasoft.csp.regrep.commons.model.HitsItem;
 import com.intrasoft.csp.regrep.commons.model.Mail;
-import com.intrasoft.csp.regrep.service.Basis;
-import com.intrasoft.csp.regrep.service.RegularReportsMailService;
-import com.intrasoft.csp.regrep.service.RegularReportsService;
-import com.intrasoft.csp.regrep.service.RequestBodyService;
+import com.intrasoft.csp.regrep.service.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +36,9 @@ public class RegularReportsServiceImpl implements RegularReportsService {
 
     @Autowired
     RequestBodyService requestBodyService;
+
+    @Autowired
+    DateMathStringBuilder dateMathStringBuilder;
 
     @Value("${regrep.basis.daily}")
     boolean daily;
@@ -72,6 +72,12 @@ public class RegularReportsServiceImpl implements RegularReportsService {
 
     @Value("${th.email.message}")
     String msg;
+
+    @Value("${app.es.logs.exc.limit.size}")
+    int excLogsLimitSize;
+
+    @Value("${th.email.es.logs.exc.limit.message}")
+    String excLogsLimitMessage;
 
     String parentheses;
 
@@ -141,39 +147,72 @@ public class RegularReportsServiceImpl implements RegularReportsService {
         String reportType = basis + " Report";
         boolean isDaily = basis.equals(DAILY) ? true : false;
         LOG.info(String.format("Preparing %s...", reportType));
-        DateMath dateMath = null;
-        String requestBody = new String();
+        String requestBody;
+        String gte = new String();
+        String lt = new String();
         Map<String, Integer> cspDataResults = new HashMap<>();
         Map<String, Integer> logstashResults = new HashMap<>();
         List<HitsItem> hitsItemList = new ArrayList<>();
 
         switch (basis) {
-            case DAILY:     dateMath = ONE_DAY; break;
-            case WEEKLY:    dateMath = ONE_WEEK; break;
-            case MONTHLY:   dateMath = ONE_MONTH; break;
-            case QUARTERLY: dateMath = THREE_MONTHS; break;
-            case YEARLY:    dateMath = ONE_YEAR; break;
+            case DAILY: {
+                gte = dateMathStringBuilder.buildStringPattern(NOW, MINUS, ONE_DAY, RBTS_OF, DAY);
+                lt = dateMathStringBuilder.buildStringPattern(NOW,RBTS_OF,DAY);
+                break;
+            }
+            case WEEKLY: {
+                gte = dateMathStringBuilder.buildStringPattern(NOW, MINUS,ONE_WEEK,RBTS_OF,WEEK);
+                lt = dateMathStringBuilder.buildStringPattern(NOW,RBTS_OF,WEEK);
+                break;
+            }
+            case MONTHLY: {
+                gte = dateMathStringBuilder.buildStringPattern(NOW, MINUS, ONE_MONTH, RBTS_OF, MONTH);
+                lt = dateMathStringBuilder.buildStringPattern(NOW,RBTS_OF,MONTH);
+                break;
+            }
+            case QUARTERLY: {
+                gte = dateMathStringBuilder.buildStringPattern(NOW, MINUS, THREE_MONTHS, RBTS_OF, MONTH);
+                lt = dateMathStringBuilder.buildStringPattern(NOW,RBTS_OF,MONTH);
+                break;
+            }
+            case YEARLY: {
+                gte = dateMathStringBuilder.buildStringPattern(NOW,MINUS,ONE_YEAR,RBTS_OF,YEAR);
+                lt = dateMathStringBuilder.buildStringPattern(NOW,RBTS_OF,YEAR);
+                break;
+            }
             default: break;
         }
+        LOG.debug("lt = "+ lt);
+        //lt = dateMathStringBuilder.buildStringPattern(NOW,RBTS_OF,DAY);
 
         parentheses = getDates(basis);
+
+        LOG.debug("cspdata request bodies... {");
         for (CspDataMappingType cdmt : CspDataMappingType.values()) {
             if (cdmt != CspDataMappingType.ALL) {  // "all" used for query construction only
-                requestBody = requestBodyService.buildRequestBody(dateMath, NOW, cdmt);
+                requestBody = requestBodyService.buildRequestBody(gte, lt, cdmt);
+                LOG.debug(requestBody);
                 cspDataResults.put(cdmt.beautify(), elasticSearchClient.getNdocs(requestBody));
             }
         }
+        LOG.debug("\n}");
+
+        LOG.debug("logstash request bodies... {");
         for (LogstashMappingType lmt : LogstashMappingType.values()) {
             if (lmt != LogstashMappingType.ALL) {  // "all" used for query construction only
-                requestBody = requestBodyService.buildRequestBody(dateMath, NOW, lmt);
+                requestBody = requestBodyService.buildRequestBody(gte, lt, lmt);
                 logstashResults.put(lmt.beautify() + " Logs", elasticSearchClient.getNlogs(requestBody));
             }
         }
+        LOG.debug("\n}");
 
+        LOG.debug("Daily logstash request body {");
         if (basis.equals(DAILY)) {
-            requestBody = requestBodyService.buildRequestBodyForLogs(dateMath, NOW, LogstashMappingType.EXCEPTION);
+            requestBody = requestBodyService.buildRequestBodyForLogs(gte, lt, LogstashMappingType.EXCEPTION);
+            LOG.info(requestBody);
             hitsItemList = elasticSearchClient.getLogData(requestBody);
         }
+        LOG.debug("\n}");
 
         Mail newMail = new Mail();
         newMail.setSenderName(mailFromName);
@@ -191,11 +230,14 @@ public class RegularReportsServiceImpl implements RegularReportsService {
         valuesMap.put("message", String.format(msg, reportType, basis.getDescription(), parentheses));
         valuesMap.put("thymeleafMapA", cspDataResults);
         valuesMap.put("thymeleafMapB", logstashResults);
-        if (isDaily)
+        if (isDaily) {
             valuesMap.put("excLogsList", hitsItemList);
+            valuesMap.put("excLogsLimitSize", excLogsLimitSize);
+            valuesMap.put("excLogsTotalSize", logstashResults.get("Exception Logs"));
+            valuesMap.put("excLogsLimitMessage", String.format(excLogsLimitMessage, excLogsLimitSize, logstashResults.get("Exception Logs")));
+        }
 
         newMail.setModel(valuesMap);
-
 
         try {
             regularReportsMailService.sendEmail(newMail);
