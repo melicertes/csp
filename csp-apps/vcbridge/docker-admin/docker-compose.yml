@@ -31,7 +31,7 @@ services:
     command: java -Xmx512m -Dserver.port=9300 -Dh2.db.file=/opt/vcb/data/vcbdb -Dteleconf-ui.protocol=https -Dteleconf-ui.host=teleconf.demo1-csp.athens.intrasoft-intl.private -Dteleconf-ui.port=443 -jar server.jar
     working_dir: /opt/csp
     volumes:
-        - ./vcb-admin-3.10.0-SNAPSHOT-exec.jar:/opt/csp/server.jar
+        - ./vcb-admin-4.0.0-SNAPSHOT-exec.jar:/opt/csp/server.jar
         - /opt/csp/logs/:/opt/csplogs
         - JitsiDataVolume:/opt/vcb/data
     expose:
@@ -49,7 +49,7 @@ services:
     command: java -Xmx512m -Dserver.port=9200 -Dh2.db.file=/opt/vcb/data/vcbdb -Djitsi.protocol=https -Djitsi.host=vc.sastix.com -Djitsi.port=443 -jar server.jar
     working_dir: /opt/csp
     volumes:
-        - ./vcb-teleconf-3.10.0-SNAPSHOT-exec.jar:/opt/csp/server.jar
+        - ./vcb-teleconf-4.0.0-SNAPSHOT-exec.jar:/opt/csp/server.jar
         - /opt/csp/logs/:/opt/csplogs
         - JitsiDataVolume:/opt/vcb/data
     expose:

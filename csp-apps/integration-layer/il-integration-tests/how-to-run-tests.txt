@@ -22,7 +22,7 @@ $ mvn clean install -DskipTests
 $ cd integration-tests/target
 
 the file will have a similar name to this format:
-integration-tests-3.10.0-SNAPSHOT.jar
+integration-tests-4.0.0-SNAPSHOT.jar
 
 
 
@@ -36,7 +36,7 @@ $ ssh central-csp.intra
 Exit the terminal and locate the jar file in your local path. Use scp to copy the jar file to the host machine.
 
 eg.
-$ scp integration-tests-3.10.0-SNAPSHOT.jar central-csp.intra:/home/csp
+$ scp integration-tests-4.0.0-SNAPSHOT.jar central-csp.intra:/home/csp
 
 Login to the host like you did before and validate that the file has been uploaded successfully.
 
@@ -44,7 +44,7 @@ Login to the host like you did before and validate that the file has been upload
 3. Copy the jar file in the container
 *************************************
 
-$ docker cp integration-tests-3.10.0-SNAPSHOT.jar csp-il:/opt/csp
+$ docker cp integration-tests-4.0.0-SNAPSHOT.jar csp-il:/opt/csp
 
 
 4. Connect to the java docker container
@@ -66,22 +66,22 @@ in any environment which has java 1.8 installed and will start an instance of th
 not affecting any other running instances.
 
 Test 1:
-$ java -jar integration-tests-3.10.0-SNAPSHOT.jar com.intrasoft.csp.integration.sandbox.server.internal.CspServerInternalSandboxTest
+$ java -jar integration-tests-4.0.0-SNAPSHOT.jar com.intrasoft.csp.integration.sandbox.server.internal.CspServerInternalSandboxTest
 
 Test 2:
-$ java -jar integration-tests-3.10.0-SNAPSHOT.jar com.intrasoft.csp.integration.sandbox.server.internal.CspServerInternalSandboxTestFlow1dataTypes
+$ java -jar integration-tests-4.0.0-SNAPSHOT.jar com.intrasoft.csp.integration.sandbox.server.internal.CspServerInternalSandboxTestFlow1dataTypes
 
 Test 3:
-$ java -jar integration-tests-3.10.0-SNAPSHOT.jar com.intrasoft.csp.integration.sandbox.server.internal.CspServerInternalSandboxTestFlow1verbs
+$ java -jar integration-tests-4.0.0-SNAPSHOT.jar com.intrasoft.csp.integration.sandbox.server.internal.CspServerInternalSandboxTestFlow1verbs
 
 Test 4:
-$ java -jar integration-tests-3.10.0-SNAPSHOT.jar com.intrasoft.csp.integration.sandbox.server.internal.CspServerInternalSandboxTestFlow2
+$ java -jar integration-tests-4.0.0-SNAPSHOT.jar com.intrasoft.csp.integration.sandbox.server.internal.CspServerInternalSandboxTestFlow2
 
 Test 5:
-$ java -jar integration-tests-3.10.0-SNAPSHOT.jar com.intrasoft.csp.integration.sandbox.server.internal.CspServerVariousIntegrationDataTest
+$ java -jar integration-tests-4.0.0-SNAPSHOT.jar com.intrasoft.csp.integration.sandbox.server.internal.CspServerVariousIntegrationDataTest
 
 Test 6:
-$ java -jar integration-tests-3.10.0-SNAPSHOT.jar com.intrasoft.csp.integration.sandbox.server.internal.IntegrationDataValidatorTest
+$ java -jar integration-tests-4.0.0-SNAPSHOT.jar com.intrasoft.csp.integration.sandbox.server.internal.IntegrationDataValidatorTest
 
 5ii. Integration (Business) Tests
 ----------------------------------
@@ -94,14 +94,14 @@ hardoced values will be used ("teamId","tcId"). In order to pass the values you 
 iTest1:
 
 $ java -jar -Dspring.profiles.active=docker -Dapache.camel.use.activemq=false -Dembedded.activemq.start=false \
-  integration-tests-3.10.0-SNAPSHOT.jar \
+  integration-tests-4.0.0-SNAPSHOT.jar \
   com.intrasoft.csp.integration.business.server.internal.CspServerInternalBusinessTestFlow1dataTypes
 
 
 iTest2:
 
 $ java -jar -Dspring.profiles.active=docker -Dapache.camel.use.activemq=false -Dembedded.activemq.start=false \
-  integration-tests-3.10.0-SNAPSHOT.jar \
+  integration-tests-4.0.0-SNAPSHOT.jar \
   com.intrasoft.csp.integration.business.server.internal.CspServerInternalBusinessTestFlow1verbs
 
 
@@ -110,7 +110,7 @@ Use an extCspId argument having a value that exists in your TC db and is NOT the
 are running these tests
 
 $ java -jar -Dspring.profiles.active=docker -Dapache.camel.use.activemq=false -Dembedded.activemq.start=false -DextCspId=demo1-csp \
-  integration-tests-3.10.0-SNAPSHOT.jar \
+  integration-tests-4.0.0-SNAPSHOT.jar \
   com.intrasoft.csp.integration.business.server.internal.CspServerInternalBusinessTestFlow2
 
 
