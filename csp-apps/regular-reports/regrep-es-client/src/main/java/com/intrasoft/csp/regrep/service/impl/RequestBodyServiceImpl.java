@@ -11,6 +11,7 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
@@ -25,16 +26,17 @@ public class RequestBodyServiceImpl implements RequestBodyService {
     @Autowired
     ObjectMapper objectMapper;
 
+    @Value("${app.es.logs.exc.limit.size}")
+    int excLogsLimitSize;
+
     String payload;
 
     Resource nLogsByType = new ClassPathResource("json.payloads/nlogs-by-type.json");
     Resource nDocsByType = new ClassPathResource("json.payloads/ndocs-by-type.json");
     Resource dailyExcLogs= new ClassPathResource("json.payloads/daily-exc-logs.json");
 
-    final String TIME_DIF = "-9h";
-
     @Override
-    public String buildRequestBody(DateMath gte, DateMath lt, LogstashMappingType type) {
+    public String buildRequestBody(String gte, String lt, LogstashMappingType type) {
 
         payload = getResourceAsString(nLogsByType);
 
@@ -45,8 +47,8 @@ public class RequestBodyServiceImpl implements RequestBodyService {
             LOG.error(e.getMessage());
         }
 
-        ( (ObjectNode) jsonNode).findParent("gte").put("gte", "now-" + gte.toString() + TIME_DIF);
-        ( (ObjectNode) jsonNode).findParent("lt").put("lt", lt.toString() + TIME_DIF);
+        ( (ObjectNode) jsonNode).findParent("gte").put("gte", gte);
+        ( (ObjectNode) jsonNode).findParent("lt").put("lt", lt);
         if (type.equals(LogstashMappingType.ALL))
             ((ObjectNode) jsonNode).findParent("match").remove("match");
         else
@@ -56,7 +58,7 @@ public class RequestBodyServiceImpl implements RequestBodyService {
     }
 
     @Override
-    public String buildRequestBody(DateMath gte, DateMath lt, CspDataMappingType type) {
+    public String buildRequestBody(String gte, String lt, CspDataMappingType type) {
 
         payload = getResourceAsString(nDocsByType);
 
@@ -67,8 +69,8 @@ public class RequestBodyServiceImpl implements RequestBodyService {
             LOG.error(e.getMessage());
         }
 
-        ( (ObjectNode) jsonNode).findParent("gte").put("gte", "now-" + gte.toString() + TIME_DIF);
-        ( (ObjectNode) jsonNode).findParent("lt").put("lt", lt.toString() + TIME_DIF);
+        ( (ObjectNode) jsonNode).findParent("gte").put("gte", gte);
+        ( (ObjectNode) jsonNode).findParent("lt").put("lt", lt);
         if (type.equals(CspDataMappingType.ALL))
             ((ObjectNode) jsonNode).findParent("match").remove("match");
         else
@@ -78,7 +80,7 @@ public class RequestBodyServiceImpl implements RequestBodyService {
     }
 
     @Override
-    public String buildRequestBodyForLogs(DateMath gte, DateMath lt, LogstashMappingType type) {
+    public String buildRequestBodyForLogs(String gte, String lt, LogstashMappingType type) {
 
         payload = getResourceAsString(dailyExcLogs);
 
@@ -89,8 +91,9 @@ public class RequestBodyServiceImpl implements RequestBodyService {
             LOG.error(e.getMessage());
         }
 
-        ( (ObjectNode) jsonNode).findParent("gte").put("gte", "now-" + gte.toString() + TIME_DIF);
-        ( (ObjectNode) jsonNode).findParent("lt").put("lt", lt.toString() + TIME_DIF);
+        ( (ObjectNode) jsonNode).findParent("size").put("size", String.valueOf(excLogsLimitSize));
+        ( (ObjectNode) jsonNode).findParent("gte").put("gte", gte);
+        ( (ObjectNode) jsonNode).findParent("lt").put("lt", lt);
 
         if (type.equals(LogstashMappingType.ALL))
             ((ObjectNode) jsonNode).findParent("match").remove("match");

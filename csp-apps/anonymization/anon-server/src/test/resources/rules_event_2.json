@@ -1,0 +1,16 @@
+{
+  "rules": [
+    {
+      "condition": "$.Event",
+      "field": "event_creator_email",
+      "action": "anon",
+      "fieldtype": "email"
+    },
+    {
+      "condition": "$.Event.Attribute[?(@.type == \"ip-dst\")]",
+      "field": "value",
+      "action": "pseudo",
+      "fieldtype": "ip"
+    }
+  ]
+}

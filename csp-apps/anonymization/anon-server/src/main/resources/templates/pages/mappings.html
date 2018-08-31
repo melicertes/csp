@@ -29,7 +29,7 @@
         <div class="col-md-12 col-sm-12">
             <div class="row" data-duplicate="contact" data-duplicate-min="2" data-duplicate-max="10">
                 <form th:id="mappingForm" id="mappingForm" th:action="@{/mapping/save}" th:object="${mapping}" enctype="multipart/form-data" method="post" data-toggle="validator">
-                    <div class="col-md-3 col-xs-12">
+                    <div class="col-md-2 col-xs-12">
                         <div class="form-group">
                             <label>CSP id:</label>
                             <input class="form-control" th:field="*{id}" name="id" type="hidden"/>
@@ -37,7 +37,7 @@
                             <span th:if="${#fields.hasErrors('cspId')}" th:errors="*{cspId}">cspId Error</span>
                         </div>
                     </div>
-                    <div class="col-md-3 col-xs-12">
+                    <div class="col-md-2 col-xs-12">
                         <label>Data Type:</label>
                         <div class="input-group" style="width: 100%;">
                             <select id="selectDataTypeId" th:id="selectDataTypeId" th:field="*{dataType}" class="form-control" name="selectDataType" th:name="selectDataType" required="required">
@@ -45,6 +45,19 @@
                                 <option th:each="dataType : ${integrationDataTypes}"
                                         th:value="${dataType.name()}"
                                         th:text="${dataType}">
+                                </option>
+                            </select>
+                            <span th:if="${#fields.hasErrors('dataType')}" th:errors="*{dataType}">dataType Error</span>
+                        </div>
+                    </div>
+                    <div class="col-md-2 col-xs-12">
+                        <label>Application id:</label>
+                        <div class="input-group" style="width: 100%;">
+                            <select id="applicationId" th:id="applicationId" th:field="*{applicationId}" class="form-control" name="selectApplicationId" th:name="selectApplicationId" required="required">
+                                <option th:value="${null}" th:text="${'select id'}" th:selected="selected"></option>
+                                <option th:each="applicationId : ${T(com.intrasoft.csp.anon.commons.model.ApplicationId).values()}"
+                                        th:value="${applicationId.name()}"
+                                        th:text="${applicationId}">
                                 </option>
                             </select>
                             <span th:if="${#fields.hasErrors('dataType')}" th:errors="*{dataType}">dataType Error</span>
@@ -79,6 +92,7 @@
                                     <th><i class="fa  fa-file-code-o"></i></th>
                                     <th data-sortable="true">CSP Id</th>
                                     <th data-sortable="true">Data Type</th>
+                                    <th data-sortable="true">Application id</th>
                                     <th data-sortable="true">Ruleset</th>
                                     <th>Actions</th>
                                 </tr>
@@ -87,6 +101,7 @@
                                     <td th:text="${iterStat.count}"></td>
                                     <td th:text="${mapping.cspId}"></td>
                                     <td th:text="${mapping.dataType}"></td>
+                                    <td th:text="${mapping.applicationId}"></td>
                                     <td th:text="${mapping.ruleSetDTO.filename}"></td>
                                     <td><a th:href="'#'+${mapping.id}"  data-toggle="modal" ><i class="fa fa-trash" aria-hidden="true"></i></a>
                                         <a th:href="'/mappings/'+${mapping.id}"><i class="fa fa-edit" aria-hidden="true"></i></a></td>
