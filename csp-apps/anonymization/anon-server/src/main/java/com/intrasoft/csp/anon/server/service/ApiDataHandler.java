@@ -150,7 +150,7 @@ public class ApiDataHandler {
                 /*Apply id filter on the each element of the rule condition's findings*/
                 for (JsonNode arrEl : test){
                     String uuidCondition = "$.." + idFilter.toString();
-                    LOG.info(uuidCondition);
+                    LOG.trace(uuidCondition);
                     out = JsonPath.using(configuration).parse(out).set(uuidCondition,
                             ((ObjectNode)jjn).put(rule.getField(),updateField(rule.getAction(), rule.getFieldType(), fieldVal, dataType)),
                             idFilter).json();
