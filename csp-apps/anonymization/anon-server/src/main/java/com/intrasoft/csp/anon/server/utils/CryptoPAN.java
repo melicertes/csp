@@ -29,7 +29,7 @@ public class CryptoPAN {
 
     public CryptoPAN(String key) {
         if (key.length() != 32) {
-            throw new IllegalArgumentException("key must me a 32 byte long string");
+            throw new IllegalArgumentException("key must me a 32 byte long string and not " + key.length());
         }
 
         this.aesKey = key.substring(0, 16);

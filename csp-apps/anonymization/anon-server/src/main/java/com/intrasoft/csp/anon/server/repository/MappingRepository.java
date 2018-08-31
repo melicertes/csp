@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 public interface MappingRepository extends JpaRepository <Mapping, Long>{
 
     Mapping findTopByDataTypeAndCspId(IntegrationDataType integrationDataType, String cspId);
+    Mapping findTopByDataTypeAndCspIdAndApplicationId(IntegrationDataType integrationDataType, String cspId, ApplicationId applicationId);
     Mapping findDistinctByDataTypeAndCspId(IntegrationDataType integrationDataType, String cspId);
     Mapping findDistinctByDataTypeAndCspIdAndApplicationId(IntegrationDataType integrationDataType, String cspId, ApplicationId applicationId);
 }

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.intrasoft.csp.anon.commons.model.*;
 import com.intrasoft.csp.anon.server.AnonApp;
 import com.intrasoft.csp.anon.server.model.Rules;
+import com.intrasoft.csp.anon.server.utils.CryptoPAN;
 import com.intrasoft.csp.commons.model.IntegrationData;
 import com.intrasoft.csp.commons.model.IntegrationDataType;
 import org.apache.commons.io.FileUtils;
@@ -19,11 +20,14 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.File;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.security.InvalidKeyException;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.UUID;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -43,7 +47,7 @@ import static org.hamcrest.Matchers.greaterThan;
                 "csp.retry.maxAttempts:1",
                 "key.update=10000",
                 "enable.oam:false",
-                "logging.level.com.intrasoft.csp.anon=DEBUG"
+                "logging.level.com.intrasoft.csp.anon=TRACE"
         })
 public class ApiDataHandlerTest {
 
@@ -66,6 +70,7 @@ public class ApiDataHandlerTest {
 
     URL data_event = getClass().getClassLoader().getResource("data_event.json");
     URL rules_event = getClass().getClassLoader().getResource("rules_event.json");
+    URL rules_event_2 = getClass().getClassLoader().getResource("rules_event_2.json");
 
 
     @Autowired
@@ -224,13 +229,13 @@ public class ApiDataHandlerTest {
         String applicationId = integrationData.getDataParams().getApplicationId();
         //insert mapping and ruleset
         RuleSetDTO ruleSetDTO = new RuleSetDTO();
-        ruleSetDTO.setFilename(new File(rules_event.getFile()).getName());
-        ruleSetDTO.setFile(FileUtils.readFileToByteArray(new File(rules_event.toURI())));
+        ruleSetDTO.setFilename(new File(rules_event_2.getFile()).getName());
+        ruleSetDTO.setFile(FileUtils.readFileToByteArray(new File(rules_event_2.toURI())));
         ruleSetDTO.setDescription("event ruleset");
         RuleSetDTO savedRuleSet = anonService.saveRuleSet(ruleSetDTO);
 
         MappingDTO mappingDTO = new MappingDTO(cspId,savedRuleSet,integrationData.getDataType(), ApplicationId.MISP);
-        MappingDTO defaultmappingDTO = new MappingDTO("**",savedRuleSet,integrationData.getDataType(), ApplicationId.MISP);
+        MappingDTO defaultmappingDTO = new MappingDTO("demo4-csp",savedRuleSet,integrationData.getDataType(), ApplicationId.MISP);
         anonService.saveMapping(mappingDTO);
         anonService.saveMapping(defaultmappingDTO);
 
@@ -243,9 +248,10 @@ public class ApiDataHandlerTest {
         IntegrationAnonData anonData = apiDataHandler.handleAnonIntegrationData(integrationAnonData);
 
         String jsonOut = objectMapper.writeValueAsString(anonData.getDataObject());
-        System.out.println(jsonOut.toString());
-        assertThat(jsonOut, containsString("\"value\":\"***.***.***.***\""));
-        assertThat(jsonOut, containsString("\"event_creator_email\":\"***@******.**\""));
+        LOG.info(jsonOut.toString());
+        assertThat(jsonOut, containsString("\"event_creator_email\":\"\""));
+        /*assertThat(jsonOut, containsString("\"value\":\"10.37.235.254\""));
+        assertThat(jsonOut, containsString("\"value\":\"10.37.235.127\""));*/
     }
 
     @DirtiesContext
@@ -274,4 +280,35 @@ public class ApiDataHandlerTest {
 
         assertThat(rules.getRules().size(),greaterThan(0));
     }
+
+    @DirtiesContext
+    @Test
+    public void testCryptoPAN() throws IOException, URISyntaxException, NoSuchAlgorithmException, InterruptedException {
+
+            String key = UUID.randomUUID().toString();
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            md.update(key.getBytes());
+
+            String digest = new BigInteger(1, md.digest()).toString(16);
+            String digest2 = String.format("%032x", new BigInteger(1, md.digest()));
+            LOG.trace("CryptoPAN mask1: " + digest);
+            LOG.trace("CryptoPAN mask2: " + digest2);
+
+            StringBuffer hexString = new StringBuffer();
+            for (int i=0;i<md.digest().length;i++) {
+                String hex=Integer.toHexString(0xFF & md.digest()[i]);
+                if(hex.length()==1)
+                    hexString.append('0');
+
+                hexString.append(hex);
+            }
+            LOG.trace("CryptoPAN mask3: " + hexString.toString());
+
+            CryptoPAN cryptoPAN = new CryptoPAN(digest);
+            String newVal = cryptoPAN.anonymize("10.10.20.254");
+            LOG.info(newVal);
+            Thread.sleep(1000);
+
+    }
+
 }

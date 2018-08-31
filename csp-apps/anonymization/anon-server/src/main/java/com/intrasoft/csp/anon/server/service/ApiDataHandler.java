@@ -133,7 +133,32 @@ public class ApiDataHandler {
                 if (jjn.get(rule.getField()) != null){
                     fieldVal = jjn.get(rule.getField()).textValue();
                 }
-                out = JsonPath.using(configuration).parse(out).set(rule.getCondition(), ((ObjectNode)jjn).put(rule.getField(),updateField(rule.getAction(), rule.getFieldType(), fieldVal, dataType))).json();
+
+                /*Create Filter to match id*/
+                Filter idFilter = null;
+                JsonNode idNode = jjn.get("id");
+                if (idNode != null){
+                    idFilter = filter(
+                            where("id").eq(idNode.asInt())
+                    );
+                }
+
+                /*Get array with findings from rule condition*/
+                ArrayNode test = JsonPath.using(configuration).parse(out).read(rule.getCondition());
+                LOG.trace("Filtered per id: " + idNode.toString() + " --> "+ test.toString());
+
+                /*Apply id filter on the each element of the rule condition's findings*/
+                for (JsonNode arrEl : test){
+                    String uuidCondition = "$.." + idFilter.toString();
+                    LOG.info(uuidCondition);
+                    out = JsonPath.using(configuration).parse(out).set(uuidCondition,
+                            ((ObjectNode)jjn).put(rule.getField(),updateField(rule.getAction(), rule.getFieldType(), fieldVal, dataType)),
+                            idFilter).json();
+                }
+
+                /*out = JsonPath.using(configuration).parse(out).set(rule.getCondition(),
+                        ((ObjectNode)jjn).put(rule.getField(),updateField(rule.getAction(), rule.getFieldType(), fieldVal, dataType)),
+                        idFilter).json();*/
             }
         }
 
@@ -155,7 +180,8 @@ public class ApiDataHandler {
             if (fieldType.equals("ip")){
                 MessageDigest md = MessageDigest.getInstance("MD5");
                 md.update(hmac.getKey().getKey().getBytes());
-                String digest = new BigInteger(1, md.digest()).toString(16);
+//                String digest = new BigInteger(1, md.digest()).toString(16);
+                String digest = String.format("%032x", new BigInteger(1, md.digest()));
                 LOG.trace("CryptoPAN mask: " + digest);
                 CryptoPAN cryptoPAN = new CryptoPAN(digest);
                 newVal = cryptoPAN.anonymize(fieldValue);
