@@ -266,7 +266,8 @@ public class RegularReportsServiceImpl implements RegularReportsService {
                 Date dateEnded = cal.getTime();
                 cal.add(Calendar.DATE, -7);
                 Date dateStarted = cal.getTime();
-                result = String.format("%s - %s", sdf.format(dateStarted), sdf.format(dateEnded));
+                //result = String.format("%s - %s", sdf.format(dateStarted), sdf.format(dateEnded));
+                result = "Monday - Sunday";
                 break;
             }
 
