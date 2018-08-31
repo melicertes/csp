@@ -45,7 +45,8 @@ public class RulesServiceImpl implements RulesService {
 
     @Override
     public Rules getRule(IntegrationDataType integrationDataType, String cspId, ApplicationId applicationId) throws IOException {
-        Mapping mapping = mappingRepository.findDistinctByDataTypeAndCspIdAndApplicationId(integrationDataType, cspId.trim(), applicationId);
+//        Mapping mapping = mappingRepository.findDistinctByDataTypeAndCspIdAndApplicationId(integrationDataType, cspId.trim(), applicationId);
+        Mapping mapping = mappingRepository.findTopByDataTypeAndCspIdAndApplicationId(integrationDataType, cspId.trim(), applicationId);
         Rules rules = null;
         if (mapping != null){
             LOG.debug("Mapping found");
@@ -53,7 +54,7 @@ public class RulesServiceImpl implements RulesService {
         }
         else {
             LOG.debug("Mapping not found");
-            mapping = mappingRepository.findDistinctByDataTypeAndCspId(integrationDataType, "**");
+            mapping = mappingRepository.findDistinctByDataTypeAndCspIdAndApplicationId(integrationDataType, "**", applicationId);
             if (mapping != null){
                 rules = new ObjectMapper().readerFor(Rules.class).readValue(new String(mapping.getRuleset().getFile()));
             }
