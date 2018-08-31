@@ -7,9 +7,11 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.intrasoft.csp.anon.commons.exceptions.AnonException;
 import com.intrasoft.csp.anon.commons.exceptions.InvalidDataTypeException;
 import com.intrasoft.csp.anon.commons.exceptions.MappingNotFoundForGivenTupleException;
+import com.intrasoft.csp.anon.commons.model.ApplicationId;
 import com.intrasoft.csp.anon.commons.model.IntegrationAnonData;
 import com.intrasoft.csp.anon.server.model.Rule;
 import com.intrasoft.csp.anon.server.model.Rules;
+import com.intrasoft.csp.anon.server.utils.CryptoPAN;
 import com.intrasoft.csp.anon.server.utils.HMAC;
 import com.intrasoft.csp.commons.apiHttpStatusResponse.HttpStatusResponseType;
 import com.intrasoft.csp.commons.model.IntegrationDataType;
@@ -26,7 +28,9 @@ import org.springframework.stereotype.Service;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.security.InvalidKeyException;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -76,9 +80,11 @@ public class ApiDataHandler {
             throw new AnonException(HttpStatusResponseType.MALFORMED_INTEGRATION_DATA_STRUCTURE.getReasonPhrase()+"[integrationAnonData is null]");
         }
 
-        LOG.info("Handle integrationData for cspId: " + integrationAnonData.getCspId() + " and " + " dataType " + integrationAnonData.getDataType());
+        LOG.debug("Handle integrationAnonData: " + integrationAnonData.toString());
         String cspId = integrationAnonData.getCspId();
         IntegrationDataType dataType = integrationAnonData.getDataType();
+        String applicationIdString = integrationAnonData.getApplicationId();
+
         if (dataType == null){
             throw new InvalidDataTypeException(HttpStatusResponseType.UNSUPPORTED_DATA_TYPE.getReasonPhrase()+"[dataType is null]");
         }
@@ -87,12 +93,27 @@ public class ApiDataHandler {
             throw new AnonException(HttpStatusResponseType.MALFORMED_INTEGRATION_DATA_STRUCTURE.getReasonPhrase()+"[cspId is empty]");
         }
 
-        Rules rules = rulesService.getRule(dataType, cspId);
+        if (applicationIdString == null || applicationIdString.equals("")){
+            throw new AnonException(HttpStatusResponseType.MALFORMED_INTEGRATION_DATA_STRUCTURE.getReasonPhrase()+"[applicationId is empty]");
+        }
+
+        if (applicationIdString == null || applicationIdString.equals("")){
+            throw new AnonException(HttpStatusResponseType.MALFORMED_INTEGRATION_DATA_STRUCTURE.getReasonPhrase()+"[applicationId is empty]");
+        }
+
+        ApplicationId applicationId = ApplicationId.asApplicationId(applicationIdString);
+
+        if (applicationId == null){
+            throw new AnonException(HttpStatusResponseType.MALFORMED_INTEGRATION_DATA_STRUCTURE.getReasonPhrase()+"[applicationId not valid]");
+        }
+
+
+        Rules rules = rulesService.getRule(dataType, cspId, applicationId);
 
         if (rules == null){
             LOG.debug("Ruleset mapping not found, using default.");
             throw new MappingNotFoundForGivenTupleException(HttpStatusResponseType.MAPPING_NOT_FOUND_FOR_GIVEN_TUPLE.getReasonPhrase()
-                    +"[dataType: "+dataType+",cspId: "+cspId+"]");
+                    +"[dataType: "+dataType+",cspId: "+cspId+ ", applicationId: " + applicationId.getApplicationId() + "]");
         }
 
         if (integrationAnonData.getDataObject() == null){
@@ -103,10 +124,41 @@ public class ApiDataHandler {
         ReadContext ctx = JsonPath.using(configuration).parse(out);
 
         for (Rule rule : rules.getRules()){
+            LOG.debug("Applying rule: " + rule.toString());
             List<LinkedHashMap> tmp = ctx.read(rule.getCondition(), List.class);
             for (LinkedHashMap jn : tmp){
                 JsonNode jjn = new ObjectMapper().valueToTree(jn);
-                out = JsonPath.using(configuration).parse(out).set(rule.getCondition(), ((ObjectNode)jjn).put(rule.getField(),updateField(rule.getAction(), rule.getField(), jjn.get(rule.getField()).textValue()))).json();
+
+                String fieldVal = null;
+                if (jjn.get(rule.getField()) != null){
+                    fieldVal = jjn.get(rule.getField()).textValue();
+                }
+
+                /*Create Filter to match id*/
+                Filter idFilter = null;
+                JsonNode idNode = jjn.get("id");
+                if (idNode != null){
+                    idFilter = filter(
+                            where("id").eq(idNode.asInt())
+                    );
+                }
+
+                /*Get array with findings from rule condition*/
+                ArrayNode test = JsonPath.using(configuration).parse(out).read(rule.getCondition());
+                LOG.trace("Filtered per id: " + idNode.toString() + " --> "+ test.toString());
+
+                /*Apply id filter on the each element of the rule condition's findings*/
+                for (JsonNode arrEl : test){
+                    String uuidCondition = "$.." + idFilter.toString();
+                    LOG.info(uuidCondition);
+                    out = JsonPath.using(configuration).parse(out).set(uuidCondition,
+                            ((ObjectNode)jjn).put(rule.getField(),updateField(rule.getAction(), rule.getFieldType(), fieldVal, dataType)),
+                            idFilter).json();
+                }
+
+                /*out = JsonPath.using(configuration).parse(out).set(rule.getCondition(),
+                        ((ObjectNode)jjn).put(rule.getField(),updateField(rule.getAction(), rule.getFieldType(), fieldVal, dataType)),
+                        idFilter).json();*/
             }
         }
 
@@ -122,13 +174,26 @@ public class ApiDataHandler {
      * @throws InvalidKeyException
      * @throws NoSuchAlgorithmException
      */
-    private String updateField(String action, String fieldType, String fieldValue) throws InvalidKeyException, NoSuchAlgorithmException {
+    private String updateField(String action, String fieldType, String fieldValue, IntegrationDataType dataType) throws InvalidKeyException, NoSuchAlgorithmException {
         String newVal = fieldValue;
         if (action.toLowerCase().equals("pseudo")){
-            newVal = pseudoField(fieldValue);
+            if (fieldType.equals("ip")){
+                MessageDigest md = MessageDigest.getInstance("MD5");
+                md.update(hmac.getKey().getKey().getBytes());
+//                String digest = new BigInteger(1, md.digest()).toString(16);
+                String digest = String.format("%032x", new BigInteger(1, md.digest()));
+                LOG.trace("CryptoPAN mask: " + digest);
+                CryptoPAN cryptoPAN = new CryptoPAN(digest);
+                newVal = cryptoPAN.anonymize(fieldValue);
+                LOG.trace(fieldValue + " --> " + newVal);
+            }
+            else  {
+                newVal = pseudoField(fieldValue);
+            }
+
         }
         else if (action.toLowerCase().equals("anon")){
-            newVal = anonField(fieldType, fieldValue);
+            newVal = anonField(fieldType, fieldValue, dataType);
         }
         return newVal;
     }
@@ -138,8 +203,14 @@ public class ApiDataHandler {
      * @param fieldVal
      * @return
      */
-    private String anonField(String fieldtype, String fieldVal){
+    private String anonField(String fieldtype, String fieldVal, IntegrationDataType dataType){
 
+        if (dataType.equals(IntegrationDataType.EVENT) ||
+                dataType.equals(IntegrationDataType.THREAT) ||
+                dataType.equals(IntegrationDataType.VULNERABILITY) ||
+                dataType.equals(IntegrationDataType.ARTEFACT)){
+            return "";
+        }
         Pattern rEmail = Pattern.compile(EMAIL_PATTERN);
         Pattern rIp = Pattern.compile(IPADDRESS_PATTERN);
         if (rEmail.matcher(fieldVal).matches()) fieldtype = "email";
