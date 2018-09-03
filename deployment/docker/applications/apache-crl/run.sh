@@ -16,7 +16,7 @@ touch /tmp/cacrl.md5sum
 while true; do
 
     log "Downloading CRL from ${CRL_URL}"
-    wget -O ${CRL_URL} /tmp/cacrl.crl
+    wget -O /tmp/cacrl.crl ${CRL_URL}
     md5new=$(md5sum /tmp/cacrl.crl)
     md5Old=$(cat /tmp/cacrl.md5sum)
 
