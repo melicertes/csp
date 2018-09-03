@@ -1,4 +1,4 @@
-FROM csp-docker-java8:1.0
+FROM docker:18.02
 
 RUN apk add --no-cache bash \
                      curl \
