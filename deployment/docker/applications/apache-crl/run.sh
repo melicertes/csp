@@ -28,7 +28,7 @@ while true; do
         rm /etc/apache2/ssl/crl/cacrl.pem
         md5sum /tmp/cacrl.crl > /tmp/cacrl.md5sum
         openssl crl -inform DER -in /tmp/cacrl.crl -outform PEM -out /tmp/cacrl.pem
-        cp /tmp/cacrl.pemr /etc/apache2/ssl/crl/
+        cp /tmp/cacrl.pem /etc/apache2/ssl/crl/
         ln -s /etc/apache2/ssl/crl/cacrl.pem `openssl crl -hash -noout -in /etc/apache2/ssl/crl/cacrl.pem`.r0
 
         log "Restarting Apache"
