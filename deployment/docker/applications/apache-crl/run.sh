@@ -24,8 +24,13 @@ while true; do
         log "CRL list is the same."
     else
         log "New CRL list received."
+        rm /etc/apache2/ssl/crl/cacrl.pem.r0
+        rm /etc/apache2/ssl/crl/cacrl.pem
         md5sum /tmp/cacrl.crl > /tmp/cacrl.md5sum
-        cp /tmp/cacrl.crl /etc/apache2/ssl/crl
+        openssl crl -inform DER -in /tmp/cacrl.crl -outform PEM -out /tmp/cacrl.pem
+        cp /tmp/cacrl.pemr /etc/apache2/ssl/crl/
+        ln -s /etc/apache2/ssl/crl/cacrl.pem `openssl crl -hash -noout -in /etc/apache2/ssl/crl/cacrl.pem`.r0
+
         log "Restarting Apache"
         docker restart csp-apache
     fi
