@@ -1,0 +1,17 @@
+version: '3'
+services:
+
+    apache-crl:
+        image: csp-apache-crl:1.0
+        container_name: csp-apache-crl
+        hostname: csp-apache-crl
+        working_dir: /etc/apache2/ssl
+        environment:
+         - CRL_URL=https://pki.dfn-cert.de/melicertes-ca/pub/crl/cacrl.crl
+        volumes:
+            - /var/run/docker.sock:/var/run/docker.sock
+            - SSLDatavolume:/etc/apache2/ssl
+
+volumes:
+    SSLDatavolume:
+        external: true
