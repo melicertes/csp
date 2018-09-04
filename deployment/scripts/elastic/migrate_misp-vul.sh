@@ -275,1080 +275,328 @@ curl -XPUT  "localhost:9200/$index/_mapping/artefact?pretty" -H 'Content-Type: a
 
 curl -XPUT  "localhost:9200/$index/_mapping/vulnerability?pretty" -H 'Content-Type: application/json' -d'
 {
-          "properties" : {
-          "dataObject": {
-            "properties": {
-              "Event": {
-                "properties": {
-                  "Attribute": {
-                    "properties": {
-                      "category": {
-                        "type": "text",
-                        "fields": {
-                          "keyword": {
-                            "type": "keyword",
-                            "ignore_above": 256
-                          }
-                        }
-                      },
-                      "comment": {
-                        "type": "text",
-                        "fields": {
-                          "keyword": {
-                            "type": "keyword",
-                            "ignore_above": 256
-                          }
-                        }
-                      },
-                      "deleted": {
-                        "type": "boolean"
-                      },
-                      "disable_correlation": {
-                        "type": "boolean"
-                      },
-                      "distribution": {
-                        "type": "text",
-                        "fields": {
-                          "keyword": {
-                            "type": "keyword",
-                            "ignore_above": 256
-                          }
-                        }
-                      },
-                      "event_id": {
-                        "type": "text",
-                        "fields": {
-                          "keyword": {
-                            "type": "keyword",
-                            "ignore_above": 256
-                          }
-                        }
-                      },
-                      "id": {
-                        "type": "text",
-                        "fields": {
-                          "keyword": {
-                            "type": "keyword",
-                            "ignore_above": 256
-                          }
-                        }
-                      },
-                      "object_id": {
-                        "type": "text",
-                        "fields": {
-                          "keyword": {
-                            "type": "keyword",
-                            "ignore_above": 256
-                          }
-                        }
-                      },
-                      "sharing_group_id": {
-                        "type": "text",
-                        "fields": {
-                          "keyword": {
-                            "type": "keyword",
-                            "ignore_above": 256
-                          }
-                        }
-                      },
-                      "timestamp": {
-                        "type": "text",
-                        "fields": {
-                          "keyword": {
-                            "type": "keyword",
-                            "ignore_above": 256
-                          }
-                        }
-                      },
-                      "to_ids": {
-                        "type": "boolean"
-                      },
-                      "type": {
-                        "type": "text",
-                        "fields": {
-                          "keyword": {
-                            "type": "keyword",
-                            "ignore_above": 256
-                          }
-                        }
-                      },
-                      "uuid": {
-                        "type": "text",
-                        "fields": {
-                          "keyword": {
-                            "type": "keyword",
-                            "ignore_above": 256
-                          }
-                        }
-                      },
-                      "value": {
-                        "type": "text",
-                        "fields": {
-                          "keyword": {
-                            "type": "keyword",
-                            "ignore_above": 256
-                          }
-                        }
-                      }
-                    }
-                  },
-                  "Object": {
-                    "properties": {
-                      "Attribute": {
-                        "properties": {
-                          "category": {
-                            "type": "text",
-                            "fields": {
-                              "keyword": {
-                                "type": "keyword",
-                                "ignore_above": 256
+        "properties" : {
+          "dataObject" : {
+            "properties" : {
+              "response" : {
+                "properties" : {
+                  "Event" : {
+                    "properties" : {
+                      "Attribute" : {
+                        "properties" : {
+                          "category" : {
+                            "type" : "text",
+                            "fields" : {
+                              "keyword" : {
+                                "type" : "keyword",
+                                "ignore_above" : 256
                               }
                             }
                           },
-                          "comment": {
-                            "type": "text",
-                            "fields": {
-                              "keyword": {
-                                "type": "keyword",
-                                "ignore_above": 256
+                          "comment" : {
+                            "type" : "text",
+                            "fields" : {
+                              "keyword" : {
+                                "type" : "keyword",
+                                "ignore_above" : 256
                               }
                             }
                           },
-                          "deleted": {
-                            "type": "boolean"
+                          "deleted" : {
+                            "type" : "boolean"
                           },
-                          "disable_correlation": {
-                            "type": "boolean"
+                          "disable_correlation" : {
+                            "type" : "boolean"
                           },
-                          "distribution": {
-                            "type": "text",
-                            "fields": {
-                              "keyword": {
-                                "type": "keyword",
-                                "ignore_above": 256
+                          "distribution" : {
+                            "type" : "text",
+                            "fields" : {
+                              "keyword" : {
+                                "type" : "keyword",
+                                "ignore_above" : 256
                               }
                             }
                           },
-                          "event_id": {
-                            "type": "text",
-                            "fields": {
-                              "keyword": {
-                                "type": "keyword",
-                                "ignore_above": 256
+                          "event_id" : {
+                            "type" : "text",
+                            "fields" : {
+                              "keyword" : {
+                                "type" : "keyword",
+                                "ignore_above" : 256
                               }
                             }
                           },
-                          "id": {
-                            "type": "text",
-                            "fields": {
-                              "keyword": {
-                                "type": "keyword",
-                                "ignore_above": 256
+                          "id" : {
+                            "type" : "text",
+                            "fields" : {
+                              "keyword" : {
+                                "type" : "keyword",
+                                "ignore_above" : 256
                               }
                             }
                           },
-                          "object_id": {
-                            "type": "text",
-                            "fields": {
-                              "keyword": {
-                                "type": "keyword",
-                                "ignore_above": 256
+                          "sharing_group_id" : {
+                            "type" : "text",
+                            "fields" : {
+                              "keyword" : {
+                                "type" : "keyword",
+                                "ignore_above" : 256
                               }
                             }
                           },
-                          "object_relation": {
-                            "type": "text",
-                            "fields": {
-                              "keyword": {
-                                "type": "keyword",
-                                "ignore_above": 256
+                          "timestamp" : {
+                            "type" : "text",
+                            "fields" : {
+                              "keyword" : {
+                                "type" : "keyword",
+                                "ignore_above" : 256
                               }
                             }
                           },
-                          "sharing_group_id": {
-                            "type": "text",
-                            "fields": {
-                              "keyword": {
-                                "type": "keyword",
-                                "ignore_above": 256
+                          "to_ids" : {
+                            "type" : "boolean"
+                          },
+                          "type" : {
+                            "type" : "text",
+                            "fields" : {
+                              "keyword" : {
+                                "type" : "keyword",
+                                "ignore_above" : 256
                               }
                             }
                           },
-                          "timestamp": {
-                            "type": "text",
-                            "fields": {
-                              "keyword": {
-                                "type": "keyword",
-                                "ignore_above": 256
+                          "uuid" : {
+                            "type" : "text",
+                            "fields" : {
+                              "keyword" : {
+                                "type" : "keyword",
+                                "ignore_above" : 256
                               }
                             }
                           },
-                          "to_ids": {
-                            "type": "boolean"
-                          },
-                          "type": {
-                            "type": "text",
-                            "fields": {
-                              "keyword": {
-                                "type": "keyword",
-                                "ignore_above": 256
-                              }
-                            }
-                          },
-                          "uuid": {
-                            "type": "text",
-                            "fields": {
-                              "keyword": {
-                                "type": "keyword",
-                                "ignore_above": 256
-                              }
-                            }
-                          },
-                          "value": {
-                            "type": "text",
-                            "fields": {
-                              "keyword": {
-                                "type": "keyword",
-                                "ignore_above": 256
+                          "value" : {
+                            "type" : "text",
+                            "fields" : {
+                              "keyword" : {
+                                "type" : "keyword",
+                                "ignore_above" : 256
                               }
                             }
                           }
                         }
                       },
-                      "comment": {
-                        "type": "text",
-                        "fields": {
-                          "keyword": {
-                            "type": "keyword",
-                            "ignore_above": 256
-                          }
-                        }
-                      },
-                      "deleted": {
-                        "type": "boolean"
-                      },
-                      "description": {
-                        "type": "text",
-                        "fields": {
-                          "keyword": {
-                            "type": "keyword",
-                            "ignore_above": 256
-                          }
-                        }
-                      },
-                      "distribution": {
-                        "type": "text",
-                        "fields": {
-                          "keyword": {
-                            "type": "keyword",
-                            "ignore_above": 256
-                          }
-                        }
-                      },
-                      "event_id": {
-                        "type": "text",
-                        "fields": {
-                          "keyword": {
-                            "type": "keyword",
-                            "ignore_above": 256
-                          }
-                        }
-                      },
-                      "id": {
-                        "type": "text",
-                        "fields": {
-                          "keyword": {
-                            "type": "keyword",
-                            "ignore_above": 256
-                          }
-                        }
-                      },
-                      "meta-category": {
-                        "type": "text",
-                        "fields": {
-                          "keyword": {
-                            "type": "keyword",
-                            "ignore_above": 256
-                          }
-                        }
-                      },
-                      "name": {
-                        "type": "text",
-                        "fields": {
-                          "keyword": {
-                            "type": "keyword",
-                            "ignore_above": 256
-                          }
-                        }
-                      },
-                      "sharing_group_id": {
-                        "type": "text",
-                        "fields": {
-                          "keyword": {
-                            "type": "keyword",
-                            "ignore_above": 256
-                          }
-                        }
-                      },
-                      "template_uuid": {
-                        "type": "text",
-                        "fields": {
-                          "keyword": {
-                            "type": "keyword",
-                            "ignore_above": 256
-                          }
-                        }
-                      },
-                      "template_version": {
-                        "type": "text",
-                        "fields": {
-                          "keyword": {
-                            "type": "keyword",
-                            "ignore_above": 256
-                          }
-                        }
-                      },
-                      "timestamp": {
-                        "type": "text",
-                        "fields": {
-                          "keyword": {
-                            "type": "keyword",
-                            "ignore_above": 256
-                          }
-                        }
-                      },
-                      "uuid": {
-                        "type": "text",
-                        "fields": {
-                          "keyword": {
-                            "type": "keyword",
-                            "ignore_above": 256
-                          }
-                        }
-                      }
-                    }
-                  },
-                  "Org": {
-                    "properties": {
-                      "id": {
-                        "type": "text",
-                        "fields": {
-                          "keyword": {
-                            "type": "keyword",
-                            "ignore_above": 256
-                          }
-                        }
-                      },
-                      "name": {
-                        "type": "text",
-                        "fields": {
-                          "keyword": {
-                            "type": "keyword",
-                            "ignore_above": 256
-                          }
-                        }
-                      },
-                      "uuid": {
-                        "type": "text",
-                        "fields": {
-                          "keyword": {
-                            "type": "keyword",
-                            "ignore_above": 256
-                          }
-                        }
-                      }
-                    }
-                  },
-                  "Orgc": {
-                    "properties": {
-                      "id": {
-                        "type": "text",
-                        "fields": {
-                          "keyword": {
-                            "type": "keyword",
-                            "ignore_above": 256
-                          }
-                        }
-                      },
-                      "name": {
-                        "type": "text",
-                        "fields": {
-                          "keyword": {
-                            "type": "keyword",
-                            "ignore_above": 256
-                          }
-                        }
-                      },
-                      "uuid": {
-                        "type": "text",
-                        "fields": {
-                          "keyword": {
-                            "type": "keyword",
-                            "ignore_above": 256
-                          }
-                        }
-                      }
-                    }
-                  },
-                  "RelatedEvent": {
-                    "properties": {
-                      "Event": {
-                        "properties": {
-                          "Org": {
-                            "properties": {
-                              "id": {
-                                "type": "text",
-                                "fields": {
-                                  "keyword": {
-                                    "type": "keyword",
-                                    "ignore_above": 256
-                                  }
-                                }
-                              },
-                              "name": {
-                                "type": "text",
-                                "fields": {
-                                  "keyword": {
-                                    "type": "keyword",
-                                    "ignore_above": 256
-                                  }
-                                }
-                              },
-                              "uuid": {
-                                "type": "text",
-                                "fields": {
-                                  "keyword": {
-                                    "type": "keyword",
-                                    "ignore_above": 256
-                                  }
-                                }
+                      "Org" : {
+                        "properties" : {
+                          "id" : {
+                            "type" : "text",
+                            "fields" : {
+                              "keyword" : {
+                                "type" : "keyword",
+                                "ignore_above" : 256
                               }
                             }
                           },
-                          "Orgc": {
-                            "properties": {
-                              "id": {
-                                "type": "text",
-                                "fields": {
-                                  "keyword": {
-                                    "type": "keyword",
-                                    "ignore_above": 256
-                                  }
-                                }
-                              },
-                              "name": {
-                                "type": "text",
-                                "fields": {
-                                  "keyword": {
-                                    "type": "keyword",
-                                    "ignore_above": 256
-                                  }
-                                }
-                              },
-                              "uuid": {
-                                "type": "text",
-                                "fields": {
-                                  "keyword": {
-                                    "type": "keyword",
-                                    "ignore_above": 256
-                                  }
-                                }
+                          "name" : {
+                            "type" : "text",
+                            "fields" : {
+                              "keyword" : {
+                                "type" : "keyword",
+                                "ignore_above" : 256
                               }
                             }
                           },
-                          "analysis": {
-                            "type": "text",
-                            "fields": {
-                              "keyword": {
-                                "type": "keyword",
-                                "ignore_above": 256
-                              }
-                            }
-                          },
-                          "date": {
-                            "type": "date"
-                          },
-                          "distribution": {
-                            "type": "text",
-                            "fields": {
-                              "keyword": {
-                                "type": "keyword",
-                                "ignore_above": 256
-                              }
-                            }
-                          },
-                          "id": {
-                            "type": "text",
-                            "fields": {
-                              "keyword": {
-                                "type": "keyword",
-                                "ignore_above": 256
-                              }
-                            }
-                          },
-                          "info": {
-                            "type": "text",
-                            "fields": {
-                              "keyword": {
-                                "type": "keyword",
-                                "ignore_above": 256
-                              }
-                            }
-                          },
-                          "org_id": {
-                            "type": "text",
-                            "fields": {
-                              "keyword": {
-                                "type": "keyword",
-                                "ignore_above": 256
-                              }
-                            }
-                          },
-                          "orgc_id": {
-                            "type": "text",
-                            "fields": {
-                              "keyword": {
-                                "type": "keyword",
-                                "ignore_above": 256
-                              }
-                            }
-                          },
-                          "published": {
-                            "type": "boolean"
-                          },
-                          "threat_level_id": {
-                            "type": "text",
-                            "fields": {
-                              "keyword": {
-                                "type": "keyword",
-                                "ignore_above": 256
-                              }
-                            }
-                          },
-                          "timestamp": {
-                            "type": "text",
-                            "fields": {
-                              "keyword": {
-                                "type": "keyword",
-                                "ignore_above": 256
-                              }
-                            }
-                          },
-                          "uuid": {
-                            "type": "text",
-                            "fields": {
-                              "keyword": {
-                                "type": "keyword",
-                                "ignore_above": 256
-                              }
-                            }
-                          }
-                        }
-                      }
-                    }
-                  },
-                  "Tag": {
-                    "properties": {
-                      "colour": {
-                        "type": "text",
-                        "fields": {
-                          "keyword": {
-                            "type": "keyword",
-                            "ignore_above": 256
-                          }
-                        }
-                      },
-                      "exportable": {
-                        "type": "boolean"
-                      },
-                      "hide_tag": {
-                        "type": "boolean"
-                      },
-                      "id": {
-                        "type": "text",
-                        "fields": {
-                          "keyword": {
-                            "type": "keyword",
-                            "ignore_above": 256
-                          }
-                        }
-                      },
-                      "name": {
-                        "type": "text",
-                        "fields": {
-                          "keyword": {
-                            "type": "keyword",
-                            "ignore_above": 256
-                          }
-                        }
-                      },
-                      "user_id": {
-                        "type": "boolean"
-                      }
-                    }
-                  },
-                  "analysis": {
-                    "type": "text",
-                    "fields": {
-                      "keyword": {
-                        "type": "keyword",
-                        "ignore_above": 256
-                      }
-                    }
-                  },
-                  "attribute_count": {
-                    "type": "text",
-                    "fields": {
-                      "keyword": {
-                        "type": "keyword",
-                        "ignore_above": 256
-                      }
-                    }
-                  },
-                  "date": {
-                    "type": "date"
-                  },
-                  "disable_correlation": {
-                    "type": "boolean"
-                  },
-                  "distribution": {
-                    "type": "text",
-                    "fields": {
-                      "keyword": {
-                        "type": "keyword",
-                        "ignore_above": 256
-                      }
-                    }
-                  },
-                  "event_creator_email": {
-                    "type": "text",
-                    "fields": {
-                      "keyword": {
-                        "type": "keyword",
-                        "ignore_above": 256
-                      }
-                    }
-                  },
-                  "extends_uuid": {
-                    "type": "text",
-                    "fields": {
-                      "keyword": {
-                        "type": "keyword",
-                        "ignore_above": 256
-                      }
-                    }
-                  },
-                  "id": {
-                    "type": "text",
-                    "fields": {
-                      "keyword": {
-                        "type": "keyword",
-                        "ignore_above": 256
-                      }
-                    }
-                  },
-                  "info": {
-                    "type": "text",
-                    "fields": {
-                      "keyword": {
-                        "type": "keyword",
-                        "ignore_above": 256
-                      }
-                    }
-                  },
-                  "locked": {
-                    "type": "boolean"
-                  },
-                  "org_id": {
-                    "type": "text",
-                    "fields": {
-                      "keyword": {
-                        "type": "keyword",
-                        "ignore_above": 256
-                      }
-                    }
-                  },
-                  "orgc_id": {
-                    "type": "text",
-                    "fields": {
-                      "keyword": {
-                        "type": "keyword",
-                        "ignore_above": 256
-                      }
-                    }
-                  },
-                  "proposal_email_lock": {
-                    "type": "boolean"
-                  },
-                  "publish_timestamp": {
-                    "type": "text",
-                    "fields": {
-                      "keyword": {
-                        "type": "keyword",
-                        "ignore_above": 256
-                      }
-                    }
-                  },
-                  "published": {
-                    "type": "boolean"
-                  },
-                  "sharing_group_id": {
-                    "type": "text",
-                    "fields": {
-                      "keyword": {
-                        "type": "keyword",
-                        "ignore_above": 256
-                      }
-                    }
-                  },
-                  "threat_level_id": {
-                    "type": "text",
-                    "fields": {
-                      "keyword": {
-                        "type": "keyword",
-                        "ignore_above": 256
-                      }
-                    }
-                  },
-                  "timestamp": {
-                    "type": "text",
-                    "fields": {
-                      "keyword": {
-                        "type": "keyword",
-                        "ignore_above": 256
-                      }
-                    }
-                  },
-                  "uuid": {
-                    "type": "text",
-                    "fields": {
-                      "keyword": {
-                        "type": "keyword",
-                        "ignore_above": 256
-                      }
-                    }
-                  }
-                }
-              },
-              "response": {
-                "properties": {
-                  "Event": {
-                    "properties": {
-                      "Attribute": {
-                        "properties": {
-                          "category": {
-                            "type": "text",
-                            "fields": {
-                              "keyword": {
-                                "type": "keyword",
-                                "ignore_above": 256
-                              }
-                            }
-                          },
-                          "comment": {
-                            "type": "text",
-                            "fields": {
-                              "keyword": {
-                                "type": "keyword",
-                                "ignore_above": 256
-                              }
-                            }
-                          },
-                          "deleted": {
-                            "type": "boolean"
-                          },
-                          "disable_correlation": {
-                            "type": "boolean"
-                          },
-                          "distribution": {
-                            "type": "text",
-                            "fields": {
-                              "keyword": {
-                                "type": "keyword",
-                                "ignore_above": 256
-                              }
-                            }
-                          },
-                          "event_id": {
-                            "type": "text",
-                            "fields": {
-                              "keyword": {
-                                "type": "keyword",
-                                "ignore_above": 256
-                              }
-                            }
-                          },
-                          "id": {
-                            "type": "text",
-                            "fields": {
-                              "keyword": {
-                                "type": "keyword",
-                                "ignore_above": 256
-                              }
-                            }
-                          },
-                          "sharing_group_id": {
-                            "type": "text",
-                            "fields": {
-                              "keyword": {
-                                "type": "keyword",
-                                "ignore_above": 256
-                              }
-                            }
-                          },
-                          "timestamp": {
-                            "type": "text",
-                            "fields": {
-                              "keyword": {
-                                "type": "keyword",
-                                "ignore_above": 256
-                              }
-                            }
-                          },
-                          "to_ids": {
-                            "type": "boolean"
-                          },
-                          "type": {
-                            "type": "text",
-                            "fields": {
-                              "keyword": {
-                                "type": "keyword",
-                                "ignore_above": 256
-                              }
-                            }
-                          },
-                          "uuid": {
-                            "type": "text",
-                            "fields": {
-                              "keyword": {
-                                "type": "keyword",
-                                "ignore_above": 256
-                              }
-                            }
-                          },
-                          "value": {
-                            "type": "text",
-                            "fields": {
-                              "keyword": {
-                                "type": "keyword",
-                                "ignore_above": 256
+                          "uuid" : {
+                            "type" : "text",
+                            "fields" : {
+                              "keyword" : {
+                                "type" : "keyword",
+                                "ignore_above" : 256
                               }
                             }
                           }
                         }
                       },
-                      "Org": {
-                        "properties": {
-                          "id": {
-                            "type": "text",
-                            "fields": {
-                              "keyword": {
-                                "type": "keyword",
-                                "ignore_above": 256
+                      "Orgc" : {
+                        "properties" : {
+                          "id" : {
+                            "type" : "text",
+                            "fields" : {
+                              "keyword" : {
+                                "type" : "keyword",
+                                "ignore_above" : 256
                               }
                             }
                           },
-                          "name": {
-                            "type": "text",
-                            "fields": {
-                              "keyword": {
-                                "type": "keyword",
-                                "ignore_above": 256
+                          "name" : {
+                            "type" : "text",
+                            "fields" : {
+                              "keyword" : {
+                                "type" : "keyword",
+                                "ignore_above" : 256
                               }
                             }
                           },
-                          "uuid": {
-                            "type": "text",
-                            "fields": {
-                              "keyword": {
-                                "type": "keyword",
-                                "ignore_above": 256
+                          "uuid" : {
+                            "type" : "text",
+                            "fields" : {
+                              "keyword" : {
+                                "type" : "keyword",
+                                "ignore_above" : 256
                               }
                             }
                           }
                         }
                       },
-                      "Orgc": {
-                        "properties": {
-                          "id": {
-                            "type": "text",
-                            "fields": {
-                              "keyword": {
-                                "type": "keyword",
-                                "ignore_above": 256
-                              }
-                            }
-                          },
-                          "name": {
-                            "type": "text",
-                            "fields": {
-                              "keyword": {
-                                "type": "keyword",
-                                "ignore_above": 256
-                              }
-                            }
-                          },
-                          "uuid": {
-                            "type": "text",
-                            "fields": {
-                              "keyword": {
-                                "type": "keyword",
-                                "ignore_above": 256
-                              }
-                            }
-                          }
-                        }
-                      },
-                      "RelatedEvent": {
-                        "properties": {
-                          "Event": {
-                            "properties": {
-                              "Org": {
-                                "properties": {
-                                  "id": {
-                                    "type": "text",
-                                    "fields": {
-                                      "keyword": {
-                                        "type": "keyword",
-                                        "ignore_above": 256
+                      "RelatedEvent" : {
+                        "properties" : {
+                          "Event" : {
+                            "properties" : {
+                              "Org" : {
+                                "properties" : {
+                                  "id" : {
+                                    "type" : "text",
+                                    "fields" : {
+                                      "keyword" : {
+                                        "type" : "keyword",
+                                        "ignore_above" : 256
                                       }
                                     }
                                   },
-                                  "name": {
-                                    "type": "text",
-                                    "fields": {
-                                      "keyword": {
-                                        "type": "keyword",
-                                        "ignore_above": 256
+                                  "name" : {
+                                    "type" : "text",
+                                    "fields" : {
+                                      "keyword" : {
+                                        "type" : "keyword",
+                                        "ignore_above" : 256
                                       }
                                     }
                                   },
-                                  "uuid": {
-                                    "type": "text",
-                                    "fields": {
-                                      "keyword": {
-                                        "type": "keyword",
-                                        "ignore_above": 256
+                                  "uuid" : {
+                                    "type" : "text",
+                                    "fields" : {
+                                      "keyword" : {
+                                        "type" : "keyword",
+                                        "ignore_above" : 256
                                       }
                                     }
                                   }
                                 }
                               },
-                              "Orgc": {
-                                "properties": {
-                                  "id": {
-                                    "type": "text",
-                                    "fields": {
-                                      "keyword": {
-                                        "type": "keyword",
-                                        "ignore_above": 256
-                                      }
-                                    }
-                                  },
-                                  "name": {
-                                    "type": "text",
-                                    "fields": {
-                                      "keyword": {
-                                        "type": "keyword",
-                                        "ignore_above": 256
+                              "Orgc" : {
+                                "properties" : {
+                                  "id" : {
+                                    "type" : "text",
+                                    "fields" : {
+                                      "keyword" : {
+                                        "type" : "keyword",
+                                        "ignore_above" : 256
                                       }
                                     }
                                   },
-                                  "uuid": {
-                                    "type": "text",
-                                    "fields": {
-                                      "keyword": {
-                                        "type": "keyword",
-                                        "ignore_above": 256
+                                  "name" : {
+                                    "type" : "text",
+                                    "fields" : {
+                                      "keyword" : {
+                                        "type" : "keyword",
+                                        "ignore_above" : 256
+                                      }
+                                    }
+                                  },
+                                  "uuid" : {
+                                    "type" : "text",
+                                    "fields" : {
+                                      "keyword" : {
+                                        "type" : "keyword",
+                                        "ignore_above" : 256
                                       }
                                     }
                                   }
                                 }
                               },
-                              "analysis": {
-                                "type": "text",
-                                "fields": {
-                                  "keyword": {
-                                    "type": "keyword",
-                                    "ignore_above": 256
+                              "analysis" : {
+                                "type" : "text",
+                                "fields" : {
+                                  "keyword" : {
+                                    "type" : "keyword",
+                                    "ignore_above" : 256
                                   }
                                 }
                               },
-                              "date": {
-                                "type": "date"
+                              "date" : {
+                                "type" : "date"
                               },
-                              "distribution": {
-                                "type": "text",
-                                "fields": {
-                                  "keyword": {
-                                    "type": "keyword",
-                                    "ignore_above": 256
+                              "distribution" : {
+                                "type" : "text",
+                                "fields" : {
+                                  "keyword" : {
+                                    "type" : "keyword",
+                                    "ignore_above" : 256
                                   }
                                 }
                               },
-                              "id": {
-                                "type": "text",
-                                "fields": {
-                                  "keyword": {
-                                    "type": "keyword",
-                                    "ignore_above": 256
+                              "id" : {
+                                "type" : "text",
+                                "fields" : {
+                                  "keyword" : {
+                                    "type" : "keyword",
+                                    "ignore_above" : 256
                                   }
                                 }
                               },
-                              "info": {
-                                "type": "text",
-                                "fields": {
-                                  "keyword": {
-                                    "type": "keyword",
-                                    "ignore_above": 256
+                              "info" : {
+                                "type" : "text",
+                                "fields" : {
+                                  "keyword" : {
+                                    "type" : "keyword",
+                                    "ignore_above" : 256
                                   }
                                 }
                               },
-                              "org_id": {
-                                "type": "text",
-                                "fields": {
-                                  "keyword": {
-                                    "type": "keyword",
-                                    "ignore_above": 256
+                              "org_id" : {
+                                "type" : "text",
+                                "fields" : {
+                                  "keyword" : {
+                                    "type" : "keyword",
+                                    "ignore_above" : 256
                                   }
                                 }
                               },
-                              "orgc_id": {
-                                "type": "text",
-                                "fields": {
-                                  "keyword": {
-                                    "type": "keyword",
-                                    "ignore_above": 256
+                              "orgc_id" : {
+                                "type" : "text",
+                                "fields" : {
+                                  "keyword" : {
+                                    "type" : "keyword",
+                                    "ignore_above" : 256
                                   }
                                 }
                               },
-                              "published": {
-                                "type": "boolean"
+                              "published" : {
+                                "type" : "boolean"
                               },
-                              "threat_level_id": {
-                                "type": "text",
-                                "fields": {
-                                  "keyword": {
-                                    "type": "keyword",
-                                    "ignore_above": 256
+                              "threat_level_id" : {
+                                "type" : "text",
+                                "fields" : {
+                                  "keyword" : {
+                                    "type" : "keyword",
+                                    "ignore_above" : 256
                                   }
                                 }
                               },
-                              "timestamp": {
-                                "type": "text",
-                                "fields": {
-                                  "keyword": {
-                                    "type": "keyword",
-                                    "ignore_above": 256
+                              "timestamp" : {
+                                "type" : "text",
+                                "fields" : {
+                                  "keyword" : {
+                                    "type" : "keyword",
+                                    "ignore_above" : 256
                                   }
                                 }
                               },
-                              "uuid": {
-                                "type": "text",
-                                "fields": {
-                                  "keyword": {
-                                    "type": "keyword",
-                                    "ignore_above": 256
+                              "uuid" : {
+                                "type" : "text",
+                                "fields" : {
+                                  "keyword" : {
+                                    "type" : "keyword",
+                                    "ignore_above" : 256
                                   }
                                 }
                               }
@@ -1356,163 +604,163 @@ curl -XPUT  "localhost:9200/$index/_mapping/vulnerability?pretty" -H 'Content-Ty
                           }
                         }
                       },
-                      "Tag": {
-                        "properties": {
-                          "colour": {
-                            "type": "text",
-                            "fields": {
-                              "keyword": {
-                                "type": "keyword",
-                                "ignore_above": 256
+                      "Tag" : {
+                        "properties" : {
+                          "colour" : {
+                            "type" : "text",
+                            "fields" : {
+                              "keyword" : {
+                                "type" : "keyword",
+                                "ignore_above" : 256
                               }
                             }
                           },
-                          "exportable": {
-                            "type": "boolean"
+                          "exportable" : {
+                            "type" : "boolean"
                           },
-                          "hide_tag": {
-                            "type": "boolean"
+                          "hide_tag" : {
+                            "type" : "boolean"
                           },
-                          "id": {
-                            "type": "text",
-                            "fields": {
-                              "keyword": {
-                                "type": "keyword",
-                                "ignore_above": 256
+                          "id" : {
+                            "type" : "text",
+                            "fields" : {
+                              "keyword" : {
+                                "type" : "keyword",
+                                "ignore_above" : 256
                               }
                             }
                           },
-                          "name": {
-                            "type": "text",
-                            "fields": {
-                              "keyword": {
-                                "type": "keyword",
-                                "ignore_above": 256
+                          "name" : {
+                            "type" : "text",
+                            "fields" : {
+                              "keyword" : {
+                                "type" : "keyword",
+                                "ignore_above" : 256
                               }
                             }
                           }
                         }
                       },
-                      "analysis": {
-                        "type": "text",
-                        "fields": {
-                          "keyword": {
-                            "type": "keyword",
-                            "ignore_above": 256
+                      "analysis" : {
+                        "type" : "text",
+                        "fields" : {
+                          "keyword" : {
+                            "type" : "keyword",
+                            "ignore_above" : 256
                           }
                         }
                       },
-                      "attribute_count": {
-                        "type": "text",
-                        "fields": {
-                          "keyword": {
-                            "type": "keyword",
-                            "ignore_above": 256
+                      "attribute_count" : {
+                        "type" : "text",
+                        "fields" : {
+                          "keyword" : {
+                            "type" : "keyword",
+                            "ignore_above" : 256
                           }
                         }
                       },
-                      "date": {
-                        "type": "date"
+                      "date" : {
+                        "type" : "date"
                       },
-                      "disable_correlation": {
-                        "type": "boolean"
+                      "disable_correlation" : {
+                        "type" : "boolean"
                       },
-                      "distribution": {
-                        "type": "text",
-                        "fields": {
-                          "keyword": {
-                            "type": "keyword",
-                            "ignore_above": 256
+                      "distribution" : {
+                        "type" : "text",
+                        "fields" : {
+                          "keyword" : {
+                            "type" : "keyword",
+                            "ignore_above" : 256
                           }
                         }
                       },
-                      "id": {
-                        "type": "text",
-                        "fields": {
-                          "keyword": {
-                            "type": "keyword",
-                            "ignore_above": 256
+                      "id" : {
+                        "type" : "text",
+                        "fields" : {
+                          "keyword" : {
+                            "type" : "keyword",
+                            "ignore_above" : 256
                           }
                         }
                       },
-                      "info": {
-                        "type": "text",
-                        "fields": {
-                          "keyword": {
-                            "type": "keyword",
-                            "ignore_above": 256
+                      "info" : {
+                        "type" : "text",
+                        "fields" : {
+                          "keyword" : {
+                            "type" : "keyword",
+                            "ignore_above" : 256
                           }
                         }
                       },
-                      "locked": {
-                        "type": "boolean"
+                      "locked" : {
+                        "type" : "boolean"
                       },
-                      "org_id": {
-                        "type": "text",
-                        "fields": {
-                          "keyword": {
-                            "type": "keyword",
-                            "ignore_above": 256
+                      "org_id" : {
+                        "type" : "text",
+                        "fields" : {
+                          "keyword" : {
+                            "type" : "keyword",
+                            "ignore_above" : 256
                           }
                         }
                       },
-                      "orgc_id": {
-                        "type": "text",
-                        "fields": {
-                          "keyword": {
-                            "type": "keyword",
-                            "ignore_above": 256
+                      "orgc_id" : {
+                        "type" : "text",
+                        "fields" : {
+                          "keyword" : {
+                            "type" : "keyword",
+                            "ignore_above" : 256
                           }
                         }
                       },
-                      "proposal_email_lock": {
-                        "type": "boolean"
+                      "proposal_email_lock" : {
+                        "type" : "boolean"
                       },
-                      "publish_timestamp": {
-                        "type": "text",
-                        "fields": {
-                          "keyword": {
-                            "type": "keyword",
-                            "ignore_above": 256
+                      "publish_timestamp" : {
+                        "type" : "text",
+                        "fields" : {
+                          "keyword" : {
+                            "type" : "keyword",
+                            "ignore_above" : 256
                           }
                         }
                       },
-                      "published": {
-                        "type": "boolean"
+                      "published" : {
+                        "type" : "boolean"
                       },
-                      "sharing_group_id": {
-                        "type": "text",
-                        "fields": {
-                          "keyword": {
-                            "type": "keyword",
-                            "ignore_above": 256
+                      "sharing_group_id" : {
+                        "type" : "text",
+                        "fields" : {
+                          "keyword" : {
+                            "type" : "keyword",
+                            "ignore_above" : 256
                           }
                         }
                       },
-                      "threat_level_id": {
-                        "type": "text",
-                        "fields": {
-                          "keyword": {
-                            "type": "keyword",
-                            "ignore_above": 256
+                      "threat_level_id" : {
+                        "type" : "text",
+                        "fields" : {
+                          "keyword" : {
+                            "type" : "keyword",
+                            "ignore_above" : 256
                           }
                         }
                       },
-                      "timestamp": {
-                        "type": "text",
-                        "fields": {
-                          "keyword": {
-                            "type": "keyword",
-                            "ignore_above": 256
+                      "timestamp" : {
+                        "type" : "text",
+                        "fields" : {
+                          "keyword" : {
+                            "type" : "keyword",
+                            "ignore_above" : 256
                           }
                         }
                       },
-                      "uuid": {
-                        "type": "text",
-                        "fields": {
-                          "keyword": {
-                            "type": "keyword",
-                            "ignore_above": 256
+                      "uuid" : {
+                        "type" : "text",
+                        "fields" : {
+                          "keyword" : {
+                            "type" : "keyword",
+                            "ignore_above" : 256
                           }
                         }
                       }
@@ -1521,116 +769,6 @@ curl -XPUT  "localhost:9200/$index/_mapping/vulnerability?pretty" -H 'Content-Ty
                 }
               }
             }
-          },
-          "dataParams": {
-            "properties": {
-              "applicationId": {
-                "type": "text",
-                "fields": {
-                  "keyword": {
-                    "type": "keyword",
-                    "ignore_above": 256
-                  }
-                }
-              },
-              "cspId": {
-                "type": "text",
-                "fields": {
-                  "keyword": {
-                    "type": "keyword",
-                    "ignore_above": 256
-                  }
-                }
-              },
-              "dateTime": {
-                "type": "date"
-              },
-              "originApplicationId": {
-                "type": "text",
-                "fields": {
-                  "keyword": {
-                    "type": "keyword",
-                    "ignore_above": 256
-                  }
-                }
-              },
-              "originCspId": {
-                "type": "text",
-                "fields": {
-                  "keyword": {
-                    "type": "keyword",
-                    "ignore_above": 256
-                  }
-                }
-              },
-              "originRecordId": {
-                "type": "text",
-                "fields": {
-                  "keyword": {
-                    "type": "keyword",
-                    "ignore_above": 256
-                  }
-                }
-              },
-              "recordId": {
-                "type": "text",
-                "fields": {
-                  "keyword": {
-                    "type": "keyword",
-                    "ignore_above": 256
-                  }
-                }
-              },
-              "url": {
-                "type": "text",
-                "fields": {
-                  "keyword": {
-                    "type": "keyword",
-                    "ignore_above": 256
-                  }
-                }
-              }
-            }
-          },
-          "dataType": {
-            "type": "text",
-            "fields": {
-              "keyword": {
-                "type": "keyword",
-                "ignore_above": 256
-              }
-            }
-          },
-          "sharingParams": {
-            "properties": {
-              "isExternal": {
-                "type": "boolean"
-              },
-              "teamId": {
-                "type": "text",
-                "fields": {
-                  "keyword": {
-                    "type": "keyword",
-                    "ignore_above": 256
-                  }
-                }
-              },
-              "toShare": {
-                "type": "boolean"
-              },
-              "trustCircleId": {
-                "type": "text",
-                "fields": {
-                  "keyword": {
-                    "type": "keyword",
-                    "ignore_above": 256
-                  }
-                }
-              }
-            }
-          }
-        }
-
           },
           "dataParams" : {
             "properties" : {
