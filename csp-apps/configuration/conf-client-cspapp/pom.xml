@@ -253,6 +253,16 @@
 					<executable>true</executable>
 				</configuration>
 			</plugin>
+			<plugin>
+				<groupId>pl.project13.maven</groupId>
+				<artifactId>git-commit-id-plugin</artifactId>
+				<configuration>
+					<dateFormatTimeZone>UTC</dateFormatTimeZone>
+					<dateFormat>yyyy-MM-dd'T'HH:mm:ss</dateFormat>
+				</configuration>
+			</plugin>
+
+
 		</plugins>
 	</build>
 

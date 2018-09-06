@@ -172,9 +172,23 @@ public class BackgroundTaskService {
     @Autowired
     ObjectMapper jackson;
 
+    @Value("${git.build.version}")
+    String buildVersion;
+    @Value("${git.commit.id.abbrev}")
+    String commitId;
+    @Value("${git.build.time}")
+    String buildTime;
+
+    public String gitVersion() {
+        return String.format("%s/%s/%s", buildVersion, commitId, buildTime);
+    }
+
 
     @PostConstruct
     public void verifyStartupState() {
+
+        log.info("CSP Installer {}",gitVersion());
+
         addTask("Fixing Module States", () -> {
             //for the moment, we check if there are any modules in
             // DOWNLOADING state ---> to UNKNOWN
