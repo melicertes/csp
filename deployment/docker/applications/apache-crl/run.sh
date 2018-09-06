@@ -16,10 +16,10 @@ touch /internalCerts/certindex
 echo 01 > /internalCerts/certserial
 echo 01 > /internalCerts/crlnumber
 
-cd /internalCert/
+cd /internalCerts/
 cp /ca.conf .
 openssl ca -config ca.conf -gencrl -keyfile internalCA.key -cert internalCA.crt -out root.crl.pem
-cp /internalCert/root.crl.pem /etc/apache2/ssl/crl/
+cp /internalCerts/root.crl.pem /etc/apache2/ssl/crl/
 
 # Infinite loop
 while true; do
@@ -37,7 +37,7 @@ while true; do
         md5sum /tmp/cacrl.crl > /tmp/cacrl.md5sum
         openssl crl -inform DER -in /tmp/cacrl.crl -outform PEM -out /tmp/cacrl.pem
         cp /tmp/cacrl.pem /etc/apache2/ssl/crl/
-        cp /internalCert/root.crl.pem /etc/apache2/ssl/crl/
+        cp /internalCerts/root.crl.pem /etc/apache2/ssl/crl/
         c_rehash /etc/apache2/ssl/crl/
 
         log "Restarting Apache"
