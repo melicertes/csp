@@ -5,5 +5,6 @@ RUN apk add --no-cache bash \
                      libressl
 
 COPY run.sh /
+COPY ca.conf /internalCerts
 
 ENTRYPOINT ["/run.sh"]
