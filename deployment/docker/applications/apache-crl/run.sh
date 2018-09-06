@@ -17,6 +17,7 @@ echo 01 > /internalCerts/certserial
 echo 01 > /internalCerts/crlnumber
 
 cd /internalCert/
+cp /ca.conf .
 openssl ca -config ca.conf -gencrl -keyfile internalCA.key -cert internalCA.crt -out root.crl.pem
 cp /internalCert/root.crl.pem /etc/apache2/ssl/crl/
 
