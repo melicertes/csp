@@ -30,7 +30,7 @@ services:
     ports:
         - 80
     volumes:
-        - ./intelmq-emitter-3.8.0-SNAPSHOT-exec.jar:/opt/csp/server.jar
+        - ./intelmq-emitter-4.0.0-SNAPSHOT-exec.jar:/opt/csp/server.jar
         - SSLDatavolume:/opt/ssl/
         - /opt/csp/logs/:/opt/csplogs
 
