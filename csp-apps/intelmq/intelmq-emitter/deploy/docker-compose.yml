@@ -1,0 +1,30 @@
+version: '3'
+services:
+
+  imq-emitter:
+    image: csp-java8:1.0
+    container_name: csp-imq-emitter
+    domainname: ${LOCAL_DOMAIN}
+    hostname: csp-imqemitter
+    env_file:
+        - .env
+    command: java  -Xmx512m -Dspring.profiles.active=docker -Dcsp.client.ssl.jks.keystore.password=changeme   -jar server.jar
+    working_dir: /opt/csp
+    ports:
+        - ${INTELMQ_ADAPTER_DOCR_PORT}
+    volumes:
+        - ./intelmq-emitter-0.3.0-SNAPSHOT-exec.jar:/opt/csp/server.jar
+        - /opt/csp/logs/:/opt/csplogs
+        - SSLDatavolume:/opt/ssl/
+
+
+
+volumes:
+    SSLDatavolume:
+        external: true
+
+
+networks:
+  default:
+    external:
+      name: ${LOCAL_DOMAIN}

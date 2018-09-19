@@ -2,7 +2,7 @@ version: '3'
 services:
 
   oam:
-    image: csp-openam:1.0-Alpha-orcl
+    image: csp-openam:1.0
     container_name: csp-oam
     domainname: ${LOCAL_DOMAIN}
     hostname: csp-oam
@@ -12,10 +12,16 @@ services:
         - ${OAM_DOCR_PORT}
     volumes:
         - OAMDatavolume:/root/
+        - OAMOptvolume:/opt/
+        - OAMWebappsvolume:/usr/local/tomcat/webapps/
         - /opt/csp/logs/:/root/openam/openam/log/
 
 volumes:
     OAMDatavolume:
+        external: true
+    OAMOptvolume:
+        external: true
+    OAMWebappsvolume:
         external: true
 
 

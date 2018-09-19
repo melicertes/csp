@@ -1,0 +1,48 @@
+{
+		"Object": [{
+			"name": "csp-vulnerability",
+			"meta-category": "network",
+			"description": "IMQ Vulnerability object describing",
+			"template_version": "1",
+			"Attribute": [{
+				"object_relation": "id",
+				"type": "vulnerability",
+				"value": "CVE-2018-14543"
+			},
+			{
+				"object_relation": "text",
+				"type": "text",
+				"value": "There"
+			},
+			{
+				"object_relation": "summary",
+				"type": "text",
+				"value": "AP4_JsonInspector mp4dump."
+			},
+			{
+				"object_relation": "vulnerable_configuration",
+				"type": "text",
+				"value": ""
+			},
+			{
+				"category": "External analysis",
+				"object_relation": "references",
+				"type": "link",
+				"value": "https://github.com/"
+			},
+			{
+				"type": "text",
+				"value": "Published"
+			}],
+			"description": "",
+			"meta-category": "network",
+			"name": "vulnerability"
+		}],
+		"Tag": [{
+			"name": "vulnerability"
+		}],
+		"distribution": "1",
+		"attribute_count": "6",
+		"info": "CVE 01 vulnerability",
+		"threat_level_id": "1"
+}
