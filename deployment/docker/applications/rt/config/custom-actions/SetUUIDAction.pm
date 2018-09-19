@@ -92,7 +92,7 @@ sub Commit {
                         Value => $RT_CSP_NAME,
                         RecordTransaction => 0);
 		if ( not defined $self->TicketObj->FirstCustomFieldValue( $CFName4 )
-		     or $self->TicketObj->FirstCustomFielValue( $CFName4 ) eq '')
+		     or $self->TicketObj->FirstCustomFieldValue( $CFName4 ) eq '')
                 {
 			$RT::Logger->debug("SetUUIDAction: using following default Sharing policy: no sharing \n");
 			$self->TicketObj->AddCustomFieldValue(

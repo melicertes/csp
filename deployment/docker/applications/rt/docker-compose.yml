@@ -31,6 +31,7 @@ services:
     volumes:
         - ./rt-emitter-adapter-4.0.0-SNAPSHOT-exec.jar:/opt/csp/server.jar
         - SSLDatavolume:/opt/ssl/
+        - /opt/csp/logs/:/opt/csplogs
         - RTAdapterDBDatavolume:/opt/csp/RTuuidRepositoryDB
     expose:
         - ${RT_ADAPTER_DOCR_PORT}

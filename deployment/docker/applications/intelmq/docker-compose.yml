@@ -1,0 +1,44 @@
+version: '3'
+services:
+  
+  intelmq:
+    env_file:
+      - .env
+    image: csp-intelmq:1.0
+    container_name: csp-imq
+    domainname: ${LOCAL_DOMAIN}
+    hostname: csp-intelmq
+    command: sh /scripts/run.sh
+    volumes:
+       - /opt/csp/intelmq-fileinput/:/tmp/intelmq-fileinput
+       - /opt/csp/intelmq-fileoutput/:/tmp/intelmq-fileoutput
+       - /opt/csp/logs/imq:/opt/intelmq/var/log
+    expose:
+       - ${INTELMQ_DOCR_PORT}
+
+  intelmq-adapter:
+    depends_on:
+       - intelmq
+    image: csp-java8:1.0
+    container_name: csp-intelmq_adapter
+    domainname: ${LOCAL_DOMAIN}
+    hostname: csp-imq-adapter
+    env_file:
+        - .env
+    command: java  -Xmx512m -Dspring.profiles.active=docker -jar server.jar
+    working_dir: /opt/csp
+    expose:
+        - 80
+    volumes:
+        - ./intelmq-emitter-4.0.0-SNAPSHOT-exec.jar:/opt/csp/server.jar
+        - SSLDatavolume:/opt/ssl/
+        - /opt/csp/logs/:/opt/csplogs
+
+volumes:
+   SSLDatavolume:
+        external: true
+
+networks:
+  default:
+    external:
+     name: ${LOCAL_DOMAIN}

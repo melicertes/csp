@@ -31,5 +31,9 @@ add-member --realm "/" --memberidname user3 --memberidtype User --idname rt-user
 add-member --realm "/" --memberidname user3 --memberidtype User --idname tc-user --idtype Group
 add-member --realm "/" --memberidname user3 --memberidtype User --idname misp-user --idtype Group
 add-member --realm "/" --memberidname user3 --memberidtype User --idname csp-user --idtype Group
+add-member --realm "/" --memberidname demo --memberidtype User --idname rt-user --idtype Group
+add-member --realm "/" --memberidname demo --memberidtype User --idname rt-admin --idtype Group
+add-member --realm "/" --memberidname demo --memberidtype User --idname csp-user --idtype Group
+add-member --realm "/" --memberidname demo --memberidtype User --idname csp-admin --idtype Group
 
  

@@ -1,0 +1,492 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+    Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+  
+    The contents of this file are subject to the terms
+    of the Common Development and Distribution License
+    (the License). You may not use this file except in
+    compliance with the License.
+
+    You can obtain a copy of the License at
+    https://opensso.dev.java.net/public/CDDLv1.0.html or
+    opensso/legal/CDDLv1.0.txt
+    See the License for the specific language governing
+    permission and limitations under the License.
+
+    When distributing Covered Code, include this CDDL
+    Header Notice in each file and include the License file
+    at opensso/legal/CDDLv1.0.txt.
+    If applicable, add the following below the CDDL Header,
+    with the fields enclosed by brackets [] replaced by
+    your own identifying information:
+    "Portions Copyrighted [year] [name of copyright owner]"
+
+    $Id: amAuthCert.xml,v 1.9 2008/06/25 05:45:41 qcheng Exp $
+
+    Portions Copyrighted 2011-2015 ForgeRock AS.
+    Portions Copyrighted 2018 Fraunhofer Fokus
+-->
+
+<!DOCTYPE ServicesConfiguration
+    PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
+    "jar://com/sun/identity/sm/sms.dtd">
+
+<ServicesConfiguration>
+    <Service name="iPlanetAMAuthCert2Service" version="1.0">
+        <Schema
+            serviceHierarchy="/DSAMEConfig/authentication/iPlanetAMAuthCert2Service"
+            i18nFileName="amAuthCert2"
+            revisionNumber="40"
+            i18nKey="iplanet-am-auth-cert2-service-description"
+            resourceName="certificate2">
+
+            <Organization>
+                <AttributeSchema name="iplanet-am-auth-cert2-check-cert-in-ldap"
+                    type="single"
+                    syntax="boolean"
+                    i18nKey="a101"
+                    resourceName="matchCertificateInLdap">
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-auth-cert2-attr-check-ldap"
+                    type="single"
+                    syntax="string"
+                    i18nKey="a1011"
+                    resourceName="ldapCertificateAttribute">
+                    <DefaultValues>
+                        <Value>CN</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-auth-cert2-check-crl"
+                    type="single"
+                    syntax="boolean"
+                    i18nKey="a102"
+                    resourceName="matchCertificateToCRL">
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="sunAMValidateCACert"
+                    type="single"
+                    syntax="boolean"
+                    i18nKey="a1023"
+                    resourceName="matchCACertificateToCRL">
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-auth-cert2-attr-check-crl"
+                    type="single"
+                    syntax="string"
+                    i18nKey="a1021"
+                    resourceName="crlMatchingCertificateAttribute">
+                    <DefaultValues>
+                        <Value>CN</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-am-auth-cert2-attr-cache-crl"
+                    type="single"
+                    syntax="boolean"
+                    i18nKey="a1024"
+                    resourceName="cacheCRLsInMemory">
+                    <DefaultValues>
+                        <Value>true</Value>
+                    </DefaultValues>
+                </AttributeSchema>                
+                <AttributeSchema name="iplanet-am-auth-cert2-param-get-crl"
+                    type="single"
+                    syntax="string"
+                    i18nKey="a1022"
+                    resourceName="crlHttpParameters">
+                    <DefaultValues>
+                        <Value></Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-am-auth-cert2-update-crl"
+                    type="single"
+                    syntax="boolean"
+                    i18nKey="a1025"
+                    resourceName="updateCRLsFromDistributionPoint">
+                    <DefaultValues>
+                        <Value>true</Value>
+                    </DefaultValues>
+                </AttributeSchema>                
+                <AttributeSchema name="iplanet-am-auth-cert2-check-ocsp"
+                    type="single"
+                    syntax="boolean"
+                    i18nKey="a103"
+                    resourceName="ocspValidationEnabled">
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-auth-cert-ldap-provider-url"
+                    type="list"
+                    syntax="string"
+                    i18nKey="a104"
+                    resourceName="certificateLdapServers">
+                    <DefaultValues>
+                        <Value>@UM_DIRECTORY_SERVER@:@UM_DIRECTORY_PORT@</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-auth-cert2-start-search-loc"
+                    type="list"
+                    syntax="string"
+                    i18nKey="a105"
+                    resourceName="ldapSearchStartDN">
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-auth-cert-security-type"
+                    type="single_choice"
+                    syntax="string"
+                    i18nKey="">
+                    <ChoiceValues>
+                        <ChoiceValue i18nKey="choiceNone">none</ChoiceValue>
+                        <ChoiceValue i18nKey="choiceSimple">simple</ChoiceValue>
+                        <ChoiceValue i18nKey="choiceCRAM-MD5">CRAM-MD5</ChoiceValue>
+                    </ChoiceValues>
+                    <DefaultValues>
+                        <Value>none</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-auth-cert-principal-user"
+                    type="single"
+                    syntax="string"
+                    i18nKey="a107"
+                    resourceName="userBindDN">
+                    <DefaultValues>
+                         <Value>@UM_DS_DIRMGRDN@</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-auth-cert2-principal-passwd"
+                    type="single"
+                    syntax="password"
+                    i18nKey="a108"
+                    resourceName="userBindPassword">
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-auth-cert2-use-ssl"
+                    type="single"
+                    syntax="boolean"
+                    i18nKey="a110"
+                    resourceName="sslEnabled">
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-auth-cert2-user-profile-mapper"
+                    type="single_choice"
+                    syntax="string"
+                    i18nKey="a111"
+                    resourceName="certificateAttributeToProfileMapping">
+                    <ChoiceValues>
+                        <ChoiceValue i18nKey="choiceSubjectDN">subject DN</ChoiceValue>
+                        <ChoiceValue i18nKey="choiceSubjectCN">subject CN</ChoiceValue>
+                        <ChoiceValue i18nKey="choiceSubjectUID">subject UID</ChoiceValue>
+                        <ChoiceValue i18nKey="choiceEmail">email address</ChoiceValue>
+                        <ChoiceValue i18nKey="choiceOther">other</ChoiceValue>
+                        <ChoiceValue i18nKey="choiceNone">none</ChoiceValue>
+                    </ChoiceValues>
+                    <DefaultValues>
+                        <Value>subject CN</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-auth-cert2-orga-profile-mapper"
+                    type="single_choice"
+                    syntax="string"
+                    i18nKey="a5011"
+                    validator="no"
+                    resourceName="orgaAttributeToProfileMapping">
+                    <ChoiceValues>
+                        <ChoiceValue i18nKey="choiceSubjectO">subject O</ChoiceValue>
+                        <ChoiceValue i18nKey="choiceSubjectOU">subject OU</ChoiceValue>
+                        <ChoiceValue i18nKey="choiceNone">none</ChoiceValue>
+                    </ChoiceValues>
+                    <DefaultValues>
+                        <Value>subject OU</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-auth-cert2-organisation-name"
+                    type="single"
+                    syntax="string"
+                    i18nKey="a501"
+                    validator="no"
+                    resourceName="cert2OrgaName">
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-auth-cert2-user-profile-mapper-other"
+                    type="single"
+                    syntax="string"
+                    i18nKey="a1111"
+                    resourceName="otherCertificateAttributeToProfileMapping">
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-auth-cert2-user-profile-mapper-ext"
+                    type="single_choice"
+                    syntax="string"
+                    i18nKey="a1112"
+                    resourceName="certificateAttributeProfileMappingExtension">
+                    <ChoiceValues>
+                        <ChoiceValue i18nKey="choiceNone">none</ChoiceValue>
+                        <ChoiceValue i18nKey="choiceRFC822Name">RFC822Name</ChoiceValue>
+                        <ChoiceValue i18nKey="choiceUPN">UPN</ChoiceValue>
+                    </ChoiceValues>
+                    <DefaultValues>
+                        <Value>none</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-auth-cert2-auth-level"
+                    type="single"
+                    syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+                    i18nKey="a500"
+                    resourceName="authenticationLevel">
+                    <DefaultValues>
+                        <Value>0</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-auth-cert2-gw-cert-auth-enabled"
+                    type="list"
+                    syntax="string"
+                    i18nKey="a113"
+                    resourceName="trustedRemoteHosts">
+                    <DefaultValues>
+                        <Value>none</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="sunAMHttpParamName"
+                    type="single"
+                    syntax="string"
+                    validator="no"
+                    i18nKey="a115"
+                    resourceName="clientCertificateHttpHeaderName">
+                    <DefaultValues>
+                        <Value></Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <SubSchema name="serverconfig" inheritance="multiple" resourceName="USE-PARENT">
+                    <AttributeSchema name="iplanet-am-auth-cert2-check-cert-in-ldap"
+                        type="single"
+                        syntax="boolean"
+                        i18nKey="a101"
+                        resourceName="matchCertificateInLdap">
+                        <DefaultValues>
+                            <Value>false</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="iplanet-am-auth-cert2-attr-check-ldap"
+                        type="single"
+                        syntax="string"
+                        i18nKey="a1011"
+                        resourceName="ldapCertificateAttribute">
+                        <DefaultValues>
+                            <Value>CN</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="iplanet-am-auth-cert2-check-crl"
+                        type="single"
+                        syntax="boolean"
+                        i18nKey="a102"
+                        resourceName="matchCertificateToCRL">
+                        <DefaultValues>
+                            <Value>false</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="sunAMValidateCACert"
+                        type="single"
+                        syntax="boolean"
+                        i18nKey="a1023"
+                        resourceName="matchCACertificateToCRL">
+                        <DefaultValues>
+                            <Value>false</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="iplanet-am-auth-cert2-attr-check-crl"
+                        type="single"
+                        syntax="string"
+                        i18nKey="a1021"
+                        resourceName="crlMatchingCertificateAttribute">
+                        <DefaultValues>
+                            <Value>CN</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="openam-am-auth-cert2-attr-cache-crl"
+                        type="single"
+                        syntax="boolean"
+                        i18nKey="a1024"
+                        resourceName="cacheCRLsInMemory">
+                        <DefaultValues>
+                            <Value>true</Value>
+                        </DefaultValues>
+                    </AttributeSchema>                       
+                    <AttributeSchema name="iplanet-am-auth-cert-param-get-crl"
+                        type="single"
+                        syntax="string"
+                        i18nKey="a1022"
+                        resourceName="crlHttpParameters">
+                        <DefaultValues>
+                            <Value></Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="openam-am-auth-cert2-update-crl"
+                        type="single"
+                        syntax="boolean"
+                        i18nKey="a1025"
+                        resourceName="updateCRLsFromDistributionPoint">
+                        <DefaultValues>
+                            <Value>true</Value>
+                        </DefaultValues>
+                    </AttributeSchema>                    
+                    <AttributeSchema name="iplanet-am-auth-cert2-check-ocsp"
+                        type="single"
+                        syntax="boolean"
+                        i18nKey="a103"
+                        resourceName="ocspValidationEnabled">
+                        <DefaultValues>
+                            <Value>false</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="iplanet-am-auth-cert-ldap-provider-url"
+                        type="list"
+                        syntax="string"
+                        i18nKey="a104"
+                        resourceName="certificateLdapServers">
+                        <DefaultValues>
+                            <Value>@UM_DIRECTORY_SERVER@:@UM_DIRECTORY_PORT@</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="iplanet-am-auth-cert2-start-search-loc"
+                        type="list"
+                        syntax="string"
+                        i18nKey="a105"
+                        resourceName="ldapSearchStartDN">
+                    </AttributeSchema>
+                    <AttributeSchema name="iplanet-am-auth-cert2-security-type"
+                        type="single_choice"
+                        syntax="string"
+                        i18nKey="">
+                        <ChoiceValues>
+                            <ChoiceValue i18nKey="choiceNone">none</ChoiceValue>
+                            <ChoiceValue i18nKey="choiceSimple">simple</ChoiceValue>
+                            <ChoiceValue i18nKey="choiceCRAM-MD5">CRAM-MD5</ChoiceValue>
+                        </ChoiceValues>
+                        <DefaultValues>
+                            <Value>none</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="iplanet-am-auth-cert-principal-user"
+                        type="single"
+                        syntax="string"
+                        i18nKey="a107"
+                        resourceName="userBindDN">
+                        <DefaultValues>
+                             <Value>@UM_DS_DIRMGRDN@</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="iplanet-am-auth-cert2-principal-passwd"
+                        type="single"
+                        syntax="password"
+                        i18nKey="a108"
+                        resourceName="userBindPassword">
+                    </AttributeSchema>
+                    <AttributeSchema name="iplanet-am-auth-cert2-use-ssl"
+                        type="single"
+                        syntax="boolean"
+                        i18nKey="a110"
+                        resourceName="sslEnabled">
+                        <DefaultValues>
+                            <Value>false</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                        <AttributeSchema name="iplanet-am-auth-cert2-user-profile-mapper"
+                        type="single_choice"
+                        syntax="string"
+                        i18nKey="a111"
+                        resourceName="certificateAttributeToProfileMapping">
+                        <ChoiceValues>
+                            <ChoiceValue i18nKey="choiceSubjectDN">subject DN</ChoiceValue>
+                            <ChoiceValue i18nKey="choiceSubjectCN">subject CN</ChoiceValue>
+                            <ChoiceValue i18nKey="choiceSubjectUID">subject UID</ChoiceValue>
+                            <ChoiceValue i18nKey="choiceEmail">email address</ChoiceValue>
+                            <ChoiceValue i18nKey="choiceOther">other</ChoiceValue>
+                            <ChoiceValue i18nKey="choiceNone">none</ChoiceValue>
+                        </ChoiceValues>
+                        <DefaultValues>
+                            <Value>subject CN</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="iplanet-am-auth-cert2-orga-profile-mapper"
+	                    type="single_choice"
+	                    syntax="string"
+	                    i18nKey="a5011"
+	                    validator="no"
+	                    resourceName="orgaAttributeToProfileMapping">
+	                    <ChoiceValues>
+	                        <ChoiceValue i18nKey="choiceSubjectO">subject O</ChoiceValue>
+	                        <ChoiceValue i18nKey="choiceSubjectOU">subject OU</ChoiceValue>
+	                        <ChoiceValue i18nKey="choiceNone">none</ChoiceValue>
+	                    </ChoiceValues>
+	                    <DefaultValues>
+	                        <Value>subject OU</Value>
+	                    </DefaultValues>
+	                </AttributeSchema>
+                    <AttributeSchema name="iplanet-am-auth-cert2-organisation-name"
+                    	type="single"
+                    	syntax="string"
+                    	i18nKey="a501"
+                    	validator="no"
+                    	resourceName="cert2OrgaName">
+                	</AttributeSchema>
+                    <AttributeSchema name="iplanet-am-auth-cert2-user-profile-mapper-other"
+                        type="single"
+                        syntax="string"
+                        i18nKey="a1111"
+                        resourceName="otherCertificateAttributeToProfileMapping">
+                    </AttributeSchema>
+                    <AttributeSchema name="iplanet-am-auth-cert2-user-profile-mapper-ext"
+                        type="single_choice"
+                        syntax="string"
+                        i18nKey="a1112"
+                        resourceName="certificateAttributeProfileMappingExtension">
+                        <ChoiceValues>
+                            <ChoiceValue i18nKey="choiceNone">none</ChoiceValue>
+                            <ChoiceValue i18nKey="choiceRFC822Name">RFC822Name</ChoiceValue>
+                            <ChoiceValue i18nKey="choiceUPN">UPN</ChoiceValue>
+                        </ChoiceValues>
+                        <DefaultValues>
+                            <Value>none</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="iplanet-am-auth-cert2-auth-level"
+                        type="single"
+                        syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+                        i18nKey="a500"
+                        resourceName="authenticationLevel">
+                        <DefaultValues>
+                            <Value>0</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="iplanet-am-auth-cert2-gw-cert-auth-enabled"
+                        type="list"
+                        syntax="string"
+                        i18nKey="a113"
+                        resourceName="trustedRemoteHosts">
+                        <DefaultValues>
+                            <Value>none</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="sunAMHttpParamName"
+                        type="single"
+                        syntax="string"
+                        validator="no"
+                        i18nKey="a115"
+                        resourceName="clientCertificateHttpHeaderName">
+                        <DefaultValues>
+                            <Value></Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                </SubSchema>
+            </Organization>
+        </Schema>
+    </Service>
+</ServicesConfiguration>
