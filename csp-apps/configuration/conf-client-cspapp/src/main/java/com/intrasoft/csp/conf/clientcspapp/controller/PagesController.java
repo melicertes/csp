@@ -13,10 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.util.List;
@@ -25,6 +22,7 @@ import java.util.stream.Collectors;
 
 @Controller
 @Slf4j
+@SessionAttributes("gitVersion")
 public class PagesController implements ContextUrl {
 
     @Value("${client.ui.jiralink}")
@@ -45,6 +43,18 @@ public class PagesController implements ContextUrl {
     @ModelAttribute("csp_contact_types")
     public ContactType[] contactTypes() {
         return ContactType.values();
+    }
+
+    @Value("${git.build.version}")
+    String buildVersion;
+    @Value("${git.commit.id.abbrev}")
+    String commitId;
+    @Value("${git.build.time}")
+    String buildTime;
+
+    @ModelAttribute("gitVersion")
+    public String gitVersion() {
+        return String.format("%s/%s/%s", buildVersion, commitId, buildTime);
     }
 
     /*
