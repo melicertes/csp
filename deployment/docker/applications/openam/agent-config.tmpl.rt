@@ -44,8 +44,7 @@ com.sun.identity.agents.config.local.log.rotate=false
 com.sun.identity.agents.config.local.log.size=52428800
 com.sun.identity.agents.config.locale=en_US
 com.sun.identity.agents.config.log.disposition=REMOTE
-com.sun.identity.agents.config.login.url[0]=https://auth.{DOMAIN}/openam/UI/Login?module=Certs
-com.sun.identity.agents.config.login.url[1]=https://auth.{DOMAIN}/openam/UI/Login
+com.sun.identity.agents.config.login.url[0]=https://auth.{DOMAIN}/openam/UI/Login
 com.sun.identity.agents.config.logout.cookie.reset[0]=
 com.sun.identity.agents.config.logout.url[0]=https://auth.{DOMAIN}/openam/UI/Logout
 com.sun.identity.agents.config.notenforced.ip[0]=

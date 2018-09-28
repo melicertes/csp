@@ -11,15 +11,23 @@ HERE
 sed -i "s/{DOMAIN}/$DOMAIN/g" /opt/ssoadm/openam-config.properties
 
 if [ ! -f /root/.csp ]; then
-    echo "Initializing OpenAM!!"
+    echo "[i] Initializing OpenAM!!"
     export CATALINA_PID=/tmp/tomcat.pid
     touch /tmp/tomcat.pid
     touch /root/.csp
     /usr/local/tomcat/bin/catalina.sh start
     /bin/bash /opt/ssoadm/post-config-openam.sh
     /usr/local/tomcat/bin/catalina.sh stop 20 -force
-    echo "Waiting for 30 sec before restarting tomcat"
+    echo "[i] Waiting for 30 sec before restarting tomcat"
     sleep 30
+fi
+
+if [ -f /tmp/updates/update.sh ]; then
+    echo "[i] move update.sh into ${TOOLS_HOME}"
+    mv /tmp/updates/update.sh ${TOOLS_HOME}/update.sh
+    chmod +x ${TOOLS_HOME}/update.sh
+    echo "[i] execute ${TOOLS_HOME}/update.sh"
+    ${TOOLS_HOME}/update.sh
 fi
 
 cd /usr/local/tomcat
