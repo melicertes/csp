@@ -1,0 +1,79 @@
+{% load form_utils %}
+{% for form, incoming in zip_objects %}
+    <div class="row diffcontent">
+        <div class="col-md-12">
+            <div class="formset-form"{% if form %} data-formset-form="{{ formset.prefix }}"{% endif %}>
+                <div class="row">
+                    <h2>{{ title_single }}
+                        {% if form.DELETE %}
+                            <div class="hidden">{{ form.DELETE }}</div>
+                            <button class="btn btn-warning pull-right delete_object_btn" type="button" data-formset-delete-button="{{ formset.prefix }}">
+                                <i class="fa fa-trash"></i> Delete
+                            </button>
+                        {% endif %}
+                    </h2>
+                    <div class="col-md-6">
+                        {% if form %}
+                            <div class="formset-form">
+                                {% for field in form.hidden_fields %}
+                                    {{ field }}
+                                {% endfor %}
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        {% form_field form.full_name %}
+                                        {% form_field form.postal_address %}
+                                        {% form_field form.postal_country %}
+                                        {% form_field form.team_role %}
+                                    </div>
+                                    <div class="col-md-6">
+                                        {% form_field form.email %}
+                                        {% form_field form.email_visibility %}
+                                        {% form_field form.ml_email %}
+                                        {% form_field form.ml_key %}
+                                        {% form_field form.host_rep %}
+                                        {% form_field form.constituency_rep %}
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        {% if incoming %}
+                            <div class="diffdatablock difflevel-1 formset">
+                                <div class="row">
+                                    {% for field in fields %}
+                                        {% if field.editable and not field.primary_key %}
+                                            <div class="col-md-6">
+                                                {% if form %}
+                                                    {% diff_field_value form incoming field.name %}
+                                                {% else %}
+                                                    {% diff_field_value formset.empty_form incoming field.name %}
+                                                {% endif %}
+                                            </div>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        {% else %}
+                            <h3 class="text-danger diff-has-changes">{{ title_single }} removed</h3>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div style="zoom: 90%;">
+                {% if form %}
+                    {% include "contacts/includes/formset_diffview.html" with show_block="phone_numbers" formset=form.team_member_phone_number_formset title_single="Team Member's Phone Number" title_all="Team Member's Phone Numbers" hide_add=False diffdatablockstyle="difflevel-2" %}
+                    {% include "contacts/includes/formset_diffview.html" with show_block="certificates" formset=form.team_member_certificate_formset title_single="Team Member's Certificate" title_all="Team Member's Certificates" hide_add=False diffdatablockstyle="difflevel-2" %}
+                    {% include "contacts/includes/formset_diffview.html" with show_block="memberships" formset=form.team_member_membership_formset title_single="Team Member's Memberships" title_all="Team Member's Memberships" hide_add=False diffdatablockstyle="difflevel-2" %}
+                {% else %}
+                    {% include "contacts/includes/formset_diffview.html" with show_block="phone_numbers" formset=formset.empty_form.team_member_phone_number_formset title_single="Team Member's Phone Number" title_all="Team Member's Phone Numbers" hide_add=True diffdatablockstyle="difflevel-2" %}
+                    {% include "contacts/includes/formset_diffview.html" with show_block="certificates" formset=formset.empty_form.team_member_certificate_formset title_single="Team Member's Certificate" title_all="Team Member's Certificates" hide_add=True diffdatablockstyle="difflevel-2" %}
+                    {% include "contacts/includes/formset_diffview.html" with show_block="memberships" formset=formset.empty_form.team_member_membership_formset title_single="Team Member's Memberships" title_all="Team Member's Memberships" hide_add=True diffdatablockstyle="difflevel-2" %}
+                {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endfor %}
+

@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+
+{% block title %} | Configuration {% endblock %}
+
+{% block page-header %}
+    <i class="fa fa-cog"></i> Configuration</h1>
+{% endblock %}
+
+{% block content %}
+    {% for msg in messages %}
+        <div class="alert alert-{{ msg.level }}">{{ msg.message }}</div>
+    {% endfor %}
+
+    <form method="POST" id="expire_days">
+        {% csrf_token %}
+        <h2><i class="fa fa-cog "></i> Options
+            <button type="submit" class="save pull-right btn btn-success">Save</button>
+        </h2>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    {% if option_expire_days_error %}<ul class="errorlist"><li>{{ option_expire_days_error }}</li></ul>{% endif %}
+                    <label for="expire_days">Expire incoming contacts after (days):</label>
+                    <input type="text" id="expire_days" name="expire_days" value="{{ option_expire_days }}" class="form-control" maxlength="5">
+                </div>
+            </div>
+        </div>
+    </form>
+
+    {% if perms.ctc.web_write %}
+        <h2><i class="fa fa-keyboard-o "></i> Autosuggest</h2>
+        {% for suggestion in suggestions %}
+            <form method="POST" id="autosuggest">
+                {% csrf_token %}
+                <div class="row" style="padding-top: 2px; padding-botton: 2px;">
+                    <div class="col-md-2">
+                        <label for="suggest_{{ suggestion.fieldname }}">{{ suggestion.fieldname }}:</label>
+                    </div>
+                    <div class="col-md-9">
+                        <input name="name" value="{{suggestion.fieldname}}" type="hidden"></input>
+                        <input name="autosuggest" value="1" type="hidden"></input>
+                        <select name="suggest_{{ suggestion.fieldname }}" multiple="multiple" class="form-control select2" id="suggest_{{ suggestion.fieldname }}" aria-hidden="true" tagsa="true">
+                            {% for suggest_entry in suggestion.suggestions %}
+                                <option selected value="{{ suggest_entry.value }}">{{ suggest_entry.value }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-1">
+                        <button type="submit" class="save pull-right btn btn-success">Save</button>
+                    </div>
+                </div>
+            </form>
+        {% endfor %}
+
+        <h2><i class="fa fa-flag "></i> Countries <button type="submit" class="save pull-right btn btn-success" data-toggle="modal" data-target="#add_country">Add</button></h2>
+
+        <!-- add form -->
+        <div id="add_country" class="modal fade">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h3 class="modal-title">New country</h3>
+                    </div>
+                    <form method="POST" id="new_country_form">
+                        {% csrf_token %}
+                        <div class="modal-body">
+                            <p>Please enter the country details below.  Note: Country abbreviations are unique. Adding Countries with existing abbreviations will overwrite data.</p>
+
+                            <!-- new country form -->
+                            <div class="row" style="padding-top: 2px; padding-botton: 2px;">
+                                <div class="col-md-2">
+                                    <label for="add_country_abbr">Abbreviation:</label>
+                                </div>
+                                <div class="col-md-10">
+                                    <input name="add_country_abbr" type="input" class="form-control" maxlength="3"></input>
+                                </div>
+                            </div>
+                            <div class="row" style="padding-top: 2px; padding-botton: 2px;">
+                                <div class="col-md-2">
+                                    <label for="add_country_name">Country name:</label>
+                                </div>
+                                <div class="col-md-10">
+                                    <input name="add_country_name" type="input" class="form-control" maxlength="256"></input>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button href="#" class="btn" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary btn-success">Add</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <table data-toggle="table" data-page-size="50" data-pagination="true">
+                    <thead>
+                        <tr>
+                            <th data-sortable="true">Abbr.</th>
+                            <th data-sortable="true">Country</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for data in countries %}
+                            <tr>
+                                <td>{{ data.id }}</td>
+                                <td>{{ data.name }}</td>
+                                <td><button type="button" class="btn btn-primary btn-danger pull-right" data-toggle="modal" data-target="#delete_country_{{ forloop.counter }}">Remove</button></td>
+                            </tr>
+                            <div id="delete_country_{{ forloop.counter }}" class="modal fade">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                            <h3 class="modal-title">Please confirm</h3>
+                                        </div>
+                                        <div class="modal-body">
+                                            <p>Are you sure you want to remove <i>{{ data.name }} ({{ data.id }})</i>?</p>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <form method="POST" id="autosuggest">
+                                                {% csrf_token %}
+                                                <button href="#" class="btn" data-dismiss="modal">Close</button>
+                                                <input type="hidden" name="remove_country" value="{{ data.id }}"></input>
+                                                <button type="submit" class="btn btn-primary btn-danger">Remove</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block javascriptcontent %}
+    <script>
+        $(document).ready(function () {
+            $('.select2').select2({tags: true});
+        });
+    </script>
+{% endblock %}

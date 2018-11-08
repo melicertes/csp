@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %} | All Person Contacts {% endblock %}
+
+{% block secondary-nav %}
+<div class="navbar navbar-default navbar-fixed-top secondary-nav">
+    <div class="container">
+        {% include "contacts/includes/contacts_tabs.html" %}
+        <div class="navbar-form navbar-right">
+            <a href="{% url 'personcontact_new' %}" type="button" class="btn btn-success nav-btn">
+                <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add Person
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <table data-toggle="table" data-page-size="20" data-pagination="true" data-sortable="true">
+            <thead>
+                <tr>
+                    <th data-align="center"></th>
+                    <th data-sortable="true">Full Name</th>
+                    <th data-sortable="true">Email</th>
+                    <th data-sortable="true">Country</th>
+                    <th data-align="right" data-sortable="true">Created</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for person in persons %}
+                <tr>
+                    <td><a href="{% url 'personcontact_view' person.id %}"><i class="fa fa-user "></i></a></td>
+                    <td><a href="{% url 'personcontact_view' person.id %}"> {{ person.full_name }}</a></td>
+                    <td>{{ person.email }}</td>
+                    <td><a href="{% url 'search_view' %}?q={{ person.postal_country }}">{{ person.postal_country }}</a></td>
+                    <td>{{ person.created|date }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

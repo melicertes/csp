@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %} | Received Team Contacts {% endblock %}
+
+{% block page-header %}
+    <i class="fa fa-upload"></i> Received Team Contacts</h1>
+{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-12">
+            <table data-toggle="table" data-page-size="20" data-pagination="true">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th data-sortable="true">Received on</th>
+                        <th data-sortable="true">Update Type</th>
+                        <th data-sortable="true">Name</th>
+                        <th data-sortable="true">Received from</th>
+                        <th data-sortable="true">Shared with</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for data in incoming %}
+                    <tr>
+                        <td><a href="{% url 'incomingcontact_view' data.id %}">View Data</a></td>
+                        <td>{{ data.created }}</td>
+                        <td>{{ data.is_update|yesno:"Update,New" }}</td>
+                        <td>{{ data.deserialized.short_name }} ({{ data.deserialized.country }})</td>
+                        <td>{{ data.csp_id }}</td>
+                        <td>{{ data.target_circle_id|default:data.target_team_id|join:", " }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

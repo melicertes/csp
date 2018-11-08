@@ -1,0 +1,209 @@
+[
+    {
+        "fields": {
+            "name": "Italy"
+        },
+        "model": "central.country",
+        "pk": "2a56120a-debd-40ed-ad59-c68def1c6a72"
+    },
+    {
+        "fields": {
+            "name": "Germany"
+        },
+        "model": "central.country",
+        "pk": "41d68647-1c3a-4681-8c7e-e85cd374d2cd"
+    },
+    {
+        "fields": {
+            "name": "European Union"
+        },
+        "model": "central.country",
+        "pk": "6a0eff1b-4a67-43fc-91c6-6e0792e5751d"
+    },
+    {
+        "fields": {
+            "name": "Greece"
+        },
+        "model": "central.country",
+        "pk": "98f6508f-6706-4a74-ae5a-b35bf278c47d"
+    },
+    {
+        "fields": {
+            "name": "United Kingdom"
+        },
+        "model": "central.country",
+        "pk": "a46d4921-b8ac-471e-8c45-ed2ebf77d253"
+    },
+    {
+        "fields": {
+            "name": "Health"
+        },
+        "model": "central.sector",
+        "pk": "2efad715-7d79-4445-89f0-d3b547277e8c"
+    },
+    {
+        "fields": {
+            "name": "Banking"
+        },
+        "model": "central.sector",
+        "pk": "38b6a409-5601-4814-b55d-93e741c71dd9"
+    },
+    {
+        "fields": {
+            "name": "Transport"
+        },
+        "model": "central.sector",
+        "pk": "449f0792-2e05-42ab-b1e2-c78936e5eb46"
+    },
+    {
+        "fields": {
+            "name": "Energy"
+        },
+        "model": "central.sector",
+        "pk": "8d2d2def-5ea0-42b1-b2ed-3c57a02d0d35"
+    },
+    {
+        "fields": {
+            "name": "EU CSIRT"
+        },
+        "model": "central.teamtype",
+        "pk": "04215624-e922-4e7d-9eb3-d8e005cdff2e"
+    },
+    {
+        "fields": {
+            "name": "MS CSIRT"
+        },
+        "model": "central.teamtype",
+        "pk": "2282af0e-292d-400b-ba31-047d9d43f229"
+    },
+    {
+        "fields": {
+            "name": "MS National SPoC"
+        },
+        "model": "central.teamtype",
+        "pk": "656000e7-fda8-4d98-b2e2-a008ffca8689"
+    },
+    {
+        "fields": {
+            "name": "MS Competent Authority"
+        },
+        "model": "central.teamtype",
+        "pk": "ce6f82fc-de9e-45e9-8d07-10d18d58421c"
+    },
+    {
+        "fields": {
+            "name": "Other"
+        },
+        "model": "central.teamstatus",
+        "pk": "743cbb6a-60ef-4f8b-b7e6-21f30315818a"
+    },
+    {
+        "fields": {
+            "name": "Known"
+        },
+        "model": "central.teamstatus",
+        "pk": "bfa2069f-ebb1-426d-ab20-d8af724baa82"
+    },
+    {
+        "fields": {
+            "name": "Active"
+        },
+        "model": "central.teamstatus",
+        "pk": "c3d6f205-eb4d-4a1b-ac2e-37a2ef80f69d"
+    },
+    {
+        "fields": {
+            "status": "c3d6f205-eb4d-4a1b-ac2e-37a2ef80f69d",
+            "established": "2010-01-22",
+            "additional_countries": [],
+            "name": "Cert of the European Union",
+            "host_organisation": "EU Unit Caroussel",
+            "created": "2017-04-25T14:07:24.537Z",
+            "country": "6a0eff1b-4a67-43fc-91c6-6e0792e5751d",
+            "nis_team_types": [],
+            "short_name": "CERT-EU",
+            "csp_installed": false,
+            "nis_sectors": [
+                "2efad715-7d79-4445-89f0-d3b547277e8c",
+                "449f0792-2e05-42ab-b1e2-c78936e5eb46"
+            ],
+            "csp_id": "",
+            "csp_domain": "",
+            "description": ""
+        },
+        "model": "central.team",
+        "pk": "306de7b8-5e8c-4a5e-9de2-1f837713bfc1"
+    },
+    {
+        "fields": {
+            "status": "bfa2069f-ebb1-426d-ab20-d8af724baa82",
+            "established": "2017-03-27",
+            "additional_countries": [],
+            "name": "CERT-Bund",
+            "host_organisation": "German Government",
+            "created": "2017-04-25T14:07:24.533Z",
+            "country": "41d68647-1c3a-4681-8c7e-e85cd374d2cd",
+            "nis_team_types": [
+                "04215624-e922-4e7d-9eb3-d8e005cdff2e",
+                "2282af0e-292d-400b-ba31-047d9d43f229"
+            ],
+            "short_name": "CERT-BUND",
+            "csp_installed": false,
+            "nis_sectors": [],
+            "csp_id": "",
+            "csp_domain": "",
+            "description": "CERT of the German Government"
+        },
+        "model": "central.team",
+        "pk": "578c0e4e-ebaf-455b-a2a1-faffb14be9e1"
+    },
+    {
+        "fields": {
+            "membership_url": "",
+            "name": "NIS Basic",
+            "info_url": "",
+            "created": "2017-04-25T14:07:24.547Z",
+            "short_name": "CTC::EU NIS:Basic",
+            "teams": [
+                "306de7b8-5e8c-4a5e-9de2-1f837713bfc1"
+            ],
+            "auth_source": "ENISA",
+            "description": "NIS Basic Circle"
+        },
+        "model": "central.trustcircle",
+        "pk": "2883f242-3e07-4378-9091-0d198e4886ba"
+    },
+    {
+        "fields": {
+            "membership_url": "",
+            "name": "TI Accredited Teams",
+            "info_url": "",
+            "created": "2017-04-25T14:07:24.543Z",
+            "short_name": "CTC::TI:Accredited",
+            "teams": [
+                "578c0e4e-ebaf-455b-a2a1-faffb14be9e1"
+            ],
+            "auth_source": "ENISA",
+            "description": "TI Accredited Teams"
+        },
+        "model": "central.trustcircle",
+        "pk": "6376712d-f767-4bac-9d9d-66dace5b2380"
+    },
+    {
+        "fields": {
+            "membership_url": "",
+            "name": "FIRST Trust Circle",
+            "info_url": "",
+            "created": "2017-04-25T14:07:24.539Z",
+            "short_name": "CTC::FIRST",
+            "teams": [
+                "578c0e4e-ebaf-455b-a2a1-faffb14be9e1",
+                "306de7b8-5e8c-4a5e-9de2-1f837713bfc1"
+            ],
+            "auth_source": "ENISA",
+            "description": "FIRST Members"
+        },
+        "model": "central.trustcircle",
+        "pk": "dc58e760-a05e-42d2-868c-cb2305825857"
+    }
+]

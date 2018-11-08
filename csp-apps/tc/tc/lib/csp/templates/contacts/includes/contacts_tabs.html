@@ -1,0 +1,6 @@
+{% load nav_helper %}
+
+<ul class="nav navbar-nav">
+    <li role="presentation" class="{% active_for '/local/contacts/teams/' %}"><a href="{% url 'teamcontact_list' %}"><i class="fa fa-group "></i> Teams</a></li>
+    <li role="presentation" class="{% active_for '/local/contacts/people/' %}"><a href="{% url 'personcontact_list' %}"><i class="fa fa-user "></i> People</a></li>
+</ul>
