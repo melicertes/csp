@@ -1,0 +1,184 @@
+/* Move down content because we have a fixed navbar that is 50px tall */
+body {
+    padding-top: 140px;
+    padding-bottom: 20px;
+}
+
+#id_csp_installed {
+    width: 20px;
+    float: left;
+    padding: 0px;
+    margin: 0;
+    height: 20px;
+}
+
+.item {
+    white-space: nowrap;
+    display: inline
+}
+
+.delete-form {
+    display: inline;
+}
+
+.list-group-item .icon .glyphicon-pencil {
+    margin-right: 0.5em;
+}
+
+.modal-body label {
+    font-weight: normal;
+}
+
+.navbar-login {
+    width: 305px;
+    padding: 10px;
+    padding-bottom: 0px;
+}
+
+.navbar-login-session {
+    padding: 10px;
+    padding-bottom: 0px;
+    padding-top: 0px;
+}
+
+.icon-size {
+    font-size: 87px;
+}
+
+.form-group .errorlist {
+    float: right;
+    list-style: none;
+    color: red;
+}
+
+.huge {
+    font-size: 40px;
+}
+
+.panel-green {
+    border-color: #5cb85c;
+}
+
+.panel-green > .panel-heading {
+    border-color: #5cb85c;
+    color: white;
+    background-color: #5cb85c;
+}
+
+.panel-green > a {
+    color: #5cb85c;
+}
+
+.panel-green > a:hover {
+    color: #3d8b3d;
+}
+
+.panel-red {
+    border-color: #d9534f;
+}
+
+.panel-red > .panel-heading {
+    border-color: #d9534f;
+    color: white;
+    background-color: #d9534f;
+}
+
+.panel-red > a {
+    color: #d9534f;
+}
+
+.panel-red > a:hover {
+    color: #b52b27;
+}
+
+.panel-yellow {
+    border-color: #f0ad4e;
+}
+
+.panel-yellow > .panel-heading {
+    border-color: #f0ad4e;
+    color: white;
+    background-color: #f0ad4e;
+}
+
+.panel-yellow > a {
+    color: #f0ad4e;
+}
+
+.panel-yellow > a:hover {
+    color: #df8a13;
+}
+
+#footer {
+    margin-top: 4em;
+    border-top: 1px solid #eee;
+    padding-top: 1em;
+    color: #888;
+    font-size: x-small;
+}
+
+.content-header {
+    margin-bottom: 2em;
+}
+
+.fixed-table-pagination .pagination-info {
+    margin-left: 1em;
+}
+
+.formset {
+    margin-bottom: 1em;
+}
+
+.formset-form {
+    padding: 20px;
+    border: 1px solid #aaa;
+    border-bottom: none;
+}
+
+.formset-form:last-child {
+    border-bottom: 1px solid #aaa;
+}
+
+.formset-form > h3 {
+    margin: 0 0 1em 0;
+}
+
+h2 {
+    padding-bottom: 9px;
+    border-bottom: 1px solid #ddd;
+    margin-bottom: 0.5em;
+}
+
+.navbar h1 {
+    margin: 15px 0 5px;
+}
+
+.secondary-nav {
+    margin-top: 50px;
+    z-index: 800;
+}
+
+.secondary-nav .page-header {
+    border-bottom: 0;
+}
+
+.secondary-nav .navbar-nav {
+    font-size: 36px;
+    line-height: 39.6px;
+}
+
+.secondary-nav .navbar-nav li a {
+    color: #666;
+}
+
+.secondary-nav .navbar-nav li.active a {
+    color: #333;
+}
+
+.secondary-nav .navbar-form {
+    padding-top: 7px;
+}
+
+table[data-toggle="table"] {
+    visibility: hidden;
+}

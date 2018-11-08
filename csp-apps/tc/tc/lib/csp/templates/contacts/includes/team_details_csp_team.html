@@ -1,0 +1,19 @@
+{% load form_utils %}
+    <div class="row">
+        <div class="panel">
+            <div class="panel-heading">Changes status</div>
+            <div class="panel-body">
+                <div class="col-md-6">
+                    {% field_value team 'csp_id' %}
+                    {% field_value team 'csp_domain' %}
+                    {% field_value team 'csp_installed' %}
+                </div>
+
+                <div class="col-md-6">
+                    {% field_value team 'nis_team_types' %}
+                    {% field_value team 'nis_sectors' %}
+                    {% field_value team 'status' %}
+                </div>
+            </div>
+        </div>
+    </div>

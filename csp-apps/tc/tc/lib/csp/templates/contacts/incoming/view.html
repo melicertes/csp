@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% load form_utils %}
+
+{% block title %} |  Received Team Contact '{{ incoming_team.name }}'{% endblock %}
+
+{% block page-header %}
+    <i class="fa fa-upload "></i> Received Team '{{ incoming_team.short_name }}'
+    <div class="pull-right">
+        <form action="{% url 'incomingcontact_delete' %}" id="delete-incoming" method="post" class="delete-form">{% csrf_token %}
+            <input type="hidden" name="id" value="{{ incoming.id }}">
+            <button name="delete-it" type="button"
+                class="btn btn-danger confirm" type="submit" data-placement="bottom">
+                <span title="Delete this received change" class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+            </button>
+        </form>
+        {% if existing_team %}
+        <a href="{% url 'teamcontact_edit' existing_team.id incoming.id %}" type="button" class="btn btn-warning">
+            <span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit Team
+        </a>
+        {% else %}
+        <a href="{% url 'teamcontact_new' incoming.id %}" type="button" class="btn btn-success">
+            <span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Add as Team
+        </a>
+        {% endif %}
+    </div>
+{% endblock %}
+
+{% block content %}
+    <div class="panel panel-info">
+        <div class="panel-heading">Update Details</div>
+        <div class="panel-body">
+            {% field_value incoming 'created' %}
+            {% field_value incoming 'csp_id' %}
+            {% field_value incoming 'target_circle_id' %}
+            {% field_value incoming 'target_team_id' %}
+        </div>
+    </div>
+
+    {% include "contacts/includes/team_details.html" with team=incoming_team %}
+{% endblock %}
+
+{% block javascriptcontent %}
+    <script>
+        $('.confirm').confirmation({
+            onConfirm: function (event) {
+                $("#delete-incoming").submit();
+            }
+        });
+    </script>
+{% endblock %}
