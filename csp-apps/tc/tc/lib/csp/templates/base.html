@@ -1,0 +1,160 @@
+{% load staticfiles nav_helper %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+
+    <link rel="shortcut icon" type="image/x-icon" href="{% static "img/favicon.ico" %}">
+
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>EU CCSPI{% block title %}{% endblock %}</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="{% static "lib/bootstrap/css/bootstrap.min.css" %}" rel="stylesheet">
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <link href="{% static "css/ie10-viewport-bug-workaround.css" %}" rel="stylesheet">
+
+    <!-- Other third-party styles -->
+    <link href="{% static "lib/bootstrap-table/bootstrap-table.css" %}" rel="stylesheet">
+    <link href="{% static "lib/bootstrap-datepicker/css/bootstrap-datepicker3.min.css" %}" rel="stylesheet">
+    <link href="{% static "lib/font-awsome/css/font-awesome.min.css" %}" rel="stylesheet">
+    <link href="{% static "lib/select2/css/select2.min.css" %}" rel="stylesheet">
+
+    <!-- Custom styles -->
+    <link href="{% static "css/custom.css" %}" rel="stylesheet">
+
+    <script src="{% static "lib/jquery/jquery.min.js" %}"></script>
+</head>
+
+<body>
+
+<nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
+                    aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="{% url 'search_view' %}">EU CCSPI</a>
+
+
+        </div>
+        <ul class="nav navbar-nav">
+            <li class="{% active_for '/central/teams/' %}"><a href="{% url 'team_list' %}"
+                title="Central Trust Teams"><i class="fa fa-user-circle "></i> Teams</a></li>
+            <li class="{% active_for '/central/circles/' %}"><a href="{% url 'circle_list' %}"
+                title="Central Trust Circles"><i class="fa fa-globe "></i> CTC</a></li>
+            <li class="{% active_for '/local/circles/' %}"><a href="{% url 'ltc_list' %}"
+                title="Local Trust Circles"><i class="fa fa-circle-o-notch "></i> LTC</a></li>
+            <li class="{% active_for '/local/contacts/' %}"><a href="{% url 'teamcontact_list' %}"><i
+                    class="fa fa-address-card "></i> Contacts</a></li>
+            <li class="{% active_for '/local/received/' %}"><a href="{% url 'incomingcontact_list' %}"><i
+                    class="fa fa-upload "></i> Received Data</a></li>
+            <li class="{% active_for '/configuration/' %}"><a href="{% url 'configuration' %}"><i
+                    class="fa fa-wrench "></i> Configuration</a></li>
+        </ul>
+        <div id="navbar" class="navbar-collapse collapse">
+            <!---------------------------->
+            <ul class="nav navbar-nav navbar-right">
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                        <span class="glyphicon glyphicon-user"></span> 
+                        <strong>{{ request.user.username }}</strong>
+                        <span class="glyphicon glyphicon-chevron-down"></span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <div class="navbar-login">
+                                <div class="row">
+                                    <div class="col-lg-4">
+                                        <p class="text-center">
+                                            <span class="glyphicon glyphicon-user icon-size"></span>
+                                        </p>
+                                    </div>
+                                    <div class="col-lg-8">
+                                        <p class="text-left">{{ request.user.username }}</p>
+                                        <p class="text-left">
+                                            <strong>{{ request.user.first_name }} {{ request.user.last_name }}</strong>
+                                        </p>
+                                        <p class="text-left small">{{ request.user.email }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="divider"></li>
+                        <li>
+                            <div class="navbar-login navbar-login-session">
+                                <div class="row">
+                                    <div class="col-lg-12">
+                                        <p>
+                                            <a href="{% url 'logout_view' %}"
+                                               class="btn btn-danger btn-block">Logout</a>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+
+            <!----------- --------------->
+            <form class="navbar-form navbar-right" method="get" action="{% url 'search_view' %}">
+                <div class="form-group">
+                    <input type="text" placeholder="Search" name="q" id="q" value="{{ q }}" class="form-control">
+                </div>
+                <button type="submit" class="btn btn-success">Go</button>
+            </form>
+
+        </div><!--/.navbar-collapse -->
+
+
+    </div>
+</nav>
+
+{% block secondary-nav %}
+<div class="navbar navbar-default navbar-fixed-top secondary-nav">
+    <div class="container">
+        <h1 class="page-header">{% block page-header %}{% endblock %}</h1>
+    </div>
+</div>
+{% endblock %}
+
+<div class="container">
+    {% block content %}{% endblock %}
+    <div id="footer">
+        Trust Circle Application <span class="pull-right">Version 1.2.0</span>
+    </div>
+</div>
+
+
+<script src="{% static "lib/bootstrap/js/bootstrap.min.js" %}"></script>
+
+<!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+<script src="{% static "js/ie10-viewport-bug-workaround.js" %}"></script>
+<script type="text/javascript">
+    $('table[data-toggle="table"]').on('post-body.bs.table', function() {
+        $(this).css({visibility: 'visible'});
+    });
+</script>
+<script src="{% static "lib/bootstrap-table/bootstrap-table.js" %}"></script>
+<script src="{% static "lib/bootstrap-table/locale/bootstrap-table-en-US.js" %}"></script>
+<script src="{% static "lib/bootstrap-confirmation/bootstrap-transition.js" %}"></script>
+<script src="{% static "lib/bootstrap-confirmation/bootstrap-tooltip.js" %}"></script>
+<script src="{% static "lib/bootstrap-confirmation/bootstrap-confirmation.min.js" %}"></script>
+<script src="{% static "lib/bootstrap-datepicker/js/bootstrap-datepicker.min.js" %}"></script>
+<script src="{% static "lib/select2/js/select2.min.js" %}"></script>
+
+<script src="{% static "js/custom.js" %}"></script>
+
+{% block javascriptcontent %}{% endblock %}
+</body>
+</html>

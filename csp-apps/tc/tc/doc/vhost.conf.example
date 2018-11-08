@@ -1,0 +1,41 @@
+# Set these two directories according to your installation
+Define CSP_HOME /path/to/csp/install/dir
+Define CSP_VIRTUAL_ENV /path/to/venv/for/csp
+
+<VirtualHost _default_:443>
+        ServerName csp.example.com
+        ServerAdmin admin@example.com
+
+        ErrorLog /var/log/apache2/csp-error_log
+        CustomLog /var/log/apache2/csp-access_log combined
+
+        WSGIDaemonProcess csp python-home=${CSP_VIRTUAL_ENV} python-path=${CSP_HOME}/lib
+        WSGIProcessGroup csp
+        WSGIScriptAlias / ${CSP_HOME}/lib/csp/wsgi.py
+
+        Alias /static ${CSP_HOME}/var/static
+
+        <Directory ${CSP_HOME}/lib/csp>
+                <Files wsgi.py>
+                        Require all granted
+                        SSLOptions +StdEnvVars
+                        SSLOptions +ExportCertData
+                </Files>
+        </Directory>
+
+        <Directory ${CSP_HOME}/lib/csp/var/static>
+                Require all granted
+        </Directory>
+
+        SSLEngine on
+        # ...
+        # Further SSL* config for server certificates etc.
+        # ...
+
+        <Location /api/v1/adapter/integrationData>
+            SSLVerifyClient require
+            # Further SSL* config for client certificates validation...
+        </Location>
+
+        # ...
+</VirtualHost>

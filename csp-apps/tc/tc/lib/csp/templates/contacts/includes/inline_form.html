@@ -1,0 +1,22 @@
+{% load form_utils %}
+
+<h3>{{ title_single }}
+    {% if form.DELETE %}
+        <div class="hidden">{{ form.DELETE }}</div>
+        <button class="btn btn-warning pull-right delete_object_btn" type="button" data-formset-delete-button="{{ formset.prefix }}">
+            <i class="fa fa-trash"></i> Delete
+        </button>
+    {% endif %}
+</h3>
+
+{% for field in form.hidden_fields %}
+    {{ field }}
+{% endfor %}
+
+<div class="row">
+    {% for field in form %}
+        {% if field.name != 'DELETE' and field not in form.hidden_fields %}
+            <div class="col-md-6">{% form_field field %}</div>
+        {% endif %}
+    {% endfor %}
+</div>
