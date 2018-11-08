@@ -1,0 +1,24 @@
+<table data-toggle="table" data-page-size="20" data-pagination="true">
+    <thead>
+    <tr>
+        <th data-align="center"></th>
+        <th data-sortable="true">Short Name</th>
+        <th data-sortable="true">Full Name</th>
+        <th data-sortable="true">TLP</th>
+        <th data-align="right" data-sortable="true"># of Teams</th>
+        <th data-align="right" data-sortable="true">Created</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for circle in circles %}
+        <tr>
+            <td><a href="{% url 'circle_view' circle.id %}"><i class="fa fa-globe"></i></a></td>
+            <td><a href="{% url 'circle_view' circle.id %}">{{ circle.short_name }}</a></td>
+            <td>{{ circle.name }}</td>
+            <td>{{ circle.get_tlp_display|default:"-" }}</a></td>
+            <td><a href="{% url 'circle_view' circle.id %}">{{ circle.teams.count }}</a></td>
+            <td>{{ circle.created|date }}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>

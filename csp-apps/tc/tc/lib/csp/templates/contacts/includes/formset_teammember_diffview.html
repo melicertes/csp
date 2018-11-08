@@ -1,0 +1,30 @@
+{% load form_utils %}
+
+<div class="formset" data-formset-prefix="{{ formset.prefix }}">
+    <h2>
+        {{ title_all }}
+        <button class="btn btn-success" type="button" data-formset-add="{{ formset.prefix }}">
+            <i class="fa fa-plus"></i> Add another
+        </button>
+    </h2>
+    {{ formset.non_field_errors }}
+    {{ formset.management_form }}
+    <div class="formset-body" data-formset-body="{{ formset.prefix }}">
+        <div class="row">
+            <div class="col-md-12">
+                {% related_fields_diffview_teammember formset incoming show_block %}
+            </div>
+        </div>
+    </div>
+    <script type="form-template" data-formset-empty-form="{{ formset.prefix }}">
+    {% escapescript %}
+        <div class="formset-form" data-formset-form="{{ formset.prefix }}" style="display: none">
+            <div class="row">
+                <div class="col-md-12">
+                    {% include "contacts/includes/inline_form_member.html" with form=formset.empty_form %}
+                </div>
+            </div>
+        </div>
+    {% endescapescript %}
+    </script>
+</div>

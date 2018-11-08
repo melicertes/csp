@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+
+{% block title %} | Central Team '{{ team.name }}'{% endblock %}
+
+{% block page-header %}
+    <i class="fa fa-user-circle "></i> Team '{{ team.short_name }}'
+    {% if perms.ctc.web_write %}
+    <div class="pull-right">
+        <a class="btn btn-default" type="button" href="{% url 'team_history' team.id %}">
+            History <span class="badge">{{ changes }}</span>
+        </a>
+        <a href="{% url 'team_new' %}" type="button" class="btn btn-success">
+            <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+        </a>
+        <form action="{% url 'team_delete' %}" id="delete-team" method="post" class="delete-form">{% csrf_token %}
+            <input type="hidden" name="id" value="{{ team.id }}">
+            <button name="delete-it" type="button"
+                class="btn btn-danger confirm" type="submit" data-placement="bottom">
+                <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+            </button>
+        </form>
+        <a href="{% url 'team_edit' team.id %}" type="button" class="btn btn-warning">
+            <span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit Team
+        </a>
+    </div>
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label>Short Team Name:</label>
+                {{ team.short_name }}
+            </div>
+
+            <div class="form-group">
+                <label>Team Name:</label>
+                {{ team.name }}
+            </div>
+
+            <div class="form-group">
+                <label>Host Organisation:</label>
+                {{ team.host_organisation }}
+            </div>
+
+            <div class="form-group">
+                <label>Country:</label>
+                {{ team.country }}
+            </div>
+
+            <div class="form-group">
+                <label>Additional Countries:</label>
+                {{ team.additional_countries|join:", "|default:"None" }}
+            </div>
+
+            <div class="form-group item">
+                <label>CSP Installed:&nbsp; </label>
+                {{ team.csp_installed|yesno }}
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="form-group">
+                <label>Established:</label>
+                {{ team.established }}
+            </div>
+
+            <div class="form-group">
+                <label>Description:</label>
+                {{ team.description }}
+            </div>
+
+            <div class="form-group">
+                <label>NIS Team Types:</label>
+                {{ team.nis_team_types|join:", "|default:"None" }}
+            </div>
+
+            <div class="form-group">
+                <label>NIS Sectors:</label>
+                {{ team.nis_sectors|join:", "|default:"None" }}
+            </div>
+
+            <div class="form-group">
+                <label>Status:</label>
+                {{ team.status }}
+            </div>
+
+            <div class="form-group">
+                <label>CSP ID:</label>
+                {{ team.csp_id }}
+            </div>
+
+            <div class="form-group">
+                <label>CSP Domain:</label>
+                {{ team.csp_domain }}
+            </div>
+        </div>
+    </div>
+
+    {% if teamcontact %}
+        {% include "contacts/includes/team_details.html" with team=teamcontact %}
+    {% endif %}
+
+    <br/>
+
+    <div class="row">
+        <div class="col-md-12">
+            <h2>
+                <i class="fa fa-globe"></i> Trust Circles
+                {% if perms.ctc.web_write %}
+                <a href="{% url 'team_edit' team.id %}" type="button" class="btn btn-warning pull-right">
+                    <span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Manage Trust Circles in
+                    Team
+                </a>
+                {% endif %}
+            </h2>
+        </div>
+    </div>
+
+    {% include 'central/ctc/table.html' %}
+
+{% endblock %}
+
+{% block javascriptcontent %}
+    <script>
+        $('.confirm').confirmation({
+            onConfirm: function (event) {
+                $("#delete-team").submit();
+            }
+        });
+    </script>
+{% endblock %}

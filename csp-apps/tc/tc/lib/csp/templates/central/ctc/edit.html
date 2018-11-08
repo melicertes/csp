@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+
+{% block title %} | Circle '{{ circle.name }}'{% endblock %}
+
+{% block page-header %}
+    <i class="fa fa-globe"></i>
+    {% if circle.id %}
+        Edit  Trust Circle '{{ circle.name }}'
+    {% else %}
+        Add New Trust Circle
+    {% endif %}
+    <div class="pull-right">
+        {% if circle.id %}
+        <a href="{% url 'circle_view' circle.id %}" class="save btn btn-default">Cancel</a>
+        {% else %}
+        <a href="{% url 'circle_list' %}" class="save btn btn-default">Cancel</a>
+        {% endif %}
+        <button type="submit" class="save btn btn-success" onclick="submitForm()">Save</button>
+    </div>
+{% endblock %}
+
+{% block content %}
+    <form method="POST" id="circle-form">{% csrf_token %}
+        {{ form.non_field_errors }}
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    {{ form.short_name.errors }}
+                    <label for="{{ form.short_name.id_for_label }}">Short CTC Name:</label>
+                    {{ form.short_name }}
+                </div>
+
+                <div class="form-group">
+                    {{ form.name.errors }}
+                    <label for="{{ form.name.id_for_label }}">CTC Name:</label>
+                    {{ form.name }}
+                </div>
+                <div class="form-group">
+                    {{ form.auth_source.errors }}
+                    <label for="{{ form.auth_source.id_for_label }}">Authoritative Source: </label>
+                    {{ form.auth_source }}
+                </div>
+                <div class="form-group">
+                    {{ form.tlp.errors }}
+                    <label for="{{ form.tlp.id_for_label }}">TLP: </label>
+                    {{ form.tlp }}
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    {{ form.description.errors }}
+                    <label for="{{ form.description.id_for_label }}">Description:</label>
+                    {{ form.description }}
+                </div>
+
+                <div class="form-group">
+                    {{ form.membership_url.errors }}
+                    <label for="{{ form.membership_url.id_for_label }}">URL for Membership Directory:</label>
+                    {{ form.membership_url }}
+                </div>
+
+                <div class="form-group">
+                    {{ form.info_url.errors }}
+                    <label for="{{ form.info_url.id_for_label }}">URL for Public Information:</label>
+                    {{ form.info_url }}
+                </div>
+            </div>
+        </div>
+
+        <h2><i class="fa fa-user-circle "></i> Central Teams</h2>
+        <div class="row">
+            <div class="col-md-12 " style="text-align:right">
+                <table data-toggle="table" selectItemName="id" id="tbl_Teams">
+                    <thead>
+                        <tr>
+                            <th data-checkbox-header="true" data-field='state' data-checkbox="true"></th>
+                            <th data-sortable="true" data-sorter="name">Name</th>
+                            <th data-sortable="true">Country</th>
+                            <th data-sortable="true">#CTC</th>
+                            <th data-sortable="true">Created</th>
+                            <th data-sortable="true">CSP Installed</th>
+                            <th data-sortable="true">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for team in teams %}
+                        <tr data-id="{{ team.id }}">
+                            <td></td>
+                            <td><a href="{% url 'team_view'  team.id %}">{{ team.name }}</a></td>
+                            <td><a href="{% url 'team_view' team.id %}">{{ team.country }}</a></td>
+                            <td><a href="{% url 'team_view' team.id %}">{{ team.circles.all|length }}</a></td>
+                            <td><a href="{% url 'team_view' team.id %}">{{ team.created }}</a></td>
+                            <td><a href="{% url 'team_view' team.id %}">{% if team.csp_installed %} Yes {% else %}
+                                No {% endif %} </a></td>
+                            <td><a href="{% url 'team_view' team.id %}">{{ team.status }}</a></td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <input type="hidden" id="selectedTeams" name="selectedTeams" value="">
+    </form>
+{% endblock %}
+
+{% block javascriptcontent %}
+    <script>
+        function submitForm() {
+            var $table = $('#tbl_Teams')
+            var selection = $table
+                                .bootstrapTable('getAllSelections')
+                                .map(function (row) { return row._data.id; })
+                                .join(';');
+            $('#selectedTeams').val(selection);
+            $('#circle-form').submit();
+        }
+
+        $(document).ready(function () {
+            var $table = $('#tbl_Teams');
+
+            {% for team in teams %}
+                {% if team.id in selected_team_ids %}
+                    $table.bootstrapTable('check', {{ forloop.counter0 }});
+                {% endif %}
+            {% endfor %}
+        });
+    </script>
+{% endblock %}

@@ -1,0 +1,368 @@
+{% load form_utils %}
+
+{% if 'csp_team' in show_blocks %}
+    <h2>CSP / Melicertes Team</h2>
+    <div class="row">
+        <div class="col-md-6">
+            {% field_value team 'csp_id' %}
+            {% field_value team 'csp_domain' %}
+            {% field_value team 'csp_installed' %}
+        </div>
+
+        <div class="col-md-6">
+            {% field_value team 'nis_team_types' %}
+            {% field_value team 'nis_sectors' %}
+            {% field_value team 'status' %}
+        </div>
+    </div>
+{% endif %}
+
+{% if 'team' in show_blocks %}
+    <h2>Team</h2>
+    <div class="row">
+        <div class="col-md-6">
+            {% field_value team 'short_name' %}
+            {% field_value team 'name' %}
+            {% field_value team 'host_organisation' %}
+            {% field_value team 'description' %}
+        </div>
+        <div class="col-md-6">
+            {% field_value team 'country' %}
+            {% field_value team 'additional_countries' %}
+            {% field_value team 'established' %}
+        </div>
+    </div>
+{% endif %}
+
+{% if 'constituency' in show_blocks %}
+    <h2>Constituency</h2>
+    <div class="row">
+        <div class="col-md-6">
+            {% field_value team 'constituency_types' %}
+            {% field_value team 'constituency_description' %}
+        </div>
+        <div class="col-md-6">
+            {% field_value team 'member_locations' %}
+        </div>
+    </div>
+{% endif %}
+
+{% if 'constituency_network' in show_blocks %}
+    <h2>Constituency Network</h2>
+    <div class="row">
+        <div class="col-md-6">
+            {% field_value team 'constituency_asns' %}
+            {% field_value team 'constituency_domains' %}
+        </div>
+        <div class="col-md-6">
+            {% field_value team 'constituency_ipranges' %}
+        </div>
+    </div>
+{% endif %}
+
+{% if 'security_notification_scope' in show_blocks %}
+    <h2>Security Notification Scope</h2>
+    <div class="row">
+        <div class="col-md-6">
+            {% field_value team 'scope_asns' %}
+            {% field_value team 'scope_ipranges' %}
+        </div>
+        <div class="col-md-6">
+            {% field_value team 'scope_email' %}
+        </div>
+    </div>
+{% endif %}
+
+{% if 'contact_information' in show_blocks %}
+    <h2>Contact Information</h2>
+    <div class="row">
+        <div class="col-md-6">
+            {% field_value team 'contact_postal_address' %}
+        </div>
+        <div class="col-md-6">
+            {% field_value team 'contact_postal_country' %}
+        </div>
+    </div>
+{% endif %}
+
+{% if 'phone_numbers' in show_blocks %}
+    {% related_fields team 'phone_numbers' %}
+{% endif %}
+
+{% if 'team_email_address' in show_blocks %}
+    <h2>Team Email Address</h2>
+    <div class="row">
+        <div class="col-md-6">
+            {% field_value team 'main_email' %}
+            {% field_value team 'public_email' %}
+        </div>
+        <div class="col-md-6">
+            {% field_value team 'automated_email' %}
+            {% field_value team 'automated_email_format' %}
+        </div>
+    </div>
+{% endif %}
+
+{% if 'certificates' in show_blocks %}
+    {% related_fields team 'certificates' %}
+{% endif %}
+
+{% if 'public_information_resources' in show_blocks %}
+    <h2>Public Information Resources</h2>
+    <div class="row">
+        <div class="col-md-6">
+            {% field_value team 'public_www' %}
+            {% field_value team 'public_ftp' %}
+        </div>
+        <div class="col-md-6">
+            {% field_value team 'public_mailinglist' %}
+            {% field_value team 'public_usenet' %}
+        </div>
+    </div>
+{% endif %}
+
+{% if 'business_hours' in show_blocks %}
+    <h2>Business Hours</h2>
+    <div class="row">
+        <div class="col-md-6">
+            {% field_value team 'business_hours' %}
+            {% field_value team 'outside_business_hours' %}
+        </div>
+        <div class="col-md-6">
+            {% field_value team 'business_hours_timezone' %}
+        </div>
+    </div>
+{% endif %}
+
+{% if 'billing_information' in show_blocks %}
+    <h2>Billing Information</h2>
+    <div class="row">
+        <div class="col-md-6">
+            {% field_value team 'billing_postal_address' %}
+            {% field_value team 'billing_postal_country' %}
+        </div>
+
+        <div class="col-md-6">
+            {% field_value team 'vat_number' %}
+        </div>
+    </div>
+{% endif %}
+
+{% if 'policies' in show_blocks %}
+    <h2>Policies</h2>
+    <div class="row">
+        <div class="col-md-6">
+            {% field_value team 'classification_policy' %}
+            {% field_value team 'exclusivity_policy' %}
+            {% field_value team 'disclosure_policy' %}
+        </div>
+        <div class="col-md-6">
+            {% field_value team 'legal_considerations' %}
+            {% field_value team 'cryptography_policy' %}
+        </div>
+    </div>
+{% endif %}
+
+{% if 'rfc2350' in show_blocks %}
+    <h2>RFC 2350</h2>
+    <div class="row">
+        <div class="col-md-12">
+            {% field_value team 'url_rfc2350' %}
+        </div>
+    </div>
+{% endif %}
+
+{% if 'memberships' in show_blocks %}
+    {% related_fields team 'memberships' %}
+{% endif %}
+
+{% if 'services_provided' in show_blocks %}
+    <h2>Services Provided to the Constituency</h2>
+    <div class="row">
+        <div class="col-md-4">
+            {% field_value team 'reactive_services' %}
+            {% field_value team 'reactive_services_comment' %}
+        </div>
+        <div class="col-md-4">
+            {% field_value team 'proactive_services' %}
+            {% field_value team 'proactive_services_comment' %}
+        </div>
+
+        <div class="col-md-4">
+            {% field_value team 'quality_management' %}
+            {% field_value team 'quality_management_comment' %}
+        </div>
+    </div>
+{% endif %}
+
+{% if 'tools_and_expertise' in show_blocks %}
+    <h2>Tools and Expertise</h2>
+    <div class="row">
+        <div class="col-md-6">
+            {% field_value team 'process_tool' %}
+            {% field_value team 'related_software' %}
+            {% field_value team 'generic' %}
+            {% field_value team 'os' %}
+        </div>
+        <div class="col-md-6">
+            {% field_value team 'platform' %}
+            {% field_value team 'network' %}
+            {% field_value team 'other' %}
+            {% field_value team 'references' %}
+        </div>
+    </div>
+{% endif %}
+
+
+{% if 'process_information' in show_blocks %}
+    <h2>Process Information</h2>
+    <div class="row">
+        <div class="col-md-6">
+            {% field_value team 'accreditations' %}
+            {% field_value team 'projects' %}
+            {% field_value team 'reporting_structure' %}
+        </div>
+        <div class="col-md-6">
+            {% field_value team 'reporting_structure' %}
+        </div>
+    </div>
+{% endif %}
+
+
+{% if 'staff_information' in show_blocks %}
+    <h2>Staff Information</h2>
+    <div class="row">
+        <div class="col-md-6">
+            {% field_value team 'education' %}
+            {% field_value team 'headcount_normal' %}
+            {% field_value team 'headcount_backup' %}
+        </div>
+        <div class="col-md-6">
+            {% field_value team 'fte_normal' %}
+            {% field_value team 'fte_backup' %}
+        </div>
+    </div>
+{% endif %}
+
+{% if 'csirt_support' in show_blocks %}
+    <h2>Statement of CSIRT-Support</h2>
+    <div class="row">
+        <div class="col-md-6">
+            {% field_value team 'provide_team_description' %}
+            {% field_value team 'provide_team_description_comment' %}
+            {% field_value team 'access_of_accredited_teams' %}
+            {% field_value team 'access_of_accredited_teams_comment' %}
+            {% field_value team 'public_access' %}
+            {% field_value team 'public_access_comment' %}
+            {% field_value team 'external_services_rfc2350' %}
+            {% field_value team 'external_services_rfc2350_comment' %}
+            {% field_value team 'adhere_to_tlp' %}
+            {% field_value team 'adhere_to_tlp_comment' %}
+            {% field_value team 'allow_ti_gpg_key' %}
+            {% field_value team 'allow_ti_gpg_key_comment' %}
+            {% field_value team 'commitment_updates' %}
+            {% field_value team 'commitment_updates_comment' %}
+            {% field_value team 'protect_information_received' %}
+            {% field_value team 'protect_information_received_comment' %}
+        </div>
+        <div class="col-md-6">
+            {% field_value team 'provide_feedback' %}
+            {% field_value team 'provide_feedback_comment' %}
+            {% field_value team 'allow_site_visits' %}
+            {% field_value team 'allow_site_visits_comment' %}
+            {% field_value team 'payment_of_fees' %}
+            {% field_value team 'payment_of_fees_comment' %}
+            {% field_value team 'registration_two_teams' %}
+            {% field_value team 'registration_two_teams_comment' %}
+            {% field_value team 'sim3_support' %}
+            {% field_value team 'sim3_support_comment' %}
+            {% field_value team 'meetings_attendance' %}
+            {% field_value team 'meetings_attendance_comment' %}
+            {% field_value team 'csirt_code_of_practice' %}
+            {% field_value team 'csirt_code_of_practice_comment' %}
+            {% field_value team 'reaction_texts_particiation' %}
+            {% field_value team 'reaction_texts_particiation_comment' %}
+        </div>
+    </div>
+{% endif %}
+
+
+{% if 'irt_object' in show_blocks %}
+    <h2>IRT Object</h2>
+    <div class="row">
+        <div class="col-md-6">
+            {% field_value team 'managed_by_ti' %}
+            {% field_value team 'irt_encryption_keys' %}
+            {% field_value team 'irt_signature_keys' %}
+            {% field_value team 'irt_authentication_keys' %}
+            {% field_value team 'irt_emails' %}
+            {% field_value team 'irt_abuse_emails' %}
+            {% field_value team 'irt_notify_emails' %}
+            {% field_value team 'irt_phone_numbers' %}
+            {% field_value team 'irt_fax_numbers' %}
+            {% field_value team 'irt_emergency_numbers' %}
+        </div>
+
+        <div class="col-md-6">
+            {% field_value team 'irt_rfc2350' %}
+            {% field_value team 'irt_address' %}
+            {% field_value team 'irt_additional_remarks' %}
+        </div>
+    </div>
+{% endif %}
+
+{% if 'outband_alerting' in show_blocks %}
+    <h2>Outband Alerting</h2>
+    <div class="row">
+        <div class="col-md-12">
+            {% field_value team 'outband_alerting_id' %}
+        </div>
+    </div>
+{% endif %}
+
+{% if 'outband_alerting_contacts' in show_blocks %}
+    {% related_fields team 'outband_alerting_contacts' %}
+{% endif %}
+
+{% if 'outband_alerting_accesses' in show_blocks %}
+    {% related_fields team 'outband_alerting_accesses' %}
+{% endif %}
+
+{% if 'team_members' in show_blocks and team.team_members.exists %}
+<h1>Team Members</h2>
+{% for person in team.team_members.all %}
+<div class="panel panel-default">
+    <div class="panel-heading">{{ person.full_name }} ({{ person.team_role }})</div>
+    <div class="panel-body">
+        <h3>Personal Details</h3>
+        <div class="row">
+            <div class="col-md-6">
+                {% field_value person 'full_name' %}
+                {% field_value person 'email' %}
+                {% field_value person 'email_visibility' %}
+            </div>
+            <div class="col-md-6">
+                {% field_value person 'postal_address' %}
+                {% field_value person 'postal_country' %}
+            </div>
+        </div>
+
+        <h3>Mailing List</h3>
+        <div class="row">
+            <div class="col-md-6">
+                {% field_value person 'ml_email' %}
+            </div>
+            <div class="col-md-6">
+                {% field_value person 'ml_key' %}
+            </div>
+        </div>
+
+        {% related_fields person 'phone_numbers' %}
+        {% related_fields person 'certificates' %}
+        {% related_fields person 'memberships' %}
+    </div>
+</div>
+{% empty %}
+    <p>No team members available</p>
+{% endfor %}
+{% endif %}

@@ -1,0 +1,182 @@
+[
+{
+  "fields": {
+    "membership_url": "",
+    "tlp": "",
+    "name": "CTC::SHARING_DATA_EVENT",
+    "info_url": "",
+    "created": "2017-06-19T09:37:26.993Z",
+    "short_name": "CTC::SHARING_DATA_EVENT",
+    "teams": [],
+    "auth_source": "ENISA",
+    "description": "For data sharing"
+  },
+  "model": "central.trustcircle",
+  "pk": "057f7278-09ee-4cd1-8000-c8efc2c20634"
+},
+{
+  "fields": {
+    "membership_url": "",
+    "tlp": "",
+    "name": "NIS Basic",
+    "info_url": "",
+    "created": "2017-04-25T14:07:24.547Z",
+    "short_name": "CTC::EU NIS:Basic",
+    "teams": [],
+    "auth_source": "ENISA",
+    "description": "NIS Basic Circle"
+  },
+  "model": "central.trustcircle",
+  "pk": "2883f242-3e07-4378-9091-0d198e4886ba"
+},
+{
+  "fields": {
+    "membership_url": "",
+    "name": "CTC::SHARING_DATA_ARTEFACT",
+    "tlp": "",
+    "info_url": "",
+    "created": "2017-06-19T09:37:27.892Z",
+    "short_name": "CTC::SHARING_DATA_ARTEFACT",
+    "teams": [],
+    "auth_source": "ENISA",
+    "description": "For data sharing"
+  },
+  "model": "central.trustcircle",
+  "pk": "2fba55ff-8119-4361-9644-ab36a3cfd9c9"
+},
+{
+  "fields": {
+    "membership_url": "",
+    "name": "CTC::SHARING_DATA_CHAT",
+    "tlp": "",
+    "info_url": "",
+    "created": "2017-06-19T09:37:30.032Z",
+    "short_name": "CTC::SHARING_DATA_CHAT",
+    "teams": [],
+    "auth_source": "ENISA",
+    "description": "For data sharing"
+  },
+  "model": "central.trustcircle",
+  "pk": "5221fca6-99d0-4990-b1d1-11d7ba9df0ce"
+},
+{
+  "fields": {
+    "membership_url": "",
+    "name": "TI Accredited Teams",
+    "tlp": "",
+    "info_url": "",
+    "created": "2017-04-25T14:07:24.543Z",
+    "short_name": "CTC::TI:Accredited",
+    "teams": [],
+    "auth_source": "ENISA",
+    "description": "TI Accredited Teams"
+  },
+  "model": "central.trustcircle",
+  "pk": "6376712d-f767-4bac-9d9d-66dace5b2380"
+},
+{
+  "fields": {
+    "membership_url": "",
+    "name": "CTC::SHARING_DATA_FILE",
+    "tlp": "",
+    "info_url": "",
+    "created": "2017-06-19T09:37:29.599Z",
+    "short_name": "CTC::SHARING_DATA_FILE",
+    "teams": [],
+    "auth_source": "ENISA",
+    "description": "For data sharing"
+  },
+  "model": "central.trustcircle",
+  "pk": "6cc2c1c7-3367-4df4-af2e-e3aa7da15022"
+},
+{
+  "fields": {
+    "membership_url": "",
+    "name": "CTC::SHARING_DATA_THREAT",
+    "tlp": "",
+    "info_url": "",
+    "created": "2017-06-19T09:37:26.527Z",
+    "short_name": "CTC::SHARING_DATA_THREAT",
+    "teams": [],
+    "auth_source": "ENISA",
+    "description": "For data sharing"
+  },
+  "model": "central.trustcircle",
+  "pk": "a6f48e55-39fe-4616-aab1-ee4dec87631d"
+},
+{
+  "fields": {
+    "membership_url": "",
+    "name": "CTC::SHARING_DATA_VULNERABILITY",
+    "tlp": "",
+    "info_url": "",
+    "created": "2017-06-19T09:37:27.435Z",
+    "short_name": "CTC::SHARING_DATA_VULNERABILITY",
+    "teams": [],
+    "auth_source": "ENISA",
+    "description": "For data sharing"
+  },
+  "model": "central.trustcircle",
+  "pk": "c03594fe-2f45-41e8-bfe8-85b7f53f20c4"
+},
+{
+  "fields": {
+    "membership_url": "",
+    "name": "CTC::CSP_ALL",
+    "tlp": "",
+    "info_url": "",
+    "created": "2017-06-19T09:37:26.062Z",
+    "short_name": "CTC::CSP_ALL",
+    "teams": [],
+    "auth_source": "ENISA",
+    "description": "For data sharing"
+  },
+  "model": "central.trustcircle",
+  "pk": "d28d4268-6e27-45ca-93a9-9bb67cb9c6f7"
+},
+{
+  "fields": {
+    "membership_url": "",
+    "name": "CTC::SHARING_DATA_CONTACT",
+    "tlp": "",
+    "info_url": "",
+    "created": "2017-06-19T09:37:29.133Z",
+    "short_name": "CTC::SHARING_DATA_CONTACT",
+    "teams": [],
+    "auth_source": "ENISA",
+    "description": "For data sharing"
+  },
+  "model": "central.trustcircle",
+  "pk": "d94aabb2-6916-421e-b850-1924073765d2"
+},
+{
+  "fields": {
+    "membership_url": "",
+    "name": "FIRST Trust Circle",
+    "tlp": "",
+    "info_url": "",
+    "created": "2017-04-25T14:07:24.539Z",
+    "short_name": "CTC::FIRST",
+    "teams": [],
+    "auth_source": "ENISA",
+    "description": "FIRST Members"
+  },
+  "model": "central.trustcircle",
+  "pk": "dc58e760-a05e-42d2-868c-cb2305825857"
+},
+{
+  "fields": {
+    "membership_url": "",
+    "name": "CTC::SHARING_DATA_INCIDENT",
+    "tlp": "",
+    "info_url": "",
+    "created": "2017-06-19T09:37:28.392Z",
+    "short_name": "CTC::SHARING_DATA_INCIDENT",
+    "teams": [],
+    "auth_source": "ENISA",
+    "description": "For data sharing"
+  },
+  "model": "central.trustcircle",
+  "pk": "f39566a5-bb02-4f71-9461-5cd8291cf168"
+}
+]

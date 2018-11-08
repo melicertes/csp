@@ -1,0 +1,18 @@
+{% load dict_helper %}
+<table data-toggle="table" data-sortable="true">
+    <thead>
+    <tr>
+        {% for col in cols %}
+            <th data-sortable="true">{{ col }}</th>
+        {% endfor %}
+    </tr>
+    </thead>
+
+    {% for entry in history %}
+        <tr>
+            {% for col in cols %}
+                <td>{{ entry|lookup:col }} </td>
+            {% endfor %}
+        </tr>
+    {% endfor %}
+</table>
