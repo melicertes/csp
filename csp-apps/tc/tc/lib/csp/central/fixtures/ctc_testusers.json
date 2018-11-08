@@ -1,0 +1,40 @@
+[
+  {
+    "fields": {
+      "username": "admin",
+      "first_name": "",
+      "last_name": "",
+      "is_active": true,
+      "is_superuser": true,
+      "is_staff": true,
+      "last_login": "2017-03-27T15:41:21.828Z",
+      "groups": [],
+      "user_permissions": [],
+      "password": "pbkdf2_sha256$20000$zlulgJe7Q5wJ$pDbPlwrXkwKQ1lBXqtxWdXoomkOta3ech0twWZyeN30=",
+      "email": "",
+      "date_joined": "2017-03-27T15:41:16.352Z"
+    },
+    "model": "openam_auth.user",
+    "pk": 1
+  },
+  {
+    "fields": {
+      "username": "user",
+      "first_name": "",
+      "last_name": "",
+      "is_active": true,
+      "is_superuser": false,
+      "is_staff": false,
+      "last_login": null,
+      "groups": [],
+      "user_permissions": [
+        34
+      ],
+      "password": "pbkdf2_sha256$20000$R9BhmE9iNnXX$S0/yQzNvGUrYyczcq0BtCWctKLC2k2lJWfz0SFjh3Fs=",
+      "email": "",
+      "date_joined": "2017-03-27T15:47:25Z"
+    },
+    "model": "openam_auth.user",
+    "pk": 2
+  }
+]

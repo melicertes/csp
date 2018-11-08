@@ -1,0 +1,258 @@
+{% extends "base.html" %}
+
+{% block title %} | Search {% endblock %}
+
+{% block page-header %}
+    Search Result for '{{ q }}'
+{% endblock %}
+
+{% block content %}
+    {% if not searchmode %}
+        <div class="row">
+            <div class="col-lg-3 col-md-6">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <div class="row">
+                            <div class="col-xs-3">
+                                <i class="fa fa-user-circle fa-5x"></i>
+                            </div>
+                            <div class="col-xs-9 text-right">
+                                <div class="huge" style="font-size:40px">{{ teams|length }}</div>
+                                <div>Central Teams</div>
+                            </div>
+                        </div>
+                    </div>
+                    <a href="{% url 'team_list' %}">
+                        <div class="panel-footer">
+                            <span class="pull-left">View all Central Teams</span>
+                            <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                            <div class="clearfix"></div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-6">
+                <div class="panel panel-green" style="border-color: #5cb85c;">
+                    <div class="panel-heading" style="background-color:#5cb85c; color:white">
+                        <div class="row">
+                            <div class="col-xs-3">
+                                <i class="fa fa-globe fa-5x"></i>
+                            </div>
+                            <div class="col-xs-9 text-right">
+                                <div class="huge" style="font-size:40px">{{ circles|length }}</div>
+                                <div>Central Trust Circles</div>
+                            </div>
+                        </div>
+                    </div>
+                    <a href="{% url 'circle_list' %}">
+                        <div class="panel-footer" style="color:green">
+                            <span class="pull-left">View all Central Trust Circlces</span>
+                            <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                            <div class="clearfix"></div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-6">
+                <div class="panel panel-yellow">
+                    <div class="panel-heading">
+                        <div class="row">
+                            <div class="col-xs-3">
+                                <i class="fa fa-circle-o-notch fa-5x"></i>
+                            </div>
+                            <div class="col-xs-9 text-right">
+                                <div class="huge">{{ ltcs.count }}</div>
+                                <div>Local Trust Circles</div>
+                            </div>
+                        </div>
+                    </div>
+                    <a href="{% url 'ltc_list' %}">
+                        <div class="panel-footer">
+                            <span class="pull-left">View all Local Trust Circles</span>
+                            <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                            <div class="clearfix"></div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+
+            <div class="col-lg-3 col-md-6">
+                <div class="panel panel-red">
+                    <div class="panel-heading">
+                        <div class="row">
+                            <div class="col-xs-3">
+                                <i class="fa fa-address-card fa-5x"></i>
+                            </div>
+                            <div class="col-xs-9 text-right">
+                                <div class="huge">{{ contact_count }}</div>
+                                <div>Contacts</div>
+                            </div>
+                        </div>
+                    </div>
+                    <a href="{% url 'teamcontact_list' %}">
+                        <div class="panel-footer">
+                            <span class="pull-left">View all Contacts</span>
+                            <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                            <div class="clearfix"></div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    {% endif %}
+
+    <div class="row">
+        <div class="col-md-12">
+            <h2>
+                <i class="fa fa-user-circle "></i> Central Teams
+            </h2>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            {% include 'central/team/table.html' %}
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <h2>
+                <i class="fa fa-globe"></i> Central Trust Circles
+            </h2>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            {% include 'central/ctc/table.html' %}
+        </div>
+    </div>
+
+
+    <!-- LTC -->
+    <div class="row">
+        <div class="col-md-12">
+            <h2>
+                <i class="fa fa-circle-o-notch"></i> Local Trust Circles
+            </h2>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <table data-toggle="table" data-page-size="20" data-pagination="true">
+                <thead>
+                <tr>
+                    <th data-align="center"></th>
+                    <th data-sortable="true">Short Name</th>
+                    <th data-sortable="true">Full Name</th>
+                    <th data-align="right" data-sortable="true">Created</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for ltc in ltcs %}
+                    <tr>
+                        <td><a href="{% url 'ltc_view' ltc.id %}"><i class="fa fa-circle-o-notch"></i></a></td>
+                        <td><a href="{% url 'ltc_view' ltc.id %}">{{ ltc.short_name }}</a></td>
+                        <td>{{ ltc.name }}</td>
+                        <td>{{ ltc.created|date }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Team Contact -->
+    <div class="row">
+        <div class="col-md-12">
+            <h2>
+                <i class="fa fa-address-card"></i> Local Team Contacts
+            </h2>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <table data-toggle="table" data-page-size="20" data-pagination="true" data-sortable="true">
+                <thead>
+                <tr>
+                    <th data-align="center"></th>
+
+                    <th data-sortable="true" data-sort-name="TeamName_sort">Name</th>
+                    <th data-visible="false" data-field="TeamName_sort">[Column for sorting] Team Name</th>
+
+                    <th data-sortable="true">Country</th>
+
+                    <th data-align="right" data-sortable="true">Created</th>
+                    <th data-align="right" data-sortable="true">CSP Installed</th>
+                    <th data-align="right" data-sortable="true">Status</th>
+                </tr>
+                </thead>
+
+                {% for team in localteams %}
+                    <tr>
+                        <td><a href="{% url 'teamcontact_view'  team.id %}"><i class="fa fa-address-card "></i></a></td>
+
+                        <td><a href="{% url 'teamcontact_view'  team.id %}"> {{ team.name }}</a></td>
+                        <td>{{ team.name }}</td>
+
+                        <td><a href="{% url 'search_view' %}?q={{ team.country }}">{{ team.country }}</a></td>
+
+                        <td>{{ team.created|date }}</td>
+                        <td>{% if team.csp_installed %} Yes {% else %} No {% endif %}</td>
+                        <td>{{ team.status }}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+
+
+    <!-- Person Contact -->
+    <div class="row">
+        <div class="col-md-12">
+            <h2>
+                <i class="fa fa-address-card"></i> Local Person Contacts
+            </h2>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <table data-toggle="table" data-page-size="20" data-pagination="true" data-sortable="true">
+                <thead>
+                <tr>
+                    <th data-align="center"></th>
+
+                    <th data-sortable="true" data-sort-name="TeamName_sort">Name</th>
+                    <th data-visible="false" data-field="TeamName_sort">[Column for sorting] Person Name</th>
+
+                    <th data-sortable="true" data-sort-name="Email_sort">Email</th>
+                    <th data-visible="false" data-field="Email_sort">[Column for sorting] Person Email</th>
+                </tr>
+                </thead>
+
+                {% for person in people %}
+                    <tr>
+                        <td><a href="{% url 'personcontact_view'  person.id %}"><i class="fa fa-user-circle "></i></a></td>
+
+                        <td><a href="{% url 'personcontact_view'  person.id %}"> {{ person.full_name }}</a></td>
+                        <td>{{ person.full_name }}</td>
+
+                        <td><a href="{% url 'personcontact_view'  person.id %}"> {{ person.email }}</a></td>
+                        <td>{{ person.full_name }}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block javascriptcontent %}
+{% endblock %}

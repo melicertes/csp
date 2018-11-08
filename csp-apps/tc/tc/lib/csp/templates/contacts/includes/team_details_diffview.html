@@ -1,0 +1,363 @@
+{% load form_utils %}
+<div class="row">
+    <div class="diff-indicator panel-default panel">
+        <div class="panel-heading">Incoming data <a class="applyalldiff" onclick="apply_all_{% if show_block == "team_members" %}team_members_{% endif %}formset_diff(this, '{{ show_block }}'); return false;">(Set to Incoming)</a>
+        </div>
+        <div class="panel-body">
+
+            {% if 'csp_team' == show_block %}
+                <div class="row">
+                    <div class="col-md-6">
+                        {% diff_field_value form incoming 'csp_id' %}
+                        {% diff_field_value form incoming 'csp_domain' %}
+                        {% diff_field_value form incoming 'csp_installed' %}
+                    </div>
+
+                    <div class="col-md-6">
+                        {% diff_field_value form incoming 'nis_team_types' %}
+                        {% diff_field_value form incoming 'nis_sectors' %}
+                        {% diff_field_value form incoming 'status' %}
+                    </div>
+                </div>
+            {% endif %}
+
+            {% if 'team' == show_block %}
+                <div class="row">
+                    <div class="col-md-6">
+                        {% diff_field_value form incoming 'short_name' %}
+                        {% diff_field_value form incoming 'name' %}
+                        {% diff_field_value form incoming 'host_organisation' %}
+                        {% diff_field_value form incoming 'description' %}
+                    </div>
+                    <div class="col-md-6">
+                        {% diff_field_value form incoming 'country' %}
+                        {% diff_field_value form incoming 'additional_countries' %}
+                        {% diff_field_value form incoming 'established' %}
+                    </div>
+                </div>
+            {% endif %}
+
+            {% if 'constituency' == show_block %}
+                <div class="row">
+                    <div class="col-md-6">
+                        {% diff_field_value form incoming 'constituency_types' %}
+                        {% diff_field_value form incoming 'constituency_description' %}
+                    </div>
+                    <div class="col-md-6">
+                        {% diff_field_value form incoming 'member_locations' %}
+                    </div>
+                </div>
+            {% endif %}
+
+            {% if 'constituency_network' == show_block %}
+                <div class="row">
+                    <div class="col-md-6">
+                        {% diff_field_value form incoming 'constituency_asns' %}
+                        {% diff_field_value form incoming 'constituency_domains' %}
+                    </div>
+                    <div class="col-md-6">
+                        {% diff_field_value form incoming 'constituency_ipranges' %}
+                    </div>
+                </div>
+            {% endif %}
+
+            {% if 'security_notification_scope' == show_block %}
+                <div class="row">
+                    <div class="col-md-6">
+                        {% diff_field_value form incoming 'scope_asns' %}
+                        {% diff_field_value form incoming 'scope_ipranges' %}
+                    </div>
+                    <div class="col-md-6">
+                        {% diff_field_value form incoming 'scope_email' %}
+                    </div>
+                </div>
+            {% endif %}
+
+            {% if 'contact_information' == show_block %}
+                <div class="row">
+                    <div class="col-md-6">
+                        {% diff_field_value form incoming 'contact_postal_address' %}
+                    </div>
+                    <div class="col-md-6">
+                        {% diff_field_value form incoming 'contact_postal_country' %}
+                    </div>
+                </div>
+            {% endif %}
+
+            {% if 'phone_numbers' == show_block %}
+                {% include "contacts/includes/formset_diffview.html" with show_block=show_block formset=formset title_single="Phone Number" title_all="Phone Numbers" %}
+            {% endif %}
+
+            {% if 'team_email_address' == show_block %}
+                <div class="row">
+                    <div class="col-md-6">
+                        {% diff_field_value form incoming 'main_email' %}
+                        {% diff_field_value form incoming 'public_email' %}
+                    </div>
+                    <div class="col-md-6">
+                        {% diff_field_value form incoming 'automated_email' %}
+                        {% diff_field_value form incoming 'automated_email_format' %}
+                    </div>
+                </div>
+            {% endif %}
+
+            {% if 'certificates' == show_block %}
+                {% include "contacts/includes/formset_diffview.html" with show_block=show_block formset=formset title_single="Certificates" title_all="Certificates" %}
+            {% endif %}
+
+            {% if 'public_information_resources' == show_block %}
+                <div class="row">
+                    <div class="col-md-6">
+                        {% diff_field_value form incoming 'public_www' %}
+                        {% diff_field_value form incoming 'public_ftp' %}
+                    </div>
+                    <div class="col-md-6">
+                        {% diff_field_value form incoming 'public_mailinglist' %}
+                        {% diff_field_value form incoming 'public_usenet' %}
+                    </div>
+                </div>
+            {% endif %}
+
+            {% if 'business_hours' == show_block %}
+                <div class="row">
+                    <div class="col-md-6">
+                        {% diff_field_value form incoming 'business_hours' %}
+                        {% diff_field_value form incoming 'outside_business_hours' %}
+                    </div>
+                    <div class="col-md-6">
+                        {% diff_field_value form incoming 'business_hours_timezone' %}
+                    </div>
+                </div>
+            {% endif %}
+
+            {% if 'billing_information' == show_block %}
+                <div class="row">
+                    <div class="col-md-6">
+                        {% diff_field_value form incoming 'billing_postal_address' %}
+                        {% diff_field_value form incoming 'billing_postal_country' %}
+                    </div>
+
+                    <div class="col-md-6">
+                        {% diff_field_value form incoming 'vat_number' %}
+                    </div>
+                </div>
+            {% endif %}
+
+            {% if 'policies' == show_block %}
+                <div class="row">
+                    <div class="col-md-6">
+                        {% diff_field_value form incoming 'classification_policy' %}
+                        {% diff_field_value form incoming 'exclusivity_policy' %}
+                        {% diff_field_value form incoming 'disclosure_policy' %}
+                    </div>
+                    <div class="col-md-6">
+                        {% diff_field_value form incoming 'legal_considerations' %}
+                        {% diff_field_value form incoming 'cryptography_policy' %}
+                    </div>
+                </div>
+            {% endif %}
+
+            {% if 'rfc2350' == show_block %}
+                <div class="row">
+                    <div class="col-md-12">
+                        {% diff_field_value form incoming 'url_rfc2350' %}
+                    </div>
+                </div>
+            {% endif %}
+
+            {% if 'memberships' == show_block %}
+                {% include "contacts/includes/formset_diffview.html" with show_block=show_block formset=formset title_single="Membership" title_all="Memberships" %}
+            {% endif %}
+
+            {% if 'services_provided' == show_block %}
+                <div class="row">
+                    <div class="col-md-4">
+                        {% diff_field_value form incoming 'reactive_services' %}
+                        {% diff_field_value form incoming 'reactive_services_comment' %}
+                    </div>
+                    <div class="col-md-4">
+                        {% diff_field_value form incoming 'proactive_services' %}
+                        {% diff_field_value form incoming 'proactive_services_comment' %}
+                    </div>
+
+                    <div class="col-md-4">
+                        {% diff_field_value form incoming 'quality_management' %}
+                        {% diff_field_value form incoming 'quality_management_comment' %}
+                    </div>
+                </div>
+            {% endif %}
+
+            {% if 'tools_and_expertise' == show_block %}
+                <div class="row">
+                    <div class="col-md-6">
+                        {% diff_field_value form incoming 'process_tool' %}
+                        {% diff_field_value form incoming 'related_software' %}
+                        {% diff_field_value form incoming 'generic' %}
+                        {% diff_field_value form incoming 'os' %}
+                    </div>
+                    <div class="col-md-6">
+                        {% diff_field_value form incoming 'platform' %}
+                        {% diff_field_value form incoming 'network' %}
+                        {% diff_field_value form incoming 'other' %}
+                        {% diff_field_value form incoming 'references' %}
+                    </div>
+                </div>
+            {% endif %}
+
+
+            {% if 'process_information' == show_block %}
+                <div class="row">
+                    <div class="col-md-6">
+                        {% diff_field_value form incoming 'accreditations' %}
+                        {% diff_field_value form incoming 'projects' %}
+                        {% diff_field_value form incoming 'reporting_structure' %}
+                    </div>
+                    <div class="col-md-6">
+                        {% diff_field_value form incoming 'reporting_structure' %}
+                    </div>
+                </div>
+            {% endif %}
+
+
+            {% if 'staff_information' == show_block %}
+                <div class="row">
+                    <div class="col-md-6">
+                        {% diff_field_value form incoming 'education' %}
+                        {% diff_field_value form incoming 'headcount_normal' %}
+                        {% diff_field_value form incoming 'headcount_backup' %}
+                    </div>
+                    <div class="col-md-6">
+                        {% diff_field_value form incoming 'fte_normal' %}
+                        {% diff_field_value form incoming 'fte_backup' %}
+                    </div>
+                </div>
+            {% endif %}
+
+            {% if 'csirt_support' == show_block %}
+                <div class="row">
+                    <div class="col-md-6">
+                        {% diff_field_value form incoming 'provide_team_description' %}
+                        {% diff_field_value form incoming 'provide_team_description_comment' %}
+                        {% diff_field_value form incoming 'access_of_accredited_teams' %}
+                        {% diff_field_value form incoming 'access_of_accredited_teams_comment' %}
+                        {% diff_field_value form incoming 'public_access' %}
+                        {% diff_field_value form incoming 'public_access_comment' %}
+                        {% diff_field_value form incoming 'external_services_rfc2350' %}
+                        {% diff_field_value form incoming 'external_services_rfc2350_comment' %}
+                        {% diff_field_value form incoming 'adhere_to_tlp' %}
+                        {% diff_field_value form incoming 'adhere_to_tlp_comment' %}
+                        {% diff_field_value form incoming 'allow_ti_gpg_key' %}
+                        {% diff_field_value form incoming 'allow_ti_gpg_key_comment' %}
+                        {% diff_field_value form incoming 'commitment_updates' %}
+                        {% diff_field_value form incoming 'commitment_updates_comment' %}
+                        {% diff_field_value form incoming 'protect_information_received' %}
+                        {% diff_field_value form incoming 'protect_information_received_comment' %}
+                    </div>
+                    <div class="col-md-6">
+                        {% diff_field_value form incoming 'provide_feedback' %}
+                        {% diff_field_value form incoming 'provide_feedback_comment' %}
+                        {% diff_field_value form incoming 'allow_site_visits' %}
+                        {% diff_field_value form incoming 'allow_site_visits_comment' %}
+                        {% diff_field_value form incoming 'payment_of_fees' %}
+                        {% diff_field_value form incoming 'payment_of_fees_comment' %}
+                        {% diff_field_value form incoming 'registration_two_teams' %}
+                        {% diff_field_value form incoming 'registration_two_teams_comment' %}
+                        {% diff_field_value form incoming 'sim3_support' %}
+                        {% diff_field_value form incoming 'sim3_support_comment' %}
+                        {% diff_field_value form incoming 'meetings_attendance' %}
+                        {% diff_field_value form incoming 'meetings_attendance_comment' %}
+                        {% diff_field_value form incoming 'csirt_code_of_practice' %}
+                        {% diff_field_value form incoming 'csirt_code_of_practice_comment' %}
+                        {% diff_field_value form incoming 'reaction_texts_particiation' %}
+                        {% diff_field_value form incoming 'reaction_texts_particiation_comment' %}
+                    </div>
+                </div>
+            {% endif %}
+
+
+            {% if 'irt_object' == show_block %}
+                <div class="row">
+                    <div class="col-md-6">
+                        {% diff_field_value form incoming 'managed_by_ti' %}
+                        {% diff_field_value form incoming 'irt_encryption_keys' %}
+                        {% diff_field_value form incoming 'irt_signature_keys' %}
+                        {% diff_field_value form incoming 'irt_authentication_keys' %}
+                        {% diff_field_value form incoming 'irt_emails' %}
+                        {% diff_field_value form incoming 'irt_abuse_emails' %}
+                        {% diff_field_value form incoming 'irt_notify_emails' %}
+                        {% diff_field_value form incoming 'irt_phone_numbers' %}
+                        {% diff_field_value form incoming 'irt_fax_numbers' %}
+                        {% diff_field_value form incoming 'irt_emergency_numbers' %}
+                    </div>
+
+                    <div class="col-md-6">
+                        {% diff_field_value form incoming 'irt_rfc2350' %}
+                        {% diff_field_value form incoming 'irt_address' %}
+                        {% diff_field_value form incoming 'irt_additional_remarks' %}
+                    </div>
+                </div>
+            {% endif %}
+
+            {% if 'outband_alerting' == show_block %}
+                <div class="row">
+                    <div class="col-md-12">
+                        {% diff_field_value form incoming 'outband_alerting_id' %}
+                    </div>
+                </div>
+            {% endif %}
+
+            {% if 'outband_alerting_contacts' == show_block %}
+                {% include "contacts/includes/formset_diffview.html" with show_block=show_block formset=formset title_single="Outband Alerting Contact" title_all="Outband Alerting Contacts" %}
+            {% endif %}
+
+            {% if 'outband_alerting_accesses' == show_block %}
+                {% include "contacts/includes/formset_diffview.html" with show_block=show_block formset=formset title_single="Outband Alerting Access" title_all="Outband Alerting Accesses" %}
+            {% endif %}
+
+            {% if 'team_members' == show_block %}
+                {% include "contacts/includes/formset_teammember_diffview.html" with show_block=show_block incoming=incoming formset=formset title_single="Team Member" title_all="Team Members" %}
+            {% endif %}
+
+{% comment %}
+            {% if 'team_members' == show_block and team.team_members.exists %}
+            <h1>Team Members</h2>
+            {% for person in team.team_members.all %}
+            <div class="panel panel-default">
+                <div class="panel-heading">{{ person.full_name }} ({{ person.team_role }})</div>
+                <div class="panel-body">
+                    <h3>Personal Details</h3>
+                    <div class="row">
+                        <div class="col-md-6">
+                            {% diff_field_value form person 'full_name' %}
+                            {% diff_field_value form person 'email' %}
+                            {% diff_field_value form person 'email_visibility' %}
+                        </div>
+                        <div class="col-md-6">
+                            {% diff_field_value form person 'postal_address' %}
+                            {% diff_field_value form person 'postal_country' %}
+                        </div>
+                    </div>
+
+                    <h3>Mailing List</h3>
+                    <div class="row">
+                        <div class="col-md-6">
+                            {% diff_field_value form person 'ml_email' %}
+                        </div>
+                        <div class="col-md-6">
+                            {% diff_field_value form person 'ml_key' %}
+                        </div>
+                    </div>
+
+                    {% related_fields person 'phone_numbers' %}
+                    {% related_fields person 'certificates' %}
+                    {% related_fields person 'memberships' %}
+                </div>
+            </div>
+            {% empty %}
+                <p>No team members available</p>
+            {% endfor %}
+            {% endif %}
+{% endcomment %}
+        </div>
+    </div>
+</div>

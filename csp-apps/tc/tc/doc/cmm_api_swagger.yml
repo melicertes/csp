@@ -1,0 +1,485 @@
+swagger: "2.0"
+info:
+  description: "API documentation for the CMM related endpoints of the TC application"
+  version: "0.8.1"
+  title: "Melicertes CMM API"
+  license:
+    name: "Melicertes internal"
+host: "localhost"
+basePath: "/api/v1"
+tags:
+- name: "ltc"
+  description: "Everything about Local Trust Circles (LTCs)"
+- name: "contacts"
+  description: "Everything you want to know about contacts"
+schemes:
+- "http"
+paths:
+  /ltc:
+    get:
+      tags:
+      - "ltc"
+      summary: "Return all LTCs"
+      description: "will return LTCs. LTCs will include references about contacts as well as references about teams (see below)"
+      operationId: "findLTCsByStatus"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "short_name"
+        in: "query"
+        description: "short name of LTC"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/LTC"
+  /ltc/{ltcId}:
+    get:
+      tags:
+      - "ltc"
+      summary: "Gets LTCs by ID"
+      description: "Returns a single LTC"
+      operationId: "getLTCById"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "ltcId"
+        in: "path"
+        description: "ID of LTC to return"
+        required: true
+        type: "string"
+        format: "uuid"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/LTC"
+        404:
+          description: "LTC not found"
+
+  /contacts:
+    get:
+      tags:
+      - "contacts"
+      summary: "Gets team contacts by querying for attributes (alias for /teamcontacts/)"
+      description: "Multiple attributes values can be provided with comma separated strings, some examples provided"
+      operationId: "searchContactsByAttributes"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "country"
+        in: "query"
+        description: "country of the contact"
+        type: "string"
+      - name: "short_name"
+        in: "query"
+        description: "contact shortname"
+        type: "string"
+      - name: "email"
+        in: "query"
+        description: "main email address"
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/team_contact"
+  /contacts/{contactId}:
+    get:
+      tags:
+      - "contacts"
+      summary: "Find team contacts by ID (alias for /teamcontact/${contactId})"
+      description: "Returns a single contact"
+      operationId: "getContactById"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "contactId"
+        in: "path"
+        description: "ID of contact to return"
+        required: true
+        type: "string"
+        format: "uuid"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/team_contact"
+        404:
+          description: "Contact not found"
+
+  /teamcontacts:
+    get:
+      tags:
+      - "contacts"
+      summary: "Gets team contacts by querying for attributes"
+      description: "Multiple attributes values can be provided with comma separated strings, some examples provided"
+      operationId: "searchTeamContactsByAttributes"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "country"
+        in: "query"
+        description: "country of the contact"
+        type: "string"
+      - name: "short_name"
+        in: "query"
+        description: "contact shortname"
+        type: "string"
+      - name: "email"
+        in: "query"
+        description: "main email address"
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/team_contact"
+  /teamcontacts/{contactId}:
+    get:
+      tags:
+      - "contacts"
+      summary: "Find team contacts by ID"
+      description: "Returns a single contact"
+      operationId: "getTeamContactById"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "contactId"
+        in: "path"
+        description: "ID of contact to return"
+        required: true
+        type: "string"
+        format: "uuid"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/team_contact"
+        404:
+          description: "Contact not found"
+
+  /personcontacts:
+    get:
+      tags:
+      - "contacts"
+      summary: "Gets person contacts by querying for attributes"
+      description: "Multiple attributes values can be provided with comma separated strings, some examples provided"
+      operationId: "searchPersonContactsByAttributes"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "country"
+        in: "query"
+        description: "country of the contact"
+        type: "string"
+      - name: "full_name"
+        in: "query"
+        description: "contact name"
+        type: "string"
+      - name: "email"
+        in: "query"
+        description: "email address"
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/person_contact"
+  /personcontacts/{contactId}:
+    get:
+      tags:
+      - "contacts"
+      summary: "Find person contacts by ID"
+      description: "Returns a single person contact"
+      operationId: "getPersonContactById"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "contactId"
+        in: "path"
+        description: "ID of contact to return"
+        required: true
+        type: "string"
+        format: "uuid"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/person_contact"
+        404:
+          description: "Contact not found"
+          
+definitions:
+  LTC:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+        format: "uuid"
+      short_name:
+        type: "string"
+      name:
+        type: "string"
+      description:
+        type: "string"
+      auth_source:
+        type: "string"
+      info_url:
+        type: "string"
+      membership_url:
+        type: "string"
+      created:
+        type: "string"
+      tlp:
+        type: "string"
+        enum:
+         - "red"
+         - "amber"
+         - "green"
+         - "white"
+      teams:
+        type: array
+        items:
+          type: "string"
+          format: "uuid"
+        description: "List of central team IDs"
+      team_contacts:
+        type: array
+        items:
+          type: "string"
+          format: "uuid"
+        description: "List of team contacts IDs"
+      person_contacts:
+        type: array
+        items:
+          type: "string"
+          format: "uuid"
+        description: "List of person contact IDs. Only include direct members, not inheriting automatically from team contacts"
+
+  team_contact:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+        format: "uuid"
+      csp_id:
+        type: "string"
+      csp_domain:
+       type: "string"
+      csp_installed:
+       type: "boolean"
+ 
+      nis_team_ types:
+        type: array
+        items:
+          type: "string"
+      nis_sectors:
+        type: array
+        items:
+          type: "string"
+      status:
+        type: "string"
+      
+      short_name:
+       type: "string"
+       description: "pkey together with country"
+      name:
+       type: "string"
+      host_organisation:
+       type: "string"
+      country:
+       type: "string"
+       description: "pkey together with short_name"
+       
+      additional_countries:
+        type: array
+        items:
+          type: "string"
+      
+      established:
+       type: "string"
+      
+      constituency_types:
+        type: array
+        items:
+          type: "string"
+      constituency_description:
+       type: "string"
+      member_locations:
+        type: array
+        items:
+          type: "string"
+      
+      constituency_asns:
+        type: array
+        items:
+          type: "string"
+      constituency_domains:
+        type: array
+        items:
+          type: "string"
+      constituency_ipranges:
+        type: array
+        items:
+          type: "string"
+      
+      scope_asns:
+        type: array
+        items:
+          type: "string"
+      scope_ipranges:
+        type: array
+        items:
+          type: "string"
+      scope_email:
+        type: array
+        items:
+          type: "string"
+          format: "email"
+      
+      contact_postal_address:
+       type: "string"
+      contact_postal_country:
+       type: "string"
+      
+      phone_numbers:
+        type: "array"
+        items:
+          $ref: "#/definitions/phonenumber"
+
+      certificates:
+        type: "array"
+        items:
+          $ref: "#/definitions/certificate"
+          
+      memberships:
+        type: "array"
+        items:
+          $ref: "#/definitions/membership"
+
+      main_email:
+       type: "string"
+       format: "email"
+      public_email:
+       type: "string"
+       format: "email"
+      automated_email:
+       type: "string"
+       format: "email"
+      
+      automated_email_format:
+        type: array
+        items:
+          type: "string"
+          description: "defines supported data exchange formats"
+      
+      public_www:
+       type: "string"
+      public_ftp:
+       type: "string"
+      public_mailinglist:
+       type: "string"
+      public_usenet:
+       type: "string"
+      
+      business_hours:
+       type: "string"
+      outside_business_hours:
+       type: "string"
+      business_hours_timezone:
+       type: "string"
+       
+      team_members:
+       type: "string"
+       description: "Will be a list of dicts (person_contact->id, role)"
+      
+  person_contact:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+        format: "uuid"
+      full_name:
+       type: "string"
+      email:
+       type: "string"
+       format: "email"
+       description: "will act as pkey"
+      email_visibility: # maybe
+       type: "boolean"
+      postal_address:
+       type: "string"
+      postal_country:
+       type: "string"
+       
+      ml_email:
+       type: "string"
+       format: "email"
+      ml_key:
+       type: "string"
+      phone_numbers:
+        type: "array"
+        items:
+          $ref: "#/definitions/phonenumber"
+
+      certificates:
+        type: "array"
+        items:
+          $ref: "#/definitions/certificate"
+          
+      memberships:
+        type: "array"
+        items:
+          $ref: "#/definitions/membership"
+
+  phonenumber:
+    type: "object"
+    properties:
+      tag:
+        type: "string"
+      number:
+        type: "string"
+      timezone:
+        type: "string"
+      number_details:
+        type: "string"
+      visibility:
+        type: "string"
+        
+  certificate:
+    type: "object"
+    properties:
+      tag:
+        type: "string"
+      method:
+        type: "string"
+        enum:
+          - pgp
+          - x509
+      keyid:
+        type: "string"
+      visibility:
+        type: "string"
+      data:
+        type: "string"
+        
+  membership:
+    type: "object"
+    properties:
+      organisation:
+        type: "string"
+      membership_state:
+        type: "string"
+      since:
+        type: "string"        

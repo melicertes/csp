@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% load form_utils %}
+
+{% block title %} | Share Team '{{ team.name }}'{% endblock %}
+
+{% block page-header %}
+    <i class="fa fa-group "></i> Share Team '{{ team.short_name }}'
+{% endblock %}
+
+{% block content %}
+    <form method="POST" class="share-team-form" id="share-team-form">{% csrf_token %}
+        {{ form.non_field_errors }}
+        <h2>Share with</h2>
+        <div class="row">
+            <div class="col-md-6">
+                {% form_field form.ctcs %}
+            </div>
+            <div class="col-md-6">
+                {% form_field form.ltcs %}
+            </div>
+        </div>
+        <div class="row">
+            <div class="pull-right">
+                <button type="submit" class="save btn btn-success" onclick="document.forms[1].submit()">Share Team with Selected Circles</button>
+            </div>
+        </div>
+    </form>
+{% endblock %}
