@@ -28,7 +28,7 @@ RUN pip3 install . && \
  cp /opt/intelmq/etc/examples/harmonization.conf /opt/intelmq/etc/ && \
  useradd -d /opt/intelmq -U -s /bin/bash intelmq && \
  mkdir -p /opt/intelmq/var/log && \
- chmod -R 0777 /opt/intelmq && \
+ chmod -R 0770 /opt/intelmq && \
  chown -R intelmq:intelmq /opt/intelmq
 
 RUN git clone https://github.com/certtools/intelmq-manager.git /tmp/intelmq-manager && \
