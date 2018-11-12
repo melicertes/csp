@@ -5,14 +5,14 @@
 	<parent>
 		<groupId>com.intrasoft.csp</groupId>
 		<artifactId>parent-pom</artifactId>
-		<version>3.5.0-SNAPSHOT</version>
+		<version>3.10.0-SNAPSHOT</version>
 	</parent>
 
 
 	<name>intelmq</name>
 	<groupId>com.fraunhofer.csp</groupId>
 	<artifactId>intelmq</artifactId>
-	<version>3.5.0-SNAPSHOT</version>
+	<version>3.10.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<modules>
