@@ -17,7 +17,7 @@ RUN apt-get update &&   \
 RUN git clone https://github.com/certtools/intelmq.git /opt/dev_intelmq
 WORKDIR /opt/dev_intelmq
 RUN git checkout tags/1.1.0
-#RUN git checkout
+#review RUN git checkout
 
 ADD test-data /tmp/test-data
 ADD csp-config/cve /opt/dev_intelmq/intelmq/bots/parsers/cve
@@ -28,7 +28,7 @@ RUN pip3 install . && \
  cp /opt/intelmq/etc/examples/harmonization.conf /opt/intelmq/etc/ && \
  useradd -d /opt/intelmq -U -s /bin/bash intelmq && \
  mkdir -p /opt/intelmq/var/log && \
- chmod -R 0770 /opt/intelmq && \
+#review chmod -R 775 /opt/intelmq && \
  chown -R intelmq:intelmq /opt/intelmq
 
 RUN git clone https://github.com/certtools/intelmq-manager.git /tmp/intelmq-manager && \
@@ -75,5 +75,5 @@ RUN chmod u+x /scripts/run.sh && \
     echo "Added CSP custom runtime done" && \
     echo "DONE SUCCESSFULLY!"
 
-ENTRYPOINT ["/scripts/run.sh"]  
+ENTRYPOINT ["/scripts/run.sh"]
 
