@@ -16,8 +16,8 @@ RUN apt-get update &&   \
 
 RUN git clone https://github.com/certtools/intelmq.git /opt/dev_intelmq
 WORKDIR /opt/dev_intelmq
-#RUN git checkout tags/1.1.0rc1
-RUN git checkout
+RUN git checkout tags/1.1.0
+#RUN git checkout
 
 ADD test-data /tmp/test-data
 ADD csp-config/cve /opt/dev_intelmq/intelmq/bots/parsers/cve
