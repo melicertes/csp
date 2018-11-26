@@ -35,7 +35,7 @@
     #--------------------------------------------------------#
     #        External
     #--------------------------------------------------------#
-    {% if "integration" in service.external_name %}
+    {% if 'integration' == service.external_name %}
         <VirtualHost *:5443>
     {% else %}
         <VirtualHost *:443>
@@ -68,7 +68,7 @@
           AmAgentConf /web_agents/apache24_agent/bin/../instances/agent_{{ service.external_name }}/config/agent.conf
           {% endif -%}
 
-          {% if "integration" in service.external_name %}
+          {% if 'integration' == service.external_name %}
           SSLOptions +StdEnvVars
           RequestHeader set CspId-Client-Certificate-Header %{SSL_CLIENT_S_DN_CN}e
           {% endif %}

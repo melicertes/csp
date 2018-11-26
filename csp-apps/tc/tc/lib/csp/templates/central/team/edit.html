@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+
+{% block title %} | Central Team '{{ team.name }}'{% endblock %}
+
+{% block page-header %}
+    <i class="fa fa-user-circle "></i>
+    {% if team.id %}
+    Edit Central Team '{{ team.short_name }}'
+    {% else %}
+    Add New Central Team
+    {% endif %}
+    <div class="pull-right">
+        {% if team.id %}
+        <a href="{% url 'team_view' team.id %}" class="save btn btn-default">Cancel</a>
+        {% else %}
+        <a href="{% url 'team_list' %}" class="save btn btn-default">Cancel</a>
+        {% endif %}
+        <button type="submit" class="save btn btn-success" onclick="submitForm()">Save</button>
+    </div>
+{% endblock %}
+
+{% block content %}
+    <form method="POST" class="team-form" id="team-form">{% csrf_token %}
+        {{ form.non_field_errors }}
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    {{ form.short_name.errors }}
+                    <label for="{{ form.short_name.id_for_label }}">Short Team Name:</label>
+                    {{ form.short_name }}
+                </div>
+
+                <div class="form-group">
+                    {{ form.name.errors }}
+                    <label for="{{ form.name.id_for_label }}">Team Name:</label>
+                    {{ form.name }}
+                </div>
+
+                <div class="form-group">
+                    {{ form.host_organisation.errors }}
+                    <label for="{{ form.host_organisation.id_for_label }}">Host Organisation:</label>
+                    {{ form.host_organisation }}
+                </div>
+
+                <div class="form-group">
+                    {{ form.country.errors }}
+                    <label for="{{ form.country.id_for_label }}">Country:</label>
+                    {{ form.country }}
+                </div>
+
+                <div class="form-group">
+                    {{ form.additional_countries.errors }}
+                    <label for="{{ form.additional_countries.id_for_label }}">Additional Countries:</label>
+                    {{ form.additional_countries }}
+                </div>
+
+                <div class=" form-group item">
+                    {{ form.csp_installed.errors }}
+
+                    <label for="{{ form.csp_installed.id_for_label }}" style="float:left">CSP
+                        Installed:&nbsp; </label>
+                    {{ form.csp_installed }}
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    {{ form.established.errors }}
+                    <label for="{{ form.established.id_for_label }}">Established:</label>
+                    {{ form.established }}
+                </div>
+
+                <div class="form-group">
+                    {{ form.description.errors }}
+                    <label for="{{ form.description.id_for_label }}">Description:</label>
+                    {{ form.description }}
+                </div>
+
+                <div class="form-group">
+                    {{ form.nis_team_types.errors }}
+                    <label for="{{ form.nis_team_types.id_for_label }}">NIS Team Types:</label>
+                    {{ form.nis_team_types }}
+                </div>
+
+                <div class="form-group">
+                    {{ form.nis_sectors.errors }}
+                    <label for="{{ form.nis_sectors.id_for_label }}">NIS Sectors:</label>
+                    {{ form.nis_sectors }}
+                </div>
+
+                <div class="form-group">
+                    {{ form.status.errors }}
+                    <label for="{{ form.status.id_for_label }}">Status:</label>
+                    {{ form.status }}
+                </div>
+
+                <div class="form-group">
+                    {{ form.csp_id.errors }}
+                    <label for="{{ form.csp_id.id_for_label }}">CSP ID:</label>
+                    {{ form.csp_id }}
+                </div>
+
+                <div class="form-group">
+                    {{ form.csp_domain.errors }}
+                    <label for="{{ form.csp_domain.id_for_label }}">CSP Domain:</label>
+                    {{ form.csp_domain }}
+                </div>
+            </div>
+        </div>
+
+        <h2><i class="fa fa-globe"></i> Trust Circles</h2>
+        <div class="row">
+            <div class="col-md-12 " style="text-align:right">
+                <table data-toggle="table" selectItemName="id" id="tbl_TrustCircles">
+                    <thead>
+                    <tr>
+                        <th data-checkbox-header="true" data-field='state' data-checkbox="true"></th>
+                        <th data-sortable="true">TC Name</th>
+                        <th data-sortable="true">TLP/Content</th>
+                        <th data-sortable="true">TLP/Source</th>
+                        <th data-sortable="true">#Teams</th>
+                        <th data-sortable="true">Created</th>
+                    </tr>
+                    </thead>
+
+                    {% for circle in circles %}
+                        <tr data-id="{{ circle.id }}">
+                            <td></td>
+                            <td><a href="{% url 'circle_view' circle.id %}">{{ circle.name }}</a></td>
+                            <td><a href="{% url 'circle_view' circle.id %}">&nbsp;</a></td>
+                            <td><a href="{% url 'circle_view' circle.id %}">&nbsp;</a></td>
+                            <td><a href="{% url 'circle_view' circle.id %}">{{ circle.teams.all|length }}</a></td>
+                            <td><a href="{% url 'circle_view' circle.id %}">{{ circle.created }}</a></td>
+                        </tr>
+                    {% endfor %}
+
+                </table>
+            </div>
+        </div>
+
+        <input type="hidden" id="selectedCircles" name="selectedCircles" value="">
+    </form>
+{% endblock %}
+
+{% block javascriptcontent %}
+    <script type="text/javascript">
+        function submitForm() {
+            var $table = $('#tbl_TrustCircles')
+            var selection = $table
+                                .bootstrapTable('getAllSelections')
+                                .map(function (row) { return row._data.id; })
+                                .join(';');
+            $('#selectedCircles').val(selection);
+            $('#team-form').submit();
+        }
+
+        $('#id_established').datepicker({
+            format: "yyyy-mm-dd",
+            orientation: 'bottom',
+            weekStart: 1,
+            autoclose: true,
+            startView: 2,
+            todayBtn: true,
+            todayHighlight: true
+        });
+
+        $(function() {
+            var $table = $('#tbl_TrustCircles');
+            {% for circle in circles %}
+                {% if circle.id in selected_circles_ids %}
+                    $table.bootstrapTable('check', {{ forloop.counter0 }});
+                {% endif %}
+            {% endfor %}
+        });
+    </script>
+{% endblock %}

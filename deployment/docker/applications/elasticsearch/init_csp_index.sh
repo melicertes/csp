@@ -274,22 +274,103 @@ curl -XPUT  'localhost:9200/cspdata/_mapping/vulnerability?pretty' -H 'Content-T
         "properties" : {
           "dataObject" : {
             "properties" : {
-              "xml_advisory" : {
+              "response" : {
                 "properties" : {
-                  "content" : {
+                  "Event" : {
                     "properties" : {
-                      "abstract" : {
-                        "type" : "text",
-                        "fields" : {
-                          "keyword" : {
-                            "type" : "keyword",
-                            "ignore_above" : 256
-                          }
-                        }
-                      },
-                      "additional_resources" : {
+                      "Attribute" : {
                         "properties" : {
-                          "resource" : {
+                          "category" : {
+                            "type" : "text",
+                            "fields" : {
+                              "keyword" : {
+                                "type" : "keyword",
+                                "ignore_above" : 256
+                              }
+                            }
+                          },
+                          "comment" : {
+                            "type" : "text",
+                            "fields" : {
+                              "keyword" : {
+                                "type" : "keyword",
+                                "ignore_above" : 256
+                              }
+                            }
+                          },
+                          "deleted" : {
+                            "type" : "boolean"
+                          },
+                          "disable_correlation" : {
+                            "type" : "boolean"
+                          },
+                          "distribution" : {
+                            "type" : "text",
+                            "fields" : {
+                              "keyword" : {
+                                "type" : "keyword",
+                                "ignore_above" : 256
+                              }
+                            }
+                          },
+                          "event_id" : {
+                            "type" : "text",
+                            "fields" : {
+                              "keyword" : {
+                                "type" : "keyword",
+                                "ignore_above" : 256
+                              }
+                            }
+                          },
+                          "id" : {
+                            "type" : "text",
+                            "fields" : {
+                              "keyword" : {
+                                "type" : "keyword",
+                                "ignore_above" : 256
+                              }
+                            }
+                          },
+                          "sharing_group_id" : {
+                            "type" : "text",
+                            "fields" : {
+                              "keyword" : {
+                                "type" : "keyword",
+                                "ignore_above" : 256
+                              }
+                            }
+                          },
+                          "timestamp" : {
+                            "type" : "text",
+                            "fields" : {
+                              "keyword" : {
+                                "type" : "keyword",
+                                "ignore_above" : 256
+                              }
+                            }
+                          },
+                          "to_ids" : {
+                            "type" : "boolean"
+                          },
+                          "type" : {
+                            "type" : "text",
+                            "fields" : {
+                              "keyword" : {
+                                "type" : "keyword",
+                                "ignore_above" : 256
+                              }
+                            }
+                          },
+                          "uuid" : {
+                            "type" : "text",
+                            "fields" : {
+                              "keyword" : {
+                                "type" : "keyword",
+                                "ignore_above" : 256
+                              }
+                            }
+                          },
+                          "value" : {
                             "type" : "text",
                             "fields" : {
                               "keyword" : {
@@ -300,219 +381,135 @@ curl -XPUT  'localhost:9200/cspdata/_mapping/vulnerability?pretty' -H 'Content-T
                           }
                         }
                       },
-                      "consequences" : {
-                        "type" : "text",
-                        "fields" : {
-                          "keyword" : {
-                            "type" : "keyword",
-                            "ignore_above" : 256
-                          }
-                        }
-                      },
-                      "description" : {
-                        "type" : "text",
-                        "fields" : {
-                          "keyword" : {
-                            "type" : "keyword",
-                            "ignore_above" : 256
-                          }
-                        }
-                      },
-                      "disclaimer" : {
-                        "type" : "text",
-                        "fields" : {
-                          "keyword" : {
-                            "type" : "keyword",
-                            "ignore_above" : 256
-                          }
-                        }
-                      },
-                      "solution" : {
-                        "type" : "text",
-                        "fields" : {
-                          "keyword" : {
-                            "type" : "keyword",
-                            "ignore_above" : 256
-                          }
-                        }
-                      }
-                    }
-                  },
-                  "meta_info" : {
-                    "properties" : {
-                      "availability" : {
-                        "type" : "text",
-                        "fields" : {
-                          "keyword" : {
-                            "type" : "keyword",
-                            "ignore_above" : 256
-                          }
-                        }
-                      },
-                      "damage" : {
-                        "type" : "text",
-                        "fields" : {
-                          "keyword" : {
-                            "type" : "keyword",
-                            "ignore_above" : 256
-                          }
-                        }
-                      },
-                      "issuer" : {
-                        "type" : "text",
-                        "fields" : {
-                          "keyword" : {
-                            "type" : "keyword",
-                            "ignore_above" : 256
-                          }
-                        }
-                      },
-                      "probability" : {
-                        "type" : "text",
-                        "fields" : {
-                          "keyword" : {
-                            "type" : "keyword",
-                            "ignore_above" : 256
-                          }
-                        }
-                      },
-                      "reference_number" : {
-                        "type" : "text",
-                        "fields" : {
-                          "keyword" : {
-                            "type" : "keyword",
-                            "ignore_above" : 256
-                          }
-                        }
-                      },
-                      "system_information" : {
+                      "Org" : {
                         "properties" : {
-                          "systemdetail" : {
-                            "properties" : {
-                              "affected_platform" : {
-                                "properties" : {
-                                  "platform" : {
-                                    "properties" : {
-                                      "name" : {
-                                        "type" : "text",
-                                        "fields" : {
-                                          "keyword" : {
-                                            "type" : "keyword",
-                                            "ignore_above" : 256
-                                          }
-                                        }
-                                      },
-                                      "producer" : {
-                                        "type" : "text",
-                                        "fields" : {
-                                          "keyword" : {
-                                            "type" : "keyword",
-                                            "ignore_above" : 256
-                                          }
-                                        }
-                                      },
-                                      "version" : {
-                                        "type" : "text",
-                                        "fields" : {
-                                          "keyword" : {
-                                            "type" : "keyword",
-                                            "ignore_above" : 256
-                                          }
-                                        }
-                                      }
-                                    }
-                                  }
-                                }
-                              },
-                              "affected_platforms_text" : {
-                                "type" : "text",
-                                "fields" : {
-                                  "keyword" : {
-                                    "type" : "keyword",
-                                    "ignore_above" : 256
-                                  }
-                                }
-                              },
-                              "affected_product" : {
-                                "properties" : {
-                                  "product" : {
-                                    "properties" : {
-                                      "name" : {
-                                        "type" : "text",
-                                        "fields" : {
-                                          "keyword" : {
-                                            "type" : "keyword",
-                                            "ignore_above" : 256
-                                          }
-                                        }
-                                      },
-                                      "producer" : {
-                                        "type" : "text",
-                                        "fields" : {
-                                          "keyword" : {
-                                            "type" : "keyword",
-                                            "ignore_above" : 256
-                                          }
-                                        }
-                                      },
-                                      "version" : {
-                                        "type" : "text",
-                                        "fields" : {
-                                          "keyword" : {
-                                            "type" : "keyword",
-                                            "ignore_above" : 256
-                                          }
-                                        }
-                                      }
-                                    }
-                                  }
-                                }
-                              },
-                              "affected_products_text" : {
-                                "type" : "text",
-                                "fields" : {
-                                  "keyword" : {
-                                    "type" : "keyword",
-                                    "ignore_above" : 256
-                                  }
-                                }
-                              },
-                              "affected_products_versions_text" : {
-                                "type" : "text",
-                                "fields" : {
-                                  "keyword" : {
-                                    "type" : "keyword",
-                                    "ignore_above" : 256
-                                  }
-                                }
+                          "id" : {
+                            "type" : "text",
+                            "fields" : {
+                              "keyword" : {
+                                "type" : "keyword",
+                                "ignore_above" : 256
+                              }
+                            }
+                          },
+                          "name" : {
+                            "type" : "text",
+                            "fields" : {
+                              "keyword" : {
+                                "type" : "keyword",
+                                "ignore_above" : 256
+                              }
+                            }
+                          },
+                          "uuid" : {
+                            "type" : "text",
+                            "fields" : {
+                              "keyword" : {
+                                "type" : "keyword",
+                                "ignore_above" : 256
                               }
                             }
                           }
                         }
                       },
-                      "taranis_version" : {
-                        "type" : "text",
-                        "fields" : {
-                          "keyword" : {
-                            "type" : "keyword",
-                            "ignore_above" : 256
-                          }
-                        }
-                      },
-                      "title" : {
-                        "type" : "text",
-                        "fields" : {
-                          "keyword" : {
-                            "type" : "keyword",
-                            "ignore_above" : 256
-                          }
-                        }
-                      },
-                      "version_history" : {
+                      "Orgc" : {
                         "properties" : {
-                          "version_instance" : {
+                          "id" : {
+                            "type" : "text",
+                            "fields" : {
+                              "keyword" : {
+                                "type" : "keyword",
+                                "ignore_above" : 256
+                              }
+                            }
+                          },
+                          "name" : {
+                            "type" : "text",
+                            "fields" : {
+                              "keyword" : {
+                                "type" : "keyword",
+                                "ignore_above" : 256
+                              }
+                            }
+                          },
+                          "uuid" : {
+                            "type" : "text",
+                            "fields" : {
+                              "keyword" : {
+                                "type" : "keyword",
+                                "ignore_above" : 256
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "RelatedEvent" : {
+                        "properties" : {
+                          "Event" : {
                             "properties" : {
-                              "version" : {
+                              "Org" : {
+                                "properties" : {
+                                  "id" : {
+                                    "type" : "text",
+                                    "fields" : {
+                                      "keyword" : {
+                                        "type" : "keyword",
+                                        "ignore_above" : 256
+                                      }
+                                    }
+                                  },
+                                  "name" : {
+                                    "type" : "text",
+                                    "fields" : {
+                                      "keyword" : {
+                                        "type" : "keyword",
+                                        "ignore_above" : 256
+                                      }
+                                    }
+                                  },
+                                  "uuid" : {
+                                    "type" : "text",
+                                    "fields" : {
+                                      "keyword" : {
+                                        "type" : "keyword",
+                                        "ignore_above" : 256
+                                      }
+                                    }
+                                  }
+                                }
+                              },
+                              "Orgc" : {
+                                "properties" : {
+                                  "id" : {
+                                    "type" : "text",
+                                    "fields" : {
+                                      "keyword" : {
+                                        "type" : "keyword",
+                                        "ignore_above" : 256
+                                      }
+                                    }
+                                  },
+                                  "name" : {
+                                    "type" : "text",
+                                    "fields" : {
+                                      "keyword" : {
+                                        "type" : "keyword",
+                                        "ignore_above" : 256
+                                      }
+                                    }
+                                  },
+                                  "uuid" : {
+                                    "type" : "text",
+                                    "fields" : {
+                                      "keyword" : {
+                                        "type" : "keyword",
+                                        "ignore_above" : 256
+                                      }
+                                    }
+                                  }
+                                }
+                              },
+                              "analysis" : {
                                 "type" : "text",
                                 "fields" : {
                                   "keyword" : {
@@ -520,18 +517,19 @@ curl -XPUT  'localhost:9200/cspdata/_mapping/vulnerability?pretty' -H 'Content-T
                                     "ignore_above" : 256
                                   }
                                 }
-                              }
-                            }
-                          }
-                        }
-                      },
-                      "vulnerability_effect" : {
-                        "type" : "object"
-                      },
-                      "vulnerability_identifiers" : {
-                        "properties" : {
-                          "cve" : {
-                            "properties" : {
+                              },
+                              "date" : {
+                                "type" : "date"
+                              },
+                              "distribution" : {
+                                "type" : "text",
+                                "fields" : {
+                                  "keyword" : {
+                                    "type" : "keyword",
+                                    "ignore_above" : 256
+                                  }
+                                }
+                              },
                               "id" : {
                                 "type" : "text",
                                 "fields" : {
@@ -540,18 +538,71 @@ curl -XPUT  'localhost:9200/cspdata/_mapping/vulnerability?pretty' -H 'Content-T
                                     "ignore_above" : 256
                                   }
                                 }
+                              },
+                              "info" : {
+                                "type" : "text",
+                                "fields" : {
+                                  "keyword" : {
+                                    "type" : "keyword",
+                                    "ignore_above" : 256
+                                  }
+                                }
+                              },
+                              "org_id" : {
+                                "type" : "text",
+                                "fields" : {
+                                  "keyword" : {
+                                    "type" : "keyword",
+                                    "ignore_above" : 256
+                                  }
+                                }
+                              },
+                              "orgc_id" : {
+                                "type" : "text",
+                                "fields" : {
+                                  "keyword" : {
+                                    "type" : "keyword",
+                                    "ignore_above" : 256
+                                  }
+                                }
+                              },
+                              "published" : {
+                                "type" : "boolean"
+                              },
+                              "threat_level_id" : {
+                                "type" : "text",
+                                "fields" : {
+                                  "keyword" : {
+                                    "type" : "keyword",
+                                    "ignore_above" : 256
+                                  }
+                                }
+                              },
+                              "timestamp" : {
+                                "type" : "text",
+                                "fields" : {
+                                  "keyword" : {
+                                    "type" : "keyword",
+                                    "ignore_above" : 256
+                                  }
+                                }
+                              },
+                              "uuid" : {
+                                "type" : "text",
+                                "fields" : {
+                                  "keyword" : {
+                                    "type" : "keyword",
+                                    "ignore_above" : 256
+                                  }
+                                }
                               }
                             }
                           }
                         }
-                      }
-                    }
-                  },
-                  "rating" : {
-                    "properties" : {
-                      "publisher_analysis" : {
+                      },
+                      "Tag" : {
                         "properties" : {
-                          "ques_dmg_codeexec" : {
+                          "colour" : {
                             "type" : "text",
                             "fields" : {
                               "keyword" : {
@@ -560,7 +611,13 @@ curl -XPUT  'localhost:9200/cspdata/_mapping/vulnerability?pretty' -H 'Content-T
                               }
                             }
                           },
-                          "ques_dmg_dos" : {
+                          "exportable" : {
+                            "type" : "boolean"
+                          },
+                          "hide_tag" : {
+                            "type" : "boolean"
+                          },
+                          "id" : {
                             "type" : "text",
                             "fields" : {
                               "keyword" : {
@@ -569,7 +626,7 @@ curl -XPUT  'localhost:9200/cspdata/_mapping/vulnerability?pretty' -H 'Content-T
                               }
                             }
                           },
-                          "ques_dmg_infoleak" : {
+                          "name" : {
                             "type" : "text",
                             "fields" : {
                               "keyword" : {
@@ -577,114 +634,129 @@ curl -XPUT  'localhost:9200/cspdata/_mapping/vulnerability?pretty' -H 'Content-T
                                 "ignore_above" : 256
                               }
                             }
-                          },
-                          "ques_dmg_privesc" : {
-                            "type" : "text",
-                            "fields" : {
-                              "keyword" : {
-                                "type" : "keyword",
-                                "ignore_above" : 256
-                              }
-                            }
-                          },
-                          "ques_dmg_remrights" : {
-                            "type" : "text",
-                            "fields" : {
-                              "keyword" : {
-                                "type" : "keyword",
-                                "ignore_above" : 256
-                              }
-                            }
-                          },
-                          "ques_pro_access" : {
-                            "type" : "text",
-                            "fields" : {
-                              "keyword" : {
-                                "type" : "keyword",
-                                "ignore_above" : 256
-                              }
-                            }
-                          },
-                          "ques_pro_complexity" : {
-                            "type" : "text",
-                            "fields" : {
-                              "keyword" : {
-                                "type" : "keyword",
-                                "ignore_above" : 256
-                              }
-                            }
-                          },
-                          "ques_pro_credent" : {
-                            "type" : "text",
-                            "fields" : {
-                              "keyword" : {
-                                "type" : "keyword",
-                                "ignore_above" : 256
-                              }
-                            }
-                          },
-                          "ques_pro_details" : {
-                            "type" : "text",
-                            "fields" : {
-                              "keyword" : {
-                                "type" : "keyword",
-                                "ignore_above" : 256
-                              }
-                            }
-                          },
-                          "ques_pro_expect" : {
-                            "type" : "text",
-                            "fields" : {
-                              "keyword" : {
-                                "type" : "keyword",
-                                "ignore_above" : 256
-                              }
-                            }
-                          },
-                          "ques_pro_exploit" : {
-                            "type" : "text",
-                            "fields" : {
-                              "keyword" : {
-                                "type" : "keyword",
-                                "ignore_above" : 256
-                              }
-                            }
-                          },
-                          "ques_pro_exploited" : {
-                            "type" : "text",
-                            "fields" : {
-                              "keyword" : {
-                                "type" : "keyword",
-                                "ignore_above" : 256
-                              }
-                            }
-                          },
-                          "ques_pro_solution" : {
-                            "type" : "text",
-                            "fields" : {
-                              "keyword" : {
-                                "type" : "keyword",
-                                "ignore_above" : 256
-                              }
-                            }
-                          },
-                          "ques_pro_standard" : {
-                            "type" : "text",
-                            "fields" : {
-                              "keyword" : {
-                                "type" : "keyword",
-                                "ignore_above" : 256
-                              }
-                            }
-                          },
-                          "ques_pro_userint" : {
-                            "type" : "text",
-                            "fields" : {
-                              "keyword" : {
-                                "type" : "keyword",
-                                "ignore_above" : 256
-                              }
-                            }
+                          }
+                        }
+                      },
+                      "analysis" : {
+                        "type" : "text",
+                        "fields" : {
+                          "keyword" : {
+                            "type" : "keyword",
+                            "ignore_above" : 256
+                          }
+                        }
+                      },
+                      "attribute_count" : {
+                        "type" : "text",
+                        "fields" : {
+                          "keyword" : {
+                            "type" : "keyword",
+                            "ignore_above" : 256
+                          }
+                        }
+                      },
+                      "date" : {
+                        "type" : "date"
+                      },
+                      "disable_correlation" : {
+                        "type" : "boolean"
+                      },
+                      "distribution" : {
+                        "type" : "text",
+                        "fields" : {
+                          "keyword" : {
+                            "type" : "keyword",
+                            "ignore_above" : 256
+                          }
+                        }
+                      },
+                      "id" : {
+                        "type" : "text",
+                        "fields" : {
+                          "keyword" : {
+                            "type" : "keyword",
+                            "ignore_above" : 256
+                          }
+                        }
+                      },
+                      "info" : {
+                        "type" : "text",
+                        "fields" : {
+                          "keyword" : {
+                            "type" : "keyword",
+                            "ignore_above" : 256
+                          }
+                        }
+                      },
+                      "locked" : {
+                        "type" : "boolean"
+                      },
+                      "org_id" : {
+                        "type" : "text",
+                        "fields" : {
+                          "keyword" : {
+                            "type" : "keyword",
+                            "ignore_above" : 256
+                          }
+                        }
+                      },
+                      "orgc_id" : {
+                        "type" : "text",
+                        "fields" : {
+                          "keyword" : {
+                            "type" : "keyword",
+                            "ignore_above" : 256
+                          }
+                        }
+                      },
+                      "proposal_email_lock" : {
+                        "type" : "boolean"
+                      },
+                      "publish_timestamp" : {
+                        "type" : "text",
+                        "fields" : {
+                          "keyword" : {
+                            "type" : "keyword",
+                            "ignore_above" : 256
+                          }
+                        }
+                      },
+                      "published" : {
+                        "type" : "boolean"
+                      },
+                      "sharing_group_id" : {
+                        "type" : "text",
+                        "fields" : {
+                          "keyword" : {
+                            "type" : "keyword",
+                            "ignore_above" : 256
+                          }
+                        }
+                      },
+                      "threat_level_id" : {
+                        "type" : "text",
+                        "fields" : {
+                          "keyword" : {
+                            "type" : "keyword",
+                            "ignore_above" : 256
+                          }
+                        }
+                      },
+                      "timestamp" : {
+                        "type" : "text",
+                        "fields" : {
+                          "keyword" : {
+                            "type" : "keyword",
+                            "ignore_above" : 256
+                          }
+                        }
+                      },
+                      "uuid" : {
+                        "type" : "text",
+                        "fields" : {
+                          "keyword" : {
+                            "type" : "keyword",
+                            "ignore_above" : 256
                           }
                         }
                       }

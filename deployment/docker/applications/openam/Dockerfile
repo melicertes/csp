@@ -2,6 +2,7 @@ FROM csp-tomcat8:1.0p1-deb
 
 MAINTAINER Majid Salehi Ghamsari <majid.salehi.ghamsari[AT]fokus[DOT]fraunhofer[DOT]de>
 MAINTAINER Orestis Akrivopoulos
+MAINTAINER Kusber, Tomasz <tomasz.kusber[AT]fokus[DOT]fraunhofer[DOT]de>
 
 
 RUN apt-get update && \
@@ -14,10 +15,11 @@ ENV CATALINA_HOME /usr/local/tomcat
 ENV PATH $CATALINA_HOME/bin:$PATH
 
 # download openam fraunhofer build 13 war
-#RUN curl "http://central.preprod.melicertes.eu/repo-loads/openam/openam.war" -o openam.war
-#RUN ls -la
-#RUN mv openam.war $CATALINA_HOME/webapps/openam.war
 ADD software/OpenAM-13.0.0.war $CATALINA_HOME/webapps/openam.war
+
+# add the custom authentication module to image
+ADD software/openam-auth-cert2-13.0.0.jar /tmp/openam-auth-cert2-13.0.0.jar
+ADD software/amAuthCert2.xml /tmp/amAuthCert2.xml
 
 # Deploy OpenAM v13.0.0 Config Tools
 RUN mkdir -p $TOOLS_HOME  
@@ -26,7 +28,6 @@ ADD software/SSOConfiguratorTools-13.0.0.zip $TOOLS_HOME/SSOConfiguratorTools-13
 
 # Deploy OpenAM v13.0.0 Config Tools
 RUN cd $TOOLS_HOME && \
-#    curl -O "http://central.preprod.melicertes.eu/repo-loads/openam/SSOConfiguratorTools-13.0.0.zip" && \
     unzip *.zip && \
     rm SSOConfiguratorTools-13.0.0.zip
 
@@ -34,7 +35,6 @@ ADD software/SSOAdminTools-13.0.0.zip $TOOLS_HOME/SSOAdminTools-13.0.0.zip
 
 # Deploy OpenAM admin Tools
 RUN cd $TOOLS_HOME && \
-#    curl -O "http://central.preprod.melicertes.eu/repo-loads/openam/SSOAdminTools-13.0.0.zip" && \
     unzip -o SSOAdminTools-13.0.0.zip && \
     rm SSOAdminTools-13.0.0.zip
     
@@ -55,10 +55,19 @@ ADD post.batch $TOOLS_HOME/post.batch
 ADD Cert.properties $TOOLS_HOME/Cert.properties
 ADD setenv.sh /usr/local/tomcat/bin/setenv.sh
 ADD proxy-ca-truststore.jks /usr/local/tomcat/conf/proxy-ca-truststore.jks
+ADD CSP-Cert.properties $TOOLS_HOME/CSP-Cert.properties
+ADD web-page/DataStore.xml $TOOLS_HOME/DataStore.xml
+ADD web-page/login-logo.png $TOOLS_HOME/login-logo.png
+ADD web-page/logo-horizontal.png $TOOLS_HOME/logo-horizontal.png
+ADD web-page/ThemeConfiguration.js $TOOLS_HOME/ThemeConfiguration.js
+ADD web-page/DataStore1.html $TOOLS_HOME/DataStore1.html
 
-RUN chmod +x /usr/local/tomcat/bin/setenv.sh
-RUN chmod +x $TOOLS_HOME/run-openam.sh
-RUN chmod +x $TOOLS_HOME/post-config-openam.sh
+#update section, if needed
+RUN mkdir /tmp/updates
+#ADD update.sh /tmp/updates/update.sh
+RUN chmod +x /usr/local/tomcat/bin/setenv.sh && \
+  chmod +x $TOOLS_HOME/run-openam.sh && \
+  chmod +x $TOOLS_HOME/post-config-openam.sh
 
 
 COPY create-agent.sh /usr/local/bin/

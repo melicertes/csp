@@ -1,5 +1,5 @@
 #!/bin/bash
-VER="3.8.0-SNAPSHOT"
+VER="4.0.0-SNAPSHOT"
 echo "Version is $VER"
 TARGET=installable
 SERVER=../../../csp-apps/configuration/conf-server/target/conf-server-$VER-exec.jar

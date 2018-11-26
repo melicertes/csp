@@ -101,6 +101,9 @@ public class AnonServiceImpl implements AnonService,Conversions {
         if(mappingDTO.getDataType()!=null) {
             mapping.setDataType(mappingDTO.getDataType());
         }
+        if(mappingDTO.getApplicationId()!=null) {
+            mapping.setApplicationId(mappingDTO.getApplicationId());
+        }
 
         Mapping saved = mappingRepository.save(mapping);
         return convertMappingToDTO.apply(saved);
@@ -123,6 +126,9 @@ public class AnonServiceImpl implements AnonService,Conversions {
         }
         if(saveMappingDTO.getDataType()!=null) {
             mapping.setDataType(saveMappingDTO.getDataType());
+        }
+        if(saveMappingDTO.getApplicationId()!=null) {
+            mapping.setApplicationId(saveMappingDTO.getApplicationId());
         }
 
         Mapping saved = mappingRepository.save(mapping);

@@ -1,0 +1,55 @@
+{
+	"threat_level_id": "1",
+	"info": "CVE 02 vulnerability",
+	"attribute_count": "7",
+	"Tag": [{
+		"name": "vulnerability"
+	}],
+	"distribution": "1",
+	"Object": [{
+		"name": "csp-vulnerability",
+		"meta-category": "network",
+		"Attribute": [{
+			"type": "vulnerability",
+			"category": "External analysis",
+			"object_relation": "id",
+			"value": "CVE-2018-6411"
+		},
+		{
+			"type": "text",
+			"category": "Other",
+			"object_relation": "text",
+			"value": "An issue was discovered"
+		},
+		{
+			"type": "text",
+			"category": "Other",
+			"object_relation": "summary",
+			"value": "An issue was Form"
+		},
+		{
+			"type": "text",
+			"category": "Other",
+			"object_relation": "state",
+			"value": "Published"
+		},
+		{
+			"type": "text",
+			"category": "Other",
+			"object_relation": "csp-originCspId",
+			"value": "Vulnerable  object Csp-originCspId"
+		},
+		{
+			"type": "text",
+			"category": "Other",
+			"object_relation": "csp-originRecordId",
+			"value": "Vulnerable  object Csp-originRecordId"
+		},
+		{
+			"type": "text",
+			"category": "Other",
+			"object_relation": "csp-url",
+			"value": "Vulnerable  object Csp-url"
+		}]
+	}]
+}

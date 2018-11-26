@@ -1,0 +1,35 @@
+{% load form_utils %}
+
+<h3>{{ title_single }}
+    {% if form.DELETE %}
+        <div class="hidden">{{ form.DELETE }}</div>
+        <button class="btn btn-warning pull-right delete_object_btn" type="button" data-formset-delete-button="{{ formset.prefix }}">
+            <i class="fa fa-trash"></i> Delete
+        </button>
+    {% endif %}
+</h3>
+
+{% for field in form.hidden_fields %}
+    {{ field }}
+{% endfor %}
+
+<div class="row">
+    <div class="col-md-6">
+        {% form_field form.full_name %}
+        {% form_field form.postal_address %}
+        {% form_field form.postal_country %}
+        {% form_field form.team_role %}
+        {% form_field form.host_rep %}
+        {% form_field form.constituency_rep %}
+    </div>
+    <div class="col-md-6">
+        {% form_field form.email %}
+        {% form_field form.email_visibility %}
+        {% form_field form.ml_email %}
+        {% form_field form.ml_key %}
+    </div>
+</div>
+
+{% include "contacts/includes/formset.html" with formset=form.team_member_phone_number_formset title_single="Team Member's Phone" title_all="Team Member's Phones" %}
+{% include "contacts/includes/formset.html" with formset=form.team_member_certificate_formset title_single="Team Member's Key Or Certificate" title_all="Team Member's Key Or Certificates" %}
+{% include "contacts/includes/formset.html" with formset=form.team_member_membership_formset title_single="Team Member's Membership" title_all="Team Member's Memberships" %}

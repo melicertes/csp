@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %} | All Trust Circles{% endblock %}
+
+{% block page-header %}
+    <i class="fa fa-globe"></i> Central Trust Circles
+    {% if perms.ctc.web_write %}
+    <a href="{% url 'circle_new' %}" type="button" class="btn btn-success pull-right">
+        <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add Central Trust Circle
+    </a>
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-12">
+            {% include 'central/ctc/table.html' %}
+        </div>
+    </div>
+{% endblock %}

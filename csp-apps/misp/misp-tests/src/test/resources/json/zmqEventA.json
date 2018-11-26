@@ -1,0 +1,420 @@
+{
+  "Event": {
+    "id": "14",
+    "orgc_id": "1",
+    "org_id": "1",
+    "date": "2018-06-06",
+    "threat_level_id": "1",
+    "info": "SharingPolicyTestA",
+    "published": false,
+    "uuid": "5b179289-c8ac-4425-8d8e-0224c0a80211",
+    "attribute_count": "11",
+    "analysis": "0",
+    "timestamp": "1528703914",
+    "distribution": "4",
+    "proposal_email_lock": false,
+    "locked": false,
+    "publish_timestamp": "0",
+    "sharing_group_id": "1",
+    "disable_correlation": false,
+    "extends_uuid": "",
+    "event_creator_email": "admin@admin.test",
+    "Org": {
+      "id": "1",
+      "name": "ORGNAME",
+      "uuid": "5b0b2cb8-74f4-416e-9fb2-45599eab18f9"
+    },
+    "Orgc": {
+      "id": "1",
+      "name": "ORGNAME",
+      "uuid": "5b0b2cb8-74f4-416e-9fb2-45599eab18f9"
+    },
+    "SharingGroup": {
+      "id": "1",
+      "name": "Sharing Group Test",
+      "releasability": "",
+      "description": "Sharing Group Description",
+      "uuid": "5b179bc1-def0-46f0-956d-071ac0a80211",
+      "organisation_uuid": "5b0b2cb8-74f4-416e-9fb2-45599eab18f9",
+      "org_id": "1",
+      "sync_user_id": "0",
+      "active": true,
+      "created": "2018-06-06 08:30:57",
+      "modified": "2018-06-06 08:30:57",
+      "local": true,
+      "roaming": false,
+      "Organisation": {
+        "id": "1",
+        "name": "ORGNAME",
+        "uuid": "5b0b2cb8-74f4-416e-9fb2-45599eab18f9"
+      },
+      "SharingGroupOrg": [
+        {
+          "id": "1",
+          "sharing_group_id": "1",
+          "org_id": "1",
+          "extend": true,
+          "Organisation": {
+            "id": "1",
+            "name": "ORGNAME",
+            "uuid": "5b0b2cb8-74f4-416e-9fb2-45599eab18f9"
+          }
+        }
+      ],
+      "SharingGroupServer": [
+        {
+          "id": "1",
+          "sharing_group_id": "1",
+          "server_id": "0",
+          "all_orgs": false,
+          "Server": {
+            "id": "0",
+            "url": "",
+            "name": ""
+          }
+        }
+      ]
+    },
+    "Attribute": [
+      {
+        "id": "1",
+        "type": "target-user",
+        "category": "Targeting data",
+        "to_ids": false,
+        "uuid": "5b179314-24c8-41b7-aa5b-0223c0a80211",
+        "event_id": "14",
+        "distribution": "4",
+        "timestamp": "1528271636",
+        "comment": "Lorem ipsum contextual",
+        "sharing_group_id": "0",
+        "deleted": false,
+        "disable_correlation": false,
+        "object_id": "0",
+        "object_relation": null,
+        "value": "Lorem ipsum value",
+        "Galaxy": [],
+        "ShadowAttribute": []
+      },
+      {
+        "id": "10",
+        "type": "attachment",
+        "category": "Payload delivery",
+        "to_ids": false,
+        "uuid": "5b18c9de-e7fc-4fda-8080-03e8c0a80211",
+        "event_id": "14",
+        "distribution": "5",
+        "timestamp": "1528351198",
+        "comment": "Lorem ipsum contextual",
+        "sharing_group_id": "0",
+        "deleted": false,
+        "disable_correlation": false,
+        "object_id": "0",
+        "object_relation": null,
+        "value": "dummyText.txt",
+        "Galaxy": [],
+        "ShadowAttribute": []
+      },
+      {
+        "id": "11",
+        "type": "first-name",
+        "category": "Person",
+        "to_ids": true,
+        "uuid": "5b1e2baa-a2ec-4e7f-9994-051ec0a80210",
+        "event_id": "14",
+        "distribution": "3",
+        "timestamp": "1528703914",
+        "comment": "Lorem ipsum contextual",
+        "sharing_group_id": "0",
+        "deleted": false,
+        "disable_correlation": false,
+        "object_id": "0",
+        "object_relation": null,
+        "value": "Joshua",
+        "Galaxy": [],
+        "ShadowAttribute": []
+      }
+    ],
+    "ShadowAttribute": [],
+    "RelatedEvent": [],
+    "Galaxy": [
+      {
+        "id": "2",
+        "uuid": "90ccdf38-1649-11e8-b8bf-e7326d553087",
+        "name": "Botnet",
+        "type": "botnet",
+        "description": "Botnet galaxy.",
+        "version": "2",
+        "icon": "sitemap",
+        "namespace": "misp",
+        "GalaxyCluster": [
+          {
+            "id": "36",
+            "uuid": "a91732f4-164a-11e8-924a-ffd4097eb03f",
+            "type": "botnet",
+            "value": "ADB.miner",
+            "tag_name": "misp-galaxy:botnet=\"ADB.miner\"",
+            "description": "A new botnet appeared over the weekend, and it's targeting Android devices by scanning for open debug ports so it can infect victims with malware that mines the Monero cryptocurrency.\n\nThe botnet came to life on Saturday, February 3, and is targeting port 5555, which on devices running the Android OS is the port used by the operating system's native Android Debug Bridge (ADB), a debugging interface that grants access to some of the operating system's most sensitive features.\n\nOnly devices running the Android OS have been infected until now, such as smartphones, smart TVs, and TV top boxes, according to security researchers from Qihoo 360's Network Security Research Lab [Netlab] division, the ones who discovered the botnet, which the named ADB.miner.",
+            "galaxy_id": "2",
+            "source": "MISP Project",
+            "authors": [
+              "Various"
+            ],
+            "version": "5",
+            "tag_id": "1",
+            "meta": {
+              "refs": [
+                "https:\/\/www.bleepingcomputer.com\/news\/security\/android-devices-targeted-by-new-monero-mining-botnet\/"
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "Object": [
+      {
+        "id": "1",
+        "name": "annotation",
+        "meta-category": "misc",
+        "description": "An annotation object allowing analysts to add annotations, comments, executive summary to a MISP event, objects or attributes.",
+        "template_uuid": "5d8dc046-15a1-4ca3-a09f-ed4ede7c4487",
+        "template_version": "2",
+        "event_id": "14",
+        "uuid": "5b1798b8-b694-4a2b-b50e-0224c0a80211",
+        "timestamp": "1528273080",
+        "distribution": "5",
+        "sharing_group_id": "0",
+        "comment": "annotation object comment",
+        "deleted": false,
+        "ObjectReference": [],
+        "Attribute": [
+          {
+            "id": "2",
+            "type": "text",
+            "category": "Internal reference",
+            "to_ids": false,
+            "uuid": "5b1798b8-8e34-4ecd-a998-0224c0a80211",
+            "event_id": "14",
+            "distribution": "5",
+            "timestamp": "1528273080",
+            "comment": "comment 1",
+            "sharing_group_id": "0",
+            "deleted": false,
+            "disable_correlation": false,
+            "object_id": "1",
+            "object_relation": "text",
+            "value": "internal ref value",
+            "Galaxy": [],
+            "ShadowAttribute": []
+          },
+          {
+            "id": "3",
+            "type": "text",
+            "category": "Other",
+            "to_ids": false,
+            "uuid": "5b1798b8-8fd4-4f3a-8a50-0224c0a80211",
+            "event_id": "14",
+            "distribution": "2",
+            "timestamp": "1528273080",
+            "comment": "comment 4",
+            "sharing_group_id": "0",
+            "deleted": false,
+            "disable_correlation": true,
+            "object_id": "1",
+            "object_relation": "type",
+            "value": "Annotation",
+            "Galaxy": [],
+            "ShadowAttribute": []
+          },
+          {
+            "id": "4",
+            "type": "text",
+            "category": "Other",
+            "to_ids": false,
+            "uuid": "5b1798b8-e424-4a90-a3ad-0224c0a80211",
+            "event_id": "14",
+            "distribution": "3",
+            "timestamp": "1528273080",
+            "comment": "comment 5",
+            "sharing_group_id": "0",
+            "deleted": false,
+            "disable_correlation": true,
+            "object_id": "1",
+            "object_relation": "format",
+            "value": "text",
+            "Galaxy": [],
+            "ShadowAttribute": []
+          },
+          {
+            "id": "5",
+            "type": "datetime",
+            "category": "Other",
+            "to_ids": true,
+            "uuid": "5b1798b8-b454-4244-9a01-0224c0a80211",
+            "event_id": "14",
+            "distribution": "5",
+            "timestamp": "1528273080",
+            "comment": "comment 6",
+            "sharing_group_id": "0",
+            "deleted": false,
+            "disable_correlation": false,
+            "object_id": "1",
+            "object_relation": "creation-date",
+            "value": "201806051800",
+            "Galaxy": [],
+            "ShadowAttribute": []
+          },
+          {
+            "id": "6",
+            "type": "datetime",
+            "category": "Other",
+            "to_ids": false,
+            "uuid": "5b1798b8-79f8-4b26-849c-0224c0a80211",
+            "event_id": "14",
+            "distribution": "5",
+            "timestamp": "1528273080",
+            "comment": "comment 7",
+            "sharing_group_id": "0",
+            "deleted": false,
+            "disable_correlation": false,
+            "object_id": "1",
+            "object_relation": "modification-date",
+            "value": "201806051800",
+            "Galaxy": [],
+            "ShadowAttribute": []
+          }
+        ]
+      },
+      {
+        "id": "2",
+        "name": "target-system",
+        "meta-category": "internal",
+        "description": "Description about an targeted system, this could potentially be a compromissed internal system",
+        "template_uuid": "3110944f-eca0-4c94-9d61-a84d022228a4",
+        "template_version": "1",
+        "event_id": "14",
+        "uuid": "5b18c986-f060-4408-9585-03e7c0a80211",
+        "timestamp": "1528351110",
+        "distribution": "5",
+        "sharing_group_id": "0",
+        "comment": "",
+        "deleted": false,
+        "ObjectReference": [],
+        "Attribute": [
+          {
+            "id": "7",
+            "type": "target-machine",
+            "category": "Targeting data",
+            "to_ids": false,
+            "uuid": "5b18c986-0f7c-4345-91bc-03e7c0a80211",
+            "event_id": "14",
+            "distribution": "0",
+            "timestamp": "1528351110",
+            "comment": "com a",
+            "sharing_group_id": "0",
+            "deleted": false,
+            "disable_correlation": true,
+            "object_id": "2",
+            "object_relation": "targeted_machine",
+            "value": "vala",
+            "Galaxy": [],
+            "ShadowAttribute": []
+          },
+          {
+            "id": "8",
+            "type": "ip-src",
+            "category": "Network activity",
+            "to_ids": true,
+            "uuid": "5b18c986-a724-48b7-bf8c-03e7c0a80211",
+            "event_id": "14",
+            "distribution": "3",
+            "timestamp": "1528351110",
+            "comment": "com b",
+            "sharing_group_id": "0",
+            "deleted": false,
+            "disable_correlation": true,
+            "object_id": "2",
+            "object_relation": "targeted_ip_of_system",
+            "value": "103.19.151.186",
+            "Galaxy": [],
+            "ShadowAttribute": []
+          },
+          {
+            "id": "9",
+            "type": "datetime",
+            "category": "Other",
+            "to_ids": false,
+            "uuid": "5b18c986-5d1c-47d2-a75f-03e7c0a80211",
+            "event_id": "14",
+            "distribution": "4",
+            "timestamp": "1528351110",
+            "comment": "com c",
+            "sharing_group_id": "1",
+            "deleted": false,
+            "disable_correlation": true,
+            "object_id": "2",
+            "object_relation": "timestamp_seen",
+            "value": "201806061800",
+            "SharingGroup": {
+              "id": "1",
+              "name": "Sharing Group Test",
+              "releasability": "",
+              "description": "Sharing Group Description",
+              "uuid": "5b179bc1-def0-46f0-956d-071ac0a80211",
+              "organisation_uuid": "5b0b2cb8-74f4-416e-9fb2-45599eab18f9",
+              "org_id": "1",
+              "sync_user_id": "0",
+              "active": true,
+              "created": "2018-06-06 08:30:57",
+              "modified": "2018-06-06 08:30:57",
+              "local": true,
+              "roaming": false,
+              "Organisation": {
+                "id": "1",
+                "name": "ORGNAME",
+                "uuid": "5b0b2cb8-74f4-416e-9fb2-45599eab18f9"
+              },
+              "SharingGroupOrg": [
+                {
+                  "id": "1",
+                  "sharing_group_id": "1",
+                  "org_id": "1",
+                  "extend": true,
+                  "Organisation": {
+                    "id": "1",
+                    "name": "ORGNAME",
+                    "uuid": "5b0b2cb8-74f4-416e-9fb2-45599eab18f9"
+                  }
+                }
+              ],
+              "SharingGroupServer": [
+                {
+                  "id": "1",
+                  "sharing_group_id": "1",
+                  "server_id": "0",
+                  "all_orgs": false,
+                  "Server": {
+                    "id": "0",
+                    "url": "",
+                    "name": ""
+                  }
+                }
+              ]
+            },
+            "Galaxy": [],
+            "ShadowAttribute": []
+          }
+        ]
+      }
+    ],
+    "Tag": [
+      {
+        "id": "1",
+        "name": "misp-galaxy:botnet=\"ADB.miner\"",
+        "colour": "#0088cc",
+        "exportable": true,
+        "user_id": false,
+        "hide_tag": false
+      }
+    ]
+  }
+}

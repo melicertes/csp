@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% load form_utils %}
+
+{% block title %} | Team '{{ team.name }}'{% endblock %}
+
+{% block page-header %}
+    <i class="fa fa-group "></i> Team '{{ team.short_name }}'
+    <div class="pull-right">
+        <a href="{% url 'teamcontact_new' %}" type="button" class="btn btn-success">
+            <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+        </a>
+        <form action="{% url 'teamcontact_delete' %}" id="delete-contact" method="post" class="delete-form">{% csrf_token %}
+            <input type="hidden" name="id" value="{{ team.id }}">
+
+            <button name="delete-it" type="button"
+                class="btn btn-danger confirm" type="submit" data-placement="bottom">
+                <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+            </button>
+        </form>
+        <a href="{% url 'teamcontact_edit' id=team.id %}" type="button" class="btn btn-warning">
+            <span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit Team
+        </a>
+
+        <a href="{% url 'teamcontact_share' id=team.id %}" type="button" class="btn btn-success">
+            <span class="glyphicon glyphicon-share" aria-hidden="true"></span> Share Team
+        </a>
+    </div>
+{% endblock %}
+
+{% block content %}
+    {% include "contacts/includes/team_details.html" %}
+{% endblock %}
+
+{% block javascriptcontent %}
+    <script>
+        $('.confirm').confirmation({
+            onConfirm: function (event) {
+                $("#delete-contact").submit();
+            }
+        });
+    </script>
+{% endblock %}

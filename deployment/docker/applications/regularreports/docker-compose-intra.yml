@@ -11,7 +11,7 @@ services:
     command: java -Xmx512m -Dspring.profiles.active=docker -Dspring.mail.properties.mail.smtp.auth=false -Dspring.mail.properties.mail.smtp.starttls.enable=false -jar server.jar
     working_dir: /opt/csp
     volumes:
-        - ./regrep-app-3.8.0-SNAPSHOT-exec.jar:/opt/csp/server.jar
+        - ./regrep-app-4.0.0-SNAPSHOT-exec.jar:/opt/csp/server.jar
         - /opt/csp/logs/:/opt/csplogs
         - RegRepDatavolume:/opt/regrep/data
         - SSLDatavolume:/opt/ssl/

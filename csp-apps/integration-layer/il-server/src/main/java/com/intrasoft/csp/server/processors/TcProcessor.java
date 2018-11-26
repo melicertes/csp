@@ -53,6 +53,9 @@ public class TcProcessor implements Processor,CamelRoutes{
     @Value("${tc.path.localcircle}")
     String tcPathLocalCircle;
 
+    @Value("${server.camel.rest.service.is.async:true}")
+    Boolean camelRestServiceIsAsync;
+
     @Autowired
     ObjectMapper objectMapper;
 
@@ -388,6 +391,7 @@ public class TcProcessor implements Processor,CamelRoutes{
                 integrationAnonData.setCspId(team.getCspId());
                 integrationAnonData.setDataType(integrationData.getDataType());
                 integrationAnonData.setDataObject(integrationData.getDataObject());
+                integrationAnonData.setApplicationId(integrationData.getDataParams().getApplicationId());
                 IntegrationAnonData anonData = null;
                 try {
                     anonData = anonClient.postAnonData(integrationAnonData);
@@ -408,7 +412,11 @@ public class TcProcessor implements Processor,CamelRoutes{
         Map<String, Object> headers = new HashMap<>();
 
         headers.put(Exchange.HTTP_METHOD, httpMethod);
-        producer.sendBodyAndHeaders(routes.apply(ECSP), ExchangePattern.InOut, enhancedTeamDTO, headers);//TODO: investigate SXCSP-430 - do we need inOut here?
+        if (!camelRestServiceIsAsync) {
+            producer.sendBodyAndHeaders(routes.apply(ECSP), ExchangePattern.InOnly, enhancedTeamDTO, headers);//TODO: investigate SXCSP-430 - do we need inOut here?
+        } else {
+            camelRestService.asyncSendInOnly(routes.apply(ECSP), enhancedTeamDTO, headers);
+        }
     }
 
     // flow2
@@ -440,7 +448,11 @@ public class TcProcessor implements Processor,CamelRoutes{
                 //exchange.getIn().setHeader("recipients", routes.apply(DSL));//replace with producer
                 Map<String, Object> headers = new HashMap<>();
                 headers.put(Exchange.HTTP_METHOD, httpMethod);
-                producer.sendBodyAndHeaders(routes.apply(DSL), ExchangePattern.InOut, integrationData, headers);
+                if (!camelRestServiceIsAsync) {
+                    producer.sendBodyAndHeaders(routes.apply(DSL), ExchangePattern.InOnly, integrationData, headers);
+                } else {
+                    camelRestService.asyncSendInOnly(routes.apply(DSL), integrationData, headers);
+                }
             }
         }
     }

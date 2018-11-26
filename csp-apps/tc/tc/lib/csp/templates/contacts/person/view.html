@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% load form_utils %}
+
+{% block title %} | Person '{{ person.full_name|default:person.email }}'{% endblock %}
+
+{% block page-header %}
+    <i class="fa fa-user "></i> Person '{{ person.full_name|default:person.email }}'
+    <div class="pull-right">
+        <a href="{% url 'personcontact_new' %}" type="button" class="btn btn-success">
+            <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+        </a>
+        <form action="{% url 'personcontact_delete' %}" id="delete-contact" method="post" class="delete-form">{% csrf_token %}
+            <input type="hidden" name="id" value="{{ person.id }}">
+            <button name="delete-it" type="button"
+                class="btn btn-danger confirm" type="submit" data-placement="bottom">
+                <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+            </button>
+        </form>
+        <a href="{% url 'personcontact_edit' id=person.id %}" type="button" class="btn btn-warning">
+            <span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit Person
+        </a>
+    </div>
+{% endblock %}
+
+{% block content %}
+<h2>Personal Details</h2>
+<div class="row">
+    <div class="col-md-6">
+        {% field_value person 'full_name' %}
+        {% field_value person 'email' %}
+        {% field_value person 'email_visibility' %}
+    </div>
+    <div class="col-md-6">
+        {% field_value person 'postal_address' %}
+        {% field_value person 'postal_country' %}
+    </div>
+</div>
+
+<h2>Mailing List</h2>
+<div class="row">
+    <div class="col-md-6">
+        {% field_value person 'ml_email' %}
+    </div>
+    <div class="col-md-6">
+        {% field_value person 'ml_key' %}
+    </div>
+</div>
+
+{% related_fields person 'phone_numbers' %}
+{% related_fields person 'certificates' %}
+{% related_fields person 'memberships' %}
+{% endblock %}
+
+{% block javascriptcontent %}
+<script>
+    $('.confirm').confirmation({
+        onConfirm: function (event) {
+            $("#delete-contact").submit();
+        }
+    });
+</script>
+{% endblock %}

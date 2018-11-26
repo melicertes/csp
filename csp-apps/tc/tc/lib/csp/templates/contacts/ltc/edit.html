@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% load staticfiles form_utils %}
+
+{% block title %} | {% if ltc.id %} '{{ ltc.short_name }}'{% else %}Add New LTC{% endif %}{% endblock %}
+
+{% block page-header %}
+    <i class="fa fa-user "></i>
+    {% if ltc.id %}
+    Edit '{{ ltc.short_name }}'
+    {% else %}
+    Add New LTC
+    {% endif %}
+    <div class="pull-right">
+        {% if ltc.id %}
+        <a href="{% url 'ltc_view' ltc.id %}" class="save btn btn-default">Cancel</a>
+        {% else %}
+        <a href="{% url 'ltc_list' %}" class="save btn btn-default">Cancel</a>
+        {% endif %}
+        <button type="submit" class="save btn btn-success" onclick="document.forms[1].submit()">Save</button>
+    </div>
+{% endblock %}
+
+{% block content %}
+<form method="POST" class="contact-form" id="contact-form">{% csrf_token %}
+    {{ form.non_field_errors }}
+
+    {% for field in form.hidden_fields %}
+        {{ field }}
+    {% endfor %}
+
+    <h2><i class="fa changeme"></i> Local Trust Circle</h2>
+    <div class="row">
+        <div class="col-md-6">{% form_field form.short_name %}</div>
+        <div class="col-md-6">{% form_field form.name %}</div>
+        <div class="col-md-6">{% form_field form.description %}</div>
+        <div class="col-md-6">{% form_field form.info_url %}</div>
+        <div class="col-md-6">{% form_field form.membership_url %}</div>
+    </div>
+
+    <h2>Members</h2>
+    <div class="row">
+        <div class="col-md-6">{% form_field form.trustcircles %}</div>
+        <div class="col-md-6">{% form_field form.teams %}</div>
+        <div class="col-md-6">{% form_field form.team_contacts %}</div>
+        <div class="col-md-6">{% form_field form.person_contacts %}</div>
+    </div>
+</form>
+{% endblock %}

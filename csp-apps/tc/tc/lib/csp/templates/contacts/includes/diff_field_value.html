@@ -1,0 +1,4 @@
+<div class="form-group">
+    <label{% if has_changed %} class="text-success"{% endif %}><a class="applydiff" difftarget="{{auto_id}}" diffvalue="{{value|escape}}" fieldtype="{{fieldtype}}" fieldname="{{name}}"><span class="glyphicon glyphicon-arrow-left{% if has_changed %} text-success {% endif %}"></span></a> {{ label }}</label> {{ value }}
+    
+</div>

@@ -1,13 +1,12 @@
 package com.intrasoft.csp.regrep.esclient.test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.intrasoft.csp.libraries.restclient.service.RetryRestTemplate;
 import com.intrasoft.csp.regrep.CspDataMappingType;
 import com.intrasoft.csp.regrep.DateMath;
 import com.intrasoft.csp.regrep.ElasticSearchClient;
 import com.intrasoft.csp.regrep.LogstashMappingType;
-import com.intrasoft.csp.regrep.commons.model.DailyExceptionsResponse;
 import com.intrasoft.csp.regrep.commons.model.HitsItem;
-import com.intrasoft.csp.regrep.commons.model.Source;
 import com.intrasoft.csp.regrep.config.ElasticSearchClientConfig;
 import com.intrasoft.csp.regrep.service.RequestBodyService;
 import com.intrasoft.csp.regrep.service.impl.RequestBodyServiceImpl;
@@ -22,7 +21,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.test.web.client.response.MockRestResponseCreators;
-import org.springframework.web.client.RestTemplate;
 
 import java.io.File;
 import java.io.IOException;
@@ -44,7 +42,7 @@ public class RegularReportsEsClientTest {
     URL dailyExcLogsResponse = getClass().getClassLoader().getResource("json.es/exc-response.json");
 
     @Autowired
-    RestTemplate restTemplate;
+    RetryRestTemplate restTemplate;
 
     @Autowired
     ElasticSearchClient elasticSearchClient;
@@ -70,8 +68,8 @@ public class RegularReportsEsClientTest {
     @Test
     public void getNlogsByTypeTest() {
         String apiUrl = "http://docker.containers:9200/logstash*/_count";
-        String requestBody = new String();
-        requestBody = requestBodyService.buildRequestBody(DateMath.ONE_YEAR, DateMath.NOW, LogstashMappingType.EXCEPTION);
+        String requestBody;
+        requestBody = requestBodyService.buildRequestBody(new String(), new String(), LogstashMappingType.EXCEPTION);
         LOG.info(requestBody);
         int count = elasticSearchClient.getNlogs(requestBody);
     }
@@ -79,8 +77,8 @@ public class RegularReportsEsClientTest {
     @Test
     public void getNdocsByTypeTest() {
         String apiUrl = "http://docker.containers:9200/cspdata/_count";
-        String requestBody = new String();
-        requestBody = requestBodyService.buildRequestBody(DateMath.ONE_YEAR, DateMath.NOW, CspDataMappingType.ALL);
+        String requestBody;
+        requestBody = requestBodyService.buildRequestBody(new String(), new String(), CspDataMappingType.ALL);
         LOG.info(requestBody);
         int count = elasticSearchClient.getNdocs(requestBody);
     }

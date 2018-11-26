@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block title %} | Circle '{{ circle.name }}'{% endblock %}
+
+{% block page-header %}
+    <i class="fa fa-globe"></i>
+    Trust Circle '{{ circle.name }}'
+    {% if perms.ctc.web_write %}
+    <div class="pull-right">
+        <a class="btn btn-default" type="button"
+            href="{% url 'circle_history' circle.id %}">
+            History <span class="badge">{{ changes }}</span>
+        </a>
+        <a href="{% url 'circle_new' %}" type="button" class="btn btn-success">
+            <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+        </a>
+        <form action="{% url 'circle_delete' %}" id="delete-circle" method="post" class="delete-form">{% csrf_token %}
+            <input type="hidden" name="id" value="{{ circle.id }}">
+            <button
+                type="button"
+                class="btn btn-danger confirm"
+                type="submit" data-placement="bottom">
+                <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+            </button>
+        </form>
+        <a href="{% url 'circle_edit' circle.id %}" type="button" class="btn btn-warning">
+            <span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit Circle
+        </a>
+    </div>
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label>Short CTC Name:</label>
+                {{ circle.short_name }}
+            </div>
+
+            <div class="form-group">
+                <label>CTC Name:</label>
+                {{ circle.name }}
+            </div>
+
+            <div class="form-group">
+                <label>Authoritative Source: </label>
+                {{ circle.auth_source }}
+            </div>
+
+            <div class="form-group">
+                <label>TLP: </label>
+                {{ circle.get_tlp_display|default:"-" }}
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="form-group">
+                <label>Description:</label>
+                {{ circle.description }}
+            </div>
+
+            <div class="form-group">
+                <label>URL for Membership Directory:</label>
+                <a href="{{ circle.membership_url }}" target="_blank"
+                    style="word-wrap:break-word">{{ circle.membership_url }}</a>
+            </div>
+
+            <div class="form-group">
+                <label>URL for Public Information:</label>
+                <a href="{{ circle.info_url }}" target="_blank"
+                    style="word-wrap:break-word">{{ circle.info_url }}</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <h2>
+                <i class="fa fa-user-circle "></i> Central Teams
+                {% if perms.ctc.web_write %}
+                <a href="{% url 'circle_edit' circle.id %}" type="button"
+                    class="btn btn-warning pull-right">
+                    <span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Manage Teams in Trust
+                    Circle
+                </a>
+                {% endif %}
+            </h2>
+        </div>
+    </div>
+    {% include 'central/team/table.html' %}
+{% endblock %}
+
+{% block javascriptcontent %}
+    <script type="text/javascript">
+        $('.confirm').confirmation({
+            onConfirm: function (event) {
+                $("#delete-circle").submit();
+            }
+        });
+    </script>
+{% endblock %}

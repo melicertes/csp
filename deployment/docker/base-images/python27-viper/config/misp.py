@@ -617,7 +617,7 @@ class MISP(Module):
 
         if not self.offline_mode:
             try:
-                self.misp = PyMISP(self.url, self.key, ssl=verify, proxies=cfg.misp.proxies, cert=('/opt/ssl/server/csp-internal.crt','/opt/ssl/server/csp-internal.key'))
+                self.misp = PyMISP(self.url, self.key, ssl=False, proxies=cfg.misp.proxies, cert=('/opt/ssl/server/csp-internal.crt','/opt/ssl/server/csp-internal.key'))
             except PyMISPError as e:
                 self.log('error', e.message)
                 return

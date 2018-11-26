@@ -14,6 +14,7 @@ import com.intrasoft.csp.misp.client.MispAppClient;
 import com.intrasoft.csp.misp.commons.config.MispContextUrl;
 import com.intrasoft.csp.misp.domain.model.Origin;
 import com.intrasoft.csp.misp.domain.service.impl.OriginServiceImpl;
+import com.intrasoft.csp.misp.service.DistributionPolicyRectifier;
 import com.intrasoft.csp.misp.service.EmitterDataHandler;
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.JsonPath;
@@ -79,6 +80,9 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
     @Qualifier("MispAppClient")
     MispAppClient mispAppClient;
 
+    @Autowired
+    DistributionPolicyRectifier distributionPolicyRectifier;
+
     @Value("${elastic.protocol}")
     String elasticProtocol;
     @Value("${elastic.host}")
@@ -129,6 +133,7 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
                 if (!isDelete){
                     object = mispAppClient.getMispEvent(uuid).getBody();
                     jsonNode = new ObjectMapper().convertValue(object, JsonNode.class);
+                    distributionPolicyRectifier.rectifyEvent(jsonNode);
 //                    jsonNode = updateTimestamp(new ObjectMapper().convertValue(object, JsonNode.class));
                 }
 
@@ -216,13 +221,16 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
 
         /**
          * issue: SXCSP-333
-         * define a classification to differentiate between threat/event
+         * define a classification to differentiate between threat/event/vulnerability
          */
         IntegrationDataType integrationDataType = IntegrationDataType.EVENT;
         if (jsonNode.get(EVENT.toString()).has("Tag")){
             for (JsonNode jn : jsonNode.get(EVENT.toString()).get("Tag")){
                 if (jn.get("name").textValue().equals("threat")){
                     integrationDataType = IntegrationDataType.THREAT;
+                }
+                else if (jn.get("name").textValue().toLowerCase().equals("vulnerability")){
+                    integrationDataType = IntegrationDataType.VULNERABILITY;
                 }
             }
         }
@@ -232,7 +240,7 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
         /** issue: SXCSP-334
          * how to identify if it is post or put
          * should search in ES to see if this uuid exists
-         * query the index based on datatype (event/threat), if found send put else send post */
+         * query the index based on datatype (event/threat/vulnerability), if found send put else send post */
 
         if (isDelete) {
             cspClient.deleteIntegrationData(integrationData);
@@ -278,7 +286,19 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
             return result; // returns empty map on sharing group absence
         }
         // Retrieving any synchronized Organisations in the Sharing Group even if it has no synchronization prefix.
-        sharingGroupUuid = jsonNode.get(EVENT.toString()).get("SharingGroup").get("uuid").toString().replace("\"","");
+        try {
+            sharingGroupUuid = jsonNode.get(EVENT.toString()).get("SharingGroup").get("uuid").toString().replace("\"","");
+            LOG.debug("~~~~~ Sharing Group UUID is " + sharingGroupUuid + "~~~~~");
+        } catch (NullPointerException e) {
+            LOG.debug("~~~~~ Error getting Sharing Group UUID ~~~~~");
+            try {
+                LOG.debug("~~~~~ Retrying for Sharing Group UUID ~~~~~");
+                sharingGroupUuid = jsonNode.get(EVENT.toString()).get("SharingGroup").get("uuid").textValue();
+                LOG.debug("~~~~~ UUID is " + sharingGroupUuid + "~~~~~");
+            } catch (NullPointerException ex) {
+                LOG.debug("~~~~~ Error Getting Sharing Group UUID ~~~~~");
+            }
+        }
         // Get any organisations found in the sharing group node.
         ArrayNode sGroupOrgs = (ArrayNode) jsonNode.get(EVENT.toString()).get("SharingGroup").get("SharingGroupOrg");
         // Catch the exception in case the sharing group has no organisations at all.

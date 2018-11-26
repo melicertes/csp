@@ -1,0 +1,36 @@
+{% load form_utils %}
+{% for form, incoming in zip_objects %}
+    <div class="row diffcontent">
+        <div class="col-md-6">
+            {% if form %}
+                <div class="formset-form" data-formset-form="{{ formset.prefix }}">
+                    {% include "contacts/includes/inline_form.html" with form=form %}
+                </div>
+            {% endif %}
+        </div>
+        <div class="col-md-6">
+            {% if incoming %}
+                <h3{% if not form %} class="text-success diff-has-changes"{% endif %}>
+                    {{ title_single }}
+                </h3>
+                <div class="diffdatablock {{ diffdatablockstyle }}" blockname="{{ fieldname }}">
+                    <div class="row">
+                        {% for field in fields %}
+                            {% if field.editable and not field.primary_key %}
+                                <div class="col-md-6">
+                                    {% if form %}
+                                        {% diff_field_value form incoming field.name %}
+                                    {% else %}
+                                        {% diff_field_value formset.empty_form incoming field.name %}
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            {% else %}
+                <h3 class="text-danger diff-has-changes">{{ title_single }} removed</h3>
+            {% endif %}
+        </div>
+    </div>
+{% endfor %}
