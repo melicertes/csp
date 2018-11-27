@@ -102,7 +102,7 @@ public class MvcController implements PagesContextUrl, DataContextUrl {
                 //get last csp heartbeat
                 CspInfo cspInfo = cspInfoRepository.findTop1ByCspIdOrderByRecordDateTimeDesc(cspId);
                 if (cspInfo != null) {
-                    List<CspModuleInfo> cspModuleInfoList = cspModuleInfoRepository.findByCspInfoId(cspInfo.getId());
+                    List<CspModuleInfo> cspModuleInfoList = cspModuleInfoRepository.findByCspInfoIdOrderById(cspInfo.getId());
                     //assume csp has not installed the module
                     row.setInstalledVersion(null);
                     //iterate through all its modules info and set the version if found the module

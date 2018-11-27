@@ -11,7 +11,7 @@ import java.util.List;
 @Repository
 public interface CspModuleInfoRepository extends JpaRepository<CspModuleInfo, Long> {
 
-    public List<CspModuleInfo> findByCspInfoId(Long cspInfoId);
+    public List<CspModuleInfo> findByCspInfoIdOrderById(Long cspInfoId);
 
     public CspModuleInfo findTop1ByCspInfoIdOrderByCspInfoIdDesc(Long cspInfoId);
 
