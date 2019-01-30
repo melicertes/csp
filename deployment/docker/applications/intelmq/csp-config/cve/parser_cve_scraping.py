@@ -9,6 +9,7 @@ from intelmq.lib import utils
 from intelmq.lib.bot import Bot
 
 
+
 class CveScrapingParserBot(Bot):
 
     def process(self):
@@ -26,7 +27,10 @@ class CveScrapingParserBot(Bot):
             tweet_text = stream_item_tweet.find("div", class_="js-tweet-text-container").p.get_text()
             tweet_textb = tweet_text.encode('utf-8')
             #self.logger.debug("CveScrapingParserBot encode utf-8 done.")
-            tweet_textstr = tweet_textb.decode('utf-8').replace(u"\u00A0", "")
+            try
+                tweet_textstr = tweet_textb.decode('utf-8').replace(u"\u00A0", "")
+            except UnicodeDecodeError:
+                tweet_textstr = tweet_textb.decode('utf-8','ignore').replace(u"\u00A0", "")
             cve = tweet_textstr.split(" ", 1)[0]
             #self.logger.debug("CveScrapingParserBot tweet CVE: %s", cve)
             url = tweet_textstr[-22:].strip()
@@ -36,8 +40,8 @@ class CveScrapingParserBot(Bot):
 
             misp_event = {"info":"","threat_level_id":"1","attribute_count":"6", "distribution": "1","Object":[{"name":"vulnerability","meta-category":"network","description":"","Attribute":[{"object_relation":"id","type":"vulnerability","value":""},{"type":"text","object_relation":"text","value":""},{"type":"text","object_relation":"summary","value":""},{"type":"text","object_relation":"vulnerable_configuration","value":""},{"type":"link","category":"External analysis","object_relation":"references","value":""},{"type":"text","value":"Published"}]}],"Tag":[{"name":"vulnerability"}]}
 
-            
-            misp_event["Object"][0]["Attribute"][0]["value"] = cve            
+
+            misp_event["Object"][0]["Attribute"][0]["value"] = cve
             misp_event["info"] = short_tweet_text
 
             misp_event["Object"][0]["Attribute"][1]["value"] = short_tweet_text
@@ -56,7 +60,7 @@ class CveScrapingParserBot(Bot):
             #self.logger.debug("CveScrapingParserBot add additional done.")
             event.add("raw", json.dumps(misp_event, sort_keys=True)) 
             #self.logger.debug("CveScrapingParserBot json.dumps done.")
-            self.send_message(event)         
+            self.send_message(event)
             #self.logger.debug("CveScrapingParserBot send_message done.")         
         self.logger.debug("CveScrapingParserBot 11.0.2 end.")
         self.acknowledge_message()
