@@ -30,6 +30,8 @@ public class RtClientImpl implements RtClient {
 	String rtProtocol;
 	@Value("${rt.app.rest.path}")
 	String rtRestPath;
+	@Value("${rt.app.username}")
+	String username;
 
 	@Value("${rt.host}")
 	String rtHost;
@@ -60,8 +62,9 @@ public class RtClientImpl implements RtClient {
 	}
 
 	@Override
-	public ResponseEntity<String> postContentData(String content, String path) {
-		String url = this.getRtURI() + "/" + path;
+	public ResponseEntity<String> postContentData(String content, String path, String key, String value) {
+		String url = this.constructUriWithQueryParameters(path, key, value).toUriString();
+		// String url = this.getRtURI() + "/" + path;
 		LOG.debug("API call postContentData [url]: " + url);
 		// LOG.debug("API call postContentData [headers]: " + headers);
 		// LOG.debug("API call postContentData [content]: " + content);
@@ -79,7 +82,8 @@ public class RtClientImpl implements RtClient {
 
 	@Override
 	public ResponseEntity<String> getContentData(String query, String path) {
-		String url = this.getRtURI() + "/" + path;
+		String url = this.constructUriWithPathParameter(path).toUriString();
+		// String url = this.getRtURI() + "/" + path;
 		LOG.debug("API call getContentData [url]: " + url);
 		LOG.debug("API call getContentData [query]: " + query);
 		LOG.debug("API call getContentData [headers]: " + headers);
@@ -99,7 +103,8 @@ public class RtClientImpl implements RtClient {
 
 	@Override
 	public ResponseEntity<String> getContentData(String path) {
-		String url = this.getRtURI() + "/" + path;
+		String url = this.constructUriWithPathParameter(path).toUriString();
+		// String url = this.getRtURI() + "/" + path;
 		LOG.debug("API call getContentData [url]: " + url);
 		// LOG.debug("API call getContentData [headers]: " + headers);
 		HttpEntity<String> request = new HttpEntity<>(headers);
@@ -110,7 +115,8 @@ public class RtClientImpl implements RtClient {
 
 	@Override
 	public ResponseEntity<String> getTickets(String path) {
-		String url = this.getRtURI() + "/" + path;
+		String url = this.constructUriWithPathParameter(path).toUriString();
+		// String url = this.getRtURI() + "/" + path;
 		LOG.debug("API call getTickets [url]: " + url);
 		headers.add("format", "l");
 		// LOG.debug("API call getTickets [headers]: " + headers);
@@ -120,8 +126,35 @@ public class RtClientImpl implements RtClient {
 		return response;
 	}
 
-	public String getRtURI() {
-		return rtProtocol + "://" + rtHost + ":" + rtPort + "/" + rtPath + "/" + rtRestPath;
+	public UriComponents constructUriWithPathParameter(String path) {
+		UriComponents uriComponents = UriComponentsBuilder.newInstance().scheme(rtProtocol).host(rtHost).port(rtPort)
+				.path(rtPath + "/" + rtRestPath + "/" + path).build();
+		LOG.debug("constructUriWithPathParameter: uriComponents.toUriString()=" + uriComponents.toUriString());
+		return uriComponents;
+
 	}
+
+	public UriComponents constructUriWithQueryParameter(String path, String query) {
+		UriComponents uriComponents = UriComponentsBuilder.newInstance().scheme(rtProtocol).host(rtHost).port(rtPort)
+				.path(rtPath + "/" + rtRestPath + "/" + path).query("q={keyword}").buildAndExpand(query);
+
+		LOG.debug("constructUriWithQueryParameter: uriComponents.toUriString()=" + uriComponents.toUriString());
+		return uriComponents;
+
+	}
+
+	public UriComponentsBuilder constructUriWithQueryParameters(String path, String key, String value) {
+		UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.newInstance().scheme(rtProtocol).host(rtHost)
+				.port(rtPort).path(rtPath + "/" + rtRestPath + "/" + path).queryParam(key, value);
+ 
+		LOG.debug("constructUriWithQueryParameters: uriComponentsBuilder.toUriString()="
+				+ uriComponentsBuilder.toUriString());
+		return uriComponentsBuilder;
+
+	}
+
+//	public String getRtURI() {
+//		return rtProtocol + "://" + rtHost + ":" + rtPort + "/" + rtPath + "/" + rtRestPath;
+//	}
 
 }
