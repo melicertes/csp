@@ -27,7 +27,7 @@ class CveScrapingParserBot(Bot):
             tweet_text = stream_item_tweet.find("div", class_="js-tweet-text-container").p.get_text()
             tweet_textb = tweet_text.encode('utf-8')
             #self.logger.debug("CveScrapingParserBot encode utf-8 done.")
-            try
+            try:
                 tweet_textstr = tweet_textb.decode('utf-8').replace(u"\u00A0", "")
             except UnicodeDecodeError:
                 tweet_textstr = tweet_textb.decode('utf-8','ignore').replace(u"\u00A0", "")
