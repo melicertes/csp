@@ -57,7 +57,7 @@ function generateInternal() {
         ## link to correct locations
 
         local CMD="keytool -importkeystore -srcstorepass changeme -srckeystore internal.server.p12 -srcstoretype pkcs12 -destkeystore internal.server.jks -deststoretype JKS -noprompt -storepass changeme"
-        docker run --rm -v "$(pwd)":/mnt --workdir /mnt frolvlad/alpine-oraclejdk8:slim sh -c "$CMD"
+        docker run --rm -v "$(pwd)":/mnt --workdir /mnt thanosa75/alpine-jdk8:slim sh -c "$CMD"
         verifyRetCode $?
 
         mkdir -p /opt/csp/apache2/ssl/ca

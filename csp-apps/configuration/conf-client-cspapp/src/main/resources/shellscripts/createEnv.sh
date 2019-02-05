@@ -87,7 +87,7 @@ function createDockerVolumes() {
 
     docker volume create SSLDatavolume
     local R1=$?
-    docker run -d --rm -v SSLDatavolume:/ssl_data -v /opt/csp/apache2/ssl/:/mnt frolvlad/alpine-oraclejdk8:slim sh -c "cp -r /mnt/server /mnt/ca  /ssl_data"
+    docker run -d --rm -v SSLDatavolume:/ssl_data -v /opt/csp/apache2/ssl/:/mnt thanosa75/alpine-jdk8:slim sh -c "cp -r /mnt/server /mnt/ca  /ssl_data"
     local R2=$(( $? + $R1 ))
 
     return $R2
