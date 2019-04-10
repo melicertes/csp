@@ -5,9 +5,9 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties("vcbadmin")
 public class VcbadminProperties {
 	public static class EmailNotifications {
-		private Integer waitAfterSubmission = 10;
+		private Integer waitAfterSubmission = 3; // time the system idles for a user to change their mind.
 
-		private Integer minTimeAllowedBefore = 30; // ten minutes
+		private Integer minTimeAllowedBefore = 30; // thirty minutes
 		private Integer maxTimeAllowedBefore = 525960; // one year
 
 		public Integer getWaitAfterSubmission() {
