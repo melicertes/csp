@@ -32,7 +32,6 @@ import java.io.*;
 import java.lang.management.ManagementFactory;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.net.UnknownHostException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
@@ -212,6 +211,18 @@ public class BackgroundTaskService {
                     .forEach(log::info);
             return new BackgroundTaskResult<String,Boolean>("Completed",true);
         });
+
+        log.info ("Checking Docker system");
+        try {
+            final BackgroundTaskResult<Boolean, Integer> result = executeScriptSimple("updateDocker.sh", Collections.EMPTY_MAP);
+            if (result.getErrorCode().longValue()== 100 || result.getErrorCode() == 0) { //platform not supported or all ok
+            } else if (result.getErrorCode().longValue() > 0) {
+                log.info("Docker upgrade failed - error code was {} - inform support", result);
+            }
+        } catch (Exception e) {
+            log.error("Failed to execute the docker upgrade script...!");
+        }
+
     }
 
 
@@ -1170,6 +1181,7 @@ public class BackgroundTaskService {
     }
 }
 
+@Slf4j
 class InternetAvailabilityChecker
 {
 
@@ -1182,13 +1194,15 @@ class InternetAvailabilityChecker
     {
         try(Socket socket = new Socket())
         {
+            log.info("Attempting to connect to {}:{}",hostName,port);
             InetSocketAddress socketAddress = new InetSocketAddress(hostName, port);
             socket.connect(socketAddress, 3000);
 
             return true;
         }
-        catch(UnknownHostException unknownHost)
+        catch(IOException ioe)
         {
+            log.error("Trying to connect to {}:{} returns {}",hostName, port, ioe.getMessage());
             return false;
         }
     }

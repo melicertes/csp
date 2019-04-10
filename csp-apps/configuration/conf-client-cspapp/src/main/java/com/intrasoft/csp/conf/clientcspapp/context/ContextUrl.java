@@ -27,6 +27,8 @@ public interface ContextUrl {
     String PAGE_STARTMODULES = "/startModules";
     String PAGE_STOPMODULES = "/stopModules";
 
+    String REST_SHUTDOWN = "/shutdown";
+
     String PAGES_ERROR = "/error";
 
 }

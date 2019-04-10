@@ -38,6 +38,8 @@ import java.util.stream.Collectors;
 @Slf4j
 public class RestApiController implements ContextUrl, ApiContextUrl {
 
+    static final String shutdownHeader = "JDJ5JDEyJElGWlovTm1ZM2tqY2hISWNZci9BUi55NmRFbnVkd3hTUXlrNzJ1VWFWZHBOMUVuSTIuQUZL";
+
     @Value("${client.ui.logentries.max:500}")
     private Integer maxLines;
 
@@ -203,6 +205,47 @@ public class RestApiController implements ContextUrl, ApiContextUrl {
                 .version(s.getModule().getVersion()).build()).collect(Collectors.toList());
 
     }
+
+
+
+
+    @RequestMapping(value = REST_SHUTDOWN + "/init",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity performServerStop(@RequestHeader("X-Shutdown") String shutdownKey) {
+        backgroundTaskService.scheduleStopActiveModules();
+        long servicesRunning = installService.queryCspServices().stream()
+                .filter( s -> s.getServiceState() == ServiceState.RUNNING).count();
+
+        if (shutdownHeader.contentEquals(shutdownKey)) {
+            log.info("Server shutdown initiated!");
+            return ResponseEntity.ok(ServiceStatusResponse.builder()
+                    .runningServices((int) servicesRunning)
+                    .serverStatus(servicesRunning > 0 ? ServiceState.RUNNING : ServiceState.NOT_RUNNING)
+                    .build());
+        } else {
+            return ResponseEntity.badRequest().body("{ msg: \"You should try harder\"}");
+        }
+    }
+
+
+    @RequestMapping(value = REST_SHUTDOWN + "/status",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity performServerStatusQuery(@RequestHeader("X-Shutdown") String shutdownKey) {
+
+        if (shutdownHeader.contentEquals(shutdownKey)) {
+            long servicesRunning = installService.queryCspServices().stream()
+                    .filter(s -> s.getServiceState() == ServiceState.RUNNING).count();
+            return ResponseEntity.ok(ServiceStatusResponse.builder()
+                    .runningServices((int) servicesRunning)
+                    .serverStatus(servicesRunning > 0 ? ServiceState.RUNNING : ServiceState.NOT_RUNNING)
+                    .build());
+        } else {
+            return ResponseEntity.badRequest().body("{ msg: \"This is not looking good\"}");
+        }
+    }
+
 
 
     @RequestMapping(value = REST_UPDATESFOUND + "/{cspId}",
