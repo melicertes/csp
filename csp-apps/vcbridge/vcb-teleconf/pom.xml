@@ -6,10 +6,10 @@
 	<parent>
 		<groupId>com.intrasoft.csp</groupId>
 		<artifactId>vcbridge</artifactId>
-		<version>4.0.0-SNAPSHOT</version>
+		<version>4.0.5-SNAPSHOT</version>
 	</parent>
 
-	<version>4.0.0-SNAPSHOT</version>
+	<version>4.0.5-SNAPSHOT</version>
 	<artifactId>vcb-teleconf</artifactId>
 	<packaging>jar</packaging>
 	<name>Video Conference Teleconference Application</name>

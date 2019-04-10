@@ -6,12 +6,12 @@
 	<parent>
 		<groupId>com.intrasoft.csp</groupId>
 		<artifactId>configuration</artifactId>
-		<version>4.0.0-SNAPSHOT</version>
+		<version>4.0.5-SNAPSHOT</version>
 	</parent>
 
 	<groupId>com.intrasoft.csp</groupId>
 	<artifactId>conf-client-cspapp</artifactId>
-	<version>4.0.0-SNAPSHOT</version>
+	<version>4.0.5-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>Configuration Service CSP Installer</name>
@@ -64,6 +64,7 @@
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
+			<version>1.18.6</version>
 			<optional>true</optional>
 		</dependency>
 
