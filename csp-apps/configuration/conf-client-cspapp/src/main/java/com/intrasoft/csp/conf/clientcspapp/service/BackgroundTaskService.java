@@ -59,7 +59,7 @@ public class BackgroundTaskService {
     @Value("${installation.reqs.cpus}")
     public int vcpus;
 
-    @Value("${installation.forced:false}")
+    @Value("${installation.forced:true}")
     private Boolean canProceedForced;
 
     @Cacheable(cacheNames = {"req.check"})
@@ -92,7 +92,7 @@ public class BackgroundTaskService {
         }
 
         if (canProceedForced) {
-            log.warn("Installation is forced due to configuration override");
+            log.warn("Installation can now proceed due to configuration override - check memory requirements!");
             return true;
         } else
             return failsFound <= 0;
@@ -220,7 +220,7 @@ public class BackgroundTaskService {
                 log.info("Docker upgrade failed - error code was {} - inform support", result);
             }
         } catch (Exception e) {
-            log.error("Failed to execute the docker upgrade script...!");
+            log.error("Failed to execute the docker upgrade script...!",e);
         }
 
     }
@@ -360,12 +360,8 @@ public class BackgroundTaskService {
 
     @Scheduled(fixedDelay = 360000, initialDelay = 5000)
     public void verifyInternetConnectivity() {
-        try {
-            internetAvailable = InternetAvailabilityChecker.isInternetAvailable(host, port);
-            log.info("Internet connectivity test has passed, connection is OK");
-        } catch (IOException e) {
-            log.error("Internet connectivity check failed!");
-        }
+        internetAvailable = InternetAvailabilityChecker.isInternetAvailable(host, port);
+        log.info("Internet connectivity test has completed, connection is {}", internetAvailable ? "OK" : "Not OK");
     }
 
     public Boolean isInternetAvailable() {
@@ -1142,8 +1138,10 @@ public class BackgroundTaskService {
         // vars
         final SystemInstallationState state = installationService.getState();
         Map<String, String> envVars = new HashMap<String, String>();
-        envVars.put("CSPNAME", state.getCspRegistration().getName());
-        envVars.put("CSPDOMAIN", state.getCspRegistration().getDomainName());
+        if (state != null && state.getCspRegistration() != null) {
+            envVars.put("CSPNAME", state.getCspRegistration().getName());
+            envVars.put("CSPDOMAIN", state.getCspRegistration().getDomainName());
+        }
         envVars.put("CSPHOME", modulesDirectory);
         envVars.put("HOME",System.getProperty("user.home")); // make sure $HOME is set
         if (env != null) {
@@ -1185,24 +1183,19 @@ public class BackgroundTaskService {
 class InternetAvailabilityChecker
 {
 
-    public static boolean isInternetAvailable(String host, Integer port) throws IOException
-    {
+    public static boolean isInternetAvailable(String host, Integer port) {
         return isHostAvailable("google.com",443) && isHostAvailable(host, port);
     }
 
-    private static boolean isHostAvailable(String hostName,Integer port) throws IOException
-    {
-        try(Socket socket = new Socket())
-        {
+    private static boolean isHostAvailable(String hostName,Integer port) {
+        try(Socket socket = new Socket()) {
             log.info("Attempting to connect to {}:{}",hostName,port);
             InetSocketAddress socketAddress = new InetSocketAddress(hostName, port);
-            socket.connect(socketAddress, 3000);
-
+            socket.connect(socketAddress, 5000);
+            log.info("Connected to {}:{}",hostName,port);
             return true;
-        }
-        catch(IOException ioe)
-        {
-            log.error("Trying to connect to {}:{} returns {}",hostName, port, ioe.getMessage());
+        } catch(IOException ioe) {
+            log.error("Trying to connect to {}:{} returns: {}",hostName, port, ioe.getMessage());
             return false;
         }
     }
