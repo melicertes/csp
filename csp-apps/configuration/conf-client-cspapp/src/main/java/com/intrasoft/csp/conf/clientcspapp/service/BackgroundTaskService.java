@@ -34,12 +34,14 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Created by tangelatos on 06/09/2017.
@@ -212,17 +214,37 @@ public class BackgroundTaskService {
             return new BackgroundTaskResult<String,Boolean>("Completed",true);
         });
 
-        log.info ("Checking Docker system");
-        try {
-            final BackgroundTaskResult<Boolean, Integer> result = executeScriptSimple("updateDocker.sh", Collections.EMPTY_MAP);
-            if (result.getErrorCode().longValue()== 100 || result.getErrorCode() == 0) { //platform not supported or all ok
-            } else if (result.getErrorCode().longValue() > 0) {
-                log.info("Docker upgrade failed - error code was {} - inform support", result);
+        log.info ("Inspecting Launch Environment ...");
+        if (runningOnBareOS()) {
+            try {
+                log.info("Checking if OS/Docker is needing an upgrade...");
+                final BackgroundTaskResult<Boolean, Integer> result = executeScriptSimple("updateDocker.sh", Collections.EMPTY_MAP);
+                if (result.getErrorCode().longValue() != 100 && result.getErrorCode().longValue() > 0) {
+                    log.info("Docker upgrade failed - error code was {} - inform support", result);
+                }  //platform not supported or all ok
+            } catch (Exception e) {
+                log.error("Failed to execute the docker upgrade script: {}", e.getMessage(), e);
             }
-        } catch (Exception e) {
-            log.error("Failed to execute the docker upgrade script...!",e);
         }
 
+    }
+
+    /**
+     * to detect if we're running inside Docker, we check process 1's cgroup entry
+     * https://stackoverflow.com/a/52581380/1823881
+     * @return if running in docker, true
+     */
+    private boolean runningOnBareOS() {
+        try (Stream<String> stream = Files.lines(Paths.get("/proc/1/cgroup"))) {
+            if (stream.noneMatch(line -> line.contains("/docker"))) {
+                return true;
+            } else {
+                log.warn("Running inside a container - inspection not possible.");
+                return false;
+            }
+        } catch (IOException e) {
+            return true;
+        }
     }
 
 

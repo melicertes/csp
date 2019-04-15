@@ -6,13 +6,13 @@
     <parent>
         <groupId>com.intrasoft.csp</groupId>
         <artifactId>configuration</artifactId>
-        <version>4.0.5-SNAPSHOT</version>
+        <version>4.0.6-SNAPSHOT</version>
     </parent>
 
     <name>Configuration Client</name>
     <groupId>com.intrasoft.csp</groupId>
     <artifactId>conf-client</artifactId>
-    <version>4.0.5-SNAPSHOT</version>
+    <version>4.0.6-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <dependencies>

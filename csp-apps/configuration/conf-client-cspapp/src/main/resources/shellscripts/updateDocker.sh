@@ -34,6 +34,11 @@ source /etc/os-release
 if [[ "$VERSION_ID" == "3.9"* ]];
 then
    echo "OS update not necessary"
+elif [[ "$VERSION_ID" == "4.0"* ]];
+then
+   echo "OS update beyond our control; OS is $VERSION_ID; update installscript"
+   service docker start
+   exit 0
 else
    echo "OS update is needed, OS now is $VERSION_ID" >> /opt/cspinst/os-update.1
    echo "http://dl-4.alpinelinux.org/alpine/latest-stable/main" > /etc/apk/repositories

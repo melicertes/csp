@@ -6,7 +6,7 @@
     <parent>
         <artifactId>regular-reports</artifactId>
         <groupId>com.intrasoft.csp</groupId>
-        <version>4.0.5-SNAPSHOT</version>
+        <version>4.0.6-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -15,7 +15,7 @@
     <artifactId>regrep-app</artifactId>
     <groupId>com.intrasoft.csp</groupId>
     <packaging>jar</packaging>
-    <version>4.0.5-SNAPSHOT</version>
+    <version>4.0.6-SNAPSHOT</version>
 
     <dependencies>
         <dependency>
@@ -30,17 +30,17 @@
         <dependency>
             <groupId>com.intrasoft.csp</groupId>
             <artifactId>regrep-es-client</artifactId>
-            <version>4.0.5-SNAPSHOT</version>
+            <version>4.0.6-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>com.intrasoft.csp</groupId>
             <artifactId>regrep-commons</artifactId>
-            <version>4.0.5-SNAPSHOT</version>
+            <version>4.0.6-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>com.intrasoft.csp</groupId>
             <artifactId>regrep-emailer</artifactId>
-            <version>4.0.5-SNAPSHOT</version>
+            <version>4.0.6-SNAPSHOT</version>
         </dependency>
     </dependencies>
 
