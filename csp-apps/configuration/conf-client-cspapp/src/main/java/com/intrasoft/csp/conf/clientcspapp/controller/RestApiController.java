@@ -19,6 +19,7 @@ import com.intrasoft.csp.conf.commons.types.StatusResponseType;
 import com.intrasoft.csp.conf.commons.utils.JodaConverter;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.LocalDateTime;
+import org.owasp.encoder.Encode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -107,6 +108,14 @@ public class RestApiController implements ContextUrl, ApiContextUrl {
         smtp.setPassword(cspForm.getSmtp_pass());
         smtp.setSenderEmail(cspForm.getSender_email());
         smtp.setSenderName(cspForm.getSender_name());
+
+        if (cspRegistration.getDomainName().contains(cspRegistration.getName())) {
+            log.error("The name {} cannot be part of the CSP domain {}", cspRegistration.getName(),
+                    cspRegistration.getDomainName());
+            ResponseDTO error = new ResponseDTO((int)3405691582L,
+                    String.format("The CSP Domain name %s cannot contain the CSP-ID %s. Please fix and resubmit.",
+                            cspRegistration.getName(), cspRegistration.getDomainName()));
+        }
 
         final ResponseDTO dto = installService.registerCsp(cspId, cspRegistration, smtp);
         if (dto.getResponseCode() == 0) {
@@ -299,27 +308,30 @@ public class RestApiController implements ContextUrl, ApiContextUrl {
     private void buildActions(SystemModule module, StringBuilder actions) {
         final long running = runningServices();
 
+        final String moduleName = Encode.forHtml(module.getName());
+        final String hash = Encode.forHtml(module.getHash());
+
         switch (module.getModuleState()) {
             case UNKNOWN:
                 actions.append("&nbsp;<a class=\"btn btn-xs btn-primary\" title=\"Download ")
-                        .append(module.getName()).append("\" href=\"").append(PAGE_DOWNLOADMODULE).append("/")
-                        .append(module.getHash()).append("\"><i class=\"fa fa-download\"></i></a>");
+                        .append(moduleName).append("\" href=\"").append(PAGE_DOWNLOADMODULE).append("/")
+                        .append(hash).append("\"><i class=\"fa fa-download\"></i></a>");
                 break;
             case DOWNLOADING:
                 actions.append("&nbsp;<a class=\"btn btn-xs btn-primary\" title=\"Show ")
-                        .append(module.getName()).append(" progress\" href=\"").append(PAGE_STATUS).append("?moduleId=")
-                        .append(module.getHash()).append("\"><i class=\"fa fa-cog fa-spin\"></i></a>");
+                        .append(moduleName).append(" progress\" href=\"").append(PAGE_STATUS).append("?moduleId=")
+                        .append(hash).append("\"><i class=\"fa fa-cog fa-spin\"></i></a>");
                 break;
             case DOWNLOADED:
                 if (running == 0) {
-                    actions.append("&nbsp;<a class=\"btn btn-xs btn-primary\" title=\"Re-Download ").append(module.getName())
-                            .append("\" href=\"").append(PAGE_DOWNLOADMODULE).append("/").append(module.getHash())
+                    actions.append("&nbsp;<a class=\"btn btn-xs btn-primary\" title=\"Re-Download ").append(moduleName)
+                            .append("\" href=\"").append(PAGE_DOWNLOADMODULE).append("/").append(hash)
                             .append("\"><i class=\"fa fa-download\"></i></a>");
-                    actions.append("&nbsp;<a class=\"btn btn-xs btn-success\" title=\"Install ").append(module.getName())
-                            .append("\" href=\"").append(PAGE_INSTALLMODULE).append("/").append(module.getHash())
+                    actions.append("&nbsp;<a class=\"btn btn-xs btn-success\" title=\"Install ").append(moduleName)
+                            .append("\" href=\"").append(PAGE_INSTALLMODULE).append("/").append(hash)
                             .append("\"><i class=\"fa fa-cogs\"></i></a>");
-                    actions.append("&nbsp;<a class=\"btn btn-xs btn-danger\" title=\"Delete ").append(module.getName())
-                            .append("\" href=\"").append(PAGE_DELETEMODULE).append("/").append(module.getHash())
+                    actions.append("&nbsp;<a class=\"btn btn-xs btn-danger\" title=\"Delete ").append(moduleName)
+                            .append("\" href=\"").append(PAGE_DELETEMODULE).append("/").append(hash)
                             .append("\"><i class=\"fa fa-trash\"></i></a>");
                 } else {
                     actions.append("&nbsp;<a class=\"btn btn-xs btn-danger\" title=\"Cannot allow installations because there are ")
@@ -329,11 +341,11 @@ public class RestApiController implements ContextUrl, ApiContextUrl {
                 break;
             case INSTALLED:
                 if (running == 0) {
-                    actions.append("&nbsp;<a class=\"btn btn-xs btn-warning\" title=\"Re-Install ").append(module.getName())
-                            .append("\" href=\"").append(PAGE_REINSTALLMODULE).append("/").append(module.getHash())
+                    actions.append("&nbsp;<a class=\"btn btn-xs btn-warning\" title=\"Re-Install ").append(moduleName)
+                            .append("\" href=\"").append(PAGE_REINSTALLMODULE).append("/").append(hash)
                             .append("\"><i class=\"fa fa-refresh\"></i></a>");
-                    actions.append("&nbsp;<a class=\"btn btn-xs btn-danger\" title=\"Delete ").append(module.getName())
-                            .append("\" href=\"").append(PAGE_DELETEMODULE).append("/").append(module.getHash())
+                    actions.append("&nbsp;<a class=\"btn btn-xs btn-danger\" title=\"Delete ").append(moduleName)
+                            .append("\" href=\"").append(PAGE_DELETEMODULE).append("/").append(hash)
                             .append("\"><i class=\"fa fa-trash\"></i></a>");
                 } else {
                     actions.append("&nbsp;<a class=\"btn btn-xs btn-danger disabled\" title=\"Cannot allow installations because there are ")
@@ -342,8 +354,8 @@ public class RestApiController implements ContextUrl, ApiContextUrl {
                 }
                 break;
             case OBSOLETE:
-                actions.append("&nbsp;<a class=\"btn btn-xs btn-danger\" title=\"Delete").append(module.getName())
-                        .append("\" href=\"").append(PAGE_DELETEMODULE).append("/").append(module.getHash())
+                actions.append("&nbsp;<a class=\"btn btn-xs btn-danger\" title=\"Delete").append(moduleName)
+                        .append("\" href=\"").append(PAGE_DELETEMODULE).append("/").append(hash)
                         .append("\"><i class=\"fa fa-trash\"></i></a>");
                 break;
             case REMOVED:
