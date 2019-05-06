@@ -12,12 +12,12 @@ RUN apt-get update &&   \
  apt-get install -y apt-utils git apache2 php libapache2-mod-php7.0 && \
  apt-get install -y sudo build-essential libcurl4-gnutls-dev libgnutls28-dev python3-dev && \
 # apt-get install -y nano vim && \
- rm -rf /var/lib/apt/lists/*
+ rm -rf /var/lib/apt/lists/*checkout
 
 RUN git clone https://github.com/certtools/intelmq.git /opt/dev_intelmq
 WORKDIR /opt/dev_intelmq
-RUN git checkout tags/1.1.0
-#review RUN git checkout
+RUN git checkout tags/1.1.1
+#RUN git checkout
 
 ADD test-data /tmp/test-data
 ADD csp-config/cve /opt/dev_intelmq/intelmq/bots/parsers/cve
@@ -31,8 +31,11 @@ RUN pip3 install . && \
 #review chmod -R 775 /opt/intelmq && \
  chown -R intelmq:intelmq /opt/intelmq
 
-RUN git clone https://github.com/certtools/intelmq-manager.git /tmp/intelmq-manager && \
- cp -R /tmp/intelmq-manager/intelmq-manager/* /var/www/html/ && \
+RUN git clone https://github.com/certtools/intelmq-manager.git /tmp/intelmq-manager
+WORKDIR /tmp/intelmq-manager
+RUN git checkout tags/1.1.0
+
+RUN cp -R /tmp/intelmq-manager/intelmq-manager/* /var/www/html/ && \
  mv /var/www/html/index.html /var/www/html/index.html.save && \
  chown -R www-data:www-data /var/www/html/ && \
  usermod -a -G intelmq www-data && \
