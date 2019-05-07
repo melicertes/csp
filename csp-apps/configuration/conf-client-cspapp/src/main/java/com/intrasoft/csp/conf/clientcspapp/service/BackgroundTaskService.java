@@ -214,18 +214,18 @@ public class BackgroundTaskService {
             return new BackgroundTaskResult<String,Boolean>("Completed",true);
         });
 
-        log.info ("Inspecting Launch Environment ...");
-        if (runningOnBareOS()) {
-            try {
-                log.info("Checking if OS/Docker is needing an upgrade...");
-                final BackgroundTaskResult<Boolean, Integer> result = executeScriptSimple("updateDocker.sh", Collections.EMPTY_MAP);
-                if (result.getErrorCode().longValue() != 100 && result.getErrorCode().longValue() > 0) {
-                    log.info("Docker upgrade failed - error code was {} - inform support", result);
-                }  //platform not supported or all ok
-            } catch (Exception e) {
-                log.error("Failed to execute the docker upgrade script: {}", e.getMessage(), e);
-            }
-        }
+//        log.info ("Inspecting Launch Environment ...");
+//        if (runningOnBareOS()) {
+//            try {
+//                log.info("Checking if OS/Docker is needing an upgrade...");
+//                final BackgroundTaskResult<Boolean, Integer> result = executeScriptSimple("updateDocker.sh", Collections.EMPTY_MAP);
+//                if (result.getErrorCode().longValue() != 100 && result.getErrorCode().longValue() > 0) {
+//                    log.info("Docker upgrade failed - error code was {} - inform support", result);
+//                }  //platform not supported or all ok
+//            } catch (Exception e) {
+//                log.error("Failed to execute the docker upgrade script: {}", e.getMessage(), e);
+//            }
+//        }
 
     }
 
