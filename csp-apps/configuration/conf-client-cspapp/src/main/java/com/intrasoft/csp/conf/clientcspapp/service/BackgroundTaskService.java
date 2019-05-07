@@ -190,7 +190,7 @@ public class BackgroundTaskService {
 
         log.info("CSP Installer {}",gitVersion());
 
-        addTask("Fixing Module States", () -> {
+        addTask("Fixing Module and Service States", () -> {
             //for the moment, we check if there are any modules in
             // DOWNLOADING state ---> to UNKNOWN
             // INSTALLING state  ---> to DOWNLOADED
@@ -211,8 +211,20 @@ public class BackgroundTaskService {
                         return mupd.getId() +" / " + mupd.getName() + " has been reset from "+orig+" to " + m.getModuleState();
                     })
                     .forEach(log::info);
+
+            // this task is clearing SERVICE states on restart, assuming that this is caused by a real restart.
+            List<SystemService> result = installationService.queryCspServices();
+            if (result != null) {
+                result.forEach(s -> {
+                    if (s.getServiceState() == ServiceState.RUNNING) {
+                        log.warn("Resetting service state for service {}", s.getName());
+                        installationService.updateServiceState(s, ServiceState.NOT_RUNNING);
+                    }
+                });
+            }
             return new BackgroundTaskResult<String,Boolean>("Completed",true);
         });
+
 
 //        log.info ("Inspecting Launch Environment ...");
 //        if (runningOnBareOS()) {
