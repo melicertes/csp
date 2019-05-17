@@ -1,14 +1,24 @@
 # Welcome to the CSP source repo 
 
-Thank you for participating in the code review and helping us improve MeliCERTes. We appreciate if you keep the following guidelines in mind:
- 
+This repository is being gradually moved to EUPL / OSS and is part of the work performed by CEF: Cybersecurity Digital Service Infrastructure; Core Service Platform – SMART 2015/1089 with funds of the European Union.
+
+
 * The source code is shared under EUPL licence.
-* The source code is shared for the sake of this review and to gather input to further improve the MeliCERTes project.
-* The source code is shared with identified individuals. These individuals are responsible for doing the review. (S)he may use trusted resources in his/her environment to do the review. (S)he may consult fellow team members under TLP:AMBER in the review process, on the TLP:AMBER basis of need-to-know.
-* Access to this source code repository will be revoked on 1 December 2018, unless otherwise agreed with you.
-* At all times, this review must not harm the reputation of the European Commission. This work is still in progress and code reviewing is part of the process to improve quality.
+* We are still in process of review and attributing licenses, which will continue within the next months
+* This text is interim also.
+
+## Comments and Issues
+
+We welcome comments and issue reporting via GitHub. Please use the Issues tab
+
+## Documentation
+
+Project documentation found in Architecture/ folder is considered obsolete and will be subsequently removed. Updated project documentation is available through the normal channels.
+
+
+
+Thank you in advance,
+
+The CSP development team.
  
-Again, many thanks for your contribution!
- 
-On behalf of the MeliCERTes/CSP project team, Roeland de Koning (project leader), Reza Malik (head of technology stream), and Don Stikvoort (head of trust building stream).
  
