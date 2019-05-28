@@ -16,6 +16,7 @@ export JICOFO_SECRET=`pwgen -s 16 1`
 export JVB_SECRET=`pwgen -s 16 1`
 export FOCUS_SECRET=`pwgen -s 16 1`
 export LOCAL_IP=`grep $(hostname) /etc/hosts | cut -f1`
+export LOCAL_ADDRESS=`grep $(hostname) /etc/hosts | cut -f1`
 
 # Substitute configuration
 for VARIABLE in `env | cut -f1 -d=`; do
@@ -27,6 +28,12 @@ prosodyctl register focus "auth.$DOMAIN" $FOCUS_SECRET
 
 else
 echo "Not first run, things already configured"
+# Local IP's are subject to change in docker containers
+echo "Updating local IPs"
+export LOCAL_IP=`grep $(hostname) /etc/hosts | cut -f1`
+for VARIABLE in "LOCAL_ADDRESS" "LOCAL_IP"; do
+  sed -i -r "s/($VARIABLE)=.*/\1=$LOCAL_IP/g" /etc/jitsi/*/* /etc/nginx/nginx.conf /etc/prosody/prosody.cfg.lua
+done
 fi
 
 # TODO: improve process management
