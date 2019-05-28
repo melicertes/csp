@@ -10,6 +10,7 @@ services:
     hostname: csp-intelmq
     command: sh /scripts/run.sh
     volumes:
+       - IMQConfigVolume:/opt/intelmq/etc
        - /opt/csp/intelmq-fileinput/:/tmp/intelmq-fileinput
        - /opt/csp/intelmq-fileoutput/:/tmp/intelmq-fileoutput
        - /opt/csp/logs/imq:/opt/intelmq/var/log
@@ -36,6 +37,8 @@ services:
 
 volumes:
    SSLDatavolume:
+        external: true
+   IMQConfigVolume:
         external: true
 
 networks:
