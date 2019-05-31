@@ -23,7 +23,7 @@ Checkout the [ENISA website](https://www.enisa.europa.eu/) for more information 
 Documentation
 -------------
 
-All of the documentation can be found in this repository in the [documentation folder](/documentation). There you will find the [CSP User Manual](/CSP_User_Manual_v4.0.0.pdf') and [CSP Installation Manual](/CSP_Installation_Manual_v4.0.6.pdf')
+All of the documentation can be found in this repository in the [documentation folder](/documentation). There you will find the [CSP User Manual](https://github.com/melicertes/csp/blob/develop/documentation/CSP_User_Manual_v4.0.0.pdf') and [CSP Installation Manual](https://github.com/melicertes/csp/blob/develop/documentation/CSP_Installation_Manual_v4.0.6.pdf)
 
 Contributing
 ------------
