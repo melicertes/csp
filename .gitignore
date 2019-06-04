@@ -114,3 +114,6 @@ crashlytics.properties
 crashlytics-build.properties
 fabric.properties
 /csp-apps/rt/rt-adapter-emitter/testenv
+
+image.tar.bz2
+
