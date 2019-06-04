@@ -25,6 +25,7 @@ services:
       - OWNCLOUD_UTF8MB4_ENABLED=true
       - OWNCLOUD_REDIS_ENABLED=true
       - OWNCLOUD_REDIS_HOST=ocredis
+      - APACHE_LISTEN=80
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost/status.php"]
       interval: 30s
