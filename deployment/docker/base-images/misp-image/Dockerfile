@@ -134,6 +134,7 @@ RUN echo "sudo -u www-data bash /var/www/MISP/app/Console/worker/start.sh" >>/et
 
 # Install MISP Modules
 WORKDIR /opt
+RUN apt-get update
 RUN apt-get install -y python3 python3-pip libjpeg-dev
 COPY --from=builder_2.4.107 /opt/ .
 ADD misp-modules /opt/misp-modules
@@ -210,7 +211,7 @@ RUN chown -R www-data:www-data /var/www/MISP/app/files/
 # Final archive
 RUN tar czpf /root/MISP.tgz .
 
-COPY AppController.php /var/www/MISP/app/Controller/AppController.php
+#COPY AppController.php /var/www/MISP/app/Controller/AppController.php
 #VOLUME /var/www/MISP
 EXPOSE 80
 ENTRYPOINT ["/run.sh"]
