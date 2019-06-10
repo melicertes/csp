@@ -1,16 +1,17 @@
 package com.intrasoft.csp.server.config;
 
+import org.apache.camel.CamelContext;
 import org.apache.camel.component.http4.HttpComponent;
-import org.apache.camel.spring.SpringCamelContext;
+import org.apache.camel.spring.boot.CamelContextConfiguration;
 import org.apache.camel.util.jsse.*;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 
-import javax.annotation.PostConstruct;
 import javax.net.ssl.TrustManagerFactory;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -31,31 +32,32 @@ public class CamelSSLConfiguration {
     public static final String INTERNAL = "internal";
     public static final String EXTERNAL = "external";
 
-    @Autowired
-    SpringCamelContext camelContext;
 
     @Autowired
     Environment env;
 
+    @Bean
+    CamelContextConfiguration contextConfiguration() {
+        return new CamelContextConfiguration() {
+            @Override
+            public void beforeApplicationStart(CamelContext camelContext) {
 
-    @PostConstruct
-    public void init() {
-        configureSslForHttp4();
+            }
+
+            @Override
+            public void afterApplicationStart(CamelContext camelContext) {
+                setHttp4Component(INTERNAL, camelContext);
+                setHttp4Component(EXTERNAL, camelContext);
+                LOG.info("Camel HTTP4 configuration complete");
+            }
+        };
     }
 
-    private void configureSslForHttp4() {
-        HttpComponent httpComponentIn = setHttp4Component(INTERNAL);
-        HttpComponent httpComponentExt = setHttp4Component(EXTERNAL);
-        //HttpComponent httpComponent = camelContext.getComponent("https4", HttpComponent.class);
-        //HttpComponent httpComponentInGet = camelContext.getComponent("https4-in", HttpComponent.class);
-
-        LOG.info("");
-    }
-
-    HttpComponent setHttp4Component(String sslType) {
+    HttpComponent setHttp4Component(String sslType, CamelContext camelContext) {
         HttpComponent httpComponent = new HttpComponent();
         Boolean useSsl = Boolean.valueOf(env.getProperty(sslType+".use.ssl"));
         String protocol = env.getProperty(sslType + ".ssl.endpoint.protocol");
+        LOG.debug("UseSSL = {}, Protocol = {}", useSsl, protocol);
         if(useSsl) {
             String resource = env.getProperty(sslType + ".ssl.keystore.resource"); //jks
             String passphrase = env.getProperty(sslType + ".ssl.keystore.passphrase");

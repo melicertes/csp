@@ -1,11 +1,10 @@
 package com.intrasoft.csp.server.routes;
 
 import com.intrasoft.csp.commons.exceptions.ErrorLogException;
-import com.intrasoft.csp.commons.exceptions.InvalidDataTypeException;
+import com.intrasoft.csp.commons.exceptions.InvalidDataException;
 import com.intrasoft.csp.commons.exceptions.InvalidSharingParamsException;
 import com.intrasoft.csp.commons.routes.CamelRoutes;
 import com.intrasoft.csp.server.processors.*;
-import com.sun.media.sound.InvalidDataException;
 import org.apache.camel.ExchangePattern;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.builder.RouteBuilder;
@@ -43,6 +42,9 @@ public class CspRoutes extends RouteBuilder implements CamelRoutes{
 
     @Autowired
     private ElasticProcessor elasticProcessor;
+
+    @Autowired
+    private NotifierProcessor notifierProcessor;
 
     @Autowired
     RouteUtils endpoint;
@@ -111,9 +113,13 @@ public class CspRoutes extends RouteBuilder implements CamelRoutes{
 
         //ExternalCSPs
         from(endpoint.apply(ECSP))
-                 .threads(10)
                 .setExchangePattern(ExchangePattern.InOnly)
                 .process(AsyncProcessorConverterHelper.convert(ecspProcessor));// AsyncProcessorConverterHelper.convert(
+        //Notifier processes events for external CSPs, if connectivity is verified, then proceeds to consume messages
+
+        from(endpoint.apply(CamelRoutes.NOTIFIER))
+                .setExchangePattern(ExchangePattern.InOnly)
+                .process(AsyncProcessorConverterHelper.convert(notifierProcessor));
 
 
         //App routing

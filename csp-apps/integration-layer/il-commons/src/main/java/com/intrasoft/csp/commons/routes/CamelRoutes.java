@@ -1,8 +1,5 @@
 package com.intrasoft.csp.commons.routes;
 
-import java.util.function.BiFunction;
-import java.util.function.Function;
-
 /**
  * Created by iskitsas on 4/7/17.
  */
@@ -21,6 +18,7 @@ public interface CamelRoutes {
     String ECSP ="ecsp";
     String APP ="app";
     String ELASTIC ="elastic";
+    String NOTIFIER = "notifier";
 
     String ORIGIN_ENDPOINT ="originEndpoint";
     String ERROR ="error";

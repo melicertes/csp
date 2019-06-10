@@ -2,10 +2,12 @@ package com.intrasoft.csp.server.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.intrasoft.csp.commons.model.IntegrationData;
+import com.intrasoft.csp.commons.exceptions.InvalidDataException;
 import com.intrasoft.csp.libraries.restclient.exceptions.CspBusinessException;
-import com.sun.media.sound.InvalidDataException;
-import org.apache.camel.*;
+import org.apache.camel.Exchange;
+import org.apache.camel.ExchangePattern;
+import org.apache.camel.Produce;
+import org.apache.camel.ProducerTemplate;
 import org.apache.camel.http.common.HttpOperationFailedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,7 +17,6 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
