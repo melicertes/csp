@@ -11,8 +11,8 @@ services:
     command: java -Xmx512m -Dserver.ssl.enabled=false -Dapache.camel.use.activemq=true -Dspring.profiles.active=docker -jar server.jar
     working_dir: /opt/csp
     volumes:
-        - ./il-server-4.0.0-SNAPSHOT-exec.jar:/opt/csp/server.jar
-        - ./integration-tests-4.0.0-SNAPSHOT.jar:/opt/csp/itests.jar
+        - ./il-server-4.0.7-SNAPSHOT-exec.jar:/opt/csp/server.jar
+        - ./integration-tests-4.0.7-SNAPSHOT.jar:/opt/csp/itests.jar
         - /opt/csp/logs/:/opt/csplogs
         - SSLDatavolume:/opt/ssl/
         - ILDatavolume:/opt/data/activemq
