@@ -21,29 +21,6 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
 
-//import javax.ws.rs.core.Cookie;
-//import javax.ws.rs.core.HttpHeaders;
-//import javax.net.ssl.HttpsURLConnection;
-//import javax.net.ssl.SSLContext;
-//import java.io.UnsupportedEncodingException;
-
-//import org.apache.commons.httpclient.HttpClient;
-//import org.apache.commons.httpclient.HttpStatus;
-//import org.apache.commons.httpclient.methods.PostMethod;
-//import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
-//import org.apache.commons.httpclient.methods.multipart.Part;
-//import org.apache.commons.httpclient.methods.multipart.StringPart;
-//
-//import org.apache.http.HttpEntity;
-//import org.apache.http.client.ClientProtocolException;
-//import org.apache.http.client.entity.UrlEncodedFormEntity;
-//import org.apache.http.client.methods.CloseableHttpResponse;
-//import org.apache.http.client.methods.HttpPost;
-//import org.apache.http.impl.client.CloseableHttpClient;
-//import org.apache.http.impl.client.HttpClients;
-//import org.apache.http.message.BasicNameValuePair;
-//import org.apache.http.util.EntityUtils;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -87,6 +64,7 @@ public class RtAppClient {
 	private static final String RT_REMOTE_USER = "RT_REMOTE_USER";
 	private static final String TICKET_SEARCH_PATH = "search/ticket";
 	private static final String TICKET_PATH = "ticket/";
+	private static final String USER = "user";
 
 	@Value("${rt.app.username}")
 	String username;
@@ -118,8 +96,7 @@ public class RtAppClient {
 
 	org.springframework.http.HttpStatus status;
 
-	public RtAppClient() {
-		// client = ClientBuilder.newClient().register(TicketListParser.class);
+	public RtAppClient() {		
 	}
 
 	private KeyStore loadStore(String keyStoreFile, String keyStorePassword) throws Exception {
@@ -135,7 +112,8 @@ public class RtAppClient {
 
 	private List<Ticket> getTicketsForId(final String ticketid) {
 		LOG.debug("get_tickets......");
-		String context = rtClient.getRtURI();
+		// String context = rtClient.getRtURI();
+		String context = rtClient.constructUriWithPathParameter("").toUriString();
 		LOG.debug("get_tickets:" + context);
 		ClientBuilder builder = ClientBuilder.newBuilder();
 
@@ -366,10 +344,11 @@ public class RtAppClient {
 		String ticketId = uuids.get(0).getTid();
 		LOG.debug("RT Object exists:id: " + ticketId);
 
-		String updatePath = "/ticket/" + ticketId + "/edit?user=" + username;
+		// String updatePath = "/ticket/" + ticketId + "/edit?user=" + username;
+		String updatePath = "/ticket/" + ticketId + "/edit";
 
 		try {
-			ResponseEntity<String> responseEntity = rtClient.postContentData(reportContent, updatePath);
+			ResponseEntity<String> responseEntity = rtClient.postContentData(reportContent, updatePath, USER, username);
 			status = responseEntity.getStatusCode();
 			LOG.info(responseEntity.toString());
 			response = responseEntity.getBody();
@@ -406,12 +385,14 @@ public class RtAppClient {
 		reportContent = reportContent + CF_REPORTER_TYPE + CF_REPORTER + "\n";
 		// LOG.debug("ReportContent:" + reportContent);
 
-		String addReportPath = "/ticket/new?user=" + username;
+		// String addReportPath = "/ticket/new?user=" + username;
+		String addReportPath = "/ticket/new";
 		LOG.debug("addRtReport:" + addReportPath);
 
 		String response = null;
 		try {
-			ResponseEntity<String> responseEntity = rtClient.postContentData(reportContent, addReportPath);
+			ResponseEntity<String> responseEntity = rtClient.postContentData(reportContent, addReportPath, USER,
+					username);
 			status = responseEntity.getStatusCode();
 			LOG.info(responseEntity.toString());
 			response = responseEntity.getBody();
@@ -590,12 +571,13 @@ public class RtAppClient {
 		String content = "id: ticket/" + ticketid + "links\nMemberOf: fsck.com-rt://example.com/ticket/" + linkId;
 		LOG.debug("addLink2Incident:content" + content);
 
-		String linksTicketPath = "/ticket/" + ticketid + "/links?user=" + username;
+		// String linksTicketPath = "/ticket/" + ticketid + "/links?user=" + username;
+		String linksTicketPath = TICKET_PATH + ticketid + "/links";
 		LOG.debug("addLink2Incident:" + linksTicketPath);
 
 		String res = null;
 		try {
-			ResponseEntity<String> responseEntity = rtClient.postContentData(content, linksTicketPath);
+			ResponseEntity<String> responseEntity = rtClient.postContentData(content, linksTicketPath, USER, username);
 			status = responseEntity.getStatusCode();
 			LOG.info(responseEntity.toString());
 			res = responseEntity.getBody();
@@ -644,12 +626,13 @@ public class RtAppClient {
 		String content = "id: " + ticketid + "\nAction: comment\nText: " + msg;
 		LOG.debug("addMessage2Incident:" + content);
 
-		String path = "/ticket/" + ticketid + "/comment?user=" + username;
-		LOG.debug("addMessage2Incident:" + path);
+		// String path = "/ticket/" + ticketid + "/comment?user=" + username;
+		String commentPath = TICKET_PATH + ticketid + "/comment";
+		LOG.debug("addMessage2Incident:" + commentPath);
 
 		String res = null;
 		try {
-			ResponseEntity<String> responseEntity = rtClient.postContentData(content, path);
+			ResponseEntity<String> responseEntity = rtClient.postContentData(content, commentPath, USER, username);
 			status = responseEntity.getStatusCode();
 			LOG.info(responseEntity.toString());
 			res = responseEntity.getBody();
@@ -713,12 +696,14 @@ public class RtAppClient {
 		ticketContent = ticketContent + "CF.{RT_UUID}: " + PREFIX_ADAPTER
 				+ incident.getCustomField(IncidentCustomFields.CF_RT_UUID) + "\n";
 
-		String addTicketPath = "/ticket/new?user=" + username;
+		// String addTicketPath = "/ticket/new?user=" + username;
+		String addTicketPath = TICKET_PATH + "new";
 		LOG.debug("addRtTicket:" + addTicketPath);
 
 		String response = null;
 		try {
-			ResponseEntity<String> responseEntity = rtClient.postContentData(ticketContent, addTicketPath);
+			ResponseEntity<String> responseEntity = rtClient.postContentData(ticketContent, addTicketPath, USER,
+					username);
 			status = responseEntity.getStatusCode();
 			LOG.info(responseEntity.toString());
 			response = responseEntity.getBody();
@@ -746,11 +731,12 @@ public class RtAppClient {
 		String content = buildTicketContent(incident, incident.getQueue(), originplusApplicationId, true);
 		content = buildAndAdjustLinks(incident, content);
 
-		String path = "/ticket/" + ticketId + "/edit?user=" + username;
+		// String path = "/ticket/" + ticketId + "/edit?user=" + username;
+		String path = TICKET_PATH + ticketId + "/edit";
 		LOG.debug("updateRtTicket:" + path);
 		String response = null;
 		try {
-			ResponseEntity<String> responseEntity = rtClient.postContentData(content, path);
+			ResponseEntity<String> responseEntity = rtClient.postContentData(content, path, USER, username);
 			status = responseEntity.getStatusCode();
 			LOG.info(responseEntity.toString());
 			response = responseEntity.getBody();
@@ -888,9 +874,10 @@ public class RtAppClient {
 		reportContent = reportContent + "Subject: " + "TEST :Subject" + "\n";
 		reportContent = reportContent + CF_HOW_REPORTED + CF_REPORTER + "\n";
 		reportContent = reportContent + CF_REPORTER_TYPE + CF_REPORTER + "\n";
-		String testpath = "/ticket/new?user=" + username;
+		// String testpath = "/ticket/new?user=" + username;
+		String testpath = TICKET_PATH + "new";
 		LOG.debug("callRtNewReportTest:" + testpath);
-		ResponseEntity<String> response = rtClient.postContentData(reportContent, testpath);
+		ResponseEntity<String> response = rtClient.postContentData(reportContent, testpath, USER, username);
 		response.getStatusCode();
 		LOG.debug("callRtNewReportTest:" + response.getStatusCode());
 		String responseBody = response.getBody();

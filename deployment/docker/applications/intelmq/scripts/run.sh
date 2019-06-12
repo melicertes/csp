@@ -2,6 +2,8 @@
 
 set -e
 
+APACHE_PID_FILE=/var/run/apache2/apache2.pid
+
 echo "[i] starting the intlemq pipes ..."
 sudo chmod -R ugo+w /opt/intelmq/var/log
 sudo -u intelmq /usr/local/bin/intelmqctl start
