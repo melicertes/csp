@@ -102,21 +102,21 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler {
 		// We have EVENT
 		else {
 			try {
-				
-				uuid = jsonNode.get("Event").get("uuid").toString().replace("\"", "");	
+
+				uuid = jsonNode.get("Event").get("uuid").toString().replace("\"", "");
 				LOG.debug("Get event_uuid: " + uuid);
 			} catch (Exception e) {
 				LOG.warn("FAILED TO READ UUID FROM JSON EVENT NODE.");
 				LOG.warn("READ UUID FROM JSON EVENT NODE. FAILED WITH:" + e);
 			}
-			try {			
-				event_info = jsonNode.get("Event").get("info").toString().replace("\"", "");		
+			try {
+				event_info = jsonNode.get("Event").get("info").toString().replace("\"", "");
 				LOG.debug("Get event_info: " + event_info);
 			} catch (Exception e) {
 				LOG.warn("FAILED TO READ INFO NODE.");
 				LOG.warn("READ EVENT INFO NODE. FAILED WITH:" + e);
 			}
-			try {				
+			try {
 				// "threat_level_id": "1",
 				threat_level_id = jsonNode.get("Event").get("threat_level_id").toString().replace("\"", "");
 				LOG.debug("Get threat_level_id: " + threat_level_id);
@@ -127,7 +127,7 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler {
 		}
 		// WE have a intelmq event
 		if (uuid == null || uuid.isEmpty()) {
-			// TODO: workaround event fron intelmq has no UUID so we create one
+			// TODO: workaround event from intelmq has no UUID so we create one
 			/*
 			 * LOG.error("handleIntegrationData failed to get uuid from JSON Node");
 			 * 
@@ -137,12 +137,15 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler {
 			 */
 			LOG.debug("Create new UUID for event.");
 			uuid = UUID.randomUUID().toString();
-			String raw = jsonNode.get("raw").toString();
-			byte[] decoded = Base64.decodeBase64(raw);
+
 			try {
+				String raw = jsonNode.get("raw").toString();
+				byte[] decoded = Base64.decodeBase64(raw);
 				event_info = new String(decoded, "UTF-8");
 			} catch (UnsupportedEncodingException e) {
 				LOG.error("Decode raw string failed with:" + e);
+			} catch (NullPointerException ex) {
+				LOG.debug("Node has no raw information.");
 			}
 		}
 

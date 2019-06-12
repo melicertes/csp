@@ -10,10 +10,11 @@ services:
     hostname: csp-intelmq
     command: sh /scripts/run.sh
     volumes:
+       - IMQConfigVolume:/opt/intelmq/etc
        - /opt/csp/intelmq-fileinput/:/tmp/intelmq-fileinput
        - /opt/csp/intelmq-fileoutput/:/tmp/intelmq-fileoutput
        - /opt/csp/logs/imq:/opt/intelmq/var/log
-    expose:
+    ports:
        - ${INTELMQ_DOCR_PORT}
 
   intelmq-adapter:
@@ -27,7 +28,7 @@ services:
         - .env
     command: java  -Xmx512m -Dspring.profiles.active=docker -jar server.jar
     working_dir: /opt/csp
-    expose:
+    ports:
         - 80
     volumes:
         - ./intelmq-emitter-4.0.0-SNAPSHOT-exec.jar:/opt/csp/server.jar
@@ -36,6 +37,8 @@ services:
 
 volumes:
    SSLDatavolume:
+        external: true
+   IMQConfigVolume:
         external: true
 
 networks:
