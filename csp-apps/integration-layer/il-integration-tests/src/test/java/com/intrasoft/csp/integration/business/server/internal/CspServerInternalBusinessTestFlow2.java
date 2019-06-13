@@ -159,10 +159,10 @@ public class CspServerInternalBusinessTestFlow2 implements CamelRoutes {
         mvc = webAppContextSetup(webApplicationContext).build();
         mockUtils.setSpringCamelContext(springCamelContext);
 
-        mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX, routes.apply(DSL), mockedDsl.getEndpointUri());
-        mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX, routes.apply(TC), mockedTC.getEndpointUri());
-        mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX, routes.apply(APP), mockedApp.getEndpointUri());
-        mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX, routes.apply(DCL), mockedEDcl.getEndpointUri());
+        mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX, routes.wrap(DSL), mockedDsl.getEndpointUri());
+        mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX, routes.wrap(TC), mockedTC.getEndpointUri());
+        mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX, routes.wrap(APP), mockedApp.getEndpointUri());
+        mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX, routes.wrap(DCL), mockedEDcl.getEndpointUri());
     }
 
     /**

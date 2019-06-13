@@ -1,5 +1,6 @@
 package com.intrasoft.csp.server.processors;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.intrasoft.csp.commons.model.EnhancedTeamDTO;
 import com.intrasoft.csp.commons.model.Team;
 import com.intrasoft.csp.commons.routes.ContextUrl;
@@ -7,6 +8,7 @@ import com.intrasoft.csp.server.config.CspSslConfiguration;
 import com.intrasoft.csp.server.routes.RouteUtils;
 import com.intrasoft.csp.server.service.CamelRestService;
 import org.apache.camel.*;
+import org.apache.camel.util.GZIPHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,19 +17,25 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.intrasoft.csp.commons.routes.CamelRoutes.ECSP;
+import static com.intrasoft.csp.commons.routes.CamelRoutes.FILE_DUMP_GLOBAL;
 
 @Component
 public class NotifierProcessor implements Processor {
     private static final Logger LOG = LoggerFactory.getLogger(NotifierProcessor.class);
     private static final int TIMEOUT = 5000;
+
+    @Autowired
+    ObjectMapper objectMapper;
 
     @Value("${server.subdomain.prefix}")
     String serverSubdomainPrefix;
@@ -55,7 +63,7 @@ public class NotifierProcessor implements Processor {
     @Override
     public void process(Exchange exchange) throws Exception {
         Team team = exchange.getIn().getBody(Team.class);
-        checkAndDeliver(team);
+        checkAndDeliver(team, LocalDateTime.now()); //we check against the event just received (assume failure is now)
     }
 
     @Scheduled(initialDelay = 60000L, fixedDelay = 60000000L)
@@ -69,15 +77,15 @@ public class NotifierProcessor implements Processor {
                     .map( entry -> entry.getKey()).collect(Collectors.toList()); // these are expired entries, we need to reprocess.
             LOG.debug("Notifier - Now will retry the following CSP teams: {}", copied.size());
             forProcessing.forEach( t -> {
-                failedConnectivityTest.remove(t);
+                LocalDateTime timeOfFailure = failedConnectivityTest.get(t); //get the last timeOfFailure
                 LOG.debug("Notifier - RETRY - CSP {} ({}) {}", t.getCspId(), t.getUrl(), t.getCountry());
-                checkAndDeliver(t);
+                checkAndDeliver(t, timeOfFailure);
             });
 
         }
     }
 
-    private void checkAndDeliver(Team team) {
+    private void checkAndDeliver(Team team, LocalDateTime timeOfFailure) {
         LOG.info("Notifier - Testing connectivity to external CSP: " + team.getName() + " -- " + team.getUrl());
         String externalSslPort = StringUtils.isEmpty(cspSslConfiguration.getExternalSslPort())?"":
                 ":"+cspSslConfiguration.getExternalSslPort();
@@ -98,19 +106,34 @@ public class NotifierProcessor implements Processor {
         // check connectivity here
         if (checkConnectivity(api)) {
             LOG.debug("Notifier - Connectivity success to {} - now delivering messages",api);
-            consumeMessagesFrom(team);
+            deliverMessagesTo(team);
+            failedConnectivityTest.remove(team); //remove from rechecking list
         } else { // we have failed the connectivity test.
-            failedConnectivityTest.put(team, LocalDateTime.now());
+            if (!failedConnectivityTest.containsKey(team)) {
+                failedConnectivityTest.put(team, timeOfFailure);
+                LOG.warn("Notifier - Connectivity has failed for {} at {}",team, api);
+            } else {
+                final LocalDateTime failureTime = failedConnectivityTest.get(team);
+                LOG.warn("Notifier - Connectivity has failed again for {}, failing since {}", team, failureTime);
+                if (failureTime.plusWeeks(1).isBefore(LocalDateTime.now())) { // failing for more than 1 week
+                    LOG.error("Notifier - team {} fails delivery for more than 1 week, expiring all messages");
+                    Exchange exchange = null;
+                    while ((exchange = consumer.receive(routes.wrap(ECSP + "." + team.getName()), TIMEOUT)) != null) {
+                        final Map<String, Object> headers = exchange.getIn().getHeaders();
+                        EnhancedTeamDTO body = exchange.getIn().getBody(EnhancedTeamDTO.class);
+                        producer.sendBody(FILE_DUMP_GLOBAL, convertToDump(headers,body));
+                    }
+                }
+            }
         }
     }
-
-    private void consumeMessagesFrom(Team team) {
+    private void deliverMessagesTo(Team team) {
         Exchange exchange = null;
-        while ( (exchange = consumer.receive(routes.apply(ECSP+"."+team.getName()), TIMEOUT)) != null) {
+        while ( (exchange = consumer.receive(routes.wrap(ECSP+"."+team.getName()), TIMEOUT)) != null) {
             final Map<String, Object> headers = exchange.getIn().getHeaders();
             EnhancedTeamDTO body = exchange.getIn().getBody(EnhancedTeamDTO.class);
             LOG.info("Notifier - Delivering type {} to {}/{}", body.getIntegrationData().getDataType(), team.getCspId(),team.getUrl());
-            producer.sendBodyAndHeaders(routes.apply(ECSP),
+            producer.sendBodyAndHeaders(routes.wrap(ECSP),
                     ExchangePattern.InOnly, body, headers);
         }
     }
@@ -125,4 +148,23 @@ public class NotifierProcessor implements Processor {
             return false;
         }
     }
+
+
+    /**
+     * convert the message to a more compact format to dump in the logs
+     * @param headers
+     * @param body
+     * @return a simple String payload
+     */
+    private String convertToDump(Map<String, Object> headers, EnhancedTeamDTO body) {
+        try {
+            final byte[] gzip = GZIPHelper.compressGZIP(objectMapper.writeValueAsBytes(new Object[]{headers, body}));
+            return String.format("{ \"dmp\":\"%s\" }", Base64.getEncoder().encodeToString(gzip));
+        } catch (IOException e) {
+            LOG.error("While packaging dump of {}, error occured {} ",body.getTeam().getName(), e.getMessage());
+            return String.format("{ \"dmp\":\"event dump for team %s failed to serialize - %s - %s\" }", body.getTeam().getName(), e.getMessage(), body.getIntegrationData().getDataType());
+        }
+    }
+
+
 }

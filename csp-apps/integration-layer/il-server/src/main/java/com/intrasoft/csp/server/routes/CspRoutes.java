@@ -60,7 +60,7 @@ public class CspRoutes extends RouteBuilder implements CamelRoutes{
     public void configure() {
 
         // same approach with onException below
-        /*errorHandler(deadLetterChannel(endpoint.apply(ERROR))
+        /*errorHandler(deadLetterChannel(endpoint.wrap(ERROR))
                 .maximumRedeliveries(maxRedeliveryAttempts)
                 .redeliveryDelay(redeliveryDelay)
                 .retryAttemptedLogLevel(LoggingLevel.WARN)
@@ -78,7 +78,7 @@ public class CspRoutes extends RouteBuilder implements CamelRoutes{
                 .process(AsyncProcessorConverterHelper.convert(exceptionProcessor))
                 .handled(true)
                 .threads(10)
-                .inOnly(endpoint.apply(ERROR))
+                .inOnly(endpoint.wrap(ERROR))
         ;
 
         //just handle the specific exception without any redelivery, just let the exceptionProcessor log the error
@@ -86,48 +86,52 @@ public class CspRoutes extends RouteBuilder implements CamelRoutes{
         onException(InvalidSharingParamsException.class).process(exceptionProcessor).handled(true);
         onException(InvalidDataException.class).process(exceptionProcessor).handled(true);
 
-        from(endpoint.apply(DSL))
+        from(endpoint.wrap(DSL))
                 .setExchangePattern(ExchangePattern.InOnly)
                 //.threads(10)
                 .process(dslProcessor)
                 .recipientList(header("recipients"));
 
-        from(endpoint.apply(DDL))
+        from(endpoint.wrap(DDL))
                 .setExchangePattern(ExchangePattern.InOnly)
                 .process(ddlProcessor)
                 .recipientList(header("recipients"));
 
-        from(endpoint.apply(DCL))
+        from(endpoint.wrap(DCL))
                 .process(dclProcessor)
                 .recipientList(header("recipients"));
 
-        from(endpoint.apply(EDCL))
+        from(endpoint.wrap(EDCL))
                 .process(edclProcessor)
                 .recipientList(header("recipients"));
 
         //TrustCircles Circles routes
-        from(endpoint.apply(TC))
+        from(endpoint.wrap(TC))
                  //.threads(10)//TC processing is heavy worker,thus making it threaded // commenting out, the TC requests must not be delivered async, since priority for TC server makes a difference
                 .process(tcProcessor)
         ;
 
         //ExternalCSPs
-        from(endpoint.apply(ECSP))
+        from(endpoint.wrap(ECSP))
                 .setExchangePattern(ExchangePattern.InOnly)
                 .process(AsyncProcessorConverterHelper.convert(ecspProcessor));// AsyncProcessorConverterHelper.convert(
         //Notifier processes events for external CSPs, if connectivity is verified, then proceeds to consume messages
 
-        from(endpoint.apply(CamelRoutes.NOTIFIER))
+        from(endpoint.wrap(CamelRoutes.NOTIFIER))
                 .setExchangePattern(ExchangePattern.InOnly)
                 .process(AsyncProcessorConverterHelper.convert(notifierProcessor));
 
+        // Route to dump events in a file when failed delivery
+        from(FILE_DUMP_GLOBAL)//note: this url should not be passed through endpoint.wrap()
+                .id("file-dump-global-queue")
+                .to("file:/opt/csplogs/?fileName=CSP.IL_EVENT_DUMP_${date:now:yyyyMMdd-hh.00}.dmp&fileExist=Append");
 
         //App routing
-        from(endpoint.apply(APP))
+        from(endpoint.wrap(APP))
                 .process(appProcessor);
 
         //Elastic route
-        from(endpoint.apply(ELASTIC))
+        from(endpoint.wrap(ELASTIC))
                 .setExchangePattern(ExchangePattern.InOnly)
                  //.threads(10) // commenting out, the order of the requests might matter, like in TC requests
                 .process(elasticProcessor);

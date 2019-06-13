@@ -178,13 +178,13 @@ public class CspServerInternalBusinessTestFlow1verbs implements CamelRoutes {
         mvc = webAppContextSetup(webApplicationContext).build();
         mockUtils.setSpringCamelContext(springCamelContext);
 
-        mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX, routes.apply(DSL), mockedDsl.getEndpointUri());
-        mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX, routes.apply(APP), mockedApp.getEndpointUri());
-        mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX, routes.apply(DDL), mockedDdl.getEndpointUri());
-        mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX, routes.apply(DCL), mockedDcl.getEndpointUri());
-        mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX, routes.apply(TC), mockedTC.getEndpointUri());
-        mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX, routes.apply(ECSP), mockedEcsp.getEndpointUri());
-        mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX, routes.apply(ELASTIC), mockedElastic.getEndpointUri());
+        mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX, routes.wrap(DSL), mockedDsl.getEndpointUri());
+        mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX, routes.wrap(APP), mockedApp.getEndpointUri());
+        mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX, routes.wrap(DDL), mockedDdl.getEndpointUri());
+        mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX, routes.wrap(DCL), mockedDcl.getEndpointUri());
+        mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX, routes.wrap(TC), mockedTC.getEndpointUri());
+        mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX, routes.wrap(ECSP), mockedEcsp.getEndpointUri());
+        mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX, routes.wrap(ELASTIC), mockedElastic.getEndpointUri());
 
         EvaluatedPolicyDTO evaluatedPolicyDTO = new EvaluatedPolicyDTO();
         evaluatedPolicyDTO.setSharingPolicyAction(SharingPolicyAction.NO_ACTION_FOUND);
@@ -333,7 +333,7 @@ public class CspServerInternalBusinessTestFlow1verbs implements CamelRoutes {
             Message in = exchange.getIn();
             IntegrationData data = in.getBody(IntegrationData.class);
             assertThat(data.getDataType(), is(this.dataTypeToTest));
-            assertThat(exchange.getIn().getHeader(CamelRoutes.ORIGIN_ENDPOINT), is(routes.apply(CamelRoutes.DCL)));
+            assertThat(exchange.getIn().getHeader(CamelRoutes.ORIGIN_ENDPOINT), is(routes.wrap(CamelRoutes.DCL)));
         }
 
         //ESCP

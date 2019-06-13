@@ -19,7 +19,7 @@ public interface CamelRoutes {
     String APP ="app";
     String ELASTIC ="elastic";
     String NOTIFIER = "notifier";
-
+    String FILE_DUMP_GLOBAL = "direct:filedump";
     String ORIGIN_ENDPOINT ="originEndpoint";
     String ERROR ="error";
 }

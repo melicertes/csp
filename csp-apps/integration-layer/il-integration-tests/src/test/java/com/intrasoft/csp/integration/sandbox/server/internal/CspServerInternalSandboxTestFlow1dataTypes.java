@@ -32,7 +32,6 @@ import org.springframework.boot.test.rule.OutputCapture;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpMethod;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.util.StringUtils;
 import org.springframework.web.context.WebApplicationContext;
@@ -169,13 +168,13 @@ public class CspServerInternalSandboxTestFlow1dataTypes implements CamelRoutes {
         elasticUri = elasticProtocol + "://" + elasticHost + ":" + elasticPort + elasticPath;
 
 
-        mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX, routes.apply(DSL), mockedDsl.getEndpointUri());
-        mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX, routes.apply(DDL), mockedDdl.getEndpointUri());
-        mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX, routes.apply(ECSP), mockedEcsp.getEndpointUri());
-        mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX, routes.apply(TC), mockedTC.getEndpointUri());
-        mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX, routes.apply(ELASTIC), mockedElastic.getEndpointUri());
-        mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX, routes.apply(APP), mockedApp.getEndpointUri());
-        mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX, routes.apply(DCL), mockedDcl.getEndpointUri());
+        mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX, routes.wrap(DSL), mockedDsl.getEndpointUri());
+        mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX, routes.wrap(DDL), mockedDdl.getEndpointUri());
+        mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX, routes.wrap(ECSP), mockedEcsp.getEndpointUri());
+        mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX, routes.wrap(TC), mockedTC.getEndpointUri());
+        mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX, routes.wrap(ELASTIC), mockedElastic.getEndpointUri());
+        mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX, routes.wrap(APP), mockedApp.getEndpointUri());
+        mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX, routes.wrap(DCL), mockedDcl.getEndpointUri());
 
         //Initialize internalApps Hashmap according application.properties (internal section)
         internalApps.put(IntegrationDataType.THREAT, 1);

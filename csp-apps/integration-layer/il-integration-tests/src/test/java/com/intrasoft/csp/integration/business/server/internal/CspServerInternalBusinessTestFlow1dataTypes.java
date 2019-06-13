@@ -36,7 +36,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.rule.OutputCapture;
 import org.springframework.core.env.Environment;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.util.StringUtils;
 import org.springframework.web.context.WebApplicationContext;
@@ -203,13 +202,13 @@ public class CspServerInternalBusinessTestFlow1dataTypes implements CamelRoutes 
         mvc = webAppContextSetup(webApplicationContext).build();
         mockUtils.setSpringCamelContext(springCamelContext);
 
-        mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX, routes.apply(DSL), mockedDsl.getEndpointUri());
-        mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX, routes.apply(APP), mockedApp.getEndpointUri());
-        mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX, routes.apply(DDL), mockedDdl.getEndpointUri());
-        mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX, routes.apply(DCL), mockedDcl.getEndpointUri());
-        mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX, routes.apply(TC), mockedTC.getEndpointUri());
-        mockUtils.mockRouteSkipSendToOriginalEndpoint(CamelRoutes.MOCK_PREFIX, routes.apply(ECSP), mockedEcsp.getEndpointUri());
-        mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX, routes.apply(ELASTIC), mockedElastic.getEndpointUri());
+        mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX, routes.wrap(DSL), mockedDsl.getEndpointUri());
+        mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX, routes.wrap(APP), mockedApp.getEndpointUri());
+        mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX, routes.wrap(DDL), mockedDdl.getEndpointUri());
+        mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX, routes.wrap(DCL), mockedDcl.getEndpointUri());
+        mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX, routes.wrap(TC), mockedTC.getEndpointUri());
+        mockUtils.mockRouteSkipSendToOriginalEndpoint(CamelRoutes.MOCK_PREFIX, routes.wrap(ECSP), mockedEcsp.getEndpointUri());
+        mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX, routes.wrap(ELASTIC), mockedElastic.getEndpointUri());
 
         //Initialize internalApps Hashmap according application.properties (internal section)
         internalApps.put(IntegrationDataType.THREAT, env.getProperty("internal.threat.apps").split(",").length);
@@ -468,7 +467,7 @@ public class CspServerInternalBusinessTestFlow1dataTypes implements CamelRoutes 
             Message in = exchange.getIn();
             IntegrationData data = in.getBody(IntegrationData.class);
             assertThat(data.getDataType(), is(dataType));
-            assertThat(exchange.getIn().getHeader(CamelRoutes.ORIGIN_ENDPOINT), is(routes.apply(CamelRoutes.DCL)));
+            assertThat(exchange.getIn().getHeader(CamelRoutes.ORIGIN_ENDPOINT), is(routes.wrap(CamelRoutes.DCL)));
         }
 
         //ESCP

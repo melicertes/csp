@@ -92,10 +92,10 @@ public class CspServerInternalDemoTcTest implements CamelRoutes {
     public void init() throws Exception {
         mvc = webAppContextSetup(webApplicationContext).build();
         mockUtils.setSpringCamelContext(springCamelContext);
-        mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX,routes.apply(DSL),mockedDsl.getEndpointUri());
-        mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX,routes.apply(DCL),mockedDcl.getEndpointUri());
-        mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX,routes.apply(DDL),mockedDdl.getEndpointUri());
-        mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX,routes.apply(TC),mockedTC.getEndpointUri());
+        mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX,routes.wrap(DSL),mockedDsl.getEndpointUri());
+        mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX,routes.wrap(DCL),mockedDcl.getEndpointUri());
+        mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX,routes.wrap(DDL),mockedDdl.getEndpointUri());
+        mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX,routes.wrap(TC),mockedTC.getEndpointUri());
     }
 
     // Use @DirtiesContext on each test method to force Spring Testing to automatically reload the CamelContext after
@@ -124,7 +124,7 @@ public class CspServerInternalDemoTcTest implements CamelRoutes {
             Message in = exchange.getIn();
             IntegrationData dataIn = in.getBody(IntegrationData.class);
             assertThat(dataIn.getDataType(), is(IntegrationDataType.INCIDENT));
-            assertThat(exchange.getIn().getHeader(CamelRoutes.ORIGIN_ENDPOINT),is(routes.apply(CamelRoutes.DCL)));
+            assertThat(exchange.getIn().getHeader(CamelRoutes.ORIGIN_ENDPOINT),is(routes.wrap(CamelRoutes.DCL)));
         }
 
         mockedDcl.expectedMessageCount(1);

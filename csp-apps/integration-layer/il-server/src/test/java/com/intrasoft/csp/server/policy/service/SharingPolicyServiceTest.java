@@ -32,17 +32,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.core.env.Environment;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
+
 import javax.script.ScriptException;
 import java.util.Comparator;
 import java.util.List;
-import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -115,9 +112,9 @@ public class SharingPolicyServiceTest implements CamelRoutes {
         mvc = webAppContextSetup(webApplicationContext).build();
         MockitoAnnotations.initMocks(this);
         mockUtils.setSpringCamelContext(springCamelContext);
-        mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX,routes.apply(DSL),mockedDsl.getEndpointUri());
-        mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX,routes.apply(DDL), mockedDdl.getEndpointUri());
-        mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX,routes.apply(ECSP), mockedEcsp.getEndpointUri());
+        mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX,routes.wrap(DSL),mockedDsl.getEndpointUri());
+        mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX,routes.wrap(DDL), mockedDdl.getEndpointUri());
+        mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX,routes.wrap(ECSP), mockedEcsp.getEndpointUri());
         Mockito.when(camelRestService.sendAndGetList(anyString(), anyObject(), eq("GET"), eq(TrustCircle.class),anyObject()))
                 .thenReturn(mockUtils.getAllMockedTrustCircles(3));
         Mockito.when(camelRestService.send(anyString(), anyObject(), eq("GET"), eq(TrustCircle.class)))

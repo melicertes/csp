@@ -46,7 +46,7 @@ public class DclProcessor implements Processor,CamelRoutes {
 
         //pass message for TC processing
         exchange.getIn().setBody(integrationData);
-        exchange.getIn().setHeader(CamelRoutes.ORIGIN_ENDPOINT, routes.apply(DCL));
-        exchange.getIn().setHeader("recipients", routes.apply(TC));
+        exchange.getIn().setHeader(CamelRoutes.ORIGIN_ENDPOINT, routes.wrap(DCL));
+        exchange.getIn().setHeader("recipients", routes.wrap(TC));
     }
 }

@@ -13,9 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 
 @Component
 public class EdclProcessor implements Processor,CamelRoutes {
@@ -44,8 +41,8 @@ public class EdclProcessor implements Processor,CamelRoutes {
         exchange.getIn().setHeader(Exchange.HTTP_METHOD, httpMethod);
         //pass message for TC processing
         exchange.getIn().setBody(integrationData);
-        exchange.getIn().setHeader(CamelRoutes.ORIGIN_ENDPOINT, routes.apply(EDCL));
-        exchange.getIn().setHeader("recipients", routes.apply(TC));
+        exchange.getIn().setHeader(CamelRoutes.ORIGIN_ENDPOINT, routes.wrap(EDCL));
+        exchange.getIn().setHeader("recipients", routes.wrap(TC));
 
     }
 }

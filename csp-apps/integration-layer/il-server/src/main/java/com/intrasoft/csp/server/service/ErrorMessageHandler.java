@@ -11,15 +11,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.MediaType;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Created by iskitsas on 5/5/17.
@@ -76,7 +73,7 @@ public class ErrorMessageHandler implements CamelRoutes {
         StringBuilder ret = new StringBuilder();
         Map<Integer, Exchange> failuresMap = new HashMap<>();
         for(int i=0; i<maxMessagesToConsume;i++){
-            String line = "Consuming from "+endpoint.apply(ERROR)+", Count "+(i+1)+": ";
+            String line = "Consuming from "+endpoint.wrap(ERROR)+", Count "+(i+1)+": ";
             String c = consumeErrorMessage(msDelay,i,failuresMap);
             if(c!=null){
                 line += c;
@@ -91,7 +88,7 @@ public class ErrorMessageHandler implements CamelRoutes {
 
     private String consumeErrorMessage(Long msDelay, int count, Map<Integer,Exchange> failuresMap){
         String ret = "";
-        Exchange exchange = consumer.receive(endpoint.apply(ERROR),msDelay);
+        Exchange exchange = consumer.receive(endpoint.wrap(ERROR),msDelay);
 
         if(exchange!=null) { // if a message is found in error Q
             //CRITICAL: The message has been consumed, in case of exception we should not loose the message
@@ -139,7 +136,7 @@ public class ErrorMessageHandler implements CamelRoutes {
                 }
 
             }catch (Exception e){
-                LOG.error("CRITICAL error, message from "+endpoint.apply(ERROR)+" will be lost." +
+                LOG.error("CRITICAL error, message from "+endpoint.wrap(ERROR)+" will be lost." +
                         "Headers:"+exchange.getIn().getHeaders().toString()+", Body:"+exchange.getIn().getBody().toString(), e);
                 //TODO: recover this state
             }
@@ -151,7 +148,7 @@ public class ErrorMessageHandler implements CamelRoutes {
     }
 
     public void consumeErrorMessagesOnIterval(){
-        LOG.debug("Consume any messages found in "+endpoint.apply(ERROR)+" on specific time interval.");
+        LOG.debug("Consume any messages found in "+endpoint.wrap(ERROR)+" on specific time interval.");
         Map<Integer, Exchange> failuresMap = new HashMap<>();
         boolean consumeWhileFound = true;
         int count = 0;
@@ -168,7 +165,7 @@ public class ErrorMessageHandler implements CamelRoutes {
         if(!failuresMap.isEmpty()){
             for (Map.Entry<Integer, Exchange> entry : failuresMap.entrySet()) {
                 //resend to DLQ any tried and failed
-                producer.send(endpoint.apply(ERROR),entry.getValue());
+                producer.send(endpoint.wrap(ERROR),entry.getValue());
             }
         }
     }

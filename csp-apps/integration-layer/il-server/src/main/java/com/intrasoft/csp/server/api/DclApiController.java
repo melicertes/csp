@@ -1,7 +1,5 @@
 package com.intrasoft.csp.server.api;
 
-import com.intrasoft.csp.commons.apiHttpStatusResponse.HttpStatusResponseType;
-import com.intrasoft.csp.commons.exceptions.InvalidDataTypeException;
 import com.intrasoft.csp.commons.model.IntegrationData;
 import com.intrasoft.csp.commons.routes.CamelRoutes;
 import com.intrasoft.csp.commons.routes.ContextUrl;
@@ -60,6 +58,6 @@ public class DclApiController implements CamelRoutes,ContextUrl{
 
 
     private ResponseEntity<String> handleIntegrationData(IntegrationData integrationData ,String requestMethod){
-        return apiDataHandler.handleIntegrationData(routes.apply(EDCL),integrationData,requestMethod);
+        return apiDataHandler.handleIntegrationData(routes.wrap(EDCL),integrationData,requestMethod);
     }
 }

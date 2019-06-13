@@ -28,7 +28,7 @@ public class RouteUtils implements CamelRoutes {
         }
     }
 
-    public String apply(String context){
+    public String wrap(String context){
         String ret =  endpoint+":"+(useActiveMQ != null && useActiveMQ?context.toUpperCase()+".Q":context);
         return ret;
     }
