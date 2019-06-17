@@ -81,6 +81,23 @@ updateMispConfig() {
   done
 }
 
+verifyMispDBConfig() {
+  cd /var/www/MISP/app/Config
+  CHK=`diff -q database.default.php database.php >/dev/null ; echo $?`
+  if [ $CHK -eq 0 ] 
+  then 
+   # MISP configuration
+   echo "Creating MISP configuration files"
+   cd /var/www/MISP/app/Config
+   cp -a database.default.php database.php
+   sed -i "s/localhost/$MYSQL_HOST/" database.php
+   sed -i "s/db\s*login/misp/" database.php
+   sed -i "s/8889/3306/" database.php
+   sed -i "s/db\s*password/$MYSQL_MISP_PASSWORD/" database.php
+  fi
+}
+
+
 verifyMispState
 
 if [ ! -f /opt/state/installed.tmp ]; then
@@ -186,14 +203,6 @@ EOSQL
                 echo $ret
         fi
 
-        # MISP configuration
-        echo "Creating MISP configuration files"
-        cd /var/www/MISP/app/Config
-        cp -a database.default.php database.php
-        sed -i "s/localhost/$MYSQL_HOST/" database.php
-        sed -i "s/db\s*login/misp/" database.php
-        sed -i "s/8889/3306/" database.php
-        sed -i "s/db\s*password/$MYSQL_MISP_PASSWORD/" database.php
 
         # Fix the base url
         if [ -z "$MISP_BASEURL" ]; then
@@ -266,6 +275,8 @@ Don't forget:
 __WELCOME__
         touch /opt/state/installed.tmp
 fi
+
+verifyMispDBConfig
 
 
 echo "Fixing permissions on /var/www/MISP/app/tmp/logs/"
