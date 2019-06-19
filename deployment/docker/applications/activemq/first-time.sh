@@ -6,6 +6,7 @@ if [ -f "$CHKPOINT42" ]; then
 else
   docker volume rm AMQDatavolume
   echo "[x] 4.2.x init complete"
+  echo " " > $CHKPOINT42
 fi
 
 docker volume create AMQDatavolume
