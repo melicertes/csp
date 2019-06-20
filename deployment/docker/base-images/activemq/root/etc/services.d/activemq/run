@@ -1,3 +1,0 @@
-#!/usr/bin/with-contenv sh
-
-su ${USER} -c "${APP_HOME}/bin/activemq console"
