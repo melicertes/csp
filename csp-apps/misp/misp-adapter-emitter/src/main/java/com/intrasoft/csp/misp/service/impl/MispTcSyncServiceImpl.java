@@ -301,10 +301,11 @@ public class MispTcSyncServiceImpl implements MispTcSyncService,Conversions {
         });
         if (!(tCircleTeamsUuids.size()>0)) {
             sGroupOrgsUuids.forEach(orgUuid -> {
+                LOG.debug("Remove org {} from sharing group {}", orgUuid, sGroupUuid);
                 if (mispAppClient.updateMispSharingGroupRemoveOrganisation(sGroupUuid, orgUuid)) {
-                    // log info after successful operation?
+                    LOG.debug("Org {} removed from sharing group {}", orgUuid, sGroupUuid);
                 } else {
-                    LOG.debug("Organisation(%s) could not be removed from Sharing Group(%s)", orgUuid, sGroupUuid);
+                    LOG.debug("Organisation {} could not be removed from Sharing Group {}", orgUuid, sGroupUuid);
                 }
             });
             sGroup.setSharingGroupOrg(null);
@@ -313,10 +314,11 @@ public class MispTcSyncServiceImpl implements MispTcSyncService,Conversions {
             // Remove any Organisations from the Sharing Group that don't match the given Trust Circle's Team UUID content.
             List<String> orgsToRemoveFromSG = removeUnlistedOrgs(tCircleTeamsUuids, sGroupOrgsUuids);
             orgsToRemoveFromSG.forEach(orgUuid -> {
+                LOG.debug("Remove org {} from sharing group {}", orgUuid, sGroupUuid);
                 if (mispAppClient.updateMispSharingGroupRemoveOrganisation(sGroupUuid, orgUuid)) {
-                    // log info after successful operation?
+                    LOG.debug("Org {} removed from sharing group {}", orgUuid, sGroupUuid);
                 } else {
-                    LOG.debug("Organisation(%s) could not be removed from Sharing Group(%s)", orgUuid, sGroupUuid);
+                    LOG.debug("Organisation  {} could not be removed from Sharing Group {}", orgUuid, sGroupUuid);
                 }
             });
             // Can't use UUID when getting a Sharing Group; use id instead. Otherwise, MISP returns "500 internal error".

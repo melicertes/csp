@@ -36,6 +36,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Objects;
 
 import static com.intrasoft.csp.misp.commons.config.MispContextUrl.MispEntity.EVENT;
 
@@ -78,30 +79,28 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler{
     public ResponseEntity<String> handleIntegrationData(IntegrationData integrationData, String requestMethod) {
 
         LOG.info("Handle integration data got by IL.");
+        LOG.trace(integrationData.toString());
         String uuid = integrationData.getDataParams().getOriginRecordId();
         Object getLocalEventResponseBody = integrationData.getDataObject();
 
 
         try{
-            LOG.debug("@@@ Fetch local event (if exists) based on the uuid of the incoming event.");
+            LOG.debug("Fetch local event (if exists) based on the uuid {} of the incoming event.", uuid);
             getLocalEventResponseBody = mispAppClient.getMispEvent(uuid).getBody();
         } catch (StatusCodeException e){
-            LOG.error("@@@ Event not found, probably a new event");
+            LOG.error("Event not found, probably a new event");
         }
 
-        localJsonNode = null;
         localJsonNode = new ObjectMapper().convertValue(getLocalEventResponseBody, JsonNode.class);
 
-        try {
+        if (Objects.nonNull(localJsonNode.get("Event")) && Objects.nonNull(localJsonNode.get("Event").get("id"))){
             localEventId = localJsonNode.get("Event").get("id").textValue();
-            LOG.debug("@@@ Extract id from local event. id: " + localEventId );
-        } catch (Exception e){
-            LOG.error("Failed: " + e);
+            LOG.debug("Extracted id {} from local event.", localEventId );
         }
 
         jsonNode = new ObjectMapper().convertValue(integrationData.getDataObject(), JsonNode.class);
 
-        LOG.debug("@@@ Handle origin params.");
+        LOG.debug("Handle origin params.");
         List<Origin> origins = originService.findByOriginRecordId(uuid);
         if (origins.isEmpty()){
             LOG.debug("Entry for " + uuid + " not found.");
@@ -124,16 +123,16 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler{
         /**
          *Search and handle RTIR objects
          */
-        LOG.debug("@@@ Handle RTIR if present.");
+        LOG.debug("Handle RTIR if present.");
         integrationData = handleRTIR(integrationData);
-        LOG.debug("@@@ Handle Vulnerability if present.");
+        LOG.debug("Handle Vulnerability if present.");
         integrationData = handleVulnerability(integrationData);
         /*
         Remake jsonNode
          */
         jsonNode = new ObjectMapper().convertValue(integrationData.getDataObject(), JsonNode.class);
 
-        LOG.debug("@@@ Handle Event.");
+        LOG.debug("Handle Event.");
         if (!requestMethod.equals("DELETE")) {
             try {
                 handleEventAddEdit(integrationData);
@@ -144,6 +143,7 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler{
 
 
         eventCreatedUpdated = localJsonNode;
+        LOG.trace("eventCreatedUpdated: {}", eventCreatedUpdated.toString());
 
 
         /**
@@ -153,7 +153,7 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler{
 
         // Add New Attribute Proposals
         String eventId = String.valueOf(eventCreatedUpdated.get("Event").get("id").textValue());
-        LOG.debug("@@@ Event id created/updated: " + eventId);
+        LOG.debug("Event id created/updated: " + eventId);
         List<LinkedHashMap> eventShadowAttributes = ctx.read("$.Event.ShadowAttribute[*]", List.class);
         handleShadowAttributeAdd(eventShadowAttributes, localEventId);
 
@@ -168,7 +168,7 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler{
         try {
             emitterDataHandler.handleMispData(jsonNode,EVENT,true,false);
         } catch (IOException e) {
-            LOG.error("Reemition failed: " + e);
+            LOG.error("Reemition failed: " + e.getMessage());
         }
 
         return new ResponseEntity<String>(status);
@@ -176,40 +176,40 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler{
 
     private void handleEventAddEdit(IntegrationData integrationData) throws IOException {
         // set "published":false
-        LOG.debug("@@@ Handle Event add/edit action.");
+        LOG.debug("Handle Event add/edit action.");
         ((ObjectNode) jsonNode.get("Event")).put("published", new Boolean(false));
 
         if (!integrationData.getDataParams().getOriginCspId().equals(integrationData.getDataParams().getCspId())){
-            LOG.debug("@@@ Cannot edit an event that I do not own. " + integrationData.getDataParams().getOriginCspId() + " -- " + integrationData.getDataParams().getCspId());
+            LOG.debug("Cannot edit an event that I do not own. " + integrationData.getDataParams().getOriginCspId() + " -- " + integrationData.getDataParams().getCspId());
             status = HttpStatus.OK;
             return;
         }
         else {
 
-            LOG.debug("@@@ Event received from its origin, Remove proposals for new attributes if exist.");
+            LOG.debug("Event received from its origin, Remove proposals for new attributes if exist.");
             JsonNode arrNode1 = localJsonNode.get("Event").get("ShadowAttribute");
             if (arrNode1 != null && arrNode1.isArray()){
                 for (JsonNode jsonNode : arrNode1){
-                    LOG.debug("@@@ New Attribute proposal to remove: " + jsonNode.toString());
+                    LOG.debug("New Attribute proposal to remove: " + jsonNode.toString());
                     mispAppClient.deleteMispProposal(jsonNode.get("id").textValue());
                 }
             }
 
-            LOG.debug("@@@ Event received from its origin, Remove existing proposals from attributes if exist.");
+            LOG.debug("Event received from its origin, Remove existing proposals from attributes if exist.");
             JsonNode arrNode = localJsonNode.get("Event").get("Attribute");
             if (arrNode != null && arrNode.isArray()){
                 for (JsonNode jsonNode : arrNode){
                     JsonNode attrProposals = jsonNode.get("ShadowAttribute");
                     if (attrProposals != null && attrProposals.isArray()){
                         for (JsonNode jn : attrProposals){
-                            LOG.debug("@@@ Proposal from existing Attribute to remove: " + jn.toString());
+                            LOG.debug("Proposal from existing Attribute to remove: " + jn.toString());
                             mispAppClient.deleteMispProposal(jn.get("id").textValue());
                         }
                     }
                 }
             }
 
-            LOG.debug("@@@ Event received from its origin, Remove existing proposals from objects if exist.");
+            LOG.debug("Event received from its origin, Remove existing proposals from objects if exist.");
             JsonNode arrNode3 = localJsonNode.get("Event").get("Object");
             if (arrNode3 != null && arrNode3.isArray()){
                 for (JsonNode jsonNode : arrNode3){
@@ -219,7 +219,7 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler{
                             JsonNode attrProposals2 = jsonNode3.get("ShadowAttribute");
                             if (attrProposals2 != null && attrProposals2.isArray()){
                                 for (JsonNode jn : attrProposals2){
-                                    LOG.debug("@@@ Proposal from existing Object Attribute to remove: " + jn.toString());
+                                    LOG.debug("Proposal from existing Object Attribute to remove: " + jn.toString());
                                     mispAppClient.deleteMispProposal(jn.get("id").textValue());
                                 }
                             }
@@ -237,19 +237,19 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler{
 
             ResponseEntity<String> responseEntity = mispAppClient.addMispEvent(jsonNode.toString());
             eventCreatedUpdated = new ObjectMapper().readValue(responseEntity.getBody(), JsonNode.class);
-            try {
+
+            if (Objects.nonNull(localJsonNode.get(EVENT.name())) && Objects.nonNull(localJsonNode.get(EVENT.name()).get("id"))){
                 localEventId = eventCreatedUpdated.get(EVENT.name()).get("id").textValue();
             }
-            catch (NullPointerException e){
 
-            }
+
             status = responseEntity.getStatusCode();
             LOG.debug(responseEntity.toString());
-            LOG.debug("@@@ Event add action result: " + responseEntity.getStatusCode().toString());
+            LOG.debug("Event add action result: " + responseEntity.getStatusCode().toString());
         } catch (StatusCodeException e) {
             LOG.error(e.getMessage());
             /*if (!integrationData.getDataParams().getOriginCspId().equals(integrationData.getDataParams().getCspId())){
-                LOG.debug("@@@ Cannot edit an event that I do not own. " + integrationData.getDataParams().getOriginCspId() + " -- " + integrationData.getDataParams().getCspId());
+                LOG.debug("Cannot edit an event that I do not own. " + integrationData.getDataParams().getOriginCspId() + " -- " + integrationData.getDataParams().getCspId());
                 status = HttpStatus.OK;
                 return;
             }*/
@@ -265,30 +265,30 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler{
                     LOG.error(eventCreatedUpdated.toString());
                     eventCreatedUpdated = jsonNode;
                 }
-                LOG.debug("@@@ Event edit action result: " + responseEntity.getStatusCode().toString());
+                LOG.debug("Event edit action result: " + responseEntity.getStatusCode().toString());
             }
         }
     }
     private void handleShadowAttributeAdd(List<LinkedHashMap> eventShadowAttributes, String eventId){
 
-        LOG.debug("@@@ Handle shadow attributes");
+        LOG.debug("Handle shadow attributes");
 
         eventShadowAttributes.forEach(shadowAttribute -> {
             LOG.debug(shadowAttribute.toString());
             String shadowAttributeJsonString = null;
             try {
                 shadowAttributeJsonString = (new ObjectMapper()).writeValueAsString(shadowAttribute);
-                LOG.debug("@@@ Add proposal request: " + shadowAttributeJsonString);
+                LOG.debug("Add proposal request: " + shadowAttributeJsonString);
                 ResponseEntity responseEntity = mispAppClient.addMispProposal(eventId ,shadowAttributeJsonString);
-                LOG.debug("@@@ Add proposal response: " + responseEntity.toString());
+                LOG.debug("Add proposal response: " + responseEntity.toString());
             } catch (JsonProcessingException e) {
-                LOG.error("@@@ Could not parse shadowattribute: " + e);
+                LOG.error("Could not parse shadowattribute: " + e);
             } catch (StatusCodeException e) {
                 LOG.error(e.getMessage());
                 String location = e.getHttpHeaders().get("location").get(0);
                 LOG.debug("" + location);
                 ResponseEntity responseEntity = mispAppClient.updateMispProposal(location, shadowAttributeJsonString);
-                LOG.debug("@@@ Add proposal response: " + responseEntity.toString());
+                LOG.debug("Add proposal response: " + responseEntity.toString());
             }
         });
     }
@@ -301,10 +301,10 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler{
             // Get Attribute by UUID
             String attrUuid = String.valueOf(shadowAttribute.get("uuid"));
             JsonNode attribute = new ObjectMapper().createObjectNode();
-            LOG.debug("@@@ Edit proposal request: " + attribute.toString());
+            LOG.debug("Edit proposal request: " + attribute.toString());
             try {
                 attribute = new ObjectMapper().readValue(mispAppClient.postMispAttribute(attrUuid).getBody(), JsonNode.class);
-                LOG.debug("@@@ Fetching local attribute: " + attribute.toString());
+                LOG.debug("Fetching local attribute: " + attribute.toString());
             } catch (IOException e) {
                 LOG.error(e.getMessage());
             }
@@ -321,13 +321,13 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler{
                 ShadowAttributeRequestDTO shadowAttributeRequest = new ShadowAttributeRequestDTO(new ShadowAttributeRequestDTO.AttributeRequest(shadowAttribute));
                 String attrRequestStr = new ObjectMapper().writeValueAsString(shadowAttributeRequest);
                 ResponseEntity responseEntity = mispAppClient.updateMispProposal(attrId , attrRequestStr);
-                LOG.debug("@@@ Edit proposal response: " + responseEntity.toString());
+                LOG.debug("Edit proposal response: " + responseEntity.toString());
             } catch (StatusCodeException e) {
                 LOG.error(e.getMessage());
                 String location = e.getHttpHeaders().get("location").get(0);
                 LOG.debug("" + location);
                 ResponseEntity responseEntity = mispAppClient.updateMispProposal(location, shadowAttributeJsonString);
-                LOG.debug("@@@ Edit proposal response:" + responseEntity.toString());
+                LOG.debug("Edit proposal response:" + responseEntity.toString());
             } catch (JsonProcessingException e) {
                 LOG.error(e.getMessage());
             }
