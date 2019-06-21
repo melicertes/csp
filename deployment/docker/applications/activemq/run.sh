@@ -1,6 +1,6 @@
 #!/bin/sh
 
-if [ -f "/opt/activemq/.amqinit" ] ; then
+if [ -f "/opt/activemq/.amqinit.1" ] ; then
     echo "======================================="
     echo "ActiveMQ initialised - not first run"
     echo "======================================="
@@ -10,7 +10,7 @@ else
     echo "=============================================="
     echo "ActiveMQ initial run - Extracted configuration"
     echo "=============================================="
-    touch /opt/activemq/.amqinit
+    touch /opt/activemq/.amqinit.1
 fi
 echo ""
 echo ""
