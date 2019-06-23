@@ -68,13 +68,23 @@ public class PageController {
         Pending, Running, Expired, Completed, Cancel, Error
          */
         if (meeting.getStatus().equals(MeetingStatus.Running) || meeting.getStatus().equals(MeetingStatus.Pending)) {
-            model = activeMeeting(model, meeting);
-            view = "index";
+            /*
+            Participant not assigned to the meeting
+             */
+            if (!participant.getMeeting().equals(meeting)) {
+                model = notallowedMeeting(model, meeting);
+                view = "forbidden";
+            } else {
+                model = activeMeeting(model, meeting);
+                view = "index";
+            }
         }
         else {
             model = inactiveMeeting(model, meeting);
             view = "expiredcompletedcancelerror";
         }
+
+
 
         return new ModelAndView(view, "", model);
     }
@@ -154,6 +164,14 @@ public class PageController {
         if (meeting.getStatus().equals(MeetingStatus.Error))
             model.addAttribute("meetingDetails", "There was an error initiating this meeting. Please contact administrator.");
 
+        model.addAttribute("title", meeting.getStatus() + messageSource.getMessage("title", null, null));
+        model.addAttribute("description", messageSource.getMessage("description", null, null));
+        model.addAttribute("keywords", messageSource.getMessage("keywords", null, null));
+
+        return model;
+    }
+
+    private Model notallowedMeeting(Model model, Meeting meeting) {
         model.addAttribute("title", meeting.getStatus() + messageSource.getMessage("title", null, null));
         model.addAttribute("description", messageSource.getMessage("description", null, null));
         model.addAttribute("keywords", messageSource.getMessage("keywords", null, null));
