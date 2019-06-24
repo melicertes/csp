@@ -66,7 +66,10 @@ public class NotifierProcessor implements Processor {
         checkAndDeliver(team, LocalDateTime.now()); //we check against the event just received (assume failure is now)
     }
 
-    @Scheduled(initialDelay = 60000L, fixedDelay = 60000000L)
+    /**
+     * scheduler runs ever 30m
+     */
+    @Scheduled(initialDelay = 60000L, fixedDelay = 1800000L)
     public void scheduledRetryConnectivity() {
         if (failedConnectivityTest.size() > 0) {
             final Map<Team, LocalDateTime> copied = new HashMap<>(failedConnectivityTest);
