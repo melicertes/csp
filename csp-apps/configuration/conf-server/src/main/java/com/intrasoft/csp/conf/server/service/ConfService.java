@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -190,15 +191,17 @@ public class ConfService implements ApiContextUrl, Configuration {
             headers.add("Expires", "0");
             headers.add("Content-Disposition", "attachment; filename=\"" + updateFile.getName() + "\"");
 
-            byte[] content = Files.readAllBytes(Paths.get(updateFile.getAbsolutePath()));
+            //byte[] content = Files.readAllBytes(Paths.get(updateFile.getAbsolutePath()));
 
             LOG_AUDIT.info(logInfo + StatusResponseType.OK.text());
             return ResponseEntity
                     .ok()
                     .headers(headers)
-                    .contentLength(content.length)
+                    .contentLength(updateFile.length())
                     .contentType(MediaType.parseMediaType(fileMediaType))
-                    .body(content);
+                    //.body(Files.readAllBytes(Paths.get(updateFile.getAbsolutePath())));
+                    .body(new InputStreamResource(new FileInputStream(updateFile)));
+                    //.body(Files.newInputStream(updateFile.toPath(), StandardOpenOption.READ));
 
         } catch (IOException e) {
             throw new UpdateNotFoundException(StatusResponseType.API_UPDATE_NOT_FOUND.text());

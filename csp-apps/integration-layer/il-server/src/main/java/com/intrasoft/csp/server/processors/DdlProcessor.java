@@ -53,19 +53,19 @@ public class DdlProcessor implements Processor,CamelRoutes {
             LOG.info("DDL - received integrationData with datatype: " + integrationData.getDataType() + ", toShare = true, sending to DCL" );
             if (!exchange.getIn().getHeader(Exchange.HTTP_METHOD).toString().equals(HttpMethods.DELETE.toString())){
                 LOG.info(exchange.getIn().getHeader(Exchange.HTTP_METHOD).toString());
-                recipients.add(routes.apply(DCL));
-                //producerTemplate.sendBodyAndHeader(routes.apply(DCL), ExchangePattern.InOut,integrationData, Exchange.HTTP_METHOD, httpMethod);
+                recipients.add(routes.wrap(DCL));
+                //producerTemplate.sendBodyAndHeader(routes.wrap(DCL), ExchangePattern.InOut,integrationData, Exchange.HTTP_METHOD, httpMethod);
             }
         }
 
         if (enableElastic && !integrationData.getDataType().equals(IntegrationDataType.TRUSTCIRCLE)
                 && !integrationData.getDataType().equals(IntegrationDataType.CONTACT)){
-            //recipients.add(routes.apply(ELASTIC));//Do not use this, because it share the exchange and will cause the bug described in SXCSP-430
+            //recipients.add(routes.wrap(ELASTIC));//Do not use this, because it share the exchange and will cause the bug described in SXCSP-430
             //Instead, use a copy of IntegrationData and send it using producer and HTTP
             //sync version
-            //producerTemplate.sendBodyAndHeader(routes.apply(ELASTIC), ExchangePattern.InOnly,integrationDataCopy, Exchange.HTTP_METHOD, httpMethod);
+            //producerTemplate.sendBodyAndHeader(routes.wrap(ELASTIC), ExchangePattern.InOnly,integrationDataCopy, Exchange.HTTP_METHOD, httpMethod);
             //async version
-            producerTemplate.asyncRequestBodyAndHeader(routes.apply(ELASTIC),integrationDataCopy, Exchange.HTTP_METHOD, httpMethod);
+            producerTemplate.asyncRequestBodyAndHeader(routes.wrap(ELASTIC),integrationDataCopy, Exchange.HTTP_METHOD, httpMethod);
         }
 
         exchange.getIn().setHeader("recipients", recipients);

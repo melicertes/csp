@@ -48,6 +48,6 @@ public class DslApiController implements CamelRoutes, ContextUrl{
     }
 
     private ResponseEntity<String> handleIntegrationData(IntegrationData integrationData ,String requestMethod){
-        return apiDataHandler.handleIntegrationData(routes.apply(DSL),integrationData,requestMethod);
+        return apiDataHandler.handleIntegrationData(routes.wrap(DSL),integrationData,requestMethod);
     }
 }

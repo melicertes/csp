@@ -135,12 +135,15 @@ public class DataController implements DataContextUrl, PagesContextUrl {
             List<String> reportUpdates = new ArrayList<>();
             //CSP may not have reported its heartbeat, so check it
             if (cspInfo != null) {
-                List<CspModuleInfo> cspModuleInfos = cspModuleInfoRepository.findByCspInfoId(cspInfo.getId());
+                List<CspModuleInfo> cspModuleInfos = cspModuleInfoRepository.findByCspInfoIdOrderById(cspInfo.getId());
                 for(CspModuleInfo cspModuleInfo : cspModuleInfos) {
-                    String s;
-                    s = moduleVersionRepository.findOne(cspModuleInfo.getModuleVersionId()).getFullName() + ":" +
-                            VersionParser.toString(moduleVersionRepository.findOne(cspModuleInfo.getModuleVersionId()).getVersion());
-                    reportUpdates.add(s);
+                    try {
+                        final String s = moduleVersionRepository.findOne(cspModuleInfo.getModuleVersionId()).getFullName() + ":" +
+                                VersionParser.toString(moduleVersionRepository.findOne(cspModuleInfo.getModuleVersionId()).getVersion());
+                        reportUpdates.add(s);
+                    } catch (NullPointerException e) { // this is a data integrity case.
+                        LOG.warn("CspModuleInfo.Id {} ModuleVersion.Id {} does not exist? ", cspModuleInfo.getId(), cspModuleInfo.getModuleVersionId());
+                    }
                 }
             }
             row.setReportUpdates(reportUpdates);

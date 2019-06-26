@@ -82,12 +82,12 @@ public class TcProcessor implements Processor,CamelRoutes{
     @Override
     public void process(Exchange exchange) throws Exception {
         String originEndpoint = (String) exchange.getIn().getHeader(CamelRoutes.ORIGIN_ENDPOINT);
-        String msg = originEndpoint.equals(routes.apply(CamelRoutes.DCL))? "send to external CSP":
-                originEndpoint.equals(routes.apply(CamelRoutes.EDCL))? " handle from external CSP":"";
+        String msg = originEndpoint.equals(routes.wrap(CamelRoutes.DCL))? "send to external CSP":
+                originEndpoint.equals(routes.wrap(CamelRoutes.EDCL))? " handle from external CSP":"";
         LOG.debug("DCL - Get Trust Circles from TC API and "+msg+" [ORIGIN_ENDPOINT:"+originEndpoint+"]");
 
-        boolean isFlow1 = originEndpoint.equals(routes.apply(CamelRoutes.DCL))?true:false;
-        boolean isFlow2 = originEndpoint.equals(routes.apply(CamelRoutes.EDCL))?true:false;
+        boolean isFlow1 = originEndpoint.equals(routes.wrap(CamelRoutes.DCL))?true:false;
+        boolean isFlow2 = originEndpoint.equals(routes.wrap(CamelRoutes.EDCL))?true:false;
 
         IntegrationData integrationData = exchange.getIn().getBody(IntegrationData.class);
         String httpMethod = (String) exchange.getIn().getHeader(Exchange.HTTP_METHOD);
@@ -220,7 +220,7 @@ public class TcProcessor implements Processor,CamelRoutes{
 
     List<Team> getTcTeams(String uri, Exchange exchange) throws IOException {
         String originEndpoint = (String) exchange.getIn().getHeader(CamelRoutes.ORIGIN_ENDPOINT);
-        boolean isFlow1 = originEndpoint.equals(routes.apply(CamelRoutes.DCL));
+        boolean isFlow1 = originEndpoint.equals(routes.wrap(CamelRoutes.DCL));
         return  getTcTeamsByArg(uri,isFlow1);
     }
 
@@ -336,14 +336,14 @@ public class TcProcessor implements Processor,CamelRoutes{
         IntegrationData integrationData = exchange.getIn().getBody(IntegrationData.class);
         String httpMethod = (String) exchange.getIn().getHeader(Exchange.HTTP_METHOD);
         // Decide the flow
-        if(originEndpoint.equals(routes.apply(CamelRoutes.DCL))) {//flow1
+        if(originEndpoint.equals(routes.wrap(CamelRoutes.DCL))) {//flow1
             for(Team t:teams) {
                 //send to ECSP
                 LOG.trace(t.toString());
                 LOG.trace(integrationData.toString());
                 handleDclFlowAndSendToECSP(httpMethod, t, integrationData);
             }
-        }else if(originEndpoint.equals(routes.apply(CamelRoutes.EDCL))){//flow2
+        }else if(originEndpoint.equals(routes.wrap(CamelRoutes.EDCL))){//flow2
             handleExternalDclFlowAndSendToDSL(exchange,httpMethod, teams, integrationData);
         }
     }
@@ -413,10 +413,17 @@ public class TcProcessor implements Processor,CamelRoutes{
 
         headers.put(Exchange.HTTP_METHOD, httpMethod);
         if (!camelRestServiceIsAsync) {
-            producer.sendBodyAndHeaders(routes.apply(ECSP), ExchangePattern.InOnly, enhancedTeamDTO, headers);//TODO: investigate SXCSP-430 - do we need inOut here?
+            producer.sendBodyAndHeaders(routes.wrap(ECSP+"."+enhancedTeamDTO.getTeam().getName()),
+                    ExchangePattern.InOnly, enhancedTeamDTO, headers);//TODO: investigate SXCSP-430 - do we need inOut here?
         } else {
-            camelRestService.asyncSendInOnly(routes.apply(ECSP), enhancedTeamDTO, headers);
+            camelRestService.asyncSendInOnly(routes.wrap(ECSP+"."+enhancedTeamDTO.getTeam().getName()),
+                    enhancedTeamDTO, headers);
         }
+        // now we send to the notifier queue, that messages for team X are pending.
+        // the processor will receive the queue name, and proceed to verify the team connectivity and then dispatch
+        producer.sendBodyAndHeaders(routes.wrap(CamelRoutes.NOTIFIER),
+                ExchangePattern.InOnly, enhancedTeamDTO.getTeam(), headers);
+
     }
 
     // flow2
@@ -445,13 +452,13 @@ public class TcProcessor implements Processor,CamelRoutes{
 
             if(shouldSend) {
                 //exchange.getIn().setBody(integrationData); //replace with producer
-                //exchange.getIn().setHeader("recipients", routes.apply(DSL));//replace with producer
+                //exchange.getIn().setHeader("recipients", routes.wrap(DSL));//replace with producer
                 Map<String, Object> headers = new HashMap<>();
                 headers.put(Exchange.HTTP_METHOD, httpMethod);
                 if (!camelRestServiceIsAsync) {
-                    producer.sendBodyAndHeaders(routes.apply(DSL), ExchangePattern.InOnly, integrationData, headers);
+                    producer.sendBodyAndHeaders(routes.wrap(DSL), ExchangePattern.InOnly, integrationData, headers);
                 } else {
-                    camelRestService.asyncSendInOnly(routes.apply(DSL), integrationData, headers);
+                    camelRestService.asyncSendInOnly(routes.wrap(DSL), integrationData, headers);
                 }
             }
         }

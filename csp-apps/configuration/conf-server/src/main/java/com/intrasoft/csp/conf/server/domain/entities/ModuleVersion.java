@@ -4,7 +4,7 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
 @Entity
-@Table(name="module_version")
+@Table(name="module_version", uniqueConstraints = { @UniqueConstraint(columnNames = {"hash"})})
 public class ModuleVersion {
 
     @Id

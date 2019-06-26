@@ -18,8 +18,6 @@ import org.springframework.util.StringUtils;
 @Component
 public class EcspProcessor implements Processor{
     private static final Logger LOG = LoggerFactory.getLogger(EcspProcessor.class);
-    @Produce
-    ProducerTemplate producerTemplate;
 
     @Value("${server.subdomain.prefix}")
     String serverSubdomainPrefix;

@@ -1,4 +1,4 @@
-FROM csp-alpine35glibc:1.0 as builder_2.4.93
+FROM csp-alpine35glibc:1.0 as builder_2.4.107
 
 RUN apk add --no-cache git
 WORKDIR /var/www
@@ -7,7 +7,7 @@ WORKDIR /var/www
 RUN git clone https://github.com/MISP/MISP.git
 WORKDIR /var/www/MISP
 #RUN git checkout tags/$(git describe --tags `git rev-list --tags --max-count=1000`)
-RUN git checkout tags/$(git describe --tags v2.4.93)
+RUN git checkout tags/$(git describe --tags v2.4.107)
 RUN git config core.filemode false
 
 WORKDIR /var/www/MISP/app/files/scripts
@@ -66,7 +66,7 @@ RUN apt-get clean
 WORKDIR /var/www
 
 USER www-data
-COPY --from=builder_2.4.93 /var/www/ .
+COPY --from=builder_2.4.107 /var/www/ .
 
 WORKDIR /var/www/MISP/app/files/scripts/python-cybox
 USER root
@@ -134,12 +134,21 @@ RUN echo "sudo -u www-data bash /var/www/MISP/app/Console/worker/start.sh" >>/et
 
 # Install MISP Modules
 WORKDIR /opt
+RUN apt-get update
 RUN apt-get install -y python3 python3-pip libjpeg-dev
-COPY --from=builder_2.4.93 /opt/ .
+COPY --from=builder_2.4.107 /opt/ .
 ADD misp-modules /opt/misp-modules
 WORKDIR /opt/misp-modules
+RUN pip3 install --upgrade pip
+RUN cat REQUIREMENTS | sed 's/aiohttp==3.4.4/aiohttp/g' > REQUIREMENTS
 RUN pip3 install --upgrade --ignore-installed urllib3
 RUN pip3 install --upgrade --ignore-installed requests
+RUN sed -i 's/aiohttp.*/aiohttp/g' REQUIREMENTS
+RUN sed -i 's/functools.*//g' REQUIREMENTS
+RUN sed -i 's/async-timeout.*/async-timeout/g' REQUIREMENTS
+RUN sed -i 's/url-normalize.*/url-normalize/g' REQUIREMENTS
+RUN sed -i 's/^\(yarl\)\=.*/\1/g' REQUIREMENTS
+RUN sed -i 's/^\(sigmatools\)\=.*/\1/' REQUIREMENTS
 RUN pip3 install -I -r REQUIREMENTS
 RUN pip3 install -I .
 RUN pip install zmq redis
@@ -202,7 +211,7 @@ RUN chown -R www-data:www-data /var/www/MISP/app/files/
 # Final archive
 RUN tar czpf /root/MISP.tgz .
 
-#COPY Event.php /var/www/MISP/app/Model/Event.php
+#COPY AppController.php /var/www/MISP/app/Controller/AppController.php
 #VOLUME /var/www/MISP
 EXPOSE 80
 ENTRYPOINT ["/run.sh"]

@@ -1,5 +1,6 @@
 package com.fraunhofer.csp.rt.config;
 
+
 import com.intrasoft.csp.client.TrustCirclesClient;
 import com.intrasoft.csp.client.impl.TrustCirclesClientImpl;
 import com.intrasoft.csp.commons.routes.ContextUrl;
@@ -28,145 +29,149 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @Configuration
 public class TrustCirclesClientConfig implements ContextUrl {
-	@Value("${app.tc.protocol:http}")
-	private String protocol;
+    @Value("${app.tc.protocol:http}")
+    private String protocol;
 
-	@Value("${app.tc.host:localhost}")
-	private String host;
+    @Value("${app.tc.host:localhost}")
+    private String host;
 
-	@Value("${app.tc.port:9000}")
-	private String port;
+    @Value("${app.tc.port:9000}")
+    private String port;
 
-	@Value("${app.tc.path.circles}")
-	String tcPathCircles;
+    @Value("${app.tc.path.circles}")
+    String tcPathCircles;
 
-	@Value("${app.tc.path.teams}")
-	String tcPathTeams;
+    @Value("${app.tc.path.teams}")
+    String tcPathTeams;
 
-	@Value("${app.tc.path.localcircle}")
-	String tcPathLocalCircle;
+    @Value("${app.tc.path.localcircle}")
+    String tcPathLocalCircle;
 
-	@Value("${app.tc.path.contacts}")
-	String tcPathContacts;
+    @Value("${app.tc.path.contacts}")
+    String tcPathContacts;
 
-	@Value("${app.tc.path.teamcontacts}")
-	String tcPathTeamContacts;
+    @Value("${app.tc.path.teamcontacts}")
+    String tcPathTeamContacts;
 
-	@Value("${app.tc.path.personcontacts}")
-	String tcPathPersonContacts;
+    @Value("${app.tc.path.personcontacts}")
+    String tcPathPersonContacts;
 
-	@Value("${app.tc.retry.backOffPeriod:5000}")
-	private String backOffPeriod;
+    @Value("${app.tc.retry.backOffPeriod:5000}")
+    private String backOffPeriod;
 
-	@Value("${app.tc.retry.maxAttempts:3}")
-	private String maxAttempts;
+    @Value("${app.tc.retry.maxAttempts:3}")
+    private String maxAttempts;
 
-	@Value("${app.tc.client.ssl.enabled:false}")
-	Boolean tcClientSslEnabled;
+    @Value("${app.tc.client.ssl.enabled:false}")
+    Boolean tcClientSslEnabled;
 
-	@Value("${app.tc.client.ssl.jks.keystore:path}")
-	String tcClientSslJksKeystore;
+    @Value("${app.tc.client.ssl.jks.keystore:path}")
+    String tcClientSslJksKeystore;
 
-	@Value("${app.tc.client.ssl.jks.keystore.password:securedPass}")
-	String tcClientSslJksKeystorePassword;
+    @Value("${app.tc.client.ssl.jks.keystore.password:securedPass}")
+    String tcClientSslJksKeystorePassword;
 
-	@Autowired
-	ResourcePatternResolver resourcePatternResolver;
+    @Autowired
+    ResourcePatternResolver resourcePatternResolver;
 
-	private static final ConcurrentHashMap<String, ExceptionHandler> SUPPORTED_EXCEPTIONS = new ConcurrentHashMap<>();
-	private static final ConcurrentHashMap<Integer, String> AVOID_RETRY_ON_STATUS_CODE = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<String, ExceptionHandler> SUPPORTED_EXCEPTIONS = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<Integer, String> AVOID_RETRY_ON_STATUS_CODE = new ConcurrentHashMap<>();
 
-	static {
-		SUPPORTED_EXCEPTIONS.put(CspGeneralException.class.getName(), CspGeneralException::new);
-		AVOID_RETRY_ON_STATUS_CODE.put(HttpStatus.NOT_FOUND.value(), "TC server responded with 404");
-	}
+    static {
+        SUPPORTED_EXCEPTIONS.put(CspGeneralException.class.getName(), CspGeneralException::new);
+        AVOID_RETRY_ON_STATUS_CODE.put(HttpStatus.NOT_FOUND.value(), "TC server responded with 404");
+    }
 
-	@Bean(name = "TcClient")
-	public TrustCirclesClient tcClient() {
-		return new TrustCirclesClientImpl(getTcBaseContext(), getTcPathCircles(), getTcPathTeams(),
-				getTcPathLocalCircle(), getTcPathContacts(), getTcPathTeamContacts(), getTcPathPersonContacts());
-	}
+    @Bean(name = "TcClient")
+    public TrustCirclesClient tcClient(){
+        return new TrustCirclesClientImpl(getTcBaseContext(),getTcPathCircles(),getTcPathTeams(), getTcPathLocalCircle(), getTcPathContacts(), getTcPathTeamContacts(), getTcPathContacts());
+    }
 
-	@Autowired
-	@Qualifier("TcRestTemplate")
-	RetryRestTemplate retryRestTemplate;
+    @Autowired
+    @Qualifier("TcRestTemplate")
+    RetryRestTemplate retryRestTemplate;
 
-	@Bean(name = "TcRestTemplate")
-	public RetryRestTemplate getRetryRestTemplate() throws CertificateException, UnrecoverableKeyException,
-			NoSuchAlgorithmException, KeyStoreException, KeyManagementException, IOException {
-		RestTemplateConfiguration restTemplateConfiguration = new RestTemplateConfiguration(backOffPeriod, maxAttempts,
-				tcClientSslEnabled, tcClientSslJksKeystore, tcClientSslJksKeystorePassword, resourcePatternResolver);
-		return restTemplateConfiguration.getRestTemplateWithOptions(SUPPORTED_EXCEPTIONS, AVOID_RETRY_ON_STATUS_CODE);
-	}
+    @Bean(name="TcRestTemplate")
+    public RetryRestTemplate getRetryRestTemplate() throws CertificateException, UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException, KeyManagementException, IOException {
+        RestTemplateConfiguration restTemplateConfiguration = new RestTemplateConfiguration(backOffPeriod, maxAttempts,
+                tcClientSslEnabled, tcClientSslJksKeystore, tcClientSslJksKeystorePassword, resourcePatternResolver);
+        return restTemplateConfiguration.getRestTemplateWithOptions(SUPPORTED_EXCEPTIONS,AVOID_RETRY_ON_STATUS_CODE);
+    }
 
-	public String getTcPathCircles() {
-		return tcPathCircles;
-	}
+    public String getTcPathCircles() {
+        return tcPathCircles;
+    }
 
-	public void setTcPathCircles(String tcPathCircles) {
-		this.tcPathCircles = tcPathCircles;
-	}
+    public void setTcPathCircles(String tcPathCircles) {
+        this.tcPathCircles = tcPathCircles;
+    }
 
-	public String getTcPathTeams() {
-		return tcPathTeams;
-	}
+    public String getTcPathTeams() {
+        return tcPathTeams;
+    }
 
-	public void setTcPathTeams(String tcPathTeams) {
-		this.tcPathTeams = tcPathTeams;
-	}
+    public void setTcPathTeams(String tcPathTeams) {
+        this.tcPathTeams = tcPathTeams;
+    }
 
-	public String getTcPathLocalCircle() {
-		return tcPathLocalCircle;
-	}
+    public String getTcPathLocalCircle() {
+        return tcPathLocalCircle;
+    }
 
-	public void setTcPathLocalCircle(String tcPathLocalCircle) {
-		this.tcPathLocalCircle = tcPathLocalCircle;
-	}
+    public void setTcPathLocalCircle(String tcPathLocalCircle) {
+        this.tcPathLocalCircle = tcPathLocalCircle;
+    }
 
-	public String getTcPathContacts() {
-		return tcPathContacts;
-	}
+    public String getTcPathContacts() {
+        return tcPathContacts;
+    }
 
-	public void setTcPathContacts(String tcPathContacts) {
-		this.tcPathContacts = tcPathContacts;
-	}
+    public void setTcPathContacts(String tcPathContacts) {
+        this.tcPathContacts = tcPathContacts;
+    }
 
-	public String getTcBaseContext() {
-		return protocol + "://" + host + ":" + port;
-	}
+    public String getTcPathTeamContacts() {
+        return tcPathTeamContacts;
+    }
 
-	public String getTcCirclesURI() {
-		return protocol + "://" + host + ":" + port + tcPathCircles;
-	}
+    public void setTcPathTeamContacts(String tcPathTeamContacts) {
+        this.tcPathTeamContacts = tcPathTeamContacts;
+    }
 
-	public String getTcTeamsURI() {
-		return protocol + "://" + host + ":" + port + tcPathTeams;
-	}
+    public String getTcPathPersonContacts() {
+        return tcPathPersonContacts;
+    }
 
-	public String getTcLocalCircleURI() {
-		return protocol + "://" + host + ":" + port + tcPathLocalCircle;
-	}
+    public void setTcPathPersonContacts(String tcPathPersonContacts) {
+        this.tcPathPersonContacts = tcPathPersonContacts;
+    }
 
-	public String getTcContactsURI() {
-		return protocol + "://" + host + ":" + port + tcPathContacts;
-	}
+    public String getTcBaseContext(){
+        return protocol + "://" + host + ":" + port;
+    }
 
-	public String getTcPathTeamContacts() {
-		return tcPathTeamContacts;
-	}
+    public String getTcCirclesURI() {
+        return protocol + "://" + host + ":" + port + tcPathCircles;
+    }
 
-	public void setTcPathTeamContacts(String tcPathTeamContacts) {
-		this.tcPathTeamContacts = tcPathTeamContacts;
-	}
+    public String getTcTeamsURI() {
+        return protocol + "://" + host + ":" + port + tcPathTeams;
+    }
 
-	public String getTcPathPersonContacts() {
-		return tcPathPersonContacts;
-	}
+    public String getTcLocalCircleURI() {
+        return protocol + "://" + host + ":" + port + tcPathLocalCircle;
+    }
 
-	public void setTcPathPersonContacts(String tcPathPersonContacts) {
-		this.tcPathPersonContacts = tcPathPersonContacts;
-	}
+    public String getTcContactsURI() {
+        return protocol + "://" + host + ":" + port + tcPathContacts;
+    }
 
+    public String getTcTeamContactsURI() {
+        return protocol + "://" + host + ":" + port + tcPathTeamContacts;
+    }
 
+    public String getTcPersonContactsURI() {
+        return protocol + "://" + host + ":" + port + tcPathPersonContacts;
+    }
 
 }

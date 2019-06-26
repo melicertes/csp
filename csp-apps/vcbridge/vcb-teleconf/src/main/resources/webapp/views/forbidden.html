@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title th:text="${title}"></title>
+    <meta name="description" th:content="${description}" content=""/>
+    <meta name="keywords" th:content="${keywords}" content=""/>
+
+    <!-- Mobile Meta -->
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- Favicon -->
+    <link rel="shortcut icon" th:href="@{webapp/static/fav/favicon.ico}"/>
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" th:href="@{webapp/static/fav/apple-touch-icon-144-precomposed.png}" />
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" th:href="@{webapp/static/fav/apple-touch-icon-114-precomposed.png}" />
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" th:href="@{webapp/static/fav/apple-touch-icon-72-precomposed.png}" />
+    <link rel="apple-touch-icon-precomposed" sizes="57x57" th:href="@{webapp/static/fav/apple-touch-icon-57-precomposed.png}" />
+
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" th:href="@{webapp/lib/bootstrap/3.3.7/css/bootstrap.min.css}"/>
+    <link rel="stylesheet" th:href="@{webapp/lib/bootstrap/3.3.7/css/bootstrap-theme.min.css}"/>
+
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <link rel="stylesheet" th:href="@{webapp/lib/ie10-viewport-bug-workaround/1.0.3/dist/ie10-viewport-bug-workaround.min.css}"/>
+
+    <!-- Custom styles for this page -->
+    <link rel="stylesheet" type="text/css" th:href="@{webapp/static/css/theme.css}" />
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+    <script th:src="@{webapp/lib/html5shiv/3.7.3/html5shiv.min.js}"></script>
+    <script th:src="@{webapp/lib/respond/1.4.2/respond.min.js}"></script>
+    <![endif]-->
+
+</head>
+
+
+<body>
+
+<nav class="navbar navbar-inverse navbar-fixed-top" id="header">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
+                    aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <span class="navbar-brand" style="">CSP - Secure Communications</span>
+
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+
+            <ul class="nav navbar-nav navbar-right">
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                        <span class="glyphicon glyphicon-user"></span>&nbsp;
+                        <strong th:text="${participant.getFullname()}"></strong>
+                        <span class="glyphicon glyphicon-chevron-down"></span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <div class="navbar-login navbar-login-session">
+                                <div class="row">
+                                    <div class="col-lg-12">
+                                        <p>
+                                            <a th:href="${'/logout?uid=' + uid}" class="btn btn-danger btn-block">Logout</a>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+
+        </div>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="cover">
+                <p>&nbsp;</p>
+                <p class="lead"> You are trying to access a meeting that you are NOT assigned to.</p>
+                <p>
+                    Please <a th:href="${'/logout?uid=' + uid}" class="btn btn-danger">logout</a> and select a proper meeting.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- jQuery and Bootstrap -->
+<script th:src="@{webapp/lib/jquery/1.12.4/dist/jquery.min.js}"></script>
+<script th:src="@{webapp/lib/bootstrap/3.3.7/js/bootstrap.min.js}"></script>
+
+<!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+<script th:src="@{webapp/lib/ie10-viewport-bug-workaround/1.0.3/dist/ie10-viewport-bug-workaround.min.js}"></script>
+
+
+</body>
+</html>

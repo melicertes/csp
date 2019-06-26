@@ -32,15 +32,16 @@ import java.io.*;
 import java.lang.management.ManagementFactory;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.net.UnknownHostException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Created by tangelatos on 06/09/2017.
@@ -60,7 +61,7 @@ public class BackgroundTaskService {
     @Value("${installation.reqs.cpus}")
     public int vcpus;
 
-    @Value("${installation.forced:false}")
+    @Value("${installation.forced:true}")
     private Boolean canProceedForced;
 
     @Cacheable(cacheNames = {"req.check"})
@@ -93,7 +94,7 @@ public class BackgroundTaskService {
         }
 
         if (canProceedForced) {
-            log.warn("Installation is forced due to configuration override");
+            log.warn("Installation can now proceed due to configuration override - check memory requirements!");
             return true;
         } else
             return failsFound <= 0;
@@ -189,7 +190,7 @@ public class BackgroundTaskService {
 
         log.info("CSP Installer {}",gitVersion());
 
-        addTask("Fixing Module States", () -> {
+        addTask("Fixing Module and Service States", () -> {
             //for the moment, we check if there are any modules in
             // DOWNLOADING state ---> to UNKNOWN
             // INSTALLING state  ---> to DOWNLOADED
@@ -210,8 +211,52 @@ public class BackgroundTaskService {
                         return mupd.getId() +" / " + mupd.getName() + " has been reset from "+orig+" to " + m.getModuleState();
                     })
                     .forEach(log::info);
+
+            // this task is clearing SERVICE states on restart, assuming that this is caused by a real restart.
+            List<SystemService> result = installationService.queryCspServices();
+            if (result != null) {
+                result.forEach(s -> {
+                    if (s.getServiceState() == ServiceState.RUNNING) {
+                        log.warn("Resetting service state for service {}", s.getName());
+                        installationService.updateServiceState(s, ServiceState.NOT_RUNNING);
+                    }
+                });
+            }
             return new BackgroundTaskResult<String,Boolean>("Completed",true);
         });
+
+
+//        log.info ("Inspecting Launch Environment ...");
+//        if (runningOnBareOS()) {
+//            try {
+//                log.info("Checking if OS/Docker is needing an upgrade...");
+//                final BackgroundTaskResult<Boolean, Integer> result = executeScriptSimple("updateDocker.sh", Collections.EMPTY_MAP);
+//                if (result.getErrorCode().longValue() != 100 && result.getErrorCode().longValue() > 0) {
+//                    log.info("Docker upgrade failed - error code was {} - inform support", result);
+//                }  //platform not supported or all ok
+//            } catch (Exception e) {
+//                log.error("Failed to execute the docker upgrade script: {}", e.getMessage(), e);
+//            }
+//        }
+
+    }
+
+    /**
+     * to detect if we're running inside Docker, we check process 1's cgroup entry
+     * https://stackoverflow.com/a/52581380/1823881
+     * @return if running in docker, true
+     */
+    private boolean runningOnBareOS() {
+        try (Stream<String> stream = Files.lines(Paths.get("/proc/1/cgroup"))) {
+            if (stream.noneMatch(line -> line.contains("/docker"))) {
+                return true;
+            } else {
+                log.warn("Running inside a container - inspection not possible.");
+                return false;
+            }
+        } catch (IOException e) {
+            return true;
+        }
     }
 
 
@@ -349,12 +394,8 @@ public class BackgroundTaskService {
 
     @Scheduled(fixedDelay = 360000, initialDelay = 5000)
     public void verifyInternetConnectivity() {
-        try {
-            internetAvailable = InternetAvailabilityChecker.isInternetAvailable(host, port);
-            log.info("Internet connectivity test has passed, connection is OK");
-        } catch (IOException e) {
-            log.error("Internet connectivity check failed!");
-        }
+        internetAvailable = InternetAvailabilityChecker.isInternetAvailable(host, port);
+        log.info("Internet connectivity test has completed, connection is {}", internetAvailable ? "OK" : "Not OK");
     }
 
     public Boolean isInternetAvailable() {
@@ -1131,8 +1172,10 @@ public class BackgroundTaskService {
         // vars
         final SystemInstallationState state = installationService.getState();
         Map<String, String> envVars = new HashMap<String, String>();
-        envVars.put("CSPNAME", state.getCspRegistration().getName());
-        envVars.put("CSPDOMAIN", state.getCspRegistration().getDomainName());
+        if (state != null && state.getCspRegistration() != null) {
+            envVars.put("CSPNAME", state.getCspRegistration().getName());
+            envVars.put("CSPDOMAIN", state.getCspRegistration().getDomainName());
+        }
         envVars.put("CSPHOME", modulesDirectory);
         envVars.put("HOME",System.getProperty("user.home")); // make sure $HOME is set
         if (env != null) {
@@ -1170,25 +1213,23 @@ public class BackgroundTaskService {
     }
 }
 
+@Slf4j
 class InternetAvailabilityChecker
 {
 
-    public static boolean isInternetAvailable(String host, Integer port) throws IOException
-    {
+    public static boolean isInternetAvailable(String host, Integer port) {
         return isHostAvailable("google.com",443) && isHostAvailable(host, port);
     }
 
-    private static boolean isHostAvailable(String hostName,Integer port) throws IOException
-    {
-        try(Socket socket = new Socket())
-        {
+    private static boolean isHostAvailable(String hostName,Integer port) {
+        try(Socket socket = new Socket()) {
+            log.info("Attempting to connect to {}:{}",hostName,port);
             InetSocketAddress socketAddress = new InetSocketAddress(hostName, port);
-            socket.connect(socketAddress, 3000);
-
+            socket.connect(socketAddress, 5000);
+            log.info("Connected to {}:{}",hostName,port);
             return true;
-        }
-        catch(UnknownHostException unknownHost)
-        {
+        } catch(IOException ioe) {
+            log.error("Trying to connect to {}:{} returns: {}",hostName, port, ioe.getMessage());
             return false;
         }
     }

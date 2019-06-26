@@ -135,10 +135,10 @@ public class CspServerInternalSandboxTestFlow2CentralCspAuthorized {
         MockitoAnnotations.initMocks(this);
         mockUtils.setSpringCamelContext(springCamelContext);
 
-        mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX, routes.apply(CamelRoutes.DSL), mockedDsl.getEndpointUri());
-        mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX, routes.apply(CamelRoutes.TC), mockedTC.getEndpointUri());
-        mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX, routes.apply(CamelRoutes.APP), mockedApp.getEndpointUri());
-        mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX, routes.apply(CamelRoutes.EDCL), mockedEDcl.getEndpointUri());
+        mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX, routes.wrap(CamelRoutes.DSL), mockedDsl.getEndpointUri());
+        mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX, routes.wrap(CamelRoutes.TC), mockedTC.getEndpointUri());
+        mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX, routes.wrap(CamelRoutes.APP), mockedApp.getEndpointUri());
+        mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX, routes.wrap(CamelRoutes.EDCL), mockedEDcl.getEndpointUri());
 
         String urlShouldContain = tcProcessor.getTcCirclesURI();
         if(tcShortNameToTest.equalsIgnoreCase(IntegrationDataType.LTC_CSP_SHARING)){

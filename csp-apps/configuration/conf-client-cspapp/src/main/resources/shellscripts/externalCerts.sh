@@ -54,7 +54,7 @@ function processExternalCerts() {
         local CMD="keytool -importkeystore -srcstorepass changeme -srckeystore $CSPNAME.$CSPDOMAIN.p12 \
                 -srcstoretype pkcs12 -destkeystore $CSPNAME.$CSPDOMAIN.jks -deststoretype JKS \
                 -noprompt -storepass changeme"
-        docker run --rm -v "$(pwd)":/mnt --workdir /mnt frolvlad/alpine-oraclejdk8:slim sh -c "$CMD"
+        docker run --rm -v "$(pwd)":/mnt --workdir /mnt thanosa75/alpine-jdk8:slim sh -c "$CMD"
         verifyRetCode $?
         ### fixing jitsi keystore
         openssl pkcs12 -export -clcerts -in $CSPNAME.$CSPDOMAIN.crt \
@@ -62,7 +62,7 @@ function processExternalCerts() {
         local CMD="keytool -importkeystore -srcstorepass changeit -srckeystore $CSPNAME.$CSPDOMAIN-jitsi.p12 \
                 -srcstoretype pkcs12 -destkeystore $CSPNAME.$CSPDOMAIN-jitsi.jks -deststoretype JKS \
                 -noprompt -storepass changeit"
-        docker run --rm -v "$(pwd)":/mnt --workdir /mnt frolvlad/alpine-oraclejdk8:slim sh -c "$CMD"
+        docker run --rm -v "$(pwd)":/mnt --workdir /mnt thanosa75/alpine-jdk8:slim sh -c "$CMD"
         verifyRetCode $?
 
         cp /opt/csp/externalCerts/$CSPNAME.$CSPDOMAIN-jitsi.jks /opt/csp/apache2/ssl/server/csp-external-jitsi.jks

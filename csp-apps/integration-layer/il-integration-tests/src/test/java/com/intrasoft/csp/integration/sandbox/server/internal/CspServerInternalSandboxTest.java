@@ -27,10 +27,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.core.env.Environment;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.util.StringUtils;
 import org.springframework.web.context.WebApplicationContext;
@@ -121,9 +119,9 @@ public class CspServerInternalSandboxTest implements CamelRoutes{
         mvc = webAppContextSetup(webApplicationContext).build();
         MockitoAnnotations.initMocks(this);
         mockUtils.setSpringCamelContext(springCamelContext);
-        mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX,routes.apply(DSL),mockedDsl.getEndpointUri());
-        mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX,routes.apply(DDL), mockedDdl.getEndpointUri());
-        mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX,routes.apply(ECSP), mockedEcsp.getEndpointUri());
+        mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX,routes.wrap(DSL),mockedDsl.getEndpointUri());
+        mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX,routes.wrap(DDL), mockedDdl.getEndpointUri());
+        mockUtils.mockRoute(CamelRoutes.MOCK_PREFIX,routes.wrap(ECSP), mockedEcsp.getEndpointUri());
 
         String tcShortNameToTestArg = env.getProperty("tcShortNameToTest");
         if(!StringUtils.isEmpty(tcShortNameToTestArg)){
@@ -157,8 +155,8 @@ public class CspServerInternalSandboxTest implements CamelRoutes{
                 .thenReturn(mockUtils.getMockedTeam(1,"http://external.csp%s.com"))
                 .thenReturn(mockUtils.getMockedTeam(2,"http://external.csp%s.com"))
                 .thenReturn(mockUtils.getMockedTeam(3,"http://external.csp%s.com"));
-        ///*deprecated*/ mockUtils.mockRouteSkipSendToOriginalEndpoint(CamelRoutes.MOCK_PREFIX, routes.apply(TC),mockedTC.getEndpointUri());
-        ///*deprecated*/ mockUtils.mockRouteSkipSendToOriginalEndpoint(CamelRoutes.MOCK_PREFIX,routes.apply(TCT),mockedTCT.getEndpointUri());
+        ///*deprecated*/ mockUtils.mockRouteSkipSendToOriginalEndpoint(CamelRoutes.MOCK_PREFIX, routes.wrap(TC),mockedTC.getEndpointUri());
+        ///*deprecated*/ mockUtils.mockRouteSkipSendToOriginalEndpoint(CamelRoutes.MOCK_PREFIX,routes.wrap(TCT),mockedTCT.getEndpointUri());
 
         IntegrationAnonData integrationAnonData = new IntegrationAnonData();
 

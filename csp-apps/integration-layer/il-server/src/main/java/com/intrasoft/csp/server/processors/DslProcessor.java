@@ -70,7 +70,7 @@ public class DslProcessor implements Processor,CamelRoutes {
         }
 
         if(!isExternal){
-            recipients.add(routes.apply(DDL));
+            recipients.add(routes.wrap(DDL));
             LOG.info("DSL - received integrationData with datatype: " + integrationData.getDataType());
         }
         else {
@@ -86,9 +86,9 @@ public class DslProcessor implements Processor,CamelRoutes {
             headers.put(HeaderName.APP_NAME,app);
             headers.put(Exchange.HTTP_METHOD,exchange.getIn().getHeader(Exchange.HTTP_METHOD));
             if(!camelRestServiceIsAsync) {
-                producerTemplate.sendBodyAndHeaders(routes.apply(APP), ExchangePattern.InOnly, integrationData, headers);
+                producerTemplate.sendBodyAndHeaders(routes.wrap(APP), ExchangePattern.InOnly, integrationData, headers);
             } else {
-                camelRestService.asyncSendInOnly(routes.apply(APP),integrationData,headers);
+                camelRestService.asyncSendInOnly(routes.wrap(APP),integrationData,headers);
             }
         }
 
