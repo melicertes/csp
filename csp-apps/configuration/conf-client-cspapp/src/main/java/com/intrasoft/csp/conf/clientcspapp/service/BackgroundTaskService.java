@@ -1218,7 +1218,7 @@ class InternetAvailabilityChecker
 {
 
     public static boolean isInternetAvailable(String host, Integer port) {
-        return isHostAvailable("google.com",443) && isHostAvailable(host, port);
+        return isHostAvailable(host, port) && isHostAvailable(host, 80);
     }
 
     private static boolean isHostAvailable(String hostName,Integer port) {
