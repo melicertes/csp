@@ -1217,8 +1217,8 @@ public class BackgroundTaskService {
 class InternetAvailabilityChecker
 {
 
-    public static boolean isInternetAvailable(String host, Integer port) {
-        return isHostAvailable(host, port) && isHostAvailable(host, 80);
+    public static boolean isInternetAvailable(final String host, final Integer port) {
+        return isHostAvailable(host, port) && isHostAvailable(System.getenv().computeIfAbsent("UPDHOST", k -> host), 80);
     }
 
     private static boolean isHostAvailable(String hostName,Integer port) {
