@@ -73,7 +73,7 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler {
 			LOG.error("handleIntegrationData failed with:", e);
 		}
 
-		// LOG.debug("handleIntegrationData:jsonNode:" + jsonNode.toString());
+		//LOG.debug("handleIntegrationData:jsonNode:" + jsonNode.toString());
 
 		String uuid = null;
 		String event_info = null;
@@ -87,6 +87,7 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler {
 			mapper.enable(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT);
 			try {
 				incident = mapper.treeToValue(jsonNode, Ticket.class);
+				//(new TicketPrinter()).print(incident);
 				incident.setSharing(CfSharing.NO_SHARING.toString());
 			} catch (IOException e1) {
 				LOG.error("handleIntegrationData failed to getIncident from JSON Node:", e1);

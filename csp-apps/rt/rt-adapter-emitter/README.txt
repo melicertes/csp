@@ -15,3 +15,10 @@ mvn clean install -DskipTests
  http://csp-rtemitter:8081/rt/emitter/test/3 POST PUT new Incident TEST copy from ticket nummer 3
  http://localhost:8081/rt/adapter/alltest/927 with ticket nummer 3
 
+
+cd /opt/csp/modules/rtf9918a2f540b/
+docker-compose stop rt-adapter
+docker-compose start rt-adapter
+docker exec -it csp-rt /bin/sh
+/ # wget http://csp-rt_adapter:8081/rt/adapter/alltest/22
+
