@@ -12,6 +12,7 @@ services:
             - .env
         expose:
             - 800
+            - 801
             - 50000
         volumes:
             - /dev/urandom:/dev/random
@@ -63,6 +64,21 @@ services:
             - MYSQLDatavolume:/var/lib/mysql
         environment:
             - MYSQL_ROOT_PASSWORD=changeit
+
+    misp-proxy:
+        container_name: misp-proxy
+        image: node:8.16.0-alpine
+        domainname: ${LOCAL_DOMAIN}
+        ports:
+            - 802
+        environment:
+            - MISP_BASEURL=https://${MISP_DOMAIN}
+            - HTML_PORT=800
+            - API_PORT=801
+        volumes:
+            - ./misp-proxy/:/opt/misp-proxy/
+        working_dir: /opt/misp-proxy
+        command: sh -c "npm install && node proxy.js"
 
 
 volumes:
