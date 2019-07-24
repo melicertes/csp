@@ -5,7 +5,7 @@ https://gitlab.fokus.fraunhofer.de/EU-CSP/csp-apps.git
 mvn clean install -DskipTests
 
 #to run this
- java -jar rt-emitter-adapter-0.4.0-SNAPSHOT-exec.jar
+java -jar rt-emitter-adapter-4.0.7-SNAPSHOT-exec.jar
  
  
  REST API
@@ -20,5 +20,5 @@ cd /opt/csp/modules/rtf9918a2f540b/
 docker-compose stop rt-adapter
 docker-compose start rt-adapter
 docker exec -it csp-rt /bin/sh
-/ # wget http://csp-rt_adapter:8081/rt/adapter/alltest/22
+wget http://csp-rt_adapter:8081/rt/adapter/alltest/22
 
