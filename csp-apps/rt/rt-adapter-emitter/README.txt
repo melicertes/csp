@@ -1,5 +1,5 @@
 
-https://gitlab.fokus.fraunhofer.de/EU-CSP/csp-apps.git
+https://github.com/melicertes/csp.git
 
 #to make 
 mvn clean install -DskipTests
