@@ -3,17 +3,11 @@ var app      = express();
 var httpProxy = require('http-proxy');
 var apiProxy = httpProxy.createProxyServer();
 
-const HTML_PORT = process.env.HTML_PORT || 3000;
-const API_PORT = process.env.API_PORT || 3001;
-const MISP_BASEURL = process.env.MISP_LOCAL_DOMAIN || 'localhost';
+const API_PORT = process.env.API_PORT || 800;
 
-var api_target = 'https://' + MISP_BASEURL +':' + API_PORT;
-var html_target = 'https://' + MISP_BASEURL +':' + HTML_PORT;
-
+var api_target = 'http://csp-misp:' + API_PORT;
 
 app.all("/*", function(req, res) {
-
-    console.log(req.headers)
 
     if (req.headers['accept'] === 'application/json') {
 
@@ -31,18 +25,10 @@ app.all("/*", function(req, res) {
             });
         });
     } else {
-
-        console.log('redirecting to: ' + html_target);
-        apiProxy.web(req, res, {
-            target: html_target,
-            secure: false,
-            changeOrigin: true,
-        }, function (e) {
-            console.log(e.message);
-            return res.status(500).send({
-                error: true,
-                message: e.message
-            });
+        console.log('Operation not permitted for ' + req.headers['accept']);
+        return res.status(400).send({
+            error: true,
+            message: 'cannot serve request'
         });
     }
 
