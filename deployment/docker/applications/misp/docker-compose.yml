@@ -12,7 +12,6 @@ services:
             - .env
         expose:
             - 800
-            - 801
             - 50000
         volumes:
             - /dev/urandom:/dev/random
@@ -66,15 +65,14 @@ services:
             - MYSQL_ROOT_PASSWORD=changeit
 
     misp-proxy:
-        container_name: misp-proxy
+        container_name: csp-misp_proxy
         image: node:8.16.0-alpine
         domainname: ${LOCAL_DOMAIN}
-        ports:
-            - 802
+        hostname: csp-misp_proxy
+        expose:
+            - 3000
         environment:
-            - MISP_BASEURL=https://${MISP_DOMAIN}
-            - HTML_PORT=800
-            - API_PORT=801
+            - API_PORT=800
         volumes:
             - ./misp-proxy/:/opt/misp-proxy/
         working_dir: /opt/misp-proxy
@@ -98,6 +96,6 @@ volumes:
         external: true
 
 networks:
-  default:
-    external:
-      name: ${LOCAL_DOMAIN}
+    default:
+        external:
+            name: ${LOCAL_DOMAIN}

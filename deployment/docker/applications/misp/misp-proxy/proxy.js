@@ -9,6 +9,8 @@ var api_target = 'http://csp-misp:' + API_PORT;
 
 app.all("/*", function(req, res) {
 
+    console.log(req.headers)
+
     if (req.headers['accept'] === 'application/json') {
 
         console.log('redirecting to: ' + api_target);
