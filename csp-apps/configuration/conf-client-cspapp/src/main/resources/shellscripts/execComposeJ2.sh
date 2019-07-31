@@ -29,7 +29,7 @@ function execj2() {
     echo "User home is set to $HOME"
 
     ### generate env file
-	$J2 $J2TEMPL $DATAJSON > $J2OUTPUT
+	$J2 "$J2TEMPL" "$DATAJSON" > "$J2OUTPUT"
 	return $?
 }
 

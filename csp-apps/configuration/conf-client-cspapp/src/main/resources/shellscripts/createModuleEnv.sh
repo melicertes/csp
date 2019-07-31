@@ -5,9 +5,9 @@ function createEnvironment() {
 
 	echo "environment found: env: $ENVJSON j2env: $J2ENV siteconf: $SITESC prefix: $MODULE_PREFIX"
 	echo "About to replace $CSPNAME $CSPDOMAIN $INT_IP inside the configuration..."
-	sed -i.bak "s/XXXDOMAINXXX/$CSPDOMAIN/" $ENVJSON
-	sed -i.bak2 "s/XXXNAMEXXX/$CSPNAME/" $ENVJSON
-	sed -i.bak3 "s/XXXIPXXX/$INT_IP/" $ENVJSON
+	sed -i.bak "s/XXXDOMAINXXX/$CSPDOMAIN/" "$ENVJSON"
+	sed -i.bak2 "s/XXXNAMEXXX/$CSPNAME/" "$ENVJSON"
+	sed -i.bak3 "s/XXXIPXXX/$INT_IP/" "$ENVJSON"
 
         ### verify j2 presence
 	local J2=$(which j2)
@@ -24,9 +24,9 @@ function createEnvironment() {
     echo "User home is set to $HOME"
 
     ### generate env file
-	$J2 $J2ENV $ENVJSON > $HOME/$MODULE_PREFIX.env
+	$J2 "$J2ENV" "$ENVJSON" > "$HOME/$MODULE_PREFIX.env"
     ## generate sites conf
-	$J2 $SITESC $ENVJSON  > $HOME/csp-sites.$MODULE_PREFIX.conf
+	$J2 "$SITESC" "$ENVJSON"  > "$HOME/csp-sites.$MODULE_PREFIX.conf"
 
 	return 0
 }
