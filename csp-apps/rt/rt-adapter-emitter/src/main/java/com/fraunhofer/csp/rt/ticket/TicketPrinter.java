@@ -11,6 +11,7 @@ public class TicketPrinter {
 	public void print(Ticket ticket) {
 		System.out.println("-[Ticket Start]-");
 		print("id", ticket.getId());
+		print("Subject", ticket.getSubject());
 		print("Queue", ticket.getQueue());
 		print("Owner", ticket.getOwner());
 		print("Creator", ticket.getCreator());
@@ -29,7 +30,13 @@ public class TicketPrinter {
 		print("Time estimated", ticket.getTimeEstimated());
 		print("Time left", ticket.getTimeLeft());
 		print("Time worked", ticket.getTimeWorked());
-		ticket.getCustomFields().entrySet().forEach(e -> print(e.getKey() + " (custom field)", e.getValue()));
+		if (ticket.getCustomFields() != null)
+			ticket.getCustomFields().entrySet().forEach(e -> print(e.getKey() + " (custom field)", e.getValue()));
+
+		if (ticket.getMessage() != null)
+			print("Message", ticket.getMessage());
+		if (ticket.getComments() != null)
+			ticket.getComments().forEach(c -> print("comment", c));
 
 		System.out.println("-[Ticket End]-");
 	}

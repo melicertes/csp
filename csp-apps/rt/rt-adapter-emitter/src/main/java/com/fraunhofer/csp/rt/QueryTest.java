@@ -96,6 +96,7 @@ public class QueryTest {
 			System.out.println("[ERROR]: " + msg);
 		}
 
+		@SuppressWarnings("unused")
 		public void info(final String msg) {
 			System.out.println("[INFO]: " + msg);
 		}

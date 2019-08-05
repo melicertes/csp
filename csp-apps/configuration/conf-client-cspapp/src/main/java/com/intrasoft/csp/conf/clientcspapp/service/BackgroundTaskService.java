@@ -1217,8 +1217,9 @@ public class BackgroundTaskService {
 class InternetAvailabilityChecker
 {
 
-    public static boolean isInternetAvailable(String host, Integer port) {
-        return isHostAvailable("google.com",443) && isHostAvailable(host, port);
+    public static boolean isInternetAvailable(final String host, final Integer port) {
+        Map<String,String> env = new HashMap(System.getenv()); //if used directly getenv returns UnmodifiableMapException
+        return isHostAvailable(host, port) && isHostAvailable(env.computeIfAbsent("UPDHOST", k -> host), 80);
     }
 
     private static boolean isHostAvailable(String hostName,Integer port) {
@@ -1233,4 +1234,31 @@ class InternetAvailabilityChecker
             return false;
         }
     }
+
+
 }
+
+class FileNameCleaner {
+    final static int[] illegalChars = {32, 34, 60, 62, 124, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 58, 42, 63, 92, 47};
+    static {
+        Arrays.sort(illegalChars);
+    }
+    public static String cleanFileName(String badFileName) {
+        StringBuilder cleanName = new StringBuilder();
+        for (int i = 0; i < badFileName.length(); i++) {
+            int c = (int)badFileName.charAt(i);
+            if (Arrays.binarySearch(illegalChars, c) < 0) {
+                cleanName.append((char)c);
+            } else {
+                cleanName.append('_');
+            }
+        }
+        return cleanName.toString();
+    }
+
+    public static void main(String[] args) {
+        System.out.println( FileNameCleaner.cleanFileName("apache crl/test[34\\53a1υολο"));
+    }
+
+}
+

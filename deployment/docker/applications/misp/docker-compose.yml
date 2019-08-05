@@ -64,6 +64,23 @@ services:
         environment:
             - MYSQL_ROOT_PASSWORD=changeit
 
+    misp-proxy:
+        depends_on:
+            - misp-web
+        container_name: csp-misp_proxy
+        image: node:8.16.0-alpine
+        domainname: ${LOCAL_DOMAIN}
+        hostname: csp-misp_proxy
+        expose:
+            - 3000
+        environment:
+            - API_PORT=800
+        volumes:
+            - ./misp-proxy/:/opt/misp-proxy/
+            - MISPSharedDatavolume:/run/secrets
+        working_dir: /opt/misp-proxy
+        command: sh -c "while [ ! -f /run/secrets/authkey ]; do echo "Waiting..." ; sleep 1 ; done && npm install && node proxy.js"
+
 
 volumes:
     MISPAdapterDatavolume:
@@ -82,6 +99,6 @@ volumes:
         external: true
 
 networks:
-  default:
-    external:
-      name: ${LOCAL_DOMAIN}
+    default:
+        external:
+            name: ${LOCAL_DOMAIN}

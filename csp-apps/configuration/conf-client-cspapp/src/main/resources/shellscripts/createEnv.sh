@@ -5,9 +5,9 @@ function createEnvironment() {
     echo "$(fgrep XXXDOMAINXXX $ENVJSON)"
 	echo "environment found: $ENVJSON $J2ENV " # $SITESC
 	echo "About to replace $CSPNAME $CSPDOMAIN $INT_IP inside the configuration..."
-	sed -i.bak1 "s/XXXDOMAINXXX/$CSPDOMAIN/" $ENVJSON
-	sed -i.bak2 "s/XXXNAMEXXX/$CSPNAME/" $ENVJSON
-	sed -i.bak3 "s/XXXIPXXX/$INT_IP/" $ENVJSON
+	sed -i.bak1 "s/XXXDOMAINXXX/$CSPDOMAIN/" "${ENVJSON}"
+	sed -i.bak2 "s/XXXNAMEXXX/$CSPNAME/" "${ENVJSON}"
+	sed -i.bak3 "s/XXXIPXXX/$INT_IP/" "${ENVJSON}"
 	sed -i.bak4 "s#XXXMAILHOSTXXX#${MAIL_HOST}#g" "${ENVJSON}"
 	sed -i.bak5 "s#XXXMAILPORTXXX#${MAIL_PORT}#g" "${ENVJSON}"
 	sed -i.bak6 "s#XXXMAILUSERNAMEXXX#${MAIL_USERNAME}#g" "${ENVJSON}"
@@ -19,7 +19,7 @@ function createEnvironment() {
     echo ""
     echo ""
     echo "${ENVJSON}"
-    cat ${ENVJSON}
+    cat "${ENVJSON}"
 
     echo ""
     echo ""
@@ -42,7 +42,7 @@ function createEnvironment() {
 
     ### generate env file (common has priority 0)
     echo "executing : $J2 $J2ENV $ENVJSON "
-	$J2 $J2ENV $ENVJSON > $HOME/common.0.env
+	$J2 "$J2ENV" "$ENVJSON" > $HOME/common.0.env
 
     echo "Env created in $HOME"
     ls -la $HOME | grep env
