@@ -1,5 +1,7 @@
 package com.fraunhofer.csp.rt.api;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 import org.joda.time.DateTime;
@@ -88,6 +90,13 @@ public class RtAdapterController {
 
 		String message = rtAppClient.getMessage(ticketid);
 		LOG.debug("doAllTestTicketById:got message:" + message);
+		List<String> comments = rtAppClient.getComments(ticketid);
+		if (comments != null && comments.size() > 0) {
+			LOG.debug("doAllTestTicketById:got comments:" + comments.size());
+			for (String comment : comments) {
+				LOG.debug("doAllTestTicketById:got comment:" + comment);
+			}
+		}
 		String response = rtAppClient.callRtNewReportTest();
 		LOG.debug("doAllTestTicketById:callRtNewReportTest:" + response);
 
@@ -109,10 +118,12 @@ public class RtAdapterController {
 		LOG.debug("doAllTestTicketById:callRtClientTicketsTest:" + response);
 
 		incident.setUUID(UUID.randomUUID().toString());
-		incident.setSubject("test subject:" + new DateTime());
+		incident.setSubject("test subject from doAllTest:" + new DateTime());
 		response = rtAppClient.addRtTicket(incident, "demo1-csp:rt", RtQueues.INCIDENT_QUEUE.toString());
 
-		rtAppClient.addMessage2Incident(response, "test message:" + new DateTime());
+		rtAppClient.addComment2Incident(response, "test message:" + new DateTime());
+		List<String> mycomments = Arrays.asList("Hello", "World!", "How", "Are", "You");
+		rtAppClient.updateComments2Incident(response, mycomments);
 
 		ResponseEntity<String> responseEntity = new ResponseEntity<>("doAllTestTicketById done", HttpStatus.OK);
 		LOG.debug("################doAllTestTicketById END#####################");
