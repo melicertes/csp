@@ -344,7 +344,7 @@ public class TcProcessor implements Processor,CamelRoutes{
                 handleDclFlowAndSendToECSP(httpMethod, t, integrationData);
             }
         }else if(originEndpoint.equals(routes.wrap(CamelRoutes.EDCL))){//flow2
-            handleExternalDclFlowAndSendToDSL(exchange,httpMethod, teams, integrationData);
+            handleExternalDclFlowAndSendToDSL(httpMethod, teams, integrationData);
         }
     }
 
@@ -427,32 +427,40 @@ public class TcProcessor implements Processor,CamelRoutes{
     }
 
     // flow2
-    private void handleExternalDclFlowAndSendToDSL(Exchange exchange,String httpMethod,List<Team> teams, IntegrationData coreIntegrationData) throws IOException {
-
+    private void handleExternalDclFlowAndSendToDSL(String httpMethod,List<Team> teams, IntegrationData coreIntegrationData)
+            throws IOException {
         String jsonIntegrationData = objectMapper.writeValueAsString(coreIntegrationData);
         IntegrationData integrationData = objectMapper.readValue(jsonIntegrationData, IntegrationData.class);
 
-        //SXCSP-255. Using cspId and not shortName
-        //should have all teams regardless of any teamId provided in sharingParams
-        boolean authorized = teams.stream().anyMatch(t->t.getCspId().toLowerCase().equals(integrationData.getDataParams().getCspId().toLowerCase()));
-        LOG.info("Authorized (cspId or shortName="+integrationData.getDataParams().getCspId().toLowerCase()+"): "+authorized);
+        final List<String> authorizedCentralCspIdsList = Arrays.asList(IntegrationDataType.authorizedCentralCspIds);
+        final String cspId = integrationData.getDataParams().getCspId();
+
+        // 1. SXCSP-255. Using cspId and not shortName (fixed)
+        // 2. https://github.com/melicertes/csp/issues/60 (fixed)
+        //  short story - catch-22 central wants to send out a nuke and rewrite local CTC entries
+        //  to do so, previous code was expecting that CTC::CSP_ALL contains 'central' but central was wrong on TC app.
+        //  Test below fails when locals are asked to remove central from their list (so to solve the TC app issue).
+        //  New code below authorizes as per previous (no change for other data types) but adds a secondary check to
+        //  authorise the operation if the incoming integrationData come from 'central' or 'central-csp' and the
+        //  datatype is TRUSTCIRCLE. This will potentially allow a nuke operation to go through, assuming that
+        //  the trustcircle CTC::CSP_ALL exists
+        boolean authorized = teams.stream().anyMatch(t->t.getCspId().equalsIgnoreCase(cspId))
+                || ( authorizedCentralCspIdsList.stream().anyMatch(c->c.equalsIgnoreCase(cspId)) &&
+                     integrationData.getDataType().equals(IntegrationDataType.TRUSTCIRCLE));
+
+        LOG.info("(flow2) cspId "+ cspId +" -> authorized = "+authorized);
         if (authorized){
             integrationData.getSharingParams().setIsExternal(true);
             boolean shouldSend = true;
 
-            String cspId = integrationData.getDataParams().getCspId();
-            List<String> authorizedCentralCspIdsList = Arrays.asList(IntegrationDataType.authorizedCentralCspIds);
-
             if(integrationData.getDataType().equals(IntegrationDataType.TRUSTCIRCLE)
                     && !authorizedCentralCspIdsList.stream().anyMatch(c->c.equalsIgnoreCase(cspId))){
                 shouldSend = false;
-                LOG.warn(String.format("TC dataType change request received from external CSP (flow2) and is not %s. Csp tried to do this is: %s"
-                        ,authorizedCentralCspIdsList.toString(),cspId));
+                LOG.error(String.format("Rejecting TC dataType change from external CSP %s (flow2), not in %s. ",
+                        cspId, authorizedCentralCspIdsList.toString()));
             }
 
             if(shouldSend) {
-                //exchange.getIn().setBody(integrationData); //replace with producer
-                //exchange.getIn().setHeader("recipients", routes.wrap(DSL));//replace with producer
                 Map<String, Object> headers = new HashMap<>();
                 headers.put(Exchange.HTTP_METHOD, httpMethod);
                 if (!camelRestServiceIsAsync) {
