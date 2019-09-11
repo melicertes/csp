@@ -126,6 +126,7 @@ public class NotifierProcessor implements Processor {
                         EnhancedTeamDTO body = exchange.getIn().getBody(EnhancedTeamDTO.class);
                         producer.sendBody(FILE_DUMP_GLOBAL, convertToDump(headers,body));
                     }
+                    failedConnectivityTest.remove(team); //remove from rechecking list as we've now emptied the queues
                 }
             }
         }
