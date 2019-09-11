@@ -119,7 +119,7 @@ public class NotifierProcessor implements Processor {
                 final LocalDateTime failureTime = failedConnectivityTest.get(team);
                 LOG.warn("Notifier - Connectivity has failed again for {}, failing since {}", team, failureTime);
                 if (failureTime.plusWeeks(1).isBefore(LocalDateTime.now())) { // failing for more than 1 week
-                    LOG.error("Notifier - team {} fails delivery for more than 1 week, expiring all messages");
+                    LOG.error("Notifier - team {} fails delivery for more than 1 week, expiring all messages",team);
                     Exchange exchange = null;
                     while ((exchange = consumer.receive(routes.wrap(ECSP + "." + team.getName()), TIMEOUT)) != null) {
                         final Map<String, Object> headers = exchange.getIn().getHeaders();
