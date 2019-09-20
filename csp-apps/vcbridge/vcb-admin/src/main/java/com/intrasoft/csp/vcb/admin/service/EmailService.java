@@ -153,6 +153,7 @@ public class EmailService {
 
                 Organizer organizer = new Organizer(URI.create("mailto:"+p1.getEmail()));
                 organizer.getParameters().add(new Cn(p1.getFullname().length()==1 ? p1.getEmail() : p1.getFullname()));
+
                 vEvent.getProperties().add(organizer);
                 for (Participant part : meeting.getParticipants()) {
                     Attendee attendee = new Attendee(URI.create("mailto:"+part.getEmail()));
@@ -161,7 +162,6 @@ public class EmailService {
                     attendee.getParameters().add(new Cn(part.getFullname().length()==1 ? part.getEmail() : part.getFullname()));
                     vEvent.getProperties().add(attendee);
                 }
-
 
                 if (et.getType().equals(EmailTemplateType.INVITATION)) {
                     vEvent.getProperties().add(Status.VEVENT_CONFIRMED);
