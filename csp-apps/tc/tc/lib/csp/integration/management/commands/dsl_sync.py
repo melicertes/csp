@@ -6,6 +6,7 @@ import time
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
+from django.core.exceptions import ObjectDoesNotExist
 
 from csp.integration.models import ChangeLog
 from csp.integration.dsl import DSL
@@ -74,7 +75,11 @@ def dispatch_changes(dsl):
                       .first())
             if change is None:
                 break
-            dsl.dispatch_change(change)
+            try:
+                dsl.dispatch_change(change)
+            except ObjectDoesNotExist:
+                LOG.exception("DSL error: can't sync object: object gone, skipping {}<{}>".format(change.model_name, change.model_pk))
+                pass
             change.delete()
 
 

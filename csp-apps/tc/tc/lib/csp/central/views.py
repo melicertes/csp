@@ -35,12 +35,15 @@ def team_view(request, id):
     show_blocks.remove('csp_team')
     show_blocks.remove('team')
 
+    protect_delete = team.short_name in ['central-csp', 'central']
+
     return render(request, 'central/team/view.html', {
         'team': team,
         'teamcontact': teamcontact,
         'circles': team.circles.all(),
         'changes': team.history.all().count(),
         'show_blocks': show_blocks,
+        'protect_delete': protect_delete,
     })
 
 
@@ -93,6 +96,7 @@ def team_history_view(request, id):
     columns = vars(Team())
     columns = {k: v for k, v in columns.items() if not k.startswith('_')}
     columns['history_date'] = ""
+    columns['history_user'] = ""
 
     context = {
         'history': instance,
@@ -114,10 +118,13 @@ def circle_list(request):
 @login_required
 def circle_view(request, id):
     circle = get_object_or_404(TrustCircle, id=id)
+    protect_delete = circle.short_name in ['CTC::CSP_ALL', 'CTC::CSP_SHARING']
+
     return render(request, 'central/ctc/view.html', {
         'teams': circle.teams.all(),
         'circle': circle,
-        'changes': circle.history.all().count()
+        'changes': circle.history.all().count(),
+        'protect_delete': protect_delete,
     })
 
 
@@ -163,7 +170,8 @@ def circle_history_view(request, id):
     # Santinize Columns
     columns = vars(TrustCircle())
     columns = {k: v for k, v in columns.items() if not k.startswith('_')}
-    columns['history_date'] = ""
+    columns['history_date'] = ""  # Show column
+    columns['history_user'] = ""  # Show column
 
     context = {
         'history': instance,

@@ -1,13 +1,13 @@
 {% extends "base.html" %}
 
-{% block title %} | Central Team '{{ team.name }}'{% endblock %}
+{% block title %} | CSP Team '{{ team.name }}'{% endblock %}
 
 {% block page-header %}
     <i class="fa fa-user-circle "></i>
     {% if team.id %}
-    Edit Central Team '{{ team.short_name }}'
+    Edit CSP Team '{{ team.short_name }}'
     {% else %}
-    Add New Central Team
+    Add New CSP Team
     {% endif %}
     <div class="pull-right">
         {% if team.id %}
@@ -31,9 +31,9 @@
                 </div>
 
                 <div class="form-group">
-                    {{ form.name.errors }}
-                    <label for="{{ form.name.id_for_label }}">Team Name:</label>
-                    {{ form.name }}
+                    {{ form.description.errors }}
+                    <label for="{{ form.description.id_for_label }}">Description:</label>
+                    {{ form.description }}
                 </div>
 
                 <div class="form-group">
@@ -53,26 +53,18 @@
                     <label for="{{ form.additional_countries.id_for_label }}">Additional Countries:</label>
                     {{ form.additional_countries }}
                 </div>
-
-                <div class=" form-group item">
-                    {{ form.csp_installed.errors }}
-
-                    <label for="{{ form.csp_installed.id_for_label }}" style="float:left">CSP
-                        Installed:&nbsp; </label>
-                    {{ form.csp_installed }}
-                </div>
             </div>
             <div class="col-md-6">
+                <div class="form-group">
+                    {{ form.name.errors }}
+                    <label for="{{ form.name.id_for_label }}">Long Team Name:</label>
+                    {{ form.name }}
+                </div>
+
                 <div class="form-group">
                     {{ form.established.errors }}
                     <label for="{{ form.established.id_for_label }}">Established:</label>
                     {{ form.established }}
-                </div>
-
-                <div class="form-group">
-                    {{ form.description.errors }}
-                    <label for="{{ form.description.id_for_label }}">Description:</label>
-                    {{ form.description }}
                 </div>
 
                 <div class="form-group">
@@ -101,8 +93,16 @@
 
                 <div class="form-group">
                     {{ form.csp_domain.errors }}
-                    <label for="{{ form.csp_domain.id_for_label }}">CSP Domain:</label>
+                    <label for="{{ form.csp_domain.id_for_label }}">CSP Domain (with CSP ID):</label>
                     {{ form.csp_domain }}
+                </div>
+
+                <div class=" form-group item">
+                    {{ form.csp_installed.errors }}
+
+                    <label for="{{ form.csp_installed.id_for_label }}" style="float:left">CSP
+                        Installed:&nbsp; </label>
+                    {{ form.csp_installed }}
                 </div>
             </div>
         </div>
@@ -153,6 +153,26 @@
             $('#team-form').submit();
         }
 
+        function short_name_is_valid(sn) {
+            // only contains a-z, A-Z, ., -
+            return /^[a-zA-Z0-9\.-]*$/.test(sn);
+        }
+
+        function csp_id_domain_is_valid(csp_id, csp_domain) {
+            // csp_domain starts with csp_id followed by "."
+            return csp_domain.startsWith(csp_id + ".");
+        }
+
+        function validateShortName() {
+            if (short_name_is_valid($(this).val())) $("label[for='id_short_name']").removeClass('invalid_short_name');
+            else $("label[for='id_short_name']").addClass('invalid_short_name');
+        }
+
+        function validateCSPIDAndDomain() {
+            if (csp_id_domain_is_valid($('#id_csp_id').val(), $('#id_csp_domain').val())) $("label[for='id_csp_id']").removeClass('invalid_csp_id');
+            else $("label[for='id_csp_id']").addClass('invalid_csp_id');
+        }
+
         $('#id_established').datepicker({
             format: "yyyy-mm-dd",
             orientation: 'bottom',
@@ -170,6 +190,14 @@
                     $table.bootstrapTable('check', {{ forloop.counter0 }});
                 {% endif %}
             {% endfor %}
+
+            $('#id_short_name').change(validateShortName);
+            $('#id_short_name').keyup(validateShortName);
+
+            $('#id_csp_id').change(validateCSPIDAndDomain);
+            $('#id_csp_id').keyup(validateCSPIDAndDomain);
+            $('#id_csp_domain').change(validateCSPIDAndDomain);
+            $('#id_csp_domain').keyup(validateCSPIDAndDomain);
         });
     </script>
 {% endblock %}

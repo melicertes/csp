@@ -3,7 +3,7 @@
 {% block title %} | All Team Contacts{% endblock %}
 
 {% block secondary-nav %}
-<div class="navbar navbar-default navbar-fixed-top secondary-nav">
+<div class="navbar navbar-default navbar-static-top">
     <div class="container">
         {% include "contacts/includes/contacts_tabs.html" %}
         <div class="navbar-form navbar-right">
@@ -24,20 +24,20 @@
                     <th data-align="center"></th>
                     <th data-sortable="true">Name</th>
                     <th data-sortable="true">Country</th>
-                    <th data-align="right" data-sortable="true">#CTC</th>
+                    <th data-align="right" data-sortable="true">#LTC</th>
                     <th data-align="right" data-sortable="true">Created</th>
-                    <th data-align="right" data-sortable="true">Status</th>
+                    <th data-align="right" data-sortable="true">Modified</th>
                 </tr>
             </thead>
             <tbody>
                 {% for team in teams %}
                 <tr>
                     <td><a href="{% url 'teamcontact_view'  team.id %}"><i class="fa fa-group"></i></a></td>
-                    <td><a href="{% url 'teamcontact_view'  team.id %}">{{ team.name }}</a></td>
+                    <td><a href="{% url 'teamcontact_view'  team.id %}">{{ team.short_name }}</a></td>
                     <td><a href="{% url 'search_view' %}?q={{ team.country }}">{{ team.country }}</a></td>
-                    <td>{{ team.circles.all|length }}</td>
+                    <td>{{ team.in_localcircles.all|length }}</td>
                     <td>{{ team.created|date }}</td>
-                    <td><a href="{% url 'search_view' %}?q={{ team.status }}">{{ team.status }}</a></td>
+                    <td>{{ team.modified|date }}</td>
                 </tr>
                 {% endfor %}
             </tbody>

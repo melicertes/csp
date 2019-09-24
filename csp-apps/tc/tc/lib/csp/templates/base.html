@@ -1,4 +1,4 @@
-{% load staticfiles nav_helper %}
+{% load staticfiles nav_helper contacts_helper %}{% unseen_contacts_count as unseen_contacts_count %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -33,7 +33,7 @@
 
 <body>
 
-<nav class="navbar navbar-inverse navbar-fixed-top">
+<nav class="navbar navbar-inverse navbar-static-top">
     <div class="container">
         <div class="navbar-header">
             <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
@@ -47,21 +47,21 @@
 
 
         </div>
-        <ul class="nav navbar-nav">
-            <li class="{% active_for '/central/teams/' %}"><a href="{% url 'team_list' %}"
-                title="Central Trust Teams"><i class="fa fa-user-circle "></i> Teams</a></li>
-            <li class="{% active_for '/central/circles/' %}"><a href="{% url 'circle_list' %}"
-                title="Central Trust Circles"><i class="fa fa-globe "></i> CTC</a></li>
-            <li class="{% active_for '/local/circles/' %}"><a href="{% url 'ltc_list' %}"
-                title="Local Trust Circles"><i class="fa fa-circle-o-notch "></i> LTC</a></li>
-            <li class="{% active_for '/local/contacts/' %}"><a href="{% url 'teamcontact_list' %}"><i
-                    class="fa fa-address-card "></i> Contacts</a></li>
-            <li class="{% active_for '/local/received/' %}"><a href="{% url 'incomingcontact_list' %}"><i
-                    class="fa fa-upload "></i> Received Data</a></li>
-            <li class="{% active_for '/configuration/' %}"><a href="{% url 'configuration' %}"><i
-                    class="fa fa-wrench "></i> Configuration</a></li>
-        </ul>
         <div id="navbar" class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+                <li class="{% active_for '/central/teams/' %}"><a href="{% url 'team_list' %}"
+                    title="Central Trust Teams"><i class="fa fa-user-circle "></i> CSP Teams</a></li>
+                <li class="{% active_for '/central/circles/' %}"><a href="{% url 'circle_list' %}"
+                    title="Central Trust Circles"><i class="fa fa-globe "></i> CTC</a></li>
+                <li class="{% active_for '/local/circles/' %}"><a href="{% url 'ltc_list' %}"
+                    title="Local Trust Circles"><i class="fa fa-circle-o-notch "></i> LTC</a></li>
+                <li class="{% active_for '/local/contacts/' %}"><a href="{% url 'teamcontact_list' %}"><i
+                        class="fa fa-address-card "></i> Contacts</a></li>
+                <li class="{% active_for '/local/received/' %}"><a href="{% url 'incomingcontact_list' %}"><i
+                        class="fa fa-upload "></i> Received {% if unseen_contacts_count > 0 %} <span class="badge badge-primary">{{ unseen_contacts_count }}</span>{% endif %}</a></li>
+                <li class="{% active_for '/configuration/' %}"><a href="{% url 'configuration' %}"><i
+                        class="fa fa-wrench "></i> Configuration</a></li>
+            </ul>
             <!---------------------------->
             <ul class="nav navbar-nav navbar-right">
                 <li class="dropdown">
@@ -121,7 +121,7 @@
 </nav>
 
 {% block secondary-nav %}
-<div class="navbar navbar-default navbar-fixed-top secondary-nav">
+<div class="navbar navbar-default navbar-static-top">
     <div class="container">
         <h1 class="page-header">{% block page-header %}{% endblock %}</h1>
     </div>
@@ -131,7 +131,7 @@
 <div class="container">
     {% block content %}{% endblock %}
     <div id="footer">
-        Trust Circle Application <span class="pull-right">Version 1.2.0</span>
+        Trust Circle Application <span class="pull-right">Version 1.3.0</span>
     </div>
 </div>
 
@@ -153,6 +153,7 @@
 <script src="{% static "lib/bootstrap-datepicker/js/bootstrap-datepicker.min.js" %}"></script>
 <script src="{% static "lib/select2/js/select2.min.js" %}"></script>
 
+<script src="{% static "js/safe-delete.js" %}"></script>
 <script src="{% static "js/custom.js" %}"></script>
 
 {% block javascriptcontent %}{% endblock %}

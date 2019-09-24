@@ -14,6 +14,11 @@ def ucfirst(val):
     return ' '.join(word[0].upper() + word[1:] for word in val.split())
 
 
+@register.inclusion_tag('contacts/includes/field_uuid_value.html')
+def field_uuid_value(obj, fieldname, label=None):
+    return field_value(obj, fieldname, label=label)
+
+
 @register.inclusion_tag('contacts/includes/field_value.html')
 def field_value(obj, fieldname, label=None):
     field = obj._meta.get_field(fieldname)

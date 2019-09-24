@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %} | Central Team '{{ team.name }}'{% endblock %}
+{% block title %} | CSP Team '{{ team.name }}'{% endblock %}
 
 {% block page-header %}
     <i class="fa fa-user-circle "></i> Team '{{ team.short_name }}'
@@ -15,7 +15,7 @@
         <form action="{% url 'team_delete' %}" id="delete-team" method="post" class="delete-form">{% csrf_token %}
             <input type="hidden" name="id" value="{{ team.id }}">
             <button name="delete-it" type="button"
-                class="btn btn-danger confirm" type="submit" data-placement="bottom">
+                class="btn btn-danger {% if protect_delete %}confirm-safe{% else %}confirm{% endif %}" type="submit" data-placement="bottom">
                 <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
             </button>
         </form>
@@ -35,8 +35,8 @@
             </div>
 
             <div class="form-group">
-                <label>Team Name:</label>
-                {{ team.name }}
+                <label>Description:</label>
+                {{ team.description }}
             </div>
 
             <div class="form-group">
@@ -53,22 +53,17 @@
                 <label>Additional Countries:</label>
                 {{ team.additional_countries|join:", "|default:"None" }}
             </div>
-
-            <div class="form-group item">
-                <label>CSP Installed:&nbsp; </label>
-                {{ team.csp_installed|yesno }}
-            </div>
         </div>
 
         <div class="col-md-6">
             <div class="form-group">
-                <label>Established:</label>
-                {{ team.established }}
+                <label>Team Name:</label>
+                {{ team.name }}
             </div>
 
             <div class="form-group">
-                <label>Description:</label>
-                {{ team.description }}
+                <label>Established:</label>
+                {{ team.established }}
             </div>
 
             <div class="form-group">
@@ -92,8 +87,13 @@
             </div>
 
             <div class="form-group">
-                <label>CSP Domain:</label>
+                <label>CSP Domain (with CSP ID):</label>
                 {{ team.csp_domain }}
+            </div>
+
+            <div class="form-group item">
+                <label>CSP Installed:&nbsp; </label>
+                {{ team.csp_installed|yesno }}
             </div>
         </div>
     </div>
@@ -128,6 +128,17 @@
             onConfirm: function (event) {
                 $("#delete-team").submit();
             }
+        });
+        $('.confirm-safe').on('click', function(){
+          $(this).safeDelete({
+            popupTitle: "Warning: You are trying to delete a protected item.  Please confirm your action by typing 'I CONFIRM'",
+            safeText : "I CONFIRM",
+            deleteButton : "Delete",
+            cancelButton : "Cancel",
+            yesCallback: function() {
+              $("#delete-team").submit();
+            },
+          });
         });
     </script>
 {% endblock %}

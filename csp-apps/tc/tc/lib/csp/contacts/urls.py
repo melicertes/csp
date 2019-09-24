@@ -18,6 +18,8 @@ urlpatterns = [
     url(r'^contacts/people/edit/(?P<id>[0-9a-z-]+)/$', views.personcontact_edit, name='personcontact_edit'),
     url(r'^contacts/people/view/(?P<id>[0-9a-z-]+)/$', views.personcontact_view, name='personcontact_view'),
 
+    url(r'^contacts/importti/$', views.importti_view, name='importti'),
+
     url(r'^circles/$', views.ltc_list, name="ltc_list"),
     url(r'^circles/new/$', views.ltc_edit, name='ltc_new'),
     url(r'^circles/delete/$', views.ltc_delete, name='ltc_delete'),
@@ -26,5 +28,6 @@ urlpatterns = [
 
     url(r'^received/$', views.incoming_list, name="incomingcontact_list"),
     url(r'^received/delete/$', views.incoming_delete, name="incomingcontact_delete"),
+    url(r'^received/deleteall/$', views.incoming_delete_all, name="incomingcontact_delete_all"),
     url(r'^received/view/(?P<id>[0-9]+)/$', views.incoming_view, name="incomingcontact_view"),
 ]
