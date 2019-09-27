@@ -18,7 +18,7 @@
             <input type="hidden" name="id" value="{{ circle.id }}">
             <button
                 type="button"
-                class="btn btn-danger confirm"
+                class="btn btn-danger {% if protect_delete %}confirm-safe{% else %}confirm{% endif %}"
                 type="submit" data-placement="bottom">
                 <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
             </button>
@@ -39,25 +39,16 @@
             </div>
 
             <div class="form-group">
-                <label>CTC Name:</label>
-                {{ circle.name }}
+                <label>Description:</label>
+                {{ circle.description }}
             </div>
 
-            <div class="form-group">
-                <label>Authoritative Source: </label>
-                {{ circle.auth_source }}
-            </div>
-
-            <div class="form-group">
-                <label>TLP: </label>
-                {{ circle.get_tlp_display|default:"-" }}
-            </div>
         </div>
 
         <div class="col-md-6">
             <div class="form-group">
-                <label>Description:</label>
-                {{ circle.description }}
+                <label>Long CTC Name:</label>
+                {{ circle.name }}
             </div>
 
             <div class="form-group">
@@ -71,13 +62,23 @@
                 <a href="{{ circle.info_url }}" target="_blank"
                     style="word-wrap:break-word">{{ circle.info_url }}</a>
             </div>
+
+            <div class="form-group">
+                <label>Authoritative Source: </label>
+                {{ circle.auth_source }}
+            </div>
+
+            <div class="form-group">
+                <label>TLP: </label>
+                {{ circle.get_tlp_display|default:"-" }}
+            </div>
         </div>
     </div>
 
     <div class="row">
         <div class="col-md-12">
             <h2>
-                <i class="fa fa-user-circle "></i> Central Teams
+                <i class="fa fa-user-circle "></i> CSP Teams
                 {% if perms.ctc.web_write %}
                 <a href="{% url 'circle_edit' circle.id %}" type="button"
                     class="btn btn-warning pull-right">
@@ -97,6 +98,17 @@
             onConfirm: function (event) {
                 $("#delete-circle").submit();
             }
+        });
+        $('.confirm-safe').on('click', function(){
+          $(this).safeDelete({
+            popupTitle: "Warning: You are trying to delete a protected item.  Please confirm your action by typing 'I CONFIRM'",
+            safeText : "I CONFIRM",
+            deleteButton : "Delete",
+            cancelButton : "Cancel",
+            yesCallback: function() {
+              $("#delete-circle").submit();
+            },
+          });
         });
     </script>
 {% endblock %}

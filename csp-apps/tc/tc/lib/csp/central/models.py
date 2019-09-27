@@ -15,18 +15,23 @@ class Team(models.Model):
     short_name = models.CharField('(Short) Team Name', max_length=128)
     name = models.CharField('(Long) Team Name', max_length=255)
     host_organisation = models.CharField('Host Organization', max_length=255)
-    description = models.CharField('Description', max_length=255)
+    description = models.TextField('Description')
     country = models.CharField(max_length=255)
-    additional_countries = ArrayField(models.TextField(), default=list, blank=True)
+    additional_countries = ArrayField(models.TextField(),
+                                      default=list,
+                                      blank=True)
     established = models.DateField('Established on')
     nis_team_types = ArrayField(models.TextField(), default=list, blank=True,
                                 verbose_name='NIS Team Types')
     nis_sectors = ArrayField(models.TextField(), default=list, blank=True,
                              verbose_name='NIS Sectors')
     created = models.DateTimeField('Created on', auto_now_add=True)
+    modified = models.DateTimeField('Modified on', auto_now=True)
     csp_installed = models.BooleanField('CSP Installed', default=False)
     csp_id = models.CharField('CSP ID', max_length=255, blank=True)
-    csp_domain = models.CharField('CSP Domain', max_length=255, blank=True)
+    csp_domain = models.CharField('CSP Domain (with CSP ID)',
+                                  max_length=255,
+                                  blank=True)
     status = models.CharField(max_length=255)
 
     history = HistoricalRecords()
@@ -66,11 +71,12 @@ class TrustCircle(models.Model):
                                   help_text='Needs to start with "CTC::"')
     tlp = models.CharField('TLP', max_length=255, choices=TLP_CHOICES, blank=True, default='')
     name = models.CharField('(Long) TC Name', max_length=255)
-    description = models.CharField('Description', max_length=255)
+    description = models.TextField('Description')
     auth_source = models.CharField('Authoritative Source', max_length=255, default='ENISA')
     info_url = models.URLField('URL for Public Information', blank=True)
     membership_url = models.URLField('URL for Membership Directory', blank=True)
     created = models.DateTimeField('Created on', default=timezone.now)
+    modified = models.DateTimeField('Modified on', auto_now=True)
     history = HistoricalRecords()
     teams = models.ManyToManyField(Team, blank=True,
                                    verbose_name='Member Teams of the Trust Circle',

@@ -37,6 +37,7 @@
         </div>
     </div>
 
+{% comment %}
     <h2><i class="fa changeme"></i> Mailing List</h2>
     <div class="row">
         <div class="col-md-6">
@@ -46,6 +47,7 @@
             {% form_field form.ml_key %}
         </div>
     </div>
+{% endcomment %}
 
     {% include "contacts/includes/formset.html" with formset_js_id="phone_numbers_formset" formset=formsets.phone_numbers title_single="Phone Number" title_all="Phone Numbers" %}
     {% include "contacts/includes/formset.html" with formset_js_id="certificates_formset" formset=formsets.certificates title_single="PGP Key X.509 Certificate" title_all="PGP Key X.509 Certificates" %}

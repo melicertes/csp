@@ -3,4 +3,8 @@
 <ul class="nav navbar-nav">
     <li role="presentation" class="{% active_for '/local/contacts/teams/' %}"><a href="{% url 'teamcontact_list' %}"><i class="fa fa-group "></i> Teams</a></li>
     <li role="presentation" class="{% active_for '/local/contacts/people/' %}"><a href="{% url 'personcontact_list' %}"><i class="fa fa-user "></i> People</a></li>
+    {% is_official_deployment as official_deployment %}
+    {% if official_deployment %}
+    	<li role="presentation" class="{% active_for '/local/contacts/importti/' %}"><a href="{% url 'importti' %}"><i class="fa fa-download "></i> TI Import</a></li>
+    {% endif %}
 </ul>

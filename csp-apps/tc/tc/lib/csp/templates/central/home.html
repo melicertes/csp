@@ -3,7 +3,7 @@
 {% block title %} | Search {% endblock %}
 
 {% block page-header %}
-    All Central Teams & Trust Circles
+    All CSP Teams &amp; Trust Circles
     {% if perms.ctc.web_write %}
     <button type="button"
         class="btn btn-default confirm pull-right" type="button" data-placement="bottom">
@@ -23,13 +23,13 @@
                         </div>
                         <div class="col-xs-9 text-right">
                             <div class="huge" style="font-size:40px">{{ teams|length }}</div>
-                            <div>Central Teams</div>
+                            <div>CSP Teams</div>
                         </div>
                     </div>
                 </div>
                 <a href="{% url 'team_list' %}">
                     <div class="panel-footer">
-                        <span class="pull-left">View all Central Teams</span>
+                        <span class="pull-left">View all CSP Teams</span>
                         <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
                         <div class="clearfix"></div>
                     </div>
@@ -111,10 +111,10 @@
     <div class="row">
         <div class="col-md-12">
             <h2>
-                <i class="fa fa-user-circle "></i> Central Teams
+                <i class="fa fa-user-circle "></i> CSP Teams
                 {% if perms.ctc.web_write %}
                 <a href="{% url 'team_new' %}" type="button" class="btn btn-success pull-right">
-                    <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add Central Team
+                    <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add CSP Team
                 </a>
                 {% endif %}
             </h2>

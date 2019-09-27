@@ -15,12 +15,12 @@ from django.apps import apps
 from django.db import IntegrityError
 
 from csp.central.models import Team, TrustCircle
-from csp.common.models import Suggestion, Country
 from csp.contacts.models import IncomingTeamContact
 
 from .models import ChangeLog
 
 
+AUDITLOG = logging.getLogger('ctc')
 log = logging.getLogger()
 
 
@@ -87,6 +87,7 @@ class AdapterView(views.APIView):
         serializer = IntegrationDataSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
             data = serializer.validated_data
+            auditlog(data, 'delete')
             model_name, model_pk = data['dataParams']['recordId']
             model = apps.get_model(model_name)
             try:
@@ -106,6 +107,7 @@ class AdapterView(views.APIView):
         serializer = IntegrationDataSerializer(data=request.data)
         if serializer.is_valid():
             data = serializer.validated_data
+            auditlog(data, 'create_or_update')
             model_name, model_pk = data['dataParams']['recordId']
 
             # if its an authoritatitve model, then it must come from
@@ -183,9 +185,30 @@ class ExportView(views.APIView):
     'CTC::CSP_ALL'.
     """
     def post(self, request):
+        AUDITLOG.info('Nuke-It! pressed, sharing Teams and TrustCircles with CTC::CSP_ALL')
         models = (Team, TrustCircle)
         for model in models:
             for obj in model.objects.all():
                 ChangeLog.objects.log('create', obj, ['CTC::CSP_ALL'])
 
         return Response({'success': True})
+
+
+def auditlog(data, action):
+    try:
+        csp_id = data['dataParams']['cspId']
+    except:
+        csp_id = 'PARSE_ERROR'
+
+    try:
+        app_id = data['dataParams']['applicationId']
+    except:
+        app_id = 'PARSE ERROR'
+
+    try:
+        model_name, model_pk = data['dataParams']['recordId']
+    except:
+        model_name, model_pk = ('PARSE ERROR', 'PARSE_ERROR')
+
+    AUDITLOG.info('IL.{} {} request from {} for {}<{}>'.format(
+        app_id, action, csp_id, model_name, model_pk))

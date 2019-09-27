@@ -5,9 +5,9 @@
 {% block page-header %}
     <i class="fa fa-globe"></i>
     {% if circle.id %}
-        Edit  Trust Circle '{{ circle.name }}'
+        Edit Central Trust Circle '{{ circle.name }}'
     {% else %}
-        Add New Trust Circle
+        Add New Central Trust Circle
     {% endif %}
     <div class="pull-right">
         {% if circle.id %}
@@ -31,26 +31,16 @@
                 </div>
 
                 <div class="form-group">
-                    {{ form.name.errors }}
-                    <label for="{{ form.name.id_for_label }}">CTC Name:</label>
-                    {{ form.name }}
-                </div>
-                <div class="form-group">
-                    {{ form.auth_source.errors }}
-                    <label for="{{ form.auth_source.id_for_label }}">Authoritative Source: </label>
-                    {{ form.auth_source }}
-                </div>
-                <div class="form-group">
-                    {{ form.tlp.errors }}
-                    <label for="{{ form.tlp.id_for_label }}">TLP: </label>
-                    {{ form.tlp }}
+                    {{ form.description.errors }}
+                    <label for="{{ form.description.id_for_label }}">Description:</label>
+                    {{ form.description }}
                 </div>
             </div>
             <div class="col-md-6">
                 <div class="form-group">
-                    {{ form.description.errors }}
-                    <label for="{{ form.description.id_for_label }}">Description:</label>
-                    {{ form.description }}
+                    {{ form.name.errors }}
+                    <label for="{{ form.name.id_for_label }}">Long CTC Name:</label>
+                    {{ form.name }}
                 </div>
 
                 <div class="form-group">
@@ -64,12 +54,24 @@
                     <label for="{{ form.info_url.id_for_label }}">URL for Public Information:</label>
                     {{ form.info_url }}
                 </div>
+
+                <div class="form-group">
+                    {{ form.auth_source.errors }}
+                    <label for="{{ form.auth_source.id_for_label }}">Authoritative Source: </label>
+                    {{ form.auth_source }}
+                </div>
+
+                <div class="form-group">
+                    {{ form.tlp.errors }}
+                    <label for="{{ form.tlp.id_for_label }}">TLP: </label>
+                    {{ form.tlp }}
+                </div>
             </div>
         </div>
 
-        <h2><i class="fa fa-user-circle "></i> Central Teams</h2>
+        <h2><i class="fa fa-user-circle "></i> CSP Teams</h2>
         <div class="row">
-            <div class="col-md-12 " style="text-align:right">
+            <div class="col-md-12 ">
                 <table data-toggle="table" selectItemName="id" id="tbl_Teams">
                     <thead>
                         <tr>
@@ -86,7 +88,7 @@
                     {% for team in teams %}
                         <tr data-id="{{ team.id }}">
                             <td></td>
-                            <td><a href="{% url 'team_view'  team.id %}">{{ team.name }}</a></td>
+                            <td><a href="{% url 'team_view'  team.id %}">{{ team.short_name }}</a></td>
                             <td><a href="{% url 'team_view' team.id %}">{{ team.country }}</a></td>
                             <td><a href="{% url 'team_view' team.id %}">{{ team.circles.all|length }}</a></td>
                             <td><a href="{% url 'team_view' team.id %}">{{ team.created }}</a></td>

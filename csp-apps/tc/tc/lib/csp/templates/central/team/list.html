@@ -3,10 +3,10 @@
 {% block title %} | All Teams {% endblock %}
 
 {% block page-header %}
-    <i class="fa fa-user-circle "></i> Central Teams
+    <i class="fa fa-user-circle "></i> CSP Teams
     {% if perms.ctc.web_write %}
     <a href="{% url 'team_new' %}" type="button" class="btn btn-success pull-right">
-        <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add Central Team
+        <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add CSP Team
     </a>
     {% endif %}
 {% endblock %}

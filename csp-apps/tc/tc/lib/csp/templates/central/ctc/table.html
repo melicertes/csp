@@ -7,6 +7,7 @@
         <th data-sortable="true">TLP</th>
         <th data-align="right" data-sortable="true"># of Teams</th>
         <th data-align="right" data-sortable="true">Created</th>
+        <th data-align="right" data-sortable="true">Modified</th>
     </tr>
     </thead>
     <tbody>
@@ -18,6 +19,7 @@
             <td>{{ circle.get_tlp_display|default:"-" }}</a></td>
             <td><a href="{% url 'circle_view' circle.id %}">{{ circle.teams.count }}</a></td>
             <td>{{ circle.created|date }}</td>
+            <td>{{ circle.modified|date }}</td>
         </tr>
     {% endfor %}
     </tbody>

@@ -1,6 +1,4 @@
-/* Move down content because we have a fixed navbar that is 50px tall */
 body {
-    padding-top: 140px;
     padding-bottom: 20px;
 }
 
@@ -179,6 +177,28 @@ h2 {
     padding-top: 7px;
 }
 
+.navbar-static-top {
+  z-index: auto;
+}
+
 table[data-toggle="table"] {
     visibility: hidden;
+}
+
+.font-weight-bold {
+    font-weight: bold;
+}
+
+#qfilter {
+    width: 240px;
+}
+
+.invalid_short_name::after {
+    color: red;
+    content: ' (Should only contain letters, numbers, - and .)';
+}
+
+.invalid_csp_id::after {
+    color: red;
+    content: ' (CSP ID needs to be part of the CSP Domain)';
 }

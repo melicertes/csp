@@ -5,6 +5,7 @@ from django.db.models.signals import post_save, post_delete
 from django.contrib.postgres.fields import ArrayField
 
 from csp.central.models import Team, TrustCircle
+from csp.contacts.models import TeamContact, PersonContact, LocalTrustCircle
 
 LOG = logging.getLogger('ctc')
 
@@ -79,17 +80,31 @@ class ChangeLog(models.Model):
         return '{} on {}:{}'.format(self.action, self.model_name, self.model_pk)
 
 
-def log_create_or_change(sender, instance, created, **kwargs):
-    ChangeLog.objects.log('create' if created else 'update', instance)
+def auditlog_create_or_change(sender, instance, created, **kwargs):
     LOG.info('{} "{}" {}'.format(instance._meta.model_name, instance,
                                  'created' if created else 'updated'))
 
 
-def log_delete(sender, instance, **kwargs):
-    ChangeLog.objects.log('delete', instance)
+def auditlog_delete(sender, instance, **kwargs):
     LOG.info('{} "{}" deleted'.format(instance._meta.model_name, instance))
 
 
+def log_create_or_change(sender, instance, created, **kwargs):
+    ChangeLog.objects.log('create' if created else 'update', instance)
+    auditlog_create_or_change(sender, instance, created)
+
+
+def log_delete(sender, instance, **kwargs):
+    ChangeLog.objects.log('delete', instance)
+    auditlog_delete(sender, instance)
+
+
+# Log with propagation (create ChangeLog entries, connected to dsl_sync)
 for model in (Team, TrustCircle):
     post_save.connect(log_create_or_change, sender=model)
     post_delete.connect(log_delete, sender=model)
+
+# Only log
+for model in (TeamContact, PersonContact, LocalTrustCircle):
+    post_save.connect(auditlog_create_or_change, sender=model)
+    post_delete.connect(auditlog_delete, sender=model)
