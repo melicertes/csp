@@ -88,7 +88,7 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler{
             LOG.debug("Fetch local event (if exists) based on the uuid {} of the incoming event.", uuid);
             getLocalEventResponseBody = mispAppClient.getMispEvent(uuid).getBody();
         } catch (StatusCodeException e){
-            LOG.error("Event not found, probably a new event");
+            LOG.error("Event not found, probably a new event - {}: {} ",e.getStatusCode(), e.getMessage());
         }
 
         localJsonNode = new ObjectMapper().convertValue(getLocalEventResponseBody, JsonNode.class);
@@ -191,7 +191,11 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler{
             if (arrNode1 != null && arrNode1.isArray()){
                 for (JsonNode jsonNode : arrNode1){
                     LOG.debug("New Attribute proposal to remove: " + jsonNode.toString());
-                    mispAppClient.deleteMispProposal(jsonNode.get("id").textValue());
+                    try {
+                        mispAppClient.deleteMispProposal(jsonNode.get("id").textValue());
+                    } catch (StatusCodeException e){
+                        LOG.error("Deleting proposal failed. - {}: {} ",e.getStatusCode(), e.getMessage());
+                    }
                 }
             }
 
@@ -203,7 +207,11 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler{
                     if (attrProposals != null && attrProposals.isArray()){
                         for (JsonNode jn : attrProposals){
                             LOG.debug("Proposal from existing Attribute to remove: " + jn.toString());
-                            mispAppClient.deleteMispProposal(jn.get("id").textValue());
+                            try {
+                                mispAppClient.deleteMispProposal(jn.get("id").textValue());
+                            } catch (StatusCodeException e){
+                                LOG.error("Deleting proposal from existing attribute failed. - {}: {} ",e.getStatusCode(), e.getMessage());
+                            }
                         }
                     }
                 }
@@ -220,7 +228,11 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler{
                             if (attrProposals2 != null && attrProposals2.isArray()){
                                 for (JsonNode jn : attrProposals2){
                                     LOG.debug("Proposal from existing Object Attribute to remove: " + jn.toString());
-                                    mispAppClient.deleteMispProposal(jn.get("id").textValue());
+                                    try {
+                                        mispAppClient.deleteMispProposal(jn.get("id").textValue());
+                                    } catch (StatusCodeException e){
+                                        LOG.error("Deleting proposal from existing object attribute failed. - {}: {} ",e.getStatusCode(), e.getMessage());
+                                    }
                                 }
                             }
                         }
@@ -258,14 +270,18 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler{
                 LOG.debug("location: " + location);
 //                    jsonNode = ((ObjectNode) jsonNode.get("Event")).put("timestamp", String.valueOf(Instant.now().getEpochSecond() + 1));
                 LOG.debug(jsonNode.toString());
-                ResponseEntity<String> responseEntity = mispAppClient.updateMispEvent(location, jsonNode.toString());
-                status = responseEntity.getStatusCode();
-                eventCreatedUpdated = new ObjectMapper().readValue(responseEntity.getBody(), JsonNode.class);
-                if (eventCreatedUpdated.get("message") != null && eventCreatedUpdated.get("message").textValue().toLowerCase().equals("error")){
-                    LOG.error(eventCreatedUpdated.toString());
-                    eventCreatedUpdated = jsonNode;
+                try {
+                    ResponseEntity<String> responseEntity = mispAppClient.updateMispEvent(location, jsonNode.toString());
+                    status = responseEntity.getStatusCode();
+                    eventCreatedUpdated = new ObjectMapper().readValue(responseEntity.getBody(), JsonNode.class);
+                    if (eventCreatedUpdated.get("message") != null && eventCreatedUpdated.get("message").textValue().toLowerCase().equals("error")){
+                        LOG.error(eventCreatedUpdated.toString());
+                        eventCreatedUpdated = jsonNode;
+                    }
+                    LOG.debug("Event edit action result: " + responseEntity.getStatusCode().toString());
+                } catch (StatusCodeException e2){
+                    LOG.error("Updating event failed. - {}: {} ",e2.getStatusCode(), e2.getMessage());
                 }
-                LOG.debug("Event edit action result: " + responseEntity.getStatusCode().toString());
             }
         }
     }
@@ -284,11 +300,16 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler{
             } catch (JsonProcessingException e) {
                 LOG.error("Could not parse shadowattribute: " + e);
             } catch (StatusCodeException e) {
-                LOG.error(e.getMessage());
+                LOG.error("Adding proposal failed - {}",e.getMessage());
                 String location = e.getHttpHeaders().get("location").get(0);
                 LOG.debug("" + location);
-                ResponseEntity responseEntity = mispAppClient.updateMispProposal(location, shadowAttributeJsonString);
-                LOG.debug("Add proposal response: " + responseEntity.toString());
+                try {
+                    ResponseEntity responseEntity = mispAppClient.updateMispProposal(location, shadowAttributeJsonString);
+                    LOG.debug("Add proposal response: " + responseEntity.toString());
+                } catch (StatusCodeException e2) {
+                    LOG.error("Updating proposal failed - {}",e.getMessage());
+                }
+
             }
         });
     }
@@ -302,11 +323,14 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler{
             String attrUuid = String.valueOf(shadowAttribute.get("uuid"));
             JsonNode attribute = new ObjectMapper().createObjectNode();
             LOG.debug("Edit proposal request: " + attribute.toString());
+
             try {
                 attribute = new ObjectMapper().readValue(mispAppClient.postMispAttribute(attrUuid).getBody(), JsonNode.class);
                 LOG.debug("Fetching local attribute: " + attribute.toString());
             } catch (IOException e) {
-                LOG.error(e.getMessage());
+                LOG.error("Parsing the postMispAttribute response has failed - {}", e.getMessage());
+            } catch (StatusCodeException e){
+                LOG.error("Adding attribute failed - {}: {}", e.getStatusCode(), e.getMessage());
             }
             String attrId = attribute.get("response").get("Attribute").get("id").textValue();
             LOG.debug("Attribute id: "  + attrId);
@@ -323,234 +347,240 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler{
                 ResponseEntity responseEntity = mispAppClient.updateMispProposal(attrId , attrRequestStr);
                 LOG.debug("Edit proposal response: " + responseEntity.toString());
             } catch (StatusCodeException e) {
-                LOG.error(e.getMessage());
+                LOG.error("Editing proposal has failed - {}, {}", e.getStatusCode(), e.getMessage());
                 String location = e.getHttpHeaders().get("location").get(0);
                 LOG.debug("" + location);
-                ResponseEntity responseEntity = mispAppClient.updateMispProposal(location, shadowAttributeJsonString);
-                LOG.debug("Edit proposal response:" + responseEntity.toString());
-            } catch (JsonProcessingException e) {
-                LOG.error(e.getMessage());
-            }
-        });
-
-    }
-
-    private IntegrationData handleRTIR(IntegrationData ilData) {
-        IntegrationData modifiedIlData = ilData;
-
-        //Convert Integration Data to JSON
-        JsonNode jsonNode = new ObjectMapper().convertValue(modifiedIlData.getDataObject(), JsonNode.class);
-
-        /**
-         * Issue: SXCSP-340, SXCSP-341
-         * Reference resolving in RTIR objects
-         */
-        String title = "";
-        String url = "";
-        String recordId = "";
-        String originCspId = "";
-        String originRecordId = "";
-        String applicationId = MispContextUrl.RTIREntity.APPLICATION_ID.toString();
-
-        if (jsonNode.get(EVENT.toString()).has("Object")) {
-            for (JsonNode jn : jsonNode.get(EVENT.toString()).get("Object")){
-                if (jn.get("name").textValue().toLowerCase().equals(MispContextUrl.RTIREntity.RTIR_NAME.toString().toLowerCase())){
-                    for (JsonNode ja : jn.get("Attribute")){
-                        if (ja.get("object_relation").textValue().toLowerCase().equals(MispContextUrl.RTIREntity.MAP_CSP_URL_VALUE.toString().toLowerCase()) &&
-                                url.length() == 0) {
-                            url = ja.get("value").textValue();
-                            LOG.debug("============RTIR url: " + url);
-                        }
-                        if (ja.get("object_relation").textValue().toLowerCase().equals(MispContextUrl.RTIREntity.MAP_ORIGIN_CSP_ID_VALUE.toString().toLowerCase()) &&
-                                originCspId.length() == 0) {
-                            originCspId = ja.get("value").textValue();
-                            LOG.debug("============RTIR originCspId: " + originCspId);
-                        }
-                        if (ja.get("object_relation").textValue().toLowerCase().equals(MispContextUrl.RTIREntity.MAP_ORIGIN_RECORD_ID_VALUE.toString().toLowerCase()) &&
-                                originRecordId.length() == 0) {
-                            originRecordId = ja.get("value").textValue();
-                            LOG.debug("============RTIR originRecordId: " + originRecordId);
-                        }
-                        if (ja.get("object_relation").textValue().toLowerCase().equals(MispContextUrl.RTIREntity.MAP_TITLE.toString().toLowerCase()) &&
-                                title.length() == 0) {
-                            title = ja.get("value").textValue();
-                            LOG.debug("============RTIR title: " + title);
-                        }
-                        if (ja.get("object_relation").textValue().toLowerCase().equals(MispContextUrl.RTIREntity.MAP_TICKET_NO.toString().toLowerCase()) &&
-                                recordId.length() == 0) {
-                            recordId = ja.get("value").textValue();
-                            LOG.debug("============RTIR recordId: " + recordId);
-                        }
+                try {
+                    ResponseEntity responseEntity = mispAppClient.updateMispProposal(location, shadowAttributeJsonString);
+                    LOG.debug("Edit proposal response:" + responseEntity.toString());
+                } catch (StatusCodeException e2) {
+                    LOG.error("Editing proposal has failed - {}, {}", e.getStatusCode(), e.getMessage());
                     }
-
-
-                    /**
-                     1. The adapter queries ES for the existence of an "incident" with the given origin cspid/appid/id
-                     2. If it finds such incidence, it rewrites the incidence url inside the RTIR object with the url that this incidence has in ES
-                     3. If not It deletes the url field
-                     4. It pushes the event with the rewriten RTIR fields to misp
-                     */
-                    String newURL = "";
-                    String newTickerNumber = "";
-                    try {
-                        IntegrationData searchData = new IntegrationData();
-                        DataParams searchParams = new DataParams();
-                        searchParams.setOriginRecordId(originRecordId);
-                        searchParams.setOriginApplicationId(applicationId);
-                        searchParams.setOriginCspId(originCspId);
-
-                        searchData.setDataParams(searchParams);
-                        searchData.setDataType(IntegrationDataType.INCIDENT);
-
-                        JsonNode esObject = elasticClient.getESobjectFromOrigin(searchData);
-                        if (esObject != null) {
-                            LOG.debug("Found in elastic");
-                            newURL = esObject.get("dataParams").get("url").textValue();
-
-                            /**
-                             * SXCSP-386
-                             */
-                            newTickerNumber = esObject.get("dataObject").get("id").textValue();
-                        }
-                        else {
-                            LOG.debug("NOT Found in elastic");
-                        }
-                        //replace
-                        for (JsonNode ja : jn.get("Attribute")){
-                            if (ja.get("object_relation").textValue().toLowerCase().equals(MispContextUrl.RTIREntity.MAP_CSP_URL_VALUE.toString().toLowerCase())) {
-                                ((ObjectNode)ja).put("value",  newURL);
-                            }
-                            if (ja.get("object_relation").textValue().toLowerCase().equals(MispContextUrl.RTIREntity.MAP_TICKET_NO.toString().toLowerCase()) ) {
-                                ((ObjectNode)ja).put("value",  newTickerNumber);
-                            }
-                        }
-                    }
-                    catch (Exception e){
-                        LOG.error(e.getMessage());
-                    }
-                    LOG.debug("RTIR new URL: " + newURL);
-
+                } catch (JsonProcessingException e) {
+                    LOG.error(e.getMessage());
                 }
-            }
+            });
+
         }
 
-        //update IntegrationData
-        modifiedIlData.setDataObject(jsonNode);
-        LOG.debug("MODIFIED IL DATA: " + modifiedIlData.toString());
+        private IntegrationData handleRTIR(IntegrationData ilData) {
+            IntegrationData modifiedIlData = ilData;
 
-        return modifiedIlData;
-    }
+            //Convert Integration Data to JSON
+            JsonNode jsonNode = new ObjectMapper().convertValue(modifiedIlData.getDataObject(), JsonNode.class);
 
-    private IntegrationData handleVulnerability(IntegrationData ilData) {
-        IntegrationData modifiedIlData = ilData;
+            /**
+             * Issue: SXCSP-340, SXCSP-341
+             * Reference resolving in RTIR objects
+             */
+            String title = "";
+            String url = "";
+            String recordId = "";
+            String originCspId = "";
+            String originRecordId = "";
+            String applicationId = MispContextUrl.RTIREntity.APPLICATION_ID.toString();
 
-        //Convert Integration Data to JSON
-        JsonNode jsonNode = new ObjectMapper().convertValue(modifiedIlData.getDataObject(), JsonNode.class);
-
-        /**
-         * Issue: SXCSP-380: link vulnerability to event/threat just like RTIR
-         */
-        String title = "";
-        String url = "";
-        String recordId = "";
-        String originCspId = "";
-        String originRecordId = "";
-        String applicationId = MispContextUrl.VULNERABILITYEntity.APPLICATION_ID.toString();
-
-        if (jsonNode.get(EVENT.toString()).has("Object")) {
-            for (JsonNode jn : jsonNode.get(EVENT.toString()).get("Object")){
-                if (jn.get("name").textValue().toLowerCase().equals(MispContextUrl.VULNERABILITYEntity.VULNERABILITY_NAME.toString().toLowerCase())){
-                    for (JsonNode ja : jn.get("Attribute")){
-                        if (ja.get("object_relation").textValue().toLowerCase().equals(MispContextUrl.VULNERABILITYEntity.MAP_CSP_URL_VALUE.toString().toLowerCase()) &&
-                                url.length() == 0) {
-                            url = ja.get("value").textValue();
-                            LOG.debug("============VULNERABILITY url: " + url);
-                        }
-                        if (ja.get("object_relation").textValue().toLowerCase().equals(MispContextUrl.VULNERABILITYEntity.MAP_ORIGIN_CSP_ID_VALUE.toString().toLowerCase()) &&
-                                originCspId.length() == 0) {
-                            originCspId = ja.get("value").textValue();
-                            LOG.debug("============VULNERABILITY originCspId: " + originCspId);
-                        }
-                        if (ja.get("object_relation").textValue().toLowerCase().equals(MispContextUrl.VULNERABILITYEntity.MAP_ORIGIN_RECORD_ID_VALUE.toString().toLowerCase()) &&
-                                originRecordId.length() == 0) {
-                            originRecordId = ja.get("value").textValue();
-                            LOG.debug("============VULNERABILITY originRecordId: " + originRecordId);
-                        }
-                        if (ja.get("object_relation").textValue().toLowerCase().equals(MispContextUrl.VULNERABILITYEntity.MAP_TITLE_RELATION.toString().toLowerCase()) &&
-                                ja.get("category").toString().toLowerCase().equals(MispContextUrl.VULNERABILITYEntity.MAP_TITLE_CATEGORY.toString().toLowerCase()) &&
-                                title.length() == 0) {
-                            title = ja.get("value").textValue();
-                            LOG.debug("============VULNERABILITY title: " + title);
-                        }
-                        if (ja.get("object_relation").textValue().toLowerCase().equals(MispContextUrl.VULNERABILITYEntity.MAP_RECORD_RELATION.toString().toLowerCase()) &&
-                                ja.get("category").toString().toLowerCase().equals(MispContextUrl.VULNERABILITYEntity.MAP_RECORD_CATEGORY.toString().toLowerCase()) &&
-                                recordId.length() == 0) {
-                            recordId = ja.get("value").textValue();
-                            LOG.debug("============VULNERABILITY recordId: " + recordId);
-                        }
-                    }
-
-                    /**
-                     1. The adapter queries ES for the existence of an "incident" with the given origin cspid/appid/id
-                     2. If it finds such incidence, it rewrites the incidence url inside the RTIR object with the url that this incidence has in ES
-                     3. If not It deletes the url field
-                     4. It pushes the event with the rewriten RTIR fields to misp
-                     */
-                    String newURL = "";
-                    String newTickerNumber = "";
-                    try {
-                        IntegrationData searchData = new IntegrationData();
-                        DataParams searchParams = new DataParams();
-                        searchParams.setOriginRecordId(originRecordId);
-                        searchParams.setOriginApplicationId(applicationId);
-                        searchParams.setOriginCspId(originCspId);
-
-                        searchData.setDataParams(searchParams);
-                        searchData.setDataType(IntegrationDataType.VULNERABILITY);
-
-                        JsonNode esObject = elasticClient.getESobjectFromOrigin(searchData);
-                        if (esObject != null) {
-                            LOG.debug("FOUND TRUE");
-                            newURL = esObject.get("dataParams").get("url").textValue();
-                            //newTickerNumber = esObject.get("dataObject").get("id").textValue();
-                        }
-                        else {
-                            LOG.debug("NOT FOUND");
-                        }
-                        //replace
+            if (jsonNode.get(EVENT.toString()).has("Object")) {
+                for (JsonNode jn : jsonNode.get(EVENT.toString()).get("Object")){
+                    if (jn.get("name").textValue().toLowerCase().equals(MispContextUrl.RTIREntity.RTIR_NAME.toString().toLowerCase())){
                         for (JsonNode ja : jn.get("Attribute")){
-                            if (ja.get("object_relation").textValue().toLowerCase().equals(MispContextUrl.VULNERABILITYEntity.MAP_CSP_URL_VALUE.toString().toLowerCase()) ) {
-                                ((ObjectNode)ja).put("value",  newURL);
+                            if (ja.get("object_relation").textValue().toLowerCase().equals(MispContextUrl.RTIREntity.MAP_CSP_URL_VALUE.toString().toLowerCase()) &&
+                                    url.length() == 0) {
+                                url = ja.get("value").textValue();
+                                LOG.debug("============RTIR url: " + url);
                             }
+                            if (ja.get("object_relation").textValue().toLowerCase().equals(MispContextUrl.RTIREntity.MAP_ORIGIN_CSP_ID_VALUE.toString().toLowerCase()) &&
+                                    originCspId.length() == 0) {
+                                originCspId = ja.get("value").textValue();
+                                LOG.debug("============RTIR originCspId: " + originCspId);
+                            }
+                            if (ja.get("object_relation").textValue().toLowerCase().equals(MispContextUrl.RTIREntity.MAP_ORIGIN_RECORD_ID_VALUE.toString().toLowerCase()) &&
+                                    originRecordId.length() == 0) {
+                                originRecordId = ja.get("value").textValue();
+                                LOG.debug("============RTIR originRecordId: " + originRecordId);
+                            }
+                            if (ja.get("object_relation").textValue().toLowerCase().equals(MispContextUrl.RTIREntity.MAP_TITLE.toString().toLowerCase()) &&
+                                    title.length() == 0) {
+                                title = ja.get("value").textValue();
+                                LOG.debug("============RTIR title: " + title);
+                            }
+                            if (ja.get("object_relation").textValue().toLowerCase().equals(MispContextUrl.RTIREntity.MAP_TICKET_NO.toString().toLowerCase()) &&
+                                    recordId.length() == 0) {
+                                recordId = ja.get("value").textValue();
+                                LOG.debug("============RTIR recordId: " + recordId);
+                            }
+                        }
+
+
+                        /**
+                         1. The adapter queries ES for the existence of an "incident" with the given origin cspid/appid/id
+                         2. If it finds such incidence, it rewrites the incidence url inside the RTIR object with the url that this incidence has in ES
+                         3. If not It deletes the url field
+                         4. It pushes the event with the rewriten RTIR fields to misp
+                         */
+                        String newURL = "";
+                        String newTickerNumber = "";
+
+                            IntegrationData searchData = new IntegrationData();
+                            DataParams searchParams = new DataParams();
+                            searchParams.setOriginRecordId(originRecordId);
+                            searchParams.setOriginApplicationId(applicationId);
+                            searchParams.setOriginCspId(originCspId);
+
+                            searchData.setDataParams(searchParams);
+                            searchData.setDataType(IntegrationDataType.INCIDENT);
+
+                        JsonNode esObject = null;
+                        try {
+                            esObject = elasticClient.getESobjectFromOrigin(searchData);
+                        } catch (IOException e) {
+                            LOG.error("Failed to get ES Object - {}", e.getMessage());
+                        }
+                        if (esObject != null) {
+                                LOG.debug("Found in elastic");
+                                newURL = esObject.get("dataParams").get("url").textValue();
+
+                                /**
+                                 * SXCSP-386
+                                 */
+                                newTickerNumber = esObject.get("dataObject").get("id").textValue();
+                            }
+                            else {
+                                LOG.debug("NOT Found in elastic");
+                            }
+                            //replace
+                            for (JsonNode ja : jn.get("Attribute")){
+                                if (ja.get("object_relation").textValue().toLowerCase().equals(MispContextUrl.RTIREntity.MAP_CSP_URL_VALUE.toString().toLowerCase())) {
+                                    ((ObjectNode)ja).put("value",  newURL);
+                                }
+                                if (ja.get("object_relation").textValue().toLowerCase().equals(MispContextUrl.RTIREntity.MAP_TICKET_NO.toString().toLowerCase()) ) {
+                                    ((ObjectNode)ja).put("value",  newTickerNumber);
+                                }
+                            }
+
+                        LOG.debug("RTIR new URL: " + newURL);
+
+                    }
+                }
+            }
+
+            //update IntegrationData
+            modifiedIlData.setDataObject(jsonNode);
+            LOG.debug("MODIFIED IL DATA: " + modifiedIlData.toString());
+
+            return modifiedIlData;
+        }
+
+        private IntegrationData handleVulnerability(IntegrationData ilData) {
+            IntegrationData modifiedIlData = ilData;
+
+            //Convert Integration Data to JSON
+            JsonNode jsonNode = new ObjectMapper().convertValue(modifiedIlData.getDataObject(), JsonNode.class);
+
+            /**
+             * Issue: SXCSP-380: link vulnerability to event/threat just like RTIR
+             */
+            String title = "";
+            String url = "";
+            String recordId = "";
+            String originCspId = "";
+            String originRecordId = "";
+            String applicationId = MispContextUrl.VULNERABILITYEntity.APPLICATION_ID.toString();
+
+            if (jsonNode.get(EVENT.toString()).has("Object")) {
+                for (JsonNode jn : jsonNode.get(EVENT.toString()).get("Object")){
+                    if (jn.get("name").textValue().toLowerCase().equals(MispContextUrl.VULNERABILITYEntity.VULNERABILITY_NAME.toString().toLowerCase())){
+                        for (JsonNode ja : jn.get("Attribute")){
+                            if (ja.get("object_relation").textValue().toLowerCase().equals(MispContextUrl.VULNERABILITYEntity.MAP_CSP_URL_VALUE.toString().toLowerCase()) &&
+                                    url.length() == 0) {
+                                url = ja.get("value").textValue();
+                                LOG.debug("============VULNERABILITY url: " + url);
+                            }
+                            if (ja.get("object_relation").textValue().toLowerCase().equals(MispContextUrl.VULNERABILITYEntity.MAP_ORIGIN_CSP_ID_VALUE.toString().toLowerCase()) &&
+                                    originCspId.length() == 0) {
+                                originCspId = ja.get("value").textValue();
+                                LOG.debug("============VULNERABILITY originCspId: " + originCspId);
+                            }
+                            if (ja.get("object_relation").textValue().toLowerCase().equals(MispContextUrl.VULNERABILITYEntity.MAP_ORIGIN_RECORD_ID_VALUE.toString().toLowerCase()) &&
+                                    originRecordId.length() == 0) {
+                                originRecordId = ja.get("value").textValue();
+                                LOG.debug("============VULNERABILITY originRecordId: " + originRecordId);
+                            }
+                            if (ja.get("object_relation").textValue().toLowerCase().equals(MispContextUrl.VULNERABILITYEntity.MAP_TITLE_RELATION.toString().toLowerCase()) &&
+                                    ja.get("category").toString().toLowerCase().equals(MispContextUrl.VULNERABILITYEntity.MAP_TITLE_CATEGORY.toString().toLowerCase()) &&
+                                    title.length() == 0) {
+                                title = ja.get("value").textValue();
+                                LOG.debug("============VULNERABILITY title: " + title);
+                            }
+                            if (ja.get("object_relation").textValue().toLowerCase().equals(MispContextUrl.VULNERABILITYEntity.MAP_RECORD_RELATION.toString().toLowerCase()) &&
+                                    ja.get("category").toString().toLowerCase().equals(MispContextUrl.VULNERABILITYEntity.MAP_RECORD_CATEGORY.toString().toLowerCase()) &&
+                                    recordId.length() == 0) {
+                                recordId = ja.get("value").textValue();
+                                LOG.debug("============VULNERABILITY recordId: " + recordId);
+                            }
+                        }
+
+                        /**
+                         1. The adapter queries ES for the existence of an "incident" with the given origin cspid/appid/id
+                         2. If it finds such incidence, it rewrites the incidence url inside the RTIR object with the url that this incidence has in ES
+                         3. If not It deletes the url field
+                         4. It pushes the event with the rewriten RTIR fields to misp
+                         */
+                        String newURL = "";
+                        String newTickerNumber = "";
+                        try {
+                            IntegrationData searchData = new IntegrationData();
+                            DataParams searchParams = new DataParams();
+                            searchParams.setOriginRecordId(originRecordId);
+                            searchParams.setOriginApplicationId(applicationId);
+                            searchParams.setOriginCspId(originCspId);
+
+                            searchData.setDataParams(searchParams);
+                            searchData.setDataType(IntegrationDataType.VULNERABILITY);
+
+                            JsonNode esObject = elasticClient.getESobjectFromOrigin(searchData);
+                            if (esObject != null) {
+                                LOG.debug("FOUND TRUE");
+                                newURL = esObject.get("dataParams").get("url").textValue();
+                                //newTickerNumber = esObject.get("dataObject").get("id").textValue();
+                            }
+                            else {
+                                LOG.debug("NOT FOUND");
+                            }
+                            //replace
+                            for (JsonNode ja : jn.get("Attribute")){
+                                if (ja.get("object_relation").textValue().toLowerCase().equals(MispContextUrl.VULNERABILITYEntity.MAP_CSP_URL_VALUE.toString().toLowerCase()) ) {
+                                    ((ObjectNode)ja).put("value",  newURL);
+                                }
                         /*
                         if (ja.get("object_relation").toString().toLowerCase().equals(MispContextUrl.VULNERABILITYEntity.MAP_RECORD_RELATION.toString().toLowerCase()) &&
                                 ja.get("category").toString().toLowerCase().equals(MispContextUrl.VULNERABILITYEntity.MAP_RECORD_CATEGORY.toString().toLowerCase()) ) {
                             ((ObjectNode)ja).put("value",  newTickerNumber);
                         }
                         */
+                            }
                         }
-                    }
-                    catch (Exception e){
-                        LOG.debug(e.getMessage());
-                    }
-                    LOG.debug("VULNERABILITY new URL: " + newURL);
-                    //LOG.info("VULNERABILITY new ID: " + newTickerNumber);
+                        catch (Exception e){
+                            LOG.debug(e.getMessage());
+                        }
+                        LOG.debug("VULNERABILITY new URL: " + newURL);
+                        //LOG.info("VULNERABILITY new ID: " + newTickerNumber);
 
+                    }
                 }
             }
+
+            //update IntegrationData
+            modifiedIlData.setDataObject(jsonNode);
+
+            return modifiedIlData;
         }
 
-        //update IntegrationData
-        modifiedIlData.setDataObject(jsonNode);
+        private int getEventDistributionPolicyLevel(JsonNode jsonNode) {
+            JsonNode locatedNode = jsonNode.path(MispContextUrl.MispEntity.EVENT.toString()).path("distribution");
+            int level = Integer.parseInt(locatedNode.textValue());
+            return level;
+        }
 
-        return modifiedIlData;
+
     }
-
-    private int getEventDistributionPolicyLevel(JsonNode jsonNode) {
-        JsonNode locatedNode = jsonNode.path(MispContextUrl.MispEntity.EVENT.toString()).path("distribution");
-        int level = Integer.parseInt(locatedNode.textValue());
-        return level;
-    }
-
-
-}
