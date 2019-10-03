@@ -83,7 +83,7 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler {
             LOG.error("Event for uuid {} not found, probably a new event: {} code: {}", uuid, integrationData.getDataType(), e.getStatusCode() );
         }
 
-       // final String localEventId = safeExtractEventId(mapper.convertValue(getLocalEventResponseBody, JsonNode.class)); //get the local MISP event id
+        // final String localEventId = safeExtractEventId(mapper.convertValue(getLocalEventResponseBody, JsonNode.class)); //get the local MISP event id
 
         List<Origin> origins = originService.findByOriginRecordId(uuid);
 

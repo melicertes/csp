@@ -31,7 +31,7 @@ WORKDIR /opt
 RUN git clone https://github.com/MISP/misp-modules.git
 
 
-FROM ubuntu:16.04
+FROM ubuntu:xenial
 MAINTAINER Christos Panagiotou
 
 # Install core components
@@ -39,7 +39,7 @@ ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get update && apt-get dist-upgrade -y && apt-get autoremove -y && apt-get clean
 RUN apt-get install -y software-properties-common
 RUN apt-get install -y postfix
-RUN apt-get install -y mysql-client curl gcc gnupg-agent make python openssl redis-server sudo vim zip locales
+RUN apt-get install -y mysql-client curl gcc git gnupg-agent make python openssl redis-server sudo vim zip locales
 
 RUN locale-gen en_US.UTF-8
 ENV LANG en_US.UTF-8
@@ -80,8 +80,15 @@ RUN chown -R www-data:www-data /var/www
 
 USER www-data
 WORKDIR /var/www/MISP/app
+# FIX COMPOSER
+RUN curl --fail --location -o composer-setup.php https://getcomposer.org/installer
+RUN php -r "if (hash_file('sha384', 'composer-setup.php') === 'a5c698ffe4b8e849a443b120cd5ba38043260d5c4023dbf93e1558871f1f07f58274fc6f4c93bcfd858c6bd0775cd8d1') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
+RUN php composer-setup.php
+RUN php -r "unlink('composer-setup.php');"
+# END FIX
+
 RUN php composer.phar config vendor-dir Vendor
-RUN php composer.phar install
+RUN php composer.phar install --ignore-platform-reqs
 USER root
 RUN phpenmod redis
 USER www-data

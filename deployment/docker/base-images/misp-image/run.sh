@@ -273,6 +273,7 @@ Don't forget:
 - Change the MISP admin email address to $MISP_ADMIN_EMAIL
 
 __WELCOME__
+
         touch /opt/state/installed.tmp
 fi
 
