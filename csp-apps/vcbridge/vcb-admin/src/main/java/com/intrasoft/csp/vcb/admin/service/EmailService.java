@@ -5,6 +5,17 @@ import com.intrasoft.csp.vcb.commons.constants.EmailTemplateType;
 import com.intrasoft.csp.vcb.commons.model.EmailTemplate;
 import com.intrasoft.csp.vcb.commons.model.Meeting;
 import com.intrasoft.csp.vcb.commons.model.Participant;
+import net.fortuna.ical4j.model.DateTime;
+import net.fortuna.ical4j.model.TimeZone;
+import net.fortuna.ical4j.model.TimeZoneRegistry;
+import net.fortuna.ical4j.model.TimeZoneRegistryFactory;
+import net.fortuna.ical4j.model.component.VAlarm;
+import net.fortuna.ical4j.model.component.VEvent;
+import net.fortuna.ical4j.model.component.VTimeZone;
+import net.fortuna.ical4j.model.parameter.Cn;
+import net.fortuna.ical4j.model.parameter.PartStat;
+import net.fortuna.ical4j.model.parameter.Role;
+import net.fortuna.ical4j.model.property.*;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.safety.Whitelist;
@@ -19,24 +30,27 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.mail.javamail.MimeMessagePreparator;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
 import javax.mail.util.ByteArrayDataSource;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
+import java.net.URI;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 @Service
 public class EmailService {
     private static final Logger log = LoggerFactory.getLogger(EmailService.class);
+
+    static {
+        // fixing the cache dependency of ical4j
+        System.setProperty("net.fortuna.ical4j.timezone.cache.impl", "net.fortuna.ical4j.util.MapTimeZoneCache");
+        // fixing an automatic attempt to update GMT
+        System.setProperty("net.fortuna.ical4j.timezone.update.enabled","false");
+    }
 
 
     @Value(value = "${app.mail.sender.name}")
@@ -73,28 +87,17 @@ public class EmailService {
         if (html == null)
             return html;
         Document document = Jsoup.parse(html);
-        document.outputSettings(new Document.OutputSettings().prettyPrint(false));// makes
-        // html()
-        // preserve
-        // linebreaks
-        // and
-        // spacing
+        document.outputSettings(new Document.OutputSettings().prettyPrint(false));
         document.select("br").append("\\n");
         document.select("p").prepend("\\n\\n");
         String s = document.html().replaceAll("\\\\n", "\n");
-        return Jsoup.clean(s, "", Whitelist.none(), new Document.OutputSettings().prettyPrint(false));
+        return Jsoup.clean(s, "", Whitelist.none(), new Document.OutputSettings().prettyPrint(false))
+                .replaceAll(Pattern.quote("\\n\\n\\n\\n\\n\\n\\n\\n"), "");
     }
 
-    // @Value(value =
-    // "classpath:templates/icalendar/invitation_description.txt")
-    // private Resource meetingTemplateInvitation;
-
-    // @Value(value =
-    // "classpath:templates/icalendar/cancellation_description.txt")
-    // private Resource meetingTemplateCancellation;
 
     @Async
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    //@Transactional(propagation = Propagation.NOT_SUPPORTED)
     public void prepareAndSend(EmailTemplate et, Meeting meeting) throws IOException {
         Map<String, Object> m = new HashMap<>();
         log.debug("Participants: " + meeting.getParticipants());
@@ -120,8 +123,6 @@ public class EmailService {
                 m.put("meeting_password", p.getPassword());
                 m.put("meeting_url", meeting.getUrl());
                 m.put("meeting_subject", meeting.getSubject());
-                //m.put("user_first", meeting.getUser().getFirstName());
-                //m.put("user_lastname", meeting.getUser().getLastName());
 
                 String subject = mailContentBuilder.build(et.getSubject(), m);
                 messageHelper.setSubject(subject);
@@ -129,60 +130,75 @@ public class EmailService {
 
                 messageHelper.setText(content, true);
 
-                String icalendar_descripion = br2nl(content).replaceAll("(\\r|\\n|\\r\\n)+", "\\\\n");// Jsoup.parse(content).text();
+                String icalendar_description = br2nl(content);//.replaceAll("(\\r|\\n|\\r\\n)+", "\\\\n");// Jsoup.parse(content).text();
 
-                // icalendar stuff
-                BufferedReader br = new BufferedReader(new InputStreamReader(meetingTemplate.getInputStream()), 1024);
-                String line;
-                StringBuilder meetingICSBuilder = new StringBuilder();
-                while ((line = br.readLine()) != null) {
-                    meetingICSBuilder.append(line).append('\n');
-                }
-                br.close();
-                m.put("organizer", meeting.getUser().getFullName());
-                m.put("organizerEmail", meeting.getUser().getEmail());
-                m.put("summary", subject);
-                m.put("duration", meeting.getDuration().toString());
-                m.put("start", DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmmssX")
-                        .format(ZonedDateTime.ofInstant(meeting.getStart().toInstant(), ZoneOffset.UTC)));
-                m.put("uid", meeting.getUid());
-                m.put("location", meeting.getUrl());
-                //m.put("comment", icalendar_descripion);
-                m.put("description", mailContentBuilder.build(icalendar_descripion, m));
-                StringBuilder attendee_string = new StringBuilder();
+                TimeZoneRegistry registry = TimeZoneRegistryFactory.getInstance().createRegistry();
+                TimeZone timeZone = registry.getTimeZone(meeting.getStart().getZone().getId());
+                VTimeZone tz = timeZone.getVTimeZone();
+
+                VEvent vEvent = new VEvent(new DateTime(Date.from(meeting.getStart().toInstant())),
+                        new DateTime(Date.from( meeting.getExpectedEnd().toInstant())), subject);
+                vEvent.getProperties().add(tz.getTimeZoneId());
+                vEvent.getProperties().add(new Uid());
+                vEvent.getUid().setValue(meeting.getUid());
+
+                vEvent.getProperties().add(new Location());
+                vEvent.getLocation().setValue(meeting.getUrl());
+
+                vEvent.getProperties().add(new Description());
+                vEvent.getDescription().setValue(mailContentBuilder.build(icalendar_description, m));
+
+                //we define the organiser to be the 1st one on the list
+                Participant p1 = meeting.getParticipants().get(0);
+
+                Organizer organizer = new Organizer(URI.create("mailto:"+p1.getEmail()));
+                organizer.getParameters().add(new Cn(p1.getFullname().length()==1 ? p1.getEmail() : p1.getFullname()));
+
+                vEvent.getProperties().add(organizer);
                 for (Participant part : meeting.getParticipants()) {
-                    attendee_string
-                            .append(String.format("ATTENDEE;ROLE=REQ-PARTICIPANT;PARTSTAT=TENTATIVE;CN=%s:MAILTO:%s",
-                                    part.getFullname(), part.getEmail()));
-                    attendee_string.append("\n");
+                    Attendee attendee = new Attendee(URI.create("mailto:"+part.getEmail()));
+                    attendee.getParameters().add(Role.REQ_PARTICIPANT);
+                    attendee.getParameters().add(PartStat.NEEDS_ACTION);
+                    attendee.getParameters().add(new Cn(part.getFullname().length()==1 ? part.getEmail() : part.getFullname()));
+                    vEvent.getProperties().add(attendee);
                 }
-                m.put("attendee", attendee_string.toString());
+
                 if (et.getType().equals(EmailTemplateType.INVITATION)) {
-                    // String ics_description_template = new
-                    // Scanner(meetingTemplateInvitation.getInputStream(),
-                    // "utf-8")
-                    // .useDelimiter("\\Z").next();
-                    m.put("seq", 0);
-                    m.put("status", "CONFIRMED");
+                    vEvent.getProperties().add(Status.VEVENT_CONFIRMED);
+                    vEvent.getProperties().add(new Sequence((int)0));
+
+                    VAlarm alarm1 = new VAlarm();
+                    alarm1.getProperties().add(Action.DISPLAY);
+                    alarm1.getProperties().add(new Trigger());
+                    alarm1.getTrigger().setValue("-PT15M"); //15m before
+                    alarm1.getProperties().add(new Description());
+                    alarm1.getDescription().setValue(subject + " - " + meeting.getUrl());
+
+                    vEvent.getAlarms().add(alarm1);
+
+                    vEvent.getProperties().add(Transp.OPAQUE);
 
                 } else {
-                    // String ics_description_template = new
-                    // Scanner(meetingTemplateCancellation.getInputStream(),
-                    // "utf-8")
-                    // .useDelimiter("\\Z").next();
-                    m.put("seq", 1);
-                    m.put("status", "CANCELLED");
+                    vEvent.getProperties().add(Status.VEVENT_CANCELLED);
+                    vEvent.getProperties().add(new Sequence((int)1));
+
                 }
 
-                String ics = mailContentBuilder.build(meetingICSBuilder.toString(), m);
-                mimeMessage.setHeader("Content-Class", "urn:content-  classes:calendarmessage");
-                mimeMessage.setHeader("Content-ID", "calendar_message");
-                messageHelper.addAttachment("Mail Attachment.ics", new ByteArrayDataSource(ics, "text/calendar"));
+
+                //lets make the calendar at last
+                net.fortuna.ical4j.model.Calendar icsCalendar = new net.fortuna.ical4j.model.Calendar();
+                icsCalendar.getProperties().add(new ProdId("-//CSP::Core Service Platform - SMART 2015_1089//vcb 1.0//EN"));
+                icsCalendar.getProperties().add(Version.VERSION_2_0); // setting the version
+                icsCalendar.getProperties().add(CalScale.GREGORIAN);
+                icsCalendar.getProperties().add(Method.REQUEST);
+                icsCalendar.getComponents().add(vEvent);
+                log.info("Calendar generated: " + icsCalendar);
+                mimeMessage.setHeader("Content-Class", "urn:content-classes:calendarmessage");
+                messageHelper.addInline("calendar_message", new ByteArrayDataSource(icsCalendar.toString(), "text/calendar; charset=\"UTF-8\"; method=REQUEST"));
+                messageHelper.addAttachment("invite.ics", new ByteArrayDataSource(icsCalendar.toString(), "application/ics"));
             };
 
-            // MimeMessagePreparator messagePreparator = new
-            // MessagePreparatorImpl(meeting, et, mailContentBuilder, p,
-            // ics);
+
             log.debug(MAIL_SERVER_HOST);
             log.debug(MAIL_SERVER_PORT.toString());
             log.debug(MAIL_USERNAME);
@@ -193,58 +209,9 @@ public class EmailService {
                 mailSender.send(messagePreparator);
                 log.info("Email sent to: " + p.getEmail() + " for Meeting UID: " + meeting.getUid() + ", subject:" + meeting.getSubject());
             } catch (MailException e) {
-                log.debug(e.toString());
-                log.error("Error sending email to: " + p.getEmail() + " for Meeting UID: " + meeting.getUid() + ", subject:" + meeting.getSubject());
-                // runtime exception; compiler will not force you to handle it
+                log.error("Error sending email to: " + p.getEmail() + " for Meeting UID: " + meeting.getUid() + ", subject:" + meeting.getSubject(),e);
             }
         }
     }
 
-    static class MessagePreparatorImpl implements MimeMessagePreparator {
-        EmailTemplate et;
-        Meeting meeting;
-        MailContentBuilder mailContentBuilder;
-        Participant p;
-        String ics;
-
-        public MessagePreparatorImpl(Meeting meeting, EmailTemplate et, MailContentBuilder mailContentBuilder,
-                                     Participant p, String ics) {
-            super();
-            this.meeting = meeting;
-            this.et = et;
-            this.mailContentBuilder = mailContentBuilder;
-            this.p = p;
-            this.ics = ics;
-        }
-
-        @Override
-        public void prepare(MimeMessage mimeMessage) throws Exception {
-            Map<String, Object> m = new HashMap<>();
-            MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage, true);
-            messageHelper.setFrom(meeting.getUser().getEmail());
-
-            messageHelper.setTo(p.getEmail());
-
-            m.put("email", p.getEmail());
-            m.put("meeting_date", meeting.getStart().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
-            m.put("meeting_time", meeting.getStart().format(DateTimeFormatter.ofPattern("HH:mm ZZZ")));
-            m.put("meeting_username", p.getUsername());
-            m.put("meeting_password", p.getPassword());
-            m.put("meeting_url", meeting.getUrl());
-            m.put("meeting_subject", meeting.getSubject());
-            //m.put("user_first", meeting.getUser().getFirstName());
-            //m.put("user_lastname", meeting.getUser().getLastName());
-
-            String subject = mailContentBuilder.build(et.getSubject(), m);
-            messageHelper.setSubject(subject);
-            String content = mailContentBuilder.build(et.getContent(), m);
-
-            messageHelper.setText(content, true);
-            if (et.getType().equals(EmailTemplateType.INVITATION)) {
-
-                messageHelper.addAttachment("meeting.ics", new ByteArrayDataSource(ics, "text/calendar"));
-            }
-        }
-
-    }
 }

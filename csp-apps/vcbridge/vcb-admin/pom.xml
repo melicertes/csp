@@ -79,6 +79,18 @@
 			<artifactId>jsoup</artifactId>
 			<version>1.10.3</version>
 		</dependency>
+		<dependency>
+			<groupId>org.mnode.ical4j</groupId>
+			<artifactId>ical4j</artifactId>
+			<version>3.0.9</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>3.9</version>
+		</dependency>
+
 
 	</dependencies>
 

@@ -6,11 +6,11 @@
 
     <!--Basic configuration-->
     <property name="APP_NAME" value="CSP.VCB-ADMIN"/>
-    <property name="LOGS_HOME" value="/opt/csp/csplogs/"/>
+    <property name="LOGS_HOME" value="/opt/csplogs/"/>
     <property name="TYPE_EXC" value="exc"/>
     <property name="TYPE_AUD" value="aud"/>
-    <property name="HISTORY_EXC" value="1"/>
-    <property name="HISTORY_AUD" value="1"/>
+    <property name="HISTORY_EXC" value="3"/>
+    <property name="HISTORY_AUD" value="5"/>
 
     <!--Patterns for console, log files, log format and rolling files-->
     <property name="CONSOLE_LOG_PATTERN"
@@ -55,6 +55,16 @@
         </encoder>
 
         <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>TRACE</level>
+            <onMatch>ACCEPT</onMatch>
+        </filter>
+
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>DEBUG</level>
+            <onMatch>ACCEPT</onMatch>
+        </filter>
+
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
             <level>INFO</level>
             <onMatch>ACCEPT</onMatch>
         </filter>
@@ -71,13 +81,9 @@
         </rollingPolicy>
     </appender>
 
-    <logger name="root" level="info" additivity="false">
+    <root level="INFO">
         <appender-ref ref="FILE-AUDIT"/>
         <appender-ref ref="FILE-EXCEPTION"/>
-        <appender-ref ref="STDOUT"/>
-    </logger>
-
-    <root level="info">
         <appender-ref ref="STDOUT"/>
     </root>
 </configuration>

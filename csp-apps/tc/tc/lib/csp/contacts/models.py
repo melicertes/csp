@@ -207,6 +207,12 @@ class TeamContact(models.Model):
         ('unsupported', 'Not Supported'))
 
     id = models.UUIDField(default=uuid.uuid4, primary_key=True, editable=False)
+    created = models.DateTimeField('Created on', auto_now_add=True)
+    modified = models.DateTimeField('Modified on', auto_now=True)
+
+    # CSP Team
+    # 29.08.2019: These fields should ALWAYS be '' for TeamContact.
+    # Matching now happens through a (short_name, country) match with a
     csp_id = models.CharField('CSP ID', max_length=255, blank=True)
     csp_domain = models.CharField('CSP Domain', max_length=255, blank=True)
     csp_installed = models.BooleanField('CSP Installed', default=False)
@@ -214,18 +220,17 @@ class TeamContact(models.Model):
                                 verbose_name='NIS Team Types')
     nis_sectors = ArrayField(models.TextField(), default=list, blank=True,
                              verbose_name='NIS Sectors')
-    status = models.CharField(max_length=255)
-    created = models.DateTimeField('Created on', auto_now_add=True)
+    status = models.CharField(max_length=255, default="", blank=True)
 
     # -- Team
     # PrimaryKeyTuple for team: short_name, country
-    short_name = models.CharField('Short Name', max_length=128)
-    name = models.CharField('Official Name', max_length=255)
-    host_organisation = models.CharField('Host Organisation', max_length=255)
-    country = models.CharField(max_length=255)
+    short_name = models.TextField('Short Name')
+    name = models.TextField('Official Name', default='')
+    host_organisation = models.TextField('Host Organisation', blank=True, default='')
+    country = models.TextField(blank=True)
     additional_countries = ArrayField(models.TextField(), verbose_name='Additional Countries', default=list, blank=True)
-    established = models.DateField('Established on', default=date.today)
-    description = models.CharField('Description', max_length=255, default='', blank=True)
+    established = models.DateField('Established on', default=date.today, blank=True)
+    description = models.TextField('Description', default='', blank=True)
 
     # -- Constituency
     constituency_types = ArrayField(models.TextField(), default=list, blank=True)
@@ -492,6 +497,8 @@ class AbstractPersonContact(models.Model):
 
 class PersonContact(AbstractPersonContact):
     email = models.EmailField('Email', blank=False, unique=True)
+    created = models.DateTimeField('Created on', auto_now_add=True)
+    modified = models.DateTimeField('Modified on', auto_now=True)
 
     def __unicode__(self):
         return '%s' % (self.email)
@@ -535,11 +542,12 @@ class LocalTrustCircle(models.Model):
     tlp = models.CharField('TLP', max_length=255, choices=TLP_CHOICES, blank=True)
     auth_source = models.CharField('Authoritative Source', max_length=255, blank=True)
     name = models.CharField('(Long) LTC Name', max_length=255)
-    description = models.CharField(max_length=255)
+    description = models.TextField('Description', default='', blank=True)
     info_url = models.URLField('URL for Public Information', blank=True)
     membership_url = models.URLField('URL for Membership Directory',
                                      blank=True)
-    created = models.DateTimeField(default=timezone.now)
+    created = models.DateTimeField('Created on', auto_now_add=True)
+    modified = models.DateTimeField('Modified on', auto_now=True)
 
     team_contacts = models.ManyToManyField(
         TeamContact,
@@ -550,7 +558,7 @@ class LocalTrustCircle(models.Model):
     teams = models.ManyToManyField(
         Team,
         blank=True,
-        verbose_name='Teams',
+        verbose_name='CSP Teams',
         related_name='in_localcircles')
 
     trustcircles = models.ManyToManyField(
@@ -575,6 +583,7 @@ class IncomingTeamContact(models.Model):
     app_id = models.TextField()
     target_circle_id = ArrayField(models.TextField(), verbose_name='Shared with CTC', blank=True)
     target_team_id = ArrayField(models.TextField(), verbose_name='Shared with Team', blank=True)
+    seen = models.DateTimeField('Object viewed on', default=None, blank=True, null=True)
     data_object = JSONField()
 
     class Meta:

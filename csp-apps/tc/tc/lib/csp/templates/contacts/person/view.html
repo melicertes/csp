@@ -36,6 +36,7 @@
     </div>
 </div>
 
+{% comment %}
 <h2>Mailing List</h2>
 <div class="row">
     <div class="col-md-6">
@@ -45,6 +46,7 @@
         {% field_value person 'ml_key' %}
     </div>
 </div>
+{% endcomment %}
 
 {% related_fields person 'phone_numbers' %}
 {% related_fields person 'certificates' %}

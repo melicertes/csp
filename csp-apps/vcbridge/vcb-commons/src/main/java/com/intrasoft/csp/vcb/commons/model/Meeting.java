@@ -1,5 +1,11 @@
 package com.intrasoft.csp.vcb.commons.model;
 
+import com.intrasoft.csp.vcb.commons.constants.MeetingStatus;
+import org.hibernate.validator.constraints.NotBlank;
+
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
@@ -8,21 +14,6 @@ import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
-import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
-
-import com.intrasoft.csp.vcb.commons.constants.MeetingStatus;
-import org.hibernate.validator.constraints.NotBlank;
 
 @Entity
 @Table(name = "vcb_meeting")
@@ -34,16 +25,13 @@ public class Meeting {
 
 	private String uid;
 
-//	@OneToMany(mappedBy = "meeting", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	@OneToMany(mappedBy = "meeting", cascade = CascadeType.ALL)
 	private List<Participant> participants = new LinkedList<>();
 
-//	@OneToMany(mappedBy = "meeting", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	@OneToMany(mappedBy = "meeting", cascade = CascadeType.ALL)
 	private List<MeetingScheduledTask> scheduledTasks = new LinkedList<>();
 
 	@NotNull
-//	@ManyToOne(fetch = FetchType.LAZY)
 	@ManyToOne
 	private User user;
 
@@ -77,16 +65,12 @@ public class Meeting {
 			e.printStackTrace();
 		}
 		if (md != null) {
-			//StringBuilder sb = new StringBuilder();
 			for (String email : emails) {
 				String hashed_email = hba.marshal(md.digest((email + System.currentTimeMillis()).getBytes()));
 				md.reset();
 				participants.add(new Participant(email, hashed_email.substring(0, 6), null, null,
 						hashed_email.substring(6, 16), this));
-				//sb.append(email);
 			}
-			//sb.append(System.currentTimeMillis());
-			//room = hba.marshal(md.digest(sb.toString().getBytes())).substring(0, 16);
 		}
 	}
 
@@ -141,20 +125,6 @@ public class Meeting {
 	public void setParticipants(List<Participant> participants) {
 		this.participants = participants;
 		this.participants.forEach(p -> p.setMeeting(this));
-//		if (room == null || room.isEmpty()) {
-//			StringBuilder sb = new StringBuilder();
-//			for (Participant p : this.participants) {
-//				sb.append(p.getEmail());
-//			}
-//			sb.append(System.currentTimeMillis());
-//			try {
-//				MessageDigest md = MessageDigest.getInstance(
-//						"MD5"); /* always create new instance not thread safe */
-//				room = hba.marshal(md.digest(sb.toString().getBytes())).substring(0, 16);
-//			} catch (NoSuchAlgorithmException e) {
-//				e.printStackTrace();
-//			}
-//		}
 	}
 
 	public MeetingStatus getStatus() {

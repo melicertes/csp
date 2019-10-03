@@ -121,6 +121,56 @@ class TeamContactSerializer(serializers.ModelSerializer):
         return DeserializedTeamContact(**self.validated_data)
 
 
+class TeamContactSerializerCSPTeam(TeamContactSerializer):
+    """
+    Same as TeamContactSerializer, with the exception for the csp_team block.
+    Here the values are either default or if a CentralTeam exists with the same
+    (short_name, country) as the TeamContact, values from the CentralTeam are
+    returned instead.
+    """
+    csp_id = serializers.SerializerMethodField()
+    nis_team_types = serializers.SerializerMethodField()
+    nis_sectors = serializers.SerializerMethodField()
+    csp_installed = serializers.SerializerMethodField()
+    csp_domain = serializers.SerializerMethodField()
+    status = serializers.SerializerMethodField()
+
+    def get_nis_team_types(self, obj):
+        return self.get_value_from_centralteam(obj, 'nis_team_types', [])
+
+    def get_nis_sectors(self, obj):
+        return self.get_value_from_centralteam(obj, 'nis_sectors', [])
+
+    def get_csp_installed(self, obj):
+        return self.get_value_from_centralteam(obj, 'csp_installed', False)
+
+    def get_csp_domain(self, obj):
+        return self.get_value_from_centralteam(obj, 'csp_domain', '')
+
+    def get_status(self, obj):
+        return self.get_value_from_centralteam(obj, 'status', '')
+
+    def get_csp_id(self, obj):
+        return self.get_value_from_centralteam(obj, 'csp_id', '')
+
+    def get_value_from_centralteam(self, obj, valuename, default):
+        """
+        Returns either the value from CentralTeam
+        (if same short_name, country) or default
+
+        obj is TeamContact
+        valuename is name of the field
+        default is the default value
+        """
+        try:
+            team = CentralTeam.objects.get(short_name=obj.short_name,
+                                           country=obj.country)
+        except CentralTeam.DoesNotExist:
+            return default
+
+        return getattr(team, valuename)
+
+
 class FakeRelated(list):
     def all(self):
         return self
@@ -236,6 +286,6 @@ class TeamContactFilters(filters.FilterSet):
 
 class TeamContactViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = TeamContact.objects.all()
-    serializer_class = TeamContactSerializer
+    serializer_class = TeamContactSerializerCSPTeam
     filter_backends = (filters.DjangoFilterBackend,)
     filter_class = TeamContactFilters

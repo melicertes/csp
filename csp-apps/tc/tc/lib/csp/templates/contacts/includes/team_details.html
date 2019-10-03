@@ -34,6 +34,14 @@
     </div>
 {% endif %}
 
+{% if 'associated_central_team' in show_blocks %}
+    {% if associated_central_team %}
+        <p class="text-center">Linked to CSP Team: <strong><a href="{% url 'team_view' id=associated_central_team.id %}">{{ associated_central_team }}</a></strong>.</p>
+    {% else %}
+        <p class="text-center">No short_name, country-match.  <strong>Not linked to any CSP Team.</strong></p>
+    {% endif %}
+{% endif %}
+
 {% if 'constituency' in show_blocks %}
     <h2>Constituency</h2>
     <div class="row">

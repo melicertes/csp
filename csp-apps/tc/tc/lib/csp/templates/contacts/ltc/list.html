@@ -22,6 +22,7 @@
             <th data-sortable="true"># Team Contacts</th>
             <th data-sortable="true"># Person Contacts</th>
             <th data-align="right" data-sortable="true">Created</th>
+            <th data-align="right" data-sortable="true">Modified</th>
         </tr>
     </thead>
     <tbody>
@@ -36,6 +37,7 @@
             <td>{{ ltc.team_contacts.count }}</td>
             <td>{{ ltc.person_contacts.count }}</td>
             <td>{{ ltc.created|date }}</td>
+            <td>{{ ltc.modified|date }}</td>
         </tr>
         {% endfor %}
     </tbody>

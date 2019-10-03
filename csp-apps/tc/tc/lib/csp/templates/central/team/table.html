@@ -12,6 +12,8 @@
         <th data-visible="false" data-field="Num_CTC_sort">[Column for sorting] #CTC</th>
 
         <th data-align="right" data-sortable="true">Created</th>
+        <th data-align="right" data-sortable="true">Modified</th>
+
         <th data-align="right" data-sortable="true">CSP Installed</th>
         <th data-align="right" data-sortable="true">Status</th>
     </tr>
@@ -21,8 +23,8 @@
         <tr>
             <td><i class="fa fa-user-circle "></i></td>
 
-            <td><a href="{% url 'team_view'  team.id %}"> {{ team.name }}</a></td>
-            <td>{{ team.name }}</td>
+            <td><a href="{% url 'team_view'  team.id %}"> {{ team.short_name }}</a></td>
+            <td>{{ team.short_name }}</td>
 
             <td><a href="{% url 'search_view' %}?q={{ team.country }}">{{ team.country }}</a></td>
 
@@ -30,6 +32,7 @@
             <td>{{ team.circles.all|length }}</td>
 
             <td>{{ team.created|date }}</td>
+            <td>{{ team.modified|date }}</td>
             <td>{% if team.csp_installed %} Yes {% else %} No {% endif %}</td>
             <td>{{ team.status }}</td>
         </tr>

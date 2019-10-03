@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
-
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -96,7 +95,7 @@ public class RtAppClient {
 
 	org.springframework.http.HttpStatus status;
 
-	public RtAppClient() {		
+	public RtAppClient() {
 	}
 
 	private KeyStore loadStore(String keyStoreFile, String keyStorePassword) throws Exception {
@@ -111,10 +110,10 @@ public class RtAppClient {
 	}
 
 	private List<Ticket> getTicketsForId(final String ticketid) {
-		LOG.debug("get_tickets......");
+		LOG.debug("getTicketsForId......");
 		// String context = rtClient.getRtURI();
 		String context = rtClient.constructUriWithPathParameter("").toUriString();
-		LOG.debug("get_tickets:" + context);
+		LOG.debug("getTicketsForId:" + context);
 		ClientBuilder builder = ClientBuilder.newBuilder();
 
 		KeyStore keyStore;
@@ -124,7 +123,7 @@ public class RtAppClient {
 			client = builder.build();
 			client.register(TicketListParser.class);
 		} catch (Exception e) {
-			LOG.error("get_tickets:");
+			LOG.error("getTicketsForId:");
 			e.printStackTrace();
 		}
 
@@ -134,24 +133,25 @@ public class RtAppClient {
 					.header(RT_REMOTE_USER, this.username).get(new GenericType<List<Ticket>>() {
 					});
 		} catch (Exception ex) {
-			LOG.error("get_tickets:" + ex.toString());
+			LOG.error("getTicketsForId:" + ex.toString());
 			return null;
 		}
 	}
 
 	private Links getTicketLinksForId(final String ticketid) {
-		LOG.debug("get_links ...");
+		LOG.debug("getTicketLinksForId....");
 		Links rv = null;
 		do {
 			try {
 				String path = TICKET_PATH + ticketid + "/links";
-				LOG.debug("working with path: {}", path);
+				LOG.debug("getTicketLinksForId:working with path: {}", path);
 
 				String strBody = null;
 				try {
 					ResponseEntity<String> responseEntity = rtClient.getContentData(path);
 					status = responseEntity.getStatusCode();
-					LOG.info(responseEntity.toString());
+					// LOG.info(responseEntity.toString());
+					LOG.info("getTicketLinksForId:status:" + status);
 					strBody = responseEntity.getBody();
 				} catch (Exception e) {
 					LOG.error("getTicketLinksForId: an exception was thrown:" + e);
@@ -194,7 +194,7 @@ public class RtAppClient {
 
 				LOG.debug("getTicketLinksForId DONE.");
 			} catch (Exception ex) {
-				LOG.error(ex.toString());
+				LOG.error("getTicketLinksForId:" + ex.toString());
 			}
 		} while (false);
 
@@ -202,19 +202,20 @@ public class RtAppClient {
 	}
 
 	public String getMessage(final String ticketid) {
-		LOG.debug("working with ticketid: {}", ticketid);
+		LOG.debug("getMessage:working with ticketid: {}", ticketid);
 
 		String Content = null;
 		try {
 
 			String path = TICKET_PATH + ticketid + "/attachments";
-			LOG.debug("working with path: {}", path);
+			LOG.debug("getMessage:working with path: {}", path);
 
 			String strBody = null;
 			try {
 				ResponseEntity<String> responseEntity = rtClient.getContentData(path);
 				status = responseEntity.getStatusCode();
-				LOG.info(responseEntity.toString());
+				// LOG.info(responseEntity.toString());
+				LOG.info("getMessage:status:" + status);
 				strBody = responseEntity.getBody();
 			} catch (Exception e) {
 				LOG.error("getMessage:an exception was thrown:", e);
@@ -249,7 +250,8 @@ public class RtAppClient {
 			try {
 				ResponseEntity<String> responseEntity = rtClient.getContentData(strPathmsg);
 				status = responseEntity.getStatusCode();
-				LOG.info(responseEntity.toString());
+				// LOG.info(responseEntity.toString());
+				LOG.info("getMessage:status:" + status);
 				strBodyMsg = responseEntity.getBody();
 			} catch (Exception e) {
 				LOG.error("getMessage:an exception was thrown:", e);
@@ -271,7 +273,76 @@ public class RtAppClient {
 			LOG.error("getMessage:an exception was thrown:", ex);
 		}
 
-		return Content;
+		return Content.trim();
+	}
+
+	public List<String> getComments(final String ticketid) {
+		// LOG.debug("getComments working with ticketid: {}", ticketid);
+		List<String> comments = new ArrayList<String>();
+		try {
+			String path = TICKET_PATH + ticketid + "/attachments";
+			// LOG.debug("getComments working with path: {}", path);
+
+			String strBody = null;
+			try {
+				ResponseEntity<String> responseEntity = rtClient.getContentData(path);
+				status = responseEntity.getStatusCode();
+				// LOG.info(responseEntity.toString());
+				//LOG.info("getComments:status:" + status);
+				strBody = responseEntity.getBody();
+			} catch (Exception e) {
+				LOG.error("getComments:an exception was thrown:", e);
+			}
+
+			if (null == strBody || "".equals(strBody.trim())) {
+				LOG.debug("getComments:got no comments body from rt");
+				return comments;
+			}
+
+			String[] lines = strBody.split(System.getProperty("line.separator"));
+			for (String line : lines) {
+				int commentid = -1;
+				if (line.contains("(Unnamed) (text/plain") && !line.contains("Attachments")) {
+					try {
+						String[] strs = line.split("\\:");
+						commentid = Integer.parseInt(strs[0].trim());
+					} catch (NumberFormatException e) {
+						LOG.debug("getComments:got NumberFormatException plain");
+					}
+				}
+
+				if (commentid != -1) {
+					String strPathmsg = TICKET_PATH + ticketid + "/attachments/" + commentid;
+					LOG.debug("getComments:working with path: {}", strPathmsg);
+					String strBodyMsg = null;
+					try {
+						ResponseEntity<String> responseEntity = rtClient.getContentData(strPathmsg);
+						status = responseEntity.getStatusCode();
+						LOG.info("getComments:status:" + status);
+						strBodyMsg = responseEntity.getBody();
+					} catch (Exception e) {
+						LOG.error("getComments:an exception was thrown:", e);
+					}
+
+					if (null == strBodyMsg || "".equals(strBodyMsg.trim())) {
+						LOG.debug("getComments:got no message body from rt");
+					} else {
+						String commentContent = strBodyMsg.substring(strBodyMsg.indexOf("Content:") + 9);
+
+						if (null == commentContent || "".equals(commentContent.trim())) {
+							LOG.debug("getComments:got no Content response from rt");
+							continue;
+						}
+						// LOG.debug("getComments done well with:" + commentContent);
+						comments.add(commentContent.trim());
+					}
+				}
+			}
+		} catch (Exception ex) {
+			LOG.error("getComments:an exception was thrown:", ex);
+		}
+
+		return comments;
 	}
 
 	public String getTicketBody(final String ticketid) {
@@ -280,12 +351,13 @@ public class RtAppClient {
 		try {
 
 			String path = TICKET_PATH + ticketid;
-			LOG.debug("working with path: {}", path);
+			LOG.debug("getTicketBody:working with path: {}", path);
 
 			try {
 				ResponseEntity<String> responseEntity = rtClient.getContentData(path);
 				status = responseEntity.getStatusCode();
-				LOG.info(responseEntity.toString());
+				// LOG.info(responseEntity.toString());
+				LOG.info("getTicketBody:status:" + status);
 				Content = responseEntity.getBody();
 			} catch (Exception e) {
 				LOG.error(e.getMessage());
@@ -294,7 +366,7 @@ public class RtAppClient {
 
 			String status = Content.substring(0, 15);
 			if (status.equalsIgnoreCase("RT/4.4.2 200 Ok"))
-				System.out.println("status:" + status);
+				LOG.debug("getTicketBody:status:" + status);
 			else {
 				LOG.error("getTicketBody:status is NO OK");
 				return null;
@@ -342,7 +414,7 @@ public class RtAppClient {
 		}
 
 		String ticketId = uuids.get(0).getTid();
-		LOG.debug("RT Object exists:id: " + ticketId);
+		LOG.debug("updateRtReport:RT Object exists:id: " + ticketId);
 
 		// String updatePath = "/ticket/" + ticketId + "/edit?user=" + username;
 		String updatePath = "/ticket/" + ticketId + "/edit";
@@ -350,7 +422,8 @@ public class RtAppClient {
 		try {
 			ResponseEntity<String> responseEntity = rtClient.postContentData(reportContent, updatePath, USER, username);
 			status = responseEntity.getStatusCode();
-			LOG.info(responseEntity.toString());
+			// LOG.info(responseEntity.toString());
+			LOG.info("updateRtReport:status:" + status);
 			response = responseEntity.getBody();
 		} catch (Exception e) {
 			LOG.error("updateRtReport:an exception was thrown:" + e);
@@ -394,7 +467,8 @@ public class RtAppClient {
 			ResponseEntity<String> responseEntity = rtClient.postContentData(reportContent, addReportPath, USER,
 					username);
 			status = responseEntity.getStatusCode();
-			LOG.info(responseEntity.toString());
+			// LOG.info(responseEntity.toString());
+			LOG.info("addRtReport:status:" + status);
 			response = responseEntity.getBody();
 		} catch (Exception e) {
 			LOG.error("addRtReport:an exception was thrown:" + e);
@@ -429,7 +503,7 @@ public class RtAppClient {
 	}
 
 	private String buildAndAdjustLinks(Ticket incident, String ticketContent) {
-		LOG.debug("buildAndAdjustLinks:ticketContent:before:" + ticketContent);
+		// LOG.debug("buildAndAdjustLinks:ticketContent:before:" + ticketContent);
 		String linkedEvents = incident.getCustomField(IncidentCustomFields.CF_LINKED_EVENTS);
 		if (linkedEvents != null && !linkedEvents.isEmpty()) {
 			ticketContent = ticketContent + CF_LINKED_EVENTS + adjustLinks(linkedEvents, IntegrationDataType.EVENT)
@@ -446,7 +520,7 @@ public class RtAppClient {
 					+ adjustLinks(linkedVulnerabilities, IntegrationDataType.VULNERABILITY) + "\n";
 		}
 
-		LOG.debug("buildAndAdjustLinks:ticketContent:after:" + ticketContent);
+		// LOG.debug("buildAndAdjustLinks:ticketContent:after:" + ticketContent);
 		return ticketContent;
 	}
 
@@ -468,7 +542,7 @@ public class RtAppClient {
 			ticketContent = ticketContent + CF_LINKED_VULNERABILITIES
 					+ adjustLinks(linkedVulnerabilities, IntegrationDataType.VULNERABILITY) + "\n";
 		}
-		LOG.debug("testbuildAndAdjustLinks:ticketContent:" + ticketContent);
+		// LOG.debug("testbuildAndAdjustLinks:ticketContent:" + ticketContent);
 		return ticketContent;
 	}
 
@@ -579,7 +653,8 @@ public class RtAppClient {
 		try {
 			ResponseEntity<String> responseEntity = rtClient.postContentData(content, linksTicketPath, USER, username);
 			status = responseEntity.getStatusCode();
-			LOG.info(responseEntity.toString());
+			// LOG.info(responseEntity.toString());
+			LOG.info("addLink2Incident:status:" + status);
 			res = responseEntity.getBody();
 		} catch (Exception e) {
 			LOG.error("addLink2Incident:an exception was thrown:" + e);
@@ -589,11 +664,17 @@ public class RtAppClient {
 
 	private String getTicketIdFromResponse(String response) {
 		// LOG.debug("getTicketIdFromResponse: response: {}", response);
-		LOG.debug("getTicketIdFromResponse.....");
 		int responseTicketId = -1;
 		String[] lines = response.split(System.getProperty("line.separator"));
 		for (String line : lines) {
 			if (line.contains("created") && line.contains("Ticket")) {
+				String[] strs = line.split("\\s+");
+				try {
+					responseTicketId = Integer.parseInt(strs[2]);
+				} catch (NumberFormatException e) {
+					responseTicketId = -1;
+				}
+			} else if (line.contains("updated") && line.contains("Ticket")) {
 				String[] strs = line.split("\\s+");
 				try {
 					responseTicketId = Integer.parseInt(strs[2]);
@@ -605,7 +686,7 @@ public class RtAppClient {
 		String ticketid = null;
 		if (responseTicketId != -1) {
 			ticketid = Integer.toString(responseTicketId);
-			LOG.debug("getTicketIdFromResponse: got ticketid: {}", ticketid);
+			// LOG.debug("getTicketIdFromResponse: got ticketid: {}", ticketid);
 		} else {
 			LOG.debug("getTicketIdFromResponse no ticketid from rt response");
 			return null;
@@ -613,35 +694,64 @@ public class RtAppClient {
 		return ticketid;
 	}
 
-	public void addMessage2Incident(String response, String msg) {
-		LOG.debug("addMessage2Incident: orig msg: {}", msg);
+	// add a comment to an existing ticket: POST on
+	// "/REST/1.0/ticket/<ticket-id>/comment"
+	// with a variable name "content", containing "key: value" line by
+	public void addComment2Incident(String response, String msg) {
+		// LOG.debug("addComment2Incident: orig msg: {}", msg);
 		msg = msg.trim();
-		LOG.debug("addMessage2Incident: trimed msg: {}", msg);
+		// LOG.debug("addComment2Incident: trimed msg: {}", msg);
 		String ticketid = getTicketIdFromResponse(response);
 		if (ticketid == null || ticketid.isEmpty()) {
-			LOG.error("addMessage2Incident incident Id cannot be null or empty");
+			LOG.error("addComment2Incident incident Id cannot be null or empty");
 			return;
 		}
 
+		if (commentExistsInIncident(response, msg)) {
+			// LOG.debug("addComment2Incident comment exist ignore it.");
+			return;
+		}
 		String content = "id: " + ticketid + "\nAction: comment\nText: " + msg;
-		LOG.debug("addMessage2Incident:" + content);
+		// LOG.debug("addComment2Incident:" + content);
 
 		// String path = "/ticket/" + ticketid + "/comment?user=" + username;
 		String commentPath = TICKET_PATH + ticketid + "/comment";
-		LOG.debug("addMessage2Incident:" + commentPath);
+		// LOG.debug("addComment2Incident:" + commentPath);
 
 		String res = null;
 		try {
 			ResponseEntity<String> responseEntity = rtClient.postContentData(content, commentPath, USER, username);
 			status = responseEntity.getStatusCode();
-			LOG.info(responseEntity.toString());
+			// LOG.info(responseEntity.toString());
+			LOG.info("addComment2Incident:" + status);
 			res = responseEntity.getBody();
 		} catch (Exception e) {
-			LOG.error("addMessage2Incident:an exception was thrown:" + e);
+			LOG.error("addComment2Incident: an exception was thrown:" + e);
 		}
 
-		LOG.debug("addMessage2Incident:done with:" + res);
+		// LOG.debug("addComment2Incident: done with:" + res);
 
+	}
+
+	private boolean commentExistsInIncident(String response, String comment) {
+
+		// LOG.debug("commentExistsInIncident: comment: {}", comment);
+		String ticketid = getTicketIdFromResponse(response);
+		// LOG.debug("commentExistsInIncident: ticketid: {}", ticketid);
+		List<String> comments = getComments(ticketid);
+		if (comments.contains(comment)) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	public void updateComments2Incident(String response, List<String> comments) {
+		// LOG.debug("addComments2Incident: comments: {}", comments.size());
+		for (String comment : comments) {
+			addComment2Incident(response, comment);
+		}
+		// LOG.debug("addComments2Incident:done.");
 	}
 
 	private String buildTicketContent(Ticket incident, String queue, String originplusApplicationId, boolean isUpdate) {
@@ -671,7 +781,7 @@ public class RtAppClient {
 
 		String ludb;
 		if (isUpdate) {
-			LOG.debug("buildTicketContent:isUpdate:" + isUpdate);
+			// LOG.debug("buildTicketContent:isUpdate:" + isUpdate);
 			ludb = CF_LAST_UPDATE_DONE_BY + PREFIX_ADAPTER + originplusApplicationId;
 			LOG.debug("buildTicketContent:isUpdate:{}", ludb);
 		} else {
@@ -681,7 +791,7 @@ public class RtAppClient {
 
 		ticketContent = ticketContent + ludb + "\n";
 
-		LOG.debug("buildTicketContent: {}", ticketContent);
+		// LOG.debug("buildTicketContent: {}", ticketContent);
 		return ticketContent;
 	}
 
@@ -705,7 +815,8 @@ public class RtAppClient {
 			ResponseEntity<String> responseEntity = rtClient.postContentData(ticketContent, addTicketPath, USER,
 					username);
 			status = responseEntity.getStatusCode();
-			LOG.info(responseEntity.toString());
+			// LOG.info(responseEntity.toString());
+			LOG.info("addRtTicket:status=" + status);
 			response = responseEntity.getBody();
 		} catch (Exception e) {
 			LOG.error("addRtTicket:an exception was thrown:" + e);
@@ -716,17 +827,23 @@ public class RtAppClient {
 		String msg = incident.getMessage();
 		if (msg != null && !msg.isEmpty())
 			// add message to incident
-			addMessage2Incident(response, msg);
+			addComment2Incident(response, msg);
 		// if (queue.equalsIgnoreCase(RtQueues.INCIDENT_REPORTS_QUEUE.toString()))
 		// this ticket was a incident report, we do not link automatically, operator has
 		// to do this manually
 		// addLink2Incident(response, incident);
+		List<String> comments = incident.getComments();
+		if (comments != null && !comments.isEmpty())
+			// add comments to incident
+			updateComments2Incident(response, comments);
+
 		LOG.debug("addRtTicket DONE.");
 		return response;
 	}
 
 	public String updateRtTicket(Ticket incident, String ticketId, String originplusApplicationId) {
-		LOG.debug("updateRtTicket ticketId:{} originplusApplicationId:{} ", ticketId, originplusApplicationId);
+		LOG.debug("########################## updateRtTicket ticketId:{} originplusApplicationId:{} ", ticketId,
+				originplusApplicationId);
 
 		String content = buildTicketContent(incident, incident.getQueue(), originplusApplicationId, true);
 		content = buildAndAdjustLinks(incident, content);
@@ -738,16 +855,23 @@ public class RtAppClient {
 		try {
 			ResponseEntity<String> responseEntity = rtClient.postContentData(content, path, USER, username);
 			status = responseEntity.getStatusCode();
-			LOG.info(responseEntity.toString());
+			// LOG.info(responseEntity.toString());
+			LOG.info("updateRtTicket:status:" + status);
 			response = responseEntity.getBody();
 		} catch (Exception e) {
 			LOG.error("updateRtTicket:an exception was thrown:" + e);
 		}
+
+		List<String> comments = incident.getComments();
+		if (comments != null && !comments.isEmpty())
+			// add comments to incident
+			updateComments2Incident(response, comments);
+
 		return response;
 	}
 
 	public String getTicketIdForUUID(Ticket incident) {
-		LOG.debug("getTicketIdForUUID starts....................");
+		// LOG.debug("getTicketIdForUUID starts....................");
 		String uuid = incident.getCustomField(IncidentCustomFields.CF_RT_UUID);
 		if (uuid == null || uuid.isEmpty())
 			return null;
@@ -761,7 +885,8 @@ public class RtAppClient {
 			String query = "'CF.{RT_UUID}'='" + uuid + "'&Queue=Incidents&fields=id";
 			ResponseEntity<String> responseEntity = rtClient.getContentData(query, path);
 			status = responseEntity.getStatusCode();
-			LOG.info(responseEntity.toString());
+			// LOG.info(responseEntity.toString());
+			LOG.info("getTicketIdForUUID:status:" + status);
 			strBody = responseEntity.getBody();
 		} catch (Exception e) {
 			LOG.error("getTicketIdForUUID:an exception was thrown:", e);
@@ -769,7 +894,7 @@ public class RtAppClient {
 			return null;
 		}
 
-		LOG.debug("getTicketIdForUUID: got response: {}", strBody);
+		// LOG.debug("getTicketIdForUUID: got response: {}", strBody);
 
 		if (null == strBody || "".equals(strBody.trim())) {
 			LOG.debug("getTicketIdForUUID: got no response from rt");
@@ -807,21 +932,30 @@ public class RtAppClient {
 			return null;
 		}
 
-		LOG.error("getTicket: Found {} ticket(s)", tickets.size());
+		LOG.debug("getTicket: Found {} ticket(s)", tickets.size());
 
-		Ticket incident = null;
+		Ticket incident = new Ticket();
+
 		for (Ticket t : tickets) {
 			if (t.getId().equals(String.valueOf(ticketid))) {
-				// printer.print(t);
 				incident = t;
 				break;
 			}
 		}
 		if (incident != null) {
 			String msg = getMessage(incident.getId());
-			if (msg != null && !msg.isEmpty())
+			if (msg != null && !msg.isEmpty()) {
+				LOG.debug("getTicket: Found {} message", msg);
 				incident.setMessage(msg);
+			}
+			List<String> comments = getComments(incident.getId());
+			if (comments != null && !comments.isEmpty()) {
+				LOG.debug("getTicket: Found {} comment(s)", comments.size());
+				incident.setComments(comments);
+			}
 		}
+		// TicketPrinter printer = new TicketPrinter();
+		// printer.print(incident);
 		return incident;
 	}
 

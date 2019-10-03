@@ -92,20 +92,20 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler {
 		incident = rtAppClient.getTicket(ticketid);
 
 		if (null == incident) {
-			LOG.error("Obtaining a ticket for id={} failed!", ticketid);
+			LOG.error("emittTicketData:Obtaining a ticket for id={} failed!", ticketid);
 			return;
 		}
-
-		LOG.debug("got incident id: {}", incident.getId());
+		// (new TicketPrinter()).print(incident);
+		LOG.debug("emittTicketData:got incident id: {}", incident.getId());
 		String uuid = incident.getCustomField(IncidentCustomFields.CF_RT_UUID);
-		LOG.debug("got incident uuid: {}", uuid);
+		LOG.debug("emittTicketData:got incident uuid: {}", uuid);
 
 		DataParams dataParams = new DataParams();
 		dataParams.setDateTime(new DateTime());
 
 		List<Origin> origins = originService.findByOriginRecordId(uuid);
 		if (origins.isEmpty()) {
-			LOG.debug("Origin not found");
+			LOG.debug("emittTicketData:Origin not found");
 			dataParams.setOriginCspId(cspId);
 			dataParams.setOriginApplicationId(APPLICATION_ID);
 			dataParams.setOriginRecordId(uuid);
@@ -113,7 +113,7 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler {
 			dataParams.setApplicationId(APPLICATION_ID);
 			dataParams.setRecordId(uuid);
 		} else {
-			LOG.debug("Origin found" + origins.toString());
+			LOG.debug("emittTicketData:Origin found" + origins.toString());
 			dataParams.setOriginCspId(origins.get(0).getOriginCspId());
 			dataParams.setOriginApplicationId(origins.get(0).getOriginApplicationId());
 			dataParams.setOriginRecordId(origins.get(0).getOriginRecordId());
@@ -123,7 +123,7 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler {
 		}
 
 		String dataparamURL = protocol + "://" + host + ":" + port + "/RTIR/Display.html?id=" + incident.getId();
-		LOG.debug("Integration data:dataParams:url: " + dataparamURL);
+		LOG.debug("emittTicketData:Integration data:dataParams:url: " + dataparamURL);
 		dataParams.setUrl(dataparamURL);
 
 		IntegrationData integrationData = new IntegrationData();
@@ -136,7 +136,7 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler {
 		sharingParams.setIsExternal(false);
 
 		String sharing = incident.getSharing();
-		LOG.debug("setToShare:" + sharing);
+		// LOG.debug("setToShare:" + sharing);
 
 		if (sharing.equalsIgnoreCase(CfSharing.DEFAULT_SHARING.toString())
 				|| sharing.toLowerCase().contains(CfSharing.DEFAULT_SHARING.toString().toLowerCase())) {
@@ -229,7 +229,7 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler {
 		IntegrationDataType integrationDataType = IntegrationDataType.INCIDENT;
 
 		integrationData.setDataType(integrationDataType);
-		LOG.debug("Integration data: " + integrationData.toString());
+		LOG.debug(">>>>emittTicketData:Integration data: " + integrationData.toString());
 
 		boolean rtObjextExists = false;
 		List<RTuuid> uuids = rtUuidService.findByRTUuid(uuid);

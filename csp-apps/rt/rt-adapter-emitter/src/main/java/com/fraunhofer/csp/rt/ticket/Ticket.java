@@ -66,6 +66,17 @@ public class Ticket {
 	@Key("Message")
 	private String message;
 
+	@Key("Comments")
+	private List<String> comments;
+
+	public List<String> getComments() {
+		return comments;
+	}
+
+	public void setComments(List<String> comments) {
+		this.comments = comments;
+	}
+
 	public Ticket() {
 		this.customFields = new HashMap<>();
 		this.links = new ArrayList<Ticket>();
@@ -250,9 +261,9 @@ public class Ticket {
 		} else
 			LOG.debug("NO Key found " + key);
 
-		if (value == null || value.isEmpty()) {
-			LOG.debug("CustomField is null or empty " + key);
-		}
+//		if (value == null || value.isEmpty()) {
+//			LOG.debug("CustomField is null or empty " + key);
+//		}
 		return value;
 	}
 

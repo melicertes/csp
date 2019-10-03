@@ -180,12 +180,6 @@ public class User {
 		this.timezone = timezone;
 	}
 
-	@Override
-	public String toString() {
-		return "User [id=" + id + ", firstName=" + firstName + ", lastName=" + lastName + ", email=" + email
-				+ ", password=" + password + ", role=" + role + "]";
-	}
-
 	public Set<EmailTemplate> getTemplates() {
 		return templates;
 	}
@@ -194,4 +188,17 @@ public class User {
 		this.templates = templates;
 	}
 
+	@Override
+	public String toString() {
+		final StringBuilder sb = new StringBuilder("User{");
+		sb.append("id=").append(id);
+		sb.append(", firstName='").append(firstName).append('\'');
+		sb.append(", lastName='").append(lastName).append('\'');
+		sb.append(", email='").append(email).append('\'');
+		sb.append(", password='").append(password).append('\'');
+		sb.append(", timezone='").append(timezone).append('\'');
+		sb.append(", role=").append(role);
+		sb.append('}');
+		return sb.toString();
+	}
 }

@@ -39,6 +39,9 @@ class TeamContactBaseForm(AnnotatedModelForm):
 
         # All widget definitions (also for subclasses) should go here:
         widgets = {
+            'short_name': forms.TextInput,
+            'name': forms.TextInput,
+            'host_organisation': forms.TextInput,
             'nis_sectors': Suggest(source='nis_sector'),
             'nis_team_types': Suggest(source='nis_team_type'),
             'status': Suggest(source='team_status'),
@@ -51,7 +54,8 @@ class TeamContactBaseForm(AnnotatedModelForm):
             'additional_countries': SuggestMultiple(source='country'),
             'contact_postal_country': Suggest(source='country'),
             'constituency_description': forms.TextInput,
-            'description': forms.TextInput,
+            'description': forms.widgets.Textarea(attrs={'rows': 5,
+                                                         'cols': 40}),
             'public_www': forms.TextInput,
             'public_ftp': forms.TextInput,
             'public_mailinglist': forms.TextInput,
@@ -80,6 +84,30 @@ class TeamContactBaseForm(AnnotatedModelForm):
             'fte_backup': forms.TextInput,
             'scope_asns': forms.TextInput,
         }
+
+    def clean_csp_id(self):
+        self.cleaned_data['csp_id'] = ''
+        return ''
+
+    def clean_csp_domain(self):
+        self.cleaned_data['csp_domain'] = ''
+        return ''
+
+    def clean_csp_installed(self):
+        self.cleaned_data['csp_installed'] = False
+        return False
+
+    def clean_nis_team_types(self):
+        self.cleaned_data['nis_team_types'] = []
+        return []
+
+    def clean_nis_sectors(self):
+        self.cleaned_data['nis_sectors'] = []
+        return []
+
+    def clean_status(self):
+        self.cleaned_data['status'] = ''
+        return ''
 
 
 class TeamContactTITUSForm(TeamContactBaseForm):
@@ -500,3 +528,11 @@ class LocalTrustCircleForm(AnnotatedModelForm):
     class Meta:
         model = LocalTrustCircle
         exclude = ['created']
+        widgets = {
+            'description': forms.widgets.Textarea(attrs={'rows': 5, 'cols': 40}),
+            'trustcircles': forms.widgets.SelectMultiple(attrs={'size': '12'}),
+            'teams': forms.widgets.SelectMultiple(attrs={'size': '12'}),
+            'team_contacts': forms.widgets.SelectMultiple(attrs={'size': '12'}),
+            'person_contacts': forms.widgets.SelectMultiple(attrs={'size': '12'}),
+        }
+

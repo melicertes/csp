@@ -3,7 +3,7 @@
 {% block title %} | All Person Contacts {% endblock %}
 
 {% block secondary-nav %}
-<div class="navbar navbar-default navbar-fixed-top secondary-nav">
+<div class="navbar navbar-default navbar-static-top">
     <div class="container">
         {% include "contacts/includes/contacts_tabs.html" %}
         <div class="navbar-form navbar-right">
@@ -26,6 +26,7 @@
                     <th data-sortable="true">Email</th>
                     <th data-sortable="true">Country</th>
                     <th data-align="right" data-sortable="true">Created</th>
+                    <th data-align="right" data-sortable="true">Modified</th>
                 </tr>
             </thead>
             <tbody>
@@ -36,6 +37,7 @@
                     <td>{{ person.email }}</td>
                     <td><a href="{% url 'search_view' %}?q={{ person.postal_country }}">{{ person.postal_country }}</a></td>
                     <td>{{ person.created|date }}</td>
+                    <td>{{ person.modified|date }}</td>
                 </tr>
                 {% endfor %}
             </tbody>

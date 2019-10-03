@@ -1,15 +1,31 @@
 {% extends "base.html" %}
+{% load contacts_helper %}
 
 {% block title %} | Received Team Contacts {% endblock %}
 
 {% block page-header %}
-    <i class="fa fa-upload"></i> Received Team Contacts</h1>
+    <i class="fa fa-upload"></i> Received Team Contacts{% if qfilter %}: Search Results{% endif %}
+    {% if incoming %}
+            <form action="{% url 'incomingcontact_delete_all' %}" id="delete-incoming-all" method="post" class="navbar-form pull-right">{% csrf_token %}
+                <button id="confirm-all" class="btn btn-danger" data-placement="bottom" type="button" data-title="Delete all received entries?">
+                    <span title="Delete all received entries?" class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                    Delete all
+                </button>
+            </form>
+    {% endif %}
+    <form class="navbar-form navbar-right" method="get">
+        <div class="form-group">
+            <input type="text" placeholder="Filter Received Team Contacts" name="qfilter" id="qfilter" value="{{ qfilter }}" class="form-control">
+            <button type="submit" class="btn btn-success">Go</button>
+        </div>
+    </form>
+
 {% endblock %}
 
 {% block content %}
     <div class="row">
         <div class="col-md-12">
-            <table data-toggle="table" data-page-size="20" data-pagination="true">
+            <table data-toggle="table" data-page-size="20" data-pagination="true" class="form-group">
                 <thead>
                     <tr>
                         <th></th>
@@ -22,17 +38,49 @@
                 </thead>
                 <tbody>
                     {% for data in incoming %}
-                    <tr>
-                        <td><a href="{% url 'incomingcontact_view' data.id %}">View Data</a></td>
+                    <tr{% if not data.seen %} class="font-weight-bold"{% endif %}>
+                        <td><a class="btn btn-link" href="{% url 'incomingcontact_view' data.id %}"><i class="fa fa-eye"></i></a>
+                            {% if data.is_update %}
+                                <a class="btn btn-link" href="{% url 'teamcontact_edit' data.get_existing.id data.id %}"><i class="fa fa-edit"></i></a>
+                            {% else %}
+                                <a class="btn btn-link" href="{% url 'teamcontact_new' data.id %}"><i class="fa fa-plus"></i></a>
+                            {% endif %}
+                            <form action="{% url 'incomingcontact_delete' %}" id="delete-incoming-{{data.id}}" method="post" class="delete-form">{% csrf_token %}
+                                <input type="hidden" name="id" value="{{ data.id }}">
+                                <button id="confirm-{{data.id}}" class="btn btn-link" data-placement="bottom" type="button" data-title="Delete this received entry?">
+                                    <span title="Delete this received change" class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                                </button>
+                            </form>
+
                         <td>{{ data.created }}</td>
                         <td>{{ data.is_update|yesno:"Update,New" }}</td>
                         <td>{{ data.deserialized.short_name }} ({{ data.deserialized.country }})</td>
                         <td>{{ data.csp_id }}</td>
-                        <td>{{ data.target_circle_id|default:data.target_team_id|join:", " }}</td>
+                        <td>{{ data.target_circle_id|default:data.target_team_id|uuid_resolve|join:"; " }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
     </div>
+{% endblock %}
+
+{% block javascriptcontent %}
+    <script>
+    $(function() {
+        {% for data in incoming %}    
+            $('#confirm-{{data.id}}').confirmation({
+                onConfirm: function(e) {
+                    $('#delete-incoming-{{data.id}}').submit();
+                }
+            });
+        {% endfor %}
+
+            $('#confirm-all').confirmation({
+                onConfirm: function(e) {
+                    $('#delete-incoming-all').submit();
+                }
+            });
+    });
+    </script>
 {% endblock %}

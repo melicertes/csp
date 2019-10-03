@@ -11,8 +11,8 @@ docker volume create MISPStateDatavolume
 docker volume  ls --format '{{.Name}}' | grep MISPDatavolume  > /dev/null
 if [[ "$?" -eq 0 ]] ; then
     echo ">>  Found Docker volume MISPDatavolume"
-    docker run -d --rm -v MISPDatavolume:/old -v MISPConfigVolume:/var/www/MISP/app/Config frolvlad/alpine-oraclejdk8:slim sh -c "cp /old/app/Config/* /var/www/MISP/app/Config/"
-    docker run -d --rm -v MISPDatavolume:/old -v MISPGnuVolume:/var/www/MISP/.gnupg frolvlad/alpine-oraclejdk8:slim sh -c "cp /old/.gnupg/* /var/www/MISP/.gnupg/"
+    docker run -d --rm -v MISPDatavolume:/old -v MISPConfigVolume:/var/www/MISP/app/Config thanosa75/alpine-jdk8:slim sh -c "cp /old/app/Config/* /var/www/MISP/app/Config/"
+    docker run -d --rm -v MISPDatavolume:/old -v MISPGnuVolume:/var/www/MISP/.gnupg thanosa75/alpine-jdk8:slim sh -c "cp /old/.gnupg/* /var/www/MISP/.gnupg/"
 fi
 
 docker ps -a --format '{{.Names}}' | grep csp-misp  > /dev/null

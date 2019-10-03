@@ -1,5 +1,16 @@
 package com.intrasoft.csp.vcb.admin.model;
 
+import com.intrasoft.csp.vcb.commons.constants.MeetingStatus;
+import com.intrasoft.csp.vcb.commons.model.Meeting;
+import com.intrasoft.csp.vcb.commons.model.Participant;
+import com.intrasoft.csp.vcb.commons.model.User;
+import org.hibernate.validator.constraints.NotEmpty;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
@@ -9,46 +20,41 @@ import java.time.ZonedDateTime;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
-
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
-
-import com.intrasoft.csp.vcb.admin.controller.RegisterController;
-import com.intrasoft.csp.vcb.commons.constants.MeetingStatus;
-import com.intrasoft.csp.vcb.commons.model.Meeting;
-import com.intrasoft.csp.vcb.commons.model.Participant;
-import com.intrasoft.csp.vcb.commons.model.User;
-import org.hibernate.validator.constraints.NotEmpty;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.concurrent.atomic.AtomicLong;
 
 
 public class MeetingForm {
 	private static final Logger log = LoggerFactory.getLogger(MeetingForm.class);
 
+	private static final AtomicLong SEED = new AtomicLong(System.currentTimeMillis());
+
 	private static HexBinaryAdapter hba = new HexBinaryAdapter();
 
 	public static Meeting createMeetingFromForm(MeetingForm form_meeting, User user) {
 		Meeting m = new Meeting();
+
+		MessageDigest md = null;
+		try {
+			md = MessageDigest.getInstance("MD5"); // always create new
+		} catch (NoSuchAlgorithmException e) {
+			log.error("Algorithm problem",e);
+		}
+
 		m.setDuration(form_meeting.getDuration());
 		m.setStart(form_meeting.getStart());
 		List<Participant> participants = new LinkedList<>();
 		for (ParticipantForm p : form_meeting.getEmails()) {
-			MessageDigest md = null;
-			try {
-				md = MessageDigest.getInstance("MD5"); // always create new
-														// instance
-														// not thread safe
-			} catch (NoSuchAlgorithmException e) {
-				//e.printStackTrace();
-				log.error(e.toString());
-			}
 			if (md != null) {
-				String hashed_email = hba.marshal(md.digest((p.getEmail() + System.currentTimeMillis()).getBytes()));
-				md.reset();
-				participants.add(new Participant(p.getEmail(), hashed_email.substring(0, 6), p.getName(),
-						p.getSurname(), hashed_email.substring(6, 16)));
+				try {
+					String hashed_email = hba.marshal(md.digest((SEED.incrementAndGet() + p.getEmail() + System.currentTimeMillis()).getBytes()));
+					participants.add(new Participant(p.getEmail(), hashed_email.substring(0, 6), p.getName(),
+							p.getSurname(), hashed_email.substring(6, 16)));
+					Thread.sleep(128);
+				} catch (InterruptedException e) {
+					log.trace("Interrupted",e);
+				} finally {
+					md.reset();
+				}
 			}
 		}
 		m.setParticipants(participants);
