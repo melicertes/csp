@@ -32,8 +32,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.time.Instant;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Objects;
@@ -88,7 +86,7 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler{
             LOG.debug("Fetch local event (if exists) based on the uuid {} of the incoming event.", uuid);
             getLocalEventResponseBody = mispAppClient.getMispEvent(uuid).getBody();
         } catch (StatusCodeException e){
-            LOG.error("Event not found, probably a new event - {}: {} ",e.getStatusCode(), e.getMessage());
+            LOG.warn("Event not found, probably a new event - {}: {} ",e.getStatusCode(), e.getMessage());
         }
 
         localJsonNode = new ObjectMapper().convertValue(getLocalEventResponseBody, JsonNode.class);
@@ -134,17 +132,11 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler{
 
         LOG.debug("Handle Event.");
         if (!requestMethod.equals("DELETE")) {
-            try {
-                handleEventAddEdit(integrationData);
-            } catch (IOException e) {
-                LOG.error(e.getMessage());
-            }
+            handleEventAddEdit(integrationData);
         }
-
 
         eventCreatedUpdated = localJsonNode;
         LOG.trace("eventCreatedUpdated: {}", eventCreatedUpdated.toString());
-
 
         /**
          * Handle Proposals
@@ -174,7 +166,7 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler{
         return new ResponseEntity<String>(status);
     }
 
-    private void handleEventAddEdit(IntegrationData integrationData) throws IOException {
+    private void handleEventAddEdit(IntegrationData integrationData) {
         // set "published":false
         LOG.debug("Handle Event add/edit action.");
         ((ObjectNode) jsonNode.get("Event")).put("published", new Boolean(false));
@@ -185,7 +177,6 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler{
             return;
         }
         else {
-
             LOG.debug("Event received from its origin, Remove proposals for new attributes if exist.");
             JsonNode arrNode1 = localJsonNode.get("Event").get("ShadowAttribute");
             if (arrNode1 != null && arrNode1.isArray()){
@@ -254,10 +245,11 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler{
                 localEventId = eventCreatedUpdated.get(EVENT.name()).get("id").textValue();
             }
 
-
             status = responseEntity.getStatusCode();
             LOG.debug(responseEntity.toString());
             LOG.debug("Event add action result: " + responseEntity.getStatusCode().toString());
+        } catch (IOException e){
+         LOG.error("Could not parse MISP response from addMispEvent - {}", e.getMessage());
         } catch (StatusCodeException e) {
             LOG.error(e.getMessage());
             /*if (!integrationData.getDataParams().getOriginCspId().equals(integrationData.getDataParams().getCspId())){
@@ -268,19 +260,20 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler{
             if (!e.getHttpHeaders().get("location").isEmpty()) {
                 String location = e.getHttpHeaders().get("location").get(0);
                 LOG.debug("location: " + location);
-//                    jsonNode = ((ObjectNode) jsonNode.get("Event")).put("timestamp", String.valueOf(Instant.now().getEpochSecond() + 1));
                 LOG.debug(jsonNode.toString());
                 try {
                     ResponseEntity<String> responseEntity = mispAppClient.updateMispEvent(location, jsonNode.toString());
                     status = responseEntity.getStatusCode();
                     eventCreatedUpdated = new ObjectMapper().readValue(responseEntity.getBody(), JsonNode.class);
                     if (eventCreatedUpdated.get("message") != null && eventCreatedUpdated.get("message").textValue().toLowerCase().equals("error")){
-                        LOG.error(eventCreatedUpdated.toString());
+                        LOG.warn("MISP responded to an updateMispEvent with {}", eventCreatedUpdated.toString());
                         eventCreatedUpdated = jsonNode;
                     }
                     LOG.debug("Event edit action result: " + responseEntity.getStatusCode().toString());
                 } catch (StatusCodeException e2){
                     LOG.error("Updating event failed. - {}: {} ",e2.getStatusCode(), e2.getMessage());
+                } catch (IOException e2){
+                    LOG.error("Could not parse MISP response from updateMispEvent - {} ", e2.getMessage());
                 }
             }
         }
@@ -300,7 +293,7 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler{
             } catch (JsonProcessingException e) {
                 LOG.error("Could not parse shadowattribute: " + e);
             } catch (StatusCodeException e) {
-                LOG.error("Adding proposal failed - {}",e.getMessage());
+                LOG.warn("Adding proposal failed - {}",e.getMessage());
                 String location = e.getHttpHeaders().get("location").get(0);
                 LOG.debug("" + location);
                 try {
@@ -309,7 +302,6 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler{
                 } catch (StatusCodeException e2) {
                     LOG.error("Updating proposal failed - {}",e.getMessage());
                 }
-
             }
         });
     }
@@ -347,7 +339,7 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler{
                 ResponseEntity responseEntity = mispAppClient.updateMispProposal(attrId , attrRequestStr);
                 LOG.debug("Edit proposal response: " + responseEntity.toString());
             } catch (StatusCodeException e) {
-                LOG.error("Editing proposal has failed - {}, {}", e.getStatusCode(), e.getMessage());
+                LOG.warn("Editing proposal has failed - {}, {}", e.getStatusCode(), e.getMessage());
                 String location = e.getHttpHeaders().get("location").get(0);
                 LOG.debug("" + location);
                 try {
@@ -360,7 +352,6 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler{
                     LOG.error(e.getMessage());
                 }
             });
-
         }
 
         private IntegrationData handleRTIR(IntegrationData ilData) {
@@ -387,30 +378,29 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler{
                             if (ja.get("object_relation").textValue().toLowerCase().equals(MispContextUrl.RTIREntity.MAP_CSP_URL_VALUE.toString().toLowerCase()) &&
                                     url.length() == 0) {
                                 url = ja.get("value").textValue();
-                                LOG.debug("============RTIR url: " + url);
+                                LOG.debug("RTIR url: " + url);
                             }
                             if (ja.get("object_relation").textValue().toLowerCase().equals(MispContextUrl.RTIREntity.MAP_ORIGIN_CSP_ID_VALUE.toString().toLowerCase()) &&
                                     originCspId.length() == 0) {
                                 originCspId = ja.get("value").textValue();
-                                LOG.debug("============RTIR originCspId: " + originCspId);
+                                LOG.debug("RTIR originCspId: " + originCspId);
                             }
                             if (ja.get("object_relation").textValue().toLowerCase().equals(MispContextUrl.RTIREntity.MAP_ORIGIN_RECORD_ID_VALUE.toString().toLowerCase()) &&
                                     originRecordId.length() == 0) {
                                 originRecordId = ja.get("value").textValue();
-                                LOG.debug("============RTIR originRecordId: " + originRecordId);
+                                LOG.debug("RTIR originRecordId: " + originRecordId);
                             }
                             if (ja.get("object_relation").textValue().toLowerCase().equals(MispContextUrl.RTIREntity.MAP_TITLE.toString().toLowerCase()) &&
                                     title.length() == 0) {
                                 title = ja.get("value").textValue();
-                                LOG.debug("============RTIR title: " + title);
+                                LOG.debug("RTIR title: " + title);
                             }
                             if (ja.get("object_relation").textValue().toLowerCase().equals(MispContextUrl.RTIREntity.MAP_TICKET_NO.toString().toLowerCase()) &&
                                     recordId.length() == 0) {
                                 recordId = ja.get("value").textValue();
-                                LOG.debug("============RTIR recordId: " + recordId);
+                                LOG.debug("RTIR recordId: " + recordId);
                             }
                         }
-
 
                         /**
                          1. The adapter queries ES for the existence of an "incident" with the given origin cspid/appid/id
@@ -494,29 +484,29 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler{
                             if (ja.get("object_relation").textValue().toLowerCase().equals(MispContextUrl.VULNERABILITYEntity.MAP_CSP_URL_VALUE.toString().toLowerCase()) &&
                                     url.length() == 0) {
                                 url = ja.get("value").textValue();
-                                LOG.debug("============VULNERABILITY url: " + url);
+                                LOG.debug("VULNERABILITY url: " + url);
                             }
                             if (ja.get("object_relation").textValue().toLowerCase().equals(MispContextUrl.VULNERABILITYEntity.MAP_ORIGIN_CSP_ID_VALUE.toString().toLowerCase()) &&
                                     originCspId.length() == 0) {
                                 originCspId = ja.get("value").textValue();
-                                LOG.debug("============VULNERABILITY originCspId: " + originCspId);
+                                LOG.debug("VULNERABILITY originCspId: " + originCspId);
                             }
                             if (ja.get("object_relation").textValue().toLowerCase().equals(MispContextUrl.VULNERABILITYEntity.MAP_ORIGIN_RECORD_ID_VALUE.toString().toLowerCase()) &&
                                     originRecordId.length() == 0) {
                                 originRecordId = ja.get("value").textValue();
-                                LOG.debug("============VULNERABILITY originRecordId: " + originRecordId);
+                                LOG.debug("VULNERABILITY originRecordId: " + originRecordId);
                             }
                             if (ja.get("object_relation").textValue().toLowerCase().equals(MispContextUrl.VULNERABILITYEntity.MAP_TITLE_RELATION.toString().toLowerCase()) &&
                                     ja.get("category").toString().toLowerCase().equals(MispContextUrl.VULNERABILITYEntity.MAP_TITLE_CATEGORY.toString().toLowerCase()) &&
                                     title.length() == 0) {
                                 title = ja.get("value").textValue();
-                                LOG.debug("============VULNERABILITY title: " + title);
+                                LOG.debug("VULNERABILITY title: " + title);
                             }
                             if (ja.get("object_relation").textValue().toLowerCase().equals(MispContextUrl.VULNERABILITYEntity.MAP_RECORD_RELATION.toString().toLowerCase()) &&
                                     ja.get("category").toString().toLowerCase().equals(MispContextUrl.VULNERABILITYEntity.MAP_RECORD_CATEGORY.toString().toLowerCase()) &&
                                     recordId.length() == 0) {
                                 recordId = ja.get("value").textValue();
-                                LOG.debug("============VULNERABILITY recordId: " + recordId);
+                                LOG.debug("VULNERABILITY recordId: " + recordId);
                             }
                         }
 
@@ -565,7 +555,6 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler{
                         }
                         LOG.debug("VULNERABILITY new URL: " + newURL);
                         //LOG.info("VULNERABILITY new ID: " + newTickerNumber);
-
                     }
                 }
             }
