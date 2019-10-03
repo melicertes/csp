@@ -31,7 +31,7 @@ WORKDIR /opt
 RUN git clone https://github.com/MISP/misp-modules.git
 
 
-FROM ubuntu:16.04
+FROM ubuntu:xenial
 MAINTAINER Christos Panagiotou
 
 # Install core components
