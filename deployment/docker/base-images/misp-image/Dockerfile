@@ -198,8 +198,6 @@ RUN touch /.firstboot.tmp
 RUN touch /var/www/MISP/app/tmp/logs/error.log
 RUN touch /var/www/MISP/app/tmp/logs/debug.log
 RUN chmod -R 777 /var/www/MISP/app/tmp/logs/
-RUN chown -R www-data:www-data /var/www/MISP/app/tmp/logs/
-VOLUME ["/var/www/MISP/app/tmp/logs"]
 
 # Make a backup of /var/www/MISP to restore it to the local moint point at first boot
 WORKDIR /var/www/MISP
@@ -210,8 +208,8 @@ COPY csp-misp-objects/ app/files/misp-objects/objects/
 RUN tar czpf /root/MISP.tgz .
 
 RUN chown -R www-data:www-data /var/www/MISP/app/files/
+RUN chown -R www-data:www-data /var/www/MISP/app/tmp/logs/
+VOLUME ["/var/www/MISP/app/tmp/logs"]
 
-#COPY AppController.php /var/www/MISP/app/Controller/AppController.php
-#VOLUME /var/www/MISP
 EXPOSE 80
 ENTRYPOINT ["/run.sh"]
