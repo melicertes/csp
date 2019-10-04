@@ -1,36 +1,3 @@
-FROM csp-alpine35glibc:1.0 as builder_2.4.107
-
-RUN apk add --no-cache git
-WORKDIR /var/www
-#RUN chown www-data:www-data /var/www
-#USER www-data
-RUN git clone https://github.com/MISP/MISP.git
-WORKDIR /var/www/MISP
-#RUN git checkout tags/$(git describe --tags `git rev-list --tags --max-count=1000`)
-RUN git checkout tags/$(git describe --tags v2.4.107)
-RUN git config core.filemode false
-
-WORKDIR /var/www/MISP/app/files/scripts
-RUN git clone https://github.com/CybOXProject/python-cybox.git
-RUN git clone https://github.com/STIXProject/python-stix.git
-
-WORKDIR /var/www/MISP/app/files/scripts/python-cybox
-RUN git checkout v2.1.0.12
-
-#USER www-data
-WORKDIR /var/www/MISP/app/files/scripts/python-stix
-RUN git checkout v1.1.1.4
-
-#USER www-data
-WORKDIR /var/www/MISP
-RUN git submodule init
-RUN git submodule update
-
-# Install MISP Modules
-WORKDIR /opt
-RUN git clone https://github.com/MISP/misp-modules.git
-
-
 FROM ubuntu:xenial
 MAINTAINER Christos Panagiotou
 
@@ -51,7 +18,10 @@ RUN a2dismod status
 RUN a2dissite 000-default
 
 # PHP 7.2
-RUN apt-get install -y libapache2-mod-php php7.2 php7.2-cli php-crypt-gpg php7.2-dev php7.2-json php7.2-mysql php7.2-opcache php7.2-readline php7.2-redis php7.2-xml git
+RUN apt-get install -y libapache2-mod-php php7.2 php7.2-cli php-crypt-gpg php7.2-dev php7.2-json php7.2-mysql php7.2-opcache php7.2-readline php7.2-redis php7.2-xml
+RUN apt-get install -y php-pear pkg-config libbson-1.0 libmongoc-1.0-0 php-xml php-dev php-gd
+# install MySQL PDO extension
+RUN apt-get install -y php-mysql
 
 # Fix php.ini with recommended settings
 RUN sed -i "s/max_execution_time = 30/max_execution_time = 300/" /etc/php/7.2/apache2/php.ini
@@ -66,20 +36,39 @@ RUN apt-get clean
 WORKDIR /var/www
 
 USER www-data
-COPY --from=builder_2.4.107 /var/www/ .
+WORKDIR /var/www
+RUN chown www-data:www-data /var/www
+USER www-data
+RUN git clone https://github.com/MISP/MISP.git
+WORKDIR /var/www/MISP
+RUN git checkout tags/$(git describe --tags v2.4.107)
+RUN git config core.filemode false
+RUN git submodule update --init --recursive
+# Make git ignore filesystem permission differences for submodules
+RUN git submodule foreach --recursive git config core.filemode false
+
+WORKDIR /var/www/MISP/app/files/scripts
+RUN git clone https://github.com/CybOXProject/python-cybox.git
+RUN git clone https://github.com/STIXProject/python-stix.git
 
 WORKDIR /var/www/MISP/app/files/scripts/python-cybox
+RUN git checkout v2.1.0.12
 USER root
 RUN python setup.py install
 
 USER www-data
 WORKDIR /var/www/MISP/app/files/scripts/python-stix
+RUN git checkout v1.1.1.4
 USER root
 RUN python setup.py install
-RUN chown -R www-data:www-data /var/www
 
 USER www-data
+WORKDIR /var/www/MISP
+RUN git submodule init
+RUN git submodule update
 WORKDIR /var/www/MISP/app
+
+
 # FIX COMPOSER
 RUN curl --fail --location -o composer-setup.php https://getcomposer.org/installer
 RUN php -r "if (hash_file('sha384', 'composer-setup.php') === 'a5c698ffe4b8e849a443b120cd5ba38043260d5c4023dbf93e1558871f1f07f58274fc6f4c93bcfd858c6bd0775cd8d1') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
