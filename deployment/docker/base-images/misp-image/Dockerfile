@@ -111,10 +111,6 @@ RUN echo "postfix postfix/mailname string localhost.localdomain" | debconf-set-s
 # Redis Setup
 RUN sed -i 's/^\(daemonize\s*\)yes\s*$/\1no/g' /etc/redis/redis.conf
 
-# Install PEAR packages
-RUN pear install Crypt_GPG >>/tmp/install.log
-RUN pear install Net_GeoIP
-
 # Apache Setup
 RUN cp /var/www/MISP/INSTALL/apache.misp.ubuntu /etc/apache2/sites-available/misp.conf
 RUN sed -i -E 's/80/800/' /etc/apache2/sites-available/misp.conf
@@ -139,12 +135,24 @@ RUN sed -i -E "s/'salt'\s=>\s'(\S+)'/'salt' => '`openssl rand -base64 32|tr "/" 
 RUN chmod a+x /var/www/MISP/app/Console/worker/start.sh
 RUN echo "sudo -u www-data bash /var/www/MISP/app/Console/worker/start.sh" >>/etc/rc.local
 
+# Install templates & stuff
+WORKDIR /var/www/MISP/app/files
+RUN rm -rf misp-objects && git clone https://github.com/MISP/misp-objects.git
+RUN rm -rf misp-galaxy && git clone https://github.com/MISP/misp-galaxy.git
+RUN rm -rf warninglists && git clone https://github.com/MISP/misp-warninglists.git ./warninglists
+RUN rm -rf taxonomies && git clone https://github.com/MISP/misp-taxonomies.git ./taxonomies
+RUN chown -R www-data:www-data misp-objects misp-galaxy warninglists taxonomies
+
+# Install MISP build requirements
+RUN sudo -E apt-get -y install libpoppler58 libpoppler-dev libpoppler-cpp-dev
+
 # Install MISP Modules
 WORKDIR /opt
-RUN apt-get update
 RUN apt-get install -y python3 python3-pip libjpeg-dev
-COPY --from=builder_2.4.107 /opt/ .
-ADD misp-modules /opt/misp-modules
+# PIP3 fix
+RUN pip install --upgrade pip
+# END FIX
+RUN git clone https://github.com/MISP/misp-modules.git
 WORKDIR /opt/misp-modules
 RUN pip3 install --upgrade pip
 RUN cat REQUIREMENTS | sed 's/aiohttp==3.4.4/aiohttp/g' > REQUIREMENTS
@@ -190,7 +198,6 @@ RUN echo 'command=/bin/bash -c "cd /opt/misp-modules/bin && /usr/bin/python3 mis
 RUN echo 'user = root' >> /etc/supervisor/conf.d/supervisord.conf
 RUN echo 'startsecs = 0' >> /etc/supervisor/conf.d/supervisord.conf
 RUN echo 'autorestart = false' >> /etc/supervisor/conf.d/supervisord.conf
-
 # Modify syslog configuration
 RUN sed -i -E 's/^(\s*)system\(\);/\1unix-stream("\/dev\/log");/' /etc/syslog-ng/syslog-ng.conf
 
