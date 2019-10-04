@@ -34,9 +34,6 @@ RUN apt-get install -y cron logrotate supervisor syslog-ng-core
 RUN apt-get clean
 
 WORKDIR /var/www
-
-USER www-data
-WORKDIR /var/www
 RUN chown www-data:www-data /var/www
 USER www-data
 RUN git clone https://github.com/MISP/MISP.git
