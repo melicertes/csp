@@ -206,10 +206,10 @@ WORKDIR /var/www/MISP
 
 # Add misp-objects for CSP support
 COPY csp-misp-objects/ app/files/misp-objects/objects/
-RUN chown -R www-data:www-data /var/www/MISP/app/files/
-
 # Final archive
 RUN tar czpf /root/MISP.tgz .
+
+RUN chown -R www-data:www-data /var/www/MISP/app/files/
 
 #COPY AppController.php /var/www/MISP/app/Controller/AppController.php
 #VOLUME /var/www/MISP
