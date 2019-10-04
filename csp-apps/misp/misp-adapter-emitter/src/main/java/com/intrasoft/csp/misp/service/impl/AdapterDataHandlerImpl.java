@@ -39,7 +39,7 @@ import java.util.Objects;
 import static com.intrasoft.csp.misp.commons.config.MispContextUrl.MispEntity.EVENT;
 
 @Service
-public class AdapterDataHandlerImpl implements AdapterDataHandler{
+public class AdapterDataHandlerImpl implements AdapterDataHandler {
     private Logger LOG = LoggerFactory.getLogger(AdapterDataHandlerImpl.class);
 
     @Autowired
@@ -58,14 +58,7 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler{
     @Value("${server.name}")
     String cspId;
 
-    HttpStatus status;
-
-    JsonNode jsonNode;
-    JsonNode eventCreatedUpdated;
-
-    String localEventId;
-
-    JsonNode localJsonNode;
+    final ObjectMapper mapper = new ObjectMapper();
 
     private static final Configuration configuration = Configuration.builder()
             .options(Option.ALWAYS_RETURN_LIST, Option.SUPPRESS_EXCEPTIONS)
@@ -76,32 +69,27 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler{
     @Override
     public ResponseEntity<String> handleIntegrationData(IntegrationData integrationData, String requestMethod) {
 
-        LOG.info("Handle integration data got by IL.");
-        LOG.trace(integrationData.toString());
+        LOG.trace("RECEIVED: {} -> {} ",integrationData.getDataParams(), integrationData.toString());
         String uuid = integrationData.getDataParams().getOriginRecordId();
         Object getLocalEventResponseBody = integrationData.getDataObject();
+        HttpStatus lastStatus = HttpStatus.OK;
 
+        LOG.info("Handle integration data [type {} uuid {}] -from-> {}", integrationData.getDataType(), uuid, integrationData.getDataParams());
 
-        try{
-            LOG.debug("Fetch local event (if exists) based on the uuid {} of the incoming event.", uuid);
+        try {
+            LOG.info("uuid {} -> Fetching local event (if exists) based on the uuid of the incoming event.", uuid);
             getLocalEventResponseBody = mispAppClient.getMispEvent(uuid).getBody();
-        } catch (StatusCodeException e){
-            LOG.warn("Event not found, probably a new event - {}: {} ",e.getStatusCode(), e.getMessage());
+        } catch (StatusCodeException e) {
+            LOG.error("Event for uuid {} not found, probably a new event: {} code: {}", uuid, integrationData.getDataType(), e.getStatusCode() );
         }
 
-        localJsonNode = new ObjectMapper().convertValue(getLocalEventResponseBody, JsonNode.class);
+        // final String localEventId = safeExtractEventId(mapper.convertValue(getLocalEventResponseBody, JsonNode.class)); //get the local MISP event id
 
-        if (Objects.nonNull(localJsonNode.get("Event")) && Objects.nonNull(localJsonNode.get("Event").get("id"))){
-            localEventId = localJsonNode.get("Event").get("id").textValue();
-            LOG.debug("Extracted id {} from local event.", localEventId );
-        }
-
-        jsonNode = new ObjectMapper().convertValue(integrationData.getDataObject(), JsonNode.class);
-
-        LOG.debug("Handle origin params.");
         List<Origin> origins = originService.findByOriginRecordId(uuid);
-        if (origins.isEmpty()){
-            LOG.debug("Entry for " + uuid + " not found.");
+
+        LOG.info("uuid {} origins detected {}", uuid, origins);
+        if (origins.isEmpty()) {
+            LOG.info("Entry for " + uuid + " not found.");
             Origin origin = new Origin();
             origin.setOriginCspId(integrationData.getDataParams().getOriginCspId());
             origin.setOriginApplicationId(integrationData.getDataParams().getOriginApplicationId());
@@ -110,33 +98,28 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler{
             origin.setApplicationId("misp");
             origin.setRecordId(integrationData.getDataParams().getOriginRecordId());
             Origin org = originService.saveOrUpdate(origin);
-            LOG.debug("Origin inserted: " + org);
-        }
-        else {
-            LOG.debug("Origin params already found in table");
+            LOG.info("Origin inserted: {}", org);
+        } else {
+            LOG.info("Origin {} of {} params already found in table", origins, uuid);
         }
 
         integrationData.getSharingParams().setToShare(false);
 
-        /**
-         *Search and handle RTIR objects
-         */
-        LOG.debug("Handle RTIR if present.");
-        integrationData = handleRTIR(integrationData);
-        LOG.debug("Handle Vulnerability if present.");
-        integrationData = handleVulnerability(integrationData);
+        handleRTIRintegration(integrationData);
+
+        handleVulnerabilityIntegration(integrationData);
+
         /*
         Remake jsonNode
          */
-        jsonNode = new ObjectMapper().convertValue(integrationData.getDataObject(), JsonNode.class);
+        JsonNode jsonNode = mapper.convertValue(integrationData.getDataObject(), JsonNode.class);
 
-        LOG.debug("Handle Event.");
-        if (!requestMethod.equals("DELETE")) {
-            handleEventAddEdit(integrationData);
-        }
+        LOG.info("Handling event type {} uuid {} to misp", integrationData.getDataType(), uuid);
 
-        eventCreatedUpdated = localJsonNode;
-        LOG.trace("eventCreatedUpdated: {}", eventCreatedUpdated.toString());
+        MispEventContext eventContext = processMispEvent(integrationData, requestMethod, jsonNode);
+        // update our variables
+        jsonNode = eventContext.getNode();
+        lastStatus = eventContext.getStatus();
 
         /**
          * Handle Proposals
@@ -144,432 +127,441 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler{
         ReadContext ctx = JsonPath.using(configuration).parse(jsonNode);
 
         // Add New Attribute Proposals
-        String eventId = String.valueOf(eventCreatedUpdated.get("Event").get("id").textValue());
-        LOG.debug("Event id created/updated: " + eventId);
+        String eventId = safeExtractEventId(jsonNode);
+        LOG.info("Event id created/updated: " + eventId);
         List<LinkedHashMap> eventShadowAttributes = ctx.read("$.Event.ShadowAttribute[*]", List.class);
-        handleShadowAttributeAdd(eventShadowAttributes, localEventId);
+
+        LOG.info("uuid {} Handle event shadow attributes", uuid);
+
+        eventShadowAttributes.forEach(shadowAttribute -> {
+            LOG.info("Working with uuid {} shadowAttribute {}", uuid, shadowAttribute.toString());
+            String shadowAttributeJsonString = null;
+            try {
+                shadowAttributeJsonString = (mapper).writeValueAsString(shadowAttribute);
+                LOG.info("{} Add proposal request: {} ", uuid,  shadowAttributeJsonString);
+                ResponseEntity responseEntity = mispAppClient.addMispProposal(eventId, shadowAttributeJsonString);
+                LOG.info("{} Add proposal response: {}", uuid, responseEntity.toString());
+            } catch (JsonProcessingException e1) {
+                LOG.error("Could not parse shadow attribute {} ", e1.getMessage(), e1);
+            } catch (StatusCodeException e2) {
+                LOG.error("Status exception {}", e2.getMessage(), e2);
+                String location = e2.getHttpHeaders().get("location").get(0);
+                LOG.info("Possible redirect location found for attribute: {} -> {}", shadowAttribute,  location);
+                ResponseEntity responseEntity = mispAppClient.updateMispProposal(location, shadowAttributeJsonString);
+                LOG.info("{} Add proposal response: {}", uuid, responseEntity.toString());
+            }
+        });
 
         // Edit Existing Attribute Proposals
         List<LinkedHashMap> attributeShadowAttributes = ctx.read("$.Event.Attribute[*].ShadowAttribute[*]", List.class);
-        handleShadowAttributeEdit(attributeShadowAttributes);
+
+        extractShadowAttributes(attributeShadowAttributes);
 
         // Edit Existing Object Proposals
         List<LinkedHashMap> objectAttributeShadowAttributes = ctx.read("$.Event.Object[*].Attribute[*].ShadowAttribute[*]", List.class);
-        handleShadowAttributeEdit(objectAttributeShadowAttributes);
+
+        extractShadowAttributes(objectAttributeShadowAttributes);
 
         try {
-            emitterDataHandler.handleMispData(jsonNode,EVENT,true,false);
+            emitterDataHandler.handleMispData(jsonNode, EVENT, true, false);
         } catch (IOException e) {
             LOG.error("Reemition failed: " + e.getMessage());
         }
-
-        return new ResponseEntity<String>(status);
+        return new ResponseEntity<String>(lastStatus);
     }
 
-    private void handleEventAddEdit(IntegrationData integrationData) {
-        // set "published":false
-        LOG.debug("Handle Event add/edit action.");
-        ((ObjectNode) jsonNode.get("Event")).put("published", new Boolean(false));
+    private MispEventContext processMispEvent(IntegrationData integrationData, String requestMethod, JsonNode jsonNode) {
+        HttpStatus lastStatus = null;
+        //response by default is the incoming json
+        JsonNode responseJsonNode = jsonNode;
+        String uuid = integrationData.getDataParams().getOriginRecordId();
 
-        if (!integrationData.getDataParams().getOriginCspId().equals(integrationData.getDataParams().getCspId())){
-            LOG.debug("Cannot edit an event that I do not own. " + integrationData.getDataParams().getOriginCspId() + " -- " + integrationData.getDataParams().getCspId());
-            status = HttpStatus.OK;
-            return;
-        }
-        else {
-            LOG.debug("Event received from its origin, Remove proposals for new attributes if exist.");
-            JsonNode arrNode1 = localJsonNode.get("Event").get("ShadowAttribute");
-            if (arrNode1 != null && arrNode1.isArray()){
-                for (JsonNode jsonNode : arrNode1){
-                    LOG.debug("New Attribute proposal to remove: " + jsonNode.toString());
-                    try {
-                        mispAppClient.deleteMispProposal(jsonNode.get("id").textValue());
-                    } catch (StatusCodeException e){
-                        LOG.error("Deleting proposal failed. - {}: {} ",e.getStatusCode(), e.getMessage());
-                    }
-                }
-            }
+        if (!requestMethod.equals("DELETE")) {
+            try {
+                LOG.info("uuid {} Handle Event add/edit action", uuid);
+                // set "published":false
+                //((ObjectNode) jsonNode.get("Event")).put("published", new Boolean(false));
 
-            LOG.debug("Event received from its origin, Remove existing proposals from attributes if exist.");
-            JsonNode arrNode = localJsonNode.get("Event").get("Attribute");
-            if (arrNode != null && arrNode.isArray()){
-                for (JsonNode jsonNode : arrNode){
-                    JsonNode attrProposals = jsonNode.get("ShadowAttribute");
-                    if (attrProposals != null && attrProposals.isArray()){
-                        for (JsonNode jn : attrProposals){
-                            LOG.debug("Proposal from existing Attribute to remove: " + jn.toString());
+                if (!integrationData.getDataParams().getOriginCspId().equals(integrationData.getDataParams().getCspId())) {
+                    LOG.warn("uuid {} Cannot edit an event that I do not own! {} ", uuid, integrationData.getDataParams().getOriginCspId() + " -- " + integrationData.getDataParams().getCspId());
+                    lastStatus = HttpStatus.OK;
+                } else {
+                    LOG.info("Event received from its origin, Remove proposals for new attributes if exist.");
+                    JsonNode arrNode1 = jsonNode.get("Event").get("ShadowAttribute");
+                    if (arrNode1 != null && arrNode1.isArray()) {
+                        for (JsonNode jsonNode1 : arrNode1) {
+                            LOG.info("uuid {} New Attribute proposal to remove {} ", uuid,  jsonNode1.toString());
                             try {
-                                mispAppClient.deleteMispProposal(jn.get("id").textValue());
+                                mispAppClient.deleteMispProposal(jsonNode1.get("id").textValue());
                             } catch (StatusCodeException e){
-                                LOG.error("Deleting proposal from existing attribute failed. - {}: {} ",e.getStatusCode(), e.getMessage());
+                                LOG.error("uuid {} Deleting proposal failed. - {}: {} ", uuid,e.getStatusCode(), e.getMessage());
                             }
                         }
                     }
-                }
-            }
 
-            LOG.debug("Event received from its origin, Remove existing proposals from objects if exist.");
-            JsonNode arrNode3 = localJsonNode.get("Event").get("Object");
-            if (arrNode3 != null && arrNode3.isArray()){
-                for (JsonNode jsonNode : arrNode3){
-                    JsonNode attrProposals = jsonNode.get("Attribute");
-                    if (attrProposals != null && attrProposals.isArray()){
-                        for (JsonNode jsonNode3 : attrProposals){
-                            JsonNode attrProposals2 = jsonNode3.get("ShadowAttribute");
-                            if (attrProposals2 != null && attrProposals2.isArray()){
-                                for (JsonNode jn : attrProposals2){
-                                    LOG.debug("Proposal from existing Object Attribute to remove: " + jn.toString());
+                    LOG.info("Event {} -> Remove existing proposals from attributes if exist.", uuid);
+                    JsonNode arrNode = jsonNode.get("Event").get("Attribute");
+                    if (arrNode != null && arrNode.isArray()) {
+                        for (JsonNode jsonNode1 : arrNode) {
+                            JsonNode attrProposals = jsonNode1.get("ShadowAttribute");
+                            if (attrProposals != null && attrProposals.isArray()) {
+                                for (JsonNode jn : attrProposals) {
+                                    LOG.info("uuid {} Proposal from existing Attribute to remove:{} ", uuid,  jn.toString());
                                     try {
                                         mispAppClient.deleteMispProposal(jn.get("id").textValue());
                                     } catch (StatusCodeException e){
-                                        LOG.error("Deleting proposal from existing object attribute failed. - {}: {} ",e.getStatusCode(), e.getMessage());
+                                        LOG.error("uuid {} Deleting proposal failed. - {}: {} ", uuid,e.getStatusCode(), e.getMessage());
                                     }
                                 }
                             }
                         }
                     }
-                }
-            }
-        }
 
-        try {
-            // SXCSP-503: Change Distribution to one lower state (2 -> 1, 1 -> 0)
-            int eventDistributionLevel = getEventDistributionPolicyLevel(jsonNode);
-            if (eventDistributionLevel == 2 || eventDistributionLevel == 1)
-                ( (ObjectNode) jsonNode).findParent("distribution").put("distribution", String.valueOf(eventDistributionLevel-1));
-
-            ResponseEntity<String> responseEntity = mispAppClient.addMispEvent(jsonNode.toString());
-            eventCreatedUpdated = new ObjectMapper().readValue(responseEntity.getBody(), JsonNode.class);
-
-            if (Objects.nonNull(localJsonNode.get(EVENT.name())) && Objects.nonNull(localJsonNode.get(EVENT.name()).get("id"))){
-                localEventId = eventCreatedUpdated.get(EVENT.name()).get("id").textValue();
-            }
-
-            status = responseEntity.getStatusCode();
-            LOG.debug(responseEntity.toString());
-            LOG.debug("Event add action result: " + responseEntity.getStatusCode().toString());
-        } catch (IOException e){
-         LOG.error("Could not parse MISP response from addMispEvent - {}", e.getMessage());
-        } catch (StatusCodeException e) {
-            LOG.error(e.getMessage());
-            /*if (!integrationData.getDataParams().getOriginCspId().equals(integrationData.getDataParams().getCspId())){
-                LOG.debug("Cannot edit an event that I do not own. " + integrationData.getDataParams().getOriginCspId() + " -- " + integrationData.getDataParams().getCspId());
-                status = HttpStatus.OK;
-                return;
-            }*/
-            if (!e.getHttpHeaders().get("location").isEmpty()) {
-                String location = e.getHttpHeaders().get("location").get(0);
-                LOG.debug("location: " + location);
-                LOG.debug(jsonNode.toString());
-                try {
-                    ResponseEntity<String> responseEntity = mispAppClient.updateMispEvent(location, jsonNode.toString());
-                    status = responseEntity.getStatusCode();
-                    eventCreatedUpdated = new ObjectMapper().readValue(responseEntity.getBody(), JsonNode.class);
-                    if (eventCreatedUpdated.get("message") != null && eventCreatedUpdated.get("message").textValue().toLowerCase().equals("error")){
-                        LOG.warn("MISP responded to an updateMispEvent with {}", eventCreatedUpdated.toString());
-                        eventCreatedUpdated = jsonNode;
+                    LOG.info("Event {} ->  Remove existing proposals from objects if exist.", uuid);
+                    JsonNode arrNode3 = jsonNode.get("Event").get("Object");
+                    if (arrNode3 != null && arrNode3.isArray()) {
+                        for (JsonNode jsonNode1 : arrNode3) {
+                            JsonNode attrProposals = jsonNode1.get("Attribute");
+                            if (attrProposals != null && attrProposals.isArray()) {
+                                for (JsonNode jsonNode3 : attrProposals) {
+                                    JsonNode attrProposals2 = jsonNode3.get("ShadowAttribute");
+                                    if (attrProposals2 != null && attrProposals2.isArray()) {
+                                        for (JsonNode jn : attrProposals2) {
+                                            LOG.info("uuid {} Proposal from existing Object Attribute to remove:{} ", uuid,  jn.toString());
+                                            try {
+                                                mispAppClient.deleteMispProposal(jn.get("id").textValue());
+                                            } catch (StatusCodeException e){
+                                                LOG.error("uuid {} Deleting proposal failed. - {}: {} ", uuid,e.getStatusCode(), e.getMessage());
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
-                    LOG.debug("Event edit action result: " + responseEntity.getStatusCode().toString());
-                } catch (StatusCodeException e2){
-                    LOG.error("Updating event failed. - {}: {} ",e2.getStatusCode(), e2.getMessage());
-                } catch (IOException e2){
-                    LOG.error("Could not parse MISP response from updateMispEvent - {} ", e2.getMessage());
+
+                    try {
+                        // SXCSP-503: Change Distribution to one lower state (2 -> 1, 1 -> 0)
+                        JsonNode locatedNode = jsonNode.path(MispContextUrl.MispEntity.EVENT.toString()).path("distribution");
+                        final int eventDistributionLevel =  Integer.parseInt(locatedNode.textValue());;
+                        if (eventDistributionLevel == 2 || eventDistributionLevel == 1) {
+                            ((ObjectNode) jsonNode).findParent("distribution").put("distribution", String.valueOf(eventDistributionLevel - 1));
+                        }
+
+                        ResponseEntity<String> responseEntity = mispAppClient.addMispEvent(jsonNode.toString());
+                        responseJsonNode = mapper.readValue(responseEntity.getBody(), JsonNode.class);
+                        String responseEventId = safeExtractEventId(responseJsonNode);
+
+                        lastStatus = responseEntity.getStatusCode();
+                        LOG.debug("uuid {}, response -> {}, ",uuid, responseEntity.toString());
+                        LOG.info("Event {}  edit/add action result: {}", responseEventId,  responseEntity.getStatusCode().toString());
+                    } catch (StatusCodeException e) {
+                        LOG.error("Status exception {}", e.getMessage(), e);
+                        if (!e.getHttpHeaders().get("location").isEmpty()) {
+                            String location = e.getHttpHeaders().get("location").get(0);
+                            LOG.info("uuid {} redirect location: {} ", uuid,  location);
+                            ResponseEntity<String> responseEntity = mispAppClient.updateMispEvent(location, jsonNode.toString());
+                            lastStatus = responseEntity.getStatusCode();
+                            responseJsonNode = mapper.readValue(responseEntity.getBody(), JsonNode.class);
+                            if (responseJsonNode.get("message") != null && responseJsonNode.get("message").textValue().toLowerCase().equals("error")) {
+                                LOG.error("Retry of operation for uuid {} failed, error was {}", uuid, responseJsonNode.toString());
+                                responseJsonNode = jsonNode;
+                            }
+                            LOG.info("Event {} edit/add action result: {}", uuid, responseEntity.getStatusCode().toString());
+                        }
+                    }
                 }
+            } catch (IOException e) {
+                LOG.error("IO exception: {}", e.getMessage(), e);
+                //TODO deal with it
             }
         }
+
+        return new MispEventContext(responseJsonNode, lastStatus);
     }
-    private void handleShadowAttributeAdd(List<LinkedHashMap> eventShadowAttributes, String eventId){
 
-        LOG.debug("Handle shadow attributes");
+    private void extractShadowAttributes(List<LinkedHashMap> attributeShadowAttributes) {
+        attributeShadowAttributes.forEach(sa -> {
+            LOG.info("Attribute {} ",sa.toString());
 
-        eventShadowAttributes.forEach(shadowAttribute -> {
-            LOG.debug(shadowAttribute.toString());
-            String shadowAttributeJsonString = null;
+            // Get Attribute by UUID
+            String attrUuid1 = String.valueOf(sa.get("uuid"));
+            JsonNode attribute1 = mapper.createObjectNode();
+            LOG.info("Edit proposal request: {} ", attribute1.toString());
             try {
-                shadowAttributeJsonString = (new ObjectMapper()).writeValueAsString(shadowAttribute);
-                LOG.debug("Add proposal request: " + shadowAttributeJsonString);
-                ResponseEntity responseEntity = mispAppClient.addMispProposal(eventId ,shadowAttributeJsonString);
-                LOG.debug("Add proposal response: " + responseEntity.toString());
-            } catch (JsonProcessingException e) {
-                LOG.error("Could not parse shadowattribute: " + e);
-            } catch (StatusCodeException e) {
-                LOG.warn("Adding proposal failed - {}",e.getMessage());
-                String location = e.getHttpHeaders().get("location").get(0);
-                LOG.debug("" + location);
-                try {
-                    ResponseEntity responseEntity = mispAppClient.updateMispProposal(location, shadowAttributeJsonString);
-                    LOG.debug("Add proposal response: " + responseEntity.toString());
-                } catch (StatusCodeException e2) {
-                    LOG.error("Updating proposal failed - {}",e.getMessage());
-                }
+                attribute1 = mapper.readValue(mispAppClient.postMispAttribute(attrUuid1).getBody(), JsonNode.class);
+                LOG.info("Fetching local attribute: {} ", attribute1.toString());
+            } catch (IOException e2) {
+                LOG.error(e2.getMessage());
+            }
+            String attrId1 = attribute1.get("response").get("Attribute").get("id").textValue();
+            LOG.info("Attribute id: " + attrId1);
+            ObjectNode shadowAttributeRequestNode1 = mapper.createObjectNode();
+            String shadowAttributeJsonString1 = null;
+            try {
+                shadowAttributeJsonString1 = (mapper).writeValueAsString(sa);
+            } catch (JsonProcessingException e2) {
+                LOG.error(e2.getMessage());
+            }
+            try {
+                ShadowAttributeRequestDTO shadowAttributeRequest1 = new ShadowAttributeRequestDTO(new ShadowAttributeRequestDTO.AttributeRequest(sa));
+                String attrRequestStr1 = mapper.writeValueAsString(shadowAttributeRequest1);
+                ResponseEntity responseEntity1 = mispAppClient.updateMispProposal(attrId1, attrRequestStr1);
+                LOG.info("Edit proposal response: " + responseEntity1.toString());
+            } catch (StatusCodeException e2) {
+                LOG.error("Proposale processing fail {}", e2.getMessage());
+                String location1 = e2.getHttpHeaders().get("location").get(0);
+                LOG.info("Redirect location {} ",  location1);
+                ResponseEntity responseEntity1 = mispAppClient.updateMispProposal(location1, shadowAttributeJsonString1);
+                LOG.info("Edit proposal response: {}", responseEntity1.toString());
+            } catch (JsonProcessingException e2) {
+                LOG.error(e2.getMessage());
             }
         });
     }
 
-    private void handleShadowAttributeEdit(List<LinkedHashMap> attributeShadowAttributes){
+    private void handleVulnerabilityIntegration(IntegrationData integrationData) {
+        String uuid = integrationData.getDataParams().getOriginRecordId();
 
-        attributeShadowAttributes.forEach(shadowAttribute -> {
-            LOG.debug(shadowAttribute.toString());
+        LOG.info("Handle Vulnerability for {} if present.", uuid );
+        //Convert Integration Data to JSON
+        JsonNode vulnDataNode = mapper.convertValue(integrationData.getDataObject(), JsonNode.class);
 
-            // Get Attribute by UUID
-            String attrUuid = String.valueOf(shadowAttribute.get("uuid"));
-            JsonNode attribute = new ObjectMapper().createObjectNode();
-            LOG.debug("Edit proposal request: " + attribute.toString());
+        /**
+         * Issue: SXCSP-380: link vulnerability to event/threat just like RTIR
+         */
+        String title1 = "";
+        String url1 = "";
+        String recordId1 = "";
+        String originCspId1 = "";
+        String originRecordId1 = "";
+        String applicationId1 = MispContextUrl.VULNERABILITYEntity.APPLICATION_ID.toString();
 
-            try {
-                attribute = new ObjectMapper().readValue(mispAppClient.postMispAttribute(attrUuid).getBody(), JsonNode.class);
-                LOG.debug("Fetching local attribute: " + attribute.toString());
-            } catch (IOException e) {
-                LOG.error("Parsing the postMispAttribute response has failed - {}", e.getMessage());
-            } catch (StatusCodeException e){
-                LOG.error("Adding attribute failed - {}: {}", e.getStatusCode(), e.getMessage());
-            }
-            String attrId = attribute.get("response").get("Attribute").get("id").textValue();
-            LOG.debug("Attribute id: "  + attrId);
-            ObjectNode shadowAttributeRequestNode = new ObjectMapper().createObjectNode();
-            String shadowAttributeJsonString = null;
-            try {
-                shadowAttributeJsonString = (new ObjectMapper()).writeValueAsString(shadowAttribute);
-            } catch (JsonProcessingException e) {
-                LOG.error(e.getMessage());
-            }
-            try {
-                ShadowAttributeRequestDTO shadowAttributeRequest = new ShadowAttributeRequestDTO(new ShadowAttributeRequestDTO.AttributeRequest(shadowAttribute));
-                String attrRequestStr = new ObjectMapper().writeValueAsString(shadowAttributeRequest);
-                ResponseEntity responseEntity = mispAppClient.updateMispProposal(attrId , attrRequestStr);
-                LOG.debug("Edit proposal response: " + responseEntity.toString());
-            } catch (StatusCodeException e) {
-                LOG.warn("Editing proposal has failed - {}, {}", e.getStatusCode(), e.getMessage());
-                String location = e.getHttpHeaders().get("location").get(0);
-                LOG.debug("" + location);
-                try {
-                    ResponseEntity responseEntity = mispAppClient.updateMispProposal(location, shadowAttributeJsonString);
-                    LOG.debug("Edit proposal response:" + responseEntity.toString());
-                } catch (StatusCodeException e2) {
-                    LOG.error("Editing proposal has failed - {}, {}", e.getStatusCode(), e.getMessage());
+        if (vulnDataNode.get(EVENT.toString()).has("Object")) {
+            for (JsonNode jn1 : vulnDataNode.get(EVENT.toString()).get("Object")) {
+                if (jn1.get("name").textValue().toLowerCase().equals(MispContextUrl.VULNERABILITYEntity.VULNERABILITY_NAME.toString().toLowerCase())) {
+                    for (JsonNode ja : jn1.get("Attribute")) {
+                        if (ja.get("object_relation").textValue().toLowerCase().equals(MispContextUrl.VULNERABILITYEntity.MAP_CSP_URL_VALUE.toString().toLowerCase()) &&
+                                url1.length() == 0) {
+                            url1 = ja.get("value").textValue();
+                            LOG.debug("============VULNERABILITY url: " + url1);
+                        }
+                        if (ja.get("object_relation").textValue().toLowerCase().equals(MispContextUrl.VULNERABILITYEntity.MAP_ORIGIN_CSP_ID_VALUE.toString().toLowerCase()) &&
+                                originCspId1.length() == 0) {
+                            originCspId1 = ja.get("value").textValue();
+                            LOG.debug("============VULNERABILITY originCspId: " + originCspId1);
+                        }
+                        if (ja.get("object_relation").textValue().toLowerCase().equals(MispContextUrl.VULNERABILITYEntity.MAP_ORIGIN_RECORD_ID_VALUE.toString().toLowerCase()) &&
+                                originRecordId1.length() == 0) {
+                            originRecordId1 = ja.get("value").textValue();
+                            LOG.info("============VULNERABILITY originRecordId: " + originRecordId1);
+                        }
+                        if (ja.get("object_relation").textValue().toLowerCase().equals(MispContextUrl.VULNERABILITYEntity.MAP_TITLE_RELATION.toString().toLowerCase()) &&
+                                ja.get("category").toString().toLowerCase().equals(MispContextUrl.VULNERABILITYEntity.MAP_TITLE_CATEGORY.toString().toLowerCase()) &&
+                                title1.length() == 0) {
+                            title1 = ja.get("value").textValue();
+                            LOG.debug("============VULNERABILITY title: " + title1);
+                        }
+                        if (ja.get("object_relation").textValue().toLowerCase().equals(MispContextUrl.VULNERABILITYEntity.MAP_RECORD_RELATION.toString().toLowerCase()) &&
+                                ja.get("category").toString().toLowerCase().equals(MispContextUrl.VULNERABILITYEntity.MAP_RECORD_CATEGORY.toString().toLowerCase()) &&
+                                recordId1.length() == 0) {
+                            recordId1 = ja.get("value").textValue();
+                            LOG.info("uuid {} ==VULNERABILITY recordId: {} ", uuid, recordId1);
+                        }
                     }
-                } catch (JsonProcessingException e) {
-                    LOG.error(e.getMessage());
-                }
-            });
-        }
 
-        private IntegrationData handleRTIR(IntegrationData ilData) {
-            IntegrationData modifiedIlData = ilData;
+                    /**
+                     1. The adapter queries ES for the existence of an "incident" with the given origin cspid/appid/id
+                     2. If it finds such incidence, it rewrites the incidence url inside the RTIR object with the url that this incidence has in ES
+                     3. If not It deletes the url field
+                     4. It pushes the event with the rewriten RTIR fields to misp
+                     */
+                    String newURL = "";
+                    try {
+                        IntegrationData searchData = new IntegrationData();
+                        DataParams searchParams = new DataParams();
+                        searchParams.setOriginRecordId(originRecordId1);
+                        searchParams.setOriginApplicationId(applicationId1);
+                        searchParams.setOriginCspId(originCspId1);
 
-            //Convert Integration Data to JSON
-            JsonNode jsonNode = new ObjectMapper().convertValue(modifiedIlData.getDataObject(), JsonNode.class);
+                        searchData.setDataParams(searchParams);
+                        searchData.setDataType(IntegrationDataType.VULNERABILITY);
 
-            /**
-             * Issue: SXCSP-340, SXCSP-341
-             * Reference resolving in RTIR objects
-             */
-            String title = "";
-            String url = "";
-            String recordId = "";
-            String originCspId = "";
-            String originRecordId = "";
-            String applicationId = MispContextUrl.RTIREntity.APPLICATION_ID.toString();
-
-            if (jsonNode.get(EVENT.toString()).has("Object")) {
-                for (JsonNode jn : jsonNode.get(EVENT.toString()).get("Object")){
-                    if (jn.get("name").textValue().toLowerCase().equals(MispContextUrl.RTIREntity.RTIR_NAME.toString().toLowerCase())){
-                        for (JsonNode ja : jn.get("Attribute")){
-                            if (ja.get("object_relation").textValue().toLowerCase().equals(MispContextUrl.RTIREntity.MAP_CSP_URL_VALUE.toString().toLowerCase()) &&
-                                    url.length() == 0) {
-                                url = ja.get("value").textValue();
-                                LOG.debug("RTIR url: " + url);
-                            }
-                            if (ja.get("object_relation").textValue().toLowerCase().equals(MispContextUrl.RTIREntity.MAP_ORIGIN_CSP_ID_VALUE.toString().toLowerCase()) &&
-                                    originCspId.length() == 0) {
-                                originCspId = ja.get("value").textValue();
-                                LOG.debug("RTIR originCspId: " + originCspId);
-                            }
-                            if (ja.get("object_relation").textValue().toLowerCase().equals(MispContextUrl.RTIREntity.MAP_ORIGIN_RECORD_ID_VALUE.toString().toLowerCase()) &&
-                                    originRecordId.length() == 0) {
-                                originRecordId = ja.get("value").textValue();
-                                LOG.debug("RTIR originRecordId: " + originRecordId);
-                            }
-                            if (ja.get("object_relation").textValue().toLowerCase().equals(MispContextUrl.RTIREntity.MAP_TITLE.toString().toLowerCase()) &&
-                                    title.length() == 0) {
-                                title = ja.get("value").textValue();
-                                LOG.debug("RTIR title: " + title);
-                            }
-                            if (ja.get("object_relation").textValue().toLowerCase().equals(MispContextUrl.RTIREntity.MAP_TICKET_NO.toString().toLowerCase()) &&
-                                    recordId.length() == 0) {
-                                recordId = ja.get("value").textValue();
-                                LOG.debug("RTIR recordId: " + recordId);
-                            }
-                        }
-
-                        /**
-                         1. The adapter queries ES for the existence of an "incident" with the given origin cspid/appid/id
-                         2. If it finds such incidence, it rewrites the incidence url inside the RTIR object with the url that this incidence has in ES
-                         3. If not It deletes the url field
-                         4. It pushes the event with the rewriten RTIR fields to misp
-                         */
-                        String newURL = "";
-                        String newTickerNumber = "";
-
-                            IntegrationData searchData = new IntegrationData();
-                            DataParams searchParams = new DataParams();
-                            searchParams.setOriginRecordId(originRecordId);
-                            searchParams.setOriginApplicationId(applicationId);
-                            searchParams.setOriginCspId(originCspId);
-
-                            searchData.setDataParams(searchParams);
-                            searchData.setDataType(IntegrationDataType.INCIDENT);
-
-                        JsonNode esObject = null;
-                        try {
-                            esObject = elasticClient.getESobjectFromOrigin(searchData);
-                        } catch (IOException e) {
-                            LOG.error("Failed to get ES Object - {}", e.getMessage());
-                        }
+                        JsonNode esObject = elasticClient.getESobjectFromOrigin(searchData);
                         if (esObject != null) {
-                                LOG.debug("Found in elastic");
-                                newURL = esObject.get("dataParams").get("url").textValue();
+                            newURL = esObject.get("dataParams").get("url").textValue();
+                            LOG.info("ES FOUND uuid {} url {} ", uuid, newURL);
 
-                                /**
-                                 * SXCSP-386
-                                 */
-                                newTickerNumber = esObject.get("dataObject").get("id").textValue();
-                            }
-                            else {
-                                LOG.debug("NOT Found in elastic");
-                            }
-                            //replace
-                            for (JsonNode ja : jn.get("Attribute")){
-                                if (ja.get("object_relation").textValue().toLowerCase().equals(MispContextUrl.RTIREntity.MAP_CSP_URL_VALUE.toString().toLowerCase())) {
-                                    ((ObjectNode)ja).put("value",  newURL);
-                                }
-                                if (ja.get("object_relation").textValue().toLowerCase().equals(MispContextUrl.RTIREntity.MAP_TICKET_NO.toString().toLowerCase()) ) {
-                                    ((ObjectNode)ja).put("value",  newTickerNumber);
-                                }
-                            }
-
-                        LOG.debug("RTIR new URL: " + newURL);
-
-                    }
-                }
-            }
-
-            //update IntegrationData
-            modifiedIlData.setDataObject(jsonNode);
-            LOG.debug("MODIFIED IL DATA: " + modifiedIlData.toString());
-
-            return modifiedIlData;
-        }
-
-        private IntegrationData handleVulnerability(IntegrationData ilData) {
-            IntegrationData modifiedIlData = ilData;
-
-            //Convert Integration Data to JSON
-            JsonNode jsonNode = new ObjectMapper().convertValue(modifiedIlData.getDataObject(), JsonNode.class);
-
-            /**
-             * Issue: SXCSP-380: link vulnerability to event/threat just like RTIR
-             */
-            String title = "";
-            String url = "";
-            String recordId = "";
-            String originCspId = "";
-            String originRecordId = "";
-            String applicationId = MispContextUrl.VULNERABILITYEntity.APPLICATION_ID.toString();
-
-            if (jsonNode.get(EVENT.toString()).has("Object")) {
-                for (JsonNode jn : jsonNode.get(EVENT.toString()).get("Object")){
-                    if (jn.get("name").textValue().toLowerCase().equals(MispContextUrl.VULNERABILITYEntity.VULNERABILITY_NAME.toString().toLowerCase())){
-                        for (JsonNode ja : jn.get("Attribute")){
-                            if (ja.get("object_relation").textValue().toLowerCase().equals(MispContextUrl.VULNERABILITYEntity.MAP_CSP_URL_VALUE.toString().toLowerCase()) &&
-                                    url.length() == 0) {
-                                url = ja.get("value").textValue();
-                                LOG.debug("VULNERABILITY url: " + url);
-                            }
-                            if (ja.get("object_relation").textValue().toLowerCase().equals(MispContextUrl.VULNERABILITYEntity.MAP_ORIGIN_CSP_ID_VALUE.toString().toLowerCase()) &&
-                                    originCspId.length() == 0) {
-                                originCspId = ja.get("value").textValue();
-                                LOG.debug("VULNERABILITY originCspId: " + originCspId);
-                            }
-                            if (ja.get("object_relation").textValue().toLowerCase().equals(MispContextUrl.VULNERABILITYEntity.MAP_ORIGIN_RECORD_ID_VALUE.toString().toLowerCase()) &&
-                                    originRecordId.length() == 0) {
-                                originRecordId = ja.get("value").textValue();
-                                LOG.debug("VULNERABILITY originRecordId: " + originRecordId);
-                            }
-                            if (ja.get("object_relation").textValue().toLowerCase().equals(MispContextUrl.VULNERABILITYEntity.MAP_TITLE_RELATION.toString().toLowerCase()) &&
-                                    ja.get("category").toString().toLowerCase().equals(MispContextUrl.VULNERABILITYEntity.MAP_TITLE_CATEGORY.toString().toLowerCase()) &&
-                                    title.length() == 0) {
-                                title = ja.get("value").textValue();
-                                LOG.debug("VULNERABILITY title: " + title);
-                            }
-                            if (ja.get("object_relation").textValue().toLowerCase().equals(MispContextUrl.VULNERABILITYEntity.MAP_RECORD_RELATION.toString().toLowerCase()) &&
-                                    ja.get("category").toString().toLowerCase().equals(MispContextUrl.VULNERABILITYEntity.MAP_RECORD_CATEGORY.toString().toLowerCase()) &&
-                                    recordId.length() == 0) {
-                                recordId = ja.get("value").textValue();
-                                LOG.debug("VULNERABILITY recordId: " + recordId);
-                            }
+                            //newTickerNumber = esObject.get("dataObject").get("id").textValue();
+                        } else {
+                            LOG.info("ES NOT FOUND uuid {}", uuid);
                         }
-
-                        /**
-                         1. The adapter queries ES for the existence of an "incident" with the given origin cspid/appid/id
-                         2. If it finds such incidence, it rewrites the incidence url inside the RTIR object with the url that this incidence has in ES
-                         3. If not It deletes the url field
-                         4. It pushes the event with the rewriten RTIR fields to misp
-                         */
-                        String newURL = "";
-                        String newTickerNumber = "";
-                        try {
-                            IntegrationData searchData = new IntegrationData();
-                            DataParams searchParams = new DataParams();
-                            searchParams.setOriginRecordId(originRecordId);
-                            searchParams.setOriginApplicationId(applicationId);
-                            searchParams.setOriginCspId(originCspId);
-
-                            searchData.setDataParams(searchParams);
-                            searchData.setDataType(IntegrationDataType.VULNERABILITY);
-
-                            JsonNode esObject = elasticClient.getESobjectFromOrigin(searchData);
-                            if (esObject != null) {
-                                LOG.debug("FOUND TRUE");
-                                newURL = esObject.get("dataParams").get("url").textValue();
-                                //newTickerNumber = esObject.get("dataObject").get("id").textValue();
+                        //replace
+                        for (JsonNode ja : jn1.get("Attribute")) {
+                            if (ja.get("object_relation").textValue().toLowerCase().equals(MispContextUrl.VULNERABILITYEntity.MAP_CSP_URL_VALUE.toString().toLowerCase())) {
+                                ((ObjectNode) ja).put("value", newURL);
                             }
-                            else {
-                                LOG.debug("NOT FOUND");
-                            }
-                            //replace
-                            for (JsonNode ja : jn.get("Attribute")){
-                                if (ja.get("object_relation").textValue().toLowerCase().equals(MispContextUrl.VULNERABILITYEntity.MAP_CSP_URL_VALUE.toString().toLowerCase()) ) {
-                                    ((ObjectNode)ja).put("value",  newURL);
-                                }
                         /*
                         if (ja.get("object_relation").toString().toLowerCase().equals(MispContextUrl.VULNERABILITYEntity.MAP_RECORD_RELATION.toString().toLowerCase()) &&
                                 ja.get("category").toString().toLowerCase().equals(MispContextUrl.VULNERABILITYEntity.MAP_RECORD_CATEGORY.toString().toLowerCase()) ) {
                             ((ObjectNode)ja).put("value",  newTickerNumber);
                         }
                         */
-                            }
                         }
-                        catch (Exception e){
-                            LOG.debug(e.getMessage());
-                        }
-                        LOG.debug("VULNERABILITY new URL: " + newURL);
-                        //LOG.info("VULNERABILITY new ID: " + newTickerNumber);
+                    } catch (Exception e3) {
+                        LOG.error("Exception connecting to ES, error {}", e3.getMessage());
                     }
+                    //LOG.info("VULNERABILITY new ID: " + newTickerNumber);
+
                 }
             }
-
-            //update IntegrationData
-            modifiedIlData.setDataObject(jsonNode);
-
-            return modifiedIlData;
         }
 
-        private int getEventDistributionPolicyLevel(JsonNode jsonNode) {
-            JsonNode locatedNode = jsonNode.path(MispContextUrl.MispEntity.EVENT.toString()).path("distribution");
-            int level = Integer.parseInt(locatedNode.textValue());
-            return level;
+        //update IntegrationData
+        integrationData.setDataObject(vulnDataNode);
+    }
+
+    private void handleRTIRintegration(IntegrationData integrationData) {
+        /**
+         *Search and handle RTIR objects
+         */
+        String uuid = integrationData.getDataParams().getOriginRecordId();
+
+        LOG.info("Handle RTIR for uuid {} if present.", uuid);
+        //Convert Integration Data to JSON
+        JsonNode rtJsonNode = mapper.convertValue(integrationData.getDataObject(), JsonNode.class);
+
+        /**
+         * Issue: SXCSP-340, SXCSP-341
+         * Reference resolving in RTIR objects
+         */
+        String title = "";
+        String url = "";
+        String recordId = "";
+        String originCspId = "";
+        String originRecordId = "";
+        String applicationId = MispContextUrl.RTIREntity.APPLICATION_ID.toString();
+
+        if (rtJsonNode.get(EVENT.toString()).has("Object")) {
+            for (JsonNode jn1 : rtJsonNode.get(EVENT.toString()).get("Object")) {
+                if (jn1.get("name").textValue().toLowerCase().equals(MispContextUrl.RTIREntity.RTIR_NAME.toString().toLowerCase())) {
+                    for (JsonNode ja : jn1.get("Attribute")) {
+                        if (ja.get("object_relation").textValue().toLowerCase().equals(MispContextUrl.RTIREntity.MAP_CSP_URL_VALUE.toString().toLowerCase()) &&
+                                url.length() == 0) {
+                            url = ja.get("value").textValue();
+                            LOG.debug("============RTIR url: " + url);
+                        }
+                        if (ja.get("object_relation").textValue().toLowerCase().equals(MispContextUrl.RTIREntity.MAP_ORIGIN_CSP_ID_VALUE.toString().toLowerCase()) &&
+                                originCspId.length() == 0) {
+                            originCspId = ja.get("value").textValue();
+                            LOG.debug("============RTIR originCspId: " + originCspId);
+                        }
+                        if (ja.get("object_relation").textValue().toLowerCase().equals(MispContextUrl.RTIREntity.MAP_ORIGIN_RECORD_ID_VALUE.toString().toLowerCase()) &&
+                                originRecordId.length() == 0) {
+                            originRecordId = ja.get("value").textValue();
+                            LOG.debug("============RTIR originRecordId: " + originRecordId);
+                        }
+                        if (ja.get("object_relation").textValue().toLowerCase().equals(MispContextUrl.RTIREntity.MAP_TITLE.toString().toLowerCase()) &&
+                                title.length() == 0) {
+                            title = ja.get("value").textValue();
+                            LOG.info("============RTIR title: " + title);
+                        }
+                        if (ja.get("object_relation").textValue().toLowerCase().equals(MispContextUrl.RTIREntity.MAP_TICKET_NO.toString().toLowerCase()) &&
+                                recordId.length() == 0) {
+                            recordId = ja.get("value").textValue();
+                            LOG.info("uuid {} ====RTIR recordId: {} ", uuid,  recordId);
+                        }
+                    }
+
+
+                    /**
+                     1. The adapter queries ES for the existence of an "incident" with the given origin cspid/appid/id
+                     2. If it finds such incidence, it rewrites the incidence url inside the RTIR object with the url that this incidence has in ES
+                     3. If not It deletes the url field
+                     4. It pushes the event with the rewriten RTIR fields to misp
+                     */
+                    String newURL = "";
+                    String newTickerNumber = "";
+                    try {
+                        IntegrationData searchData = new IntegrationData();
+                        DataParams searchParams = new DataParams();
+                        searchParams.setOriginRecordId(originRecordId);
+                        searchParams.setOriginApplicationId(applicationId);
+                        searchParams.setOriginCspId(originCspId);
+
+                        searchData.setDataParams(searchParams);
+                        searchData.setDataType(IntegrationDataType.INCIDENT);
+
+                        JsonNode esObject = elasticClient.getESobjectFromOrigin(searchData);
+                        if (esObject != null) {
+                            LOG.info("Found in elastic");
+                            newURL = esObject.get("dataParams").get("url").textValue();
+
+                            /**
+                             * SXCSP-386
+                             */
+                            newTickerNumber = esObject.get("dataObject").get("id").textValue();
+                        } else {
+                            LOG.info("NOT Found in elastic");
+                        }
+                        //replace
+                        for (JsonNode ja : jn1.get("Attribute")) {
+                            if (ja.get("object_relation").textValue().toLowerCase().equals(MispContextUrl.RTIREntity.MAP_CSP_URL_VALUE.toString().toLowerCase())) {
+                                ((ObjectNode) ja).put("value", newURL);
+                            }
+                            if (ja.get("object_relation").textValue().toLowerCase().equals(MispContextUrl.RTIREntity.MAP_TICKET_NO.toString().toLowerCase())) {
+                                ((ObjectNode) ja).put("value", newTickerNumber);
+                            }
+                        }
+                    } catch (Exception e3) {
+                        LOG.error(e3.getMessage());
+                    }
+                    LOG.info("RTIR new URL: " + newURL);
+
+                }
+            }
         }
 
+        //update IntegrationData
+        integrationData.setDataObject(rtJsonNode);
+        LOG.debug("MODIFIED IL DATA: " + integrationData.toString());
+
+        //--- end rtir
+    }
+
+    private String safeExtractEventId(JsonNode jsonNode) {
+        if (Objects.nonNull(jsonNode.get(EVENT.name())) && Objects.nonNull(jsonNode.get(EVENT.name()).get("id"))) {
+            return jsonNode.get(EVENT.name()).get("id").textValue();
+        }
+        LOG.error("Using " + jsonNode.toString() + " no event Id could be extracted. ");
+        return "";
+    }
+
+    static class MispEventContext {
+        private JsonNode node;
+        private HttpStatus status;
+
+        MispEventContext(JsonNode node, HttpStatus status) {
+            this.node = node;
+            this.status = status;
+        }
+
+        public JsonNode getNode() {
+            return node;
+        }
+
+        public void setNode(JsonNode node) {
+            this.node = node;
+        }
+
+        public HttpStatus getStatus() {
+            return status;
+        }
+
+        public void setStatus(HttpStatus status) {
+            this.status = status;
+        }
 
     }
+
+}

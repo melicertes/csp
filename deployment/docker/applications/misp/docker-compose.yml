@@ -38,7 +38,7 @@ services:
         hostname: csp-misp_adapter
         env_file:
             - .env
-        command: sh -c "while [ ! -f /run/secrets/authkey ]; do echo "Waiting..." ; sleep 1 ; done && java -Xmx512m -Dspring.profiles.active=docker -Dmisp.app.authorization.key=$$(cat /run/secrets/authkey) -jar server.jar"
+        command: sh -c "while [ ! -f /run/secrets/authkey ]; do echo \"/run/secrets/authkey not found yet, waiting...\" ; sleep 5 ; done && java -Xmx512m -Dspring.profiles.active=docker -Dmisp.app.authorization.key=$$(cat /run/secrets/authkey) -jar server.jar"
         working_dir: /opt/csp
         volumes:
             - ./misp-server-4.0.0-SNAPSHOT-exec.jar:/opt/csp/server.jar
@@ -79,7 +79,7 @@ services:
             - ./misp-proxy/:/opt/misp-proxy/
             - MISPSharedDatavolume:/run/secrets
         working_dir: /opt/misp-proxy
-        command: sh -c "while [ ! -f /run/secrets/authkey ]; do echo "Waiting..." ; sleep 1 ; done && npm install && node proxy.js"
+        command: sh -c "while [ ! -f /run/secrets/authkey ]; do echo \"/run/secrets/authkey not found yet, waiting...\" ; sleep 1 ; done && npm install && node proxy.js"
 
 
 volumes:
