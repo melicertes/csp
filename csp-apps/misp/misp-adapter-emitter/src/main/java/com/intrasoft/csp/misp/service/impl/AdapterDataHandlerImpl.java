@@ -191,7 +191,11 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler {
                     if (arrNode1 != null && arrNode1.isArray()) {
                         for (JsonNode jsonNode1 : arrNode1) {
                             LOG.info("uuid {} New Attribute proposal to remove {} ", uuid,  jsonNode1.toString());
-                            mispAppClient.deleteMispProposal(jsonNode1.get("id").textValue());
+                            try {
+                                mispAppClient.deleteMispProposal(jsonNode1.get("id").textValue());
+                            } catch (StatusCodeException e){
+                                LOG.error("uuid {} Deleting proposal failed. - {}: {} ", uuid,e.getStatusCode(), e.getMessage());
+                            }
                         }
                     }
 
@@ -203,7 +207,11 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler {
                             if (attrProposals != null && attrProposals.isArray()) {
                                 for (JsonNode jn : attrProposals) {
                                     LOG.info("uuid {} Proposal from existing Attribute to remove:{} ", uuid,  jn.toString());
-                                    mispAppClient.deleteMispProposal(jn.get("id").textValue());
+                                    try {
+                                        mispAppClient.deleteMispProposal(jn.get("id").textValue());
+                                    } catch (StatusCodeException e){
+                                        LOG.error("uuid {} Deleting proposal failed. - {}: {} ", uuid,e.getStatusCode(), e.getMessage());
+                                    }
                                 }
                             }
                         }
@@ -220,7 +228,11 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler {
                                     if (attrProposals2 != null && attrProposals2.isArray()) {
                                         for (JsonNode jn : attrProposals2) {
                                             LOG.info("uuid {} Proposal from existing Object Attribute to remove:{} ", uuid,  jn.toString());
-                                            mispAppClient.deleteMispProposal(jn.get("id").textValue());
+                                            try {
+                                                mispAppClient.deleteMispProposal(jn.get("id").textValue());
+                                            } catch (StatusCodeException e){
+                                                LOG.error("uuid {} Deleting proposal failed. - {}: {} ", uuid,e.getStatusCode(), e.getMessage());
+                                            }
                                         }
                                     }
                                 }

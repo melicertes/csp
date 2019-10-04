@@ -113,7 +113,7 @@ public class MispAppClientImpl implements MispAppClient, MispContextUrl {
         HttpEntity<?> request = new HttpEntity<>(headers);
         ResponseEntity<String> response = retryRestTemplate.exchange(url, HttpMethod.DELETE, request, String.class);
 
-        LOG.debug(response.toString());
+       // LOG.debug(response.toString());
         retryRestTemplate.delete(url);
 
         return response;
