@@ -3,12 +3,12 @@ MAINTAINER Christos Panagiotou
 
 # Install core components
 ENV DEBIAN_FRONTEND noninteractive
-RUN apt-get update && apt-get dist-upgrade -y && apt-get autoremove -y && apt-get clean
-RUN apt-get install -y software-properties-common postfix mysql-client curl gcc git gnupg-agent make python openssl redis-server sudo vim zip locales
+RUN apt-get update && apt-get dist-upgrade -y && apt-get autoremove -y \
+  && apt-get install -y software-properties-common postfix mysql-client curl gcc git gnupg-agent make python openssl redis-server sudo vim zip locales && apt clean
 
 RUN locale-gen en_US.UTF-8
 ENV LANG en_US.UTF-8
-RUN add-apt-repository -y ppa:ondrej/php && apt-get update
+RUN LC_ALL=C.UTF-8 add-apt-repository -y ppa:ondrej/php && apt-get update
 
 # Apache
 RUN apt-get install -y apache2 apache2-doc apache2-utils
@@ -16,7 +16,10 @@ RUN a2dismod status
 RUN a2dissite 000-default
 
 # PHP 7.2
-RUN apt-get install -y libapache2-mod-php php7.2 php7.2-cli php-crypt-gpg php7.2-dev php7.2-json php7.2-mysql php7.2-opcache php7.2-readline php7.2-redis php7.2-xml php-pear pkg-config libbson-1.0 libmongoc-1.0-0 php-xml php-dev php-gd php-mysql
+RUN apt-get install -y libapache2-mod-php php7.2 php7.2-cli php-crypt-gpg \
+      php7.2-dev php7.2-json php7.2-mysql php7.2-opcache \
+      php7.2-readline php7.2-redis php7.2-xml php-pear pkg-config \
+      libbson-1.0 libmongoc-1.0-0 php-xml php-dev php-gd php-mysql && apt clean
 
 # Fix php.ini with recommended settings
 RUN sed -i "s/max_execution_time = 30/max_execution_time = 300/" /etc/php/7.2/apache2/php.ini
@@ -24,8 +27,7 @@ RUN sed -i "s/memory_limit = 128M/memory_limit = 512M/" /etc/php/7.2/apache2/php
 RUN sed -i "s/upload_max_filesize = 2M/upload_max_filesize = 50M/" /etc/php/7.2/apache2/php.ini
 RUN sed -i "s/post_max_size = 8M/post_max_size = 50M/" /etc/php/7.2/apache2/php.ini
 
-RUN apt-get install -y python-dev python-pip libxml2-dev libxslt1-dev zlib1g-dev python-setuptools cron logrotate supervisor syslog-ng-core
-RUN apt-get clean
+RUN apt-get install -y python-dev python-pip libxml2-dev libxslt1-dev zlib1g-dev python-setuptools cron logrotate supervisor syslog-ng-core && apt-get clean
 
 WORKDIR /var/www
 RUN chown www-data:www-data /var/www
@@ -134,6 +136,8 @@ RUN pip install --upgrade pip
 # END FIX
 RUN git clone https://github.com/MISP/misp-modules.git
 WORKDIR /opt/misp-modules
+# fix pip3 caching
+RUN echo "[global]" > /etc/pip.conf && echo "no-cache-dir = false" >> /etc/pip.conf
 RUN pip3 install --upgrade pip
 RUN cat REQUIREMENTS | sed 's/aiohttp==3.4.4/aiohttp/g' > REQUIREMENTS
 RUN pip3 install --upgrade --ignore-installed urllib3
