@@ -14,6 +14,10 @@ public class RestErrorDTO {
     
     private String status;
 
+    private String name;
+    private String errors;
+    private String url;
+
     public RestErrorDTO() {
     }
 
@@ -65,6 +69,30 @@ public class RestErrorDTO {
         this.status = status;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getErrors() {
+        return errors;
+    }
+
+    public void setErrors(String errors) {
+        this.errors = errors;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
     @Override
     public String toString() {
         return "RestErrorDTO{" +
@@ -74,6 +102,9 @@ public class RestErrorDTO {
                 ", message='" + message + '\'' +
                 ", timestamp='" + timestamp + '\'' +
                 ", status='" + status + '\'' +
+                ", name='" + name + '\'' +
+                ", errors='" + errors + '\'' +
+                ", url='" + url + '\'' +
                 '}';
     }
 }

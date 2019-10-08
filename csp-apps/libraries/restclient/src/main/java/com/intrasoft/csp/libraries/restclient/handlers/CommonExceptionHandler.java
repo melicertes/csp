@@ -105,6 +105,9 @@ public class CommonExceptionHandler implements ResponseErrorHandler {
                 final HttpHeaders httpHeaders = response.getHeaders();
                 final RestErrorDTO errorDTO;
 
+                String responseBodyString = new String(responseBody, charset);
+                LOGGER.debug("CLIENT Error Response body: {}", responseBodyString);
+
                 if(getAvoidRetryOnStatusCodeMap()!=null) {
                     Integer statusCodeValue = statusCode.value();
                     String statusCodeMessage = getAvoidRetryOnStatusCodeMap().get(statusCodeValue);
@@ -121,7 +124,7 @@ public class CommonExceptionHandler implements ResponseErrorHandler {
                     //It is an Unknown Exception
                     //Throw Default Exception
                     final HttpClientErrorException clientErrorException = new HttpClientErrorException(statusCode, statusText, httpHeaders, responseBody, charset);
-                    LOGGER.error("Unknown Exception: " + clientErrorException.getMessage());
+                    LOGGER.error("Unknown Exception: " + clientErrorException.getMessage() + new String(responseBody, charset));
                     throw clientErrorException;
                 }
 

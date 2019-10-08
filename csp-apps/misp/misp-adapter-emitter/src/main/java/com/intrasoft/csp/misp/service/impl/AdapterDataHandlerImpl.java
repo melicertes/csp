@@ -142,13 +142,20 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler {
                 ResponseEntity responseEntity = mispAppClient.addMispProposal(eventId, shadowAttributeJsonString);
                 LOG.info("{} Add proposal response: {}", uuid, responseEntity.toString());
             } catch (JsonProcessingException e1) {
-                LOG.error("Could not parse shadow attribute {} ", e1.getMessage(), e1);
+                LOG.error("Could not parse shadow attribute for eventId {} -> {}: {} ",eventId, e1.getMessage(), e1);
             } catch (StatusCodeException e2) {
-                LOG.error("Status exception {}", e2.getMessage(), e2);
-                String location = e2.getHttpHeaders().get("location").get(0);
-                LOG.info("Possible redirect location found for attribute: {} -> {}", shadowAttribute,  location);
-                ResponseEntity responseEntity = mispAppClient.updateMispProposal(location, shadowAttributeJsonString);
-                LOG.info("{} Add proposal response: {}", uuid, responseEntity.toString());
+                if (Objects.nonNull(e2.getHttpHeaders().get("location"))){
+                    String location = e2.getHttpHeaders().get("location").get(0);
+                    LOG.info("Redirect location found for attribute: {} -> {}", shadowAttribute,  location);
+                    try {
+                        ResponseEntity responseEntity = mispAppClient.updateMispProposal(location, shadowAttributeJsonString);
+                        LOG.info("{} Add proposal response: {}", uuid, responseEntity.toString());
+                    } catch (StatusCodeException e3){
+                        LOG.error("Update MISP proposal for location {} failed -> {}: {}",location, e3.getStatusCode(), e3.getMessage());
+                    }
+                } else {
+                    LOG.error("Proposal could not be added for the event with uuid: {} -> {}: {}",uuid, e2.getStatusCode(), e2.getMessage());
+                }
             }
         });
 
@@ -183,15 +190,20 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler {
                 //((ObjectNode) jsonNode.get("Event")).put("published", new Boolean(false));
 
                 if (!integrationData.getDataParams().getOriginCspId().equals(integrationData.getDataParams().getCspId())) {
-                    LOG.warn("uuid {} Cannot edit an event that I do not own! {} ", uuid, integrationData.getDataParams().getOriginCspId() + " -- " + integrationData.getDataParams().getCspId());
+                    LOG.warn("uuid: {} Cannot edit an event that I do not own! {} -- {} ", uuid, integrationData.getDataParams().getOriginCspId(), integrationData.getDataParams().getCspId());
                     lastStatus = HttpStatus.OK;
                 } else {
-                    LOG.info("Event received from its origin, Remove proposals for new attributes if exist.");
+                    LOG.info("Event received from its creator, Remove proposals for new attributes if exist.");
                     JsonNode arrNode1 = jsonNode.get("Event").get("ShadowAttribute");
                     if (arrNode1 != null && arrNode1.isArray()) {
                         for (JsonNode jsonNode1 : arrNode1) {
                             LOG.info("uuid {} New Attribute proposal to remove {} ", uuid,  jsonNode1.toString());
-                            mispAppClient.deleteMispProposal(jsonNode1.get("id").textValue());
+                            try {
+                                mispAppClient.deleteMispProposal(jsonNode1.get("id").textValue());
+                            } catch (StatusCodeException e){
+                                LOG.error("Could not delete proposal for a new attribute -> {}: {}", e.getStatusCode(), e.getMessage());
+                            }
+
                         }
                     }
 
@@ -203,7 +215,12 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler {
                             if (attrProposals != null && attrProposals.isArray()) {
                                 for (JsonNode jn : attrProposals) {
                                     LOG.info("uuid {} Proposal from existing Attribute to remove:{} ", uuid,  jn.toString());
-                                    mispAppClient.deleteMispProposal(jn.get("id").textValue());
+                                    try {
+                                        mispAppClient.deleteMispProposal(jn.get("id").textValue());
+                                    } catch (StatusCodeException e){
+                                        LOG.error("Could not delete proposal for existing attribute -> {}: {}", e.getStatusCode(), e.getMessage());
+                                    }
+
                                 }
                             }
                         }
@@ -220,7 +237,11 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler {
                                     if (attrProposals2 != null && attrProposals2.isArray()) {
                                         for (JsonNode jn : attrProposals2) {
                                             LOG.info("uuid {} Proposal from existing Object Attribute to remove:{} ", uuid,  jn.toString());
-                                            mispAppClient.deleteMispProposal(jn.get("id").textValue());
+                                            try {
+                                                mispAppClient.deleteMispProposal(jn.get("id").textValue());
+                                            } catch (StatusCodeException e){
+                                                LOG.error("Could not delete proposal for an object's attribute -> {}: {}", e.getStatusCode(), e.getMessage());
+                                            }
                                         }
                                     }
                                 }
@@ -244,23 +265,28 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler {
                         LOG.debug("uuid {}, response -> {}, ",uuid, responseEntity.toString());
                         LOG.info("Event {}  edit/add action result: {}", responseEventId,  responseEntity.getStatusCode().toString());
                     } catch (StatusCodeException e) {
-                        LOG.error("Status exception {}", e.getMessage(), e);
                         if (!e.getHttpHeaders().get("location").isEmpty()) {
                             String location = e.getHttpHeaders().get("location").get(0);
                             LOG.info("uuid {} redirect location: {} ", uuid,  location);
-                            ResponseEntity<String> responseEntity = mispAppClient.updateMispEvent(location, jsonNode.toString());
-                            lastStatus = responseEntity.getStatusCode();
-                            responseJsonNode = mapper.readValue(responseEntity.getBody(), JsonNode.class);
-                            if (responseJsonNode.get("message") != null && responseJsonNode.get("message").textValue().toLowerCase().equals("error")) {
-                                LOG.error("Retry of operation for uuid {} failed, error was {}", uuid, responseJsonNode.toString());
-                                responseJsonNode = jsonNode;
+                            try {
+                                ResponseEntity<String> responseEntity = mispAppClient.updateMispEvent(location, jsonNode.toString());
+                                lastStatus = responseEntity.getStatusCode();
+                                responseJsonNode = mapper.readValue(responseEntity.getBody(), JsonNode.class);
+                                if (responseJsonNode.get("message") != null && responseJsonNode.get("message").textValue().toLowerCase().equals("error")) {
+                                    LOG.error("Retry of operation for uuid {} failed, error was {}", uuid, responseJsonNode.toString());
+                                    responseJsonNode = jsonNode;
+                                }
+                                LOG.info("Event {} edit/add action result: {}", uuid, responseEntity.getStatusCode().toString());
+                            } catch (StatusCodeException e2){
+                                LOG.error("Updating event failed -> {}: {}", e2.getStatusCode(), e2.getMessage());
                             }
-                            LOG.info("Event {} edit/add action result: {}", uuid, responseEntity.getStatusCode().toString());
+                        } else {
+                            LOG.error("Location not present in the MISP response");
                         }
                     }
                 }
             } catch (IOException e) {
-                LOG.error("IO exception: {}", e.getMessage(), e);
+                LOG.error("IO exception: {}", e.getMessage());
                 //TODO deal with it
             }
         }
@@ -279,8 +305,10 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler {
             try {
                 attribute1 = mapper.readValue(mispAppClient.postMispAttribute(attrUuid1).getBody(), JsonNode.class);
                 LOG.info("Fetching local attribute: {} ", attribute1.toString());
-            } catch (IOException e2) {
-                LOG.error(e2.getMessage());
+            } catch (StatusCodeException e) {
+                LOG.error("Adding MISP attribute for {} failed with -> {}: {}",attrUuid1, e.getStatusCode(), e.getMessage());
+            } catch (IOException e) {
+                LOG.error("Parsing MISP response for uuid: {} has failed -> {}",attrUuid1, e.getMessage());
             }
             String attrId1 = attribute1.get("response").get("Attribute").get("id").textValue();
             LOG.info("Attribute id: " + attrId1);
@@ -297,11 +325,16 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler {
                 ResponseEntity responseEntity1 = mispAppClient.updateMispProposal(attrId1, attrRequestStr1);
                 LOG.info("Edit proposal response: " + responseEntity1.toString());
             } catch (StatusCodeException e2) {
-                LOG.error("Proposale processing fail {}", e2.getMessage());
+                LOG.error("Proposal processing for {} failed -> {}: {}",attrId1, e2.getStatusCode(), e2.getMessage());
                 String location1 = e2.getHttpHeaders().get("location").get(0);
                 LOG.info("Redirect location {} ",  location1);
-                ResponseEntity responseEntity1 = mispAppClient.updateMispProposal(location1, shadowAttributeJsonString1);
-                LOG.info("Edit proposal response: {}", responseEntity1.toString());
+                try {
+                    ResponseEntity responseEntity1 = mispAppClient.updateMispProposal(location1, shadowAttributeJsonString1);
+                    LOG.info("Edit proposal response: {}", responseEntity1.toString());
+                } catch (StatusCodeException e3){
+                    LOG.error("Updating MISP proposal for {} failed for second time -> {}: {}", location1, e3.getStatusCode(), e3.getMessage());
+                }
+
             } catch (JsonProcessingException e2) {
                 LOG.error(e2.getMessage());
             }
@@ -332,29 +365,29 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler {
                         if (ja.get("object_relation").textValue().toLowerCase().equals(MispContextUrl.VULNERABILITYEntity.MAP_CSP_URL_VALUE.toString().toLowerCase()) &&
                                 url1.length() == 0) {
                             url1 = ja.get("value").textValue();
-                            LOG.debug("============VULNERABILITY url: " + url1);
+                            LOG.debug("VULNERABILITY url: " + url1);
                         }
                         if (ja.get("object_relation").textValue().toLowerCase().equals(MispContextUrl.VULNERABILITYEntity.MAP_ORIGIN_CSP_ID_VALUE.toString().toLowerCase()) &&
                                 originCspId1.length() == 0) {
                             originCspId1 = ja.get("value").textValue();
-                            LOG.debug("============VULNERABILITY originCspId: " + originCspId1);
+                            LOG.debug("VULNERABILITY originCspId: " + originCspId1);
                         }
                         if (ja.get("object_relation").textValue().toLowerCase().equals(MispContextUrl.VULNERABILITYEntity.MAP_ORIGIN_RECORD_ID_VALUE.toString().toLowerCase()) &&
                                 originRecordId1.length() == 0) {
                             originRecordId1 = ja.get("value").textValue();
-                            LOG.info("============VULNERABILITY originRecordId: " + originRecordId1);
+                            LOG.info("VULNERABILITY originRecordId: " + originRecordId1);
                         }
                         if (ja.get("object_relation").textValue().toLowerCase().equals(MispContextUrl.VULNERABILITYEntity.MAP_TITLE_RELATION.toString().toLowerCase()) &&
                                 ja.get("category").toString().toLowerCase().equals(MispContextUrl.VULNERABILITYEntity.MAP_TITLE_CATEGORY.toString().toLowerCase()) &&
                                 title1.length() == 0) {
                             title1 = ja.get("value").textValue();
-                            LOG.debug("============VULNERABILITY title: " + title1);
+                            LOG.debug("VULNERABILITY title: " + title1);
                         }
                         if (ja.get("object_relation").textValue().toLowerCase().equals(MispContextUrl.VULNERABILITYEntity.MAP_RECORD_RELATION.toString().toLowerCase()) &&
                                 ja.get("category").toString().toLowerCase().equals(MispContextUrl.VULNERABILITYEntity.MAP_RECORD_CATEGORY.toString().toLowerCase()) &&
                                 recordId1.length() == 0) {
                             recordId1 = ja.get("value").textValue();
-                            LOG.info("uuid {} ==VULNERABILITY recordId: {} ", uuid, recordId1);
+                            LOG.info("uuid {} VULNERABILITY recordId: {} ", uuid, recordId1);
                         }
                     }
 
@@ -437,22 +470,22 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler {
                         if (ja.get("object_relation").textValue().toLowerCase().equals(MispContextUrl.RTIREntity.MAP_CSP_URL_VALUE.toString().toLowerCase()) &&
                                 url.length() == 0) {
                             url = ja.get("value").textValue();
-                            LOG.debug("============RTIR url: " + url);
+                            LOG.debug("RTIR url: " + url);
                         }
                         if (ja.get("object_relation").textValue().toLowerCase().equals(MispContextUrl.RTIREntity.MAP_ORIGIN_CSP_ID_VALUE.toString().toLowerCase()) &&
                                 originCspId.length() == 0) {
                             originCspId = ja.get("value").textValue();
-                            LOG.debug("============RTIR originCspId: " + originCspId);
+                            LOG.debug("RTIR originCspId: " + originCspId);
                         }
                         if (ja.get("object_relation").textValue().toLowerCase().equals(MispContextUrl.RTIREntity.MAP_ORIGIN_RECORD_ID_VALUE.toString().toLowerCase()) &&
                                 originRecordId.length() == 0) {
                             originRecordId = ja.get("value").textValue();
-                            LOG.debug("============RTIR originRecordId: " + originRecordId);
+                            LOG.debug("RTIR originRecordId: " + originRecordId);
                         }
                         if (ja.get("object_relation").textValue().toLowerCase().equals(MispContextUrl.RTIREntity.MAP_TITLE.toString().toLowerCase()) &&
                                 title.length() == 0) {
                             title = ja.get("value").textValue();
-                            LOG.info("============RTIR title: " + title);
+                            LOG.info("RTIR title: " + title);
                         }
                         if (ja.get("object_relation").textValue().toLowerCase().equals(MispContextUrl.RTIREntity.MAP_TICKET_NO.toString().toLowerCase()) &&
                                 recordId.length() == 0) {
@@ -518,8 +551,8 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler {
     }
 
     private String safeExtractEventId(JsonNode jsonNode) {
-        if (Objects.nonNull(jsonNode.get(EVENT.name())) && Objects.nonNull(jsonNode.get(EVENT.name()).get("id"))) {
-            return jsonNode.get(EVENT.name()).get("id").textValue();
+        if (Objects.nonNull(jsonNode.get(EVENT.toString())) && Objects.nonNull(jsonNode.get(EVENT.toString()).get("id"))) {
+            return jsonNode.get(EVENT.toString()).get("id").textValue();
         }
         LOG.error("Using " + jsonNode.toString() + " no event Id could be extracted. ");
         return "";
