@@ -1,45 +1,10 @@
-FROM csp-alpine35glibc:1.0 as builder_2.4.107
-
-RUN apk add --no-cache git
-WORKDIR /var/www
-#RUN chown www-data:www-data /var/www
-#USER www-data
-RUN git clone https://github.com/MISP/MISP.git
-WORKDIR /var/www/MISP
-#RUN git checkout tags/$(git describe --tags `git rev-list --tags --max-count=1000`)
-RUN git checkout tags/$(git describe --tags v2.4.107)
-RUN git config core.filemode false
-
-WORKDIR /var/www/MISP/app/files/scripts
-RUN git clone https://github.com/CybOXProject/python-cybox.git
-RUN git clone https://github.com/STIXProject/python-stix.git
-
-WORKDIR /var/www/MISP/app/files/scripts/python-cybox
-RUN git checkout v2.1.0.12
-
-#USER www-data
-WORKDIR /var/www/MISP/app/files/scripts/python-stix
-RUN git checkout v1.1.1.4
-
-#USER www-data
-WORKDIR /var/www/MISP
-RUN git submodule init
-RUN git submodule update
-
-# Install MISP Modules
-WORKDIR /opt
-RUN git clone https://github.com/MISP/misp-modules.git
-
-
 FROM ubuntu:xenial
 MAINTAINER Christos Panagiotou
 
 # Install core components
 ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get update && apt-get dist-upgrade -y && apt-get autoremove -y && apt-get clean
-RUN apt-get install -y software-properties-common
-RUN apt-get install -y postfix
-RUN apt-get install -y mysql-client curl gcc git gnupg-agent make python openssl redis-server sudo vim zip locales
+RUN apt-get install -y software-properties-common postfix mysql-client curl gcc git gnupg-agent make python openssl redis-server sudo vim zip locales
 
 RUN locale-gen en_US.UTF-8
 ENV LANG en_US.UTF-8
@@ -51,7 +16,7 @@ RUN a2dismod status
 RUN a2dissite 000-default
 
 # PHP 7.2
-RUN apt-get install -y libapache2-mod-php php7.2 php7.2-cli php-crypt-gpg php7.2-dev php7.2-json php7.2-mysql php7.2-opcache php7.2-readline php7.2-redis php7.2-xml git
+RUN apt-get install -y libapache2-mod-php php7.2 php7.2-cli php-crypt-gpg php7.2-dev php7.2-json php7.2-mysql php7.2-opcache php7.2-readline php7.2-redis php7.2-xml php-pear pkg-config libbson-1.0 libmongoc-1.0-0 php-xml php-dev php-gd php-mysql
 
 # Fix php.ini with recommended settings
 RUN sed -i "s/max_execution_time = 30/max_execution_time = 300/" /etc/php/7.2/apache2/php.ini
@@ -59,27 +24,42 @@ RUN sed -i "s/memory_limit = 128M/memory_limit = 512M/" /etc/php/7.2/apache2/php
 RUN sed -i "s/upload_max_filesize = 2M/upload_max_filesize = 50M/" /etc/php/7.2/apache2/php.ini
 RUN sed -i "s/post_max_size = 8M/post_max_size = 50M/" /etc/php/7.2/apache2/php.ini
 
-RUN apt-get install -y python-dev python-pip libxml2-dev libxslt1-dev zlib1g-dev python-setuptools
-RUN apt-get install -y cron logrotate supervisor syslog-ng-core
+RUN apt-get install -y python-dev python-pip libxml2-dev libxslt1-dev zlib1g-dev python-setuptools cron logrotate supervisor syslog-ng-core
 RUN apt-get clean
 
 WORKDIR /var/www
-
+RUN chown www-data:www-data /var/www
 USER www-data
-COPY --from=builder_2.4.107 /var/www/ .
+RUN git clone https://github.com/MISP/MISP.git
+WORKDIR /var/www/MISP
+RUN git checkout tags/$(git describe --tags `git rev-list --tags --max-count=1`)
+RUN git config core.filemode false
+RUN git submodule update --init --recursive
+# Make git ignore filesystem permission differences for submodules
+RUN git submodule foreach --recursive git config core.filemode false
+
+WORKDIR /var/www/MISP/app/files/scripts
+RUN git clone https://github.com/CybOXProject/python-cybox.git
+RUN git clone https://github.com/STIXProject/python-stix.git
 
 WORKDIR /var/www/MISP/app/files/scripts/python-cybox
+RUN git checkout v2.1.0.12
 USER root
 RUN python setup.py install
 
 USER www-data
 WORKDIR /var/www/MISP/app/files/scripts/python-stix
+RUN git checkout v1.1.1.4
 USER root
 RUN python setup.py install
-RUN chown -R www-data:www-data /var/www
 
 USER www-data
+WORKDIR /var/www/MISP
+RUN git submodule init
+RUN git submodule update
 WORKDIR /var/www/MISP/app
+
+
 # FIX COMPOSER
 RUN curl --fail --location -o composer-setup.php https://getcomposer.org/installer
 RUN php -r "if (hash_file('sha384', 'composer-setup.php') === 'a5c698ffe4b8e849a443b120cd5ba38043260d5c4023dbf93e1558871f1f07f58274fc6f4c93bcfd858c6bd0775cd8d1') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
@@ -111,10 +91,6 @@ RUN echo "postfix postfix/mailname string localhost.localdomain" | debconf-set-s
 # Redis Setup
 RUN sed -i 's/^\(daemonize\s*\)yes\s*$/\1no/g' /etc/redis/redis.conf
 
-# Install PEAR packages
-RUN pear install Crypt_GPG >>/tmp/install.log
-RUN pear install Net_GeoIP
-
 # Apache Setup
 RUN cp /var/www/MISP/INSTALL/apache.misp.ubuntu /etc/apache2/sites-available/misp.conf
 RUN sed -i -E 's/80/800/' /etc/apache2/sites-available/misp.conf
@@ -139,12 +115,24 @@ RUN sed -i -E "s/'salt'\s=>\s'(\S+)'/'salt' => '`openssl rand -base64 32|tr "/" 
 RUN chmod a+x /var/www/MISP/app/Console/worker/start.sh
 RUN echo "sudo -u www-data bash /var/www/MISP/app/Console/worker/start.sh" >>/etc/rc.local
 
+# Install templates & stuff
+WORKDIR /var/www/MISP/app/files
+RUN rm -rf misp-objects && git clone https://github.com/MISP/misp-objects.git
+RUN rm -rf misp-galaxy && git clone https://github.com/MISP/misp-galaxy.git
+RUN rm -rf warninglists && git clone https://github.com/MISP/misp-warninglists.git ./warninglists
+RUN rm -rf taxonomies && git clone https://github.com/MISP/misp-taxonomies.git ./taxonomies
+RUN chown -R www-data:www-data misp-objects misp-galaxy warninglists taxonomies
+
+# Install MISP build requirements
+RUN sudo -E apt-get -y install libpoppler58 libpoppler-dev libpoppler-cpp-dev
+
 # Install MISP Modules
 WORKDIR /opt
-RUN apt-get update
 RUN apt-get install -y python3 python3-pip libjpeg-dev
-COPY --from=builder_2.4.107 /opt/ .
-ADD misp-modules /opt/misp-modules
+# PIP3 fix
+RUN pip install --upgrade pip
+# END FIX
+RUN git clone https://github.com/MISP/misp-modules.git
 WORKDIR /opt/misp-modules
 RUN pip3 install --upgrade pip
 RUN cat REQUIREMENTS | sed 's/aiohttp==3.4.4/aiohttp/g' > REQUIREMENTS
@@ -190,7 +178,6 @@ RUN echo 'command=/bin/bash -c "cd /opt/misp-modules/bin && /usr/bin/python3 mis
 RUN echo 'user = root' >> /etc/supervisor/conf.d/supervisord.conf
 RUN echo 'startsecs = 0' >> /etc/supervisor/conf.d/supervisord.conf
 RUN echo 'autorestart = false' >> /etc/supervisor/conf.d/supervisord.conf
-
 # Modify syslog configuration
 RUN sed -i -E 's/^(\s*)system\(\);/\1unix-stream("\/dev\/log");/' /etc/syslog-ng/syslog-ng.conf
 
@@ -198,27 +185,21 @@ RUN sed -i -E 's/^(\s*)system\(\);/\1unix-stream("\/dev\/log");/' /etc/syslog-ng
 ADD run.sh /run.sh
 ADD csp_configuration /csp_configuration
 RUN chmod 0755 /run.sh
-
-# Trigger to perform first boot operations
-RUN touch /.firstboot.tmp
-
 RUN touch /var/www/MISP/app/tmp/logs/error.log
 RUN touch /var/www/MISP/app/tmp/logs/debug.log
 RUN chmod -R 777 /var/www/MISP/app/tmp/logs/
-RUN chown -R www-data:www-data /var/www/MISP/app/tmp/logs/
-VOLUME ["/var/www/MISP/app/tmp/logs"]
 
 # Make a backup of /var/www/MISP to restore it to the local moint point at first boot
 WORKDIR /var/www/MISP
 
 # Add misp-objects for CSP support
 COPY csp-misp-objects/ app/files/misp-objects/objects/
-RUN chown -R www-data:www-data /var/www/MISP/app/files/
-
 # Final archive
 RUN tar czpf /root/MISP.tgz .
 
-#COPY AppController.php /var/www/MISP/app/Controller/AppController.php
-#VOLUME /var/www/MISP
+RUN chown -R www-data:www-data /var/www/MISP/app/files/
+RUN chown -R www-data:www-data /var/www/MISP/app/tmp/logs/
+VOLUME ["/var/www/MISP/app/tmp/logs"]
+
 EXPOSE 80
 ENTRYPOINT ["/run.sh"]
