@@ -34,7 +34,8 @@ RUN chown www-data:www-data /var/www
 USER www-data
 RUN git clone https://github.com/MISP/MISP.git
 WORKDIR /var/www/MISP
-RUN git checkout tags/$(git describe --tags `git rev-list --tags --max-count=1`)
+#RUN git checkout tags/$(git describe --tags `git rev-list --tags --max-count=1`)
+RIN git checkout 2.4
 RUN git config core.filemode false
 RUN git submodule update --init --recursive
 # Make git ignore filesystem permission differences for submodules
