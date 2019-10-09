@@ -117,13 +117,6 @@
 			<version>2.1.2.RELEASE</version>
 		</dependency>
 
-		<!-- Developer tools -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-devtools</artifactId>
-			<optional>true</optional>
-		</dependency>
-
 		<!-- WEBJARS -->
 		<!-- https://mvnrepository.com/artifact/org.webjars/bootstrap -->
 		<dependency>
