@@ -69,6 +69,12 @@ public class RuleSetController {
         model.addAttribute("id", ruleset.getId());
         ruleset.setFilename(file.getOriginalFilename());
         ruleset.setFile(file.getBytes());
+
+        if (!(file.getOriginalFilename().endsWith("json") && file.getContentType().equals("application/json"))){
+            redirectAttributes.addFlashAttribute("error", "Please upload a .json file");
+            return "redirect:";
+        }
+
         if (file.isEmpty() && ruleset.getId() == null) {
             redirectAttributes.addFlashAttribute("error", "Please select a file to upload");
             return "redirect:";

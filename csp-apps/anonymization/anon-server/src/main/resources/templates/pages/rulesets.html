@@ -42,7 +42,7 @@
                         <div class="col-md-12 col-xs-12">
                             <div class="form-group">
                                 <label for="file">File:</label>
-                                <input id="file" th:field="*{file}" name="file" type="file" class="file"></input>
+                                <input id="file" th:field="*{file}" name="file" type="file" class="file" accept="application/json"/>
                             </div>
                         </div>
                         <div class="col-md-12 col-xs-12">
@@ -116,7 +116,7 @@
 
 <script>
 
-    $("#file").fileinput({'showUpload':false, 'showPreview':false, 'hiddenThumbnailContent': true});
+    $("#file").fileinput({'showUpload':false, 'showPreview':false, 'hiddenThumbnailContent': true, 'allowedFileExtensions': ['json']});
 
 </script>
 <!--
