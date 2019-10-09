@@ -10,6 +10,7 @@ import com.intrasoft.csp.commons.model.DataParams;
 import com.intrasoft.csp.commons.model.IntegrationData;
 import com.intrasoft.csp.commons.model.IntegrationDataType;
 import com.intrasoft.csp.commons.model.SharingParams;
+import com.intrasoft.csp.libraries.restclient.exceptions.StatusCodeException;
 import com.intrasoft.csp.misp.client.MispAppClient;
 import com.intrasoft.csp.misp.commons.config.MispContextUrl;
 import com.intrasoft.csp.misp.domain.model.Origin;
@@ -138,8 +139,8 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
                 }
 
             }
-            catch (Exception e){
-                LOG.error("Get Event from MISP API Failed: ", e);
+            catch (StatusCodeException e){
+                LOG.error("Get Event from MISP API Failed -> {}: {} ", e.getStatusCode(), e.getMessage());
                 if (!isDelete){
                     return;
                 }

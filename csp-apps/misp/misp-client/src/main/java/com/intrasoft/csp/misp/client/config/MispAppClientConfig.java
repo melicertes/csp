@@ -62,6 +62,7 @@ public class MispAppClientConfig {
         SUPPORTED_EXCEPTIONS.put(CspBusinessException.class.getName(), CspBusinessException::new);
         AVOID_RETRY_ON_STATUS_CODE.put(HttpStatus.NOT_FOUND.value(), "Event already exists or url not found");
         AVOID_RETRY_ON_STATUS_CODE.put(HttpStatus.METHOD_NOT_ALLOWED.value(), "Event could not be added");
+        AVOID_RETRY_ON_STATUS_CODE.put(HttpStatus.FORBIDDEN.value(), "Event could not be added");
     }
 
     @Autowired

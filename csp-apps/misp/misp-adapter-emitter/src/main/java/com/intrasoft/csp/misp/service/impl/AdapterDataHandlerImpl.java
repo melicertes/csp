@@ -83,7 +83,7 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler {
             LOG.error("Event for uuid {} not found, probably a new event: {} code: {}", uuid, integrationData.getDataType(), e.getStatusCode() );
         }
 
-        // final String localEventId = safeExtractEventId(mapper.convertValue(getLocalEventResponseBody, JsonNode.class)); //get the local MISP event id
+         final String localEventId = safeExtractEventId(mapper.convertValue(getLocalEventResponseBody, JsonNode.class)); //get the local MISP event id
 
         List<Origin> origins = originService.findByOriginRecordId(uuid);
 
@@ -128,7 +128,7 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler {
 
         // Add New Attribute Proposals
         String eventId = safeExtractEventId(jsonNode);
-        LOG.info("Event id created/updated: " + eventId);
+        LOG.info("Event id created/updated: " + localEventId);
         List<LinkedHashMap> eventShadowAttributes = ctx.read("$.Event.ShadowAttribute[*]", List.class);
 
         LOG.info("uuid {} Handle event shadow attributes", uuid);
@@ -139,10 +139,10 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler {
             try {
                 shadowAttributeJsonString = (mapper).writeValueAsString(shadowAttribute);
                 LOG.info("{} Add proposal request: {} ", uuid,  shadowAttributeJsonString);
-                ResponseEntity responseEntity = mispAppClient.addMispProposal(eventId, shadowAttributeJsonString);
+                ResponseEntity responseEntity = mispAppClient.addMispProposal(localEventId, shadowAttributeJsonString);
                 LOG.info("{} Add proposal response: {}", uuid, responseEntity.toString());
             } catch (JsonProcessingException e1) {
-                LOG.error("Could not parse shadow attribute for eventId {} -> {}: {} ",eventId, e1.getMessage(), e1);
+                LOG.error("Could not parse shadow attribute for eventId {} -> {}: {} ",localEventId, e1.getMessage(), e1);
             } catch (StatusCodeException e2) {
                 if (Objects.nonNull(e2.getHttpHeaders().get("location"))){
                     String location = e2.getHttpHeaders().get("location").get(0);
@@ -265,7 +265,7 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler {
                         LOG.debug("uuid {}, response -> {}, ",uuid, responseEntity.toString());
                         LOG.info("Event {}  edit/add action result: {}", responseEventId,  responseEntity.getStatusCode().toString());
                     } catch (StatusCodeException e) {
-                        if (!e.getHttpHeaders().get("location").isEmpty()) {
+                        if (Objects.nonNull(e.getHttpHeaders().get("location")) && !e.getHttpHeaders().get("location").isEmpty()) {
                             String location = e.getHttpHeaders().get("location").get(0);
                             LOG.info("uuid {} redirect location: {} ", uuid,  location);
                             try {
@@ -278,16 +278,19 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler {
                                 }
                                 LOG.info("Event {} edit/add action result: {}", uuid, responseEntity.getStatusCode().toString());
                             } catch (StatusCodeException e2){
+                                lastStatus = HttpStatus.valueOf(e2.getStatusCode());
                                 LOG.error("Updating event failed -> {}: {}", e2.getStatusCode(), e2.getMessage());
                             }
                         } else {
                             LOG.error("Location not present in the MISP response");
+                            lastStatus =HttpStatus.OK;
                         }
                     }
                 }
             } catch (IOException e) {
                 LOG.error("IO exception: {}", e.getMessage());
                 //TODO deal with it
+                lastStatus = HttpStatus.OK;
             }
         }
 
