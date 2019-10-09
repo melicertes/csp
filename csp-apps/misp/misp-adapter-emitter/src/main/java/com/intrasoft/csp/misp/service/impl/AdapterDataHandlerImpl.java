@@ -181,13 +181,9 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler {
             LOG.info("uuid {} No shadow attributes to handle", uuid);
         }
 
+        LOG.info("uuid {} re-emit event to IL to get indexed.", uuid);
+        emitterDataHandler.handleMispData(jsonNode, EVENT, true, false);
 
-        try {
-            LOG.info("Remit event to IL to get indexed.");
-            emitterDataHandler.handleMispData(jsonNode, EVENT, true, false);
-        } catch (IOException e) {
-            LOG.error("Reemition failed: " + e.getMessage());
-        }
         return new ResponseEntity<String>(lastStatus);
     }
 
@@ -204,10 +200,10 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler {
                 //((ObjectNode) jsonNode.get("Event")).put("published", new Boolean(false));
 
                 if (!integrationData.getDataParams().getOriginCspId().equals(integrationData.getDataParams().getCspId())) {
-                    LOG.warn("uuid: {} Cannot edit an event that I do not own! {} -- {} ", uuid, integrationData.getDataParams().getOriginCspId(), integrationData.getDataParams().getCspId());
+                    LOG.warn("uuid {} Cannot edit an event that I do not own! {} -- {} ", uuid, integrationData.getDataParams().getOriginCspId(), integrationData.getDataParams().getCspId());
                     lastStatus = HttpStatus.OK;
                 } else {
-                    LOG.info("Event received from its creator, Remove proposals for new attributes if exist.");
+                    LOG.info("uuid {} Event received from its creator, Remove proposals for new attributes if exist.", uuid);
                     JsonNode arrNode1 = localJsonNode.get("Event").get("ShadowAttribute");
                     if (arrNode1 != null && arrNode1.isArray()) {
                         for (JsonNode jsonNode1 : arrNode1) {
@@ -216,7 +212,7 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler {
                                 ResponseEntity<String> responseEntity = mispAppClient.deleteMispProposal(jsonNode1.get("id").textValue());
                                 LOG.info("uuid {} Attribute removal response {}.", uuid, responseEntity.getBody());
                             } catch (StatusCodeException e){
-                                LOG.error("Could not delete proposal for a new attribute -> {}: {}", e.getStatusCode(), e.getMessage());
+                                LOG.error("uuid {} Could not delete proposal for a new attribute -> {}: {}",uuid, e.getStatusCode(), e.getMessage());
                             }
 
                         }
@@ -306,7 +302,6 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler {
                 }
             } catch (IOException e) {
                 LOG.error("IO exception: {}", e.getMessage());
-                //TODO deal with it
                 lastStatus = HttpStatus.OK;
             }
         }

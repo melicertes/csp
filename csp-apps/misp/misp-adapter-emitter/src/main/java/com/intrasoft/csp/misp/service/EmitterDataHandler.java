@@ -10,5 +10,5 @@ import java.io.IOException;
 
 public interface EmitterDataHandler {
 
-    public void handleMispData(Object object, MispContextUrl.MispEntity mispEntity, boolean isReEmittion, boolean isDelete) throws IOException;
+    public void handleMispData(Object object, MispContextUrl.MispEntity mispEntity, boolean isReEmittion, boolean isDelete);
 }
