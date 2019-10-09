@@ -83,7 +83,7 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler {
             LOG.error("Event for uuid {} not found, probably a new event: {} code: {}", uuid, integrationData.getDataType(), e.getStatusCode() );
         }
 
-         final String localEventId = safeExtractEventId(mapper.convertValue(getLocalEventResponseBody, JsonNode.class)); //get the local MISP event id
+        final String localEventId = safeExtractEventId(mapper.convertValue(getLocalEventResponseBody, JsonNode.class)); //get the local MISP event id
 
         List<Origin> origins = originService.findByOriginRecordId(uuid);
 
@@ -113,10 +113,11 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler {
         Remake jsonNode
          */
         JsonNode jsonNode = mapper.convertValue(integrationData.getDataObject(), JsonNode.class);
+        JsonNode localJsonNode = mapper.convertValue(getLocalEventResponseBody, JsonNode.class);
 
         LOG.info("Handling event type {} uuid {} to misp", integrationData.getDataType(), uuid);
 
-        MispEventContext eventContext = processMispEvent(integrationData, requestMethod, jsonNode);
+        MispEventContext eventContext = processMispEvent(integrationData, requestMethod, jsonNode, localJsonNode);
         // update our variables
         jsonNode = eventContext.getNode();
         lastStatus = eventContext.getStatus();
@@ -131,7 +132,7 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler {
         LOG.info("Event id created/updated: " + localEventId);
         List<LinkedHashMap> eventShadowAttributes = ctx.read("$.Event.ShadowAttribute[*]", List.class);
 
-        LOG.info("uuid {} Handle event shadow attributes", uuid);
+        LOG.info("uuid {} Handle {} event shadow attributes", uuid, eventShadowAttributes.size());
 
         eventShadowAttributes.forEach(shadowAttribute -> {
             LOG.info("Working with uuid {} shadowAttribute {}", uuid, shadowAttribute.toString());
@@ -162,14 +163,27 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler {
         // Edit Existing Attribute Proposals
         List<LinkedHashMap> attributeShadowAttributes = ctx.read("$.Event.Attribute[*].ShadowAttribute[*]", List.class);
 
-        extractShadowAttributes(attributeShadowAttributes);
+        if (Objects.nonNull(attributeShadowAttributes)){
+            LOG.info("uuid {} Handle {} shadow attributes", uuid, attributeShadowAttributes.size());
+            extractShadowAttributes(attributeShadowAttributes);
+        } else {
+            LOG.info("uuid {} No shadow attributes to handle", uuid);
+        }
+
 
         // Edit Existing Object Proposals
         List<LinkedHashMap> objectAttributeShadowAttributes = ctx.read("$.Event.Object[*].Attribute[*].ShadowAttribute[*]", List.class);
 
-        extractShadowAttributes(objectAttributeShadowAttributes);
+        if (Objects.nonNull(objectAttributeShadowAttributes)){
+            LOG.info("uuid {} Handle {} objects' shadow attributes", uuid, objectAttributeShadowAttributes.size());
+            extractShadowAttributes(objectAttributeShadowAttributes);
+        } else {
+            LOG.info("uuid {} No shadow attributes to handle", uuid);
+        }
+
 
         try {
+            LOG.info("Remit event to IL to get indexed.");
             emitterDataHandler.handleMispData(jsonNode, EVENT, true, false);
         } catch (IOException e) {
             LOG.error("Reemition failed: " + e.getMessage());
@@ -177,7 +191,7 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler {
         return new ResponseEntity<String>(lastStatus);
     }
 
-    private MispEventContext processMispEvent(IntegrationData integrationData, String requestMethod, JsonNode jsonNode) {
+    private MispEventContext processMispEvent(IntegrationData integrationData, String requestMethod, JsonNode jsonNode, JsonNode localJsonNode) {
         HttpStatus lastStatus = null;
         //response by default is the incoming json
         JsonNode responseJsonNode = jsonNode;
@@ -194,12 +208,13 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler {
                     lastStatus = HttpStatus.OK;
                 } else {
                     LOG.info("Event received from its creator, Remove proposals for new attributes if exist.");
-                    JsonNode arrNode1 = jsonNode.get("Event").get("ShadowAttribute");
+                    JsonNode arrNode1 = localJsonNode.get("Event").get("ShadowAttribute");
                     if (arrNode1 != null && arrNode1.isArray()) {
                         for (JsonNode jsonNode1 : arrNode1) {
                             LOG.info("uuid {} New Attribute proposal to remove {} ", uuid,  jsonNode1.toString());
                             try {
-                                mispAppClient.deleteMispProposal(jsonNode1.get("id").textValue());
+                                ResponseEntity<String> responseEntity = mispAppClient.deleteMispProposal(jsonNode1.get("id").textValue());
+                                LOG.info("uuid {} Attribute removal response {}.", uuid, responseEntity.getBody());
                             } catch (StatusCodeException e){
                                 LOG.error("Could not delete proposal for a new attribute -> {}: {}", e.getStatusCode(), e.getMessage());
                             }
@@ -208,7 +223,7 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler {
                     }
 
                     LOG.info("Event {} -> Remove existing proposals from attributes if exist.", uuid);
-                    JsonNode arrNode = jsonNode.get("Event").get("Attribute");
+                    JsonNode arrNode = localJsonNode.get("Event").get("Attribute");
                     if (arrNode != null && arrNode.isArray()) {
                         for (JsonNode jsonNode1 : arrNode) {
                             JsonNode attrProposals = jsonNode1.get("ShadowAttribute");
@@ -216,7 +231,8 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler {
                                 for (JsonNode jn : attrProposals) {
                                     LOG.info("uuid {} Proposal from existing Attribute to remove:{} ", uuid,  jn.toString());
                                     try {
-                                        mispAppClient.deleteMispProposal(jn.get("id").textValue());
+                                        ResponseEntity<String> responseEntity = mispAppClient.deleteMispProposal(jn.get("id").textValue());
+                                        LOG.info("uuid {} Attribute removal response {}.", uuid, responseEntity.getBody());
                                     } catch (StatusCodeException e){
                                         LOG.error("Could not delete proposal for existing attribute -> {}: {}", e.getStatusCode(), e.getMessage());
                                     }
@@ -227,7 +243,7 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler {
                     }
 
                     LOG.info("Event {} ->  Remove existing proposals from objects if exist.", uuid);
-                    JsonNode arrNode3 = jsonNode.get("Event").get("Object");
+                    JsonNode arrNode3 = localJsonNode.get("Event").get("Object");
                     if (arrNode3 != null && arrNode3.isArray()) {
                         for (JsonNode jsonNode1 : arrNode3) {
                             JsonNode attrProposals = jsonNode1.get("Attribute");
@@ -238,7 +254,8 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler {
                                         for (JsonNode jn : attrProposals2) {
                                             LOG.info("uuid {} Proposal from existing Object Attribute to remove:{} ", uuid,  jn.toString());
                                             try {
-                                                mispAppClient.deleteMispProposal(jn.get("id").textValue());
+                                                ResponseEntity<String> responseEntity = mispAppClient.deleteMispProposal(jn.get("id").textValue());
+                                                LOG.info("uuid {} Attribute removal response {}.", uuid, responseEntity.getBody());
                                             } catch (StatusCodeException e){
                                                 LOG.error("Could not delete proposal for an object's attribute -> {}: {}", e.getStatusCode(), e.getMessage());
                                             }
@@ -299,7 +316,8 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler {
 
     private void extractShadowAttributes(List<LinkedHashMap> attributeShadowAttributes) {
         attributeShadowAttributes.forEach(sa -> {
-            LOG.info("Attribute {} ",sa.toString());
+            if (Objects.isNull(sa)) return;
+            LOG.debug("Attribute {} ",sa.toString());
 
             // Get Attribute by UUID
             String attrUuid1 = String.valueOf(sa.get("uuid"));
@@ -307,39 +325,41 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler {
             LOG.info("Edit proposal request: {} ", attribute1.toString());
             try {
                 attribute1 = mapper.readValue(mispAppClient.postMispAttribute(attrUuid1).getBody(), JsonNode.class);
-                LOG.info("Fetching local attribute: {} ", attribute1.toString());
+                if (Objects.nonNull(attribute1)){
+                    LOG.info("Fetching local attribute: {} ", attribute1.toString());
+                    String attrId1 = attribute1.get("response").get("Attribute").get("id").textValue();
+                    LOG.info("Attribute id: " + attrId1);
+                    ObjectNode shadowAttributeRequestNode1 = mapper.createObjectNode();
+                    String shadowAttributeJsonString1 = null;
+                    try {
+                        shadowAttributeJsonString1 = (mapper).writeValueAsString(sa);
+                    } catch (JsonProcessingException e2) {
+                        LOG.error(e2.getMessage());
+                    }
+                    try {
+                        ShadowAttributeRequestDTO shadowAttributeRequest1 = new ShadowAttributeRequestDTO(new ShadowAttributeRequestDTO.AttributeRequest(sa));
+                        String attrRequestStr1 = mapper.writeValueAsString(shadowAttributeRequest1);
+                        ResponseEntity responseEntity1 = mispAppClient.updateMispProposal(attrId1, attrRequestStr1);
+                        LOG.info("Edit proposal response: " + responseEntity1.toString());
+                    } catch (StatusCodeException e2) {
+                        LOG.error("Proposal processing for {} failed -> {}: {}",attrId1, e2.getStatusCode(), e2.getMessage());
+                        String location1 = e2.getHttpHeaders().get("location").get(0);
+                        LOG.info("Redirect location {} ",  location1);
+                        try {
+                            ResponseEntity responseEntity1 = mispAppClient.updateMispProposal(location1, shadowAttributeJsonString1);
+                            LOG.info("Edit proposal response: {}", responseEntity1.toString());
+                        } catch (StatusCodeException e3){
+                            LOG.error("Updating MISP proposal for {} failed for second time -> {}: {}", location1, e3.getStatusCode(), e3.getMessage());
+                        }
+
+                    } catch (JsonProcessingException e2) {
+                        LOG.error(e2.getMessage());
+                    }
+                }
             } catch (StatusCodeException e) {
                 LOG.error("Adding MISP attribute for {} failed with -> {}: {}",attrUuid1, e.getStatusCode(), e.getMessage());
             } catch (IOException e) {
                 LOG.error("Parsing MISP response for uuid: {} has failed -> {}",attrUuid1, e.getMessage());
-            }
-            String attrId1 = attribute1.get("response").get("Attribute").get("id").textValue();
-            LOG.info("Attribute id: " + attrId1);
-            ObjectNode shadowAttributeRequestNode1 = mapper.createObjectNode();
-            String shadowAttributeJsonString1 = null;
-            try {
-                shadowAttributeJsonString1 = (mapper).writeValueAsString(sa);
-            } catch (JsonProcessingException e2) {
-                LOG.error(e2.getMessage());
-            }
-            try {
-                ShadowAttributeRequestDTO shadowAttributeRequest1 = new ShadowAttributeRequestDTO(new ShadowAttributeRequestDTO.AttributeRequest(sa));
-                String attrRequestStr1 = mapper.writeValueAsString(shadowAttributeRequest1);
-                ResponseEntity responseEntity1 = mispAppClient.updateMispProposal(attrId1, attrRequestStr1);
-                LOG.info("Edit proposal response: " + responseEntity1.toString());
-            } catch (StatusCodeException e2) {
-                LOG.error("Proposal processing for {} failed -> {}: {}",attrId1, e2.getStatusCode(), e2.getMessage());
-                String location1 = e2.getHttpHeaders().get("location").get(0);
-                LOG.info("Redirect location {} ",  location1);
-                try {
-                    ResponseEntity responseEntity1 = mispAppClient.updateMispProposal(location1, shadowAttributeJsonString1);
-                    LOG.info("Edit proposal response: {}", responseEntity1.toString());
-                } catch (StatusCodeException e3){
-                    LOG.error("Updating MISP proposal for {} failed for second time -> {}: {}", location1, e3.getStatusCode(), e3.getMessage());
-                }
-
-            } catch (JsonProcessingException e2) {
-                LOG.error(e2.getMessage());
             }
         });
     }

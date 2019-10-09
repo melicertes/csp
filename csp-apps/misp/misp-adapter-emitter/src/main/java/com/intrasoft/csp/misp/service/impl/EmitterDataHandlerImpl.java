@@ -109,7 +109,7 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
 
         jsonNode = new ObjectMapper().convertValue(object, JsonNode.class);
 
-        LOG.info(jsonNode.toString());
+        LOG.trace(jsonNode.toString());
 
         String uuid = "";
         Map<String, List<String>> eventValidationMap = new HashMap<>();
