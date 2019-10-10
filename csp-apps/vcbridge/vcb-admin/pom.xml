@@ -6,10 +6,10 @@
     <parent>
         <groupId>com.intrasoft.csp</groupId>
         <artifactId>vcbridge</artifactId>
-		<version>4.0.7-SNAPSHOT</version>
+		<version>4.3.1-SNAPSHOT</version>
     </parent>
 
-	<version>4.0.7-SNAPSHOT</version>
+	<version>4.3.1-SNAPSHOT</version>
 	<artifactId>vcb-admin</artifactId>
 	<packaging>jar</packaging>
 	<name>Video Conference Bridge Admin Application</name>
