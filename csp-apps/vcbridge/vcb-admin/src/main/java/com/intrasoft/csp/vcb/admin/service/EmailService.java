@@ -199,12 +199,12 @@ public class EmailService {
             };
 
 
-            log.debug(MAIL_SERVER_HOST);
-            log.debug(MAIL_SERVER_PORT.toString());
-            log.debug(MAIL_USERNAME);
-            log.debug(MAIL_PASSWORD);
-            log.debug(MAIL_SENDER_NAME);
-            log.debug(MAIL_SENDER_EMAIL);
+            log.debug("Server host  :{}",MAIL_SERVER_HOST);
+            log.debug("Server port  :{}",MAIL_SERVER_PORT.toString());
+            log.debug("Username     :{}",MAIL_USERNAME);
+            log.debug("Password     :(not printed)");
+            log.debug("Sender name  :{}",MAIL_SENDER_NAME);
+            log.debug("Sender email :{}",MAIL_SENDER_EMAIL);
             try {
                 mailSender.send(messagePreparator);
                 log.info("Email sent to: " + p.getEmail() + " for Meeting UID: " + meeting.getUid() + ", subject:" + meeting.getSubject());
