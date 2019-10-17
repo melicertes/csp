@@ -50,8 +50,8 @@ public class EcspProcessor implements Processor{
                         +uri;
             }
         }
-        LOG.info("URI resolved: "+uri);
         String response = camelRestService.send(uri, enhancedTeamDTO.getIntegrationData(), httpMethod, true);
+        LOG.info("DCL - URI resolved: {}, send complete - {}", uri, response);
 
     }
 }

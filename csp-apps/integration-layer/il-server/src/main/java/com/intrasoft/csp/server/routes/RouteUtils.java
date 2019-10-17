@@ -46,8 +46,11 @@ public class RouteUtils implements CamelRoutes {
      * @return
      */
     public String safeQueueName(Team team) {
-        final String queuePart = String.format("%s_%s", team.getCspId(), team.getCountry());
-        LOG.debug("QPart {} for {}:{}", queuePart, team.getId(), team.getCountry());
+        //encoding has to be either full lower or full upper; AMQ converts to upper, so mixed (base64) is not useful
+        final String country = team.getCountry() == null? "N/A" : team.getCountry();
+        final String queuePart = String.format("%s_%s", team.getId(), Long.toHexString(country.hashCode()));
+        LOG.debug("QPart {} for {}:{}", queuePart, team.getId(), country);
         return queuePart;
     }
+
 }
