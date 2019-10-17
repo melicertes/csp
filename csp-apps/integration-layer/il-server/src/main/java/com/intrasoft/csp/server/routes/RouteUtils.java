@@ -2,6 +2,8 @@ package com.intrasoft.csp.server.routes;
 
 import com.intrasoft.csp.commons.model.Team;
 import com.intrasoft.csp.commons.routes.CamelRoutes;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -13,6 +15,8 @@ import javax.annotation.PostConstruct;
  */
 @Service
 public class RouteUtils implements CamelRoutes {
+    private static final Logger LOG = LoggerFactory.getLogger(RouteUtils.class);
+
     @Value("${apache.camel.use.activemq}")
     Boolean useActiveMQ;
 
@@ -35,6 +39,9 @@ public class RouteUtils implements CamelRoutes {
     }
 
     public String safeQueueName(Team team) {
-        return Long.toHexString(String.format("%s:%s", team.getCspId(),team.getCountry()).hashCode());
+        final String hashedName = Long.toHexString(String.format("%s:%s", team.getCspId(), team.getCountry()).hashCode());
+        LOG.debug("QPart {} for {}:{}", hashedName, team.getCspId(), team.getCountry());
+
+        return hashedName;
     }
 }
