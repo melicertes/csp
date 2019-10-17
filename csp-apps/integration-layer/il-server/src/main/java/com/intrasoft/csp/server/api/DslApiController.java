@@ -8,6 +8,7 @@ import com.intrasoft.csp.server.service.ApiDataHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,24 +27,27 @@ public class DslApiController implements CamelRoutes, ContextUrl{
     @RequestMapping(value = "/v"+REST_API_V1+"/"+DSL_INTEGRATION_DATA,
             consumes = {"application/json"},
             method = RequestMethod.POST)
-    public ResponseEntity<String> synchNewIntData(@RequestBody IntegrationData integrationData) {
-        LOG.info("DSL Endpoint: POST received");
+    public ResponseEntity<String> syncNewIntData(@RequestBody IntegrationData integrationData, @RequestHeader HttpHeaders headers) {
+        LOG.info("DSL API: POST received with headers {}",headers);
+        LOG.debug("DSL API: type {} origin {}", integrationData.getDataType(), integrationData.getDataParams().getOriginCspId());
         return handleIntegrationData(integrationData, "POST");
     }
 
     @RequestMapping(value = "/v"+REST_API_V1+"/"+DSL_INTEGRATION_DATA,
             consumes = {"application/json"},
             method = RequestMethod.PUT)
-    public ResponseEntity<String> synchUpdatedIntData(@RequestBody IntegrationData integrationData) {
-        LOG.info("DSL Endpoint: PUT received");
+    public ResponseEntity<String> syncUpdatedIntData(@RequestBody IntegrationData integrationData, @RequestHeader HttpHeaders headers) {
+        LOG.info("DSL API: PUT received with headers {}",headers);
+        LOG.debug("DSL API: type {} origin {}", integrationData.getDataType(), integrationData.getDataParams().getOriginCspId());
         return handleIntegrationData(integrationData, "PUT");
     }
 
     @RequestMapping(value = "/v"+REST_API_V1+"/"+DSL_INTEGRATION_DATA,
             consumes = {"application/json"},
             method = RequestMethod.DELETE)
-    public ResponseEntity<String> synchDeletedIntData(@RequestBody IntegrationData integrationData) {
-        LOG.info("DSL Endpoint: DELETE received");
+    public ResponseEntity<String> syncDeletedIntData(@RequestBody IntegrationData integrationData, @RequestHeader HttpHeaders headers) {
+        LOG.info("DSL API: DELETE received with headers {}",headers);
+        LOG.debug("DSL API: type {} origin {}", integrationData.getDataType(), integrationData.getDataParams().getOriginCspId());
         return handleIntegrationData(integrationData, "DELETE");
     }
 

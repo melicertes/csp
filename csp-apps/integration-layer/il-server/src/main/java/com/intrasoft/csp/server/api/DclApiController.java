@@ -37,7 +37,8 @@ public class DclApiController implements CamelRoutes,ContextUrl{
             consumes = {"application/json"},
             method = RequestMethod.POST)
     public ResponseEntity<String> getNewIntDataFromExtCsp(@RequestBody IntegrationData integrationData,@RequestHeader HttpHeaders headers) {
-        LOG.info("DCL Endpoint: POST received");
+        LOG.info("DCL API: POST received with headers {}",headers);
+        LOG.debug("DCL API: type {} origin {}", integrationData.getDataType(), integrationData.getDataParams().getOriginCspId());
         apiDataHandler.checkIsValidCspIdAgainstCertificateHeader(headers,integrationData);
         return handleIntegrationData(integrationData, "POST");
     }
@@ -51,7 +52,8 @@ public class DclApiController implements CamelRoutes,ContextUrl{
             consumes = {"application/json"},
             method = RequestMethod.PUT)
     public ResponseEntity<String> getUpdateIntDataFromExtCsp(@RequestBody IntegrationData integrationData,@RequestHeader HttpHeaders headers) {
-        LOG.info("DCL Endpoint: PUT received");
+        LOG.info("DCL API: PUT received with headers {}",headers);
+        LOG.debug("DCL API: type {} origin {}", integrationData.getDataType(), integrationData.getDataParams().getOriginCspId());
         apiDataHandler.checkIsValidCspIdAgainstCertificateHeader(headers,integrationData);
         return handleIntegrationData(integrationData, "PUT");
     }

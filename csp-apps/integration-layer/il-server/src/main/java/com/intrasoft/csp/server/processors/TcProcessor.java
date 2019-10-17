@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by iskitsas on 4/9/17.
@@ -240,6 +241,8 @@ public class TcProcessor implements Processor,CamelRoutes{
 
     List<Team> getTcTeamsByArg(String uri, boolean isFlow1) throws IOException {
         TrustCircle tc = camelRestService.send(uri, null,  HttpMethod.GET.name(), TrustCircle.class);
+        LOG.debug("Received TC {}(size={}) from {}, flow is {} - deciding teams ",
+                tc.getId(),tc.getTeams().size(), uri, isFlow1 ? "flow1" : "flow2");
         List<Team> teams = new ArrayList<>();
         //first make all calls to get the teams
         for (String teamId : tc.getTeams()) {
@@ -247,17 +250,13 @@ public class TcProcessor implements Processor,CamelRoutes{
             Team team = camelRestService.send(this.getTcTeamsURI() + "/" + teamId, teamId, HttpMethod.GET.name(), Team.class);
             if (StringUtils.isEmpty(team.getShortName())) {
                 //DO NO ACTIVATE GDELIVERY by throwing any exception, just log the error and let the code flow to next iteration
-                LOG.error("Team short name received from TC API is empty/null - SKIPPING this team... \n" +
-                        "TrustCircle: " + tc.toString() + "\n" +
-                        "Team: " + team.toString());
+                LOG.error("Team short name received from TC API is empty/null - SKIPPING this team... TrustCircle: {} Team: {}" , tc,  team);
                 continue; // continue to next iteration
             }
 
             if (StringUtils.isEmpty(team.getCspId())) {
                 //DO NO ACTIVATE GDELIVERY by throwing any exception, just log the error and let the code flow to next iteration
-                LOG.error("CspId received from TC API is empty/null - SKIPPING this team... \n" +
-                        "TrustCircle: " + tc.toString() + "\n" +
-                        "Team: " + team.toString());
+                LOG.error("Team id received from TC API is empty/null - SKIPPING this team... TrustCircle: {} Team: {}" , tc,  team);
                 continue;// continue to next iteration
             }
 
@@ -271,7 +270,7 @@ public class TcProcessor implements Processor,CamelRoutes{
                 teams.add(team);
             }
         }
-        LOG.trace("-- Teams: "+teams.toString());
+        LOG.debug("--> Decided: (size={}) {}",teams.size(), printableTeamsList(teams));
         return teams;
     }
 
@@ -329,6 +328,7 @@ public class TcProcessor implements Processor,CamelRoutes{
             //SHOULD NOT activate GDelivery. Log as error
             throw new ErrorLogException("Integration Test error: Could not find trust circle id for this data. ");
         }
+        LOG.debug("===> TC API uri {} [optionalTC = {}]",uri, optionalTc.orElse(null));
         return uri;
     }
 
@@ -351,15 +351,21 @@ public class TcProcessor implements Processor,CamelRoutes{
         String httpMethod = (String) exchange.getIn().getHeader(Exchange.HTTP_METHOD);
         // Decide the flow
         if(originEndpoint.equals(routes.wrap(CamelRoutes.DCL))) {//flow1
+            LOG.debug("[flow1] == {} will send to (count={}) {}",originEndpoint, teams.size(), printableTeamsList(teams));
             for(Team t:teams) {
                 //send to ECSP
-                LOG.trace(t.toString());
-                LOG.trace(integrationData.toString());
                 handleDclFlowAndSendToECSP(httpMethod, t, integrationData);
             }
         }else if(originEndpoint.equals(routes.wrap(CamelRoutes.EDCL))){//flow2
+            LOG.debug("[flow2] == {} will send to (count={}) {}",originEndpoint,teams.size(), printableTeamsList(teams));
             handleExternalDclFlowAndSendToDSL(httpMethod, teams, integrationData);
         }
+    }
+
+    private List<String> printableTeamsList(List<Team> teams) {
+        return teams.stream().map(t -> {
+            return String.format("[cspId:%s,short:%s]", t.getCspId(), t.getShortName());
+        }).collect(Collectors.toList());
     }
 
     public Team getTeamByRestCall(String teamId) throws IOException {
@@ -374,6 +380,7 @@ public class TcProcessor implements Processor,CamelRoutes{
             throw new ErrorLogException("CspId received from TC API is null - cannot proceed. \n" +
                     "Team: "+team.toString());
         }
+        LOG.debug("Team received cspId={},short={},id={}", team.getCspId(), team.getShortName(), team.getId());
         return team;
     }
 
@@ -398,8 +405,6 @@ public class TcProcessor implements Processor,CamelRoutes{
             sharingPolicyAction = evaluatedPolicyDTO.getSharingPolicyAction();
         }
         switch (sharingPolicyAction){
-            case SHARE_AS_IS:
-                break;
             case SHARE_ANONYMIZED:
                 IntegrationAnonData integrationAnonData = new IntegrationAnonData();
                 integrationAnonData.setCspId(team.getCspId());
@@ -419,6 +424,7 @@ public class TcProcessor implements Processor,CamelRoutes{
                 break;
             case DO_NOT_SHARE:
                 return;
+            case SHARE_AS_IS:
             case NO_ACTION_FOUND:
                 break;
         }

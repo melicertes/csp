@@ -24,7 +24,6 @@ import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
@@ -55,6 +54,7 @@ public class SharingPolicyImpl implements SharingPolicyService, Conversions{
     @Override
     public EvaluatedPolicyDTO evaluate(IntegrationData integrationData, Team team) {
         IntegrationDataType integrationDataType = integrationData.getDataType();
+        LOG.info("Evaluating policy for team {} and data type {}", team.getShortName(), integrationDataType);
         Policy defaultPolicy = policyRepository.findByIntegrationDataTypeAndActive(integrationDataType,null).stream().findAny().orElse(null);
         if(defaultPolicy == null){
             LOG.warn("Default policy was not found. Will check any other existing policies.");

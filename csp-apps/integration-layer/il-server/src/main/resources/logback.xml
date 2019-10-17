@@ -9,17 +9,17 @@
     <property name="LOGS_HOME" value="/opt/csplogs/"/>
     <property name="TYPE_EXC" value="exc"/>
     <property name="TYPE_AUD" value="aud"/>
-    <property name="HISTORY_EXC" value="1"/>
-    <property name="HISTORY_AUD" value="1"/>
+    <property name="HISTORY_EXC" value="3"/>
+    <property name="HISTORY_AUD" value="5"/>
 
     <!--Patterns for console, log files, log format and rolling files-->
     <property name="CONSOLE_LOG_PATTERN"
               value="%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(%X{user}){faint}  %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}"/>
-    <property name="FILE_EXC_LOG_PATTERN" value="${LOGS_HOME}${APP_NAME}-${TYPE_EXC}.log"></property>
-    <property name="FILE_AUD_LOG_PATTERN" value="${LOGS_HOME}${APP_NAME}-${TYPE_AUD}.log"></property>
-    <property name="LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss} ${HOSTNAME} ${APP_NAME:-}[${PID:-}] %X{user}: %replace(%msg){'\n',' '}%n"></property>
-    <property name="FILE_EXC_ROLL_PATTERN" value="${LOGS_HOME}${APP_NAME}-${TYPE_EXC}.%d{yyyy-MM-dd}.log"></property>
-    <property name="FILE_AUD_ROLL_PATTERN" value="${LOGS_HOME}${APP_NAME}-${TYPE_AUD}.%d{yyyy-MM-dd}.log"></property>
+    <property name="FILE_EXC_LOG_PATTERN" value="${LOGS_HOME}${APP_NAME}-${TYPE_EXC}.log"/>
+    <property name="FILE_AUD_LOG_PATTERN" value="${LOGS_HOME}${APP_NAME}-${TYPE_AUD}.log"/>
+    <property name="LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss} ${HOSTNAME} ${APP_NAME:-}[${PID:-}] %X{user}: %replace(%msg){'\n',' '}%n"/>
+    <property name="FILE_EXC_ROLL_PATTERN" value="${LOGS_HOME}${APP_NAME}-${TYPE_EXC}.%d{yyyy-MM-dd}.log"/>
+    <property name="FILE_AUD_ROLL_PATTERN" value="${LOGS_HOME}${APP_NAME}-${TYPE_AUD}.%d{yyyy-MM-dd}.log"/>
 
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
@@ -54,10 +54,22 @@
             <Pattern>${LOG_PATTERN}</Pattern>
         </encoder>
 
+
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>TRACE</level>
+            <onMatch>ACCEPT</onMatch>
+        </filter>
+
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>DEBUG</level>
+            <onMatch>ACCEPT</onMatch>
+        </filter>
+
         <filter class="ch.qos.logback.classic.filter.LevelFilter">
             <level>INFO</level>
             <onMatch>ACCEPT</onMatch>
         </filter>
+
 
         <filter class="ch.qos.logback.classic.filter.LevelFilter">
             <level>WARN</level>
@@ -71,13 +83,9 @@
         </rollingPolicy>
     </appender>
 
-    <logger name="root" level="info" additivity="false">
+    <root level="INFO">
         <appender-ref ref="FILE-AUDIT"/>
         <appender-ref ref="FILE-EXCEPTION"/>
-        <appender-ref ref="STDOUT"/>
-    </logger>
-
-    <root level="info">
         <appender-ref ref="STDOUT"/>
     </root>
 </configuration>
