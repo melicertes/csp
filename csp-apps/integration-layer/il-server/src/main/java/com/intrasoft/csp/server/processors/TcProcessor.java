@@ -433,10 +433,10 @@ public class TcProcessor implements Processor,CamelRoutes{
 
         headers.put(Exchange.HTTP_METHOD, httpMethod);
         if (!camelRestServiceIsAsync) {
-            producer.sendBodyAndHeaders(routes.wrap(ECSP+"."+enhancedTeamDTO.getTeam().getName()),
+            producer.sendBodyAndHeaders(routes.wrap(ECSP+"."+ routes.safeQueueName(enhancedTeamDTO.getTeam())),
                     ExchangePattern.InOnly, enhancedTeamDTO, headers);//TODO: investigate SXCSP-430 - do we need inOut here?
         } else {
-            camelRestService.asyncSendInOnly(routes.wrap(ECSP+"."+enhancedTeamDTO.getTeam().getName()),
+            camelRestService.asyncSendInOnly(routes.wrap(ECSP+"."+ routes.safeQueueName(enhancedTeamDTO.getTeam())),
                     enhancedTeamDTO, headers);
         }
         // now we send to the notifier queue, that messages for team X are pending.

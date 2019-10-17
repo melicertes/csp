@@ -1,5 +1,6 @@
 package com.intrasoft.csp.server.routes;
 
+import com.intrasoft.csp.commons.model.Team;
 import com.intrasoft.csp.commons.routes.CamelRoutes;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -31,5 +32,9 @@ public class RouteUtils implements CamelRoutes {
     public String wrap(String context){
         String ret =  endpoint+":"+(useActiveMQ != null && useActiveMQ?context.toUpperCase()+".Q":context);
         return ret;
+    }
+
+    public String safeQueueName(Team team) {
+        return Long.toHexString(String.format("%s:%s", team.getCspId(),team.getCountry()).hashCode());
     }
 }

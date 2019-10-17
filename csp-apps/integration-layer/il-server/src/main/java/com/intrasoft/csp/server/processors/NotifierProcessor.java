@@ -121,7 +121,7 @@ public class NotifierProcessor implements Processor {
                 if (failureTime.plusWeeks(1).isBefore(LocalDateTime.now())) { // failing for more than 1 week
                     LOG.error("Notifier - team {} fails delivery for more than 1 week, expiring all messages",team);
                     Exchange exchange = null;
-                    while ((exchange = consumer.receive(routes.wrap(ECSP + "." + team.getName()), TIMEOUT)) != null) {
+                    while ((exchange = consumer.receive(routes.wrap(ECSP + "." + routes.safeQueueName(team)), TIMEOUT)) != null) {
                         final Map<String, Object> headers = exchange.getIn().getHeaders();
                         EnhancedTeamDTO body = exchange.getIn().getBody(EnhancedTeamDTO.class);
                         producer.sendBody(FILE_DUMP_GLOBAL, convertToDump(headers,body));
@@ -133,7 +133,7 @@ public class NotifierProcessor implements Processor {
     }
     private void deliverMessagesTo(Team team) {
         Exchange exchange = null;
-        while ( (exchange = consumer.receive(routes.wrap(ECSP+"."+team.getName()), TIMEOUT)) != null) {
+        while ( (exchange = consumer.receive(routes.wrap(ECSP+"."+routes.safeQueueName(team)), TIMEOUT)) != null) {
             final Map<String, Object> headers = exchange.getIn().getHeaders();
             EnhancedTeamDTO body = exchange.getIn().getBody(EnhancedTeamDTO.class);
             LOG.info("Notifier - Delivering type {} to {}/{}", body.getIntegrationData().getDataType(), team.getCspId(),team.getUrl());
