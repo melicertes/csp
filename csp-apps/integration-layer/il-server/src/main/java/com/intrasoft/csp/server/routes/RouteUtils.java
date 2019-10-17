@@ -10,9 +10,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.PostConstruct;
-import java.nio.ByteBuffer;
-
-import static net.openhft.hashing.LongHashFunction.xx;
 
 /**
  * Created by iskitsas on 4/27/17.
@@ -21,9 +18,6 @@ import static net.openhft.hashing.LongHashFunction.xx;
 public class RouteUtils implements CamelRoutes {
     private static final Logger LOG = LoggerFactory.getLogger(RouteUtils.class);
 
-    private static final long CSP_SEED = 0x99384411234L;
-
-    // Note: no padding is added when using the URL-safe alphabet.
     private static final Base64 B64 = new Base64(true);
     @Value("${apache.camel.use.activemq}")
     Boolean useActiveMQ;
@@ -52,10 +46,8 @@ public class RouteUtils implements CamelRoutes {
      * @return
      */
     public String safeQueueName(Team team) {
-        ByteBuffer buffer = ByteBuffer.allocate(Long.BYTES);
-        buffer.putLong(xx(CSP_SEED).hashChars(String.format("%s:%s", team.getCspId(), team.getCountry())));
-        final String hashedName = B64.encodeAsString(buffer.array());
-        LOG.debug("QPart {} for {}:{}", hashedName, team.getId(), team.getCountry());
-        return hashedName;
+        final String queuePart = String.format("%s_%s", team.getCspId(), team.getCountry());
+        LOG.debug("QPart {} for {}:{}", queuePart, team.getId(), team.getCountry());
+        return queuePart;
     }
 }
