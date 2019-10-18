@@ -162,10 +162,10 @@ public class NotifierProcessor implements Processor {
      */
     private String convertToDump(Map<String, Object> headers, EnhancedTeamDTO body) {
         try {
-            final byte[] gzip = GZIPHelper.compressGZIP(objectMapper.writeValueAsBytes(new Object[]{headers, body}));
+            final byte[] gzip = GZIPHelper.compressGZIP(objectMapper.writeValueAsBytes(body));
             return String.format("{ \"dmp\":\"%s\" }", Base64.getEncoder().encodeToString(gzip));
         } catch (IOException e) {
-            LOG.error("While packaging dump of {}, error occured {} ",body.getTeam().getName(), e.getMessage());
+            LOG.error("While packaging dump of {}, error occurred {} ",body.getTeam().getName(), e.getMessage());
             return String.format("{ \"dmp\":\"event dump for team %s failed to serialize - %s - %s\" }", body.getTeam().getName(), e.getMessage(), body.getIntegrationData().getDataType());
         }
     }
