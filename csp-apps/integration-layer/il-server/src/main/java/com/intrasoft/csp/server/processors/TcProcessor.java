@@ -93,7 +93,7 @@ public class TcProcessor implements Processor,CamelRoutes{
 
         boolean isFlow1 = originEndpoint.equals(routes.wrap(CamelRoutes.DCL))?true:false;
         boolean isFlow2 = originEndpoint.equals(routes.wrap(CamelRoutes.EDCL))?true:false;
-
+        LOG.debug("flow 1 = {}, flow 2 = {}", isFlow1, isFlow2);
         IntegrationData integrationData = exchange.getIn().getBody(IntegrationData.class);
         String httpMethod = (String) exchange.getIn().getHeader(Exchange.HTTP_METHOD);
 
@@ -108,18 +108,22 @@ public class TcProcessor implements Processor,CamelRoutes{
 
         if(isFlow1) {
             if (integrationData.getSharingParams().getTcId()!=null) {
+                LOG.debug("F1 tc Id {}", integrationData.getSharingParams().getTcId());
                 //send by tcId provided - only in flow1
                 if(integrationData.getSharingParams().getTcId() instanceof List){
                     List<String> list = (List<String>) integrationData.getSharingParams().getTcId();
                     if(list.size()>0){
+                        LOG.debug("F1 Sending to list {}", list);
                         for(String tcId:list) {
                             if(!StringUtils.isEmpty(tcId)) {
+                                LOG.debug("F1 sending to {}", tcId);
                                 sendByTcId(tcId,localTcExists(tcId), exchange);
                             }
                         }
                     }
                 }else if(integrationData.getSharingParams().getTcId() instanceof String){
                     String tcId = (String) integrationData.getSharingParams().getTcId();
+                    LOG.debug("F1 single TC: {}",tcId);
                     if(!StringUtils.isEmpty(tcId)) {
                         sendByTcId(tcId, localTcExists(tcId),exchange);
                     }
@@ -127,24 +131,31 @@ public class TcProcessor implements Processor,CamelRoutes{
 
             } else if (integrationData.getSharingParams().getTeamId()!=null) {
                 //send by teamId provided - only in flow1
-
-
+                LOG.debug("F1 TeamId found - {}", integrationData.getSharingParams().getTeamId());
                 if(integrationData.getSharingParams().getTeamId() instanceof List){
                     List<String> list = (List<String>) integrationData.getSharingParams().getTeamId();
                     if(list.size()>0){
+                        LOG.debug("F1 list teamId: {}", integrationData.getSharingParams().getTeamId());
+
                         for(String teamId:list) {
                             if(!StringUtils.isEmpty(teamId)) {
+                                LOG.debug("F1.1 sending to {}", teamId);
                                 sendByTeamId(teamId, exchange);
                             }
                         }
                     }
                 }else if(integrationData.getSharingParams().getTeamId() instanceof String){
+                    LOG.debug("F1 single teamId: {}", integrationData.getSharingParams().getTeamId());
+
                     String teamId = (String) integrationData.getSharingParams().getTeamId();
                     if(!StringUtils.isEmpty(teamId)) {
+                        LOG.debug("F1.2 sending to {}", teamId);
+
                         sendByTeamId(teamId, exchange);
                     }
                 }
             } else {
+                LOG.debug("F1 not teamId or tcId - sending by datatype {}", integrationData.getDataType());
                 //send by dataType
                 sendByDataType(integrationData, exchange, originEndpoint, httpMethod);
             }
@@ -212,12 +223,14 @@ public class TcProcessor implements Processor,CamelRoutes{
     }
 
     boolean tcExists(String uuid, boolean isLocal) throws IOException {
+        LOG.debug("tcExists: Checking if {} exists (isLocal={})", uuid, isLocal);
         String uri = (isLocal?this.getLocalCirclesURI():this.getTcCirclesURI()) + "/" + uuid;
         //handle "404 not found" properly
         List<Integer> doNotLogErrorOnTheseStatusCodes = new ArrayList<>();
         doNotLogErrorOnTheseStatusCodes.add(404);
         TrustCircle tc = camelRestService.send(uri, null,  HttpMethod.GET.name(),
                 TrustCircle.class,true, doNotLogErrorOnTheseStatusCodes);
+        LOG.debug("tcExists: {} result is {} (found {})", uuid, tc != null, tc);
         return tc != null;
     }
 
