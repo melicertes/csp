@@ -51,6 +51,7 @@ public class IntegrationDataValidator implements Validator {
             //now set it to "xx" and try to generate the hmac again
             signHMAC((IntegrationData)obj);
             String computed = ((IntegrationData) obj).getHmac();
+            LOG.debug("About to validate HMAC of {}",obj);
             if (computed != null) {
                 if (!computed.contentEquals(hmac)) {
                     LOG.error("signature does not match - computed {}, in object {}", computed, hmac);
