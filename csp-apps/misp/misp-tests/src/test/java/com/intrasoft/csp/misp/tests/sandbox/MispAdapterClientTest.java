@@ -3,7 +3,6 @@ package com.intrasoft.csp.misp.tests.sandbox;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.intrasoft.csp.commons.model.DataParams;
 import com.intrasoft.csp.commons.model.IntegrationData;
 import com.intrasoft.csp.commons.model.IntegrationDataType;
@@ -11,7 +10,6 @@ import com.intrasoft.csp.commons.model.SharingParams;
 import com.intrasoft.csp.misp.MispAdapterEmitterApplication;
 import com.intrasoft.csp.misp.client.MispClient;
 import com.intrasoft.csp.misp.client.config.MispClientConfig;
-import com.intrasoft.csp.misp.service.impl.AdapterDataHandlerImpl;
 import org.joda.time.DateTime;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -80,8 +78,8 @@ public class MispAdapterClientTest {
         SharingParams sharingParams = new SharingParams();
         sharingParams.setIsExternal(false);
         sharingParams.setToShare(true);
-        sharingParams.setTcId(null);
-        sharingParams.setTeamId(null);
+
+
 
         IntegrationData integrationData = new IntegrationData();
         integrationData.setDataParams(dataParams);

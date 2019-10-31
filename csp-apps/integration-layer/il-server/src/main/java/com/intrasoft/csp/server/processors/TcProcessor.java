@@ -99,61 +99,41 @@ public class TcProcessor implements Processor,CamelRoutes{
 
 
         // SXCSP-185. tcId and teamId logic to be implemented - if both throw exception - Malformed 4xx
-        if (!StringUtils.isEmpty(integrationData.getSharingParams().getTcId())
-                && !StringUtils.isEmpty(integrationData.getSharingParams().getTeamId())) {
+        if ((integrationData.getSharingParams().getTeamIds() != null && integrationData.getSharingParams().getTeamIds().size() > 0) &&
+                (integrationData.getSharingParams().getTrustCircleIds() != null && integrationData.getSharingParams().getTrustCircleIds().size() >0)) {
             //DO NOT ACTIVATE GDELIVERY by throwing any exception, just log the error
             throw new InvalidSharingParamsException("Invalid sharing params provided: tcId and team were both provided. " +
                     "Only one or none should be provided. "+integrationData.getSharingParams().toString());
         }
 
         if(isFlow1) {
-            if (integrationData.getSharingParams().getTcId()!=null) {
-                LOG.debug("F1 tc Id {}", integrationData.getSharingParams().getTcId());
+            if (integrationData.getSharingParams().getTrustCircleIds()!=null) {
+                LOG.debug("F1 tc Id {}", integrationData.getSharingParams().getTrustCircleIds());
                 //send by tcId provided - only in flow1
-                if(integrationData.getSharingParams().getTcId() instanceof List){
-                    List<String> list = (List<String>) integrationData.getSharingParams().getTcId();
-                    if(list.size()>0){
-                        LOG.debug("F1 Sending to list {}", list);
-                        for(String tcId:list) {
-                            if(!StringUtils.isEmpty(tcId)) {
-                                LOG.debug("F1 sending to {}", tcId);
-                                sendByTcId(tcId,localTcExists(tcId), exchange);
-                            }
+                List<String> list = (List<String>) integrationData.getSharingParams().getTrustCircleIds();
+                if(list.size()>0) {
+                    LOG.debug("F1 Sending to list {}", list);
+                    for (String tcId : list) {
+                        if (!StringUtils.isEmpty(tcId)) {
+                            LOG.debug("F1 sending to {}", tcId);
+                            sendByTcId(tcId, localTcExists(tcId), exchange);
                         }
                     }
-                }else if(integrationData.getSharingParams().getTcId() instanceof String){
-                    String tcId = (String) integrationData.getSharingParams().getTcId();
-                    LOG.debug("F1 single TC: {}",tcId);
-                    if(!StringUtils.isEmpty(tcId)) {
-                        sendByTcId(tcId, localTcExists(tcId),exchange);
-                    }
                 }
-
-            } else if (integrationData.getSharingParams().getTeamId()!=null) {
+            } else if (integrationData.getSharingParams().getTeamIds()!=null) {
                 //send by teamId provided - only in flow1
-                LOG.debug("F1 TeamId found - {}", integrationData.getSharingParams().getTeamId());
-                if(integrationData.getSharingParams().getTeamId() instanceof List){
-                    List<String> list = (List<String>) integrationData.getSharingParams().getTeamId();
-                    if(list.size()>0){
-                        LOG.debug("F1 list teamId: {}", integrationData.getSharingParams().getTeamId());
-
-                        for(String teamId:list) {
-                            if(!StringUtils.isEmpty(teamId)) {
-                                LOG.debug("F1.1 sending to {}", teamId);
-                                sendByTeamId(teamId, exchange);
-                            }
+                LOG.debug("F1 TeamId found - {}", integrationData.getSharingParams().getTeamIds());
+                List<String> list = (List<String>) integrationData.getSharingParams().getTeamIds();
+                if (list.size() > 0) {
+                    LOG.debug("F1 list teamId: {}", integrationData.getSharingParams().getTeamIds());
+                    for (String teamId : list) {
+                        if (!StringUtils.isEmpty(teamId)) {
+                            LOG.debug("F1.1 sending to {}", teamId);
+                            sendByTeamId(teamId, exchange);
                         }
                     }
-                }else if(integrationData.getSharingParams().getTeamId() instanceof String){
-                    LOG.debug("F1 single teamId: {}", integrationData.getSharingParams().getTeamId());
-
-                    String teamId = (String) integrationData.getSharingParams().getTeamId();
-                    if(!StringUtils.isEmpty(teamId)) {
-                        LOG.debug("F1.2 sending to {}", teamId);
-
-                        sendByTeamId(teamId, exchange);
-                    }
                 }
+
             } else {
                 LOG.debug("F1 not teamId or tcId - sending by datatype {}", integrationData.getDataType());
                 //send by dataType

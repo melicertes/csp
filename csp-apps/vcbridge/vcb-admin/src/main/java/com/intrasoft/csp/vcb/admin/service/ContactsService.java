@@ -1,11 +1,10 @@
 package com.intrasoft.csp.vcb.admin.service;
 
 
-import com.intrasoft.csp.client.TrustCirclesClient;
-import com.intrasoft.csp.commons.model.PersonContact;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
+import com.intrasoft.csp.commons.model.*;
+import com.intrasoft.csp.client.*;
 
 import java.util.ArrayList;
 import java.util.List;

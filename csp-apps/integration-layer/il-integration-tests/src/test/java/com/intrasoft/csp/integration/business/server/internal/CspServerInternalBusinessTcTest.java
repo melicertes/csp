@@ -11,7 +11,9 @@ import com.intrasoft.csp.server.policy.service.SharingPolicyService;
 import com.intrasoft.csp.server.routes.RouteUtils;
 import com.intrasoft.csp.server.service.ErrorMessageHandler;
 import com.intrasoft.csp.server.utils.MockUtils;
-import org.apache.camel.*;
+import org.apache.camel.EndpointInject;
+import org.apache.camel.Exchange;
+import org.apache.camel.Message;
 import org.apache.camel.component.mock.MockEndpoint;
 import org.apache.camel.spring.SpringCamelContext;
 import org.apache.camel.test.spring.CamelSpringBootRunner;
@@ -36,7 +38,6 @@ import java.util.List;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Matchers.anyObject;
-import static org.mockito.Matchers.eq;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
 /**
@@ -183,7 +184,7 @@ public class CspServerInternalBusinessTcTest implements CamelRoutes {
         for (Exchange exchange : list) {
             Message in = exchange.getIn();
             IntegrationData data = in.getBody(IntegrationData.class);
-            assertThat(((List)data.getSharingParams().getTcId()).get(0), is(tcId));
+            assertThat(((List)data.getSharingParams().getTrustCircleIds()).get(0), is(tcId));
             assertThat(data.getDataType(), is(IntegrationDataType.INCIDENT));
         }
 

@@ -72,12 +72,12 @@ public class DataMappingTest {
         if(!StringUtils.isEmpty(tcId)){
             List<String> list = new ArrayList<>();
             list.add(tcId);
-            sharingParams.setTcId(list);
+            sharingParams.setTrustCircleIds(list);
         }
         if(!StringUtils.isEmpty(teamId)){
             List<String> list = new ArrayList<>();
             list.add(teamId);
-            sharingParams.setTeamId(list);
+            sharingParams.setTeamIds(list);
         }
         integrationData.setDataParams(dataParams);
         String data = mockUtils.getDataObjectMap().get(integrationData.getDataType());
@@ -99,7 +99,7 @@ public class DataMappingTest {
         String tcId="dummyYcId";
         List<String> list = new ArrayList<>();
         list.add(tcId);
-        sharingParams.setTcId(list);
+        sharingParams.setTrustCircleIds(list);
         integrationData.setSharingParams(sharingParams);
         String out = objectMapper.writeValueAsString(integrationData);
         LOG.info(out);
@@ -110,7 +110,7 @@ public class DataMappingTest {
     public void inputJsonSharingParamsTest() throws IOException {
         String inStr = "{\"dataParams\":null,\"sharingParams\":{\"toShare\":null,\"isExternal\":null,\"trustCircleId\":\"dummyTcId\",\"teamId\":null},\"dataType\":\"incident\",\"dataObject\":null}";
         IntegrationData integrationData = objectMapper.readValue(inStr,IntegrationData.class);
-        assertThat(integrationData.getSharingParams().getTcId(), is("dummyTcId"));
+        assertThat(integrationData.getSharingParams().getTrustCircleIds(), is("dummyTcId"));
     }
 
     @Test
