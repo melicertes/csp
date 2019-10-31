@@ -205,12 +205,13 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
          * find out how to differentiate our custom shared groups from the normal ones
          * use custom sharing groups uuids as tcid, use custom organizations(?) uuids as team id.
          * harvest only from the dataobject part which dictates which organization or sharing group should get this event*/
+        LOG.info("Sharing event with validation map {}",eventValidationMap);
         if (eventValidationMap.containsKey("org")) { // Valid Sharing Group with valid Organisations
             sharingParams.setTeamIds(eventValidationMap.get("org"));
         } else if (eventValidationMap.containsKey("sg")) { // Valid Sharing Group without any valid organisations
             sharingParams.setTrustCircleIds(eventValidationMap.get("sg"));
         }
-
+        LOG.info("Sharing with sharing params {} and data {}", sharingParams, dataParams);
         IntegrationData integrationData = new IntegrationData();
         integrationData.setDataParams(dataParams);
         integrationData.setSharingParams(sharingParams);
@@ -244,7 +245,7 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
             return;
         }
 
-        LOG.debug("Integration Data Forwarded to IL: " + integrationData);
+        LOG.debug("Integration Data Forwarded to IL: {}", integrationData);
 
         boolean objextExists = false;
         try {
@@ -278,7 +279,7 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler, MispContextUr
         try { // handling the case when there's no sharing group specified in the event's distribution setting.
             sharingGroupName = jsonNode.get(EVENT.toString()).get("SharingGroup").get("name").toString().replace("\"","");
         } catch (NullPointerException e) {
-            LOG.debug("No sharing group distribution set for this event");
+            LOG.warn("No sharing group distribution set for this event");
             result.put("", new ArrayList<>());
             return result; // returns empty map on sharing group absence
         }
