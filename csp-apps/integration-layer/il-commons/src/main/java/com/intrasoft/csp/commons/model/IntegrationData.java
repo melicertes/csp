@@ -35,7 +35,6 @@ public class IntegrationData implements Serializable {
     @JsonProperty("dataObject")
     private Object dataObject;
 
-    @NotNull
     @JsonProperty("hmac")
     private String hmac;
 
