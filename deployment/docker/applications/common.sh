@@ -24,6 +24,7 @@ function prepareModule() {
   #rm manifest.json #not necessary to stay here
   cd $WD
   echo "Done - zip $FNAME created, zip returned $R"
+  echo "Created $FNAME on `date`" >> module-creation.log
   return $R
 }
 
