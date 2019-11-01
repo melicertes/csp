@@ -49,16 +49,16 @@ public class IntegrationDataValidator implements Validator {
             }
             String hmac = ((IntegrationData)obj).getHmac();
             //now set it to "xx" and try to generate the hmac again
-            signHMAC((IntegrationData)obj);
+            HmacHelper.getInstance().hmacIntegrationData((IntegrationData) obj);
             String computed = ((IntegrationData) obj).getHmac();
             LOG.debug("About to validate HMAC of {}",obj);
-            if (computed != null) {
+            if (hmac != null) {
                 if (!computed.contentEquals(hmac)) {
                     LOG.error("signature does not match - computed {}, in object {}", computed, hmac);
                     errors.reject("IntegrationData.hmac not valid.");
                 }
             } else {
-                LOG.error("signature cannot be computed - object is null -> {}", obj);
+                LOG.error("signature cannot be computed - object hmac is null -> {}", obj);
             }
 
 
@@ -71,10 +71,6 @@ public class IntegrationDataValidator implements Validator {
         }
     }
 
-    private void signHMAC(IntegrationData integrationData) {
-        integrationData.setHmac("xx");
-        integrationData.setHmac(Long.toHexString(LongHashFunction.xx(54018521).hashChars(integrationData.toString())));
-    }
 
     public boolean isValidJSON(final Object jsonObj) throws IOException {
         String json = null;
