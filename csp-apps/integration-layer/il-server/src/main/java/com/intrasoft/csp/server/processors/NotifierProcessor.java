@@ -20,10 +20,7 @@ import org.springframework.util.StringUtils;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.intrasoft.csp.commons.routes.CamelRoutes.ECSP;
@@ -73,11 +70,11 @@ public class NotifierProcessor implements Processor {
     public void scheduledRetryConnectivity() {
         if (failedConnectivityTest.size() > 0) {
             final Map<Team, LocalDateTime> copied = new HashMap<>(failedConnectivityTest);
-            final List<Team> forProcessing =
+            final Set<Team> forProcessing =
                 copied.entrySet()
                     .stream()
                     .filter( e -> e.getValue().plus(retryFailedMinutes, ChronoUnit.MINUTES).isBefore(LocalDateTime.now()))
-                    .map( entry -> entry.getKey()).collect(Collectors.toList()); // these are expired entries, we need to reprocess.
+                    .map( entry -> entry.getKey()).collect(Collectors.toSet()); // these are expired entries, we need to reprocess; use SET so we dont check the same multiple times
             LOG.debug("Notifier - Now will retry the following CSP teams: {}", copied.size());
             forProcessing.forEach( t -> {
                 LocalDateTime timeOfFailure = failedConnectivityTest.get(t); //get the last timeOfFailure
