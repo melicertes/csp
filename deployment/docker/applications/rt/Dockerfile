@@ -2,10 +2,10 @@ FROM csp-alpine35glibc:1.0
 
 MAINTAINER tku
 
-# version of RT
-ENV RT_VERSION=4.4.2
+# version of RT set to new one 4.4.4
+ENV RT_VERSION=4.4.4
 # version of RT::IR extension
-ENV RT_IR_VERSION=4.0.0
+ENV RT_IR_VERSION=4.0.1
 # address of the RT host
 ENV RT_HOSTNAME=csp-rt
 # address of the postgresql host

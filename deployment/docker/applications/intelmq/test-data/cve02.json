@@ -1,55 +1,86 @@
 {
 	"threat_level_id": "1",
-	"info": "CVE 02 vulnerability",
+	"info": "CVE 02 vulnerability OCT2019",
 	"attribute_count": "7",
-	"Tag": [{
-		"name": "vulnerability"
-	}],
+	"id": "2345645",
+	"uuid": "d942c684-fa5d-11e9-8f0b-362b9e155667",
+	"timestamp": "1572272841",
+	"Attribute": [],
+	"Tag": [
+		{
+			"name": "vulnerability"
+		}
+	],
 	"distribution": "1",
-	"Object": [{
-		"name": "csp-vulnerability",
-		"meta-category": "network",
-		"Attribute": [{
-			"type": "vulnerability",
-			"category": "External analysis",
-			"object_relation": "id",
-			"value": "CVE-2018-6411"
-		},
+	"Object": [
 		{
-			"type": "text",
-			"category": "Other",
-			"object_relation": "text",
-			"value": "An issue was discovered"
-		},
-		{
-			"type": "text",
-			"category": "Other",
-			"object_relation": "summary",
-			"value": "An issue was Form"
-		},
-		{
-			"type": "text",
-			"category": "Other",
-			"object_relation": "state",
-			"value": "Published"
-		},
-		{
-			"type": "text",
-			"category": "Other",
-			"object_relation": "csp-originCspId",
-			"value": "Vulnerable  object Csp-originCspId"
-		},
-		{
-			"type": "text",
-			"category": "Other",
-			"object_relation": "csp-originRecordId",
-			"value": "Vulnerable  object Csp-originRecordId"
-		},
-		{
-			"type": "text",
-			"category": "Other",
-			"object_relation": "csp-url",
-			"value": "Vulnerable  object Csp-url"
-		}]
-	}]
+			"name": "csp-vulnerability",
+			"meta-category": "network",
+			"Attribute": [
+				{
+					"type": "url",
+					"category": "Network activity",
+					"object_relation": "id",
+					"uuid": "d942caf8-fa5d-11e9-8f0b-362b9e155667",
+					"comment": "test comment 2019-10-28",
+					"timestamp": "1572272841",
+					"value": "http://fake.website.com/malware/is/here"
+				},
+				{
+					"type": "text",
+					"category": "Other",
+					"object_relation": "text",
+					"uuid": "d942caf8-fa5d-11e9-8f0b-362b9e155667",
+					"comment": "test comment 2019-10-28",
+					"timestamp": "1572272841",
+					"value": "An issue was discovered"
+				},
+				{
+					"type": "text",
+					"category": "Other",
+					"object_relation": "summary",
+					"uuid": "d942caf8-fa5d-11e9-8f0b-362b9e155667",
+					"comment": "test comment 2019-10-28",
+					"timestamp": "1572272841",
+					"value": "An issue was Form"
+				},
+				{
+					"type": "text",
+					"category": "Other",
+					"object_relation": "state",
+					"uuid": "d942caf8-fa5d-11e9-8f0b-362b9e155667",
+					"comment": "test comment 2019-10-28",
+					"timestamp": "1572272841",
+					"value": "Published"
+				},
+				{
+					"type": "text",
+					"category": "Other",
+					"object_relation": "csp-originCspId",
+					"uuid": "d942caf8-fa5d-11e9-8f0b-362b9e155667",
+					"comment": "test comment 2019-10-28",
+					"timestamp": "1572272841",
+					"value": "Vulnerable object Csp-originCspId"
+				},
+				{
+					"type": "text",
+					"category": "Other",
+					"object_relation": "csp-originRecordId",
+					"uuid": "d942caf8-fa5d-11e9-8f0b-362b9e155667",
+					"comment": "test comment 2019-10-28",
+					"timestamp": "1572272841",
+					"value": "Vulnerable object Csp-originRecordId"
+				},
+				{
+					"type": "text",
+					"category": "Other",
+					"object_relation": "csp-url",
+					"uuid": "d942caf8-fa5d-11e9-8f0b-362b9e155667",
+					"comment": "test comment 2019-10-28",
+					"timestamp": "1572272841",
+					"value": "Vulnerable  object Csp-url"
+				}
+			]
+		}
+	]
 }

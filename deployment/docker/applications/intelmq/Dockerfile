@@ -5,50 +5,67 @@ MAINTAINER tku
 MAINTAINER msg
 
 
-#RUN apt-get clean &&  apt-get update &&  apt-get -y upgrade && \
-RUN apt-get update &&   \
- apt-get install -y python3-pip python3-dnspython python3-psutil python3-redis python3-requests python3-termstyle python3-tz python3-bs4 && \
+ENV IMQ_VERSION=2.1.0
+ENV IMQMGR_VERSION=2.1.0
+
+RUN apt-get clean &&  apt-get update &&  apt-get -y upgrade && \
+#RUN apt-get update &&   \
+ apt-get install -y python3-pip python3-dnspython python3-psutil python3-redis python3-requests python3-termstyle python3-tz python3-dateutil python3-bs4 && \
  apt-get update -y && \
  apt-get install -y apt-utils git apache2 php libapache2-mod-php7.0 && \
  apt-get install -y sudo build-essential libcurl4-gnutls-dev libgnutls28-dev python3-dev && \
-# apt-get install -y nano vim && \
+ apt-get install -y bash-completion jq python3-sleekxmpp python3-pymongo python3-psycopg2 && \
+ apt-get install -y nano vim && \
  rm -rf /var/lib/apt/lists/*checkout
+
 
 RUN git clone https://github.com/certtools/intelmq.git /opt/dev_intelmq
 WORKDIR /opt/dev_intelmq
-RUN git checkout tags/1.1.1
-#RUN git checkout
+RUN git fetch
+RUN git checkout tags/$IMQ_VERSION -b $IMQ_VERSION
+
 
 ADD test-data /tmp/test-data
 ADD csp-config/cve /opt/dev_intelmq/intelmq/bots/parsers/cve
 COPY ./csp-config/BOTS /opt/dev_intelmq/intelmq/bots/BOTS
 COPY ./csp-config/BOTS /opt/intelmq/etc/BOTS
 
+
 RUN pip3 install . && \
- cp /opt/intelmq/etc/examples/harmonization.conf /opt/intelmq/etc/ && \
  useradd -d /opt/intelmq -U -s /bin/bash intelmq && \
  mkdir -p /opt/intelmq/var/log && \
-#review chmod -R 775 /opt/intelmq && \
+ mkdir -p /opt/intelmq/var/lib && \
+ mkdir -p /opt/intelmq/var/run && \
+ mkdir -p /opt/intelmq/var/lib/bots && \
+ cp -R /opt/dev_intelmq/intelmq/etc /opt/intelmq/ && \
+ cp -R /opt/dev_intelmq/intelmq/bots/BOTS /opt/intelmq/etc/ && \
  chown -R intelmq:intelmq /opt/intelmq
 
+#COPY ./csp-config/*.conf /opt/intelmq/etc/
+COPY ./csp-config/runtime.conf /opt/intelmq/etc/
+COPY ./csp-config/pipeline.conf /opt/intelmq/etc/
+#COPY ./csp-config/state.json /opt/intelmq/var/lib/ 
+
+#####install intelmq manager################
 RUN git clone https://github.com/certtools/intelmq-manager.git /tmp/intelmq-manager
 WORKDIR /tmp/intelmq-manager
-RUN git checkout tags/1.1.0
+RUN git fetch
+RUN git checkout -b $IMQMGR_VERSION
+
 
 RUN cp -R /tmp/intelmq-manager/intelmq-manager/* /var/www/html/ && \
  mv /var/www/html/index.html /var/www/html/index.html.save && \
  chown -R www-data:www-data /var/www/html/ && \
  usermod -a -G intelmq www-data && \
- mkdir /opt/intelmq/etc/manager/ 
-
-ADD positions.conf /opt/intelmq/etc/manager/positions.conf
-
-RUN chmod 666  /opt/intelmq/etc/manager/positions.conf && \
+ mkdir /opt/intelmq/etc/manager && \
+ touch /opt/intelmq/etc/manager/positions.conf && \
  rm -rf /tmp/intelmq-manager
 
-COPY ./csp-config/*.conf /opt/intelmq/etc/
+
+
 RUN chown intelmq:www-data /opt/intelmq/etc/*.conf && \
- chmod g+w /opt/intelmq/etc/*.conf && \
+ chgrp www-data /opt/intelmq/etc/*.conf /opt/intelmq/etc/manager/positions.conf && \
+ chmod g+w /opt/intelmq/etc/*.conf /opt/intelmq/etc/manager/positions.conf && \
  echo "www-data ALL=(intelmq) NOPASSWD: /usr/local/bin/intelmqctl" >> /etc/sudoers && \
  echo "intelmq ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 

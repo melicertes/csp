@@ -1,48 +1,33 @@
 {
-		"Object": [{
+	"Attribute": [],
+	"Object": [
+		{
 			"name": "csp-vulnerability",
 			"meta-category": "network",
 			"description": "IMQ Vulnerability object describing",
 			"template_version": "1",
-			"Attribute": [{
-				"object_relation": "id",
-				"type": "vulnerability",
-				"value": "CVE-2018-14543"
-			},
-			{
-				"object_relation": "text",
-				"type": "text",
-				"value": "There"
-			},
-			{
-				"object_relation": "summary",
-				"type": "text",
-				"value": "AP4_JsonInspector mp4dump."
-			},
-			{
-				"object_relation": "vulnerable_configuration",
-				"type": "text",
-				"value": ""
-			},
-			{
-				"category": "External analysis",
-				"object_relation": "references",
-				"type": "link",
-				"value": "https://github.com/"
-			},
-			{
-				"type": "text",
-				"value": "Published"
-			}],
-			"description": "",
-			"meta-category": "network",
+			"Attribute": [
+				{
+					"object_relation": "id",
+					"type": "md5",
+					"value": "CVE-2018-14543",
+					"category": "Payload delivery",
+					"uuid": "1347cf89-67e7-405c-a097-05939651f466",
+					"timestamp": "1572272841",
+					"comment": "test comment 2019-10-28"
+				}
+			]
+		}
+	],
+	"Tag": [
+		{
 			"name": "vulnerability"
-		}],
-		"Tag": [{
-			"name": "vulnerability"
-		}],
-		"distribution": "1",
-		"attribute_count": "6",
-		"info": "CVE 01 vulnerability",
-		"threat_level_id": "1"
+		}
+	],
+	"distribution": "1",
+	"attribute_count": "6",
+	"info": "CVE 01 vulnerability OCT2019",
+	"threat_level_id": "1",
+	"id": "234562",
+	"uuid": ""
 }

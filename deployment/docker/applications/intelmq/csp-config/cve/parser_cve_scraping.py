@@ -22,19 +22,19 @@ class CveScrapingParserBot(Bot):
         soup = BeautifulSoup(raw_report, "html.parser")        
         #self.logger.debug("CveScrapingParserBot BeautifulSoup done.")
 
-        self.logger.debug("CveScrapingParserBot starts soup findAll...")
+        #self.logger.debug("CveScrapingParserBot starts soup findAll...")
         for stream_item_tweet in soup.findAll('li', attrs={'data-item-type': 'tweet'}):
             tweet_text = stream_item_tweet.find("div", class_="js-tweet-text-container").p.get_text()
             tweet_textb = tweet_text.encode('utf-8')
-            #self.logger.debug("CveScrapingParserBot encode utf-8 done.")
+            #self.logger.debug("CveScrapingParserBot encode utf-8 done %s",tweet_textb)
             try:
                 tweet_textstr = tweet_textb.decode('utf-8').replace(u"\u00A0", "")
             except UnicodeDecodeError:
                 tweet_textstr = tweet_textb.decode('utf-8','ignore').replace(u"\u00A0", "")
             cve = tweet_textstr.split(" ", 1)[0]
-            #self.logger.debug("CveScrapingParserBot tweet CVE: %s", cve)
-            url = tweet_textstr[-22:].strip()
-            #self.logger.debug("tweet url: %s", url)
+            self.logger.debug("CveScrapingParserBot tweet CVE: %s", cve)
+            url = tweet_textstr[-62:].strip()
+            self.logger.debug("CveScrapingParserBot tweet url: %s", url)
             short_tweet_text = tweet_textstr.split(" ", 1)[1][0:70].strip() + " ....."
 
 

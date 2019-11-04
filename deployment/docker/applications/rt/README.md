@@ -9,10 +9,10 @@
 Version: perl 5, version 24, subversion 3 (v5.24.3) built for x86_64-linux-thread-multi
 
 - RT
-Version: 4.4.2
+Version: 4.4.4
 
 - RT-IR
-Version: 4.0.0
+Version: 4.0.1
 
 - Preset users
 1. root/password - superuser
