@@ -29,7 +29,7 @@ public class DslApiController implements CamelRoutes, ContextUrl{
             method = RequestMethod.POST)
     public ResponseEntity<String> syncNewIntData(@RequestBody IntegrationData integrationData, @RequestHeader HttpHeaders headers) {
         LOG.info("DSL API: POST received with headers {}",headers);
-        LOG.debug("DSL API: type {} origin {}", integrationData.getDataType(), integrationData.getDataParams().getOriginCspId());
+        LOG.debug("DSL API: type {} origin {} sharing {} ", integrationData.getDataType(), integrationData.getDataParams().getOriginCspId(), integrationData.getSharingParams());
         return handleIntegrationData(integrationData, "POST");
     }
 
@@ -38,7 +38,7 @@ public class DslApiController implements CamelRoutes, ContextUrl{
             method = RequestMethod.PUT)
     public ResponseEntity<String> syncUpdatedIntData(@RequestBody IntegrationData integrationData, @RequestHeader HttpHeaders headers) {
         LOG.info("DSL API: PUT received with headers {}",headers);
-        LOG.debug("DSL API: type {} origin {}", integrationData.getDataType(), integrationData.getDataParams().getOriginCspId());
+        LOG.debug("DSL API: type {} origin {} sharing {} ", integrationData.getDataType(), integrationData.getDataParams().getOriginCspId(), integrationData.getSharingParams());
         return handleIntegrationData(integrationData, "PUT");
     }
 

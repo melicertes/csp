@@ -1,6 +1,8 @@
 package com.intrasoft.csp.misp.service.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.intrasoft.csp.misp.commons.config.MispContextUrl;
@@ -8,6 +10,7 @@ import com.intrasoft.csp.misp.service.DistributionPolicy;
 import com.intrasoft.csp.misp.service.DistributionPolicyRectifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -17,6 +20,9 @@ import java.util.List;
 public class DistributionPolicyRectifierImpl implements DistributionPolicyRectifier, MispContextUrl {
 
     private static final Logger LOG = LoggerFactory.getLogger(DistributionPolicyRectifierImpl.class);
+
+    @Autowired
+    ObjectMapper mapper;
 
     @Override
     public JsonNode rectifyEvent(JsonNode jsonNode) {
@@ -44,7 +50,11 @@ public class DistributionPolicyRectifierImpl implements DistributionPolicyRectif
                 removeNonShareableNodes(entityArray, eventDistributionLevel, eventSharinggroupId);
             }
         }
-
+        try {
+            LOG.debug("After policy rectifier - event is {}", mapper.writeValueAsString(jsonNode));
+        } catch (JsonProcessingException e) {
+            LOG.error("Rectified object cannot be written {}",e.getMessage());
+        }
         return jsonNode;
     }
 

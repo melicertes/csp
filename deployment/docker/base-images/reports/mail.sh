@@ -1,1 +1,0 @@
-cat ~/template/01.txt  ~/reg/data/csp/csp/report1.txt ~/template/02.txt  ~/reg/data/csp/csp/report2.txt ~/template/03.txt  ~/reg/data/csp/csp/report3.txt ~/template/04.txt  ~/reg/data/csp/csp/report4.txt | ssmtp andreas@papalambrou.gr

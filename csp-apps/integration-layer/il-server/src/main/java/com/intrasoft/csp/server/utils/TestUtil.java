@@ -4,6 +4,9 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
+import com.intrasoft.csp.commons.model.IntegrationData;
+import com.intrasoft.csp.commons.validators.HmacHelper;
+import net.openhft.hashing.LongHashFunction;
 import org.springframework.http.MediaType;
 
 import java.io.IOException;
@@ -20,6 +23,11 @@ public class TestUtil {
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         mapper.registerModule(new JodaModule());
         mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        if (object instanceof IntegrationData) {
+            HmacHelper.getInstance().hmacIntegrationData((IntegrationData) object);
+        }
         return mapper.writeValueAsBytes(object);
     }
+
+
 }

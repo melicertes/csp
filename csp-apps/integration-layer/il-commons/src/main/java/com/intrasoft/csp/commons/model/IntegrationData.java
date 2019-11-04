@@ -2,7 +2,6 @@ package com.intrasoft.csp.commons.model;
 
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -35,6 +34,9 @@ public class IntegrationData implements Serializable {
     @NotNull
     @JsonProperty("dataObject")
     private Object dataObject;
+
+    @JsonProperty("hmac")
+    private String hmac;
 
     public IntegrationData() {
     }
@@ -111,6 +113,14 @@ public class IntegrationData implements Serializable {
 
         sb.append("}");
         return sb.toString();
+    }
+
+    public String getHmac() {
+        return hmac;
+    }
+
+    public void setHmac(String hmac) {
+        this.hmac = hmac;
     }
 
     /**

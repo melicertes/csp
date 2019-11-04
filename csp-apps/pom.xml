@@ -39,43 +39,7 @@
         <camel.version>2.21.2</camel.version>
 	</properties>
 
-	<distributionManagement>
-<!--		<repository>
-			<id>sastix-releases-repo</id>
-			<name>release</name>
-			<url>https://nexus.sastix.com/repository/maven-releases/</url>
-		</repository>
-		<snapshotRepository>
-			<id>sastix-snapshots-repo</id>
-			<name>snapshot</name>
-			<url>https://nexus.sastix.com/repository/maven-snapshots/</url>
-		</snapshotRepository> -->
-	</distributionManagement>
 
-	<repositories>
-		<repository>
-			<id>sastix-releases-repo</id>
-			<name>Private Sparks Repo</name>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-			<url>https://nexus.sastix.com/repository/maven-releases/</url>
-		</repository>
-		<repository>
-			<id>sastix-snapshots-repo</id>
-			<name>Private Sparks Repo</name>
-			<releases>
-				<enabled>false</enabled>
-			</releases>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-			<url>https://nexus.sastix.com/repository/maven-snapshots/</url>
-		</repository>
-	</repositories>
 
 	<build>
 		<pluginManagement>

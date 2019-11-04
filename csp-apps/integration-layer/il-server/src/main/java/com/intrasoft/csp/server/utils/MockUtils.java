@@ -190,12 +190,12 @@ public class MockUtils implements ContextUrl {
         if(!StringUtils.isEmpty(tcId)){
             List<String> list = new ArrayList<>();
             list.add(tcId);
-            sharingParams.setTcId(list);
+            sharingParams.setTrustCircleIds(list);
         }
         if(!StringUtils.isEmpty(teamId)){
             List<String> list = new ArrayList<>();
             list.add(teamId);
-            sharingParams.setTeamId(list);
+            sharingParams.setTeamIds(list);
         }
         integrationData.setDataParams(dataParams);
         String data = dataObjectToTest!=null?dataObjectToTest:dataObjectMap.get(integrationData.getDataType());
@@ -233,12 +233,12 @@ public class MockUtils implements ContextUrl {
         if(!StringUtils.isEmpty(tcId)){
             List<String> list = new ArrayList<>();
             list.add(tcId);
-            sharingParams.setTcId(list);
+            sharingParams.setTrustCircleIds(list);
         }
         if(!StringUtils.isEmpty(teamId)){
             List<String> list = new ArrayList<>();
             list.add(teamId);
-            sharingParams.setTeamId(list);
+            sharingParams.setTeamIds(list);
         }
         integrationData.setSharingParams(sharingParams);
         DataParams dataParams = new DataParams();
@@ -294,12 +294,12 @@ public class MockUtils implements ContextUrl {
         if(!StringUtils.isEmpty(tcId)){
             List<String> list = new ArrayList<>();
             list.add(tcId);
-            sharingParams.setTcId(list);
+            sharingParams.setTrustCircleIds(list);
         }
         if(!StringUtils.isEmpty(teamId)){
             List<String> list = new ArrayList<>();
             list.add(teamId);
-            sharingParams.setTeamId(list);
+            sharingParams.setTeamIds(list);
         }
         integrationData.setSharingParams(sharingParams);
         DataParams dataParams = new DataParams();

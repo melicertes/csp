@@ -1,19 +1,6 @@
 
 package com.fraunhofer.csp.rt.service.impl;
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.joda.time.DateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
-
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -31,12 +18,19 @@ import com.fraunhofer.csp.rt.ticket.CfSharing;
 import com.fraunhofer.csp.rt.ticket.Ticket;
 import com.intrasoft.csp.client.CspClient;
 import com.intrasoft.csp.client.TrustCirclesClient;
-import com.intrasoft.csp.commons.model.DataParams;
-import com.intrasoft.csp.commons.model.IntegrationData;
-import com.intrasoft.csp.commons.model.IntegrationDataType;
-import com.intrasoft.csp.commons.model.SharingParams;
-import com.intrasoft.csp.commons.model.Team;
-import com.intrasoft.csp.commons.model.TrustCircle;
+import com.intrasoft.csp.commons.model.*;
+import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Created by Majid Salehi on 4/8/17.
@@ -131,8 +125,8 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler {
 
 		// set SharingParams
 		SharingParams sharingParams = new SharingParams();
-		sharingParams.setTcId(null);
-		sharingParams.setTeamId(null);
+//		sharingParams.setTcId(null);
+//		sharingParams.setTeamId(null);
 		sharingParams.setIsExternal(false);
 
 		String sharing = incident.getSharing();
@@ -188,7 +182,7 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler {
 						LOG.debug("trustCircle ID:" + tcsIdlist.get(i));
 					}
 				}
-				sharingParams.setTcId(tcsIdlist);
+				sharingParams.setTrustCircleIds(tcsIdlist);
 
 				List<Team> teams = tcClient.getAllTeams();
 				LOG.debug("All Teams size:" + teams.size());
@@ -216,7 +210,7 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler {
 						LOG.debug("team ID:" + teamsIdlist.get(i));
 					}
 				}
-				sharingParams.setTeamId(teamsIdlist);
+				sharingParams.setTeamIds(teamsIdlist);
 			}
 		}
 

@@ -3,9 +3,7 @@ package com.intrasoft.csp.commons.model;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.intrasoft.csp.commons.model.tc.Certificate;
-import com.intrasoft.csp.commons.model.tc.Membership;
-import com.intrasoft.csp.commons.model.tc.PhoneNumber;
+import com.intrasoft.csp.commons.model.tc.*;
 
 import java.util.List;
 

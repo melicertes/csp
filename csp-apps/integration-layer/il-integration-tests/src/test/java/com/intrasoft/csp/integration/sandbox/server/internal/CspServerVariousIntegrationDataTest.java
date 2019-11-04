@@ -26,7 +26,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.mock.http.MockHttpOutputMessage;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
 
@@ -133,10 +132,10 @@ public class CspServerVariousIntegrationDataTest implements CamelRoutes, Context
         SharingParams sharingParams = new SharingParams();
         sharingParams.setIsExternal(false);
         sharingParams.setToShare(false);
-        List<Boolean> teams= new ArrayList<>();
-        teams.add(true);
-        teams.add(false);
-        sharingParams.setTeamId(teams);
+        List<String> teams= new ArrayList<>();
+        teams.add("true");
+        teams.add("false");
+        sharingParams.setTeamIds(teams);
         integrationData.setSharingParams(sharingParams);
 
         integrationData.setDataObject(sharingParams);

@@ -1,9 +1,14 @@
 package com.fraunhofer.csp.intelmq.service.impl;
 
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.UUID;
-
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fraunhofer.csp.intelmq.service.EmitterDataHandler;
+import com.intrasoft.csp.client.CspClient;
+import com.intrasoft.csp.commons.model.DataParams;
+import com.intrasoft.csp.commons.model.IntegrationData;
+import com.intrasoft.csp.commons.model.IntegrationDataType;
+import com.intrasoft.csp.commons.model.SharingParams;
 import org.apache.commons.codec.binary.Base64;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -14,15 +19,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fraunhofer.csp.intelmq.service.EmitterDataHandler;
-import com.intrasoft.csp.client.CspClient;
-import com.intrasoft.csp.commons.model.DataParams;
-import com.intrasoft.csp.commons.model.IntegrationData;
-import com.intrasoft.csp.commons.model.IntegrationDataType;
-import com.intrasoft.csp.commons.model.SharingParams;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.UUID;
 
 /**
  * Created by Majid Salehi on 20/04/2018
@@ -136,8 +135,8 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler {
 
 		// set SharingParams
 		SharingParams sharingParams = new SharingParams();
-		sharingParams.setTcId(null);
-		sharingParams.setTeamId(null);
+//		sharingParams.setTcId(null);
+//		sharingParams.setTeamId(null);
 		//setIsExternal(true) IL only sends to the prime app (MISP) and not to RT
 		sharingParams.setIsExternal(true);
 		sharingParams.setToShare(false);

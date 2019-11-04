@@ -2,15 +2,12 @@ package com.intrasoft.csp.integration.business.client.elastic;
 
 
 import com.intrasoft.csp.client.ElasticClient;
-import com.intrasoft.csp.client.config.CspClientConfig;
 import com.intrasoft.csp.client.config.ElasticClientConfig;
-import com.intrasoft.csp.client.config.TrustCirclesClientConfig;
 import com.intrasoft.csp.commons.model.DataParams;
 import com.intrasoft.csp.commons.model.IntegrationData;
 import com.intrasoft.csp.commons.model.IntegrationDataType;
 import com.intrasoft.csp.commons.model.SharingParams;
 import com.intrasoft.csp.server.CspApp;
-import com.intrasoft.csp.server.utils.MockUtils;
 import org.joda.time.DateTime;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -58,8 +55,8 @@ public class ElasticClientSandboxTest {
         SharingParams sharingParams = new SharingParams();
         sharingParams.setIsExternal(false);
         sharingParams.setToShare(true);
-        sharingParams.setTcId(null);
-        sharingParams.setTeamId(null);
+        sharingParams.setTrustCircleIds(null);
+        sharingParams.setTeamIds(null);
 
         IntegrationData integrationData = new IntegrationData();
         integrationData.setDataParams(dataParams);

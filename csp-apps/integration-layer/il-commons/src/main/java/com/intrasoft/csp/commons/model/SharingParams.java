@@ -23,10 +23,11 @@ public class SharingParams implements Serializable {
     private Boolean isExternal;
 
     @JsonProperty("trustCircleId")
-    private Object tcId; //supported values: String or Array
+    private List<String> trustCircleIds; //supported values: Array
+
 
     @JsonProperty("teamId")
-    private Object teamId;//supported values: String or Array
+    private List<String> teamIds;//supported values:  Array
 
     public SharingParams() {
     }
@@ -52,62 +53,45 @@ public class SharingParams implements Serializable {
         this.isExternal = isExternal;
     }
 
-    public Object getTcId() {
-        return tcId;
+    public List<String> getTrustCircleIds() {
+        return trustCircleIds;
     }
 
-    public void setTcId(Object tcId) {
-        this.tcId = tcId;
+    public void setTrustCircleIds(List<String> trustCircleIds) {
+        this.trustCircleIds = trustCircleIds;
     }
 
-    public Object getTeamId() {
-        return teamId;
+    public List<String> getTeamIds() {
+        return teamIds;
     }
 
-    public void setTeamId(Object teamId) {
-        this.teamId = teamId;
+    public void setTeamIds(List<String> teamIds) {
+        this.teamIds = teamIds;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        SharingParams sharingParams = (SharingParams) o;
-        return Objects.equals(this.toShare, sharingParams.toShare) &&
-                Objects.equals(this.isExternal, sharingParams.isExternal);
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
+        if (!super.equals(object)) return false;
+        SharingParams that = (SharingParams) object;
+        return java.util.Objects.equals(toShare, that.toShare) &&
+                java.util.Objects.equals(isExternal, that.isExternal) &&
+                java.util.Objects.equals(trustCircleIds, that.trustCircleIds) &&
+                java.util.Objects.equals(teamIds, that.teamIds);
     }
 
-    @Override
     public int hashCode() {
-        return Objects.hash(toShare, isExternal);
+        return Objects.hash(super.hashCode(), toShare, isExternal, trustCircleIds, teamIds);
     }
 
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("class SharingParams {\n");
-
-        sb.append("    toShare: ").append(toIndentedString(toShare)).append("\n");
-        sb.append("    isExternal: ").append(toIndentedString(isExternal)).append("\n");
-        sb.append("    tcId: ").append(toIndentedString(tcId)).append("\n");
-        sb.append("    teamId: ").append(toIndentedString(teamId)).append("\n");
-        sb.append("}");
-        return sb.toString();
-    }
-
-    /**
-     * Convert the given object to string with each line indented by 4 spaces
-     * (except the first line).
-     */
-    private String toIndentedString(Object o) {
-        if (o == null) {
-            return "null";
-        }
-        return o.toString().replace("\n", "\n    ");
+    @java.lang.Override
+    public java.lang.String toString() {
+        return new java.util.StringJoiner(", ", SharingParams.class.getSimpleName() + "[", "]")
+                .add("toShare=" + toShare)
+                .add("isExternal=" + isExternal)
+                .add("trustCircleIds=" + trustCircleIds)
+                .add("teamIds=" + teamIds)
+                .toString();
     }
 }
 

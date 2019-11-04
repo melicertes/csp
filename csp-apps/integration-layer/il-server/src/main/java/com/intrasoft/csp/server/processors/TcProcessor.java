@@ -93,58 +93,49 @@ public class TcProcessor implements Processor,CamelRoutes{
 
         boolean isFlow1 = originEndpoint.equals(routes.wrap(CamelRoutes.DCL))?true:false;
         boolean isFlow2 = originEndpoint.equals(routes.wrap(CamelRoutes.EDCL))?true:false;
-
+        LOG.debug("flow 1 = {}, flow 2 = {}", isFlow1, isFlow2);
         IntegrationData integrationData = exchange.getIn().getBody(IntegrationData.class);
         String httpMethod = (String) exchange.getIn().getHeader(Exchange.HTTP_METHOD);
 
 
         // SXCSP-185. tcId and teamId logic to be implemented - if both throw exception - Malformed 4xx
-        if (!StringUtils.isEmpty(integrationData.getSharingParams().getTcId())
-                && !StringUtils.isEmpty(integrationData.getSharingParams().getTeamId())) {
+        if ((integrationData.getSharingParams().getTeamIds() != null && integrationData.getSharingParams().getTeamIds().size() > 0) &&
+                (integrationData.getSharingParams().getTrustCircleIds() != null && integrationData.getSharingParams().getTrustCircleIds().size() >0)) {
             //DO NOT ACTIVATE GDELIVERY by throwing any exception, just log the error
             throw new InvalidSharingParamsException("Invalid sharing params provided: tcId and team were both provided. " +
                     "Only one or none should be provided. "+integrationData.getSharingParams().toString());
         }
 
         if(isFlow1) {
-            if (integrationData.getSharingParams().getTcId()!=null) {
+            if (integrationData.getSharingParams().getTrustCircleIds()!=null) {
+                LOG.debug("F1 tc Id {}", integrationData.getSharingParams().getTrustCircleIds());
                 //send by tcId provided - only in flow1
-                if(integrationData.getSharingParams().getTcId() instanceof List){
-                    List<String> list = (List<String>) integrationData.getSharingParams().getTcId();
-                    if(list.size()>0){
-                        for(String tcId:list) {
-                            if(!StringUtils.isEmpty(tcId)) {
-                                sendByTcId(tcId,localTcExists(tcId), exchange);
-                            }
+                List<String> list = (List<String>) integrationData.getSharingParams().getTrustCircleIds();
+                if(list.size()>0) {
+                    LOG.debug("F1 Sending to list {}", list);
+                    for (String tcId : list) {
+                        if (!StringUtils.isEmpty(tcId)) {
+                            LOG.debug("F1 sending to {}", tcId);
+                            sendByTcId(tcId, localTcExists(tcId), exchange);
                         }
                     }
-                }else if(integrationData.getSharingParams().getTcId() instanceof String){
-                    String tcId = (String) integrationData.getSharingParams().getTcId();
-                    if(!StringUtils.isEmpty(tcId)) {
-                        sendByTcId(tcId, localTcExists(tcId),exchange);
-                    }
                 }
-
-            } else if (integrationData.getSharingParams().getTeamId()!=null) {
+            } else if (integrationData.getSharingParams().getTeamIds()!=null) {
                 //send by teamId provided - only in flow1
-
-
-                if(integrationData.getSharingParams().getTeamId() instanceof List){
-                    List<String> list = (List<String>) integrationData.getSharingParams().getTeamId();
-                    if(list.size()>0){
-                        for(String teamId:list) {
-                            if(!StringUtils.isEmpty(teamId)) {
-                                sendByTeamId(teamId, exchange);
-                            }
+                LOG.debug("F1 TeamId found - {}", integrationData.getSharingParams().getTeamIds());
+                List<String> list = (List<String>) integrationData.getSharingParams().getTeamIds();
+                if (list.size() > 0) {
+                    LOG.debug("F1 list teamId: {}", integrationData.getSharingParams().getTeamIds());
+                    for (String teamId : list) {
+                        if (!StringUtils.isEmpty(teamId)) {
+                            LOG.debug("F1.1 sending to {}", teamId);
+                            sendByTeamId(teamId, exchange);
                         }
                     }
-                }else if(integrationData.getSharingParams().getTeamId() instanceof String){
-                    String teamId = (String) integrationData.getSharingParams().getTeamId();
-                    if(!StringUtils.isEmpty(teamId)) {
-                        sendByTeamId(teamId, exchange);
-                    }
                 }
+
             } else {
+                LOG.debug("F1 not teamId or tcId - sending by datatype {}", integrationData.getDataType());
                 //send by dataType
                 sendByDataType(integrationData, exchange, originEndpoint, httpMethod);
             }
@@ -212,12 +203,14 @@ public class TcProcessor implements Processor,CamelRoutes{
     }
 
     boolean tcExists(String uuid, boolean isLocal) throws IOException {
+        LOG.debug("tcExists: Checking if {} exists (isLocal={})", uuid, isLocal);
         String uri = (isLocal?this.getLocalCirclesURI():this.getTcCirclesURI()) + "/" + uuid;
         //handle "404 not found" properly
         List<Integer> doNotLogErrorOnTheseStatusCodes = new ArrayList<>();
         doNotLogErrorOnTheseStatusCodes.add(404);
         TrustCircle tc = camelRestService.send(uri, null,  HttpMethod.GET.name(),
                 TrustCircle.class,true, doNotLogErrorOnTheseStatusCodes);
+        LOG.debug("tcExists: {} result is {} (found {})", uuid, tc != null, tc);
         return tc != null;
     }
 
