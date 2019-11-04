@@ -51,18 +51,20 @@ public class EmitterAuditLogHandlerImpl implements EmitterAuditLogHandler {
         "action":"log"
     }
     */
-        LOG.debug(object.toString());
-        String msg;
-        if (object.get("Log").has("action") && object.get("Log").has("title") && object.get("Log").has("change") &&
-                object.get("Log").has("description") && object.get("Log").has("user_id") ){
-            msg = object.get("Log").get("action").textValue() + ":";
-            msg += object.get("Log").get("title").textValue() + ";";
-            msg += object.get("Log").get("change").textValue() + ";";
-            msg += object.get("Log").get("description").textValue() + ";";
-            msg += object.get("Log").get("user_id").textValue() + ";";
+        LOG.debug("writing received audit log {}", object.toString());
+        final JsonNode log = object.get("Log");
+        if (log.has("action") && log.has("title") && log.has("change") &&
+                log.has("description") && log.has("user_id") ){
+
+            String msg = String.format("%s:%s;%s;%s;%s;",
+                    log.get("action").textValue(),
+                    log.get("title").textValue(),
+                    log.get("change").textValue(),
+                    log.get("description").textValue(),
+                    log.get("user_id").textValue()
+                    );
             LOG.info(msg);
-        }
-        else {
+        } else {
             throw new RuntimeException("Unable to parse audit log from ZMQ");
         }
     }

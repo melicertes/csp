@@ -74,8 +74,8 @@ public class NotifierProcessor implements Processor {
                 copied.entrySet()
                     .stream()
                     .filter( e -> e.getValue().plus(retryFailedMinutes, ChronoUnit.MINUTES).isBefore(LocalDateTime.now()))
-                    .map( entry -> entry.getKey()).collect(Collectors.toSet()); // these are expired entries, we need to reprocess; use SET so we dont check the same multiple times
-            LOG.debug("Notifier - Now will retry the following CSP teams: {}", copied.size());
+                    .map(Map.Entry::getKey).collect(Collectors.toSet()); // these are expired entries, we need to reprocess; use SET so we dont check the same multiple times
+            LOG.debug("Notifier - Now will retry the following CSP teams: {} ({})", forProcessing, forProcessing.size());
             forProcessing.forEach( t -> {
                 LocalDateTime timeOfFailure = failedConnectivityTest.get(t); //get the last timeOfFailure
                 LOG.debug("Notifier - RETRY - CSP {} ({}) {}", t.getCspId(), t.getUrl(), t.getCountry());

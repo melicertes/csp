@@ -92,22 +92,20 @@ public class EmitterSubscriberImpl implements EmitterSubscriber, MispContextUrl{
                 boolean hasEvent = jsonNode.has("Event");
 
                 if (jsonNode.has("Event") && jsonNode.has("action") && jsonNode.get("action").textValue().equals("delete")){
-                    LOG.debug("Delete");
                     isDelete = true;
                 }
-                LOG.debug("Message received from queue. Topic: "  + topic);
-                String uuid;
-                Object getLocalEventResponseBody;
+
                 switch (topic){
                     case MISP_EVENT:
-                        uuid = jsonNode.get(EVENT.toString()).get("uuid").textValue();
+                        String uuid = jsonNode.get(EVENT.toString()).get("uuid").textValue();
+                        LOG.debug("Message received from queue [isDelete = {}]. Topic: {} Event: {} ", isDelete, topic, uuid);
 
                         try {
                             LOG.info("uuid {} -> Fetching local event based on the uuid of the published event.", uuid);
-                            getLocalEventResponseBody = mispAppClient.getMispEvent(uuid).getBody();
-                            jsonNode = new ObjectMapper().convertValue(getLocalEventResponseBody, JsonNode.class);
+                            Object fetchedBody = mispAppClient.getMispEvent(uuid).getBody();
+                            jsonNode = new ObjectMapper().convertValue(fetchedBody, JsonNode.class);
                         } catch (StatusCodeException e) {
-                            LOG.error("Event for uuid {} not found: {}", uuid,  e.getStatusCode() );
+                            LOG.error("Event for uuid {} not found: {} - will use original!", uuid,  e.getStatusCode() );
                         }
 
                         emitterDataHandler.handleMispData(jsonNode, MispEntity.EVENT, false, isDelete);
