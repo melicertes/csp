@@ -30,16 +30,15 @@ RUN set -ex \
 # if this is called "PIP_VERSION", pip explodes with "ValueError: invalid truth value '<VERSION>'"
 ENV PYTHON_PIP_VERSION 9.0.1
 COPY config/* /tmp/
+COPY get-pip.py /tmp/
 RUN apk add --no-cache py-psycopg2 postgresql-client gcc postgresql-dev linux-headers
 RUN set -ex; \
 	\
 	apk add --no-cache --virtual .fetch-deps openssl; \
 	\
-	wget -O get-pip.py "http://central.preprod.melicertes.eu/repo-loads/python27/get-pip.py"; \
-	\
 	apk del .fetch-deps; \
 	\
-	python get-pip.py \
+	python /tmp/get-pip.py \
 		--disable-pip-version-check \
 		--no-cache-dir \
 		"pip==$PYTHON_PIP_VERSION" \
