@@ -3,6 +3,7 @@ package com.intrasoft.csp.misp.service.impl;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.intrasoft.csp.libraries.restclient.exceptions.StatusCodeException;
 import com.intrasoft.csp.misp.client.MispAppClient;
 import com.intrasoft.csp.misp.commons.config.MispContextUrl;
 import com.intrasoft.csp.misp.service.EmitterAuditLogHandler;
@@ -95,54 +96,38 @@ public class EmitterSubscriberImpl implements EmitterSubscriber, MispContextUrl{
                     isDelete = true;
                 }
                 LOG.debug("Message received from queue. Topic: "  + topic);
+                String uuid;
+                Object getLocalEventResponseBody;
                 switch (topic){
                     case MISP_EVENT:
+                        uuid = jsonNode.get(EVENT.toString()).get("uuid").textValue();
+
+                        try {
+                            LOG.info("uuid {} -> Fetching local event based on the uuid of the published event.", uuid);
+                            getLocalEventResponseBody = mispAppClient.getMispEvent(uuid).getBody();
+                            jsonNode = new ObjectMapper().convertValue(getLocalEventResponseBody, JsonNode.class);
+                        } catch (StatusCodeException e) {
+                            LOG.error("Event for uuid {} not found: {}", uuid,  e.getStatusCode() );
+                        }
+
                         emitterDataHandler.handleMispData(jsonNode, MispEntity.EVENT, false, isDelete);
                         break;
-                    /*case MISP_JSON_ATTRIBUTE:
-                        if (jsonNode.has("Event") && jsonNode.has("action")){
-                            String uuid = jsonNode.get(EVENT.toString()).get("uuid").textValue();
-
-                            if (jsonNode.get("action").textValue().equals("add") && addedAttributes.contains(uuid)){
-                                addedAttributes.remove(uuid);
-                                break;
-                            }
-
-                            try {
-                                Object object = mispAppClient.getMispEvent(uuid).getBody();
-                                jsonNode = new ObjectMapper().convertValue(object, JsonNode.class);
-                            }
-                            catch (Exception e){
-                                LOG.error("Could not fetch event, probably deleted");
-                            }
-                        }
-                        emitterDataHandler.handleMispData(jsonNode, MispEntity.EVENT, false, isDelete);
-                        break;*/
                     case MISP_JSON_EVENT:
-                        if (jsonNode.has("Event") && jsonNode.has("action") && isDelete){
-                            /*String uuid = jsonNode.get(EVENT.toString()).get("uuid").textValue();
+                        /*if (jsonNode.has("Event") && jsonNode.has("action")){
 
-                            if (jsonNode.get("action").textValue().equals("add")){
-                                ReadContext ctx = JsonPath.using(configuration).parse(jsonNode);
-                                // Edit Existing Attribute Proposals
-                                List<String> attributes = ctx.read("$.Event.Attribute[*].uuid", List.class);
-
-                                // Edit Existing Object Proposals
-                                List<String> objectAttributes = ctx.read("$.Event.Object[*].Attribute[*].uuid", List.class);
-
-                                addedAttributes.addAll(attributes);
-                                addedAttributes.addAll(objectAttributes);
-                            }
+                            uuid = jsonNode.get(EVENT.toString()).get("uuid").textValue();
 
                             try {
-                                Object object = mispAppClient.getMispEvent(uuid).getBody();
-                                jsonNode = new ObjectMapper().convertValue(object, JsonNode.class);
+                                LOG.info("uuid {} -> Fetching local event based on the uuid of the published event.", uuid);
+                                getLocalEventResponseBody = mispAppClient.getMispEvent(uuid).getBody();
+                                jsonNode = new ObjectMapper().convertValue(getLocalEventResponseBody, JsonNode.class);
+                            } catch (StatusCodeException e) {
+                                LOG.error("Event for uuid {} not found: {}", uuid,  e.getStatusCode() );
                             }
-                            catch (Exception e){
-                                LOG.error("Could not fetch event, probably deleted");
-                            }*/
+
                             emitterDataHandler.handleMispData(jsonNode, MispEntity.EVENT, false, isDelete);
-                        }
+
+                        }*/
 
                         break;
                     case MISP_AUDIT:
