@@ -1,6 +1,6 @@
 FROM csp-alpine35glibc:1.0
 
-MAINTAINER tku
+MAINTAINER tku,msg
 
 # version of RT set to new one 4.4.4
 ENV RT_VERSION=4.4.4
