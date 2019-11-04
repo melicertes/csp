@@ -65,7 +65,7 @@ public class EmitterAuditLogHandlerImpl implements EmitterAuditLogHandler {
                     );
             LOG.info(msg);
         } else {
-            throw new RuntimeException("Unable to parse audit log from ZMQ");
+            throw new RuntimeException("Unable to parse audit log from ZMQ event : " + log.toString());
         }
     }
 }
