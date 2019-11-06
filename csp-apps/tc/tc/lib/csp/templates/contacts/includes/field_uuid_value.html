@@ -1,0 +1,4 @@
+<div class="form-group">{% load contacts_helper %}
+    <label>{{ label }}</label>
+    {% if not value %}--{% else %}{{ value|uuid_resolve|join:"; " }}{% endif %}
+</div>
