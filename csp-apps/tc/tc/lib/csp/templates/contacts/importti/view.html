@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %} | Import TI{% endblock %}
+
+{% block secondary-nav %}
+<div class="navbar navbar-default navbar-static-top">
+    <div class="container">
+        {% include "contacts/includes/contacts_tabs.html" %}
+    </div>
+    <div class="container">
+        <h1 class="page-header"><i class="fa fa-globe"></i> Import Trusted Introducer Data</h1>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block content %}
+{% if import_ok %}
+<p>JSON file updated.  <span class="text-success">{{ import_stats.success }}</span> incoming changes differ from last cached file.{% if import_stats.fail %} Could not import <span class="text-danger">{{ import_stats.fail }}</span> changes for teams: {{ import_stats.failed_teamnames }}.{% endif %}
+{% endif %}
+<p>TI JSON last cached: {% if ti_json_type %}{{ ti_json_timestamp }} from {% if ti_json_type == 'public' %}public TI{% elif ti_json_type == 'auth' %}non-public TI{% elif ti_json_type == 'upload' %}user-provided data{% else %}{{ ti_json_type }}{% endif %}<a href="#" id='btn-delete'> [Clear cache]</a>{% else %} Empty{% endif %}</p><br>
+<form id="importform" class="form-horizontal" method="post" role="form">
+    {% csrf_token %}
+    <input id="content" type="hidden" name="content">
+
+    <label for="source">Fetch from contacts repository: <span id="status" class="text-danger">{{ errormsg }}</span></label>
+    <select name="source" class="form-control select2" id="source" aria-hidden="true" tags="true">
+        <option selected value="auth">Closed-access TI</option>
+        <option value="public">Public TI</option>
+    </select>
+    <div style="margin-top:10px" class="form-group">
+        <div class="col-sm-12 controls">
+            <button type="button" id="btn-import" class="btn btn-success">Import</button>
+        </div>
+    </div>
+</form>
+{% endblock %}
+{% block javascriptcontent %}
+    <script>
+        function do_import() {
+            var url = $('#source').val();
+            if (url == 'public') {
+                url = 'https://www.trusted-introducer.org/directory/teams.json'; 
+            } else if (url == 'auth') {
+                url = 'https://tiw.trusted-introducer.org/directory/teams.json'; // http://localhost:8001/directory/teams.json
+            }
+
+            $('#status').html('Fetching...').removeClass('text-danger').addClass('text-success');
+            $.get(url, function(data, foo) {
+                // success
+                console.dir(data);
+                console.dir($('#content').val());
+                $('#content').val(JSON.stringify(data));
+                $('#importform').submit();
+            }).fail(function () {
+                $('#status').html('Problems while fetching the resource from the server.').removeClass('text-success').addClass('text-danger');;
+            })
+        }
+        function do_delete() {
+            $.post({
+                url : "{% url 'importti' %}",
+                type: "POST",
+                data : {csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value, 'delete': true},
+                dataType : "json",
+            });
+
+            // clear POST, reloading page.  split("#") workarounds some browsers caching.
+            window.location = window.location.href.split("#")[0];
+            // location.reload();
+        }
+        $(document).ready(function () {
+            $('.select2').select2({tags: true});
+            $('#btn-import').click(do_import);
+            $('#btn-delete').click(do_delete);
+        });
+    </script>
+{% endblock %}
