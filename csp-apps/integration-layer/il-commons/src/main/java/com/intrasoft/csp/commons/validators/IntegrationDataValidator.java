@@ -55,7 +55,9 @@ public class IntegrationDataValidator implements Validator {
             if (hmac != null) {
                 if (!computed.contentEquals(hmac)) {
                     LOG.error("signature does not match - computed {}, in object {}", computed, hmac);
-                    errors.reject("IntegrationData.hmac not valid.");
+                    if (System.getProperty("il.security.strict.hmac.validation","false").equalsIgnoreCase("true")) {
+                        errors.reject("IntegrationData.hmac not valid.");
+                    }
                 }
             } else {
                 LOG.error("signature cannot be computed - object hmac is null -> {}", obj);
