@@ -273,7 +273,7 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler {
                             }
                         } catch (NumberFormatException e){
                             LOG.error("uuid {} Could not parse distribution {}, setting default distribution 0: {}", uuid, locatedNode, e.getMessage());
-                            ((ObjectNode) jsonNode).findParent("distribution").put("distribution", String.valueOf(0));
+//                            ((ObjectNode) jsonNode).findParent("distribution").put("distribution", String.valueOf(0));
                         }
 
 
