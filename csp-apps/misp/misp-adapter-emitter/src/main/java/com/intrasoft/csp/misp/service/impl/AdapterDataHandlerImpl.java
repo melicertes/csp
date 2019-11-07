@@ -265,10 +265,17 @@ public class AdapterDataHandlerImpl implements AdapterDataHandler {
                     try {
                         // SXCSP-503: Change Distribution to one lower state (2 -> 1, 1 -> 0)
                         JsonNode locatedNode = jsonNode.path(MispContextUrl.MispEntity.EVENT.toString()).path("distribution");
-                        final int eventDistributionLevel =  Integer.parseInt(locatedNode.textValue());;
-                        if (eventDistributionLevel == 2 || eventDistributionLevel == 1) {
-                            ((ObjectNode) jsonNode).findParent("distribution").put("distribution", String.valueOf(eventDistributionLevel - 1));
+
+                        try {
+                            final int eventDistributionLevel =  Objects.nonNull(locatedNode) ? Integer.parseInt(locatedNode.textValue()) : 0;
+                            if (eventDistributionLevel == 2 || eventDistributionLevel == 1) {
+                                ((ObjectNode) jsonNode).findParent("distribution").put("distribution", String.valueOf(eventDistributionLevel - 1));
+                            }
+                        } catch (NumberFormatException e){
+                            LOG.error("uuid {} Could not parse distribution {}, setting default distribution 0: {}", uuid, locatedNode, e.getMessage());
+                            ((ObjectNode) jsonNode).findParent("distribution").put("distribution", String.valueOf(0));
                         }
+
 
                         ResponseEntity<String> responseEntity = mispAppClient.addMispEvent(jsonNode.toString());
                         responseJsonNode = mapper.readValue(responseEntity.getBody(), JsonNode.class);
