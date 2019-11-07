@@ -1,5 +1,6 @@
 Architecture/.metadata/
-
+deployment/docker/applications/trustcircles/tc
+*.bz2
 
 #### Spring Boot ####
 .gradle
@@ -114,5 +115,5 @@ crashlytics-build.properties
 fabric.properties
 /csp-apps/rt/rt-adapter-emitter/testenv
 
-image.tar.bz2
+*tar.bz2
 

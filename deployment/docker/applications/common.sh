@@ -11,7 +11,12 @@ function prepareModule() {
      echo "manifest not found, creating a dummy 1.1"
      echo '{"format":1.1}' > manifest.json
   fi
-
+  if [ -f "build.sh" ] ;
+  then
+     echo "Building image...."
+     chmod +x ./build.sh
+     sh ./build.sh
+  fi
   if [ -f "saveImage.sh" ] ;
   then
      chmod +x ./saveImage.sh

@@ -3,7 +3,8 @@
 echo "Save all CSP images (base images) to tar for packaging"
 
 
-
+docker pull mariadb 
+docker pull node:8.16.0-alpine
 declare -a arr=( mariadb node:8.16.0-alpine csp-alpine35glibc csp-java8 csp-docker-java8 csp-apache csp-postgres csp-python27 csp-tomcat8 ) ## now loop through the above array
 for i in "${arr[@]}"
 do

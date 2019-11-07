@@ -27,7 +27,8 @@ RUN sed -i "s/memory_limit = 128M/memory_limit = 512M/" /etc/php/7.2/apache2/php
 RUN sed -i "s/upload_max_filesize = 2M/upload_max_filesize = 50M/" /etc/php/7.2/apache2/php.ini
 RUN sed -i "s/post_max_size = 8M/post_max_size = 50M/" /etc/php/7.2/apache2/php.ini
 
-RUN apt-get install -y python-dev python-pip libxml2-dev libxslt1-dev zlib1g-dev python-setuptools cron logrotate supervisor syslog-ng-core && apt-get clean
+RUN apt-get install -y python-dev python-pip libxml2-dev libxslt1-dev zlib1g-dev cron logrotate supervisor syslog-ng-core && apt-get clean \
+  && pip install -U pip setuptools
 
 WORKDIR /var/www
 RUN chown www-data:www-data /var/www
