@@ -130,7 +130,7 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler {
 		sharingParams.setIsExternal(false);
 
 		String sharing = incident.getSharing();
-		// LOG.debug("setToShare:" + sharing);
+		 LOG.debug("setToShare:" + sharing);
 
 		if (sharing.equalsIgnoreCase(CfSharing.DEFAULT_SHARING.toString())
 				|| sharing.toLowerCase().contains(CfSharing.DEFAULT_SHARING.toString().toLowerCase())) {
@@ -163,11 +163,16 @@ public class EmitterDataHandlerImpl implements EmitterDataHandler {
 			}
 
 			if (tcsandTeams != null && tcsandTeams.size() > 0) {
+				LOG.debug("tcsandTeams: {}", tcsandTeams.toString());
 				try {
 					// UAT FIX 4.4.2018 tcsIdlist = tcClient.getAllLocalTrustCircles().stream()
 					tcsIdlist = tcClient.getAllTrustCircles().stream()
 							.filter(tc -> tcsandTeams.contains(tc.getShortName())).map(TrustCircle::getId)
 							.collect(Collectors.toList());
+
+					tcsIdlist.addAll(tcClient.getAllLocalTrustCircles().stream()
+							.filter(tc -> tcsandTeams.contains(tc.getShortName())).map(TrustCircle::getId)
+							.collect(Collectors.toList()));
 				} catch (Exception e) {
 					LOG.error("getAllTrustCircle from TC failed with: ", e);
 					tcsIdlist = null;

@@ -224,6 +224,7 @@ public class Ticket {
 		String sharing = "";
 		String sp = null;
 		sp = getCustomField(IncidentCustomFields.CF_SHARING_POLICY);
+		LOG.trace("getCustomField(IncidentCustomFields.CF_SHARING_POLICY): {}", getCustomField(IncidentCustomFields.CF_SHARING_POLICY));
 		if (sp.isEmpty() || sp.equalsIgnoreCase(CfSharing.NO_SHARING.toString())) {
 			LOG.debug("CustomField Sharing policy:NO_SHARING:" + sp);
 			sharing = CfSharing.NO_SHARING.toString();
