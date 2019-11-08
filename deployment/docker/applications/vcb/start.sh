@@ -36,6 +36,9 @@ for VARIABLE in "LOCAL_ADDRESS" "LOCAL_IP"; do
 done
 fi
 
+# need to make sure that log dir has proper permissions
+chmod 777 /var/log/jitsi
+
 # TODO: improve process management
 /etc/init.d/prosody restart
 /etc/init.d/jicofo restart
