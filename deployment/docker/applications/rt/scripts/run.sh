@@ -60,7 +60,7 @@ else
                 --dba ${POSTGRES_USER} \
                 --dba-password ${POSTGRES_PASSWORD} \
                 --package RT::IR \
-                --ext-version 4.0.0
+                --ext-version 4.0.1
 	echo "[i] Initializing some CSP additional data"
 	cd /tmp/rt-$RT_VERSION
 	perl sbin/rt-setup-database \
