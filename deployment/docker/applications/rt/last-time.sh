@@ -1,7 +1,7 @@
 #!/bin/sh
 
 echo "[i] cleaning the rt-database stored on postgresql"
-docker-compose run --rm --entrypoint /scripts/cleandb.sh csp-rt
+docker-compose run --rm --entrypoint /scripts/cleandb.sh rt
 
 echo "[i] deleteing rt common files stored on /opt/csp/rt"
 echo "y" | rm -f /opt/csp/rt/*
