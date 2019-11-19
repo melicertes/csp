@@ -67,7 +67,7 @@ else
 		--action insert \
 		--datafile /opt/rt4/etc/additional-initialdata.csp \
 		--dba ${POSTGRES_USER} \
-                --dba-password ${POSTGRES_PASSWORD}
+        --dba-password ${POSTGRES_PASSWORD}
 
 	touch /scripts/rt/db.initialized
 	#rm -rf /tmp/rt-$RT_VERSION 
