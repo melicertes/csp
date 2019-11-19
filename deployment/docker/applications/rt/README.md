@@ -3,6 +3,9 @@
 # -----------------------------------------------------------
 # Released on: 2017-11-22
 # -----------------------------------------------------------
+# -----------------------------------------------------------
+# Updated on: 2019-11-19
+# -----------------------------------------------------------
 
 * Short description
 - Perl
@@ -77,7 +80,7 @@ means drop and init) execute the following steps:
 
 1. Shutdown the csp-rt container (otherwise there is still active connection 
 to the database).
-2. docker-compose run --rm --entrypoint /scripts/reinitdb.sh csp-rt
+2. docker-compose run --rm --entrypoint /scripts/reinitdb.sh rt
 3. docker-compose start; docker-compose logs -f
 
 # -----------------------------------------------------------
