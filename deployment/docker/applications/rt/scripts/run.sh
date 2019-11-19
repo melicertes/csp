@@ -55,8 +55,8 @@ else
 	cd /tmp/RT-IR-${RT_IR_VERSION}
         perl -Ilib -I/opt/rt4/local/lib -I/opt/rt4/lib /opt/rt4/sbin/rt-setup-database \
                 --action insert \
-		--datadir etc \
-                --datafile etc/initialdata \
+                --datadir /tmp/RT-IR-${RT_IR_VERSION}/etc \
+                --datafile /tmp/RT-IR-${RT_IR_VERSION}/etc/initialdata \
                 --dba ${POSTGRES_USER} \
                 --dba-password ${POSTGRES_PASSWORD} \
                 --package RT::IR \
