@@ -4,7 +4,7 @@ MAINTAINER tku,msg
 
 # version of RT set to new one 4.4.4
 ENV RT_VERSION=4.4.4
-# version of RT::IR extension
+# version of RT::IR extension set to new one 4.0.1
 ENV RT_IR_VERSION=4.0.1
 # address of the RT host
 ENV RT_HOSTNAME=csp-rt
