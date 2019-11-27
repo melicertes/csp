@@ -2,7 +2,7 @@
 
 echo "[i] reset the configuration of the RT, do not touch the data stored in DB"
 
-docker-compose run --rm --entrypoint /scripts/uninit-rt.sh csp-rt
+docker-compose run --rm --entrypoint /scripts/uninit-rt.sh rt
 
 echo "[i] deleting the container csp-rt"
 
