@@ -6,7 +6,7 @@ MAINTAINER msg
 
 
 ENV IMQ_VERSION=2.1.0
-ENV IMQMGR_VERSION=2.1.0
+ENV IMQMGR_VERSION=2.1.1
 
 RUN apt-get clean &&  apt-get update &&  apt-get -y upgrade && \
 #RUN apt-get update &&   \
@@ -22,7 +22,7 @@ RUN apt-get clean &&  apt-get update &&  apt-get -y upgrade && \
 RUN git clone https://github.com/certtools/intelmq.git /opt/dev_intelmq
 WORKDIR /opt/dev_intelmq
 RUN git fetch
-RUN git checkout tags/$IMQ_VERSION -b $IMQ_VERSION
+RUN git checkout $IMQ_VERSION
 
 
 ADD test-data /tmp/test-data
@@ -50,7 +50,7 @@ COPY ./csp-config/pipeline.conf /opt/intelmq/etc/
 RUN git clone https://github.com/certtools/intelmq-manager.git /tmp/intelmq-manager
 WORKDIR /tmp/intelmq-manager
 RUN git fetch
-RUN git checkout -b $IMQMGR_VERSION
+RUN git checkout $IMQMGR_VERSION
 
 
 RUN cp -R /tmp/intelmq-manager/intelmq-manager/* /var/www/html/ && \
