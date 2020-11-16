@@ -40,6 +40,8 @@ RUN pip3 install . && \
  cp -R /opt/dev_intelmq/intelmq/etc /opt/intelmq/ && \
  cp -R /opt/dev_intelmq/intelmq/bots/BOTS /opt/intelmq/etc/ && \
  chown -R intelmq:intelmq /opt/intelmq
+RUN pip3 install dnspython==1.16.0
+RUN pip3 install python_dateutil==2.8.1
 
 #COPY ./csp-config/*.conf /opt/intelmq/etc/
 COPY ./csp-config/runtime.conf /opt/intelmq/etc/
