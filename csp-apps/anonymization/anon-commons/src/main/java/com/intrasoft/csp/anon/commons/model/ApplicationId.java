@@ -5,7 +5,7 @@ public enum ApplicationId {
     RT("rt"),
     INTELMQ("intelmq"),
     VIPER("viper"),
-    TRUESTCIRCLE("trustcircle");
+    TRUSTCIRCLE("trustcircle");
 
     private String applicationId;
 
