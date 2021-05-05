@@ -2,7 +2,7 @@
 
 
 CRL_DATE_FORMAT=${CRL_DATE_FORMAT:-'%Y-%m-%dT%H:%M:%SZ'}
-CRL_URL=${CRL_URL:-'https://pki.dfn-cert.de/melicertes-ca/pub/crl/cacrl.crl'}
+CRL_URL=${CRL_URL:-'https://www.sk-cert.sk/pki/melicertes-ca/pub/crl/cacrl.crl'}
 CRL_INTERVAL=${CRL_INTERVAL:-'600'}
 
 log() {
@@ -25,8 +25,8 @@ cp /internalCerts/root.crl.pem /etc/apache2/ssl/crl/
 while true; do
 
     log "Downloading CRL from ${CRL_URL}"
-    wget -O /tmp/cacrl.crl ${CRL_URL}
-    md5new=$(md5sum /tmp/cacrl.crl)
+    wget -O /tmp/cacrl.pem ${CRL_URL}
+    md5new=$(md5sum /tmp/cacrl.pem)
     md5Old=$(cat /tmp/cacrl.md5sum)
 
     if [ "$md5new" == "$md5Old" ]; then
@@ -34,8 +34,7 @@ while true; do
     else
         log "New CRL list received."
         rm /etc/apache2/ssl/crl/*
-        md5sum /tmp/cacrl.crl > /tmp/cacrl.md5sum
-        openssl crl -inform DER -in /tmp/cacrl.crl -outform PEM -out /tmp/cacrl.pem
+        md5sum /tmp/cacrl.pem > /tmp/cacrl.md5sum
         cp /tmp/cacrl.pem /etc/apache2/ssl/crl/
         cp /internalCerts/root.crl.pem /etc/apache2/ssl/crl/
         c_rehash /etc/apache2/ssl/crl/
