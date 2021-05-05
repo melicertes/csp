@@ -7,7 +7,7 @@ services:
         hostname: csp-apache-crl
         working_dir: /etc/apache2/ssl
         environment:
-         - CRL_URL=https://pki.dfn-cert.de/melicertes-ca/pub/crl/cacrl.crl
+         - CRL_URL=https://www.sk-cert.sk/pki/melicertes-ca/pub/crl/cacrl.crl
         volumes:
             - /var/run/docker.sock:/var/run/docker.sock
             - SSLDatavolume:/etc/apache2/ssl

@@ -19,6 +19,7 @@
           SSLCertificateKeyFile {{ internalSSLCertificateKeyFile }}
           {% if service.mutual_ssl.internal == true-%}
           SSLVerifyClient require
+          SSLCARevocationCheck none
           SSLVerifyDepth 1
           {% if internalSSLCACertificateFile is defined %}
           SSLCACertificateFile {{ internalSSLCACertificateFile }}
