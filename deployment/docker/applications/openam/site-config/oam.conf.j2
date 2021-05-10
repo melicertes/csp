@@ -10,6 +10,7 @@
     {% if (  service.internal_name) -%}
     #        Internal
     #--------------------------------------------------------#
+    LoadModule rewrite_module modules/mod_rewrite.so
     <VirtualHost *:443>
 
           ServerName {{ service.internal_name }}.local.{{ csp_name }}.{{ domain }}
@@ -40,6 +41,14 @@
 
           ServerName {{ service.external_name }}.{{ csp_name }}.{{ domain }}
           Alias /static/ /opt/tc/var/static/
+
+          <IfModule mod_rewrite.c>
+            RewriteEngine on
+            RewriteCond %{QUERY_STRING} ^.*(\=\/\/).* [NC,OR]
+            RewriteCond %{QUERY_STRING} ^.*(\=%2F%2F).* [NC]
+            RewriteRule ^(.*)$ - [F,L]
+          </IfModule>
+
           {% for path in service.skip_reverse_proxy_paths -%}
           ProxyPass {{ path }} !
           {% endfor %}
