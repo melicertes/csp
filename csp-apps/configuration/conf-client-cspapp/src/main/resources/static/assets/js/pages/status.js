@@ -60,7 +60,7 @@ function ajaxd_status() {
                 var h = '<div>' +
                     timestamp +
                     '<span id="row'+i+'" class="label label-'+label+'">'+type+'</span>&nbsp;'
-                    + message +
+                    + jsEscape(message) +
                     '</div>';
                 $('div.error-log > div').append(h);
             });

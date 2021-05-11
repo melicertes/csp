@@ -45,13 +45,16 @@ $(document).ready(function() {
                 required: true
             },
             csp_name: {
-                required: true
+                required: true,
+                pattern: "[\-_a-zA-Z0-9 ]+"
             },
             csp_domain_name: {
-                required: true
+                required: true,
+                pattern: "(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z0-9][a-z0-9-]{0,61}[a-z0-9]"
             },
             "csp_contact_name[]": {
                 required: true,
+                pattern: "[\-_a-zA-Z0-9 ]+",
                 require_from_group: [$(".csp_contact_name").length, ".csp_contact_name"]
             },
             "csp_contact_email[]": {
@@ -64,10 +67,12 @@ $(document).ready(function() {
                 require_from_group: [$(".csp_contact_type").length, ".csp_contact_type"]
             },
             "csp_internal_ip[]": {
-                required: true
+                required: true,
+                ipv4: true
             },
             "csp_external_ip[]": {
-                required: true
+                required: true,
+                ipv4: true
             }
         }
     });
