@@ -11,7 +11,7 @@ RUN apk add --no-cache --virtual=build-dependencies wget ca-certificates unzip &
 
 RUN apk add --no-cache bash drill wget ca-certificates libressl python py2-pip py-jinja2 git curl py-pip python-dev libffi-dev openssl-dev gcc  libc-dev  make \
    && pip install --upgrade pip \
-   && pip install j2cli[yaml] && update-ca-certificates
+   && pip install j2cli[yaml] cryptography==2.8 && update-ca-certificates
 RUN pip install docker-compose
 
 
