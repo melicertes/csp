@@ -31,8 +31,21 @@ mvn clean install -DskipTests
 ```
 
 This will, given the required software above, complete with a "SUCCESS" message after 3-5 minutes.
-The modules created are found by the following command: `find . -name "*exec.java" ` when executed from 
+The modules created are found by the following command: `find . -name "*exec.jar" ` when executed from
 the /csp-apps directory.
+
+```bash
+csp-apps $ find . -name "*exec.jar"
+./integration-layer/il-server/target/il-server-4.3.1-SNAPSHOT-exec.jar
+./anonymization/anon-server/target/anon-server-4.3.1-SNAPSHOT-exec.jar
+./intelmq/intelmq-emitter/target/intelmq-emitter-4.3.1-SNAPSHOT-exec.jar
+./regular-reports/regrep-app/target/regrep-app-4.3.1-SNAPSHOT-exec.jar
+./configuration/conf-server/target/conf-server-4.3.1-SNAPSHOT-exec.jar
+./rt/rt-adapter-emitter/target/rt-emitter-adapter-4.3.1-SNAPSHOT-exec.jar
+./misp/misp-adapter-emitter/target/misp-adapter-emitter-4.3.1-SNAPSHOT-exec.jar
+./vcbridge/vcb-admin/target/vcb-admin-4.3.1-SNAPSHOT-exec.jar
+./vcbridge/vcb-teleconf/target/vcb-teleconf-4.3.1-SNAPSHOT-exec.jar
+```
 
 ### Compiling the base images
 Going into the /deployment/docker directory, a couple of scripts exist. Use the script `01.build-base-module.sh`
@@ -41,7 +54,7 @@ the base module. Keep the base module for later use.
 
 ### Compiling the application modules
 Some of the application modules _require_ an adapter/emitter. To find which ones, execute the following
-command: `find . -name "docker-compose.yml" -exec fgrep -H \.jar {} \+ |grep -v command`
+command (from the `deployment/docker/applications` dir): `find . -name "docker-compose.yml" -exec fgrep -H \.jar {} \+ |grep -v command`
 The produced list (see example below) shows directories and modules that require the respective target files:
 ```shell script
 # find . -name "docker-compose.yml" -exec fgrep -H \.jar {} \+ |grep -v command
@@ -58,6 +71,13 @@ The produced list (see example below) shows directories and modules that require
 In essence, the "left side" before the separator `:` is the expected "exec.jar" file. You need to 
 produce/replace existing exec.jar file with the one produced in the step that compiles the code
 (Compiling the CSP adapter emitters).
+
+example: replacement/emplacement of newly create **jar** file:
+```bash
+csp $ cd deployment/docker/applications
+applications $ cp ../../../csp-apps/integration-layer/il-server/target/il-server-4.3.1-SNAPSHOT-exec.jar ./integrationlayer/il-server-4.0.7-SNAPSHOT-exec.jar
+```
+according the example stdouts from above (`Compiling the CSP adapter emitters` and `Compiling the application modules`)
 
 When all replacements are made, the script `makeModules.sh` should be executed. This will build all modules.
 The script should be executed from the directory /deployment/docker/applications. It should take more than 1
@@ -83,4 +103,3 @@ the previous step). The document contains the necessary steps; the gist of it is
 and a PKI Service exists (so certificates can be created for all services), the next steps are to configure modules
 and start the CSP registrations process. A DNS service is also required to provide for naming for all services, as
 they are exposed as CNAMEs on the base name of the CSP installation. 
- 

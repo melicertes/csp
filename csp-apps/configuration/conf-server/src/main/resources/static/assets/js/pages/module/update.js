@@ -34,7 +34,8 @@ $(document).ready(function() {
     form.validate({
         rules: {
             module_short_name: {
-                required: true
+                required: true,
+                pattern: "[\-_a-zA-Z0-9 ]+"
             },
             module_start_priority: {
                 required: true

@@ -17,7 +17,7 @@ $(document).ready(function() {
         BootstrapDialog.confirm({
             title: 'Confirmation',
             size: BootstrapDialog.SIZE_NORMAL,
-            message: 'Are you sure to delete CSP: <strong>' + cspId + '</strong> and its related information?',
+            message: 'Are you sure to delete CSP: <strong>' + jsEscape(cspId) + '</strong> and its related information?',
             type: BootstrapDialog.TYPE_WARNING,
             closable: false,
             draggable: true,
@@ -31,7 +31,7 @@ $(document).ready(function() {
                     BootstrapDialog.confirm({
                         title: 'Confirmation',
                         size: BootstrapDialog.SIZE_NORMAL,
-                        message: 'Are you sure to delete CSP: <strong>' + cspId + '</strong> and its related information?<br><br>Last report of CSP was on: <strong>' + cspLastReport + '</strong><br><br>A second confirmation is required!',
+                        message: 'Are you sure to delete CSP: <strong>' + jsEscape(cspId) + '</strong> and its related information?<br><br>Last report of CSP was on: <strong>' + jsEscape(cspLastReport) + '</strong><br><br>A second confirmation is required!',
                         type: BootstrapDialog.TYPE_DANGER,
                         closable: false,
                         draggable: true,

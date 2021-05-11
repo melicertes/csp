@@ -20,7 +20,7 @@ $(document).ready(function(){
         BootstrapDialog.confirm({
             title: 'Confirmation',
             size: BootstrapDialog.SIZE_NORMAL,
-            message: 'Are you sure to delete Module Version: <strong>' + moduleVersionName + '</strong> and its related information?',
+            message: 'Are you sure to delete Module Version: <strong>' + jsEscape(moduleVersionName) + '</strong> and its related information?',
             type: BootstrapDialog.TYPE_WARNING,
             closable: false,
             draggable: true,
