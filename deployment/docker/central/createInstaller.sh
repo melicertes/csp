@@ -1,5 +1,5 @@
 #!/bin/bash
-VER="4.0.7-SNAPSHOT"
+VER="4.3.1-SNAPSHOT"
 echo "Creating installer for version is $VER - you should have compiled csp-apps completely before executing this!"
 TARGET=installable
 SERVER=../../../csp-apps/configuration/conf-server/target/conf-server-$VER-exec.jar
